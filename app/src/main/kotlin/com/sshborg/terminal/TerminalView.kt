@@ -93,15 +93,13 @@ class TerminalView @JvmOverloads constructor(
      * e bisogna esplicitamente scalzarla con restartInput().
      */
     private fun reattachIme() {
-        val focused = requestFocus()
-        android.util.Log.e("SSHBorg", "reattachIme: requestFocus=$focused hasFocus=${hasFocus()}")
+        requestFocus()
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE)
                 as android.view.inputmethod.InputMethodManager
         imm.restartInput(this)
         androidx.core.view.ViewCompat.getWindowInsetsController(this)
             ?.show(androidx.core.view.WindowInsetsCompat.Type.ime())
-        val shown = imm.showSoftInput(this, android.view.inputmethod.InputMethodManager.SHOW_FORCED)
-        android.util.Log.e("SSHBorg", "reattachIme: showSoftInput=$shown")
+        imm.showSoftInput(this, android.view.inputmethod.InputMethodManager.SHOW_FORCED)
     }
 
     private fun updateMetrics() {
@@ -237,7 +235,6 @@ class TerminalView @JvmOverloads constructor(
     override fun onCheckIsTextEditor() = true
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection {
-        android.util.Log.e("SSHBorg", "onCreateInputConnection called — IME si connette a TerminalView")
         outAttrs.inputType = InputType.TYPE_NULL
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN
         return TerminalInputConnection(this)
@@ -327,17 +324,14 @@ class TerminalView @JvmOverloads constructor(
     /** Handles soft keyboard input. */
     private inner class TerminalInputConnection(view: View) : BaseInputConnection(view, false) {
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
-            android.util.Log.e("SSHBorg", "commitText: '$text' onInput=${onInput != null}")
             text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
             return true
         }
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            android.util.Log.e("SSHBorg", "deleteSurroundingText: before=$beforeLength")
             if (beforeLength > 0) onInput?.invoke(byteArrayOf(0x7F))
             return true
         }
         override fun sendKeyEvent(event: KeyEvent): Boolean {
-            android.util.Log.e("SSHBorg", "sendKeyEvent: keyCode=${event.keyCode} action=${event.action}")
             if (event.action == KeyEvent.ACTION_DOWN) {
                 val bytes = keyEventToBytes(event.keyCode, event)
                 if (bytes != null) { onInput?.invoke(bytes); return true }

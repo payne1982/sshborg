@@ -50,10 +50,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
     fun connect(hostId: Long, columns: Int = 80, rows: Int = 24) {
         // Prevent multiple concurrent connection attempts
-        if (connectJob?.isActive == true || shellSession?.isConnected == true) {
-            android.util.Log.e("SSHBorg", "connect: already connecting/connected, ignoring duplicate call")
-            return
-        }
+        if (connectJob?.isActive == true || shellSession?.isConnected == true) return
         emulator.onTitleChanged = { t -> _title.value = t }
 
         connectJob = viewModelScope.launch(Dispatchers.IO) {
@@ -121,35 +118,24 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val buf = ByteArray(4096)
-            android.util.Log.e("SSHBorg", "startReading: loop starts")
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
-                    if (n < 0) {
-                        android.util.Log.e("SSHBorg", "read: EOF (n=-1) exitStatus=${session.exitStatus}")
-                        break
-                    }
-                    val hex = buf.take(n).joinToString(" ") { "%02X".format(it) }
-                    val txt = String(buf, 0, n, Charsets.UTF_8).replace("\r", "\\r").replace("\n", "\\n").replace("\u001b", "ESC")
-                    android.util.Log.e("SSHBorg", "read: n=$n hex=[$hex] txt=[$txt]")
+                    if (n < 0) break
                     synchronized(emulator) { emulator.process(buf, 0, n) }
                     onNeedsRedraw?.invoke()
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("SSHBorg", "startReading exception", e)
-            }
-            android.util.Log.e("SSHBorg", "startReading: loop ended, isConnected=${session.isConnected} exitStatus=${session.exitStatus}")
+            } catch (_: Exception) {}
             _state.value = ConnectionState.Disconnected
         }
     }
 
     fun sendInput(data: ByteArray) {
-        android.util.Log.e("SSHBorg", "sendInput: ${data.size} bytes, session=${shellSession != null}")
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 shellSession?.outputStream?.write(data)
                 shellSession?.outputStream?.flush()
-            }.onFailure { android.util.Log.e("SSHBorg", "sendInput error", it) }
+            }
         }
     }
 

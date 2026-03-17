@@ -28,14 +28,6 @@ object SshManager {
 
         val jsch = JSch()
 
-        // Enable JSch internal logging so we can see why sessions drop
-        JSch.setLogger(object : com.jcraft.jsch.Logger {
-            override fun isEnabled(level: Int) = true
-            override fun log(level: Int, message: String?) {
-                android.util.Log.e("SSHBorg/JSch", message ?: "")
-            }
-        })
-
         // Auth: load identity for key auth
         if (params.auth is SshAuth.PublicKey) {
             jsch.addIdentity(
@@ -81,9 +73,6 @@ object SshManager {
         }
         session.setConfig(config)
         session.connect(20_000)
-        // Reset socket timeout to infinite after connect — JSch may leave a residual timeout
-        // from the connect phase which causes the session to drop silently.
-        session.setTimeout(0)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
