@@ -28,6 +28,14 @@ object SshManager {
 
         val jsch = JSch()
 
+        // Enable JSch internal logging so we can see why sessions drop
+        JSch.setLogger(object : com.jcraft.jsch.Logger {
+            override fun isEnabled(level: Int) = true
+            override fun log(level: Int, message: String?) {
+                android.util.Log.e("SSHBorg/JSch", message ?: "")
+            }
+        })
+
         // Auth: load identity for key auth
         if (params.auth is SshAuth.PublicKey) {
             jsch.addIdentity(
@@ -64,9 +72,7 @@ object SshManager {
         })
 
         val config = Properties().apply {
-            setProperty("StrictHostKeyChecking",
-                if (params.knownHostsEntry.isNullOrBlank()) "ask" else "yes"
-            )
+            setProperty("StrictHostKeyChecking", "ask")
             setProperty("PreferredAuthentications", when (params.auth) {
                 is SshAuth.PublicKey -> "publickey"
                 is SshAuth.Password  -> "password"
@@ -75,18 +81,31 @@ object SshManager {
         }
         session.setConfig(config)
         session.connect(20_000)
+        // Reset socket timeout to infinite after connect — JSch may leave a residual timeout
+        // from the connect phase which causes the session to drop silently.
+        session.setTimeout(0)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
         channel.setAgentForwarding(params.agentForwarding)
+
+        // Stdin: use setInputStream so JSch reads from our pipe and forwards to server.
+        // This is more reliable than channel.getOutputStream() in the mwiede JSch fork.
+        val stdinIn  = java.io.PipedInputStream(4096)
+        val stdinOut = java.io.PipedOutputStream(stdinIn)
+        channel.setInputStream(stdinIn)
+
+        // Stdout: initialise JSch's internal pipe BEFORE connecting so no bytes are lost.
+        val channelInput = channel.inputStream
+
         channel.connect(10_000)
 
         // Capture the host key string for storage in DB
         val hostKey = session.hostKey
         val hostKeyLine = buildKnownHostsLine(hostKey)
 
-        ShellSession(session, channel, params.hostname, hostKeyLine)
+        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine)
     }
 
     /**
@@ -156,13 +175,16 @@ object SshManager {
 class ShellSession(
     private val session: Session,
     private val channel: ChannelShell,
+    private val channelInput: java.io.InputStream,
+    private val stdinOutput: java.io.OutputStream,
     val hostname: String,
     /** Known-hosts line to persist in DB after first successful connect. */
     val hostKeyLine: String,
 ) {
-    val inputStream get() = channel.inputStream
-    val outputStream get() = channel.outputStream
+    val inputStream: java.io.InputStream get() = channelInput
+    val outputStream: java.io.OutputStream get() = stdinOutput
     val isConnected get() = channel.isConnected && session.isConnected
+    val exitStatus get() = channel.exitStatus
 
     fun resize(columns: Int, rows: Int) {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)

@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.terminal.TerminalView
+import kotlinx.coroutines.delay
+@Suppress("UNUSED_VARIABLE")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,17 +24,12 @@ fun TerminalScreen(
 ) {
     val state by vm.state.collectAsState()
     val title by vm.title.collectAsState()
-    val redrawTick by vm.redrawTick.collectAsState()
 
-    // Wire TerminalView reference so we can call invalidate on redraw ticks
-    val terminalViewRef = remember { mutableStateOf<TerminalView?>(null) }
-
-    LaunchedEffect(redrawTick) { terminalViewRef.value?.invalidate() }
-
-    // Mostra la tastiera e dai il focus alla view appena la connessione è pronta
+    // Mostra la tastiera quando la connessione è pronta
     LaunchedEffect(state) {
         if (state is ConnectionState.Connected) {
-            terminalViewRef.value?.showKeyboard()
+            delay(300)
+            vm.terminalViewRef?.showKeyboard()
         }
     }
 
@@ -52,21 +49,24 @@ fun TerminalScreen(
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            // Main terminal view (always rendered so size is known)
+            // Main terminal view
             AndroidView(
                 factory = { ctx ->
                     TerminalView(ctx).also { view ->
                         view.emulator = vm.emulator
                         view.onInput = { bytes -> vm.sendInput(bytes) }
-                        terminalViewRef.value = view
+                        view.onResize = { cols, rows -> vm.resize(cols, rows) }
+                        vm.onNeedsRedraw = { view.postInvalidate() }
+                        vm.terminalViewRef = view
                     }
                 },
                 update = { view ->
                     view.emulator = vm.emulator
                     view.onInput = { bytes -> vm.sendInput(bytes) }
-                    val cols = view.termColumns
-                    val rows = view.termRows
-                    // Fire connect once we know the real dimensions
+                    view.onResize = { cols, rows -> vm.resize(cols, rows) }
+                    vm.onNeedsRedraw = { view.postInvalidate() }
+                    vm.terminalViewRef = view
+                    view.postInvalidate()
                 },
                 modifier = Modifier.fillMaxSize(),
             )

@@ -33,20 +33,30 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title
 
-    private val _redrawTick = MutableStateFlow(0L)
-    val redrawTick: StateFlow<Long> = _redrawTick
+    // Riferimento diretto alla view — settato da TerminalScreen nell'update block
+    var terminalViewRef: com.sshborg.terminal.TerminalView? = null
+
+    // Chiamato dal reader loop (thread IO) per chiedere alla view di ridisegnarsi.
+    // postInvalidate() è thread-safe, a differenza di invalidate().
+    var onNeedsRedraw: (() -> Unit)? = null
 
     private var shellSession: ShellSession? = null
     private var readerJob: Job? = null
+    private var connectJob: Job? = null
 
     // Deferred results for dialogs
     private val hostKeyResult = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     fun connect(hostId: Long, columns: Int = 80, rows: Int = 24) {
+        // Prevent multiple concurrent connection attempts
+        if (connectJob?.isActive == true || shellSession?.isConnected == true) {
+            android.util.Log.e("SSHBorg", "connect: already connecting/connected, ignoring duplicate call")
+            return
+        }
         emulator.onTitleChanged = { t -> _title.value = t }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        connectJob = viewModelScope.launch(Dispatchers.IO) {
             val host = hostDao.getById(hostId) ?: run {
                 _state.value = ConnectionState.Error("Host not found")
                 return@launch
@@ -105,26 +115,41 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun startReading(session: ShellSession) {
+        // Hook emulator responses (CPR, DA) directly to the SSH output stream
+        emulator.onSendResponse = { bytes ->
+            runCatching { session.outputStream.write(bytes); session.outputStream.flush() }
+        }
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val buf = ByteArray(4096)
+            android.util.Log.e("SSHBorg", "startReading: loop starts")
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
-                    if (n < 0) break
+                    if (n < 0) {
+                        android.util.Log.e("SSHBorg", "read: EOF (n=-1) exitStatus=${session.exitStatus}")
+                        break
+                    }
+                    val hex = buf.take(n).joinToString(" ") { "%02X".format(it) }
+                    val txt = String(buf, 0, n, Charsets.UTF_8).replace("\r", "\\r").replace("\n", "\\n").replace("\u001b", "ESC")
+                    android.util.Log.e("SSHBorg", "read: n=$n hex=[$hex] txt=[$txt]")
                     synchronized(emulator) { emulator.process(buf, 0, n) }
-                    _redrawTick.value = System.currentTimeMillis()
+                    onNeedsRedraw?.invoke()
                 }
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                android.util.Log.e("SSHBorg", "startReading exception", e)
+            }
+            android.util.Log.e("SSHBorg", "startReading: loop ended, isConnected=${session.isConnected} exitStatus=${session.exitStatus}")
             _state.value = ConnectionState.Disconnected
         }
     }
 
     fun sendInput(data: ByteArray) {
+        android.util.Log.e("SSHBorg", "sendInput: ${data.size} bytes, session=${shellSession != null}")
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 shellSession?.outputStream?.write(data)
                 shellSession?.outputStream?.flush()
-            }
+            }.onFailure { android.util.Log.e("SSHBorg", "sendInput error", it) }
         }
     }
 
@@ -138,8 +163,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     fun submitPassword(password: String) { passwordResult.tryEmit(password) }
 
     fun disconnect() {
+        connectJob?.cancel()
         readerJob?.cancel()
         shellSession?.disconnect()
+        shellSession = null
         _state.value = ConnectionState.Disconnected
     }
 

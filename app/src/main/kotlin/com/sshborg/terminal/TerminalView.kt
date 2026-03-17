@@ -23,6 +23,7 @@ class TerminalView @JvmOverloads constructor(
 
     var emulator: TerminalEmulator? = null
     var onInput: ((ByteArray) -> Unit)? = null
+    var onResize: ((cols: Int, rows: Int) -> Unit)? = null
 
     // --- Fonts and metrics ---
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -74,13 +75,33 @@ class TerminalView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        requestFocus()
+        post { requestFocus() }
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (hasWindowFocus) post { reattachIme() }
     }
 
     fun showKeyboard() {
-        requestFocus()
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-        imm.showSoftInput(this, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        post { reattachIme() }
+    }
+
+    /**
+     * Forza l'IME a riconnettersi a questa view.
+     * Necessario in Compose: la ComposeView parent cattura il focus IME
+     * e bisogna esplicitamente scalzarla con restartInput().
+     */
+    private fun reattachIme() {
+        val focused = requestFocus()
+        android.util.Log.e("SSHBorg", "reattachIme: requestFocus=$focused hasFocus=${hasFocus()}")
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE)
+                as android.view.inputmethod.InputMethodManager
+        imm.restartInput(this)
+        androidx.core.view.ViewCompat.getWindowInsetsController(this)
+            ?.show(androidx.core.view.WindowInsetsCompat.Type.ime())
+        val shown = imm.showSoftInput(this, android.view.inputmethod.InputMethodManager.SHOW_FORCED)
+        android.util.Log.e("SSHBorg", "reattachIme: showSoftInput=$shown")
     }
 
     private fun updateMetrics() {
@@ -105,7 +126,9 @@ class TerminalView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        emulator?.resize(termColumns, termRows)
+        val cols = termColumns; val rows = termRows
+        emulator?.resize(cols, rows)
+        onResize?.invoke(cols, rows)
     }
 
     // --- Drawing ---
@@ -214,6 +237,7 @@ class TerminalView @JvmOverloads constructor(
     override fun onCheckIsTextEditor() = true
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection {
+        android.util.Log.e("SSHBorg", "onCreateInputConnection called — IME si connette a TerminalView")
         outAttrs.inputType = InputType.TYPE_NULL
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN
         return TerminalInputConnection(this)
@@ -303,14 +327,17 @@ class TerminalView @JvmOverloads constructor(
     /** Handles soft keyboard input. */
     private inner class TerminalInputConnection(view: View) : BaseInputConnection(view, false) {
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            android.util.Log.e("SSHBorg", "commitText: '$text' onInput=${onInput != null}")
             text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
             return true
         }
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            android.util.Log.e("SSHBorg", "deleteSurroundingText: before=$beforeLength")
             if (beforeLength > 0) onInput?.invoke(byteArrayOf(0x7F))
             return true
         }
         override fun sendKeyEvent(event: KeyEvent): Boolean {
+            android.util.Log.e("SSHBorg", "sendKeyEvent: keyCode=${event.keyCode} action=${event.action}")
             if (event.action == KeyEvent.ACTION_DOWN) {
                 val bytes = keyEventToBytes(event.keyCode, event)
                 if (bytes != null) { onInput?.invoke(bytes); return true }

@@ -22,6 +22,8 @@ class TerminalEmulator(columns: Int, rows: Int) {
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
     var onBell: (() -> Unit)? = null
+    // Called when the terminal must send a response back to the remote (e.g. CPR, DA replies)
+    var onSendResponse: ((ByteArray) -> Unit)? = null
 
     private enum class State { NORMAL, ESC, CSI, OSC, SS3 }
 
@@ -165,6 +167,15 @@ class TerminalEmulator(columns: Int, rows: Int) {
             'T' -> buffer.scrollDown(param(0, 1))
             // SGR (colors/attributes)
             'm' -> handleSgr()
+            // Device Status Report: ESC[5n → OK, ESC[6n → cursor position
+            'n' -> when (param(0, 0)) {
+                5 -> onSendResponse?.invoke("\u001b[0n".toByteArray())
+                6 -> onSendResponse?.invoke(
+                    "\u001b[${buffer.cursorRow + 1};${buffer.cursorCol + 1}R".toByteArray()
+                )
+            }
+            // Primary Device Attributes: ESC[c → report as VT100 with AVO
+            'c' -> if (param(0, 0) == 0) onSendResponse?.invoke("\u001b[?1;2c".toByteArray())
             // Scroll region
             'r' -> {
                 buffer.scrollTop = (param(0, 1) - 1).coerceIn(0, buffer.rows - 1)
