@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local configuration (contiene il path dell'SDK, non va in repo)
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Keystore e file di firma
+*.jks
+*.keystore
+
+# Log
+*.log
+
+# Kotlin
+.kotlin/
+
+# MacOS
+.DS_Store

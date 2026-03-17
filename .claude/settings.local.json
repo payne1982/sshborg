@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/tmp/gradle-8.9/bin/gradle wrapper:*)",
+      "Bash(curl -L \"https://services.gradle.org/distributions/gradle-8.12-bin.zip\" -o /tmp/gradle-8.12.zip && unzip -q /tmp/gradle-8.12.zip -d /tmp/ && /tmp/gradle-8.12/bin/gradle --version 2>&1)",
+      "Bash(/tmp/gradle-8.12/bin/gradle wrapper:*)",
+      "Read(//usr/lib/jvm/**)",
+      "Read(//opt/**)",
+      "Read(//usr/local/lib/**)",
+      "Bash(curl -L \"https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz\" -o /tmp/jdk21.tar.gz && mkdir -p /opt/jdk21 && tar xzf /tmp/jdk21.tar.gz -C /opt/jdk21 --strip-components=1 && /opt/jdk21/bin/java -version 2>&1)",
+      "Bash(JAVA_HOME=~/jdk21 /tmp/gradle-8.12/bin/gradle wrapper --gradle-version 8.12 2>&1 | tail -5)",
+      "Bash(JAVA_HOME=~/jdk21 ./gradlew assembleDebug 2>&1 | tail -30)",
+      "Bash(JAVA_HOME=~/jdk21 ./gradlew assembleDebug 2>&1 | tail -50)",
+      "Bash(JAVA_HOME=~/jdk21 ./gradlew assembleDebug 2>&1 | tail -40)",
+      "Bash(JAVA_HOME=~/jdk21 ./gradlew assembleDebug 2>&1 | tail -20)",
+      "Bash(JAVA_HOME=~/jdk21 ./gradlew assembleDebug 2>&1 | tail -15)",
+      "Bash(JAVA_HOME=~/jdk21 ./gradlew assembleDebug 2>&1 | tail -10)"
+    ]
+  }
+}

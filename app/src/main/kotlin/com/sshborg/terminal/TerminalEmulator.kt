@@ -1,0 +1,345 @@
+package com.sshborg.terminal
+
+/**
+ * VT100/VT220/xterm terminal emulator.
+ * Feed incoming bytes via [process]; the state is reflected in [buffer].
+ */
+class TerminalEmulator(columns: Int, rows: Int) {
+
+    val buffer = TerminalBuffer(columns, rows)
+
+    // Parser state machine
+    private var state = State.NORMAL
+    private val params = mutableListOf<Int>()
+    private val oscBuf = StringBuilder()
+    private var csiIntermediate = ""
+    private var privMode = false   // '?' was seen after CSI
+
+    // Alternate screen
+    private var onAltScreen = false
+    private var mainScreenLines: Array<Array<TerminalBuffer.Cell>>? = null
+
+    // Pending title / callback
+    var onTitleChanged: ((String) -> Unit)? = null
+    var onBell: (() -> Unit)? = null
+
+    private enum class State { NORMAL, ESC, CSI, OSC, SS3 }
+
+    // --- Public API ---
+
+    fun process(data: ByteArray, offset: Int = 0, length: Int = data.size) {
+        val end = offset + length
+        var i = offset
+        while (i < end) {
+            val b = data[i].toInt() and 0xFF
+            processByte(b)
+            i++
+        }
+    }
+
+    fun process(text: String) = process(text.toByteArray(Charsets.UTF_8))
+
+    fun resize(cols: Int, rows: Int) {
+        buffer.resize(cols, rows)
+    }
+
+    // --- Private processing ---
+
+    private fun processByte(b: Int) {
+        when (state) {
+            State.NORMAL -> processNormal(b)
+            State.ESC    -> processEsc(b)
+            State.CSI    -> processCsi(b)
+            State.OSC    -> processOsc(b)
+            State.SS3    -> processSs3(b)
+        }
+    }
+
+    private fun processNormal(b: Int) {
+        when (b) {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 -> {} // NUL..ACK ignored
+            0x07 -> onBell?.invoke()  // BEL
+            0x08 -> { // BS
+                if (buffer.cursorCol > 0) buffer.cursorCol--
+            }
+            0x09 -> { // HT (tab)
+                val next = ((buffer.cursorCol / 8) + 1) * 8
+                buffer.cursorCol = next.coerceAtMost(buffer.columns - 1)
+            }
+            0x0A, 0x0B, 0x0C -> lineFeed() // LF, VT, FF
+            0x0D -> buffer.cursorCol = 0     // CR
+            0x0E, 0x0F -> {}  // SO/SI charset (ignored)
+            0x1B -> { // ESC
+                state = State.ESC
+            }
+            0x9B -> { // 8-bit CSI
+                state = State.CSI; params.clear(); csiIntermediate = ""; privMode = false
+            }
+            else -> if (b >= 0x20) printChar(b)
+        }
+    }
+
+    private fun processEsc(b: Int) {
+        state = State.NORMAL
+        when (b) {
+            '['.code -> { state = State.CSI; params.clear(); csiIntermediate = ""; privMode = false }
+            ']'.code -> { state = State.OSC; oscBuf.clear() }
+            'O'.code -> { state = State.SS3 }
+            '7'.code -> buffer.saveCursor()
+            '8'.code -> buffer.restoreCursor()
+            'M'.code -> reverseLineFeed()
+            'c'.code -> resetTerminal()
+            'D'.code -> lineFeed()
+            'E'.code -> { buffer.cursorCol = 0; lineFeed() }
+            'H'.code -> {} // Tab set (ignored)
+            else -> {} // unknown escape
+        }
+    }
+
+    private fun processCsi(b: Int) {
+        when {
+            b == '?'.code && params.isEmpty() && csiIntermediate.isEmpty() -> privMode = true
+            b in 0x30..0x39 -> { // digit
+                if (params.isEmpty()) params.add(0)
+                val last = params.last()
+                params[params.size - 1] = last * 10 + (b - 0x30)
+            }
+            b == ';'.code -> params.add(0) // parameter separator
+            b in 0x20..0x2F -> csiIntermediate += b.toChar() // intermediate bytes
+            b in 0x40..0x7E -> { // final byte
+                executeCsi(b.toChar())
+                state = State.NORMAL
+                privMode = false
+            }
+            else -> state = State.NORMAL
+        }
+    }
+
+    private fun processOsc(b: Int) {
+        when (b) {
+            0x07, 0x9C -> { handleOsc(oscBuf.toString()); state = State.NORMAL }
+            0x1B -> { /* ESC \ terminator – wait for next */ }
+            '\\'.code -> { handleOsc(oscBuf.toString()); state = State.NORMAL }
+            else -> oscBuf.append(b.toChar())
+        }
+    }
+
+    private fun processSs3(b: Int) {
+        state = State.NORMAL
+        // Application keypad/cursor keys – ignore for now
+    }
+
+    // --- CSI dispatch ---
+
+    private fun param(index: Int, default: Int = 0): Int {
+        val v = params.getOrElse(index) { default }
+        return if (v == 0) default else v
+    }
+
+    private fun executeCsi(final: Char) {
+        if (privMode) { executePrivateCsi(final); return }
+        when (final) {
+            // Cursor movement
+            'A' -> moveCursor(-param(0, 1), 0)
+            'B' -> moveCursor(param(0, 1), 0)
+            'C' -> moveCursorCol(param(0, 1))
+            'D' -> moveCursorCol(-param(0, 1))
+            'E' -> { buffer.cursorRow = (buffer.cursorRow + param(0, 1)).coerceAtMost(buffer.rows - 1); buffer.cursorCol = 0 }
+            'F' -> { buffer.cursorRow = (buffer.cursorRow - param(0, 1)).coerceAtLeast(0); buffer.cursorCol = 0 }
+            'G' -> buffer.cursorCol = (param(0, 1) - 1).coerceIn(0, buffer.columns - 1)
+            'H', 'f' -> {
+                buffer.cursorRow = (param(0, 1) - 1).coerceIn(0, buffer.rows - 1)
+                buffer.cursorCol = (param(1, 1) - 1).coerceIn(0, buffer.columns - 1)
+            }
+            // Erase
+            'J' -> buffer.eraseInDisplay(param(0, 0))
+            'K' -> buffer.eraseInLine(param(0, 0))
+            'X' -> buffer.eraseChars(param(0, 1))
+            // Insert/delete
+            'L' -> buffer.insertLines(buffer.cursorRow, param(0, 1))
+            'M' -> buffer.deleteLines(buffer.cursorRow, param(0, 1))
+            'P' -> buffer.deleteChars(param(0, 1))
+            '@' -> buffer.insertChars(param(0, 1))
+            // Scroll
+            'S' -> buffer.scrollUp(param(0, 1))
+            'T' -> buffer.scrollDown(param(0, 1))
+            // SGR (colors/attributes)
+            'm' -> handleSgr()
+            // Scroll region
+            'r' -> {
+                buffer.scrollTop = (param(0, 1) - 1).coerceIn(0, buffer.rows - 1)
+                buffer.scrollBottom = (param(1, buffer.rows) - 1).coerceIn(buffer.scrollTop, buffer.rows - 1)
+                buffer.cursorRow = 0; buffer.cursorCol = 0
+            }
+            // Save/restore cursor (ANSI.SYS)
+            's' -> buffer.saveCursor()
+            'u' -> buffer.restoreCursor()
+            // Cursor visibility
+            'd' -> buffer.cursorRow = (param(0, 1) - 1).coerceIn(0, buffer.rows - 1)
+            // Repeat
+            'b' -> {
+                val ch = lastPrintedChar
+                if (ch != '\u0000') repeat(param(0, 1)) { printChar(ch.code) }
+            }
+            else -> {} // unhandled
+        }
+    }
+
+    private fun executePrivateCsi(final: Char) {
+        val p = param(0, 0)
+        when (final) {
+            'h' -> when (p) {
+                1    -> {} // application cursor keys
+                25   -> buffer.cursorVisible = true
+                47, 1047 -> switchToAltScreen()
+                1049 -> { buffer.saveCursor(); switchToAltScreen() }
+                else -> {}
+            }
+            'l' -> when (p) {
+                1    -> {}
+                25   -> buffer.cursorVisible = false
+                47, 1047 -> switchToMainScreen()
+                1049 -> { switchToMainScreen(); buffer.restoreCursor() }
+                else -> {}
+            }
+            else -> {}
+        }
+    }
+
+    // --- SGR (Select Graphic Rendition) ---
+
+    private fun handleSgr() {
+        if (params.isEmpty()) { buffer.currentStyle = TextStyle.DEFAULT; return }
+        var s = buffer.currentStyle
+        var i = 0
+        while (i < params.size) {
+            when (val p = params[i]) {
+                0  -> s = TextStyle.DEFAULT
+                1  -> s = s.copy(bold = true)
+                3  -> s = s.copy(italic = true)
+                4  -> s = s.copy(underline = true)
+                5, 6 -> s = s.copy(blink = true)
+                7  -> s = s.copy(inverse = true)
+                8  -> s = s.copy(invisible = true)
+                9  -> s = s.copy(strikethrough = true)
+                22 -> s = s.copy(bold = false)
+                23 -> s = s.copy(italic = false)
+                24 -> s = s.copy(underline = false)
+                25 -> s = s.copy(blink = false)
+                27 -> s = s.copy(inverse = false)
+                28 -> s = s.copy(invisible = false)
+                29 -> s = s.copy(strikethrough = false)
+                in 30..37 -> s = s.copy(fg = p - 30)
+                38 -> {
+                    val color = parseSgrColor(i); if (color != null) { s = s.copy(fg = color.first); i += color.second }
+                }
+                39 -> s = s.copy(fg = TextStyle.COLOR_DEFAULT)
+                in 40..47 -> s = s.copy(bg = p - 40)
+                48 -> {
+                    val color = parseSgrColor(i); if (color != null) { s = s.copy(bg = color.first); i += color.second }
+                }
+                49 -> s = s.copy(bg = TextStyle.COLOR_DEFAULT)
+                in 90..97  -> s = s.copy(fg = p - 90 + 8)  // bright fg
+                in 100..107 -> s = s.copy(bg = p - 100 + 8) // bright bg
+                else -> {}
+            }
+            i++
+        }
+        buffer.currentStyle = s
+    }
+
+    /** Returns (color, paramsConsumed) for 38/48;2/5 sequences, or null. */
+    private fun parseSgrColor(idx: Int): Pair<Int, Int>? {
+        return when (params.getOrElse(idx + 1) { -1 }) {
+            5 -> {
+                val n = params.getOrElse(idx + 2) { 0 }
+                Pair(n, 2) // 256-color
+            }
+            2 -> {
+                val r = params.getOrElse(idx + 2) { 0 }
+                val g = params.getOrElse(idx + 3) { 0 }
+                val bv = params.getOrElse(idx + 4) { 0 }
+                Pair(0x1000000 or (r shl 16) or (g shl 8) or bv, 4) // 24-bit RGB
+            }
+            else -> null
+        }
+    }
+
+    // --- OSC ---
+
+    private fun handleOsc(s: String) {
+        val semi = s.indexOf(';')
+        if (semi < 0) return
+        val cmd = s.substring(0, semi).trim().toIntOrNull() ?: return
+        val arg = s.substring(semi + 1)
+        when (cmd) {
+            0, 2 -> onTitleChanged?.invoke(arg) // set window title
+            else -> {}
+        }
+    }
+
+    // --- Helpers ---
+
+    private var lastPrintedChar = '\u0000'
+
+    private fun printChar(b: Int) {
+        val ch = b.toChar()
+        lastPrintedChar = ch
+        if (buffer.cursorCol >= buffer.columns) {
+            buffer.cursorCol = 0
+            lineFeed()
+        }
+        buffer.setChar(buffer.cursorRow, buffer.cursorCol, ch)
+        buffer.cursorCol++
+    }
+
+    private fun lineFeed() {
+        if (buffer.cursorRow == buffer.scrollBottom) {
+            buffer.scrollUp()
+        } else {
+            buffer.cursorRow = (buffer.cursorRow + 1).coerceAtMost(buffer.rows - 1)
+        }
+    }
+
+    private fun reverseLineFeed() {
+        if (buffer.cursorRow == buffer.scrollTop) {
+            buffer.scrollDown()
+        } else {
+            buffer.cursorRow = (buffer.cursorRow - 1).coerceAtLeast(0)
+        }
+    }
+
+    private fun moveCursor(dRow: Int, dCol: Int) {
+        buffer.cursorRow = (buffer.cursorRow + dRow).coerceIn(0, buffer.rows - 1)
+        buffer.cursorCol = (buffer.cursorCol + dCol).coerceIn(0, buffer.columns - 1)
+    }
+
+    private fun moveCursorCol(d: Int) {
+        buffer.cursorCol = (buffer.cursorCol + d).coerceIn(0, buffer.columns - 1)
+    }
+
+    private fun resetTerminal() {
+        buffer.eraseInDisplay(2)
+        buffer.cursorRow = 0; buffer.cursorCol = 0
+        buffer.scrollTop = 0; buffer.scrollBottom = buffer.rows - 1
+        buffer.currentStyle = TextStyle.DEFAULT
+        buffer.cursorVisible = true
+    }
+
+    private fun switchToAltScreen() {
+        if (!onAltScreen) {
+            mainScreenLines = null // not saving full buffer for simplicity
+            onAltScreen = true
+            buffer.eraseInDisplay(2)
+            buffer.cursorRow = 0; buffer.cursorCol = 0
+        }
+    }
+
+    private fun switchToMainScreen() {
+        if (onAltScreen) {
+            onAltScreen = false
+            buffer.eraseInDisplay(2)
+            buffer.cursorRow = 0; buffer.cursorCol = 0
+        }
+    }
+}
