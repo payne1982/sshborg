@@ -1,21 +1,28 @@
 package com.sshborg.ui.terminal
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.terminal.TerminalView
 import kotlinx.coroutines.delay
 @Suppress("UNUSED_VARIABLE")
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun TerminalScreen(
     hostId: Long,
@@ -25,6 +32,31 @@ fun TerminalScreen(
     val state by vm.state.collectAsState()
     val title by vm.title.collectAsState()
 
+    // Toggle state for sticky modifier keys
+    var ctrlActive by remember { mutableStateOf(false) }
+    var altActive  by remember { mutableStateOf(false) }
+
+    // Input handler that applies active modifiers to the next keypress
+    val sendInput: (ByteArray) -> Unit = { bytes ->
+        val out = when {
+            ctrlActive && bytes.size == 1 -> {
+                ctrlActive = false
+                val ch = bytes[0].toInt() and 0xFF
+                when (ch) {
+                    in 0x40..0x5F -> byteArrayOf((ch - 0x40).toByte())
+                    in 0x61..0x7A -> byteArrayOf((ch - 0x60).toByte())
+                    else -> bytes
+                }
+            }
+            altActive && bytes.size == 1 -> {
+                altActive = false
+                byteArrayOf(0x1B, bytes[0])
+            }
+            else -> bytes
+        }
+        vm.sendInput(out)
+    }
+
     // Mostra la tastiera quando la connessione è pronta
     LaunchedEffect(state) {
         if (state is ConnectionState.Connected) {
@@ -33,7 +65,10 @@ fun TerminalScreen(
         }
     }
 
+    val imeVisible = WindowInsets.isImeVisible
+
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
                 title = { Text(title.ifEmpty { "Terminal" }, maxLines = 1) },
@@ -49,27 +84,40 @@ fun TerminalScreen(
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            // Main terminal view
-            AndroidView(
-                factory = { ctx ->
-                    TerminalView(ctx).also { view ->
+            Column(Modifier.fillMaxSize().imePadding()) {
+                // Main terminal view
+                AndroidView(
+                    factory = { ctx ->
+                        TerminalView(ctx).also { view ->
+                            view.emulator = vm.emulator
+                            view.onInput = sendInput
+                            view.onResize = { cols, rows -> vm.resize(cols, rows) }
+                            vm.onNeedsRedraw = { view.postInvalidate() }
+                            vm.terminalViewRef = view
+                        }
+                    },
+                    update = { view ->
                         view.emulator = vm.emulator
-                        view.onInput = { bytes -> vm.sendInput(bytes) }
+                        view.onInput = sendInput
                         view.onResize = { cols, rows -> vm.resize(cols, rows) }
                         vm.onNeedsRedraw = { view.postInvalidate() }
                         vm.terminalViewRef = view
-                    }
-                },
-                update = { view ->
-                    view.emulator = vm.emulator
-                    view.onInput = { bytes -> vm.sendInput(bytes) }
-                    view.onResize = { cols, rows -> vm.resize(cols, rows) }
-                    vm.onNeedsRedraw = { view.postInvalidate() }
-                    vm.terminalViewRef = view
-                    view.postInvalidate()
-                },
-                modifier = Modifier.fillMaxSize(),
-            )
+                        view.postInvalidate()
+                    },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                )
+
+                // Extra key bar — only visible when soft keyboard is open
+                if (imeVisible) {
+                    ExtraKeyRow(
+                        ctrlActive = ctrlActive,
+                        altActive  = altActive,
+                        onCtrlToggle = { ctrlActive = !ctrlActive },
+                        onAltToggle  = { altActive  = !altActive  },
+                        onKey = { bytes -> sendInput(bytes) },
+                    )
+                }
+            }
 
             // Overlays depending on state
             when (val s = state) {
@@ -99,6 +147,104 @@ fun TerminalScreen(
 
     // Connect when composition first runs
     LaunchedEffect(hostId) { vm.connect(hostId) }
+}
+
+@Composable
+private fun ExtraKeyRow(
+    ctrlActive: Boolean,
+    altActive: Boolean,
+    onCtrlToggle: () -> Unit,
+    onAltToggle: () -> Unit,
+    onKey: (ByteArray) -> Unit,
+) {
+    val clipboardManager = LocalClipboardManager.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 2.dp, vertical = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        // Sticky modifier keys
+        ExtraKey("Ctrl", active = ctrlActive, onClick = onCtrlToggle)
+        ExtraKey("Alt",  active = altActive,  onClick = onAltToggle)
+
+        Spacer(Modifier.width(4.dp))
+
+        // Direct keys
+        ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
+        ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
+        ExtraKey("↑",    onClick = { onKey("\u001b[A".toByteArray()) })
+        ExtraKey("↓",    onClick = { onKey("\u001b[B".toByteArray()) })
+        ExtraKey("←",    onClick = { onKey("\u001b[D".toByteArray()) })
+        ExtraKey("→",    onClick = { onKey("\u001b[C".toByteArray()) })
+        ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
+        ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
+        ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })
+        ExtraKey("PgDn", onClick = { onKey("\u001b[6~".toByteArray()) })
+        ExtraKey("Del",  onClick = { onKey("\u001b[3~".toByteArray()) })
+
+        // Paste icon — placed before F-keys to avoid accidental taps
+        IconButton(
+            onClick = {
+                clipboardManager.getText()?.text
+                    ?.toByteArray(Charsets.UTF_8)
+                    ?.let { onKey(it) }
+            },
+            modifier = Modifier
+                .size(32.dp)
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall),
+        ) {
+            Icon(
+                Icons.Filled.ContentPaste,
+                contentDescription = "Paste",
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+
+        Spacer(Modifier.width(4.dp))
+
+        ExtraKey("F1",   onClick = { onKey("\u001bOP".toByteArray()) })
+        ExtraKey("F2",   onClick = { onKey("\u001bOQ".toByteArray()) })
+        ExtraKey("F3",   onClick = { onKey("\u001bOR".toByteArray()) })
+        ExtraKey("F4",   onClick = { onKey("\u001bOS".toByteArray()) })
+        ExtraKey("F5",   onClick = { onKey("\u001b[15~".toByteArray()) })
+        ExtraKey("F6",   onClick = { onKey("\u001b[17~".toByteArray()) })
+        ExtraKey("F7",   onClick = { onKey("\u001b[18~".toByteArray()) })
+        ExtraKey("F8",   onClick = { onKey("\u001b[19~".toByteArray()) })
+        ExtraKey("F9",   onClick = { onKey("\u001b[20~".toByteArray()) })
+        ExtraKey("F10",  onClick = { onKey("\u001b[21~".toByteArray()) })
+        ExtraKey("F11",  onClick = { onKey("\u001b[23~".toByteArray()) })
+        ExtraKey("F12",  onClick = { onKey("\u001b[24~".toByteArray()) })
+    }
+}
+
+@Composable
+private fun ExtraKey(
+    label: String,
+    active: Boolean = false,
+    onClick: () -> Unit,
+) {
+    val bg        = if (active) MaterialTheme.colorScheme.primaryContainer
+                    else        MaterialTheme.colorScheme.surface
+    val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer
+                    else        MaterialTheme.colorScheme.onSurface
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.background(bg, MaterialTheme.shapes.extraSmall),
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+    ) {
+        Text(
+            label,
+            fontSize = 13.sp,
+            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+            maxLines = 1,
+            color = textColor,
+        )
+    }
 }
 
 @Composable

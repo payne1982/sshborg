@@ -27,6 +27,10 @@ class TerminalEmulator(columns: Int, rows: Int) {
 
     private enum class State { NORMAL, ESC, CSI, OSC, SS3 }
 
+    // UTF-8 multi-byte decoder state
+    private var utf8Remaining  = 0
+    private var utf8Codepoint  = 0
+
     // --- Public API ---
 
     fun process(data: ByteArray, offset: Int = 0, length: Int = data.size) {
@@ -58,30 +62,43 @@ class TerminalEmulator(columns: Int, rows: Int) {
     }
 
     private fun processNormal(b: Int) {
-        when (b) {
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 -> {} // NUL..ACK ignored
-            0x07 -> onBell?.invoke()  // BEL
-            0x08 -> { // BS
-                if (buffer.cursorCol > 0) buffer.cursorCol--
+        // UTF-8 continuation byte (10xxxxxx) — accumulate into current codepoint
+        if (b in 0x80..0xBF) {
+            if (utf8Remaining > 0) {
+                utf8Codepoint = (utf8Codepoint shl 6) or (b and 0x3F)
+                utf8Remaining--
+                if (utf8Remaining == 0) printChar(utf8Codepoint)
             }
-            0x09 -> { // HT (tab)
+            return
+        }
+        // Any non-continuation byte resets a partial sequence (handles invalid UTF-8 gracefully)
+        utf8Remaining = 0
+        utf8Codepoint = 0
+
+        when {
+            b <= 0x06 -> {}                          // NUL..ACK ignored
+            b == 0x07 -> onBell?.invoke()            // BEL
+            b == 0x08 -> { if (buffer.cursorCol > 0) buffer.cursorCol-- } // BS
+            b == 0x09 -> {                           // HT (tab)
                 val next = ((buffer.cursorCol / 8) + 1) * 8
                 buffer.cursorCol = next.coerceAtMost(buffer.columns - 1)
             }
-            0x0A, 0x0B, 0x0C -> lineFeed() // LF, VT, FF
-            0x0D -> buffer.cursorCol = 0     // CR
-            0x0E, 0x0F -> {}  // SO/SI charset (ignored)
-            0x1B -> { // ESC
-                state = State.ESC
-            }
-            0x9B -> { // 8-bit CSI
+            b in 0x0A..0x0C -> lineFeed()            // LF, VT, FF
+            b == 0x0D -> buffer.cursorCol = 0        // CR
+            b == 0x0E || b == 0x0F -> {}             // SO/SI charset (ignored)
+            b == 0x1B -> state = State.ESC           // ESC
+            b == 0x9B -> {                           // 8-bit CSI
                 state = State.CSI; params.clear(); csiIntermediate = ""; privMode = false
             }
-            else -> if (b >= 0x20) printChar(b)
+            b in 0x20..0x7F -> printChar(b)          // printable ASCII
+            b in 0xC0..0xDF -> { utf8Remaining = 1; utf8Codepoint = b and 0x1F } // 2-byte start
+            b in 0xE0..0xEF -> { utf8Remaining = 2; utf8Codepoint = b and 0x0F } // 3-byte start
+            b in 0xF0..0xF7 -> { utf8Remaining = 3; utf8Codepoint = b and 0x07 } // 4-byte start
         }
     }
 
     private fun processEsc(b: Int) {
+        utf8Remaining = 0; utf8Codepoint = 0
         state = State.NORMAL
         when (b) {
             '['.code -> { state = State.CSI; params.clear(); csiIntermediate = ""; privMode = false }
@@ -293,15 +310,19 @@ class TerminalEmulator(columns: Int, rows: Int) {
 
     private var lastPrintedChar = '\u0000'
 
-    private fun printChar(b: Int) {
-        val ch = b.toChar()
-        lastPrintedChar = ch
-        if (buffer.cursorCol >= buffer.columns) {
-            buffer.cursorCol = 0
-            lineFeed()
+    private fun printChar(codepoint: Int) {
+        // BMP codepoint (U+0000..U+FFFF) fits in a single Char.
+        // Supplementary codepoints (emoji, etc.) are stored as two surrogate Chars.
+        val chars = Character.toChars(codepoint)
+        for (ch in chars) {
+            lastPrintedChar = ch
+            if (buffer.cursorCol >= buffer.columns) {
+                buffer.cursorCol = 0
+                lineFeed()
+            }
+            buffer.setChar(buffer.cursorRow, buffer.cursorCol, ch)
+            buffer.cursorCol++
         }
-        buffer.setChar(buffer.cursorRow, buffer.cursorCol, ch)
-        buffer.cursorCol++
     }
 
     private fun lineFeed() {

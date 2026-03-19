@@ -307,6 +307,22 @@ class TerminalView @JvmOverloads constructor(
             imm.showSoftInput(this@TerminalView, InputMethodManager.SHOW_FORCED)
             return true
         }
+        override fun onLongPress(e: MotionEvent) {
+            val buf = emulator?.buffer ?: return
+            val sb = StringBuilder()
+            for (row in 0 until buf.rows) {
+                val line = StringBuilder()
+                for (col in 0 until buf.columns) {
+                    line.append(buf.getCell(row, col).char)
+                }
+                sb.appendLine(line.trimEnd())
+            }
+            val text = sb.toString().trimEnd()
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
+                    as android.content.ClipboardManager
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
+            android.widget.Toast.makeText(context, "Copied", android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -315,7 +331,10 @@ class TerminalView @JvmOverloads constructor(
             textPaint.textSize = newSize
             boldPaint.textSize = newSize
             updateMetrics()
-            emulator?.resize(termColumns, termRows)
+            val cols = termColumns; val rows = termRows
+            // Do NOT call emulator.resize() here — onResize delegates to vm.resize()
+            // which does it under the correct synchronized lock.
+            onResize?.invoke(cols, rows)
             invalidate()
             return true
         }

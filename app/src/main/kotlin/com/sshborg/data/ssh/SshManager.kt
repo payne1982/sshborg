@@ -70,8 +70,16 @@ object SshManager {
                 is SshAuth.Password  -> "password"
             })
             setProperty("HashKnownHosts", "no")
+            // Keep TCP connection alive at the OS socket level
+            setProperty("TCPKeepAlive", "yes")
         }
         session.setConfig(config)
+
+        // Send SSH-level keepalive every 30 s. INT_MAX retries = never disconnect
+        // intentionally (if the network is truly dead the TCP stack will eventually
+        // time out on its own, which is fine per the user's requirement).
+        session.setServerAliveInterval(30_000)
+        session.setServerAliveCountMax(Int.MAX_VALUE)
 
         // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
         // channel-level flag (which sends auth-agent-req@openssh.com to the server) but
@@ -88,6 +96,10 @@ object SshManager {
         }
 
         session.connect(20_000)
+        // JSch sets socket.setSoTimeout(timeout) during connect() and does not reset it
+        // afterward. Without this, the reader loop gets SocketTimeoutException after
+        // 20 s of inactivity and silently disconnects.
+        session.setTimeout(0)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)

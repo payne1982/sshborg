@@ -86,6 +86,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 )
             }.onSuccess { session ->
                 shellSession = session
+                // Sync PTY with the actual screen size. onSizeChanged() may have
+                // resized the emulator while the connection was still establishing,
+                // but shellSession was null at that point so the resize was not sent.
+                synchronized(emulator) { session.resize(emulator.buffer.columns, emulator.buffer.rows) }
                 _state.value = ConnectionState.Connected
                 // Persist host key if it's a first-time connection
                 if (host.knownHostsEntry == null) {
@@ -141,7 +145,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
     fun resize(cols: Int, rows: Int) {
         synchronized(emulator) { emulator.resize(cols, rows) }
-        shellSession?.resize(cols, rows)
+        // channel.setPtySize() must run on the IO thread — calling it from the UI thread
+        // while the reader job is active causes concurrent JSch session access and corrupts
+        // internal state, which surfaces as a spurious disconnect after the next keypress.
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { shellSession?.resize(cols, rows) }
+        }
     }
 
     fun acceptHostKey() { hostKeyResult.tryEmit(true) }
