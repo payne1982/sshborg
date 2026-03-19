@@ -72,6 +72,21 @@ object SshManager {
             setProperty("HashKnownHosts", "no")
         }
         session.setConfig(config)
+
+        // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
+        // channel-level flag (which sends auth-agent-req@openssh.com to the server) but
+        // never sets Session.agent_forwarding. The Session checks that field when the server
+        // opens a reverse auth-agent@openssh.com channel — if false, it sends
+        // SSH_MSG_CHANNEL_OPEN_FAILURE and the agent is unusable ("agent refused operation").
+        // Fix: set the field directly via reflection.
+        if (params.agentForwarding) {
+            try {
+                val f = session.javaClass.getDeclaredField("agent_forwarding")
+                f.isAccessible = true
+                f.setBoolean(session, true)
+            } catch (_: Exception) {}
+        }
+
         session.connect(20_000)
 
         val channel = session.openChannel("shell") as ChannelShell

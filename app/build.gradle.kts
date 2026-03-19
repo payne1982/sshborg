@@ -62,7 +62,10 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.jsch)
+    // Use local patched JAR with ChannelAgentForwarding removed (our app provides it).
+    // The original com.github.mwiede:jsch:0.2.19 was keeping its own ChannelAgentForwarding
+    // in classes9.dex, which took precedence over our override in classes11.dex.
+    implementation(files("libs/jsch-0.2.19-patched.jar"))
     implementation(libs.bouncycastle)
     debugImplementation(libs.androidx.ui.tooling)
 }
