@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.sshborg.ui.hosts.AddEditHostScreen
 import com.sshborg.ui.hosts.HostsScreen
 import com.sshborg.ui.keys.KeysScreen
+import com.sshborg.ui.sftp.SftpScreen
 import com.sshborg.ui.terminal.TerminalScreen
 
 sealed class Screen(val route: String) {
@@ -19,6 +20,9 @@ sealed class Screen(val route: String) {
     }
     object Terminal : Screen("terminal/{hostId}") {
         fun routeFor(id: Long) = "terminal/$id"
+    }
+    object Sftp : Screen("sftp/{hostId}") {
+        fun routeFor(id: Long) = "sftp/$id"
     }
     object Keys : Screen("keys")
 }
@@ -31,10 +35,11 @@ fun AppNavigation() {
 
         composable(Screen.Hosts.route) {
             HostsScreen(
-                onHostClick = { hostId -> navController.navigate(Screen.Terminal.routeFor(hostId)) },
-                onAddHost = { navController.navigate(Screen.AddEditHost.routeFor(Screen.AddEditHost.NEW_ID)) },
-                onEditHost = { hostId -> navController.navigate(Screen.AddEditHost.routeFor(hostId)) },
-                onKeysClick = { navController.navigate(Screen.Keys.route) },
+                onHostClick  = { hostId -> navController.navigate(Screen.Terminal.routeFor(hostId)) },
+                onSftpClick  = { hostId -> navController.navigate(Screen.Sftp.routeFor(hostId)) },
+                onAddHost    = { navController.navigate(Screen.AddEditHost.routeFor(Screen.AddEditHost.NEW_ID)) },
+                onEditHost   = { hostId -> navController.navigate(Screen.AddEditHost.routeFor(hostId)) },
+                onKeysClick  = { navController.navigate(Screen.Keys.route) },
             )
         }
 
@@ -56,6 +61,17 @@ fun AppNavigation() {
         ) { backEntry ->
             val hostId = backEntry.arguments?.getLong("hostId") ?: return@composable
             TerminalScreen(
+                hostId = hostId,
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            Screen.Sftp.route,
+            arguments = listOf(navArgument("hostId") { type = NavType.LongType }),
+        ) { backEntry ->
+            val hostId = backEntry.arguments?.getLong("hostId") ?: return@composable
+            SftpScreen(
                 hostId = hostId,
                 onBack = { navController.popBackStack() },
             )

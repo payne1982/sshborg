@@ -186,21 +186,20 @@ private fun ExtraKeyRow(
         ExtraKey("PgDn", onClick = { onKey("\u001b[6~".toByteArray()) })
         ExtraKey("Del",  onClick = { onKey("\u001b[3~".toByteArray()) })
 
-        // Paste icon — placed before F-keys to avoid accidental taps
-        IconButton(
+        // Paste icon — same TextButton structure as ExtraKey so height aligns
+        TextButton(
             onClick = {
                 clipboardManager.getText()?.text
                     ?.toByteArray(Charsets.UTF_8)
                     ?.let { onKey(it) }
             },
-            modifier = Modifier
-                .size(32.dp)
-                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall),
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall),
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
         ) {
             Icon(
                 Icons.Filled.ContentPaste,
                 contentDescription = "Paste",
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.onSurface,
             )
         }

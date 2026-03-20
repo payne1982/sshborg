@@ -20,6 +20,7 @@ import com.sshborg.data.db.HostEntity
 @Composable
 fun HostsScreen(
     onHostClick: (Long) -> Unit,
+    onSftpClick: (Long) -> Unit,
     onAddHost: () -> Unit,
     onEditHost: (Long) -> Unit,
     onKeysClick: () -> Unit,
@@ -55,6 +56,7 @@ fun HostsScreen(
                     HostItem(
                         host = host,
                         onClick = { onHostClick(host.id) },
+                        onSftp = { onSftpClick(host.id) },
                         onEdit = { onEditHost(host.id) },
                         onDelete = { hostToDelete = host },
                     )
@@ -83,6 +85,7 @@ fun HostsScreen(
 private fun HostItem(
     host: HostEntity,
     onClick: () -> Unit,
+    onSftp: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -114,6 +117,11 @@ private fun HostItem(
                         text = { Text("Connect") },
                         leadingIcon = { Icon(Icons.Default.Terminal, null) },
                         onClick = { menuExpanded = false; onClick() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Files") },
+                        leadingIcon = { Icon(Icons.Default.Folder, null) },
+                        onClick = { menuExpanded = false; onSftp() },
                     )
                     DropdownMenuItem(
                         text = { Text("Edit") },

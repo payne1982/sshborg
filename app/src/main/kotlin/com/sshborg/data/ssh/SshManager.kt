@@ -13,10 +13,6 @@ object SshManager {
 
     /**
      * Opens an interactive shell session.
-     *
-     * @param onHostKeyVerify called with (hostname, fingerprint) when the host is not in known_hosts.
-     *   Return true to accept (and cache), false to reject.
-     * @return [ShellSession] on success; throws [JSchException] on failure.
      */
     suspend fun openShell(
         params: SshConnectionParams,
@@ -26,9 +22,52 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
     ): ShellSession = withContext(Dispatchers.IO) {
 
+        val session = createSession(params, onHostKeyVerify)
+
+        val channel = session.openChannel("shell") as ChannelShell
+        channel.setPtyType(termType)
+        channel.setPtySize(columns, rows, columns * 8, rows * 16)
+        channel.setAgentForwarding(params.agentForwarding)
+
+        // Stdin: use setInputStream so JSch reads from our pipe and forwards to server.
+        val stdinIn  = java.io.PipedInputStream(4096)
+        val stdinOut = java.io.PipedOutputStream(stdinIn)
+        channel.setInputStream(stdinIn)
+
+        // Stdout: initialise JSch's internal pipe BEFORE connecting so no bytes are lost.
+        val channelInput = channel.inputStream
+
+        channel.connect(10_000)
+
+        val hostKeyLine = buildKnownHostsLine(session.hostKey)
+        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine)
+    }
+
+    /**
+     * Opens an SFTP session.
+     */
+    suspend fun openSftp(
+        params: SshConnectionParams,
+        onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
+    ): SftpSession = withContext(Dispatchers.IO) {
+
+        val session = createSession(params, onHostKeyVerify)
+        val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
+        channel.connect(10_000)
+
+        val hostKeyLine = buildKnownHostsLine(session.hostKey)
+        SftpSession(session, channel, params.hostname, hostKeyLine)
+    }
+
+    /**
+     * Shared session setup: auth, known hosts, config, keepalives, connect.
+     */
+    private fun createSession(
+        params: SshConnectionParams,
+        onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
+    ): Session {
         val jsch = JSch()
 
-        // Auth: load identity for key auth
         if (params.auth is SshAuth.PublicKey) {
             jsch.addIdentity(
                 "key",
@@ -38,23 +77,19 @@ object SshManager {
             )
         }
 
-        // Known hosts: feed in-memory as a stream in known_hosts format
         if (!params.knownHostsEntry.isNullOrBlank()) {
             jsch.setKnownHosts(ByteArrayInputStream(params.knownHostsEntry.toByteArray()))
         }
 
         val session = jsch.getSession(params.username, params.hostname, params.port)
 
-        // Capture fingerprint for the verify callback
         var capturedFingerprint = ""
-
         session.setUserInfo(object : UserInfo {
             override fun getPassphrase(): String? = null
             override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
             override fun promptPassword(message: String?) = params.auth is SshAuth.Password
             override fun promptPassphrase(message: String?) = false
             override fun promptYesNo(message: String?): Boolean {
-                // JSch passes the fingerprint inside the message for unknown hosts
                 capturedFingerprint = message?.lines()
                     ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
                     ?: message ?: "unknown"
@@ -70,23 +105,14 @@ object SshManager {
                 is SshAuth.Password  -> "password"
             })
             setProperty("HashKnownHosts", "no")
-            // Keep TCP connection alive at the OS socket level
             setProperty("TCPKeepAlive", "yes")
         }
         session.setConfig(config)
-
-        // Send SSH-level keepalive every 30 s. INT_MAX retries = never disconnect
-        // intentionally (if the network is truly dead the TCP stack will eventually
-        // time out on its own, which is fine per the user's requirement).
         session.setServerAliveInterval(30_000)
         session.setServerAliveCountMax(Int.MAX_VALUE)
 
         // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
-        // channel-level flag (which sends auth-agent-req@openssh.com to the server) but
-        // never sets Session.agent_forwarding. The Session checks that field when the server
-        // opens a reverse auth-agent@openssh.com channel — if false, it sends
-        // SSH_MSG_CHANNEL_OPEN_FAILURE and the agent is unusable ("agent refused operation").
-        // Fix: set the field directly via reflection.
+        // channel-level flag but never sets Session.agent_forwarding. Fix via reflection.
         if (params.agentForwarding) {
             try {
                 val f = session.javaClass.getDeclaredField("agent_forwarding")
@@ -96,32 +122,10 @@ object SshManager {
         }
 
         session.connect(20_000)
-        // JSch sets socket.setSoTimeout(timeout) during connect() and does not reset it
-        // afterward. Without this, the reader loop gets SocketTimeoutException after
-        // 20 s of inactivity and silently disconnects.
+        // JSch leaves a residual socket read timeout from the connect phase — reset to infinite.
         session.setTimeout(0)
 
-        val channel = session.openChannel("shell") as ChannelShell
-        channel.setPtyType(termType)
-        channel.setPtySize(columns, rows, columns * 8, rows * 16)
-        channel.setAgentForwarding(params.agentForwarding)
-
-        // Stdin: use setInputStream so JSch reads from our pipe and forwards to server.
-        // This is more reliable than channel.getOutputStream() in the mwiede JSch fork.
-        val stdinIn  = java.io.PipedInputStream(4096)
-        val stdinOut = java.io.PipedOutputStream(stdinIn)
-        channel.setInputStream(stdinIn)
-
-        // Stdout: initialise JSch's internal pipe BEFORE connecting so no bytes are lost.
-        val channelInput = channel.inputStream
-
-        channel.connect(10_000)
-
-        // Capture the host key string for storage in DB
-        val hostKey = session.hostKey
-        val hostKeyLine = buildKnownHostsLine(hostKey)
-
-        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine)
+        return session
     }
 
     /**
@@ -204,6 +208,63 @@ class ShellSession(
 
     fun resize(columns: Int, rows: Int) {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
+    }
+
+    fun disconnect() {
+        runCatching { channel.disconnect() }
+        runCatching { session.disconnect() }
+    }
+}
+
+/** A single entry returned by [SftpSession.listDir]. */
+data class SftpEntry(
+    val name: String,
+    val isDir: Boolean,
+    val size: Long,
+    val modTimeSeconds: Int,   // Unix timestamp
+)
+
+/** A live SFTP session. */
+class SftpSession(
+    private val session: Session,
+    private val channel: com.jcraft.jsch.ChannelSftp,
+    val hostname: String,
+    val hostKeyLine: String,
+) {
+    val isConnected get() = channel.isConnected && session.isConnected
+
+    /** Lists [path], returning entries sorted: dirs first, then files, both alphabetically. */
+    @Suppress("UNCHECKED_CAST")
+    fun listDir(path: String): List<SftpEntry> {
+        val raw = channel.ls(path) as Collection<com.jcraft.jsch.ChannelSftp.LsEntry>
+        return raw
+            .filter { it.filename != "." && it.filename != ".." }
+            .map { e ->
+                SftpEntry(
+                    name           = e.filename,
+                    isDir          = e.attrs.isDir,
+                    size           = e.attrs.size,
+                    modTimeSeconds = e.attrs.mTime,
+                )
+            }
+            .sortedWith(compareByDescending<SftpEntry> { it.isDir }.thenBy { it.name.lowercase() })
+    }
+
+    /**
+     * Downloads [remotePath] into [dest], calling [onProgress] with cumulative bytes received.
+     * Runs synchronously — call from an IO coroutine.
+     */
+    fun downloadFile(
+        remotePath: String,
+        dest: java.io.OutputStream,
+        onProgress: (bytesReceived: Long) -> Unit = {},
+    ) {
+        var received = 0L
+        channel.get(remotePath, dest, object : com.jcraft.jsch.SftpProgressMonitor {
+            override fun init(op: Int, src: String?, dest: String?, max: Long) {}
+            override fun count(count: Long): Boolean { received += count; onProgress(received); return true }
+            override fun end() {}
+        })
     }
 
     fun disconnect() {
