@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -147,6 +148,17 @@ fun TerminalScreen(
 
     // Connect when composition first runs
     LaunchedEffect(hostId) { vm.connect(hostId) }
+
+    // Dismiss the soft keyboard whenever this screen leaves the composition,
+    // regardless of how the user exits (back arrow, hardware back, etc.)
+    val view = LocalView.current
+    DisposableEffect(Unit) {
+        onDispose {
+            val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+                    as android.view.inputmethod.InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
 }
 
 @Composable
