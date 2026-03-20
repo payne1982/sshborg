@@ -27,6 +27,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var useKey = MutableStateFlow(false)
     var selectedKeyId = MutableStateFlow<Long?>(null)
     var agentForwarding = MutableStateFlow(false)
+    /** Raw jump-hosts string: "host1:port,host2:port,...". Only relevant when agentForwarding=true. */
+    var jumpHosts = MutableStateFlow("")
 
     private var editingId: Long? = null
 
@@ -42,6 +44,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             useKey.value = h.keyId != null
             selectedKeyId.value = h.keyId
             agentForwarding.value = h.agentForwarding
+            jumpHosts.value = h.jumpHosts ?: ""
         }
     }
 
@@ -54,6 +57,10 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             username = username.value.trim(),
             keyId = if (useKey.value) selectedKeyId.value else null,
             agentForwarding = agentForwarding.value,
+            jumpHosts = jumpHosts.value.trim().takeIf { it.isNotEmpty() && agentForwarding.value },
+            // Clear persisted jump-host keys whenever the jump-hosts string changes,
+            // so the user is re-prompted to accept keys for newly configured hops.
+            jumpHostKeys = null,
         )
         hostDao.upsert(entity)
         onDone()

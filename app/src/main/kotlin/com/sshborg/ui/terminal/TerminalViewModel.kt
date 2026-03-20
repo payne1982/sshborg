@@ -63,6 +63,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
             _state.value = ConnectionState.Connecting
 
+            val jumpHosts = parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
+
             val params = SshConnectionParams(
                 hostname = host.hostname,
                 port = host.port,
@@ -70,6 +72,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 auth = auth,
                 agentForwarding = host.agentForwarding,
                 knownHostsEntry = host.knownHostsEntry,
+                jumpHosts = jumpHosts,
             )
 
             runCatching {
@@ -91,9 +94,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 // but shellSession was null at that point so the resize was not sent.
                 synchronized(emulator) { session.resize(emulator.buffer.columns, emulator.buffer.rows) }
                 _state.value = ConnectionState.Connected
-                // Persist host key if it's a first-time connection
+                // Persist target host key on first connect
                 if (host.knownHostsEntry == null) {
                     hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
+                }
+                // Persist any new jump host keys
+                if (session.newJumpHostKeyLines.isNotEmpty() && host.jumpHostKeys == null) {
+                    val current = hostDao.getById(hostId) ?: host
+                    hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
                 }
                 hostDao.updateLastConnected(hostId, System.currentTimeMillis())
                 startReading(session)

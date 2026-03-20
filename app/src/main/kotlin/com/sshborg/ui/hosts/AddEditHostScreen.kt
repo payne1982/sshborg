@@ -36,6 +36,7 @@ fun AddEditHostScreen(
     val useKey by vm.useKey.collectAsState()
     val selectedKeyId by vm.selectedKeyId.collectAsState()
     val agentForwarding by vm.agentForwarding.collectAsState()
+    val jumpHosts by vm.jumpHosts.collectAsState()
     val keys by vm.keys.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -136,6 +137,19 @@ fun AddEditHostScreen(
                 Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
                 Spacer(Modifier.width(8.dp))
                 Text("Agent Forwarding")
+            }
+
+            if (agentForwarding) {
+                OutlinedTextField(
+                    value = jumpHosts,
+                    onValueChange = { vm.jumpHosts.value = it },
+                    label = { Text("Jump hosts (optional)") },
+                    placeholder = { Text("host1:22,host2:2222") },
+                    supportingText = { Text("Comma-separated list of SSH jump hosts in host:port format") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                )
             }
 
             Spacer(Modifier.height(8.dp))

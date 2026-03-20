@@ -22,7 +22,7 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
     ): ShellSession = withContext(Dispatchers.IO) {
 
-        val session = createSession(params, onHostKeyVerify)
+        val (session, jumpSessions, newJumpKeyLines) = createSession(params, onHostKeyVerify)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
@@ -40,7 +40,7 @@ object SshManager {
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine)
+        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines)
     }
 
     /**
@@ -51,13 +51,20 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
     ): SftpSession = withContext(Dispatchers.IO) {
 
-        val session = createSession(params, onHostKeyVerify)
+        val (session, jumpSessions, newJumpKeyLines) = createSession(params, onHostKeyVerify)
+
         val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        SftpSession(session, channel, params.hostname, hostKeyLine)
+        SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines)
     }
+
+    private data class SessionResult(
+        val session: Session,
+        val jumpSessions: List<Session>,
+        val newJumpKeyLines: List<String>,
+    )
 
     /**
      * Shared session setup: auth, known hosts, config, keepalives, connect.
@@ -65,7 +72,72 @@ object SshManager {
     private fun createSession(
         params: SshConnectionParams,
         onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
-    ): Session {
+    ): SessionResult {
+        // ── 1. Build jump-host chain ────────────────────────────────────────────
+        val jumpSessions = mutableListOf<Session>()
+        val newJumpKeyLines = mutableListOf<String>()
+        var proxy: com.jcraft.jsch.Proxy? = null
+
+        for (jump in params.jumpHosts) {
+            val jumpJsch = JSch()
+            // Jump hosts use the same auth as the target
+            if (params.auth is SshAuth.PublicKey) {
+                jumpJsch.addIdentity(
+                    "key",
+                    params.auth.privateKeyPem.toByteArray(),
+                    null,
+                    params.auth.passphrase?.toByteArray(),
+                )
+            }
+            if (!jump.knownHostsEntry.isNullOrBlank()) {
+                jumpJsch.setKnownHosts(ByteArrayInputStream(jump.knownHostsEntry.toByteArray()))
+            }
+
+            val jumpSession = jumpJsch.getSession(params.username, jump.host, jump.port)
+            if (proxy != null) jumpSession.setProxy(proxy)
+
+            jumpSession.setUserInfo(object : UserInfo {
+                override fun getPassphrase(): String? = null
+                override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
+                override fun promptPassword(message: String?) = params.auth is SshAuth.Password
+                override fun promptPassphrase(message: String?) = false
+                override fun promptYesNo(message: String?): Boolean {
+                    val fp = message?.lines()
+                        ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
+                        ?: message ?: "unknown"
+                    return onHostKeyVerify(jump.host, fp)
+                }
+                override fun showMessage(message: String?) {}
+            })
+
+            val jumpConfig = Properties().apply {
+                setProperty("StrictHostKeyChecking", if (jump.knownHostsEntry.isNullOrBlank()) "ask" else "yes")
+                setProperty("PreferredAuthentications", when (params.auth) {
+                    is SshAuth.PublicKey -> "publickey"
+                    is SshAuth.Password  -> "password"
+                })
+                setProperty("HashKnownHosts", "no")
+                setProperty("TCPKeepAlive", "yes")
+            }
+            jumpSession.setConfig(jumpConfig)
+            jumpSession.setServerAliveInterval(30_000)
+            jumpSession.setServerAliveCountMax(Int.MAX_VALUE)
+
+            jumpSession.connect(20_000)
+            jumpSession.setTimeout(0)
+
+            // Collect the host key so we can persist it if it was unknown
+            if (jump.knownHostsEntry.isNullOrBlank()) {
+                newJumpKeyLines.add(buildKnownHostsLine(jumpSession.hostKey))
+            }
+
+            jumpSessions.add(jumpSession)
+
+            // Create a proxy that tunnels through this jump session to the next hop
+            proxy = JumpProxy(jumpSession)
+        }
+
+        // ── 2. Connect the real target session (possibly through the jump chain) ──
         val jsch = JSch()
 
         if (params.auth is SshAuth.PublicKey) {
@@ -82,18 +154,19 @@ object SshManager {
         }
 
         val session = jsch.getSession(params.username, params.hostname, params.port)
+        if (proxy != null) session.setProxy(proxy)
 
-        var capturedFingerprint = ""
+        // Tag the session with the jump sessions so ShellSession/SftpSession can clean them up
         session.setUserInfo(object : UserInfo {
             override fun getPassphrase(): String? = null
             override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
             override fun promptPassword(message: String?) = params.auth is SshAuth.Password
             override fun promptPassphrase(message: String?) = false
             override fun promptYesNo(message: String?): Boolean {
-                capturedFingerprint = message?.lines()
+                val fp = message?.lines()
                     ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
                     ?: message ?: "unknown"
-                return onHostKeyVerify(params.hostname, capturedFingerprint)
+                return onHostKeyVerify(params.hostname, fp)
             }
             override fun showMessage(message: String?) {}
         })
@@ -125,7 +198,27 @@ object SshManager {
         // JSch leaves a residual socket read timeout from the connect phase — reset to infinite.
         session.setTimeout(0)
 
-        return session
+        return SessionResult(session, jumpSessions, newJumpKeyLines)
+    }
+
+    /** JSch [Proxy] implementation that tunnels through an already-connected SSH [Session]. */
+    private class JumpProxy(private val via: Session) : com.jcraft.jsch.Proxy {
+        private var channel: com.jcraft.jsch.ChannelDirectTCPIP? = null
+
+        override fun connect(sf: com.jcraft.jsch.SocketFactory?, host: String, port: Int, timeout: Int) {
+            val ch = via.openChannel("direct-tcpip") as com.jcraft.jsch.ChannelDirectTCPIP
+            ch.setHost(host)
+            ch.setPort(port)
+            ch.setOrgIPAddress("127.0.0.1")
+            ch.setOrgPort(0)
+            ch.connect(if (timeout <= 0) 20_000 else timeout)
+            channel = ch
+        }
+
+        override fun getInputStream(): java.io.InputStream = channel!!.inputStream
+        override fun getOutputStream(): java.io.OutputStream = channel!!.outputStream
+        override fun getSocket(): java.net.Socket? = null
+        override fun close() { runCatching { channel?.disconnect() } }
     }
 
     /**
@@ -200,6 +293,12 @@ class ShellSession(
     val hostname: String,
     /** Known-hosts line to persist in DB after first successful connect. */
     val hostKeyLine: String,
+    private val jumpSessions: List<Session> = emptyList(),
+    /**
+     * Known-hosts lines for jump hosts that had no prior stored key (empty on subsequent connects).
+     * Callers should persist these so the user is not prompted again next time.
+     */
+    val newJumpHostKeyLines: List<String> = emptyList(),
 ) {
     val inputStream: java.io.InputStream get() = channelInput
     val outputStream: java.io.OutputStream get() = stdinOutput
@@ -213,6 +312,7 @@ class ShellSession(
     fun disconnect() {
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
+        jumpSessions.reversed().forEach { runCatching { it.disconnect() } }
     }
 }
 
@@ -230,6 +330,9 @@ class SftpSession(
     private val channel: com.jcraft.jsch.ChannelSftp,
     val hostname: String,
     val hostKeyLine: String,
+    private val jumpSessions: List<Session> = emptyList(),
+    /** See [ShellSession.newJumpHostKeyLines]. */
+    val newJumpHostKeyLines: List<String> = emptyList(),
 ) {
     val isConnected get() = channel.isConnected && session.isConnected
 
@@ -292,5 +395,6 @@ class SftpSession(
     fun disconnect() {
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
+        jumpSessions.reversed().forEach { runCatching { it.disconnect() } }
     }
 }

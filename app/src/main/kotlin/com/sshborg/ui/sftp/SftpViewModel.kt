@@ -54,13 +54,16 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val auth = buildAuth(host) ?: return@launch
             _state.value = State.Connecting
 
+            val jumpHosts = parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
+
             val params = SshConnectionParams(
                 hostname         = host.hostname,
                 port             = host.port,
                 username         = host.username,
                 auth             = auth,
-                agentForwarding  = false,
+                agentForwarding  = host.agentForwarding,
                 knownHostsEntry  = host.knownHostsEntry,
+                jumpHosts        = jumpHosts,
             )
 
             runCatching {
@@ -72,8 +75,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }.onSuccess { session ->
                 sftpSession = session
+                // Persist target host key on first connect
                 if (host.knownHostsEntry == null) {
                     hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
+                }
+                // Persist any new jump host keys
+                if (session.newJumpHostKeyLines.isNotEmpty() && host.jumpHostKeys == null) {
+                    val current = hostDao.getById(hostId) ?: host
+                    hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
                 }
                 navigateTo("/")
             }.onFailure { err ->

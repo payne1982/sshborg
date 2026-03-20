@@ -15,4 +15,8 @@ data class HostEntity(
     val knownHostsEntry: String? = null,
     val agentForwarding: Boolean = false,
     val lastConnected: Long? = null,
+    /** Comma-separated jump hosts: "host1:port,host2:port,..." — only used when agentForwarding=true */
+    val jumpHosts: String? = null,
+    /** Newline-separated known_hosts lines for each jump host, persisted after first connect */
+    val jumpHostKeys: String? = null,
 )
