@@ -284,6 +284,11 @@ class SftpSession(
         }, com.jcraft.jsch.ChannelSftp.OVERWRITE)
     }
 
+    fun deleteFile(remotePath: String) = channel.rm(remotePath)
+    fun deleteDir(remotePath: String)  = channel.rmdir(remotePath)
+    fun rename(oldPath: String, newPath: String) = channel.rename(oldPath, newPath)
+    fun mkdir(remotePath: String)      = channel.mkdir(remotePath)
+
     fun disconnect() {
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }

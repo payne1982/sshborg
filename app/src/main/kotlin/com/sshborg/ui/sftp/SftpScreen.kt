@@ -3,7 +3,9 @@ package com.sshborg.ui.sftp
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -64,6 +66,11 @@ fun SftpScreen(
     val atRoot = currentPath == "/" || currentPath.isEmpty()
     val isListing = state is SftpViewModel.State.Listing
 
+    // Dialog states (local UI only — operations go through ViewModel)
+    var entryToDelete by remember { mutableStateOf<SftpEntry?>(null) }
+    var entryToRename by remember { mutableStateOf<SftpEntry?>(null) }
+    var showMkdirDialog by remember { mutableStateOf(false) }
+
     // File picker — opens system file chooser, result forwarded to ViewModel
     val filePicker = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -83,7 +90,6 @@ fun SftpScreen(
                     )
                 },
                 navigationIcon = {
-                    // Always exits to host list — use ".." row or hardware back to navigate up
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to hosts")
                     }
@@ -91,10 +97,17 @@ fun SftpScreen(
             )
         },
         floatingActionButton = {
-            // FAB visible only when browsing, to upload a file to the current directory
             if (isListing) {
-                FloatingActionButton(onClick = { filePicker.launch("*/*") }) {
-                    Icon(Icons.Default.Upload, contentDescription = "Upload file")
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    SmallFloatingActionButton(onClick = { showMkdirDialog = true }) {
+                        Icon(Icons.Default.CreateNewFolder, contentDescription = "New folder")
+                    }
+                    FloatingActionButton(onClick = { filePicker.launch("*/*") }) {
+                        Icon(Icons.Default.Upload, contentDescription = "Upload file")
+                    }
                 }
             }
         },
@@ -148,11 +161,13 @@ fun SftpScreen(
                         } else {
                             items(s.entries, key = { it.name }) { entry ->
                                 SftpEntryItem(
-                                    entry   = entry,
-                                    onClick = {
+                                    entry       = entry,
+                                    onClick     = {
                                         if (entry.isDir) vm.navigateTo("${s.path.trimEnd('/')}/${entry.name}")
                                         else vm.downloadFile(entry, s.path)
                                     },
+                                    onRename    = { entryToRename = entry },
+                                    onDelete    = { entryToDelete = entry },
                                 )
                             }
                         }
@@ -203,6 +218,87 @@ fun SftpScreen(
             }
         }
     }
+
+    // Delete confirmation dialog
+    entryToDelete?.let { entry ->
+        AlertDialog(
+            onDismissRequest = { entryToDelete = null },
+            title = { Text("Delete ${if (entry.isDir) "folder" else "file"}") },
+            text  = { Text("Delete \"${entry.name}\"?\nThis cannot be undone.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.deleteEntry(entry, currentPath)
+                    entryToDelete = null
+                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { entryToDelete = null }) { Text("Cancel") }
+            },
+        )
+    }
+
+    // Rename dialog
+    entryToRename?.let { entry ->
+        var newName by remember(entry) { mutableStateOf(entry.name) }
+        AlertDialog(
+            onDismissRequest = { entryToRename = null },
+            title = { Text("Rename") },
+            text  = {
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("New name") },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (newName.isNotBlank() && newName != entry.name) {
+                            vm.renameEntry(entry, currentPath, newName.trim())
+                        }
+                        entryToRename = null
+                    },
+                    enabled = newName.isNotBlank(),
+                ) { Text("Rename") }
+            },
+            dismissButton = {
+                TextButton(onClick = { entryToRename = null }) { Text("Cancel") }
+            },
+        )
+    }
+
+    // New folder dialog
+    if (showMkdirDialog) {
+        var folderName by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showMkdirDialog = false; folderName = "" },
+            title = { Text("New folder") },
+            text  = {
+                OutlinedTextField(
+                    value = folderName,
+                    onValueChange = { folderName = it },
+                    label = { Text("Folder name") },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (folderName.isNotBlank()) {
+                            vm.createDirectory(currentPath, folderName.trim())
+                        }
+                        showMkdirDialog = false
+                        folderName = ""
+                    },
+                    enabled = folderName.isNotBlank(),
+                ) { Text("Create") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMkdirDialog = false; folderName = "" }) { Text("Cancel") }
+            },
+        )
+    }
 }
 
 @Composable
@@ -230,37 +326,62 @@ private fun BoxScope.TransferProgress(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SftpEntryItem(entry: SftpEntry, onClick: () -> Unit) {
-    ListItem(
-        modifier = Modifier.clickable(onClick = onClick),
-        leadingContent = {
-            Icon(
-                if (entry.isDir) Icons.Default.Folder else Icons.Default.InsertDriveFile,
-                contentDescription = null,
-                tint = if (entry.isDir) MaterialTheme.colorScheme.primary
-                       else MaterialTheme.colorScheme.onSurfaceVariant,
+private fun SftpEntryItem(
+    entry: SftpEntry,
+    onClick: () -> Unit,
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Box {
+        ListItem(
+            modifier = Modifier.combinedClickable(
+                onClick = onClick,
+                onLongClick = { menuExpanded = true },
+            ),
+            leadingContent = {
+                Icon(
+                    if (entry.isDir) Icons.Default.Folder else Icons.Default.InsertDriveFile,
+                    contentDescription = null,
+                    tint = if (entry.isDir) MaterialTheme.colorScheme.primary
+                           else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            headlineContent = {
+                Text(entry.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            },
+            supportingContent = {
+                if (!entry.isDir) {
+                    val date = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
+                        .format(Date(entry.modTimeSeconds.toLong() * 1000))
+                    Text("${formatSize(entry.size)}  ·  $date",
+                        style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            trailingContent = {
+                if (!entry.isDir) {
+                    Icon(Icons.Default.Download, contentDescription = "Download",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp))
+                }
+            },
+        )
+        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text("Rename") },
+                leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) },
+                onClick = { menuExpanded = false; onRename() },
             )
-        },
-        headlineContent = {
-            Text(entry.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        },
-        supportingContent = {
-            if (!entry.isDir) {
-                val date = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
-                    .format(Date(entry.modTimeSeconds.toLong() * 1000))
-                Text("${formatSize(entry.size)}  ·  $date",
-                    style = MaterialTheme.typography.bodySmall)
-            }
-        },
-        trailingContent = {
-            if (!entry.isDir) {
-                Icon(Icons.Default.Download, contentDescription = "Download",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp))
-            }
-        },
-    )
+            DropdownMenuItem(
+                text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                leadingIcon = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
+                onClick = { menuExpanded = false; onDelete() },
+            )
+        }
+    }
     HorizontalDivider(thickness = 0.5.dp)
 }
 

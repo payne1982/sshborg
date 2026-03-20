@@ -177,6 +177,44 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     /** Call after showing the Uploaded snackbar to refresh and return to listing. */
     fun dismissUploaded() = refreshListing()
 
+    fun deleteEntry(entry: SftpEntry, currentPath: String) {
+        val path = "${currentPath.trimEnd('/')}/${entry.name}"
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                if (entry.isDir) sftpSession!!.deleteDir(path)
+                else             sftpSession!!.deleteFile(path)
+                refreshListing()
+            }.onFailure {
+                _opError.tryEmit(it.message ?: "Delete failed")
+            }
+        }
+    }
+
+    fun renameEntry(entry: SftpEntry, currentPath: String, newName: String) {
+        val oldPath = "${currentPath.trimEnd('/')}/${entry.name}"
+        val newPath = "${currentPath.trimEnd('/')}/$newName"
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                sftpSession!!.rename(oldPath, newPath)
+                refreshListing()
+            }.onFailure {
+                _opError.tryEmit(it.message ?: "Rename failed")
+            }
+        }
+    }
+
+    fun createDirectory(currentPath: String, name: String) {
+        val path = "${currentPath.trimEnd('/')}/$name"
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                sftpSession!!.mkdir(path)
+                refreshListing()
+            }.onFailure {
+                _opError.tryEmit(it.message ?: "Create directory failed")
+            }
+        }
+    }
+
     private fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
         val session = sftpSession ?: return
