@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
@@ -22,6 +23,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         data class Listing(val path: String, val entries: List<SftpEntry>) : State
         data class Downloading(val filename: String, val bytesReceived: Long) : State
         data class Downloaded(val filename: String) : State
+        data class Uploading(val filename: String, val bytesSent: Long) : State
+        data class Uploaded(val filename: String) : State
         data class Error(val message: String) : State
         object Disconnected : State
     }
@@ -140,13 +143,45 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Call after showing the Downloaded snackbar to return to the listing. */
-    fun dismissDownloaded() {
+    fun dismissDownloaded() = refreshListing()
+
+    fun uploadFile(uri: Uri) {
+        val context = getApplication<Application>()
+        val currentPath = (state.value as? State.Listing)?.path ?: return
+
+        // Resolve the display name from the URI
+        val filename = context.contentResolver
+            .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.use { cursor ->
+                if (cursor.moveToFirst()) cursor.getString(0) else null
+            } ?: uri.lastPathSegment ?: "file"
+
+        val remotePath = "${currentPath.trimEnd('/')}/$filename"
+
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.value = State.Uploading(filename, 0L)
+            runCatching {
+                context.contentResolver.openInputStream(uri)!!.use { stream ->
+                    sftpSession!!.uploadFile(stream, remotePath) { bytes ->
+                        _state.value = State.Uploading(filename, bytes)
+                    }
+                }
+                _state.value = State.Uploaded(filename)
+            }.onFailure {
+                refreshListing()
+                _opError.tryEmit(it.message ?: "Upload failed")
+            }
+        }
+    }
+
+    /** Call after showing the Uploaded snackbar to refresh and return to listing. */
+    fun dismissUploaded() = refreshListing()
+
+    private fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
         val session = sftpSession ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                _state.value = State.Listing(current, session.listDir(current))
-            }
+            runCatching { _state.value = State.Listing(current, session.listDir(current)) }
         }
     }
 

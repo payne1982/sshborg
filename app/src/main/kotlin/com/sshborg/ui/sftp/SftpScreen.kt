@@ -1,6 +1,8 @@
 package com.sshborg.ui.sftp
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +19,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.data.ssh.SftpEntry
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,23 +31,29 @@ fun SftpScreen(
 ) {
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(hostId) { vm.connect(hostId) }
 
-    // Non-fatal operation errors (permission denied, download failed, etc.)
+    // Non-fatal operation errors shown as snackbar without leaving listing
     LaunchedEffect(Unit) {
         vm.opError.collect { message ->
             snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Long)
         }
     }
 
-    // Handle Downloaded state: show snackbar then go back to listing
+    // Downloaded: show snackbar, then refresh listing
     LaunchedEffect(state) {
         if (state is SftpViewModel.State.Downloaded) {
             val s = state as SftpViewModel.State.Downloaded
-            snackbarHostState.showSnackbar("Saved to ${android.os.Environment.DIRECTORY_DOWNLOADS}/SSHBorg/${s.filename}")
+            snackbarHostState.showSnackbar(
+                "Saved to ${android.os.Environment.DIRECTORY_DOWNLOADS}/SSHBorg/${s.filename}"
+            )
             vm.dismissDownloaded()
+        }
+        if (state is SftpViewModel.State.Uploaded) {
+            val s = state as SftpViewModel.State.Uploaded
+            snackbarHostState.showSnackbar("Uploaded: ${s.filename}")
+            vm.dismissUploaded()
         }
     }
 
@@ -55,6 +62,12 @@ fun SftpScreen(
 
     val currentPath = (state as? SftpViewModel.State.Listing)?.path ?: ""
     val atRoot = currentPath == "/" || currentPath.isEmpty()
+    val isListing = state is SftpViewModel.State.Listing
+
+    // File picker — opens system file chooser, result forwarded to ViewModel
+    val filePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri -> uri?.let { vm.uploadFile(it) } }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -76,6 +89,14 @@ fun SftpScreen(
                     }
                 },
             )
+        },
+        floatingActionButton = {
+            // FAB visible only when browsing, to upload a file to the current directory
+            if (isListing) {
+                FloatingActionButton(onClick = { filePicker.launch("*/*") }) {
+                    Icon(Icons.Default.Upload, contentDescription = "Upload file")
+                }
+            }
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
@@ -139,21 +160,26 @@ fun SftpScreen(
                 }
 
                 is SftpViewModel.State.Downloading -> {
-                    Column(
-                        Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        CircularProgressIndicator()
-                        Text("Downloading ${s.filename}…")
-                        if (s.bytesReceived > 0) {
-                            Text(formatSize(s.bytesReceived), style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
+                    TransferProgress(
+                        label   = "Downloading ${s.filename}",
+                        bytes   = s.bytesReceived,
+                        icon    = Icons.Default.Download,
+                    )
                 }
 
                 is SftpViewModel.State.Downloaded -> {
-                    // Handled by LaunchedEffect above; show spinner while snackbar is visible
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+
+                is SftpViewModel.State.Uploading -> {
+                    TransferProgress(
+                        label   = "Uploading ${s.filename}",
+                        bytes   = s.bytesSent,
+                        icon    = Icons.Default.Upload,
+                    )
+                }
+
+                is SftpViewModel.State.Uploaded -> {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
 
@@ -175,6 +201,31 @@ fun SftpScreen(
                     Text("Disconnected", Modifier.align(Alignment.Center))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.TransferProgress(
+    label: String,
+    bytes: Long,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+) {
+    Column(
+        Modifier.align(Alignment.Center),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        CircularProgressIndicator()
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Icon(icon, null, modifier = Modifier.size(18.dp))
+            Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        if (bytes > 0) {
+            Text(formatSize(bytes), style = MaterialTheme.typography.bodySmall)
         }
     }
 }

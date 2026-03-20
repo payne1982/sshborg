@@ -267,6 +267,23 @@ class SftpSession(
         })
     }
 
+    /**
+     * Uploads [src] to [remotePath], calling [onProgress] with cumulative bytes sent.
+     * Runs synchronously — call from an IO coroutine.
+     */
+    fun uploadFile(
+        src: java.io.InputStream,
+        remotePath: String,
+        onProgress: (bytesSent: Long) -> Unit = {},
+    ) {
+        var sent = 0L
+        channel.put(src, remotePath, object : com.jcraft.jsch.SftpProgressMonitor {
+            override fun init(op: Int, src: String?, dest: String?, max: Long) {}
+            override fun count(count: Long): Boolean { sent += count; onProgress(sent); return true }
+            override fun end() {}
+        }, com.jcraft.jsch.ChannelSftp.OVERWRITE)
+    }
+
     fun disconnect() {
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
