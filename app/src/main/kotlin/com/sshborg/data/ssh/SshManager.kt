@@ -93,7 +93,7 @@ object SshManager {
                 jumpJsch.setKnownHosts(ByteArrayInputStream(jump.knownHostsEntry.toByteArray()))
             }
 
-            val jumpSession = jumpJsch.getSession(params.username, jump.host, jump.port)
+            val jumpSession = jumpJsch.getSession(jump.username ?: params.username, jump.host, jump.port)
             if (proxy != null) jumpSession.setProxy(proxy)
 
             jumpSession.setUserInfo(object : UserInfo {

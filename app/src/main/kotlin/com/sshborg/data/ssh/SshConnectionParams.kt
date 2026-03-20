@@ -4,6 +4,8 @@ package com.sshborg.data.ssh
 data class JumpHost(
     val host: String,
     val port: Int,
+    /** If null, the target host's username is used for this hop. */
+    val username: String?,
     /** Known-hosts line for this jump host — null on first connect, non-null on subsequent connects. */
     val knownHostsEntry: String?,
 )
@@ -27,8 +29,10 @@ sealed interface SshAuth {
 }
 
 /**
- * Parses a jump-hosts string ("host1:22,host2:port") and a newline-delimited known_hosts blob
- * into a list of [JumpHost].
+ * Parses a jump-hosts string ("user@host1:22,host2:port") and a newline-delimited known_hosts
+ * blob into a list of [JumpHost].
+ *
+ * Each token format: [user@]host[:port]  — user and port are optional.
  */
 fun parseJumpHosts(raw: String?, knownKeysBlob: String?): List<JumpHost> {
     if (raw.isNullOrBlank()) return emptyList()
@@ -41,17 +45,38 @@ fun parseJumpHosts(raw: String?, knownKeysBlob: String?): List<JumpHost> {
     return raw.split(",").mapNotNull { token ->
         val trimmed = token.trim()
         if (trimmed.isEmpty()) return@mapNotNull null
-        val lastColon = trimmed.lastIndexOf(':')
+
+        // Split off optional username: user@host:port
+        val atIdx = trimmed.indexOf('@')
+        val username: String?
+        val hostPort: String
+        if (atIdx != -1) {
+            username = trimmed.substring(0, atIdx).takeIf { it.isNotEmpty() }
+            hostPort = trimmed.substring(atIdx + 1)
+        } else {
+            username = null
+            hostPort = trimmed
+        }
+
+        // Split host:port — only treat the suffix as a port if it's a valid port number,
+        // so that plain hostnames with dots (e.g. server.example.com) are never mangled.
+        val lastColon = hostPort.lastIndexOf(':')
         val host: String
         val port: Int
-        if (lastColon == -1 || trimmed.indexOf(':') == lastColon && trimmed.contains('.')) {
-            // No colon, or single colon that is part of IPv4 — treat full token as host
-            host = trimmed
+        if (lastColon == -1) {
+            host = hostPort
             port = 22
         } else {
-            host = trimmed.substring(0, lastColon)
-            port = trimmed.substring(lastColon + 1).toIntOrNull() ?: 22
+            val possiblePort = hostPort.substring(lastColon + 1).toIntOrNull()
+            if (possiblePort != null && possiblePort in 1..65535) {
+                host = hostPort.substring(0, lastColon)
+                port = possiblePort
+            } else {
+                host = hostPort
+                port = 22
+            }
         }
-        JumpHost(host, port, keysByHost[host])
+
+        JumpHost(host, port, username, keysByHost[host])
     }
 }
