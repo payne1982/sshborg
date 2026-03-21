@@ -112,9 +112,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
                 if (host.knownHostsEntry == null)
                     hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
-                if (session.newJumpHostKeyLines.isNotEmpty() && host.jumpHostKeys == null) {
+                if (session.newJumpHostKeyLines.isNotEmpty()) {
                     val current = hostDao.getById(hostId) ?: host
-                    hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
+                    val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
+                    val merged = (existing + session.newJumpHostKeyLines).joinToString("\n")
+                    hostDao.upsert(current.copy(jumpHostKeys = merged))
                 }
                 navigateTo(session.homePath)
             }.onFailure { err ->
