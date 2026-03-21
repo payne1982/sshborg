@@ -9,6 +9,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -76,6 +77,11 @@ fun SftpScreen(
     var entryToDelete by remember { mutableStateOf<SftpEntry?>(null) }
     var entryToRename by remember { mutableStateOf<SftpEntry?>(null) }
     var showMkdirDialog by remember { mutableStateOf(false) }
+    var pendingConflict by remember { mutableStateOf<SftpViewModel.ConflictData?>(null) }
+
+    LaunchedEffect(Unit) {
+        vm.conflictEvent.collect { pendingConflict = it }
+    }
 
     // File picker — opens system file chooser, result forwarded to ViewModel
     val filePicker = rememberLauncherForActivityResult(
@@ -156,12 +162,14 @@ fun SftpScreen(
                 is SftpViewModel.State.Listing -> {
                     var isRefreshing by remember { mutableStateOf(false) }
                     LaunchedEffect(s) { isRefreshing = false }
+                    val listState = rememberLazyListState()
+                    LaunchedEffect(s.path) { listState.scrollToItem(0) }
                     PullToRefreshBox(
                         isRefreshing = isRefreshing,
                         onRefresh = { isRefreshing = true; vm.refreshListing() },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                    LazyColumn(Modifier.fillMaxSize()) {
+                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
                         // ".." row — go up one level (hidden at root)
                         if (!atRoot) {
                             item(key = "..") {
@@ -289,6 +297,28 @@ fun SftpScreen(
             },
             dismissButton = {
                 TextButton(onClick = { entryToRename = null }) { Text("Cancel") }
+            },
+        )
+    }
+
+    // Download conflict dialog
+    pendingConflict?.let { conflict ->
+        AlertDialog(
+            onDismissRequest = { pendingConflict = null },
+            title = { Text("File already exists") },
+            text  = { Text("\"${conflict.entry.name}\" already exists in Downloads/SSHBorg/.") },
+            confirmButton = {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = { pendingConflict = null }) {
+                        Text("Cancel")
+                    }
+                    TextButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
+                        Text("Keep both")
+                    }
+                    TextButton(onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) }) {
+                        Text("Overwrite", color = MaterialTheme.colorScheme.error)
+                    }
+                }
             },
         )
     }

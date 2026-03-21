@@ -1,6 +1,7 @@
 package com.sshborg.ui.sftp
 
 import android.app.Application
+import android.content.ContentUris
 import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
@@ -44,6 +45,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _opError = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val opError: SharedFlow<String> = _opError
+
+    /** Emitted when a file to be downloaded already exists in Downloads/SSHBorg/. */
+    data class ConflictData(val entry: SftpEntry, val remotePath: String, val existingUri: Uri)
+    private val _conflictEvent = MutableSharedFlow<ConflictData>(extraBufferCapacity = 1)
+    val conflictEvent: SharedFlow<ConflictData> = _conflictEvent
 
     private var sftpSession: SftpSession? = null
     private val pathStack = mutableListOf<String>()
@@ -142,33 +148,69 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     fun downloadFile(entry: SftpEntry, currentPath: String) {
         val remotePath = if (currentPath.endsWith("/")) "$currentPath${entry.name}"
                          else "$currentPath/${entry.name}"
-        val context = getApplication<Application>()
-
         viewModelScope.launch(Dispatchers.IO) {
-            _state.value = State.Downloading(entry.name, 0L)
-
-            val values = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, entry.name)
-                put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
-                put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg/")
+            val existing = findExistingDownload(entry.name)
+            if (existing != null) {
+                _conflictEvent.tryEmit(ConflictData(entry, remotePath, existing))
+                return@launch
             }
-            val uri: Uri? = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-            if (uri == null) {
-                _state.value = State.Error("Cannot create file in Downloads"); return@launch
-            }
+            performDownload(entry.name, remotePath)
+        }
+    }
 
-            runCatching {
-                context.contentResolver.openOutputStream(uri)!!.use { out ->
-                    sftpSession!!.downloadFile(remotePath, out) { bytes ->
-                        _state.value = State.Downloading(entry.name, bytes)
-                    }
+    fun downloadOverwrite(conflict: ConflictData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            getApplication<Application>().contentResolver.delete(conflict.existingUri, null, null)
+            performDownload(conflict.entry.name, conflict.remotePath)
+        }
+    }
+
+    fun downloadKeepBoth(conflict: ConflictData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            performDownload(conflict.entry.name, conflict.remotePath)
+        }
+    }
+
+    private suspend fun performDownload(filename: String, remotePath: String) {
+        val context = getApplication<Application>()
+        _state.value = State.Downloading(filename, 0L)
+        val values = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, filename)
+            put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
+            put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg/")
+        }
+        val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+        if (uri == null) {
+            _state.value = State.Error("Cannot create file in Downloads"); return
+        }
+        runCatching {
+            context.contentResolver.openOutputStream(uri)!!.use { out ->
+                sftpSession!!.downloadFile(remotePath, out) { bytes ->
+                    _state.value = State.Downloading(filename, bytes)
                 }
-                _state.value = State.Downloaded(entry.name)
-            }.onFailure {
-                context.contentResolver.delete(uri, null, null)
-                dismissDownloaded()
-                _opError.tryEmit(it.message ?: "Download failed")
             }
+            _state.value = State.Downloaded(filename)
+        }.onFailure {
+            context.contentResolver.delete(uri, null, null)
+            dismissDownloaded()
+            _opError.tryEmit(it.message ?: "Download failed")
+        }
+    }
+
+    private fun findExistingDownload(filename: String): Uri? {
+        val context = getApplication<Application>()
+        val projection = arrayOf(MediaStore.Downloads._ID)
+        val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ? AND " +
+                        "${MediaStore.Downloads.RELATIVE_PATH} = ?"
+        val selectionArgs = arrayOf(filename, "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg/")
+        return context.contentResolver.query(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            projection, selection, selectionArgs, null,
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID))
+                ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id)
+            } else null
         }
     }
 
