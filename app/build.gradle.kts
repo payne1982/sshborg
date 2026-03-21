@@ -18,9 +18,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["allowBackup"] = "true"
+        }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            manifestPlaceholders["allowBackup"] = "false"
         }
     }
 
@@ -35,6 +40,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -67,5 +73,8 @@ dependencies {
     // in classes9.dex, which took precedence over our override in classes11.dex.
     implementation(files("libs/jsch-0.2.19-patched.jar"))
     implementation(libs.bouncycastle)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.datastore.preferences)
     debugImplementation(libs.androidx.ui.tooling)
 }

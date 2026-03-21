@@ -1,19 +1,42 @@
 package com.sshborg
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
 import com.sshborg.ui.theme.SshBorgTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!BuildConfig.DEBUG) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
         enableEdgeToEdge()
         setContent {
             SshBorgTheme {
                 AppNavigation()
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val app = application as SshBorgApp
+        lifecycleScope.launch {
+            val biometricEnabled = app.appPreferences.biometricLock.first()
+            if (!biometricEnabled) return@launch
+            val timeoutMs = app.appPreferences.lockTimeoutMinutes.first() * 60_000L
+            val elapsed = System.currentTimeMillis() - app.lastAuthTime
+            if (elapsed <= timeoutMs) return@launch
+            val ok = BiometricHelper.authenticate(this@MainActivity)
+            if (ok) app.lastAuthTime = System.currentTimeMillis()
+            else finish()
         }
     }
 }

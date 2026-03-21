@@ -1,9 +1,12 @@
 package com.sshborg
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +17,7 @@ import com.sshborg.service.SshForegroundService
 import com.sshborg.ui.hosts.AddEditHostScreen
 import com.sshborg.ui.hosts.HostsScreen
 import com.sshborg.ui.keys.KeysScreen
+import com.sshborg.ui.settings.SettingsScreen
 import com.sshborg.ui.sftp.SftpScreen
 import com.sshborg.ui.terminal.TerminalScreen
 
@@ -30,6 +34,7 @@ sealed class Screen(val route: String) {
         fun routeFor(sessionId: String) = "sftp/$sessionId"
     }
     object Keys : Screen("keys")
+    object Settings : Screen("settings")
 }
 
 @Composable
@@ -38,6 +43,35 @@ fun AppNavigation() {
     val context = LocalContext.current
     val app = context.applicationContext as SshBorgApp
     val sessionManager = app.sessionManager
+
+    // One-time root warning
+    val isRooted = remember { RootDetector.isRooted() }
+    var showRootWarning by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        if (isRooted && !app.appPreferences.rootWarningAcknowledged.first()) {
+            showRootWarning = true
+        }
+    }
+    if (showRootWarning) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("Security warning") },
+            text  = {
+                Text(
+                    "This device appears to be rooted. On rooted devices the security " +
+                    "guarantees of the Android Keystore are weakened, and other apps " +
+                    "may be able to access sensitive data. Proceed with caution."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRootWarning = false
+                    scope.launch { app.appPreferences.setRootWarningAcknowledged() }
+                }) { Text("I understand") }
+            },
+        )
+    }
 
     NavHost(navController = navController, startDestination = Screen.Hosts.route) {
 
@@ -65,6 +99,7 @@ fun AppNavigation() {
                 onAddHost  = { navController.navigate(Screen.AddEditHost.routeFor(Screen.AddEditHost.NEW_ID)) },
                 onEditHost = { hostId -> navController.navigate(Screen.AddEditHost.routeFor(hostId)) },
                 onKeysClick = { navController.navigate(Screen.Keys.route) },
+                onSettingsClick = { navController.navigate(Screen.Settings.route) },
             )
         }
 
@@ -112,6 +147,10 @@ fun AppNavigation() {
 
         composable(Screen.Keys.route) {
             KeysScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }

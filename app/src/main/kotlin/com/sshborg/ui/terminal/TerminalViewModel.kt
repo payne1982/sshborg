@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
+import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
@@ -148,7 +149,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private suspend fun buildAuth(host: HostEntity): SshAuth? {
-        val keyPem = host.keyId?.let { keyDao.getById(it)?.privateKeyPem }
+        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
         return if (host.keyId != null && keyPem != null) {
             SshAuth.PublicKey(keyPem)
         } else {

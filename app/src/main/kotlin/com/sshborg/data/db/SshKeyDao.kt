@@ -8,6 +8,9 @@ interface SshKeyDao {
     @Query("SELECT * FROM ssh_keys ORDER BY label ASC")
     fun getAll(): Flow<List<SshKeyEntity>>
 
+    @Query("SELECT * FROM ssh_keys ORDER BY label ASC")
+    suspend fun getAllOnce(): List<SshKeyEntity>
+
     @Query("SELECT * FROM ssh_keys WHERE id = :id")
     suspend fun getById(id: Long): SshKeyEntity?
 
