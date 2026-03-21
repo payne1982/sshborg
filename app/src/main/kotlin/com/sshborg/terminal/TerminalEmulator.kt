@@ -11,7 +11,7 @@ class TerminalEmulator(columns: Int, rows: Int) {
     // Parser state machine
     private var state = State.NORMAL
     private val params = mutableListOf<Int>()
-    private val oscBuf = StringBuilder()
+    private val oscBuf = java.io.ByteArrayOutputStream()
     private var csiIntermediate = ""
     private var privMode = false   // '?' was seen after CSI
 
@@ -102,7 +102,7 @@ class TerminalEmulator(columns: Int, rows: Int) {
         state = State.NORMAL
         when (b) {
             '['.code -> { state = State.CSI; params.clear(); csiIntermediate = ""; privMode = false }
-            ']'.code -> { state = State.OSC; oscBuf.clear() }
+            ']'.code -> { state = State.OSC; oscBuf.reset() }
             'O'.code -> { state = State.SS3 }
             '7'.code -> buffer.saveCursor()
             '8'.code -> buffer.restoreCursor()
@@ -136,10 +136,10 @@ class TerminalEmulator(columns: Int, rows: Int) {
 
     private fun processOsc(b: Int) {
         when (b) {
-            0x07, 0x9C -> { handleOsc(oscBuf.toString()); state = State.NORMAL }
+            0x07, 0x9C -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
             0x1B -> { /* ESC \ terminator – wait for next */ }
-            '\\'.code -> { handleOsc(oscBuf.toString()); state = State.NORMAL }
-            else -> oscBuf.append(b.toChar())
+            '\\'.code -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
+            else -> oscBuf.write(b)
         }
     }
 
