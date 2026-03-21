@@ -12,13 +12,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
 
 private val TIMEOUT_OPTIONS = listOf(
-    0   to "Immediately",
-    1   to "1 minute",
-    5   to "5 minutes",
-    15  to "15 minutes",
-    30  to "30 minutes",
-    60  to "1 hour",
-    240 to "4 hours",
+    0    to "Immediately",
+    30   to "30 seconds",
+    60   to "1 minute",
+    180  to "3 minutes",
+    300  to "5 minutes",
+    900  to "15 minutes",
+    1800 to "30 minutes",
+    3600 to "1 hour",
+    14400 to "4 hours",
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,7 +31,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val biometricLock      by vm.biometricLock.collectAsState()
-    val lockTimeoutMinutes by vm.lockTimeoutMinutes.collectAsState()
+    val lockTimeoutSeconds by vm.lockTimeoutSeconds.collectAsState()
     val keystoreEncryption by vm.keystoreEncryption.collectAsState()
     val confirmExit        by vm.confirmExit.collectAsState()
     val isMigrating        by vm.isMigrating.collectAsState()
@@ -43,8 +45,8 @@ fun SettingsScreen(
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
-    val currentTimeoutLabel = TIMEOUT_OPTIONS.find { it.first == lockTimeoutMinutes }?.second
-        ?: "$lockTimeoutMinutes minutes"
+    val currentTimeoutLabel = TIMEOUT_OPTIONS.find { it.first == lockTimeoutSeconds }?.second
+        ?: "$lockTimeoutSeconds seconds"
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -139,11 +141,11 @@ fun SettingsScreen(
                                 expanded = timeoutMenuExpanded,
                                 onDismissRequest = { timeoutMenuExpanded = false },
                             ) {
-                                TIMEOUT_OPTIONS.forEach { (minutes, label) ->
+                                TIMEOUT_OPTIONS.forEach { (seconds, label) ->
                                     DropdownMenuItem(
                                         text = { Text(label) },
                                         onClick = {
-                                            vm.setLockTimeoutMinutes(minutes)
+                                            vm.setLockTimeoutSeconds(seconds)
                                             timeoutMenuExpanded = false
                                         },
                                     )

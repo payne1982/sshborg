@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val biometricEnabled = app.appPreferences.biometricLock.first()
             if (!biometricEnabled) return@launch
-            val timeoutMs = app.appPreferences.lockTimeoutMinutes.first() * 60_000L
+            val timeoutMs = app.appPreferences.lockTimeoutSeconds.first() * 1_000L
             val elapsed = System.currentTimeMillis() - app.lastAuthTime
             if (elapsed <= timeoutMs) return@launch
             val ok = BiometricHelper.authenticate(this@MainActivity)

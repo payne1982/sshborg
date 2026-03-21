@@ -24,8 +24,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val confirmExit: StateFlow<Boolean> =
         prefs.confirmExit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val lockTimeoutMinutes: StateFlow<Int> =
-        prefs.lockTimeoutMinutes.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 30)
+    val lockTimeoutSeconds: StateFlow<Int> =
+        prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
     private val _isMigrating = MutableStateFlow(false)
     val isMigrating: StateFlow<Boolean> = _isMigrating
@@ -41,8 +41,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setConfirmExit(enabled) }
     }
 
-    fun setLockTimeoutMinutes(minutes: Int) {
-        viewModelScope.launch { prefs.setLockTimeoutMinutes(minutes) }
+    fun setLockTimeoutSeconds(seconds: Int) {
+        viewModelScope.launch { prefs.setLockTimeoutSeconds(seconds) }
     }
 
     /** Encrypts all existing plain-text keys with Android Keystore. */

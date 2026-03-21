@@ -18,7 +18,7 @@ class AppPreferences(private val context: Context) {
         val BIOMETRIC_LOCK           = booleanPreferencesKey("biometric_lock")
         val KEYSTORE_ENCRYPTION      = booleanPreferencesKey("keystore_encryption")
         val CONFIRM_EXIT             = booleanPreferencesKey("confirm_exit")
-        val LOCK_TIMEOUT_MINUTES     = intPreferencesKey("lock_timeout_minutes")
+        val LOCK_TIMEOUT_SECONDS     = intPreferencesKey("lock_timeout_seconds")
         val ROOT_WARNING_ACKNOWLEDGED = booleanPreferencesKey("root_warning_acknowledged")
     }
 
@@ -31,9 +31,9 @@ class AppPreferences(private val context: Context) {
     val confirmExit: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.CONFIRM_EXIT] ?: false }
 
-    /** Lock timeout in minutes. 0 = lock immediately on every app switch. Default 30. */
-    val lockTimeoutMinutes: Flow<Int> =
-        context.dataStore.data.map { it[Keys.LOCK_TIMEOUT_MINUTES] ?: 30 }
+    /** Lock timeout in seconds. 0 = lock immediately on every app switch. Default 60 (1 minute). */
+    val lockTimeoutSeconds: Flow<Int> =
+        context.dataStore.data.map { it[Keys.LOCK_TIMEOUT_SECONDS] ?: 60 }
 
     val rootWarningAcknowledged: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.ROOT_WARNING_ACKNOWLEDGED] ?: false }
@@ -50,8 +50,8 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.CONFIRM_EXIT] = enabled }
     }
 
-    suspend fun setLockTimeoutMinutes(minutes: Int) {
-        context.dataStore.edit { it[Keys.LOCK_TIMEOUT_MINUTES] = minutes }
+    suspend fun setLockTimeoutSeconds(seconds: Int) {
+        context.dataStore.edit { it[Keys.LOCK_TIMEOUT_SECONDS] = seconds }
     }
 
     suspend fun setRootWarningAcknowledged() {
