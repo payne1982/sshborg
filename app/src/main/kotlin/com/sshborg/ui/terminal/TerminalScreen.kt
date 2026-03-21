@@ -176,6 +176,11 @@ fun TerminalScreen(
         }
     }
 
+    // Auto-navigate back when the remote shell exits cleanly
+    LaunchedEffect(Unit) {
+        vm.navBack.collect { onBack() }
+    }
+
     // Dismiss keyboard on screen exit
     val view = LocalView.current
     DisposableEffect(Unit) {

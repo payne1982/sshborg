@@ -50,6 +50,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
+    /** Emitted when the remote shell exits cleanly — screen should navigate back automatically. */
+    private val _navBack = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val navBack: SharedFlow<Unit> = _navBack
+
     /**
      * Attaches this ViewModel to an existing session in [SessionManager].
      * Must be called before [connect]. If the session is already connected, starts reading.
@@ -134,7 +138,11 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 startReading(session)
             }.onFailure { err ->
                 _state.value = ConnectionState.Error(err.message ?: "Connection failed")
-                sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
+                // Remove from SessionManager so the notification reflects zero active sessions
+                sessionManager.remove(id)
+                if (sessionManager.sessions.value.isEmpty()) {
+                    SshForegroundService.stop(getApplication())
+                }
             }
         }
     }
@@ -159,19 +167,37 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         readerJob?.cancel()
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val buf = ByteArray(4096)
+            var cleanExit = false
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
-                    if (n < 0) break
+                    if (n < 0) { cleanExit = true; break }
                     synchronized(em) { em.process(buf, 0, n) }
                     onNeedsRedraw?.invoke()
                 }
-            } catch (_: Exception) {}
-            // Mark session as disconnected only if this is still the active session
-            val id = sessionId
-            if (id != null && sessionManager.get(id)?.shellSession === session) {
-                _state.value = ConnectionState.Disconnected
-                sessionManager.update(id) { it.copy(status = SessionManager.Status.Disconnected) }
+                // Loop exited because session.isConnected flipped (e.g. server closed channel)
+                if (isActive && !cleanExit) cleanExit = true
+            } catch (_: Exception) {
+                // IOException: unexpected network/socket error
+            }
+
+            // If the job was cancelled (background() called), don't touch the session
+            if (!isActive) return@launch
+
+            // Session ended — remove it from SessionManager so the notification updates
+            val id = sessionId ?: return@launch
+            if (sessionManager.get(id)?.shellSession === session) {
+                sessionManager.remove(id)
+                if (sessionManager.sessions.value.isEmpty()) {
+                    SshForegroundService.stop(getApplication())
+                }
+                if (cleanExit) {
+                    // Shell exited normally (exit/logout) — go back automatically
+                    _navBack.tryEmit(Unit)
+                } else {
+                    // Unexpected disconnect — show overlay so the user knows
+                    _state.value = ConnectionState.Disconnected
+                }
             }
         }
     }
