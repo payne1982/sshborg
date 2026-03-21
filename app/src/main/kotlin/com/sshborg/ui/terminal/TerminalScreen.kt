@@ -1,11 +1,13 @@
 package com.sshborg.ui.terminal
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import kotlinx.coroutines.delay
 @Suppress("UNUSED_VARIABLE")
@@ -26,18 +29,25 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun TerminalScreen(
-    hostId: Long,
+    sessionId: String,
+    sessions: List<SessionManager.ActiveSession>,
     onBack: () -> Unit,
+    onSwitchSession: (String) -> Unit,
     vm: TerminalViewModel = viewModel(),
 ) {
-    val state by vm.state.collectAsState()
-    val title by vm.title.collectAsState()
+    val state   by vm.state.collectAsState()
+    val title   by vm.title.collectAsState()
+    val emulator by vm.emulatorFlow.collectAsState()
 
-    // Toggle state for sticky modifier keys
+    // Siblings: other Shell sessions for the same host (for the tab bar)
+    val currentSession = sessions.find { it.id == sessionId }
+    val siblingShellSessions = if (currentSession != null)
+        sessions.filter { it.hostId == currentSession.hostId && it.type == SessionManager.SessionType.Shell }
+    else emptyList()
+
     var ctrlActive by remember { mutableStateOf(false) }
     var altActive  by remember { mutableStateOf(false) }
 
-    // Input handler that applies active modifiers to the next keypress
     val sendInput: (ByteArray) -> Unit = { bytes ->
         val out = when {
             ctrlActive && bytes.size == 1 -> {
@@ -49,16 +59,17 @@ fun TerminalScreen(
                     else -> bytes
                 }
             }
-            altActive && bytes.size == 1 -> {
-                altActive = false
-                byteArrayOf(0x1B, bytes[0])
-            }
+            altActive && bytes.size == 1 -> { altActive = false; byteArrayOf(0x1B, bytes[0]) }
             else -> bytes
         }
         vm.sendInput(out)
     }
 
-    // Mostra la tastiera quando la connessione è pronta
+    // Reject host key on hardware back during verification
+    BackHandler(state is ConnectionState.HostKeyPrompt) { vm.rejectHostKey() }
+    // Cancel password prompt on hardware back
+    BackHandler(state is ConnectionState.PasswordPrompt) { vm.submitPassword(""); onBack() }
+
     LaunchedEffect(state) {
         if (state is ConnectionState.Connected) {
             delay(300)
@@ -72,10 +83,17 @@ fun TerminalScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title = { Text(title.ifEmpty { "Terminal" }, maxLines = 1) },
+                title = { Text(title.ifEmpty { currentSession?.hostLabel ?: "Terminal" }, maxLines = 1) },
                 navigationIcon = {
-                    IconButton(onClick = { vm.disconnect(); onBack() }) {
+                    // Back = send to background (don't disconnect)
+                    IconButton(onClick = { vm.background(); onBack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                    }
+                },
+                actions = {
+                    // Disconnect button
+                    IconButton(onClick = { vm.disconnect(); onBack() }) {
+                        Icon(Icons.Default.Close, contentDescription = "Disconnect")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -86,77 +104,111 @@ fun TerminalScreen(
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             Column(Modifier.fillMaxSize().imePadding()) {
-                // Main terminal view
+                // Terminal view
                 AndroidView(
                     factory = { ctx ->
                         TerminalView(ctx).also { view ->
-                            view.emulator = vm.emulator
-                            view.onInput = sendInput
-                            view.onResize = { cols, rows -> vm.resize(cols, rows) }
-                            vm.onNeedsRedraw = { view.postInvalidate() }
+                            view.emulator = vm.emulatorFlow.value
+                            view.onInput   = sendInput
+                            view.onResize  = { cols, rows -> vm.resize(cols, rows) }
+                            vm.onNeedsRedraw  = { view.postInvalidate() }
                             vm.terminalViewRef = view
                         }
                     },
                     update = { view ->
-                        view.emulator = vm.emulator
-                        view.onInput = sendInput
-                        view.onResize = { cols, rows -> vm.resize(cols, rows) }
-                        vm.onNeedsRedraw = { view.postInvalidate() }
+                        view.emulator = emulator
+                        view.onInput   = sendInput
+                        view.onResize  = { cols, rows -> vm.resize(cols, rows) }
+                        vm.onNeedsRedraw  = { view.postInvalidate() }
                         vm.terminalViewRef = view
                         view.postInvalidate()
                     },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 )
 
-                // Extra key bar — only visible when soft keyboard is open
+                // Tab chips — only when there are multiple sessions for this host
+                if (siblingShellSessions.size > 1) {
+                    SessionTabRow(
+                        sessions       = siblingShellSessions,
+                        currentId      = sessionId,
+                        onSwitch       = onSwitchSession,
+                    )
+                }
+
+                // Extra key bar — only when soft keyboard is open
                 if (imeVisible) {
                     ExtraKeyRow(
-                        ctrlActive = ctrlActive,
-                        altActive  = altActive,
+                        ctrlActive  = ctrlActive,
+                        altActive   = altActive,
                         onCtrlToggle = { ctrlActive = !ctrlActive },
                         onAltToggle  = { altActive  = !altActive  },
-                        onKey = { bytes -> sendInput(bytes) },
+                        onKey        = { bytes -> sendInput(bytes) },
                     )
                 }
             }
 
-            // Overlays depending on state
+            // State overlays
             when (val s = state) {
-                is ConnectionState.Connecting -> LoadingOverlay("Connecting…")
-
-                is ConnectionState.PasswordPrompt -> PasswordDialog(
-                    hostname = s.hostname,
+                is ConnectionState.Connecting      -> LoadingOverlay("Connecting…")
+                is ConnectionState.PasswordPrompt  -> PasswordDialog(
+                    hostname  = s.hostname,
                     onConfirm = vm::submitPassword,
-                    onDismiss = { vm.disconnect(); onBack() },
+                    onDismiss = { vm.submitPassword(""); onBack() },
                 )
-
-                is ConnectionState.HostKeyPrompt -> HostKeyDialog(
-                    hostname = s.hostname,
+                is ConnectionState.HostKeyPrompt   -> HostKeyDialog(
+                    hostname    = s.hostname,
                     fingerprint = s.fingerprint,
-                    onAccept = { vm.acceptHostKey() },
-                    onReject = { vm.rejectHostKey(); onBack() },
+                    onAccept    = { vm.acceptHostKey() },
+                    onReject    = { vm.rejectHostKey() },
                 )
-
-                is ConnectionState.Error -> ErrorOverlay(message = s.message, onBack = onBack)
-
-                is ConnectionState.Disconnected -> DisconnectedOverlay(onBack = onBack)
-
-                is ConnectionState.Connected -> { /* normal, no overlay */ }
+                is ConnectionState.Error           -> ErrorOverlay(message = s.message, onBack = onBack)
+                is ConnectionState.Disconnected    -> DisconnectedOverlay(onBack = onBack)
+                is ConnectionState.Connected       -> { /* normal */ }
             }
         }
     }
 
-    // Connect when composition first runs
-    LaunchedEffect(hostId) { vm.connect(hostId) }
+    // Attach + connect on first composition
+    LaunchedEffect(sessionId) {
+        vm.attach(sessionId)
+        if (vm.state.value == ConnectionState.Connecting) {
+            vm.connect()
+        }
+    }
 
-    // Dismiss the soft keyboard whenever this screen leaves the composition,
-    // regardless of how the user exits (back arrow, hardware back, etc.)
+    // Dismiss keyboard on screen exit
     val view = LocalView.current
     DisposableEffect(Unit) {
         onDispose {
             val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
                     as android.view.inputmethod.InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+}
+
+@Composable
+private fun SessionTabRow(
+    sessions: List<SessionManager.ActiveSession>,
+    currentId: String,
+    onSwitch: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 4.dp, vertical = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        sessions.forEachIndexed { index, session ->
+            val selected = session.id == currentId
+            FilterChip(
+                selected  = selected,
+                onClick   = { if (!selected) onSwitch(session.id) },
+                label     = { Text("#${index + 1}", fontSize = 12.sp) },
+                modifier  = Modifier.height(28.dp),
+            )
         }
     }
 }
@@ -179,13 +231,9 @@ private fun ExtraKeyRow(
             .padding(horizontal = 2.dp, vertical = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        // Sticky modifier keys
         ExtraKey("Ctrl", active = ctrlActive, onClick = onCtrlToggle)
         ExtraKey("Alt",  active = altActive,  onClick = onAltToggle)
-
         Spacer(Modifier.width(4.dp))
-
-        // Direct keys
         ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
         ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
         ExtraKey("↑",    onClick = { onKey("\u001b[A".toByteArray()) })
@@ -197,8 +245,6 @@ private fun ExtraKeyRow(
         ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })
         ExtraKey("PgDn", onClick = { onKey("\u001b[6~".toByteArray()) })
         ExtraKey("Del",  onClick = { onKey("\u001b[3~".toByteArray()) })
-
-        // Paste icon — same TextButton structure as ExtraKey so height aligns
         TextButton(
             onClick = {
                 clipboardManager.getText()?.text
@@ -208,53 +254,37 @@ private fun ExtraKeyRow(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall),
             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
         ) {
-            Icon(
-                Icons.Filled.ContentPaste,
-                contentDescription = "Paste",
-                modifier = Modifier.size(14.dp),
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
+            Icon(Icons.Filled.ContentPaste, contentDescription = "Paste",
+                modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurface)
         }
-
         Spacer(Modifier.width(4.dp))
-
-        ExtraKey("F1",   onClick = { onKey("\u001bOP".toByteArray()) })
-        ExtraKey("F2",   onClick = { onKey("\u001bOQ".toByteArray()) })
-        ExtraKey("F3",   onClick = { onKey("\u001bOR".toByteArray()) })
-        ExtraKey("F4",   onClick = { onKey("\u001bOS".toByteArray()) })
-        ExtraKey("F5",   onClick = { onKey("\u001b[15~".toByteArray()) })
-        ExtraKey("F6",   onClick = { onKey("\u001b[17~".toByteArray()) })
-        ExtraKey("F7",   onClick = { onKey("\u001b[18~".toByteArray()) })
-        ExtraKey("F8",   onClick = { onKey("\u001b[19~".toByteArray()) })
-        ExtraKey("F9",   onClick = { onKey("\u001b[20~".toByteArray()) })
-        ExtraKey("F10",  onClick = { onKey("\u001b[21~".toByteArray()) })
-        ExtraKey("F11",  onClick = { onKey("\u001b[23~".toByteArray()) })
-        ExtraKey("F12",  onClick = { onKey("\u001b[24~".toByteArray()) })
+        ExtraKey("F1",  onClick = { onKey("\u001bOP".toByteArray()) })
+        ExtraKey("F2",  onClick = { onKey("\u001bOQ".toByteArray()) })
+        ExtraKey("F3",  onClick = { onKey("\u001bOR".toByteArray()) })
+        ExtraKey("F4",  onClick = { onKey("\u001bOS".toByteArray()) })
+        ExtraKey("F5",  onClick = { onKey("\u001b[15~".toByteArray()) })
+        ExtraKey("F6",  onClick = { onKey("\u001b[17~".toByteArray()) })
+        ExtraKey("F7",  onClick = { onKey("\u001b[18~".toByteArray()) })
+        ExtraKey("F8",  onClick = { onKey("\u001b[19~".toByteArray()) })
+        ExtraKey("F9",  onClick = { onKey("\u001b[20~".toByteArray()) })
+        ExtraKey("F10", onClick = { onKey("\u001b[21~".toByteArray()) })
+        ExtraKey("F11", onClick = { onKey("\u001b[23~".toByteArray()) })
+        ExtraKey("F12", onClick = { onKey("\u001b[24~".toByteArray()) })
     }
 }
 
 @Composable
-private fun ExtraKey(
-    label: String,
-    active: Boolean = false,
-    onClick: () -> Unit,
-) {
-    val bg        = if (active) MaterialTheme.colorScheme.primaryContainer
-                    else        MaterialTheme.colorScheme.surface
-    val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer
-                    else        MaterialTheme.colorScheme.onSurface
+private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit) {
+    val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+    val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
     TextButton(
         onClick = onClick,
         modifier = Modifier.background(bg, MaterialTheme.shapes.extraSmall),
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
     ) {
-        Text(
-            label,
-            fontSize = 13.sp,
+        Text(label, fontSize = 13.sp,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-            maxLines = 1,
-            color = textColor,
-        )
+            maxLines = 1, color = textColor)
     }
 }
 

@@ -15,12 +15,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.data.db.HostEntity
+import com.sshborg.service.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HostsScreen(
-    onHostClick: (Long) -> Unit,
-    onSftpClick: (Long) -> Unit,
+    sessions: List<SessionManager.ActiveSession>,
+    onNewTerminal: (hostId: Long, hostLabel: String) -> Unit,
+    onResumeTerminal: (sessionId: String) -> Unit,
+    onNewSftp: (hostId: Long, hostLabel: String) -> Unit,
+    onResumeSftp: (sessionId: String) -> Unit,
     onAddHost: () -> Unit,
     onEditHost: (Long) -> Unit,
     onKeysClick: () -> Unit,
@@ -28,6 +32,10 @@ fun HostsScreen(
 ) {
     val hosts by vm.hosts.collectAsState()
     var hostToDelete by remember { mutableStateOf<HostEntity?>(null) }
+
+    // Bottom sheet state for session picker
+    var sessionPickerHost by remember { mutableStateOf<HostEntity?>(null) }
+    var sessionPickerType by remember { mutableStateOf(SessionManager.SessionType.Shell) }
 
     Scaffold(
         topBar = {
@@ -53,23 +61,46 @@ fun HostsScreen(
         } else {
             LazyColumn(Modifier.fillMaxSize().padding(padding)) {
                 items(hosts, key = { it.id }) { host ->
+                    val shellSessions = sessions.filter {
+                        it.hostId == host.id && it.type == SessionManager.SessionType.Shell
+                    }
+                    val sftpSessions = sessions.filter {
+                        it.hostId == host.id && it.type == SessionManager.SessionType.Sftp
+                    }
                     HostItem(
-                        host = host,
-                        onClick = { onHostClick(host.id) },
-                        onSftp = { onSftpClick(host.id) },
-                        onEdit = { onEditHost(host.id) },
-                        onDelete = { hostToDelete = host },
+                        host          = host,
+                        shellCount    = shellSessions.size,
+                        sftpCount     = sftpSessions.size,
+                        onClick       = {
+                            when (shellSessions.size) {
+                                0    -> onNewTerminal(host.id, host.label)
+                                1    -> onResumeTerminal(shellSessions[0].id)
+                                else -> { sessionPickerHost = host; sessionPickerType = SessionManager.SessionType.Shell }
+                            }
+                        },
+                        onSftp        = {
+                            when (sftpSessions.size) {
+                                0    -> onNewSftp(host.id, host.label)
+                                1    -> onResumeSftp(sftpSessions[0].id)
+                                else -> { sessionPickerHost = host; sessionPickerType = SessionManager.SessionType.Sftp }
+                            }
+                        },
+                        onEdit        = { onEditHost(host.id) },
+                        onDelete      = { hostToDelete = host },
+                        onNewTerminal = { onNewTerminal(host.id, host.label) },
+                        onNewSftp     = { onNewSftp(host.id, host.label) },
                     )
                 }
             }
         }
     }
 
+    // Delete confirmation
     hostToDelete?.let { host ->
         AlertDialog(
             onDismissRequest = { hostToDelete = null },
             title = { Text("Delete host") },
-            text = { Text("Delete \"${host.label}\"?") },
+            text  = { Text("Delete \"${host.label}\"?") },
             confirmButton = {
                 TextButton(onClick = { vm.deleteHost(host); hostToDelete = null }) { Text("Delete") }
             },
@@ -78,22 +109,95 @@ fun HostsScreen(
             },
         )
     }
+
+    // Session picker bottom sheet (for hosts with multiple active sessions)
+    sessionPickerHost?.let { host ->
+        val activeSessions = sessions.filter {
+            it.hostId == host.id && it.type == sessionPickerType
+        }
+        SessionPickerSheet(
+            host        = host,
+            type        = sessionPickerType,
+            sessions    = activeSessions,
+            onResume    = { id ->
+                sessionPickerHost = null
+                if (sessionPickerType == SessionManager.SessionType.Shell) onResumeTerminal(id)
+                else onResumeSftp(id)
+            },
+            onNew       = {
+                sessionPickerHost = null
+                if (sessionPickerType == SessionManager.SessionType.Shell) onNewTerminal(host.id, host.label)
+                else onNewSftp(host.id, host.label)
+            },
+            onDismiss   = { sessionPickerHost = null },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun SessionPickerSheet(
+    host: HostEntity,
+    type: SessionManager.SessionType,
+    sessions: List<SessionManager.ActiveSession>,
+    onResume: (String) -> Unit,
+    onNew: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val typeName = if (type == SessionManager.SessionType.Shell) "Terminal" else "Files"
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Text(
+            "${host.label} — $typeName sessions",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+        sessions.forEachIndexed { index, session ->
+            val statusText = when (session.status) {
+                SessionManager.Status.Connected    -> "Connected"
+                SessionManager.Status.Connecting   -> "Connecting…"
+                SessionManager.Status.Disconnected -> "Disconnected"
+                SessionManager.Status.Error        -> "Error"
+            }
+            ListItem(
+                modifier = Modifier.combinedClickable(onClick = { onResume(session.id) }),
+                leadingContent = {
+                    Icon(
+                        if (type == SessionManager.SessionType.Shell) Icons.Default.Terminal else Icons.Default.Folder,
+                        contentDescription = null,
+                    )
+                },
+                headlineContent  = { Text("Session ${index + 1}") },
+                supportingContent = { Text(statusText) },
+            )
+            HorizontalDivider(thickness = 0.5.dp)
+        }
+        ListItem(
+            modifier = Modifier.combinedClickable(onClick = onNew),
+            leadingContent = { Icon(Icons.Default.Add, contentDescription = null) },
+            headlineContent = { Text("New $typeName session") },
+        )
+        Spacer(Modifier.height(16.dp))
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HostItem(
     host: HostEntity,
+    shellCount: Int,
+    sftpCount: Int,
     onClick: () -> Unit,
     onSftp: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onNewTerminal: () -> Unit,
+    onNewSftp: () -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
     ListItem(
         modifier = Modifier.combinedClickable(
-            onClick = onClick,
+            onClick     = onClick,
             onLongClick = { menuExpanded = true },
         ),
         headlineContent = { Text(host.label) },
@@ -105,7 +209,19 @@ private fun HostItem(
             )
         },
         leadingContent = {
-            Icon(Icons.Default.Computer, contentDescription = null)
+            // Show active session badge if any sessions are running
+            val totalActive = shellCount + sftpCount
+            BadgedBox(
+                badge = {
+                    if (totalActive > 0) {
+                        Badge(containerColor = MaterialTheme.colorScheme.primary) {
+                            Text("$totalActive")
+                        }
+                    }
+                }
+            ) {
+                Icon(Icons.Default.Computer, contentDescription = null)
+            }
         },
         trailingContent = {
             Box {
@@ -113,16 +229,32 @@ private fun HostItem(
                     Icon(Icons.Default.MoreVert, contentDescription = "Options")
                 }
                 DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                    // "Connect" — resumes if 1 active, picks if >1, creates if 0
                     DropdownMenuItem(
-                        text = { Text("Connect") },
+                        text = { Text(if (shellCount > 0) "Resume terminal ($shellCount)" else "Connect") },
                         leadingIcon = { Icon(Icons.Default.Terminal, null) },
                         onClick = { menuExpanded = false; onClick() },
                     )
+                    if (shellCount > 0) {
+                        DropdownMenuItem(
+                            text = { Text("New terminal") },
+                            leadingIcon = { Icon(Icons.Default.Add, null) },
+                            onClick = { menuExpanded = false; onNewTerminal() },
+                        )
+                    }
                     DropdownMenuItem(
-                        text = { Text("Files") },
+                        text = { Text(if (sftpCount > 0) "Resume files ($sftpCount)" else "Files") },
                         leadingIcon = { Icon(Icons.Default.Folder, null) },
                         onClick = { menuExpanded = false; onSftp() },
                     )
+                    if (sftpCount > 0) {
+                        DropdownMenuItem(
+                            text = { Text("New files session") },
+                            leadingIcon = { Icon(Icons.Default.Add, null) },
+                            onClick = { menuExpanded = false; onNewSftp() },
+                        )
+                    }
+                    HorizontalDivider()
                     DropdownMenuItem(
                         text = { Text("Edit") },
                         leadingIcon = { Icon(Icons.Default.Edit, null) },

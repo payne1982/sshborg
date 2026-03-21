@@ -27,14 +27,19 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SftpScreen(
-    hostId: Long,
+    sessionId: String,
     onBack: () -> Unit,
     vm: SftpViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(hostId) { vm.connect(hostId) }
+    LaunchedEffect(sessionId) {
+        vm.attach(sessionId)
+        if (vm.state.value == SftpViewModel.State.Connecting) {
+            vm.connect()
+        }
+    }
 
     // Non-fatal operation errors shown as snackbar without leaving listing
     LaunchedEffect(Unit) {
@@ -59,7 +64,7 @@ fun SftpScreen(
         }
     }
 
-    // Android hardware back: navigate up in dir tree first, then exit
+    // Hardware back: navigate up in dir tree; at root, go back (session stays alive)
     BackHandler { if (!vm.navigateUp()) onBack() }
 
     val currentPath = (state as? SftpViewModel.State.Listing)?.path ?: ""
@@ -90,8 +95,14 @@ fun SftpScreen(
                     )
                 },
                 navigationIcon = {
+                    // Back = send to background (session stays alive)
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to hosts")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { vm.disconnect(); onBack() }) {
+                        Icon(Icons.Default.Close, contentDescription = "Disconnect")
                     }
                 },
             )

@@ -2,12 +2,14 @@ package com.sshborg
 
 import android.app.Application
 import com.sshborg.data.db.AppDatabase
+import com.sshborg.service.SessionManager
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
 
 class SshBorgApp : Application() {
 
     val db by lazy { AppDatabase.getInstance(this) }
+    val sessionManager = SessionManager()
 
     override fun onCreate() {
         super.onCreate()

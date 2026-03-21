@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.ssh.*
+import com.sshborg.service.SessionManager
+import com.sshborg.service.SshForegroundService
 import com.sshborg.terminal.TerminalEmulator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -21,11 +23,16 @@ sealed interface ConnectionState {
 
 class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val sshBorgApp = app as SshBorgApp
-    private val hostDao = sshBorgApp.db.hostDao()
-    private val keyDao  = sshBorgApp.db.sshKeyDao()
+    private val sshBorgApp    = app as SshBorgApp
+    private val sessionManager = sshBorgApp.sessionManager
+    private val hostDao        = sshBorgApp.db.hostDao()
+    private val keyDao         = sshBorgApp.db.sshKeyDao()
 
-    val emulator = TerminalEmulator(80, 24)
+    private var sessionId: String? = null
+
+    /** Emulator for the current session — initialized in attach(). */
+    private val _emulator = MutableStateFlow(TerminalEmulator(80, 24))
+    val emulatorFlow: StateFlow<TerminalEmulator> = _emulator.asStateFlow()
 
     private val _state = MutableStateFlow<ConnectionState>(ConnectionState.Connecting)
     val state: StateFlow<ConnectionState> = _state
@@ -33,54 +40,77 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title
 
-    // Riferimento diretto alla view — settato da TerminalScreen nell'update block
     var terminalViewRef: com.sshborg.terminal.TerminalView? = null
-
-    // Chiamato dal reader loop (thread IO) per chiedere alla view di ridisegnarsi.
-    // postInvalidate() è thread-safe, a differenza di invalidate().
     var onNeedsRedraw: (() -> Unit)? = null
 
     private var shellSession: ShellSession? = null
     private var readerJob: Job? = null
     private var connectJob: Job? = null
 
-    // Deferred results for dialogs
-    private val hostKeyResult = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
-    fun connect(hostId: Long, columns: Int = 80, rows: Int = 24) {
-        // Prevent multiple concurrent connection attempts
-        if (connectJob?.isActive == true || shellSession?.isConnected == true) return
-        emulator.onTitleChanged = { t -> _title.value = t }
+    /**
+     * Attaches this ViewModel to an existing session in [SessionManager].
+     * Must be called before [connect]. If the session is already connected, starts reading.
+     */
+    fun attach(id: String) {
+        sessionId = id
+        val session = sessionManager.get(id) ?: run {
+            _state.value = ConnectionState.Error("Session not found")
+            return
+        }
+
+        // Get or create the emulator for this session
+        val em = session.emulator ?: TerminalEmulator(80, 24).also { newEm ->
+            sessionManager.update(id) { it.copy(emulator = newEm) }
+        }
+        em.onTitleChanged = { t -> _title.value = t }
+        _emulator.value = em
+
+        // If already connected, resume reading
+        if (session.shellSession != null) {
+            shellSession = session.shellSession
+            if (session.shellSession.isConnected) {
+                _state.value = ConnectionState.Connected
+                startReading(session.shellSession)
+            } else {
+                _state.value = ConnectionState.Disconnected
+                sessionManager.update(id) { it.copy(status = SessionManager.Status.Disconnected) }
+            }
+        }
+        // else: new session, connect() will be called next
+    }
+
+    /** Starts the SSH connection for a newly created session. */
+    fun connect(columns: Int = 80, rows: Int = 24) {
+        val id     = sessionId ?: return
+        val hostId = sessionManager.get(id)?.hostId ?: return
+        if (connectJob?.isActive == true) return
 
         connectJob = viewModelScope.launch(Dispatchers.IO) {
             val host = hostDao.getById(hostId) ?: run {
-                _state.value = ConnectionState.Error("Host not found")
-                return@launch
+                _state.value = ConnectionState.Error("Host not found"); return@launch
             }
-
-            val auth: SshAuth = buildAuth(host) ?: return@launch
-
+            val auth = buildAuth(host) ?: return@launch
             _state.value = ConnectionState.Connecting
 
-            val jumpHosts = parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
-
             val params = SshConnectionParams(
-                hostname = host.hostname,
-                port = host.port,
-                username = host.username,
-                auth = auth,
+                hostname        = host.hostname,
+                port            = host.port,
+                username        = host.username,
+                auth            = auth,
                 agentForwarding = host.agentForwarding,
                 knownHostsEntry = host.knownHostsEntry,
-                jumpHosts = jumpHosts,
+                jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
             )
 
             runCatching {
                 SshManager.openShell(
-                    params = params,
+                    params  = params,
                     columns = columns,
-                    rows = rows,
-                    onHostKeyVerify = { hostname: String, fingerprint: String ->
+                    rows    = rows,
+                    onHostKeyVerify = { hostname, fingerprint ->
                         runBlocking {
                             _state.value = ConnectionState.HostKeyPrompt(hostname, fingerprint)
                             hostKeyResult.first()
@@ -89,16 +119,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 )
             }.onSuccess { session ->
                 shellSession = session
-                // Sync PTY with the actual screen size. onSizeChanged() may have
-                // resized the emulator while the connection was still establishing,
-                // but shellSession was null at that point so the resize was not sent.
-                synchronized(emulator) { session.resize(emulator.buffer.columns, emulator.buffer.rows) }
+                sessionManager.update(id) { it.copy(shellSession = session, status = SessionManager.Status.Connected) }
+                val em = _emulator.value
+                synchronized(em) { session.resize(em.buffer.columns, em.buffer.rows) }
                 _state.value = ConnectionState.Connected
-                // Persist target host key on first connect
-                if (host.knownHostsEntry == null) {
+
+                if (host.knownHostsEntry == null)
                     hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
-                }
-                // Persist any new jump host keys
                 if (session.newJumpHostKeyLines.isNotEmpty() && host.jumpHostKeys == null) {
                     val current = hostDao.getById(hostId) ?: host
                     hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
@@ -107,6 +134,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 startReading(session)
             }.onFailure { err ->
                 _state.value = ConnectionState.Error(err.message ?: "Connection failed")
+                sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
             }
         }
     }
@@ -124,21 +152,27 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun startReading(session: ShellSession) {
-        // Hook emulator responses (CPR, DA) directly to the SSH output stream
-        emulator.onSendResponse = { bytes ->
+        val em = _emulator.value
+        em.onSendResponse = { bytes ->
             runCatching { session.outputStream.write(bytes); session.outputStream.flush() }
         }
+        readerJob?.cancel()
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val buf = ByteArray(4096)
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
                     if (n < 0) break
-                    synchronized(emulator) { emulator.process(buf, 0, n) }
+                    synchronized(em) { em.process(buf, 0, n) }
                     onNeedsRedraw?.invoke()
                 }
             } catch (_: Exception) {}
-            _state.value = ConnectionState.Disconnected
+            // Mark session as disconnected only if this is still the active session
+            val id = sessionId
+            if (id != null && sessionManager.get(id)?.shellSession === session) {
+                _state.value = ConnectionState.Disconnected
+                sessionManager.update(id) { it.copy(status = SessionManager.Status.Disconnected) }
+            }
         }
     }
 
@@ -152,10 +186,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun resize(cols: Int, rows: Int) {
-        synchronized(emulator) { emulator.resize(cols, rows) }
-        // channel.setPtySize() must run on the IO thread — calling it from the UI thread
-        // while the reader job is active causes concurrent JSch session access and corrupts
-        // internal state, which surfaces as a spurious disconnect after the next keypress.
+        val em = _emulator.value
+        synchronized(em) { em.resize(cols, rows) }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { shellSession?.resize(cols, rows) }
         }
@@ -165,13 +197,37 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     fun rejectHostKey() { hostKeyResult.tryEmit(false) }
     fun submitPassword(password: String) { passwordResult.tryEmit(password) }
 
-    fun disconnect() {
-        connectJob?.cancel()
+    /** Stops the reading loop but keeps the session alive in [SessionManager]. */
+    fun background() {
         readerJob?.cancel()
-        shellSession?.disconnect()
-        shellSession = null
-        _state.value = ConnectionState.Disconnected
+        readerJob = null
+        onNeedsRedraw = null
     }
 
-    override fun onCleared() { super.onCleared(); disconnect() }
+    /** Fully disconnects and removes the session from [SessionManager]. */
+    fun disconnect() {
+        val id = sessionId ?: return
+        connectJob?.cancel()
+        readerJob?.cancel()
+        shellSession = null
+        sessionManager.remove(id)
+        _state.value = ConnectionState.Disconnected
+        if (sessionManager.sessions.value.isEmpty()) {
+            SshForegroundService.stop(getApplication())
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Stop reading loop — session stays alive in background
+        background()
+        // If the connection never completed, clean up the dangling session
+        val id = sessionId ?: return
+        if (sessionManager.get(id)?.status == SessionManager.Status.Connecting) {
+            sessionManager.remove(id)
+            if (sessionManager.sessions.value.isEmpty()) {
+                SshForegroundService.stop(getApplication())
+            }
+        }
+    }
 }

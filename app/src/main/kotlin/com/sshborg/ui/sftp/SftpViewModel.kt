@@ -11,6 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.ssh.*
+import com.sshborg.service.SessionManager
+import com.sshborg.service.SshForegroundService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -29,24 +31,50 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         object Disconnected : State
     }
 
-    private val hostDao = (app as SshBorgApp).db.hostDao()
-    private val keyDao  = (app as SshBorgApp).db.sshKeyDao()
+    private val sshBorgApp    = app as SshBorgApp
+    private val sessionManager = sshBorgApp.sessionManager
+    private val hostDao        = sshBorgApp.db.hostDao()
+    private val keyDao         = sshBorgApp.db.sshKeyDao()
+
+    private var sessionId: String? = null
 
     private val _state = MutableStateFlow<State>(State.Connecting)
     val state: StateFlow<State> = _state
 
-    // Non-fatal operation errors (permission denied, download failed, etc.)
-    // shown as a snackbar without leaving the current listing.
     private val _opError = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val opError: SharedFlow<String> = _opError
 
     private var sftpSession: SftpSession? = null
     private val pathStack = mutableListOf<String>()
 
-    private val hostKeyResult = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
-    fun connect(hostId: Long) {
+    /**
+     * Attaches to an existing SFTP session in [SessionManager].
+     * If already connected, restores the last-known path.
+     */
+    fun attach(id: String) {
+        sessionId = id
+        val session = sessionManager.get(id) ?: run {
+            _state.value = State.Error("Session not found"); return
+        }
+
+        if (session.sftpSession != null) {
+            sftpSession = session.sftpSession
+            // Restore the directory we were in
+            val path = session.sftpCurrentPath
+            pathStack.clear()
+            navigateTo(path)
+        }
+        // else: new session, connect() will be called next
+    }
+
+    /** Starts the SFTP connection for a newly created session. */
+    fun connect() {
+        val id     = sessionId ?: return
+        val hostId = sessionManager.get(id)?.hostId ?: return
+
         viewModelScope.launch(Dispatchers.IO) {
             val host = hostDao.getById(hostId) ?: run {
                 _state.value = State.Error("Host not found"); return@launch
@@ -54,16 +82,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val auth = buildAuth(host) ?: return@launch
             _state.value = State.Connecting
 
-            val jumpHosts = parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
-
             val params = SshConnectionParams(
-                hostname         = host.hostname,
-                port             = host.port,
-                username         = host.username,
-                auth             = auth,
-                agentForwarding  = host.agentForwarding,
-                knownHostsEntry  = host.knownHostsEntry,
-                jumpHosts        = jumpHosts,
+                hostname        = host.hostname,
+                port            = host.port,
+                username        = host.username,
+                auth            = auth,
+                agentForwarding = host.agentForwarding,
+                knownHostsEntry = host.knownHostsEntry,
+                jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
             )
 
             runCatching {
@@ -75,11 +101,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }.onSuccess { session ->
                 sftpSession = session
-                // Persist target host key on first connect
-                if (host.knownHostsEntry == null) {
+                sessionManager.update(id) { it.copy(sftpSession = session, status = SessionManager.Status.Connected) }
+
+                if (host.knownHostsEntry == null)
                     hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
-                }
-                // Persist any new jump host keys
                 if (session.newJumpHostKeyLines.isNotEmpty() && host.jumpHostKeys == null) {
                     val current = hostDao.getById(hostId) ?: host
                     hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
@@ -87,6 +112,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 navigateTo("/")
             }.onFailure { err ->
                 _state.value = State.Error(err.message ?: "Connection failed")
+                sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
             }
         }
     }
@@ -96,19 +122,18 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             runCatching {
                 val entries = sftpSession!!.listDir(path)
                 pathStack.add(path)
+                sessionManager.update(sessionId ?: return@launch) { it.copy(sftpCurrentPath = path) }
                 _state.value = State.Listing(path, entries)
             }.onFailure {
-                // Non-fatal: stay on current listing, show error as snackbar
                 _opError.tryEmit(it.message ?: "Cannot list directory")
             }
         }
     }
 
-    /** Navigates to parent directory. Returns false if already at root. */
     fun navigateUp(): Boolean {
         if (pathStack.size <= 1) return false
         pathStack.removeLast()
-        val parent = pathStack.removeLast() // navigateTo will re-add it
+        val parent = pathStack.removeLast()
         navigateTo(parent)
         return true
     }
@@ -121,18 +146,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = State.Downloading(entry.name, 0L)
 
-            // Create the file in Downloads/SSHBorg/ via MediaStore (no permissions needed on API 30+)
             val values = ContentValues().apply {
                 put(MediaStore.Downloads.DISPLAY_NAME, entry.name)
                 put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
                 put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg/")
             }
-            val uri: Uri? = context.contentResolver.insert(
-                MediaStore.Downloads.EXTERNAL_CONTENT_URI, values
-            )
+            val uri: Uri? = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
             if (uri == null) {
-                _state.value = State.Error("Cannot create file in Downloads")
-                return@launch
+                _state.value = State.Error("Cannot create file in Downloads"); return@launch
             }
 
             runCatching {
@@ -143,7 +164,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 _state.value = State.Downloaded(entry.name)
             }.onFailure {
-                // Remove the incomplete file, stay on listing
                 context.contentResolver.delete(uri, null, null)
                 dismissDownloaded()
                 _opError.tryEmit(it.message ?: "Download failed")
@@ -151,19 +171,16 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Call after showing the Downloaded snackbar to return to the listing. */
     fun dismissDownloaded() = refreshListing()
 
     fun uploadFile(uri: Uri) {
         val context = getApplication<Application>()
         val currentPath = (state.value as? State.Listing)?.path ?: return
 
-        // Resolve the display name from the URI
         val filename = context.contentResolver
             .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-            ?.use { cursor ->
-                if (cursor.moveToFirst()) cursor.getString(0) else null
-            } ?: uri.lastPathSegment ?: "file"
+            ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+            ?: uri.lastPathSegment ?: "file"
 
         val remotePath = "${currentPath.trimEnd('/')}/$filename"
 
@@ -183,19 +200,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Call after showing the Uploaded snackbar to refresh and return to listing. */
     fun dismissUploaded() = refreshListing()
 
     fun deleteEntry(entry: SftpEntry, currentPath: String) {
         val path = "${currentPath.trimEnd('/')}/${entry.name}"
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                if (entry.isDir) sftpSession!!.deleteDir(path)
-                else             sftpSession!!.deleteFile(path)
+                if (entry.isDir) sftpSession!!.deleteDir(path) else sftpSession!!.deleteFile(path)
                 refreshListing()
-            }.onFailure {
-                _opError.tryEmit(it.message ?: "Delete failed")
-            }
+            }.onFailure { _opError.tryEmit(it.message ?: "Delete failed") }
         }
     }
 
@@ -203,32 +216,23 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val oldPath = "${currentPath.trimEnd('/')}/${entry.name}"
         val newPath = "${currentPath.trimEnd('/')}/$newName"
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                sftpSession!!.rename(oldPath, newPath)
-                refreshListing()
-            }.onFailure {
-                _opError.tryEmit(it.message ?: "Rename failed")
-            }
+            runCatching { sftpSession!!.rename(oldPath, newPath); refreshListing() }
+                .onFailure { _opError.tryEmit(it.message ?: "Rename failed") }
         }
     }
 
     fun createDirectory(currentPath: String, name: String) {
         val path = "${currentPath.trimEnd('/')}/$name"
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                sftpSession!!.mkdir(path)
-                refreshListing()
-            }.onFailure {
-                _opError.tryEmit(it.message ?: "Create directory failed")
-            }
+            runCatching { sftpSession!!.mkdir(path); refreshListing() }
+                .onFailure { _opError.tryEmit(it.message ?: "Create directory failed") }
         }
     }
 
     private fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
-        val session = sftpSession ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { _state.value = State.Listing(current, session.listDir(current)) }
+            runCatching { _state.value = State.Listing(current, sftpSession!!.listDir(current)) }
         }
     }
 
@@ -236,14 +240,30 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     fun rejectHostKey() { hostKeyResult.tryEmit(false) }
     fun submitPassword(pwd: String) { passwordResult.tryEmit(pwd) }
 
+    /** Disconnects and removes the session from [SessionManager]. */
     fun disconnect() {
-        sftpSession?.disconnect()
+        val id = sessionId ?: return
         sftpSession = null
         pathStack.clear()
+        sessionManager.remove(id)
         _state.value = State.Disconnected
+        if (sessionManager.sessions.value.isEmpty()) {
+            SshForegroundService.stop(getApplication())
+        }
     }
 
-    override fun onCleared() { super.onCleared(); disconnect() }
+    override fun onCleared() {
+        super.onCleared()
+        // Don't disconnect — session stays alive in background
+        // Clean up dangling connecting sessions
+        val id = sessionId ?: return
+        if (sessionManager.get(id)?.status == SessionManager.Status.Connecting) {
+            sessionManager.remove(id)
+            if (sessionManager.sessions.value.isEmpty()) {
+                SshForegroundService.stop(getApplication())
+            }
+        }
+    }
 
     private suspend fun buildAuth(host: HostEntity): SshAuth? {
         val keyPem = host.keyId?.let { keyDao.getById(it)?.privateKeyPem }
