@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +25,7 @@ import com.sshborg.data.ssh.SftpEntry
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SftpScreen(
     sessionId: String,
@@ -44,7 +45,7 @@ fun SftpScreen(
     // Non-fatal operation errors shown as snackbar without leaving listing
     LaunchedEffect(Unit) {
         vm.opError.collect { message ->
-            snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Long)
+            snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Short)
         }
     }
 
@@ -101,6 +102,11 @@ fun SftpScreen(
                     }
                 },
                 actions = {
+                    if (isListing) {
+                        IconButton(onClick = { vm.refreshListing() }) {
+                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
                     IconButton(onClick = { vm.disconnect(); onBack() }) {
                         Icon(Icons.Default.Close, contentDescription = "Disconnect")
                     }
@@ -148,6 +154,13 @@ fun SftpScreen(
                 }
 
                 is SftpViewModel.State.Listing -> {
+                    var isRefreshing by remember { mutableStateOf(false) }
+                    LaunchedEffect(s) { isRefreshing = false }
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = { isRefreshing = true; vm.refreshListing() },
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
                     LazyColumn(Modifier.fillMaxSize()) {
                         // ".." row — go up one level (hidden at root)
                         if (!atRoot) {
@@ -182,6 +195,7 @@ fun SftpScreen(
                                 )
                             }
                         }
+                    }
                     }
                 }
 

@@ -9,9 +9,14 @@ data class SshKeyEntity(
     val label: String,
     /** Key type: RSA, ECDSA, ED25519 */
     val keyType: String,
-    /** PEM-encoded private key (stored encrypted via Android Keystore) */
-    val privateKeyPem: String,
+    /**
+     * Plain-text PEM private key. Empty string when [encryptedBlob] is set.
+     * Use [com.sshborg.data.KeystoreManager.getPrivateKeyPem] to read the key.
+     */
+    val privateKeyPem: String = "",
     /** OpenSSH public key string (e.g. "ssh-ed25519 AAAA...") */
     val publicKey: String,
     val createdAt: Long = System.currentTimeMillis(),
+    /** AES-GCM blob (Base64 IV||ciphertext) set when Keystore encryption is enabled. */
+    val encryptedBlob: String? = null,
 )

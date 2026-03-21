@@ -1,6 +1,7 @@
 package com.sshborg
 
 import android.app.Application
+import com.sshborg.data.AppPreferences
 import com.sshborg.data.db.AppDatabase
 import com.sshborg.service.SessionManager
 import org.bouncycastle.jce.provider.BouncyCastleProvider
@@ -10,6 +11,10 @@ class SshBorgApp : Application() {
 
     val db by lazy { AppDatabase.getInstance(this) }
     val sessionManager = SessionManager()
+    val appPreferences by lazy { AppPreferences(this) }
+
+    /** Timestamp of the last successful biometric authentication (in-memory only). */
+    var lastAuthTime: Long = 0L
 
     override fun onCreate() {
         super.onCreate()

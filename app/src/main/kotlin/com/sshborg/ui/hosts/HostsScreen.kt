@@ -1,5 +1,8 @@
 package com.sshborg.ui.hosts
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -11,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,9 +32,25 @@ fun HostsScreen(
     onAddHost: () -> Unit,
     onEditHost: (Long) -> Unit,
     onKeysClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     vm: HostsViewModel = viewModel(),
 ) {
-    val hosts by vm.hosts.collectAsState()
+    val hosts       by vm.hosts.collectAsState()
+    val confirmExit by vm.confirmExit.collectAsState()
+    val context     = LocalContext.current
+
+    // Double-back-to-exit
+    var lastBackPress by remember { mutableLongStateOf(0L) }
+    BackHandler(enabled = confirmExit) {
+        val now = System.currentTimeMillis()
+        if (now - lastBackPress < 2_000L) {
+            (context as Activity).finish()
+        } else {
+            lastBackPress = now
+            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     var hostToDelete by remember { mutableStateOf<HostEntity?>(null) }
 
     // Bottom sheet state for session picker
@@ -44,6 +64,9 @@ fun HostsScreen(
                 actions = {
                     IconButton(onClick = onKeysClick) {
                         Icon(Icons.Default.Key, contentDescription = "Manage keys")
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }
                 },
             )

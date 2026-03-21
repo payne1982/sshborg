@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
+import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
@@ -22,7 +23,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         object Connecting : State
         data class HostKeyPrompt(val hostname: String, val fingerprint: String) : State
         data class PasswordPrompt(val hostname: String) : State
-        data class Listing(val path: String, val entries: List<SftpEntry>) : State
+        data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
         data class Downloading(val filename: String, val bytesReceived: Long) : State
         data class Downloaded(val filename: String) : State
         data class Uploading(val filename: String, val bytesSent: Long) : State
@@ -109,7 +110,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     val current = hostDao.getById(hostId) ?: host
                     hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
                 }
-                navigateTo("/")
+                navigateTo(session.homePath)
             }.onFailure { err ->
                 _state.value = State.Error(err.message ?: "Connection failed")
                 sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
@@ -229,10 +230,12 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun refreshListing() {
+    fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { _state.value = State.Listing(current, sftpSession!!.listDir(current)) }
+            runCatching {
+                _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
+            }.onFailure { _opError.tryEmit(it.message ?: "Refresh failed") }
         }
     }
 
@@ -266,7 +269,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private suspend fun buildAuth(host: HostEntity): SshAuth? {
-        val keyPem = host.keyId?.let { keyDao.getById(it)?.privateKeyPem }
+        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
         return if (host.keyId != null && keyPem != null) {
             SshAuth.PublicKey(keyPem)
         } else {

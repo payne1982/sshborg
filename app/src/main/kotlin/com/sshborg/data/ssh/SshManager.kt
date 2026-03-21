@@ -56,8 +56,9 @@ object SshManager {
         val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
         channel.connect(10_000)
 
+        val homePath = runCatching { channel.pwd() }.getOrDefault("/")
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines)
+        SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, homePath)
     }
 
     private data class SessionResult(
@@ -333,6 +334,8 @@ class SftpSession(
     private val jumpSessions: List<Session> = emptyList(),
     /** See [ShellSession.newJumpHostKeyLines]. */
     val newJumpHostKeyLines: List<String> = emptyList(),
+    /** The working directory at the time the channel was opened (i.e. the user's home). */
+    val homePath: String = "/",
 ) {
     val isConnected get() = channel.isConnected && session.isConnected
 
