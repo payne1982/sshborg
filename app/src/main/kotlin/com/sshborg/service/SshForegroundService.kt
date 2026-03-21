@@ -34,8 +34,14 @@ class SshForegroundService : Service() {
         val sessionManager = (application as SshBorgApp).sessionManager
         observeJob = scope.launch {
             sessionManager.sessions.collect { sessions ->
-                updateNotification(sessions.size)
-                if (sessions.isEmpty()) stopSelf()
+                if (sessions.isEmpty()) {
+                    // Must call stopForeground before stopSelf, otherwise the notification lingers
+                    @Suppress("DEPRECATION")
+                    stopForeground(true)
+                    stopSelf()
+                } else {
+                    updateNotification(sessions.size)
+                }
             }
         }
     }
@@ -49,6 +55,8 @@ class SshForegroundService : Service() {
 
     override fun onDestroy() {
         scope.cancel()
+        @Suppress("DEPRECATION")
+        stopForeground(true)
         super.onDestroy()
     }
 
