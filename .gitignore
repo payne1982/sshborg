@@ -24,3 +24,6 @@ local.properties
 
 # MacOS
 .DS_Store
+
+# Claude Code local settings (permessi approvati, non va in repo)
+.claude/
