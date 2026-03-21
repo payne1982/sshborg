@@ -18,8 +18,9 @@ class AppPreferences(private val context: Context) {
         val BIOMETRIC_LOCK           = booleanPreferencesKey("biometric_lock")
         val KEYSTORE_ENCRYPTION      = booleanPreferencesKey("keystore_encryption")
         val CONFIRM_EXIT             = booleanPreferencesKey("confirm_exit")
-        val LOCK_TIMEOUT_SECONDS     = intPreferencesKey("lock_timeout_seconds")
+        val LOCK_TIMEOUT_SECONDS      = intPreferencesKey("lock_timeout_seconds")
         val ROOT_WARNING_ACKNOWLEDGED = booleanPreferencesKey("root_warning_acknowledged")
+        val INVERT_TERMINAL_SCROLL    = booleanPreferencesKey("invert_terminal_scroll")
     }
 
     val biometricLock: Flow<Boolean> =
@@ -37,6 +38,9 @@ class AppPreferences(private val context: Context) {
 
     val rootWarningAcknowledged: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.ROOT_WARNING_ACKNOWLEDGED] ?: false }
+
+    val invertTerminalScroll: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.INVERT_TERMINAL_SCROLL] ?: false }
 
     suspend fun setBiometricLock(enabled: Boolean) {
         context.dataStore.edit { it[Keys.BIOMETRIC_LOCK] = enabled }
@@ -56,5 +60,9 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setRootWarningAcknowledged() {
         context.dataStore.edit { it[Keys.ROOT_WARNING_ACKNOWLEDGED] = true }
+    }
+
+    suspend fun setInvertTerminalScroll(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.INVERT_TERMINAL_SCROLL] = enabled }
     }
 }

@@ -37,6 +37,9 @@ class TerminalView @JvmOverloads constructor(
 
     // Scroll offset (in lines) for viewing scrollback
     private var scrollbackOffset = 0
+
+    /** When true, swipe up = see newer content (inverted from natural scroll). */
+    var invertScroll: Boolean = false
     private var gestureDetector = GestureDetector(context, GestureListener())
     private var scaleDetector = ScaleGestureDetector(context, ScaleListener())
 
@@ -296,7 +299,7 @@ class TerminalView @JvmOverloads constructor(
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
             val buf = emulator?.buffer ?: return false
-            val lines = (dy / cellH).toInt()
+            val lines = ((if (invertScroll) -dy else dy) / cellH).toInt()
             scrollbackOffset = (scrollbackOffset + lines).coerceIn(0, buf.scrollbackSize)
             invalidate()
             return true

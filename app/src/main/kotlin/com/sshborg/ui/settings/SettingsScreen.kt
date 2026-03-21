@@ -30,11 +30,12 @@ fun SettingsScreen(
     vm: SettingsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val biometricLock      by vm.biometricLock.collectAsState()
-    val lockTimeoutSeconds by vm.lockTimeoutSeconds.collectAsState()
-    val keystoreEncryption by vm.keystoreEncryption.collectAsState()
-    val confirmExit        by vm.confirmExit.collectAsState()
-    val isMigrating        by vm.isMigrating.collectAsState()
+    val biometricLock         by vm.biometricLock.collectAsState()
+    val lockTimeoutSeconds    by vm.lockTimeoutSeconds.collectAsState()
+    val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
+    val confirmExit           by vm.confirmExit.collectAsState()
+    val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
+    val isMigrating           by vm.isMigrating.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
@@ -82,6 +83,17 @@ fun SettingsScreen(
                     Switch(
                         checked = confirmExit,
                         onCheckedChange = { vm.setConfirmExit(it) },
+                    )
+                },
+            )
+
+            ListItem(
+                headlineContent = { Text("Invert terminal scroll") },
+                supportingContent = { Text("Swipe up to see newer output instead of older") },
+                trailingContent = {
+                    Switch(
+                        checked = invertTerminalScroll,
+                        onCheckedChange = { vm.setInvertTerminalScroll(it) },
                     )
                 },
             )

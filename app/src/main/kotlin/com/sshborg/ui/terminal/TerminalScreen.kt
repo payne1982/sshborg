@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sshborg.SshBorgApp
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import kotlinx.coroutines.delay
@@ -35,9 +37,12 @@ fun TerminalScreen(
     onSwitchSession: (String) -> Unit,
     vm: TerminalViewModel = viewModel(),
 ) {
-    val state   by vm.state.collectAsState()
-    val title   by vm.title.collectAsState()
+    val state    by vm.state.collectAsState()
+    val title    by vm.title.collectAsState()
     val emulator by vm.emulatorFlow.collectAsState()
+
+    val app = LocalContext.current.applicationContext as SshBorgApp
+    val invertScroll by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
 
     // Siblings: other Shell sessions for the same host (for the tab bar)
     val currentSession = sessions.find { it.id == sessionId }
@@ -108,18 +113,20 @@ fun TerminalScreen(
                 AndroidView(
                     factory = { ctx ->
                         TerminalView(ctx).also { view ->
-                            view.emulator = vm.emulatorFlow.value
-                            view.onInput   = sendInput
-                            view.onResize  = { cols, rows -> vm.resize(cols, rows) }
+                            view.emulator    = vm.emulatorFlow.value
+                            view.invertScroll = invertScroll
+                            view.onInput     = sendInput
+                            view.onResize    = { cols, rows -> vm.resize(cols, rows) }
                             vm.onNeedsRedraw  = { view.postInvalidate() }
                             vm.terminalViewRef = view
                         }
                     },
                     update = { view ->
-                        view.emulator = emulator
-                        view.onInput   = sendInput
-                        view.onResize  = { cols, rows -> vm.resize(cols, rows) }
-                        vm.onNeedsRedraw  = { view.postInvalidate() }
+                        view.emulator     = emulator
+                        view.invertScroll = invertScroll
+                        view.onInput      = sendInput
+                        view.onResize     = { cols, rows -> vm.resize(cols, rows) }
+                        vm.onNeedsRedraw   = { view.postInvalidate() }
                         vm.terminalViewRef = view
                         view.postInvalidate()
                     },

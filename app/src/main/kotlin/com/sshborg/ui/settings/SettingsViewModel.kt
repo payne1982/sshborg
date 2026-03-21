@@ -24,6 +24,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val confirmExit: StateFlow<Boolean> =
         prefs.confirmExit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val invertTerminalScroll: StateFlow<Boolean> =
+        prefs.invertTerminalScroll.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
@@ -39,6 +42,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setConfirmExit(enabled: Boolean) {
         viewModelScope.launch { prefs.setConfirmExit(enabled) }
+    }
+
+    fun setInvertTerminalScroll(enabled: Boolean) {
+        viewModelScope.launch { prefs.setInvertTerminalScroll(enabled) }
     }
 
     fun setLockTimeoutSeconds(seconds: Int) {
