@@ -299,7 +299,7 @@ class TerminalView @JvmOverloads constructor(
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
             val buf = emulator?.buffer ?: return false
-            val lines = ((if (invertScroll) -dy else dy) / cellH).toInt()
+            val lines = ((if (invertScroll) dy else -dy) / cellH).toInt()
             scrollbackOffset = (scrollbackOffset + lines).coerceIn(0, buf.scrollbackSize)
             invalidate()
             return true
