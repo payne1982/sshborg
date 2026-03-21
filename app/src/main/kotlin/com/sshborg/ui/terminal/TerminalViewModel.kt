@@ -3,6 +3,7 @@ package com.sshborg.ui.terminal
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.KeystoreManager
@@ -19,7 +20,7 @@ sealed interface ConnectionState {
     data class HostKeyPrompt(val hostname: String, val fingerprint: String) : ConnectionState
     data class PasswordPrompt(val hostname: String) : ConnectionState
     data class Error(val message: String) : ConnectionState
-    object Disconnected : ConnectionState
+    data class Disconnected(val cause: String? = null) : ConnectionState
 }
 
 class TerminalViewModel(app: Application) : AndroidViewModel(app) {
@@ -80,7 +81,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 _state.value = ConnectionState.Connected
                 startReading(session.shellSession)
             } else {
-                _state.value = ConnectionState.Disconnected
+                _state.value = ConnectionState.Disconnected()
                 sessionManager.update(id) { it.copy(status = SessionManager.Status.Disconnected) }
             }
         }
@@ -131,9 +132,11 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
                 if (host.knownHostsEntry == null)
                     hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
-                if (session.newJumpHostKeyLines.isNotEmpty() && host.jumpHostKeys == null) {
+                if (session.newJumpHostKeyLines.isNotEmpty()) {
                     val current = hostDao.getById(hostId) ?: host
-                    hostDao.upsert(current.copy(jumpHostKeys = session.newJumpHostKeyLines.joinToString("\n")))
+                    val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
+                    val merged = (existing + session.newJumpHostKeyLines).joinToString("\n")
+                    hostDao.upsert(current.copy(jumpHostKeys = merged))
                 }
                 hostDao.updateLastConnected(hostId, System.currentTimeMillis())
                 startReading(session)
@@ -155,7 +158,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         } else {
             _state.value = ConnectionState.PasswordPrompt(host.hostname)
             val pwd = passwordResult.first()
-            if (pwd.isEmpty()) { _state.value = ConnectionState.Disconnected; null }
+            if (pwd.isEmpty()) { _state.value = ConnectionState.Disconnected(); null }
             else SshAuth.Password(pwd)
         }
     }
@@ -169,6 +172,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val buf = ByteArray(4096)
             var cleanExit = false
+            var disconnectCause: String? = null
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
@@ -178,8 +182,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 // Loop exited because session.isConnected flipped (e.g. server closed channel)
                 if (isActive && !cleanExit) cleanExit = true
-            } catch (_: Exception) {
-                // IOException: unexpected network/socket error
+            } catch (e: Exception) {
+                disconnectCause = if (BuildConfig.DEBUG) e.toString()
+                                  else "${e.javaClass.simpleName}${e.message?.let { ": $it" } ?: ""}"
             }
 
             // If the job was cancelled (background() called), don't touch the session
@@ -197,7 +202,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     _navBack.tryEmit(Unit)
                 } else {
                     // Unexpected disconnect — show overlay so the user knows
-                    _state.value = ConnectionState.Disconnected
+                    _state.value = ConnectionState.Disconnected(disconnectCause)
                 }
             }
         }
@@ -238,7 +243,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         readerJob?.cancel()
         shellSession = null
         sessionManager.remove(id)
-        _state.value = ConnectionState.Disconnected
+        _state.value = ConnectionState.Disconnected()
         if (sessionManager.sessions.value.isEmpty()) {
             SshForegroundService.stop(getApplication())
         }

@@ -169,7 +169,10 @@ fun TerminalScreen(
                     onReject    = { vm.rejectHostKey() },
                 )
                 is ConnectionState.Error           -> ErrorOverlay(message = s.message, onBack = onBack)
-                is ConnectionState.Disconnected    -> DisconnectedOverlay(onBack = onBack)
+                is ConnectionState.Disconnected    -> DisconnectedOverlay(
+                    cause   = s.cause,
+                    onClose = { vm.disconnect(); onBack() },
+                )
                 is ConnectionState.Connected       -> { /* normal */ }
             }
         }
@@ -366,13 +369,17 @@ private fun ErrorOverlay(message: String, onBack: () -> Unit) {
 }
 
 @Composable
-private fun DisconnectedOverlay(onBack: () -> Unit) {
+private fun DisconnectedOverlay(cause: String?, onClose: () -> Unit) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), shape = MaterialTheme.shapes.medium) {
             Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Disconnected")
+                Text("Disconnected", style = MaterialTheme.typography.titleMedium)
+                if (cause != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(cause, style = MaterialTheme.typography.bodySmall)
+                }
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = onBack) { Text("Back") }
+                Button(onClick = onClose) { Text("Close") }
             }
         }
     }
