@@ -66,8 +66,8 @@ fun SftpScreen(
         }
     }
 
-    // Hardware back: navigate up in dir tree; at root, go back (session stays alive)
-    BackHandler { if (!vm.navigateUp()) onBack() }
+    // Hardware back: navigate up in dir tree; at root, disconnect and go back
+    BackHandler { if (!vm.navigateUp()) { vm.disconnect(); onBack() } }
 
     val currentPath = (state as? SftpViewModel.State.Listing)?.path ?: ""
     val atRoot = currentPath == "/" || currentPath.isEmpty()
@@ -102,8 +102,7 @@ fun SftpScreen(
                     )
                 },
                 navigationIcon = {
-                    // Back = send to background (session stays alive)
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { vm.disconnect(); onBack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to hosts")
                     }
                 },
