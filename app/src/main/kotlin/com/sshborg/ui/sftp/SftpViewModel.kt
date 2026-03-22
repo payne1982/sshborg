@@ -69,9 +69,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
         if (session.sftpSession != null) {
             sftpSession = session.sftpSession
-            // Restore the directory we were in
+            // Mark as non-Connecting immediately so SftpScreen doesn't call connect()
             val path = session.sftpCurrentPath
             pathStack.clear()
+            _state.value = State.Listing(path, emptyList())
             navigateTo(path)
         }
         // else: new session, connect() will be called next
