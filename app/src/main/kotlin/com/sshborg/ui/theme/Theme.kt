@@ -15,6 +15,9 @@ private val DarkColors = darkColorScheme(
     surface = Color(0xFF1E1E1E),
     onBackground = Color(0xFFE0E0E0),
     onSurface = Color(0xFFE0E0E0),
+    // Snackbar uses inverseSurface/inverseOnSurface — force light-on-dark contrast
+    inverseSurface = Color(0xFFE0E0E0),
+    inverseOnSurface = Color(0xFF1E1E1E),
 )
 
 private val LightColors = lightColorScheme(
@@ -25,6 +28,9 @@ private val LightColors = lightColorScheme(
     surface = Color(0xFFFFFFFF),
     onBackground = Color(0xFF1C1C1C),
     onSurface = Color(0xFF1C1C1C),
+    // Snackbar uses inverseSurface/inverseOnSurface — force dark-on-light contrast
+    inverseSurface = Color(0xFF1C1C1C),
+    inverseOnSurface = Color(0xFFECEFF1),
 )
 
 @Composable
