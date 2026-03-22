@@ -1,6 +1,13 @@
 # ── JSch ─────────────────────────────────────────────────────────────────────
 # JSch loads algorithm implementations by class name via reflection.
 -keep class com.jcraft.jsch.** { *; }
+# JSch optional dependencies not available on Android — suppress all warnings.
+-dontwarn com.sun.jna.**
+-dontwarn com.jcraft.jsch.PageantConnector
+-dontwarn org.apache.logging.log4j.**
+-dontwarn org.slf4j.**
+-dontwarn org.ietf.jgss.**
+-dontwarn org.newsclub.net.unix.**
 
 # ── BouncyCastle ──────────────────────────────────────────────────────────────
 # Registered as a JCE provider; internal classes loaded by name.
