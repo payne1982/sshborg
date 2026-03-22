@@ -171,7 +171,21 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun downloadKeepBoth(conflict: ConflictData) {
         viewModelScope.launch(Dispatchers.IO) {
-            performDownload(conflict.entry.name, conflict.remotePath)
+            val unique = uniqueFilename(conflict.entry.name)
+            performDownload(unique, conflict.remotePath)
+        }
+    }
+
+    /** Returns a filename like "file(1).txt" that does not yet exist in Downloads/SSHBorg/. */
+    private fun uniqueFilename(original: String): String {
+        val dot = original.lastIndexOf('.')
+        val base = if (dot > 0) original.substring(0, dot) else original
+        val ext  = if (dot > 0) original.substring(dot) else ""
+        var counter = 1
+        while (true) {
+            val candidate = "$base($counter)$ext"
+            if (findExistingDownload(candidate) == null) return candidate
+            counter++
         }
     }
 
