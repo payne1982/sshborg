@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,15 +19,33 @@ android {
         versionName = "1.0"
     }
 
+    val localProps = Properties()
+    val localPropsFile = rootProject.file("local.properties")
+    if (localPropsFile.exists()) localPropsFile.inputStream().use { localProps.load(it) }
+
+    signingConfigs {
+        create("release") {
+            val sf = localProps.getProperty("signing.storeFile")
+            storeFile     = if (sf != null) file(sf) else null
+            storePassword = localProps.getProperty("signing.storePassword")
+            keyAlias      = localProps.getProperty("signing.keyAlias")
+            keyPassword   = localProps.getProperty("signing.keyPassword")
+        }
+    }
+
     buildTypes {
         debug {
+            applicationIdSuffix = ".debug"
             manifestPlaceholders["allowBackup"] = "true"
+            manifestPlaceholders["appLabel"] = "SSHBorgDebug"
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             manifestPlaceholders["allowBackup"] = "false"
+            manifestPlaceholders["appLabel"] = "SSHBorg"
         }
     }
 
