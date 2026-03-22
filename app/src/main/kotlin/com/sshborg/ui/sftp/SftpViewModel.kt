@@ -141,9 +141,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun navigateUp(): Boolean {
-        if (pathStack.size <= 1) return false
-        pathStack.removeLast()
-        val parent = pathStack.removeLast()
+        val current = (state.value as? State.Listing)?.path ?: return false
+        if (current == "/" || current.isEmpty()) return false
+        val parent = current.substringBeforeLast("/").ifEmpty { "/" }
+        if (pathStack.isNotEmpty()) pathStack.removeLast()
         navigateTo(parent)
         return true
     }
