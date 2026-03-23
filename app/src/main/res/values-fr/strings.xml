@@ -199,4 +199,14 @@
     <string name="error_refresh_failed">Actualisation échouée</string>
     <string name="error_encryption_failed">Chiffrement échoué</string>
     <string name="error_decryption_failed">Déchiffrement échoué</string>
+
+    <!-- ── Foreground service notification ─────────────────────────────── -->
+    <string name="notification_channel_name">Sessions SSH actives</string>
+    <string name="notification_channel_description">Affiche les sessions SSH/SFTP actives</string>
+    <string name="notification_no_sessions">Aucune session active</string>
+    <string name="notification_disconnect_all">Tout déconnecter</string>
+    <plurals name="notification_active_sessions">
+        <item quantity="one">1 session active</item>
+        <item quantity="other">%d sessions actives</item>
+    </plurals>
 </resources>

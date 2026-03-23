@@ -199,4 +199,16 @@
     <string name="error_refresh_failed">Помилка оновлення</string>
     <string name="error_encryption_failed">Помилка шифрування</string>
     <string name="error_decryption_failed">Помилка розшифрування</string>
+
+    <!-- ── Foreground service notification ─────────────────────────────── -->
+    <string name="notification_channel_name">Активні SSH-сесії</string>
+    <string name="notification_channel_description">Показує активні SSH/SFTP-сесії</string>
+    <string name="notification_no_sessions">Немає активних сесій</string>
+    <string name="notification_disconnect_all">Від\'єднати все</string>
+    <plurals name="notification_active_sessions">
+        <item quantity="one">1 активна сесія</item>
+        <item quantity="few">%d активні сесії</item>
+        <item quantity="many">%d активних сесій</item>
+        <item quantity="other">%d активної сесії</item>
+    </plurals>
 </resources>

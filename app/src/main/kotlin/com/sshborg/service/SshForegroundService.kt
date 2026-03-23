@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationCompat
 import com.sshborg.MainActivity
 import com.sshborg.R
@@ -19,6 +20,17 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class SshForegroundService : Service() {
+
+    override fun attachBaseContext(base: Context) {
+        val locales = AppCompatDelegate.getApplicationLocales()
+        if (locales.isEmpty) {
+            super.attachBaseContext(base)
+        } else {
+            val config = base.resources.configuration
+            config.setLocales(android.os.LocaleList(locales[0]))
+            super.attachBaseContext(base.createConfigurationContext(config))
+        }
+    }
 
     private val scope = CoroutineScope(Dispatchers.Main)
     private var observeJob: Job? = null
@@ -65,9 +77,9 @@ class SshForegroundService : Service() {
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Active SSH Sessions",
+            getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_LOW,
-        ).apply { description = "Shows active SSH/SFTP sessions" }
+        ).apply { description = getString(R.string.notification_channel_description) }
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
             .createNotificationChannel(channel)
     }
@@ -83,18 +95,18 @@ class SshForegroundService : Service() {
             Intent(this, SshForegroundService::class.java).apply { action = ACTION_DISCONNECT_ALL },
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val text = when (sessionCount) {
-            0    -> "No active sessions"
-            1    -> "1 active session"
-            else -> "$sessionCount active sessions"
+        val text = if (sessionCount == 0) {
+            getString(R.string.notification_no_sessions)
+        } else {
+            resources.getQuantityString(R.plurals.notification_active_sessions, sessionCount, sessionCount)
         }
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("SSHBorg")
+            .setContentTitle(getString(R.string.app_name))
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(tapIntent)
             .setOngoing(true)
-            .addAction(0, "Disconnect all", disconnectAllIntent)
+            .addAction(0, getString(R.string.notification_disconnect_all), disconnectAllIntent)
             .build()
     }
 
