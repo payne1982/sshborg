@@ -17,7 +17,10 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -325,6 +328,7 @@ private fun PasswordDialog(
     onDismiss: () -> Unit,
 ) {
     var password by remember(wrongPassword) { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Password for $hostname") },
@@ -332,17 +336,24 @@ private fun PasswordDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (wrongPassword) {
                     Text(
-                        "Wrong password, please try again.",
+                        "Authentication failed. Please try again.",
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 OutlinedTextField(
-                    value = password, onValueChange = { password = it },
+                    value = password,
+                    onValueChange = { password = it },
                     label = { Text("Password") },
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     isError = wrongPassword,
+                    trailingIcon = {
+                        TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Text(if (passwordVisible) "Hide" else "Show")
+                        }
+                    },
                 )
             }
         },

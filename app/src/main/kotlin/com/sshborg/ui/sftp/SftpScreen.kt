@@ -470,6 +470,7 @@ private fun PasswordDialog(
     onCancel: () -> Unit,
 ) {
     var pwd by remember(wrongPassword) { mutableStateOf("") }
+    var pwdVisible by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onCancel,
         title = { Text("Password for $hostname") },
@@ -477,17 +478,27 @@ private fun PasswordDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (wrongPassword) {
                     Text(
-                        "Wrong password, please try again.",
+                        "Authentication failed. Please try again.",
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 OutlinedTextField(
-                    value = pwd, onValueChange = { pwd = it },
+                    value = pwd,
+                    onValueChange = { pwd = it },
                     label = { Text("Password") },
                     singleLine = true,
                     isError = wrongPassword,
-                    visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                    visualTransformation = if (pwdVisible) androidx.compose.ui.text.input.VisualTransformation.None
+                                           else androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
+                    ),
+                    trailingIcon = {
+                        TextButton(onClick = { pwdVisible = !pwdVisible }) {
+                            Text(if (pwdVisible) "Hide" else "Show")
+                        }
+                    },
                 )
             }
         },
