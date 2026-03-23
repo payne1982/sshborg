@@ -99,6 +99,7 @@ fun AddEditHostScreen(
                     value = password, onValueChange = { vm.password.value = it },
                     label = { Text("Password") }, modifier = Modifier.fillMaxWidth(),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         TextButton(onClick = { passwordVisible = !passwordVisible }) {
                             Text(if (passwordVisible) "Hide" else "Show")

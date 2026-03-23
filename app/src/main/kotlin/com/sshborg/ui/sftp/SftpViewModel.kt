@@ -132,7 +132,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
                 val err = result.exceptionOrNull()
                 if (isAuthFailure(err)) {
-                    _state.value = State.PasswordPrompt(host.hostname, wrongPassword = wrongPassword)
+                    _state.value = State.PasswordPrompt(host.hostname, wrongPassword = true)
                     val pwd = passwordResult.first()
                     if (pwd.isEmpty()) {
                         _state.value = State.Disconnected
@@ -140,7 +140,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                         return@launch
                     }
                     auth = SshAuth.Password(pwd)
-                    wrongPassword = true
                 } else {
                     _state.value = State.Error(err?.message ?: "Connection failed")
                     sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }

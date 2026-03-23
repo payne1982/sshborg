@@ -150,7 +150,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
                 val err = result.exceptionOrNull()
                 if (isAuthFailure(err)) {
-                    _state.value = ConnectionState.PasswordPrompt(host.hostname, wrongPassword = wrongPassword)
+                    _state.value = ConnectionState.PasswordPrompt(host.hostname, wrongPassword = true)
                     val pwd = passwordResult.first()
                     if (pwd.isEmpty()) {
                         _state.value = ConnectionState.Disconnected()
@@ -159,7 +159,6 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         return@launch
                     }
                     auth = SshAuth.Password(pwd)
-                    wrongPassword = true
                 } else {
                     _state.value = ConnectionState.Error(err?.message ?: "Connection failed")
                     sessionManager.remove(id)
