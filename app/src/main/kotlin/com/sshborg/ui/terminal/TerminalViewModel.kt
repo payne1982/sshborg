@@ -149,7 +149,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 }
 
                 val err = result.exceptionOrNull()
-                if (isAuthFailure(err)) {
+                if (isAuthFailure(err) && auth !is SshAuth.PublicKey) {
                     _state.value = ConnectionState.PasswordPrompt(host.hostname, wrongPassword = true)
                     val pwd = passwordResult.first()
                     if (pwd.isEmpty()) {
