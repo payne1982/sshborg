@@ -162,14 +162,14 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
 
                 when (type) {
                     "ed25519" -> Text(
-                        "Dimensione fissa: 256 bit",
+                        "Fixed size: 256 bit",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     "rsa" -> OutlinedTextField(
                         value = rsaBits,
                         onValueChange = { if (it.all(Char::isDigit)) rsaBits = it },
-                        label = { Text("Dimensione (bit)") },
+                        label = { Text("Size (bit)") },
                         singleLine = true,
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                             keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
@@ -177,7 +177,7 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
                         modifier = Modifier.fillMaxWidth(),
                     )
                     "ecdsa" -> {
-                        Text("Curva (bit)", style = MaterialTheme.typography.labelMedium)
+                        Text("Curve (bit)", style = MaterialTheme.typography.labelMedium)
                         ecdsaCurves.forEach { curve ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 RadioButton(selected = ecdsaCurve == curve, onClick = { ecdsaCurve = curve })
