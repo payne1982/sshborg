@@ -3,6 +3,10 @@
     <!-- App name — keep untranslated in all languages -->
     <string name="app_name">SSHBorg</string>
 
+    <!-- ── Language setting ────────────────────────────────────────────── -->
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System default</string>
+
     <!-- ── Common actions ──────────────────────────────────────────────── -->
     <string name="action_cancel">Cancel</string>
     <string name="action_delete">Delete</string>

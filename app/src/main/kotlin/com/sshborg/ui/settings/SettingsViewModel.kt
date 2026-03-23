@@ -1,6 +1,8 @@
 package com.sshborg.ui.settings
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
@@ -37,6 +39,19 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _error = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val error: SharedFlow<String> = _error
+
+    /** The BCP-47 tag of the currently forced locale, or "" for system default. */
+    val currentLocaleTag: String
+        get() {
+            val locales = AppCompatDelegate.getApplicationLocales()
+            return if (locales.isEmpty) "" else locales[0]?.toLanguageTag() ?: ""
+        }
+
+    fun setLocale(tag: String) {
+        val localeList = if (tag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
+                         else LocaleListCompat.forLanguageTags(tag)
+        AppCompatDelegate.setApplicationLocales(localeList)
+    }
 
     fun setBiometricLock(enabled: Boolean) {
         viewModelScope.launch { prefs.setBiometricLock(enabled) }

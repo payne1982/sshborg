@@ -46,6 +46,8 @@ fun SettingsScreen(
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
+    var languageMenuExpanded by remember { mutableStateOf(false) }
+    var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
 
@@ -102,6 +104,59 @@ fun SettingsScreen(
                         checked = invertTerminalScroll,
                         onCheckedChange = { vm.setInvertTerminalScroll(it) },
                     )
+                },
+            )
+
+            // Language picker
+            val systemDefaultLabel = stringResource(R.string.settings_language_system)
+            val languageOptions = remember {
+                listOf(
+                    "" to systemDefaultLabel,
+                    "en" to "English",
+                    "it" to "Italiano",
+                    "fr" to "Français",
+                    "de" to "Deutsch",
+                    "es" to "Español",
+                    "pt" to "Português",
+                    "uk" to "Українська",
+                )
+            }
+            val currentLanguageLabel = languageOptions.find { it.first == currentLocaleTag }?.second
+                ?: systemDefaultLabel
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_language)) },
+                trailingContent = {
+                    ExposedDropdownMenuBox(
+                        expanded = languageMenuExpanded,
+                        onExpandedChange = { languageMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = currentLanguageLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(languageMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .width(180.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = languageMenuExpanded,
+                            onDismissRequest = { languageMenuExpanded = false },
+                        ) {
+                            languageOptions.forEach { (tag, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        languageMenuExpanded = false
+                                        currentLocaleTag = tag
+                                        vm.setLocale(tag)
+                                    },
+                                )
+                            }
+                        }
+                    }
                 },
             )
 

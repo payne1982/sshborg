@@ -3,6 +3,9 @@
     <string name="app_name">SSHBorg</string>
 
     <!-- ── Common actions ──────────────────────────────────────────────── -->
+    <string name="settings_language">Мова</string>
+    <string name="settings_language_system">Системна мова</string>
+
     <string name="action_cancel">Скасувати</string>
     <string name="action_delete">Видалити</string>
     <string name="action_save">Зберегти</string>

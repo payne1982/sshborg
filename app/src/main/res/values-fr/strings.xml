@@ -3,6 +3,9 @@
     <string name="app_name">SSHBorg</string>
 
     <!-- ── Common actions ──────────────────────────────────────────────── -->
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_system">Par défaut du système</string>
+
     <string name="action_cancel">Annuler</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_save">Enregistrer</string>
