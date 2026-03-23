@@ -3,6 +3,7 @@ package com.sshborg.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -21,6 +22,7 @@ class AppPreferences(private val context: Context) {
         val LOCK_TIMEOUT_SECONDS      = intPreferencesKey("lock_timeout_seconds")
         val ROOT_WARNING_ACKNOWLEDGED = booleanPreferencesKey("root_warning_acknowledged")
         val INVERT_TERMINAL_SCROLL    = booleanPreferencesKey("invert_terminal_scroll")
+        val NIGHT_MODE                = intPreferencesKey("night_mode")
     }
 
     val biometricLock: Flow<Boolean> =
@@ -41,6 +43,9 @@ class AppPreferences(private val context: Context) {
 
     val invertTerminalScroll: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.INVERT_TERMINAL_SCROLL] ?: false }
+
+    val nightMode: Flow<Int> =
+        context.dataStore.data.map { it[Keys.NIGHT_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM }
 
     suspend fun setBiometricLock(enabled: Boolean) {
         context.dataStore.edit { it[Keys.BIOMETRIC_LOCK] = enabled }
@@ -64,5 +69,9 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setInvertTerminalScroll(enabled: Boolean) {
         context.dataStore.edit { it[Keys.INVERT_TERMINAL_SCROLL] = enabled }
+    }
+
+    suspend fun setNightMode(mode: Int) {
+        context.dataStore.edit { it[Keys.NIGHT_MODE] = mode }
     }
 }

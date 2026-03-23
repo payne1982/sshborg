@@ -3,16 +3,20 @@ package com.sshborg
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import com.sshborg.ui.theme.SshBorgTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val nightMode = runBlocking { (application as SshBorgApp).appPreferences.nightMode.first() }
+        AppCompatDelegate.setDefaultNightMode(nightMode)
         super.onCreate(savedInstanceState)
         if (!BuildConfig.DEBUG) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SSHBorg</string>
+
+    <!-- ── Common actions ──────────────────────────────────────────────── -->
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_system">Padrão do sistema</string>
+
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_back">Voltar</string>
+    <string name="action_connect">Ligar</string>
+    <string name="action_disconnect">Desligar</string>
+    <string name="action_close">Fechar</string>
+    <string name="action_rename">Renomear</string>
+    <string name="action_create">Criar</string>
+    <string name="action_generate">Gerar</string>
+    <string name="action_enable">Ativar</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_copied">Copiado!</string>
+    <string name="action_show">Mostrar</string>
+    <string name="action_hide">Ocultar</string>
+    <string name="action_refresh">Atualizar</string>
+    <string name="action_trust">Confiar</string>
+    <string name="action_reject">Rejeitar</string>
+    <string name="action_go_back">Voltar</string>
+    <string name="action_back_to_hosts">Voltar aos hosts</string>
+    <string name="action_overwrite">Substituir</string>
+    <string name="action_keep_both">Manter ambos</string>
+    <string name="action_i_understand">Entendi</string>
+
+    <!-- ── Hosts screen ──────────────────────────────────────────────── -->
+    <string name="hosts_title">SSHBorg</string>
+    <string name="hosts_empty">Nenhum host.\nToque em + para adicionar um.</string>
+    <string name="hosts_add_host_cd">Adicionar host</string>
+    <string name="hosts_manage_keys_cd">Gerir chaves</string>
+    <string name="hosts_settings_cd">Definições</string>
+    <string name="hosts_options_cd">Opções</string>
+    <string name="hosts_press_back_to_exit">Prima novamente para sair</string>
+    <string name="hosts_delete_title">Eliminar host</string>
+    <string name="hosts_delete_message">Eliminar \"%1$s\"?</string>
+
+    <string name="host_menu_connect">Ligar</string>
+    <string name="host_menu_resume_terminal">Retomar terminal (%1$d)</string>
+    <string name="host_menu_new_terminal">Novo terminal</string>
+    <string name="host_menu_files">Ficheiros</string>
+    <string name="host_menu_resume_files">Retomar ficheiros (%1$d)</string>
+    <string name="host_menu_new_files_session">Nova sessão de ficheiros</string>
+
+    <string name="session_picker_title">%1$s — sessões de %2$s</string>
+    <string name="session_picker_session_label">Sessão %1$d</string>
+    <string name="session_picker_new_session">Nova sessão de %1$s</string>
+    <string name="session_type_terminal">Terminal</string>
+    <string name="session_type_files">Ficheiros</string>
+    <string name="session_status_connected">Ligado</string>
+    <string name="session_status_connecting">A ligar…</string>
+    <string name="session_status_disconnected">Desligado</string>
+    <string name="session_status_error">Erro</string>
+
+    <!-- ── Add/Edit Host screen ──────────────────────────────────────── -->
+    <string name="add_host_title">Adicionar Host</string>
+    <string name="edit_host_title">Editar Host</string>
+    <string name="host_field_label">Etiqueta (opcional)</string>
+    <string name="host_field_hostname">Nome de host / IP</string>
+    <string name="host_field_username">Utilizador</string>
+    <string name="host_field_port">Porta</string>
+    <string name="host_section_authentication">Autenticação</string>
+    <string name="host_auth_ssh_key">Chave SSH</string>
+    <string name="host_auth_password">Palavra-passe</string>
+    <string name="host_field_password">Palavra-passe</string>
+    <string name="host_key_select_placeholder">Selecionar uma chave…</string>
+    <string name="host_key_change">Alterar</string>
+    <string name="host_key_no_keys">Sem chaves – adicione uma primeiro</string>
+    <string name="host_agent_forwarding">Encaminhamento de agente</string>
+    <string name="host_field_jump_hosts">Hosts de salto (opcional)</string>
+    <string name="host_jump_hosts_placeholder">host1:22,utilizador@host2:2222</string>
+    <string name="host_jump_hosts_supporting">Separados por vírgulas: [utilizador@]host[:porta] — predefinições: porta 22, mesmo utilizador</string>
+
+    <!-- ── Keys screen ─────────────────────────────────────────────────── -->
+    <string name="keys_title">Chaves SSH</string>
+    <string name="keys_empty">Nenhuma chave.\nToque em + para gerar uma.</string>
+    <string name="keys_generate_cd">Gerar chave</string>
+    <string name="keys_show_public_key_cd">Mostrar chave pública</string>
+    <string name="keys_delete_cd">Eliminar</string>
+    <string name="keys_public_key_label">Chave pública (adicionar a ~/.ssh/authorized_keys):</string>
+    <string name="keys_delete_title">Eliminar chave</string>
+    <string name="keys_delete_message">Eliminar \"%1$s\"? Os hosts que usam esta chave voltarão a usar autenticação por palavra-passe.</string>
+
+    <string name="keygen_title">Gerar Chave SSH</string>
+    <string name="keygen_field_label">Etiqueta</string>
+    <string name="keygen_key_type">Tipo de chave</string>
+    <string name="keygen_fixed_size">Tamanho fixo: 256 bits</string>
+    <string name="keygen_size_bits">Tamanho (bits)</string>
+    <string name="keygen_curve_bits">Curva (bits)</string>
+
+    <!-- ── Settings screen ─────────────────────────────────────────────── -->
+    <string name="settings_title">Definições</string>
+    <string name="settings_section_general">Geral</string>
+    <string name="settings_section_security">Segurança</string>
+
+    <string name="settings_confirm_exit_title">Confirmar saída</string>
+    <string name="settings_confirm_exit_subtitle">Pedir confirmação antes de fechar a aplicação</string>
+
+    <string name="settings_invert_scroll_title">Inverter scroll do terminal</string>
+    <string name="settings_invert_scroll_subtitle">Deslize para cima para ver a saída mais recente</string>
+
+    <string name="settings_biometric_lock_title">Bloqueio biométrico</string>
+    <string name="settings_biometric_available">Exigir autenticação ao regressar à aplicação</string>
+    <string name="settings_biometric_unavailable">Nenhum bloqueio biométrico ou de ecrã configurado neste dispositivo</string>
+
+    <string name="settings_lock_after_title">Bloquear após</string>
+    <string name="settings_lock_after_subtitle">Tempo antes de exigir autenticação novamente</string>
+    <string name="settings_lock_timeout_fallback">%1$d segundos</string>
+
+    <string name="settings_encrypt_title">Cifrar dados sensíveis</string>
+    <string name="settings_encrypt_subtitle">As chaves privadas SSH e palavras-passe dos hosts são cifradas usando o hardware seguro deste dispositivo. Se desinstalar a aplicação, as chaves cifradas ficarão inacessíveis.</string>
+
+    <string name="settings_encrypt_dialog_title">Cifrar dados sensíveis?</string>
+    <string name="settings_encrypt_dialog_body">As suas chaves privadas SSH e palavras-passe dos hosts serão cifradas usando o hardware seguro deste dispositivo.\n\nOs dados cifrados estão vinculados a este dispositivo e instalação da aplicação. Se desinstalar a aplicação, as suas chaves atuais ficarão inacessíveis e precisará de gerar novas e adicioná-las aos seus servidores.</string>
+
+    <string name="timeout_immediately">Imediatamente</string>
+    <string name="timeout_30_seconds">30 segundos</string>
+    <string name="timeout_1_minute">1 minuto</string>
+    <string name="timeout_3_minutes">3 minutos</string>
+    <string name="timeout_5_minutes">5 minutos</string>
+    <string name="timeout_15_minutes">15 minutos</string>
+    <string name="timeout_30_minutes">30 minutos</string>
+    <string name="timeout_1_hour">1 hora</string>
+    <string name="timeout_4_hours">4 horas</string>
+
+    <!-- ── Terminal screen ─────────────────────────────────────────────── -->
+    <string name="terminal_title_default">Terminal</string>
+    <string name="terminal_disconnect_cd">Desligar</string>
+    <string name="terminal_paste_cd">Colar</string>
+    <string name="terminal_connecting">A ligar…</string>
+    <string name="terminal_connection_failed">Ligação falhada</string>
+    <string name="terminal_disconnected">Desligado</string>
+
+    <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
+    <string name="sftp_back_cd">Voltar aos hosts</string>
+    <string name="sftp_refresh_cd">Atualizar</string>
+    <string name="sftp_disconnect_cd">Desligar</string>
+    <string name="sftp_new_folder_cd">Nova pasta</string>
+    <string name="sftp_upload_file_cd">Enviar ficheiro</string>
+    <string name="sftp_download_cd">Transferir</string>
+    <string name="sftp_empty_directory">Diretório vazio</string>
+    <string name="sftp_disconnected">Desligado</string>
+    <string name="sftp_go_back">Voltar</string>
+
+    <string name="sftp_downloading">A transferir %1$s</string>
+    <string name="sftp_uploading">A enviar %1$s</string>
+    <string name="sftp_saved_to_downloads">Guardado em %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_uploaded">Enviado: %1$s</string>
+
+    <string name="sftp_delete_file_title">Eliminar ficheiro</string>
+    <string name="sftp_delete_folder_title">Eliminar pasta</string>
+    <string name="sftp_delete_message">Eliminar \"%1$s\"?\nEsta ação não pode ser desfeita.</string>
+
+    <string name="sftp_rename_title">Renomear</string>
+    <string name="sftp_rename_new_name">Novo nome</string>
+
+    <string name="sftp_conflict_title">O ficheiro já existe</string>
+    <string name="sftp_conflict_message">\"%1$s\" já existe em Transferências/SSHBorg/.</string>
+
+    <string name="sftp_mkdir_title">Nova pasta</string>
+    <string name="sftp_mkdir_folder_name">Nome da pasta</string>
+
+    <string name="sftp_menu_rename">Renomear</string>
+    <string name="sftp_menu_delete">Eliminar</string>
+
+    <!-- ── Host key / password dialogs ─────────────────────────────────── -->
+    <string name="hostkey_title">Host desconhecido</string>
+    <string name="hostkey_sftp_body">%1$s\n\n%2$s\n\nLigar mesmo assim?</string>
+    <string name="hostkey_terminal_host">Host: %1$s</string>
+    <string name="hostkey_terminal_fingerprint">Impressão digital:</string>
+    <string name="hostkey_terminal_trust_question">Confia neste host?</string>
+
+    <string name="password_dialog_title">Palavra-passe para %1$s</string>
+    <string name="password_field_label">Palavra-passe</string>
+    <string name="password_auth_failed">Autenticação falhada. Por favor, tente novamente.</string>
+
+    <!-- ── Root warning dialog ───────────────────────────────────────────── -->
+    <string name="root_warning_title">Aviso de segurança</string>
+    <string name="root_warning_body">Este dispositivo parece ter root. Em dispositivos com root, as garantias de segurança do Android Keystore estão enfraquecidas e outras aplicações podem aceder a dados sensíveis. Proceda com cautela.</string>
+
+    <!-- ── Error strings from ViewModels ───────────────────────────────── -->
+    <string name="error_session_not_found">Sessão não encontrada</string>
+    <string name="error_host_not_found">Host não encontrado</string>
+    <string name="error_connection_failed">Ligação falhada</string>
+    <string name="error_cannot_list_directory">Não é possível listar o diretório</string>
+    <string name="error_cannot_create_file">Não é possível criar o ficheiro em Transferências</string>
+    <string name="error_download_failed">Transferência falhada</string>
+    <string name="error_upload_failed">Envio falhado</string>
+    <string name="error_delete_failed">Eliminação falhada</string>
+    <string name="error_rename_failed">Renomeação falhada</string>
+    <string name="error_create_directory_failed">Criação de diretório falhada</string>
+    <string name="error_refresh_failed">Atualização falhada</string>
+    <string name="error_encryption_failed">Cifragem falhada</string>
+    <string name="error_decryption_failed">Decifragem falhada</string>
+
+    <!-- ── Theme setting ─────────────────────────────────────────────────── -->
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_follow_system">Seguir o sistema</string>
+    <string name="settings_theme_light">Claro</string>
+<string name="settings_theme_dark">Escuro</string>
+
+    <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
+    <string name="biometric_prompt_subtitle">Autentique-se para continuar</string>
+
+    <!-- ── Foreground service notification ─────────────────────────────── -->
+    <string name="notification_channel_name">Sessões SSH ativas</string>
+    <string name="notification_channel_description">Mostra as sessões SSH/SFTP ativas</string>
+    <string name="notification_no_sessions">Sem sessões ativas</string>
+    <string name="notification_disconnect_all">Desligar tudo</string>
+    <plurals name="notification_active_sessions">
+        <item quantity="one">1 sessão ativa</item>
+        <item quantity="other">%d sessões ativas</item>
+    </plurals>
+</resources>

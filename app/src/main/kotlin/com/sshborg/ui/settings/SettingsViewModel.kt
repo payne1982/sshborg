@@ -1,7 +1,10 @@
 package com.sshborg.ui.settings
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
+import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.KeystoreManager
@@ -28,6 +31,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val invertTerminalScroll: StateFlow<Boolean> =
         prefs.invertTerminalScroll.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val nightMode: StateFlow<Int> =
+        prefs.nightMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
@@ -36,6 +42,19 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _error = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val error: SharedFlow<String> = _error
+
+    /** The BCP-47 tag of the currently forced locale, or "" for system default. */
+    val currentLocaleTag: String
+        get() {
+            val locales = AppCompatDelegate.getApplicationLocales()
+            return if (locales.isEmpty) "" else locales[0]?.toLanguageTag() ?: ""
+        }
+
+    fun setLocale(tag: String) {
+        val localeList = if (tag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
+                         else LocaleListCompat.forLanguageTags(tag)
+        AppCompatDelegate.setApplicationLocales(localeList)
+    }
 
     fun setBiometricLock(enabled: Boolean) {
         viewModelScope.launch { prefs.setBiometricLock(enabled) }
@@ -51,6 +70,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setLockTimeoutSeconds(seconds: Int) {
         viewModelScope.launch { prefs.setLockTimeoutSeconds(seconds) }
+    }
+
+    fun setNightMode(mode: Int) {
+        AppCompatDelegate.setDefaultNightMode(mode)
+        viewModelScope.launch { prefs.setNightMode(mode) }
     }
 
     /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */
@@ -71,7 +95,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     }
                 }
                 prefs.setKeystoreEncryption(true)
-            }.onFailure { _error.tryEmit(it.message ?: "Encryption failed") }
+            }.onFailure { _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_encryption_failed)) }
             _isMigrating.value = false
         }
     }
@@ -95,7 +119,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 KeystoreManager.deleteKey()
                 prefs.setKeystoreEncryption(false)
-            }.onFailure { _error.tryEmit(it.message ?: "Decryption failed") }
+            }.onFailure { _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_decryption_failed)) }
             _isMigrating.value = false
         }
     }

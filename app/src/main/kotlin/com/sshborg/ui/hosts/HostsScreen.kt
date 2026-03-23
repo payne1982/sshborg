@@ -15,9 +15,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sshborg.R
 import com.sshborg.data.db.HostEntity
 import com.sshborg.service.SessionManager
 
@@ -41,13 +43,14 @@ fun HostsScreen(
 
     // Double-back-to-exit
     var lastBackPress by remember { mutableLongStateOf(0L) }
+    val pressBackToExit = stringResource(R.string.hosts_press_back_to_exit)
     BackHandler(enabled = confirmExit) {
         val now = System.currentTimeMillis()
         if (now - lastBackPress < 2_000L) {
             (context as Activity).finish()
         } else {
             lastBackPress = now
-            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, pressBackToExit, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -60,26 +63,26 @@ fun HostsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("SSHBorg") },
+                title = { Text(stringResource(R.string.hosts_title)) },
                 actions = {
                     IconButton(onClick = onKeysClick) {
-                        Icon(Icons.Default.Key, contentDescription = "Manage keys")
+                        Icon(Icons.Default.Key, contentDescription = stringResource(R.string.hosts_manage_keys_cd))
                     }
                     IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.hosts_settings_cd))
                     }
                 },
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddHost) {
-                Icon(Icons.Default.Add, contentDescription = "Add host")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.hosts_add_host_cd))
             }
         },
     ) { padding ->
         if (hosts.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("No hosts yet.\nTap + to add one.", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.hosts_empty), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
             LazyColumn(Modifier.fillMaxSize().padding(padding)) {
@@ -122,13 +125,17 @@ fun HostsScreen(
     hostToDelete?.let { host ->
         AlertDialog(
             onDismissRequest = { hostToDelete = null },
-            title = { Text("Delete host") },
-            text  = { Text("Delete \"${host.label}\"?") },
+            title = { Text(stringResource(R.string.hosts_delete_title)) },
+            text  = { Text(stringResource(R.string.hosts_delete_message, host.label)) },
             confirmButton = {
-                TextButton(onClick = { vm.deleteHost(host); hostToDelete = null }) { Text("Delete") }
+                TextButton(onClick = { vm.deleteHost(host); hostToDelete = null }) {
+                    Text(stringResource(R.string.action_delete))
+                }
             },
             dismissButton = {
-                TextButton(onClick = { hostToDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { hostToDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             },
         )
     }
@@ -167,19 +174,22 @@ private fun SessionPickerSheet(
     onNew: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val typeName = if (type == SessionManager.SessionType.Shell) "Terminal" else "Files"
+    val typeName = if (type == SessionManager.SessionType.Shell)
+        stringResource(R.string.session_type_terminal)
+    else
+        stringResource(R.string.session_type_files)
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
-            "${host.label} — $typeName sessions",
+            stringResource(R.string.session_picker_title, host.label, typeName),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
         sessions.forEachIndexed { index, session ->
             val statusText = when (session.status) {
-                SessionManager.Status.Connected    -> "Connected"
-                SessionManager.Status.Connecting   -> "Connecting…"
-                SessionManager.Status.Disconnected -> "Disconnected"
-                SessionManager.Status.Error        -> "Error"
+                SessionManager.Status.Connected    -> stringResource(R.string.session_status_connected)
+                SessionManager.Status.Connecting   -> stringResource(R.string.session_status_connecting)
+                SessionManager.Status.Disconnected -> stringResource(R.string.session_status_disconnected)
+                SessionManager.Status.Error        -> stringResource(R.string.session_status_error)
             }
             ListItem(
                 modifier = Modifier.combinedClickable(onClick = { onResume(session.id) }),
@@ -189,7 +199,7 @@ private fun SessionPickerSheet(
                         contentDescription = null,
                     )
                 },
-                headlineContent  = { Text("Session ${index + 1}") },
+                headlineContent  = { Text(stringResource(R.string.session_picker_session_label, index + 1)) },
                 supportingContent = { Text(statusText) },
             )
             HorizontalDivider(thickness = 0.5.dp)
@@ -197,7 +207,7 @@ private fun SessionPickerSheet(
         ListItem(
             modifier = Modifier.combinedClickable(onClick = onNew),
             leadingContent = { Icon(Icons.Default.Add, contentDescription = null) },
-            headlineContent = { Text("New $typeName session") },
+            headlineContent = { Text(stringResource(R.string.session_picker_new_session, typeName)) },
         )
         Spacer(Modifier.height(16.dp))
     }
@@ -249,42 +259,56 @@ private fun HostItem(
         trailingContent = {
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Options")
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.hosts_options_cd))
                 }
                 DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                     // "Connect" — resumes if 1 active, picks if >1, creates if 0
                     DropdownMenuItem(
-                        text = { Text(if (shellCount > 0) "Resume terminal ($shellCount)" else "Connect") },
+                        text = {
+                            Text(
+                                if (shellCount > 0)
+                                    stringResource(R.string.host_menu_resume_terminal, shellCount)
+                                else
+                                    stringResource(R.string.host_menu_connect)
+                            )
+                        },
                         leadingIcon = { Icon(Icons.Default.Terminal, null) },
                         onClick = { menuExpanded = false; onClick() },
                     )
                     if (shellCount > 0) {
                         DropdownMenuItem(
-                            text = { Text("New terminal") },
+                            text = { Text(stringResource(R.string.host_menu_new_terminal)) },
                             leadingIcon = { Icon(Icons.Default.Add, null) },
                             onClick = { menuExpanded = false; onNewTerminal() },
                         )
                     }
                     DropdownMenuItem(
-                        text = { Text(if (sftpCount > 0) "Resume files ($sftpCount)" else "Files") },
+                        text = {
+                            Text(
+                                if (sftpCount > 0)
+                                    stringResource(R.string.host_menu_resume_files, sftpCount)
+                                else
+                                    stringResource(R.string.host_menu_files)
+                            )
+                        },
                         leadingIcon = { Icon(Icons.Default.Folder, null) },
                         onClick = { menuExpanded = false; onSftp() },
                     )
                     if (sftpCount > 0) {
                         DropdownMenuItem(
-                            text = { Text("New files session") },
+                            text = { Text(stringResource(R.string.host_menu_new_files_session)) },
                             leadingIcon = { Icon(Icons.Default.Add, null) },
                             onClick = { menuExpanded = false; onNewSftp() },
                         )
                     }
                     HorizontalDivider()
                     DropdownMenuItem(
-                        text = { Text("Edit") },
+                        text = { Text(stringResource(R.string.action_edit)) },
                         leadingIcon = { Icon(Icons.Default.Edit, null) },
                         onClick = { menuExpanded = false; onEdit() },
                     )
                     DropdownMenuItem(
-                        text = { Text("Delete") },
+                        text = { Text(stringResource(R.string.action_delete)) },
                         leadingIcon = { Icon(Icons.Default.Delete, null) },
                         onClick = { menuExpanded = false; onDelete() },
                     )

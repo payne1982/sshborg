@@ -35,8 +35,8 @@ object BiometricHelper {
 
             val prompt = BiometricPrompt(activity, callback)
             val info = BiometricPrompt.PromptInfo.Builder()
-                .setTitle("SSHBorg")
-                .setSubtitle("Authenticate to continue")
+                .setTitle(activity.getString(R.string.biometric_prompt_title))
+                .setSubtitle(activity.getString(R.string.biometric_prompt_subtitle))
                 .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
                 .build()
 

@@ -18,10 +18,12 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sshborg.R
 import com.sshborg.data.ssh.SftpEntry
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,12 +52,14 @@ fun SftpScreen(
         }
     }
 
+    val downloadsDir = android.os.Environment.DIRECTORY_DOWNLOADS
+
     // Downloaded: show snackbar, then refresh listing
     LaunchedEffect(state) {
         if (state is SftpViewModel.State.Downloaded) {
             val s = state as SftpViewModel.State.Downloaded
             snackbarHostState.showSnackbar(
-                "Saved to ${android.os.Environment.DIRECTORY_DOWNLOADS}/SSHBorg/${s.filename}"
+                "Saved to $downloadsDir/SSHBorg/${s.filename}"
             )
             vm.dismissDownloaded()
         }
@@ -104,17 +108,17 @@ fun SftpScreen(
                 navigationIcon = {
                     // Back arrow keeps the session alive; use X to disconnect
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to hosts")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.sftp_back_cd))
                     }
                 },
                 actions = {
                     if (isListing) {
                         IconButton(onClick = { vm.refreshListing() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.sftp_refresh_cd))
                         }
                     }
                     IconButton(onClick = { vm.disconnect(); onBack() }) {
-                        Icon(Icons.Default.Close, contentDescription = "Disconnect")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.sftp_disconnect_cd))
                     }
                 },
             )
@@ -126,10 +130,10 @@ fun SftpScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     SmallFloatingActionButton(onClick = { showMkdirDialog = true }) {
-                        Icon(Icons.Default.CreateNewFolder, contentDescription = "New folder")
+                        Icon(Icons.Default.CreateNewFolder, contentDescription = stringResource(R.string.sftp_new_folder_cd))
                     }
                     FloatingActionButton(onClick = { filePicker.launch("*/*") }) {
-                        Icon(Icons.Default.Upload, contentDescription = "Upload file")
+                        Icon(Icons.Default.Upload, contentDescription = stringResource(R.string.sftp_upload_file_cd))
                     }
                 }
             }
@@ -188,7 +192,10 @@ fun SftpScreen(
                         if (s.entries.isEmpty()) {
                             item {
                                 Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                                    Text("Empty directory", style = MaterialTheme.typography.bodyLarge)
+                                    Text(
+                                        stringResource(R.string.sftp_empty_directory),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
                                 }
                             }
                         } else {
@@ -210,7 +217,7 @@ fun SftpScreen(
 
                 is SftpViewModel.State.Downloading -> {
                     TransferProgress(
-                        label   = "Downloading ${s.filename}",
+                        label   = stringResource(R.string.sftp_downloading, s.filename),
                         bytes   = s.bytesReceived,
                         icon    = Icons.Default.Download,
                     )
@@ -222,7 +229,7 @@ fun SftpScreen(
 
                 is SftpViewModel.State.Uploading -> {
                     TransferProgress(
-                        label   = "Uploading ${s.filename}",
+                        label   = stringResource(R.string.sftp_uploading, s.filename),
                         bytes   = s.bytesSent,
                         icon    = Icons.Default.Upload,
                     )
@@ -242,12 +249,12 @@ fun SftpScreen(
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(48.dp))
                         Text(s.message, style = MaterialTheme.typography.bodyMedium)
-                        Button(onClick = onBack) { Text("Go back") }
+                        Button(onClick = onBack) { Text(stringResource(R.string.action_go_back)) }
                     }
                 }
 
                 SftpViewModel.State.Disconnected -> {
-                    Text("Disconnected", Modifier.align(Alignment.Center))
+                    Text(stringResource(R.string.sftp_disconnected), Modifier.align(Alignment.Center))
                 }
             }
         }
@@ -257,16 +264,23 @@ fun SftpScreen(
     entryToDelete?.let { entry ->
         AlertDialog(
             onDismissRequest = { entryToDelete = null },
-            title = { Text("Delete ${if (entry.isDir) "folder" else "file"}") },
-            text  = { Text("Delete \"${entry.name}\"?\nThis cannot be undone.") },
+            title = {
+                Text(
+                    if (entry.isDir) stringResource(R.string.sftp_delete_folder_title)
+                    else stringResource(R.string.sftp_delete_file_title)
+                )
+            },
+            text  = { Text(stringResource(R.string.sftp_delete_message, entry.name)) },
             confirmButton = {
                 TextButton(onClick = {
                     vm.deleteEntry(entry, currentPath)
                     entryToDelete = null
-                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { entryToDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { entryToDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             },
         )
     }
@@ -276,12 +290,12 @@ fun SftpScreen(
         var newName by remember(entry) { mutableStateOf(entry.name) }
         AlertDialog(
             onDismissRequest = { entryToRename = null },
-            title = { Text("Rename") },
+            title = { Text(stringResource(R.string.sftp_rename_title)) },
             text  = {
                 OutlinedTextField(
                     value = newName,
                     onValueChange = { newName = it },
-                    label = { Text("New name") },
+                    label = { Text(stringResource(R.string.sftp_rename_new_name)) },
                     singleLine = true,
                 )
             },
@@ -294,10 +308,12 @@ fun SftpScreen(
                         entryToRename = null
                     },
                     enabled = newName.isNotBlank(),
-                ) { Text("Rename") }
+                ) { Text(stringResource(R.string.action_rename)) }
             },
             dismissButton = {
-                TextButton(onClick = { entryToRename = null }) { Text("Cancel") }
+                TextButton(onClick = { entryToRename = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             },
         )
     }
@@ -306,18 +322,18 @@ fun SftpScreen(
     pendingConflict?.let { conflict ->
         AlertDialog(
             onDismissRequest = { pendingConflict = null },
-            title = { Text("File already exists") },
-            text  = { Text("\"${conflict.entry.name}\" already exists in Downloads/SSHBorg/.") },
+            title = { Text(stringResource(R.string.sftp_conflict_title)) },
+            text  = { Text(stringResource(R.string.sftp_conflict_message, conflict.entry.name)) },
             confirmButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = { pendingConflict = null }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
                     TextButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
-                        Text("Keep both")
+                        Text(stringResource(R.string.action_keep_both))
                     }
                     TextButton(onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) }) {
-                        Text("Overwrite", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.action_overwrite), color = MaterialTheme.colorScheme.error)
                     }
                 }
             },
@@ -329,12 +345,12 @@ fun SftpScreen(
         var folderName by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { showMkdirDialog = false; folderName = "" },
-            title = { Text("New folder") },
+            title = { Text(stringResource(R.string.sftp_mkdir_title)) },
             text  = {
                 OutlinedTextField(
                     value = folderName,
                     onValueChange = { folderName = it },
-                    label = { Text("Folder name") },
+                    label = { Text(stringResource(R.string.sftp_mkdir_folder_name)) },
                     singleLine = true,
                 )
             },
@@ -348,10 +364,12 @@ fun SftpScreen(
                         folderName = ""
                     },
                     enabled = folderName.isNotBlank(),
-                ) { Text("Create") }
+                ) { Text(stringResource(R.string.action_create)) }
             },
             dismissButton = {
-                TextButton(onClick = { showMkdirDialog = false; folderName = "" }) { Text("Cancel") }
+                TextButton(onClick = { showMkdirDialog = false; folderName = "" }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             },
         )
     }
@@ -419,7 +437,7 @@ private fun SftpEntryItem(
             },
             trailingContent = {
                 if (!entry.isDir) {
-                    Icon(Icons.Default.Download, contentDescription = "Download",
+                    Icon(Icons.Default.Download, contentDescription = stringResource(R.string.sftp_download_cd),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp))
                 }
@@ -427,13 +445,20 @@ private fun SftpEntryItem(
         )
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
             DropdownMenuItem(
-                text = { Text("Rename") },
+                text = { Text(stringResource(R.string.sftp_menu_rename)) },
                 leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) },
                 onClick = { menuExpanded = false; onRename() },
             )
             DropdownMenuItem(
-                text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-                leadingIcon = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
+                text = {
+                    Text(
+                        stringResource(R.string.sftp_menu_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error)
+                },
                 onClick = { menuExpanded = false; onDelete() },
             )
         }
@@ -455,10 +480,14 @@ private fun HostKeyDialog(
 ) {
     AlertDialog(
         onDismissRequest = onReject,
-        title = { Text("Unknown host") },
-        text  = { Text("$hostname\n\n$fingerprint\n\nConnect anyway?") },
-        confirmButton = { TextButton(onClick = onAccept) { Text("Connect") } },
-        dismissButton = { TextButton(onClick = onReject)  { Text("Cancel")  } },
+        title = { Text(stringResource(R.string.hostkey_title)) },
+        text  = { Text(stringResource(R.string.hostkey_sftp_body, hostname, fingerprint)) },
+        confirmButton = {
+            TextButton(onClick = onAccept) { Text(stringResource(R.string.action_connect)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onReject)  { Text(stringResource(R.string.action_cancel)) }
+        },
     )
 }
 
@@ -473,12 +502,12 @@ private fun PasswordDialog(
     var pwdVisible by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onCancel,
-        title = { Text("Password for $hostname") },
+        title = { Text(stringResource(R.string.password_dialog_title, hostname)) },
         text  = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (wrongPassword) {
                     Text(
-                        "Authentication failed. Please try again.",
+                        stringResource(R.string.password_auth_failed),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -486,7 +515,7 @@ private fun PasswordDialog(
                 OutlinedTextField(
                     value = pwd,
                     onValueChange = { pwd = it },
-                    label = { Text("Password") },
+                    label = { Text(stringResource(R.string.password_field_label)) },
                     singleLine = true,
                     isError = wrongPassword,
                     visualTransformation = if (pwdVisible) androidx.compose.ui.text.input.VisualTransformation.None
@@ -496,13 +525,20 @@ private fun PasswordDialog(
                     ),
                     trailingIcon = {
                         TextButton(onClick = { pwdVisible = !pwdVisible }) {
-                            Text(if (pwdVisible) "Hide" else "Show")
+                            Text(
+                                if (pwdVisible) stringResource(R.string.action_hide)
+                                else stringResource(R.string.action_show)
+                            )
                         }
                     },
                 )
             }
         },
-        confirmButton = { TextButton(onClick = { onSubmit(pwd) }) { Text("Connect") } },
-        dismissButton = { TextButton(onClick = onCancel) { Text("Cancel") } },
+        confirmButton = {
+            TextButton(onClick = { onSubmit(pwd) }) { Text(stringResource(R.string.action_connect)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
+        },
     )
 }
