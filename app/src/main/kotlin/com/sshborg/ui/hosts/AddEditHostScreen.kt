@@ -10,11 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sshborg.R
 import com.sshborg.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,10 +48,15 @@ fun AddEditHostScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (isNew) "Add Host" else "Edit Host") },
+                title = {
+                    Text(
+                        if (isNew) stringResource(R.string.add_host_title)
+                        else stringResource(R.string.edit_host_title)
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back))
                     }
                 },
             )
@@ -66,43 +73,54 @@ fun AddEditHostScreen(
         ) {
             OutlinedTextField(
                 value = label, onValueChange = { vm.label.value = it },
-                label = { Text("Label (optional)") }, modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.host_field_label)) },
+                modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = hostname, onValueChange = { vm.hostname.value = it },
-                label = { Text("Hostname / IP") }, modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.host_field_hostname)) },
+                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = username, onValueChange = { vm.username.value = it },
-                    label = { Text("Username") }, modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.host_field_username)) },
+                    modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
                     value = port, onValueChange = { vm.port.value = it },
-                    label = { Text("Port") }, modifier = Modifier.width(90.dp),
+                    label = { Text(stringResource(R.string.host_field_port)) },
+                    modifier = Modifier.width(90.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
             }
 
             HorizontalDivider()
-            Text("Authentication", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.host_section_authentication), style = MaterialTheme.typography.titleSmall)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(checked = useKey, onCheckedChange = { vm.useKey.value = it })
                 Spacer(Modifier.width(8.dp))
-                Text(if (useKey) "SSH Key" else "Password")
+                Text(
+                    if (useKey) stringResource(R.string.host_auth_ssh_key)
+                    else stringResource(R.string.host_auth_password)
+                )
             }
 
             if (!useKey) {
                 OutlinedTextField(
                     value = password, onValueChange = { vm.password.value = it },
-                    label = { Text("Password") }, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.host_field_password)) },
+                    modifier = Modifier.fillMaxWidth(),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         TextButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Text(if (passwordVisible) "Hide" else "Show")
+                            Text(
+                                if (passwordVisible) stringResource(R.string.action_hide)
+                                else stringResource(R.string.action_show)
+                            )
                         }
                     },
                 )
@@ -110,13 +128,16 @@ fun AddEditHostScreen(
                 // Key selector
                 Box {
                     OutlinedTextField(
-                        value = keys.find { it.id == selectedKeyId }?.label ?: "Select a key…",
+                        value = keys.find { it.id == selectedKeyId }?.label
+                            ?: stringResource(R.string.host_key_select_placeholder),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("SSH Key") },
+                        label = { Text(stringResource(R.string.host_auth_ssh_key)) },
                         modifier = Modifier.fillMaxWidth(),
                         trailingIcon = {
-                            TextButton(onClick = { keyMenuExpanded = true }) { Text("Change") }
+                            TextButton(onClick = { keyMenuExpanded = true }) {
+                                Text(stringResource(R.string.host_key_change))
+                            }
                         },
                     )
                     DropdownMenu(expanded = keyMenuExpanded, onDismissRequest = { keyMenuExpanded = false }) {
@@ -127,7 +148,10 @@ fun AddEditHostScreen(
                             )
                         }
                         if (keys.isEmpty()) {
-                            DropdownMenuItem(text = { Text("No keys – go add one first") }, onClick = { keyMenuExpanded = false })
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.host_key_no_keys)) },
+                                onClick = { keyMenuExpanded = false }
+                            )
                         }
                     }
                 }
@@ -138,16 +162,16 @@ fun AddEditHostScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
                 Spacer(Modifier.width(8.dp))
-                Text("Agent Forwarding")
+                Text(stringResource(R.string.host_agent_forwarding))
             }
 
             if (agentForwarding) {
                 OutlinedTextField(
                     value = jumpHosts,
                     onValueChange = { vm.jumpHosts.value = it },
-                    label = { Text("Jump hosts (optional)") },
-                    placeholder = { Text("host1:22,user@host2:2222") },
-                    supportingText = { Text("Comma-separated: [user@]host[:port] — defaults: port 22, same user") },
+                    label = { Text(stringResource(R.string.host_field_jump_hosts)) },
+                    placeholder = { Text(stringResource(R.string.host_jump_hosts_placeholder)) },
+                    supportingText = { Text(stringResource(R.string.host_jump_hosts_supporting)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
@@ -161,7 +185,7 @@ fun AddEditHostScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = hostname.isNotBlank() && username.isNotBlank(),
             ) {
-                Text("Save")
+                Text(stringResource(R.string.action_save))
             }
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sshborg.R
 import com.sshborg.SshBorgApp
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
@@ -91,17 +93,22 @@ fun TerminalScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title = { Text(title.ifEmpty { currentSession?.hostLabel ?: "Terminal" }, maxLines = 1) },
+                title = {
+                    Text(
+                        title.ifEmpty { currentSession?.hostLabel ?: stringResource(R.string.terminal_title_default) },
+                        maxLines = 1
+                    )
+                },
                 navigationIcon = {
                     // Back = send to background (don't disconnect)
                     IconButton(onClick = { vm.background(); onBack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back))
                     }
                 },
                 actions = {
                     // Disconnect button
                     IconButton(onClick = { vm.disconnect(); onBack() }) {
-                        Icon(Icons.Default.Close, contentDescription = "Disconnect")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.terminal_disconnect_cd))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -159,7 +166,7 @@ fun TerminalScreen(
 
             // State overlays
             when (val s = state) {
-                is ConnectionState.Connecting      -> LoadingOverlay("Connecting…")
+                is ConnectionState.Connecting      -> LoadingOverlay(stringResource(R.string.terminal_connecting))
                 is ConnectionState.PasswordPrompt  -> PasswordDialog(
                     hostname      = s.hostname,
                     wrongPassword = s.wrongPassword,
@@ -241,6 +248,7 @@ private fun ExtraKeyRow(
     onKey: (ByteArray) -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
 
     Row(
         modifier = Modifier
@@ -273,7 +281,7 @@ private fun ExtraKeyRow(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall),
             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
         ) {
-            Icon(Icons.Filled.ContentPaste, contentDescription = "Paste",
+            Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
                 modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurface)
         }
         Spacer(Modifier.width(4.dp))
@@ -331,12 +339,12 @@ private fun PasswordDialog(
     var passwordVisible by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Password for $hostname") },
+        title = { Text(stringResource(R.string.password_dialog_title, hostname)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (wrongPassword) {
                     Text(
-                        "Authentication failed. Please try again.",
+                        stringResource(R.string.password_auth_failed),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -344,21 +352,30 @@ private fun PasswordDialog(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text(stringResource(R.string.password_field_label)) },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     isError = wrongPassword,
                     trailingIcon = {
                         TextButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Text(if (passwordVisible) "Hide" else "Show")
+                            Text(
+                                if (passwordVisible) stringResource(R.string.action_hide)
+                                else stringResource(R.string.action_show)
+                            )
                         }
                     },
                 )
             }
         },
-        confirmButton = { TextButton(onClick = { onConfirm(password) }) { Text("Connect") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(password) }) {
+                Text(stringResource(R.string.action_connect))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
     )
 }
 
@@ -366,17 +383,21 @@ private fun PasswordDialog(
 private fun HostKeyDialog(hostname: String, fingerprint: String, onAccept: () -> Unit, onReject: () -> Unit) {
     AlertDialog(
         onDismissRequest = onReject,
-        title = { Text("Unknown host") },
+        title = { Text(stringResource(R.string.hostkey_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Host: $hostname")
-                Text("Fingerprint:")
+                Text(stringResource(R.string.hostkey_terminal_host, hostname))
+                Text(stringResource(R.string.hostkey_terminal_fingerprint))
                 Text(fingerprint, style = MaterialTheme.typography.bodySmall)
-                Text("Do you trust this host?")
+                Text(stringResource(R.string.hostkey_terminal_trust_question))
             }
         },
-        confirmButton = { TextButton(onClick = onAccept) { Text("Trust") } },
-        dismissButton = { TextButton(onClick = onReject) { Text("Reject") } },
+        confirmButton = {
+            TextButton(onClick = onAccept) { Text(stringResource(R.string.action_trust)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onReject) { Text(stringResource(R.string.action_reject)) }
+        },
     )
 }
 
@@ -385,11 +406,11 @@ private fun ErrorOverlay(message: String, onBack: () -> Unit) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
             Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Connection failed", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.terminal_connection_failed), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 Text(message, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = onBack) { Text("Back") }
+                Button(onClick = onBack) { Text(stringResource(R.string.action_go_back)) }
             }
         }
     }
@@ -400,13 +421,13 @@ private fun DisconnectedOverlay(cause: String?, onClose: () -> Unit) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), shape = MaterialTheme.shapes.medium) {
             Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Disconnected", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.terminal_disconnected), style = MaterialTheme.typography.titleMedium)
                 if (cause != null) {
                     Spacer(Modifier.height(8.dp))
                     Text(cause, style = MaterialTheme.typography.bodySmall)
                 }
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = onClose) { Text("Close") }
+                Button(onClick = onClose) { Text(stringResource(R.string.action_close)) }
             }
         }
     }

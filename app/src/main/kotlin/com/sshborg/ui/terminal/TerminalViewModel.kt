@@ -2,6 +2,7 @@ package com.sshborg.ui.terminal
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
@@ -63,7 +64,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     fun attach(id: String) {
         sessionId = id
         val session = sessionManager.get(id) ?: run {
-            _state.value = ConnectionState.Error("Session not found")
+            _state.value = ConnectionState.Error(getApplication<Application>().getString(R.string.error_session_not_found))
             return
         }
 
@@ -96,7 +97,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
         connectJob = viewModelScope.launch(Dispatchers.IO) {
             val host = hostDao.getById(hostId) ?: run {
-                _state.value = ConnectionState.Error("Host not found"); return@launch
+                _state.value = ConnectionState.Error(getApplication<Application>().getString(R.string.error_host_not_found)); return@launch
             }
             var auth = buildAuth(host) ?: return@launch
             var wrongPassword = false
@@ -160,7 +161,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     auth = SshAuth.Password(pwd)
                 } else {
-                    _state.value = ConnectionState.Error(err?.message ?: "Connection failed")
+                    _state.value = ConnectionState.Error(err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed))
                     sessionManager.remove(id)
                     if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
                     return@launch

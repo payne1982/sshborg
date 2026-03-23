@@ -8,6 +8,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
+import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
@@ -64,7 +65,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     fun attach(id: String) {
         sessionId = id
         val session = sessionManager.get(id) ?: run {
-            _state.value = State.Error("Session not found"); return
+            _state.value = State.Error(getApplication<Application>().getString(R.string.error_session_not_found)); return
         }
 
         if (session.sftpSession != null) {
@@ -85,7 +86,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch(Dispatchers.IO) {
             val host = hostDao.getById(hostId) ?: run {
-                _state.value = State.Error("Host not found"); return@launch
+                _state.value = State.Error(getApplication<Application>().getString(R.string.error_host_not_found)); return@launch
             }
             var auth = buildAuth(host) ?: return@launch
             var wrongPassword = false
@@ -141,7 +142,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     auth = SshAuth.Password(pwd)
                 } else {
-                    _state.value = State.Error(err?.message ?: "Connection failed")
+                    _state.value = State.Error(err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed))
                     sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
                     return@launch
                 }
@@ -165,7 +166,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 sessionManager.update(sessionId ?: return@launch) { it.copy(sftpCurrentPath = path) }
                 _state.value = State.Listing(path, entries)
             }.onFailure {
-                _opError.tryEmit(it.message ?: "Cannot list directory")
+                _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_cannot_list_directory))
             }
         }
     }
@@ -229,7 +230,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
         val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
         if (uri == null) {
-            _state.value = State.Error("Cannot create file in Downloads"); return
+            _state.value = State.Error(context.getString(R.string.error_cannot_create_file)); return
         }
         runCatching {
             context.contentResolver.openOutputStream(uri)!!.use { out ->
@@ -241,7 +242,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }.onFailure {
             context.contentResolver.delete(uri, null, null)
             dismissDownloaded()
-            _opError.tryEmit(it.message ?: "Download failed")
+            _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_download_failed))
         }
     }
 
@@ -286,7 +287,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 _state.value = State.Uploaded(filename)
             }.onFailure {
                 refreshListing()
-                _opError.tryEmit(it.message ?: "Upload failed")
+                _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_upload_failed))
             }
         }
     }
@@ -299,7 +300,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             runCatching {
                 if (entry.isDir) sftpSession!!.deleteDir(path) else sftpSession!!.deleteFile(path)
                 refreshListing()
-            }.onFailure { _opError.tryEmit(it.message ?: "Delete failed") }
+            }.onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_delete_failed)) }
         }
     }
 
@@ -308,7 +309,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val newPath = "${currentPath.trimEnd('/')}/$newName"
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { sftpSession!!.rename(oldPath, newPath); refreshListing() }
-                .onFailure { _opError.tryEmit(it.message ?: "Rename failed") }
+                .onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_rename_failed)) }
         }
     }
 
@@ -316,7 +317,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val path = "${currentPath.trimEnd('/')}/$name"
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { sftpSession!!.mkdir(path); refreshListing() }
-                .onFailure { _opError.tryEmit(it.message ?: "Create directory failed") }
+                .onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_create_directory_failed)) }
         }
     }
 
@@ -325,7 +326,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
-            }.onFailure { _opError.tryEmit(it.message ?: "Refresh failed") }
+            }.onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_refresh_failed)) }
         }
     }
 

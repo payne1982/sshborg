@@ -2,6 +2,7 @@ package com.sshborg.ui.settings
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.KeystoreManager
@@ -71,7 +72,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     }
                 }
                 prefs.setKeystoreEncryption(true)
-            }.onFailure { _error.tryEmit(it.message ?: "Encryption failed") }
+            }.onFailure { _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_encryption_failed)) }
             _isMigrating.value = false
         }
     }
@@ -95,7 +96,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 KeystoreManager.deleteKey()
                 prefs.setKeystoreEncryption(false)
-            }.onFailure { _error.tryEmit(it.message ?: "Decryption failed") }
+            }.onFailure { _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_decryption_failed)) }
             _isMigrating.value = false
         }
     }
