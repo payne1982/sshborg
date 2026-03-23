@@ -13,6 +13,7 @@ data class HostEntity(
     /** Null = password auth; non-null = ID of the key to use */
     val keyId: Long? = null,
     val password: String? = null,
+    val encryptedPassword: String? = null,
     val knownHostsEntry: String? = null,
     val agentForwarding: Boolean = false,
     val lastConnected: Long? = null,

@@ -172,11 +172,11 @@ fun SettingsScreen(
 
             // Keystore encryption
             ListItem(
-                headlineContent = { Text("Encrypt private keys") },
+                headlineContent = { Text("Encrypt sensitive data") },
                 supportingContent = {
                     Text(
-                        "Private keys are encrypted and bound to this device and app installation. " +
-                        "If you uninstall the app, you will need to generate new keys."
+                        "SSH private keys and host passwords are encrypted using this device's secure hardware. " +
+                        "If you uninstall the app, encrypted keys will become inaccessible."
                     )
                 },
                 trailingContent = {
@@ -199,11 +199,11 @@ fun SettingsScreen(
     if (showEnableEncryptionDialog) {
         AlertDialog(
             onDismissRequest = { showEnableEncryptionDialog = false },
-            title = { Text("Encrypt private keys?") },
+            title = { Text("Encrypt sensitive data?") },
             text  = {
                 Text(
-                    "Your SSH private keys will be encrypted using this device's secure hardware.\n\n" +
-                    "These keys are bound to this device and app installation. " +
+                    "Your SSH private keys and host passwords will be encrypted using this device's secure hardware.\n\n" +
+                    "Encrypted data is bound to this device and app installation. " +
                     "If you uninstall the app, your current keys will become inaccessible and " +
                     "you will need to generate new ones and add them to your servers again."
                 )
