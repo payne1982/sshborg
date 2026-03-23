@@ -192,6 +192,10 @@
     <string name="root_warning_title">Security warning</string>
     <string name="root_warning_body">This device appears to be rooted. On rooted devices the security guarantees of the Android Keystore are weakened, and other apps may be able to access sensitive data. Proceed with caution.</string>
 
+    <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
+    <string name="biometric_prompt_title">SSHBorg</string>
+    <string name="biometric_prompt_subtitle">Authenticate to continue</string>
+
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Active SSH sessions</string>
     <string name="notification_channel_description">Shows active SSH/SFTP sessions</string>

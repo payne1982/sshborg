@@ -200,6 +200,9 @@
     <string name="error_encryption_failed">Cifragem falhada</string>
     <string name="error_decryption_failed">Decifragem falhada</string>
 
+    <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
+    <string name="biometric_prompt_subtitle">Autentique-se para continuar</string>
+
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Sessões SSH ativas</string>
     <string name="notification_channel_description">Mostra as sessões SSH/SFTP ativas</string>

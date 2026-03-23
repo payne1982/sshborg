@@ -200,6 +200,9 @@
     <string name="error_encryption_failed">Verschlüsselung fehlgeschlagen</string>
     <string name="error_decryption_failed">Entschlüsselung fehlgeschlagen</string>
 
+    <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
+    <string name="biometric_prompt_subtitle">Authentifizieren Sie sich, um fortzufahren</string>
+
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Aktive SSH-Sitzungen</string>
     <string name="notification_channel_description">Zeigt aktive SSH/SFTP-Sitzungen an</string>

@@ -200,6 +200,9 @@
     <string name="error_encryption_failed">Помилка шифрування</string>
     <string name="error_decryption_failed">Помилка розшифрування</string>
 
+    <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
+    <string name="biometric_prompt_subtitle">Автентифікуйтесь, щоб продовжити</string>
+
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Активні SSH-сесії</string>
     <string name="notification_channel_description">Показує активні SSH/SFTP-сесії</string>
