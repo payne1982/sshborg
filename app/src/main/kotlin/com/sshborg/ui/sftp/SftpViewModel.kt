@@ -23,7 +23,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     sealed interface State {
         object Connecting : State
         data class HostKeyPrompt(val hostname: String, val fingerprint: String) : State
-        data class PasswordPrompt(val hostname: String) : State
+        data class PasswordPrompt(val hostname: String, val wrongPassword: Boolean = false) : State
         data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
         data class Downloading(val filename: String, val bytesReceived: Long) : State
         data class Downloaded(val filename: String) : State
@@ -87,44 +87,74 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val host = hostDao.getById(hostId) ?: run {
                 _state.value = State.Error("Host not found"); return@launch
             }
-            val auth = buildAuth(host) ?: return@launch
-            _state.value = State.Connecting
+            var auth = buildAuth(host) ?: return@launch
+            var wrongPassword = false
 
-            val params = SshConnectionParams(
-                hostname        = host.hostname,
-                port            = host.port,
-                username        = host.username,
-                auth            = auth,
-                agentForwarding = host.agentForwarding,
-                knownHostsEntry = host.knownHostsEntry,
-                jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
-            )
+            while (true) {
+                _state.value = State.Connecting
 
-            runCatching {
-                SshManager.openSftp(params) { hostname, fingerprint ->
-                    runBlocking {
-                        _state.value = State.HostKeyPrompt(hostname, fingerprint)
-                        hostKeyResult.first()
+                val result = runCatching {
+                    SshManager.openSftp(
+                        SshConnectionParams(
+                            hostname        = host.hostname,
+                            port            = host.port,
+                            username        = host.username,
+                            auth            = auth,
+                            agentForwarding = host.agentForwarding,
+                            knownHostsEntry = host.knownHostsEntry,
+                            jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
+                        )
+                    ) { hostname, fingerprint ->
+                        runBlocking {
+                            _state.value = State.HostKeyPrompt(hostname, fingerprint)
+                            val accepted = hostKeyResult.first()
+                            if (accepted) _state.value = State.Connecting
+                            accepted
+                        }
                     }
                 }
-            }.onSuccess { session ->
-                sftpSession = session
-                sessionManager.update(id) { it.copy(sftpSession = session, status = SessionManager.Status.Connected) }
 
-                if (host.knownHostsEntry == null)
-                    hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
-                if (session.newJumpHostKeyLines.isNotEmpty()) {
-                    val current = hostDao.getById(hostId) ?: host
-                    val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
-                    val merged = (existing + session.newJumpHostKeyLines).joinToString("\n")
-                    hostDao.upsert(current.copy(jumpHostKeys = merged))
+                val session = result.getOrNull()
+                if (session != null) {
+                    sftpSession = session
+                    sessionManager.update(id) { it.copy(sftpSession = session, status = SessionManager.Status.Connected) }
+                    if (host.knownHostsEntry == null)
+                        hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
+                    if (session.newJumpHostKeyLines.isNotEmpty()) {
+                        val current = hostDao.getById(hostId) ?: host
+                        val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
+                        val merged = (existing + session.newJumpHostKeyLines).joinToString("\n")
+                        hostDao.upsert(current.copy(jumpHostKeys = merged))
+                    }
+                    navigateTo(session.homePath)
+                    return@launch
                 }
-                navigateTo(session.homePath)
-            }.onFailure { err ->
-                _state.value = State.Error(err.message ?: "Connection failed")
-                sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
+
+                val err = result.exceptionOrNull()
+                if (isAuthFailure(err) && auth !is SshAuth.PublicKey) {
+                    _state.value = State.PasswordPrompt(host.hostname, wrongPassword = true)
+                    val pwd = passwordResult.first()
+                    if (pwd.isEmpty()) {
+                        _state.value = State.Disconnected
+                        sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
+                        return@launch
+                    }
+                    auth = SshAuth.Password(pwd)
+                } else {
+                    _state.value = State.Error(err?.message ?: "Connection failed")
+                    sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
+                    return@launch
+                }
             }
         }
+    }
+
+    private fun isAuthFailure(err: Throwable?): Boolean {
+        val msg = err?.message ?: return false
+        return msg.contains("Auth fail", ignoreCase = true) ||
+               msg.contains("Auth cancel", ignoreCase = true) ||
+               msg.contains("USERAUTH", ignoreCase = true) ||
+               msg.contains("authentication", ignoreCase = true)
     }
 
     fun navigateTo(path: String) {
@@ -332,6 +362,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
         return if (host.keyId != null && keyPem != null) {
             SshAuth.PublicKey(keyPem)
+        } else if (!host.encryptedPassword.isNullOrEmpty()) {
+            SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword))
+        } else if (!host.password.isNullOrEmpty()) {
+            SshAuth.Password(host.password)
         } else {
             _state.value = State.PasswordPrompt(host.hostname)
             val pwd = passwordResult.first()

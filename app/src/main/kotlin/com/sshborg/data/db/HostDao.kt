@@ -8,6 +8,9 @@ interface HostDao {
     @Query("SELECT * FROM hosts ORDER BY label ASC")
     fun getAll(): Flow<List<HostEntity>>
 
+    @Query("SELECT * FROM hosts")
+    suspend fun getAllOnce(): List<HostEntity>
+
     @Query("SELECT * FROM hosts WHERE id = :id")
     suspend fun getById(id: Long): HostEntity?
 

@@ -14,6 +14,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val sshBorgApp   = app as SshBorgApp
     private val prefs        = sshBorgApp.appPreferences
     private val keyDao       = sshBorgApp.db.sshKeyDao()
+    private val hostDao      = sshBorgApp.db.hostDao()
 
     val biometricLock: StateFlow<Boolean> =
         prefs.biometricLock.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -52,7 +53,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setLockTimeoutSeconds(seconds) }
     }
 
-    /** Encrypts all existing plain-text keys with Android Keystore. */
+    /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */
     fun enableKeystoreEncryption() {
         _isMigrating.value = true
         viewModelScope.launch(Dispatchers.IO) {
@@ -63,13 +64,19 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         keyDao.upsert(key.copy(privateKeyPem = "", encryptedBlob = blob))
                     }
                 }
+                hostDao.getAllOnce().forEach { host ->
+                    if (host.encryptedPassword == null && !host.password.isNullOrEmpty()) {
+                        val blob = KeystoreManager.encrypt(host.password)
+                        hostDao.upsert(host.copy(password = null, encryptedPassword = blob))
+                    }
+                }
                 prefs.setKeystoreEncryption(true)
             }.onFailure { _error.tryEmit(it.message ?: "Encryption failed") }
             _isMigrating.value = false
         }
     }
 
-    /** Decrypts all keys back to plain-text and removes the Keystore key. */
+    /** Decrypts all SSH keys and host passwords back to plain-text and removes the Keystore key. */
     fun disableKeystoreEncryption() {
         _isMigrating.value = true
         viewModelScope.launch(Dispatchers.IO) {
@@ -78,6 +85,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     if (key.encryptedBlob != null) {
                         val pem = KeystoreManager.decrypt(key.encryptedBlob)
                         keyDao.upsert(key.copy(privateKeyPem = pem, encryptedBlob = null))
+                    }
+                }
+                hostDao.getAllOnce().forEach { host ->
+                    if (host.encryptedPassword != null) {
+                        val pwd = KeystoreManager.decrypt(host.encryptedPassword)
+                        hostDao.upsert(host.copy(password = pwd, encryptedPassword = null))
                     }
                 }
                 KeystoreManager.deleteKey()

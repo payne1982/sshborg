@@ -5,16 +5,20 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sshborg.Screen
 import com.sshborg.SshBorgApp
+import com.sshborg.data.KeystoreManager
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.db.SshKeyEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
 
     private val sshBorgApp = app as SshBorgApp
     private val hostDao = sshBorgApp.db.hostDao()
     private val keyDao  = sshBorgApp.db.sshKeyDao()
+    private val prefs   = sshBorgApp.appPreferences
 
     val keys: StateFlow<List<SshKeyEntity>> =
         keyDao.getAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -24,6 +28,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var hostname = MutableStateFlow("")
     var port = MutableStateFlow("22")
     var username = MutableStateFlow("")
+    var password = MutableStateFlow("")
     var useKey = MutableStateFlow(false)
     var selectedKeyId = MutableStateFlow<Long?>(null)
     var agentForwarding = MutableStateFlow(false)
@@ -41,6 +46,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             hostname.value = h.hostname
             port.value = h.port.toString()
             username.value = h.username
+            password.value = when {
+                h.encryptedPassword != null ->
+                    withContext(Dispatchers.IO) {
+                        runCatching { KeystoreManager.decrypt(h.encryptedPassword) }.getOrDefault("")
+                    }
+                else -> h.password ?: ""
+            }
             useKey.value = h.keyId != null
             selectedKeyId.value = h.keyId
             agentForwarding.value = h.agentForwarding
@@ -49,12 +61,23 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun save(onDone: () -> Unit) = viewModelScope.launch {
+        val rawPassword = if (!useKey.value) password.value.takeIf { it.isNotEmpty() } else null
+        val encEnabled = prefs.keystoreEncryption.first()
+
+        val (plainPwd, encryptedPwd) = when {
+            rawPassword == null -> null to null
+            encEnabled -> null to withContext(Dispatchers.IO) { KeystoreManager.encrypt(rawPassword) }
+            else -> rawPassword to null
+        }
+
         val entity = HostEntity(
             id = editingId ?: 0,
             label = label.value.ifBlank { hostname.value },
             hostname = hostname.value.trim(),
             port = port.value.toIntOrNull() ?: 22,
             username = username.value.trim(),
+            password = plainPwd,
+            encryptedPassword = encryptedPwd,
             keyId = if (useKey.value) selectedKeyId.value else null,
             agentForwarding = agentForwarding.value,
             jumpHosts = jumpHosts.value.trim().takeIf { it.isNotEmpty() && agentForwarding.value },

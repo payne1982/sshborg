@@ -17,7 +17,10 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -158,9 +161,10 @@ fun TerminalScreen(
             when (val s = state) {
                 is ConnectionState.Connecting      -> LoadingOverlay("Connecting…")
                 is ConnectionState.PasswordPrompt  -> PasswordDialog(
-                    hostname  = s.hostname,
-                    onConfirm = vm::submitPassword,
-                    onDismiss = { vm.submitPassword(""); onBack() },
+                    hostname      = s.hostname,
+                    wrongPassword = s.wrongPassword,
+                    onConfirm     = vm::submitPassword,
+                    onDismiss     = { vm.submitPassword(""); onBack() },
                 )
                 is ConnectionState.HostKeyPrompt   -> HostKeyDialog(
                     hostname    = s.hostname,
@@ -317,18 +321,41 @@ private fun LoadingOverlay(message: String) {
 }
 
 @Composable
-private fun PasswordDialog(hostname: String, onConfirm: (String) -> Unit, onDismiss: () -> Unit) {
-    var password by remember { mutableStateOf("") }
+private fun PasswordDialog(
+    hostname: String,
+    wrongPassword: Boolean = false,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var password by remember(wrongPassword) { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Password for $hostname") },
         text = {
-            OutlinedTextField(
-                value = password, onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                singleLine = true,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wrongPassword) {
+                    Text(
+                        "Authentication failed. Please try again.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    isError = wrongPassword,
+                    trailingIcon = {
+                        TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Text(if (passwordVisible) "Hide" else "Show")
+                        }
+                    },
+                )
+            }
         },
         confirmButton = { TextButton(onClick = { onConfirm(password) }) { Text("Connect") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },

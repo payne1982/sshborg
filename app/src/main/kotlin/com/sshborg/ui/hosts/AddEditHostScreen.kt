@@ -38,9 +38,9 @@ fun AddEditHostScreen(
     val agentForwarding by vm.agentForwarding.collectAsState()
     val jumpHosts by vm.jumpHosts.collectAsState()
     val keys by vm.keys.collectAsState()
+    val password by vm.password.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
-    var password by remember { mutableStateOf("") }
     var keyMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -96,9 +96,10 @@ fun AddEditHostScreen(
 
             if (!useKey) {
                 OutlinedTextField(
-                    value = password, onValueChange = { password = it },
+                    value = password, onValueChange = { vm.password.value = it },
                     label = { Text("Password") }, modifier = Modifier.fillMaxWidth(),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         TextButton(onClick = { passwordVisible = !passwordVisible }) {
                             Text(if (passwordVisible) "Hide" else "Show")
