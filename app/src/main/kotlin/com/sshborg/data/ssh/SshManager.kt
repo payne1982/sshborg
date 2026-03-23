@@ -98,9 +98,14 @@ object SshManager {
             if (proxy != null) jumpSession.setProxy(proxy)
 
             jumpSession.setUserInfo(object : UserInfo {
+                private var passwordUsed = false
                 override fun getPassphrase(): String? = null
                 override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
-                override fun promptPassword(message: String?) = params.auth is SshAuth.Password
+                override fun promptPassword(message: String?): Boolean {
+                    if (passwordUsed) return false
+                    passwordUsed = true
+                    return params.auth is SshAuth.Password
+                }
                 override fun promptPassphrase(message: String?) = false
                 override fun promptYesNo(message: String?): Boolean {
                     val fp = message?.lines()
@@ -159,9 +164,14 @@ object SshManager {
 
         // Tag the session with the jump sessions so ShellSession/SftpSession can clean them up
         session.setUserInfo(object : UserInfo {
+            private var passwordUsed = false
             override fun getPassphrase(): String? = null
             override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
-            override fun promptPassword(message: String?) = params.auth is SshAuth.Password
+            override fun promptPassword(message: String?): Boolean {
+                if (passwordUsed) return false
+                passwordUsed = true
+                return params.auth is SshAuth.Password
+            }
             override fun promptPassphrase(message: String?) = false
             override fun promptYesNo(message: String?): Boolean {
                 val fp = message?.lines()
