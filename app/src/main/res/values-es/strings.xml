@@ -200,6 +200,12 @@
     <string name="error_encryption_failed">Cifrado fallido</string>
     <string name="error_decryption_failed">Descifrado fallido</string>
 
+    <!-- ── Theme setting ─────────────────────────────────────────────────── -->
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_follow_system">Seguir el sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+
     <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
     <string name="biometric_prompt_subtitle">Autentícate para continuar</string>
 

@@ -105,6 +105,11 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_security">Security</string>
 
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_follow_system">Follow system</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+
     <string name="settings_confirm_exit_title">Confirm exit</string>
     <string name="settings_confirm_exit_subtitle">Ask for confirmation before closing the app</string>
 

@@ -31,6 +31,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val invertTerminalScroll: StateFlow<Boolean> =
         prefs.invertTerminalScroll.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val nightMode: StateFlow<Int> =
+        prefs.nightMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
@@ -67,6 +70,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setLockTimeoutSeconds(seconds: Int) {
         viewModelScope.launch { prefs.setLockTimeoutSeconds(seconds) }
+    }
+
+    fun setNightMode(mode: Int) {
+        AppCompatDelegate.setDefaultNightMode(mode)
+        viewModelScope.launch { prefs.setNightMode(mode) }
     }
 
     /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */

@@ -1,5 +1,6 @@
 package com.sshborg.ui.settings
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -38,6 +39,7 @@ fun SettingsScreen(
     val confirmExit           by vm.confirmExit.collectAsState()
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
+    val nightMode             by vm.nightMode.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
@@ -47,6 +49,7 @@ fun SettingsScreen(
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
+    var themeMenuExpanded by remember { mutableStateOf(false) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
@@ -152,6 +155,50 @@ fun SettingsScreen(
                                         languageMenuExpanded = false
                                         currentLocaleTag = tag
                                         vm.setLocale(tag)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            )
+
+            // Theme picker
+            val themeOptions = listOf(
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM to stringResource(R.string.settings_theme_follow_system),
+                AppCompatDelegate.MODE_NIGHT_NO            to stringResource(R.string.settings_theme_light),
+                AppCompatDelegate.MODE_NIGHT_YES           to stringResource(R.string.settings_theme_dark),
+            )
+            val currentThemeLabel = themeOptions.find { it.first == nightMode }?.second
+                ?: stringResource(R.string.settings_theme_follow_system)
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_theme_title)) },
+                trailingContent = {
+                    ExposedDropdownMenuBox(
+                        expanded = themeMenuExpanded,
+                        onExpandedChange = { themeMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = currentThemeLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(themeMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .width(180.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = themeMenuExpanded,
+                            onDismissRequest = { themeMenuExpanded = false },
+                        ) {
+                            themeOptions.forEach { (mode, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        themeMenuExpanded = false
+                                        vm.setNightMode(mode)
                                     },
                                 )
                             }
