@@ -24,6 +24,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var hostname = MutableStateFlow("")
     var port = MutableStateFlow("22")
     var username = MutableStateFlow("")
+    var password = MutableStateFlow("")
     var useKey = MutableStateFlow(false)
     var selectedKeyId = MutableStateFlow<Long?>(null)
     var agentForwarding = MutableStateFlow(false)
@@ -41,6 +42,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             hostname.value = h.hostname
             port.value = h.port.toString()
             username.value = h.username
+            password.value = h.password ?: ""
             useKey.value = h.keyId != null
             selectedKeyId.value = h.keyId
             agentForwarding.value = h.agentForwarding
@@ -55,6 +57,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             hostname = hostname.value.trim(),
             port = port.value.toIntOrNull() ?: 22,
             username = username.value.trim(),
+            password = if (!useKey.value) password.value.takeIf { it.isNotEmpty() } else null,
             keyId = if (useKey.value) selectedKeyId.value else null,
             agentForwarding = agentForwarding.value,
             jumpHosts = jumpHosts.value.trim().takeIf { it.isNotEmpty() && agentForwarding.value },

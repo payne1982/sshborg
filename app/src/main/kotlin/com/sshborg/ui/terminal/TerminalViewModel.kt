@@ -155,6 +155,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
         return if (host.keyId != null && keyPem != null) {
             SshAuth.PublicKey(keyPem)
+        } else if (!host.password.isNullOrEmpty()) {
+            SshAuth.Password(host.password)
         } else {
             _state.value = ConnectionState.PasswordPrompt(host.hostname)
             val pwd = passwordResult.first()
