@@ -21,17 +21,6 @@ import kotlinx.coroutines.launch
 
 class SshForegroundService : Service() {
 
-    override fun attachBaseContext(base: Context) {
-        val locales = AppCompatDelegate.getApplicationLocales()
-        if (locales.isEmpty) {
-            super.attachBaseContext(base)
-        } else {
-            val config = base.resources.configuration
-            config.setLocales(android.os.LocaleList(locales[0]))
-            super.attachBaseContext(base.createConfigurationContext(config))
-        }
-    }
-
     private val scope = CoroutineScope(Dispatchers.Main)
     private var observeJob: Job? = null
 
@@ -74,17 +63,29 @@ class SshForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    /** Returns a Context whose locale matches the per-app language chosen by the user. */
+    private fun localizedContext(): Context {
+        val locales = AppCompatDelegate.getApplicationLocales()
+        if (locales.isEmpty) return this
+        val locale = locales[0] ?: return this
+        val config = resources.configuration
+        config.setLocale(locale)
+        return createConfigurationContext(config)
+    }
+
     private fun createNotificationChannel() {
+        val ctx = localizedContext()
         val channel = NotificationChannel(
             CHANNEL_ID,
-            getString(R.string.notification_channel_name),
+            ctx.getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_LOW,
-        ).apply { description = getString(R.string.notification_channel_description) }
+        ).apply { description = ctx.getString(R.string.notification_channel_description) }
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
             .createNotificationChannel(channel)
     }
 
     private fun buildNotification(sessionCount: Int): Notification {
+        val ctx = localizedContext()
         val tapIntent = PendingIntent.getActivity(
             this, 0,
             Intent(this, MainActivity::class.java),
@@ -96,17 +97,17 @@ class SshForegroundService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val text = if (sessionCount == 0) {
-            getString(R.string.notification_no_sessions)
+            ctx.getString(R.string.notification_no_sessions)
         } else {
-            resources.getQuantityString(R.plurals.notification_active_sessions, sessionCount, sessionCount)
+            ctx.resources.getQuantityString(R.plurals.notification_active_sessions, sessionCount, sessionCount)
         }
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.app_name))
+            .setContentTitle(ctx.getString(R.string.app_name))
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(tapIntent)
             .setOngoing(true)
-            .addAction(0, getString(R.string.notification_disconnect_all), disconnectAllIntent)
+            .addAction(0, ctx.getString(R.string.notification_disconnect_all), disconnectAllIntent)
             .build()
     }
 
