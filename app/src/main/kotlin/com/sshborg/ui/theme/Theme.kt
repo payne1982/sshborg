@@ -1,5 +1,6 @@
 package com.sshborg.ui.theme
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -34,7 +35,15 @@ private val LightColors = lightColorScheme(
 )
 
 @Composable
-fun SshBorgTheme(content: @Composable () -> Unit) {
-    val colors = if (isSystemInDarkTheme()) DarkColors else LightColors
+fun SshBorgTheme(
+    nightMode: Int = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM,
+    content: @Composable () -> Unit,
+) {
+    val darkTheme = when (nightMode) {
+        AppCompatDelegate.MODE_NIGHT_YES -> true
+        AppCompatDelegate.MODE_NIGHT_NO  -> false
+        else                             -> isSystemInDarkTheme()
+    }
+    val colors = if (darkTheme) DarkColors else LightColors
     MaterialTheme(colorScheme = colors, content = content)
 }
