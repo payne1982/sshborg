@@ -89,8 +89,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 hostDao.getAllOnce().forEach { host ->
                     if (host.encryptedPassword != null) {
-                        val pwd = KeystoreManager.decrypt(host.encryptedPassword)
-                        hostDao.upsert(host.copy(password = pwd, encryptedPassword = null))
+                        hostDao.upsert(host.copy(encryptedPassword = null))
                     }
                 }
                 KeystoreManager.deleteKey()

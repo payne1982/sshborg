@@ -63,12 +63,9 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     fun save(onDone: () -> Unit) = viewModelScope.launch {
         val rawPassword = if (!useKey.value) password.value.takeIf { it.isNotEmpty() } else null
         val encEnabled = prefs.keystoreEncryption.first()
-
-        val (plainPwd, encryptedPwd) = when {
-            rawPassword == null -> null to null
-            encEnabled -> null to withContext(Dispatchers.IO) { KeystoreManager.encrypt(rawPassword) }
-            else -> rawPassword to null
-        }
+        val encryptedPwd = if (rawPassword != null && encEnabled)
+            withContext(Dispatchers.IO) { KeystoreManager.encrypt(rawPassword) }
+        else null
 
         val entity = HostEntity(
             id = editingId ?: 0,
@@ -76,7 +73,6 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             hostname = hostname.value.trim(),
             port = port.value.toIntOrNull() ?: 22,
             username = username.value.trim(),
-            password = plainPwd,
             encryptedPassword = encryptedPwd,
             keyId = if (useKey.value) selectedKeyId.value else null,
             agentForwarding = agentForwarding.value,
