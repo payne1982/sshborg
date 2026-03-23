@@ -173,6 +173,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private fun isAuthFailure(err: Throwable?): Boolean {
         val msg = err?.message ?: return false
         return msg.contains("Auth fail", ignoreCase = true) ||
+               msg.contains("Auth cancel", ignoreCase = true) ||
                msg.contains("USERAUTH", ignoreCase = true) ||
                msg.contains("authentication", ignoreCase = true)
     }
