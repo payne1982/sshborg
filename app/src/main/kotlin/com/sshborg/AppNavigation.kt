@@ -5,6 +5,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.sshborg.R
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
@@ -56,19 +58,13 @@ fun AppNavigation() {
     if (showRootWarning) {
         AlertDialog(
             onDismissRequest = {},
-            title = { Text("Security warning") },
-            text  = {
-                Text(
-                    "This device appears to be rooted. On rooted devices the security " +
-                    "guarantees of the Android Keystore are weakened, and other apps " +
-                    "may be able to access sensitive data. Proceed with caution."
-                )
-            },
+            title = { Text(stringResource(R.string.root_warning_title)) },
+            text  = { Text(stringResource(R.string.root_warning_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     showRootWarning = false
                     scope.launch { app.appPreferences.setRootWarningAcknowledged() }
-                }) { Text("I understand") }
+                }) { Text(stringResource(R.string.action_i_understand)) }
             },
         )
     }

@@ -7,20 +7,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
+import com.sshborg.R
 
 private val TIMEOUT_OPTIONS = listOf(
-    0    to "Immediately",
-    30   to "30 seconds",
-    60   to "1 minute",
-    180  to "3 minutes",
-    300  to "5 minutes",
-    900  to "15 minutes",
-    1800 to "30 minutes",
-    3600 to "1 hour",
-    14400 to "4 hours",
+    0     to R.string.timeout_immediately,
+    30    to R.string.timeout_30_seconds,
+    60    to R.string.timeout_1_minute,
+    180   to R.string.timeout_3_minutes,
+    300   to R.string.timeout_5_minutes,
+    900   to R.string.timeout_15_minutes,
+    1800  to R.string.timeout_30_minutes,
+    3600  to R.string.timeout_1_hour,
+    14400 to R.string.timeout_4_hours,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,19 +46,26 @@ fun SettingsScreen(
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
+    var languageMenuExpanded by remember { mutableStateOf(false) }
+    var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
-    val currentTimeoutLabel = TIMEOUT_OPTIONS.find { it.first == lockTimeoutSeconds }?.second
-        ?: "$lockTimeoutSeconds seconds"
+
+    // Map seconds to string resource id, then resolve the label
+    val currentTimeoutResId = TIMEOUT_OPTIONS.find { it.first == lockTimeoutSeconds }?.second
+    val currentTimeoutLabel = if (currentTimeoutResId != null)
+        stringResource(currentTimeoutResId)
+    else
+        stringResource(R.string.settings_lock_timeout_fallback, lockTimeoutSeconds)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back))
                     }
                 },
             )
@@ -70,15 +79,15 @@ fun SettingsScreen(
         ) {
             // ── General section ───────────────────────────────────────────────
             Text(
-                "General",
+                stringResource(R.string.settings_section_general),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
 
             ListItem(
-                headlineContent = { Text("Confirm exit") },
-                supportingContent = { Text("Ask for confirmation before closing the app") },
+                headlineContent = { Text(stringResource(R.string.settings_confirm_exit_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_confirm_exit_subtitle)) },
                 trailingContent = {
                     Switch(
                         checked = confirmExit,
@@ -88,8 +97,8 @@ fun SettingsScreen(
             )
 
             ListItem(
-                headlineContent = { Text("Invert terminal scroll") },
-                supportingContent = { Text("Swipe up to see newer output instead of older") },
+                headlineContent = { Text(stringResource(R.string.settings_invert_scroll_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_invert_scroll_subtitle)) },
                 trailingContent = {
                     Switch(
                         checked = invertTerminalScroll,
@@ -98,11 +107,64 @@ fun SettingsScreen(
                 },
             )
 
+            // Language picker
+            val systemDefaultLabel = stringResource(R.string.settings_language_system)
+            val languageOptions = remember {
+                listOf(
+                    "" to systemDefaultLabel,
+                    "en" to "English",
+                    "it" to "Italiano",
+                    "fr" to "Français",
+                    "de" to "Deutsch",
+                    "es" to "Español",
+                    "pt" to "Português",
+                    "uk" to "Українська",
+                )
+            }
+            val currentLanguageLabel = languageOptions.find { it.first == currentLocaleTag }?.second
+                ?: systemDefaultLabel
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_language)) },
+                trailingContent = {
+                    ExposedDropdownMenuBox(
+                        expanded = languageMenuExpanded,
+                        onExpandedChange = { languageMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = currentLanguageLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(languageMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .width(180.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = languageMenuExpanded,
+                            onDismissRequest = { languageMenuExpanded = false },
+                        ) {
+                            languageOptions.forEach { (tag, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        languageMenuExpanded = false
+                                        currentLocaleTag = tag
+                                        vm.setLocale(tag)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            )
+
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
             // ── Security section ──────────────────────────────────────────────
             Text(
-                "Security",
+                stringResource(R.string.settings_section_security),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -110,13 +172,13 @@ fun SettingsScreen(
 
             // Biometric lock
             ListItem(
-                headlineContent = { Text("Biometric lock") },
+                headlineContent = { Text(stringResource(R.string.settings_biometric_lock_title)) },
                 supportingContent = {
                     Text(
                         if (biometricAvailable)
-                            "Require authentication when returning to the app"
+                            stringResource(R.string.settings_biometric_available)
                         else
-                            "No biometric or screen lock set up on this device"
+                            stringResource(R.string.settings_biometric_unavailable)
                     )
                 },
                 trailingContent = {
@@ -131,8 +193,8 @@ fun SettingsScreen(
             // Lock timeout — only shown when biometric is enabled
             if (biometricLock) {
                 ListItem(
-                    headlineContent = { Text("Lock after") },
-                    supportingContent = { Text("Time before requiring authentication again") },
+                    headlineContent = { Text(stringResource(R.string.settings_lock_after_title)) },
+                    supportingContent = { Text(stringResource(R.string.settings_lock_after_subtitle)) },
                     trailingContent = {
                         ExposedDropdownMenuBox(
                             expanded = timeoutMenuExpanded,
@@ -153,9 +215,9 @@ fun SettingsScreen(
                                 expanded = timeoutMenuExpanded,
                                 onDismissRequest = { timeoutMenuExpanded = false },
                             ) {
-                                TIMEOUT_OPTIONS.forEach { (seconds, label) ->
+                                TIMEOUT_OPTIONS.forEach { (seconds, labelResId) ->
                                     DropdownMenuItem(
-                                        text = { Text(label) },
+                                        text = { Text(stringResource(labelResId)) },
                                         onClick = {
                                             vm.setLockTimeoutSeconds(seconds)
                                             timeoutMenuExpanded = false
@@ -172,13 +234,8 @@ fun SettingsScreen(
 
             // Keystore encryption
             ListItem(
-                headlineContent = { Text("Encrypt sensitive data") },
-                supportingContent = {
-                    Text(
-                        "SSH private keys and host passwords are encrypted using this device's secure hardware. " +
-                        "If you uninstall the app, encrypted keys will become inaccessible."
-                    )
-                },
+                headlineContent = { Text(stringResource(R.string.settings_encrypt_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_encrypt_subtitle)) },
                 trailingContent = {
                     if (isMigrating) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp))
@@ -199,23 +256,18 @@ fun SettingsScreen(
     if (showEnableEncryptionDialog) {
         AlertDialog(
             onDismissRequest = { showEnableEncryptionDialog = false },
-            title = { Text("Encrypt sensitive data?") },
-            text  = {
-                Text(
-                    "Your SSH private keys and host passwords will be encrypted using this device's secure hardware.\n\n" +
-                    "Encrypted data is bound to this device and app installation. " +
-                    "If you uninstall the app, your current keys will become inaccessible and " +
-                    "you will need to generate new ones and add them to your servers again."
-                )
-            },
+            title = { Text(stringResource(R.string.settings_encrypt_dialog_title)) },
+            text  = { Text(stringResource(R.string.settings_encrypt_dialog_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     showEnableEncryptionDialog = false
                     vm.enableKeystoreEncryption()
-                }) { Text("Enable") }
+                }) { Text(stringResource(R.string.action_enable)) }
             },
             dismissButton = {
-                TextButton(onClick = { showEnableEncryptionDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showEnableEncryptionDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             },
         )
     }
