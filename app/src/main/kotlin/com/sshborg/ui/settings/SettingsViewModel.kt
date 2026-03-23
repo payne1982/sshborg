@@ -73,7 +73,6 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setNightMode(mode: Int) {
-        AppCompatDelegate.setDefaultNightMode(mode)
         viewModelScope.launch { prefs.setNightMode(mode) }
     }
 
