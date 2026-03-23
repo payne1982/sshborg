@@ -153,9 +153,10 @@ fun SftpScreen(
 
                 is SftpViewModel.State.PasswordPrompt -> {
                     PasswordDialog(
-                        hostname  = s.hostname,
-                        onSubmit  = vm::submitPassword,
-                        onCancel  = { vm.submitPassword(""); onBack() },
+                        hostname      = s.hostname,
+                        wrongPassword = s.wrongPassword,
+                        onSubmit      = vm::submitPassword,
+                        onCancel      = { vm.submitPassword(""); onBack() },
                     )
                 }
 
@@ -464,20 +465,31 @@ private fun HostKeyDialog(
 @Composable
 private fun PasswordDialog(
     hostname: String,
+    wrongPassword: Boolean = false,
     onSubmit: (String) -> Unit,
     onCancel: () -> Unit,
 ) {
-    var pwd by remember { mutableStateOf("") }
+    var pwd by remember(wrongPassword) { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onCancel,
         title = { Text("Password for $hostname") },
         text  = {
-            OutlinedTextField(
-                value = pwd, onValueChange = { pwd = it },
-                label = { Text("Password") },
-                singleLine = true,
-                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wrongPassword) {
+                    Text(
+                        "Wrong password, please try again.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                OutlinedTextField(
+                    value = pwd, onValueChange = { pwd = it },
+                    label = { Text("Password") },
+                    singleLine = true,
+                    isError = wrongPassword,
+                    visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                )
+            }
         },
         confirmButton = { TextButton(onClick = { onSubmit(pwd) }) { Text("Connect") } },
         dismissButton = { TextButton(onClick = onCancel) { Text("Cancel") } },

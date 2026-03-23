@@ -158,9 +158,10 @@ fun TerminalScreen(
             when (val s = state) {
                 is ConnectionState.Connecting      -> LoadingOverlay("Connecting…")
                 is ConnectionState.PasswordPrompt  -> PasswordDialog(
-                    hostname  = s.hostname,
-                    onConfirm = vm::submitPassword,
-                    onDismiss = { vm.submitPassword(""); onBack() },
+                    hostname      = s.hostname,
+                    wrongPassword = s.wrongPassword,
+                    onConfirm     = vm::submitPassword,
+                    onDismiss     = { vm.submitPassword(""); onBack() },
                 )
                 is ConnectionState.HostKeyPrompt   -> HostKeyDialog(
                     hostname    = s.hostname,
@@ -317,18 +318,33 @@ private fun LoadingOverlay(message: String) {
 }
 
 @Composable
-private fun PasswordDialog(hostname: String, onConfirm: (String) -> Unit, onDismiss: () -> Unit) {
-    var password by remember { mutableStateOf("") }
+private fun PasswordDialog(
+    hostname: String,
+    wrongPassword: Boolean = false,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var password by remember(wrongPassword) { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Password for $hostname") },
         text = {
-            OutlinedTextField(
-                value = password, onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                singleLine = true,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (wrongPassword) {
+                    Text(
+                        "Wrong password, please try again.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                OutlinedTextField(
+                    value = password, onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true,
+                    isError = wrongPassword,
+                )
+            }
         },
         confirmButton = { TextButton(onClick = { onConfirm(password) }) { Text("Connect") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
