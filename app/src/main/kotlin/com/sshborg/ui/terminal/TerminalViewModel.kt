@@ -157,6 +157,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             SshAuth.PublicKey(keyPem)
         } else if (!host.encryptedPassword.isNullOrEmpty()) {
             SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword))
+        } else if (!host.password.isNullOrEmpty()) {
+            SshAuth.Password(host.password)
         } else {
             _state.value = ConnectionState.PasswordPrompt(host.hostname)
             val pwd = passwordResult.first()

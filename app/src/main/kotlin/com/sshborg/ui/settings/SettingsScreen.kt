@@ -43,7 +43,6 @@ fun SettingsScreen(
     }
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
-    var showDisableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
@@ -188,35 +187,13 @@ fun SettingsScreen(
                             checked = keystoreEncryption,
                             onCheckedChange = { enabled ->
                                 if (enabled) showEnableEncryptionDialog = true
-                                else showDisableEncryptionDialog = true
+                                else vm.disableKeystoreEncryption()
                             },
                         )
                     }
                 },
             )
         }
-    }
-
-    if (showDisableEncryptionDialog) {
-        AlertDialog(
-            onDismissRequest = { showDisableEncryptionDialog = false },
-            title = { Text("Disable encryption?") },
-            text  = {
-                Text(
-                    "SSH private keys will be decrypted and stored in plain text.\n\n" +
-                    "Saved host passwords will be removed — you will be asked to enter them again on the next connection."
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDisableEncryptionDialog = false
-                    vm.disableKeystoreEncryption()
-                }) { Text("Disable") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDisableEncryptionDialog = false }) { Text("Cancel") }
-            },
-        )
     }
 
     if (showEnableEncryptionDialog) {
