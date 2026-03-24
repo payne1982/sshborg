@@ -136,8 +136,11 @@ class TerminalEmulator(columns: Int, rows: Int) {
 
     private fun processOsc(b: Int) {
         when (b) {
-            0x07, 0x9C -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
-            0x1B -> { /* ESC \ terminator – wait for next */ }
+            // BEL (0x07) terminates OSC. 0x9C (8-bit ST) is intentionally NOT treated as a
+            // terminator because in UTF-8 mode 0x9C is a valid continuation byte (e.g. U+2726
+            // ✦ encodes as E2 9C A6), so treating it as ST would corrupt multi-byte titles.
+            0x07 -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
+            0x1B -> { /* ESC \ terminator – wait for next byte */ }
             '\\'.code -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
             else -> oscBuf.write(b)
         }
