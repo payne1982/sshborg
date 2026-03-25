@@ -23,6 +23,7 @@ class AppPreferences(private val context: Context) {
         val ROOT_WARNING_ACKNOWLEDGED = booleanPreferencesKey("root_warning_acknowledged")
         val INVERT_TERMINAL_SCROLL    = booleanPreferencesKey("invert_terminal_scroll")
         val NIGHT_MODE                = intPreferencesKey("night_mode")
+        val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
     }
 
     val biometricLock: Flow<Boolean> =
@@ -73,5 +74,12 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setNightMode(mode: Int) {
         context.dataStore.edit { it[Keys.NIGHT_MODE] = mode }
+    }
+
+    val allowScreenshots: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.ALLOW_SCREENSHOTS] ?: false }
+
+    suspend fun setAllowScreenshots(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.ALLOW_SCREENSHOTS] = enabled }
     }
 }

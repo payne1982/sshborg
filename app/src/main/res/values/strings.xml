@@ -127,6 +127,9 @@
     <string name="settings_encrypt_title">Encrypt sensitive data</string>
     <string name="settings_encrypt_subtitle">SSH private keys and host passwords are encrypted using this device\'s secure hardware. If you uninstall the app, encrypted keys will become inaccessible.</string>
 
+    <string name="settings_allow_screenshots_title">Allow screenshots</string>
+    <string name="settings_allow_screenshots_subtitle">Permit screenshots and screen recording. Disable to protect sensitive content.</string>
+
     <!-- Encrypt confirmation dialog -->
     <string name="settings_encrypt_dialog_title">Encrypt sensitive data?</string>
     <string name="settings_encrypt_dialog_body">Your SSH private keys and host passwords will be encrypted using this device\'s secure hardware.\n\nEncrypted data is bound to this device and app installation. If you uninstall the app, your current keys will become inaccessible and you will need to generate new ones and add them to your servers again.</string>
