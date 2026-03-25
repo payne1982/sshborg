@@ -175,7 +175,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val current = (state.value as? State.Listing)?.path ?: return false
         if (current == "/" || current.isEmpty()) return false
         val parent = current.substringBeforeLast("/").ifEmpty { "/" }
-        if (pathStack.isNotEmpty()) pathStack.removeLast()
+        if (pathStack.isNotEmpty()) pathStack.removeAt(pathStack.lastIndex)
         navigateTo(parent)
         return true
     }

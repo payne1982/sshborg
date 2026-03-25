@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy – SSHBorg</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 760px;
+            margin: 40px auto;
+            padding: 0 24px;
+            color: #222;
+            line-height: 1.7;
+        }
+        h1 { font-size: 1.8em; margin-bottom: 4px; }
+        h2 { font-size: 1.2em; margin-top: 2em; color: #1a1a1a; }
+        p, li { font-size: 1em; }
+        ul { padding-left: 1.4em; }
+        li { margin-bottom: 6px; }
+        .subtitle { color: #666; font-style: italic; margin-top: 0; }
+        strong { color: #111; }
+        .note {
+            background: #f5f5f5;
+            border-left: 4px solid #aaa;
+            padding: 10px 16px;
+            border-radius: 4px;
+            margin-top: 12px;
+        }
+        a { color: #1565C0; }
+    </style>
+</head>
+<body>
+
+    <h1>Privacy Policy for SSHBorg</h1>
+    <p class="subtitle">Last updated: March 24, 2026</p>
+
+    <h2>Overview</h2>
+    <p>SSHBorg ("the app") is an SSH/SFTP client for Android. This privacy policy explains what data the app handles, how it is stored, and your rights as a user.</p>
+
+    <h2>Data We Collect and Store</h2>
+    <p>SSHBorg stores all data <strong>locally on your device only</strong>. We do not operate any servers, and no data is ever transmitted to us or any third party.</p>
+    <p>The following data is stored locally:</p>
+    <ul>
+        <li><strong>Host configurations</strong> — hostname, port, username, and optionally a saved password for SSH servers you add to the app.</li>
+        <li><strong>SSH private keys</strong> — cryptographic keys you generate or import within the app.</li>
+        <li><strong>App preferences</strong> — settings such as theme, language, biometric lock timeout, and display options.</li>
+    </ul>
+
+    <h2>How Data Is Protected</h2>
+    <ul>
+        <li>SSH private keys and saved passwords can optionally be encrypted using the <strong>Android Keystore</strong>, a hardware-backed secure storage system provided by your device. When enabled, encrypted data is bound to your device and app installation.</li>
+        <li>The app can optionally require <strong>biometric authentication</strong> (fingerprint, face, or device PIN) before granting access.</li>
+        <li>The app prevents screenshots and screen recording via the <code>FLAG_SECURE</code> flag.</li>
+    </ul>
+
+    <h2>Network Connections</h2>
+    <p>SSHBorg connects exclusively to SSH servers that <strong>you explicitly configure</strong>. The app makes no connections to any external services, analytics platforms, advertising networks, or our own servers.</p>
+    <p>All network traffic is SSH protocol traffic between your device and your own servers.</p>
+
+    <h2>Data Sharing</h2>
+    <p>We do not share, sell, or transmit your data to any third party. Ever.</p>
+
+    <h2>Permissions</h2>
+    <p>The app requests the following Android permissions:</p>
+    <ul>
+        <li><strong>INTERNET</strong> — required to establish SSH/SFTP connections to your servers.</li>
+        <li><strong>USE_BIOMETRIC / USE_FINGERPRINT</strong> — optional, used only if you enable biometric lock.</li>
+        <li><strong>FOREGROUND_SERVICE</strong> — used to show a persistent notification while SSH sessions are active.</li>
+    </ul>
+
+    <h2>Data Deletion</h2>
+    <p>All app data can be deleted at any time by uninstalling the app or clearing app data from Android Settings. There is no account or server-side data to delete.</p>
+    <div class="note">
+        <strong>Note:</strong> SSH private keys encrypted with the Android Keystore are permanently inaccessible after uninstalling the app. Export your public keys to your servers before uninstalling if needed.
+    </div>
+
+    <h2>Children's Privacy</h2>
+    <p>SSHBorg is not directed at children under 13 and does not knowingly collect any information from children.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>If this policy changes, the updated version will be published at the same URL with a new "Last updated" date.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, you can contact us at: massimiliano.playdev AT gmail.com</p>
+
+</body>
+</html>

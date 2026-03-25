@@ -70,6 +70,12 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             else -> rawPassword to null
         }
 
+        val newJumpHosts = jumpHosts.value.trim().takeIf { it.isNotEmpty() && agentForwarding.value }
+        // Preserve cached jump-host keys only when the jump-hosts string is unchanged.
+        // If the user edited it, clear so they are re-prompted for the new hops.
+        val existing = editingId?.let { hostDao.getById(it) }
+        val preservedJumpHostKeys = if (existing?.jumpHosts == newJumpHosts) existing?.jumpHostKeys else null
+
         val entity = HostEntity(
             id = editingId ?: 0,
             label = label.value.ifBlank { hostname.value },
@@ -80,10 +86,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             encryptedPassword = encryptedPwd,
             keyId = if (useKey.value) selectedKeyId.value else null,
             agentForwarding = agentForwarding.value,
-            jumpHosts = jumpHosts.value.trim().takeIf { it.isNotEmpty() && agentForwarding.value },
-            // Clear persisted jump-host keys whenever the jump-hosts string changes,
-            // so the user is re-prompted to accept keys for newly configured hops.
-            jumpHostKeys = null,
+            jumpHosts = newJumpHosts,
+            jumpHostKeys = preservedJumpHostKeys,
         )
         hostDao.upsert(entity)
         onDone()

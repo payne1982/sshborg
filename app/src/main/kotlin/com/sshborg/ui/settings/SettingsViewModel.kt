@@ -34,6 +34,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val nightMode: StateFlow<Int> =
         prefs.nightMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
+    val allowScreenshots: StateFlow<Boolean> =
+        prefs.allowScreenshots.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
@@ -74,6 +77,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setNightMode(mode: Int) {
         viewModelScope.launch { prefs.setNightMode(mode) }
+    }
+
+    fun setAllowScreenshots(enabled: Boolean) {
+        viewModelScope.launch { prefs.setAllowScreenshots(enabled) }
     }
 
     /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */

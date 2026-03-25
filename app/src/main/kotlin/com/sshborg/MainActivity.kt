@@ -17,15 +17,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!BuildConfig.DEBUG) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        }
         enableEdgeToEdge()
         val prefs = (application as SshBorgApp).appPreferences
         setContent {
             val nightMode by prefs.nightMode.collectAsState(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             SshBorgTheme(nightMode = nightMode) {
                 AppNavigation()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!BuildConfig.DEBUG) {
+            lifecycleScope.launch {
+                val allow = (application as SshBorgApp).appPreferences.allowScreenshots.first()
+                if (allow) {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                } else {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                }
             }
         }
     }

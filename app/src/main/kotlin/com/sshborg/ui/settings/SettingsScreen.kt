@@ -40,6 +40,7 @@ fun SettingsScreen(
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
+    val allowScreenshots      by vm.allowScreenshots.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
@@ -280,6 +281,17 @@ fun SettingsScreen(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
             // Keystore encryption
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_allow_screenshots_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_allow_screenshots_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = allowScreenshots,
+                        onCheckedChange = { vm.setAllowScreenshots(it) },
+                    )
+                },
+            )
+
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_encrypt_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_encrypt_subtitle)) },
