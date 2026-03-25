@@ -73,7 +73,7 @@
     <string name="host_key_select_placeholder">Seleziona una chiave…</string>
     <string name="host_key_change">Cambia</string>
     <string name="host_key_no_keys">Nessuna chiave – aggiungine una prima</string>
-    <string name="host_agent_forwarding">Inoltro agente</string>
+    <string name="host_agent_forwarding">Agent Forwarding</string>
     <string name="host_field_jump_hosts">Jump host (opzionale)</string>
     <string name="host_jump_hosts_placeholder">host1:22,utente@host2:2222</string>
     <string name="host_jump_hosts_supporting">Separati da virgola: [utente@]host[:porta] — predefiniti: porta 22, stesso utente</string>
