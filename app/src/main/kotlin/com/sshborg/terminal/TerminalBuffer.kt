@@ -64,7 +64,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         repeat(count) {
             // Push top line into scrollback
             val evicted = screen[scrollTop].copyOf()
-            if (scrollback.size >= maxScrollback) scrollback.removeFirst()
+            if (scrollback.size >= maxScrollback) scrollback.removeAt(0)
             scrollback.addLast(evicted)
             // Shift lines up within scroll region
             for (r in scrollTop until scrollBottom) {
