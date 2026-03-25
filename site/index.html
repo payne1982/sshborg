@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSHBorg – SSH & SFTP Client for Android</title>
+    <meta name="description" content="SSHBorg is a powerful SSH and SFTP client for Android. Manage your servers securely from your phone with key authentication, encrypted storage, and biometric lock.">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:       #0d1117;
+            --surface:  #161b22;
+            --card:     #1c2330;
+            --border:   #30363d;
+            --accent:   #58a6ff;
+            --green:    #3fb950;
+            --text:     #e6edf3;
+            --muted:    #8b949e;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+        }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ── Nav ─────────────────────────────────────────────── */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(13,17,23,0.92);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .nav-brand img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-links { display: flex; gap: 24px; font-size: 0.9em; color: var(--muted); }
+        .nav-links a { color: var(--muted); }
+        .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+        /* ── Hero ────────────────────────────────────────────── */
+        .hero {
+            text-align: center;
+            padding: 80px 24px 60px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 28px;
+            box-shadow: 0 8px 32px rgba(88,166,255,0.25);
+            margin-bottom: 32px;
+        }
+        .hero h1 {
+            font-size: 3em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #58a6ff, #3fb950);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.2em;
+            color: var(--muted);
+            max-width: 560px;
+            margin: 0 auto 40px;
+        }
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+        .badge-green { border-color: var(--green); color: var(--green); }
+        .badge-blue  { border-color: var(--accent); color: var(--accent); }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent);
+            color: #0d1117;
+            font-weight: 700;
+            font-size: 1em;
+            padding: 14px 28px;
+            border-radius: 10px;
+            margin-top: 40px;
+            transition: opacity 0.15s;
+        }
+        .cta-btn:hover { opacity: 0.85; text-decoration: none; }
+        .cta-btn svg { width: 22px; height: 22px; }
+
+        /* ── Features ────────────────────────────────────────── */
+        section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+        section h2 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 48px;
+            color: var(--text);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: border-color 0.2s;
+        }
+        .feature-card:hover { border-color: var(--accent); }
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 14px;
+        }
+        .feature-card h3 {
+            font-size: 1.05em;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .feature-card p {
+            font-size: 0.9em;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ── Security highlight ──────────────────────────────── */
+        .security-block {
+            background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(63,185,80,0.08));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .security-block h2 { margin-bottom: 16px; }
+        .security-block p { color: var(--muted); max-width: 500px; margin: 0 auto 24px; }
+        .security-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* ── Footer ──────────────────────────────────────────── */
+        footer {
+            border-top: 1px solid var(--border);
+            text-align: center;
+            padding: 32px 24px;
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+        footer a { color: var(--muted); }
+        footer a:hover { color: var(--text); }
+
+        @media (max-width: 600px) {
+            nav { padding: 14px 20px; }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.2em; }
+            .security-block { padding: 32px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+    <div class="nav-brand">
+        <img src="logo.png" alt="SSHBorg logo">
+        SSHBorg
+    </div>
+    <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="privacy_policy.html">Privacy Policy</a>
+        <a href="mailto:massimiliano.playdev AT gmail.com">Contact</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <img class="hero-logo" src="logo.png" alt="SSHBorg">
+    <h1>SSHBorg</h1>
+    <p>A powerful SSH &amp; SFTP client for Android. Manage your servers securely, directly from your phone.</p>
+    <div class="hero-badges">
+        <span class="badge badge-green">&#10003; No ads</span>
+        <span class="badge badge-green">&#10003; No tracking</span>
+        <span class="badge badge-green">&#10003; No cloud</span>
+        <span class="badge badge-blue">Free</span>
+        <span class="badge badge-blue">Android 11+</span>
+    </div>
+    <a class="cta-btn" href="https://play.google.com/store/apps/details?id=com.sshborg">
+        <!-- Google Play icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
+        </svg>
+        Get it on Google Play
+    </a>
+</div>
+
+<!-- Features -->
+<section id="features">
+    <h2>Everything you need to manage your servers</h2>
+    <div class="features">
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128187;</div>
+            <h3>Full SSH Terminal</h3>
+            <p>Interactive terminal with VT100/xterm emulation, full UTF-8 support, and multiple concurrent sessions.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128193;</div>
+            <h3>SFTP File Manager</h3>
+            <p>Browse, upload, download, rename, and delete files on your servers with an intuitive file manager.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128273;</div>
+            <h3>SSH Key Authentication</h3>
+            <p>Generate Ed25519, ECDSA, and RSA keys directly on your device. No passwords needed.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128268;</div>
+            <h3>Jump Host Support</h3>
+            <p>Connect through one or more bastion hosts with transparent tunnelling. Full SSH agent forwarding.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128274;</div>
+            <h3>Biometric Lock</h3>
+            <p>Protect access to your servers with fingerprint or face unlock. Configurable timeout.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#127760;</div>
+            <h3>Multilingual</h3>
+            <p>Available in English, Italian, French, German, Spanish, Portuguese, and Ukrainian.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#127763;</div>
+            <h3>Dark &amp; Light Theme</h3>
+            <p>Follows the system theme or let you choose. Fully readable in any lighting condition.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#9889;</div>
+            <h3>Multiple Sessions</h3>
+            <p>Keep several SSH and SFTP sessions open simultaneously. Switch between them instantly.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Security -->
+<section id="security">
+    <div class="security-block">
+        <h2>Privacy first, by design</h2>
+        <p>SSHBorg never collects your data. Everything stays on your device — your credentials, your keys, your connections.</p>
+        <div class="security-list">
+            <span class="badge badge-green">Android Keystore encryption</span>
+            <span class="badge badge-green">No analytics</span>
+            <span class="badge badge-green">No third-party SDKs</span>
+            <span class="badge badge-green">Screenshot protection</span>
+            <span class="badge badge-green">Open source libraries only</span>
+        </div>
+        <p style="margin-top:24px;">
+            <a href="privacy_policy.html">Read the full Privacy Policy &rarr;</a>
+        </p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>
+        &copy; 2026 SSHBorg &nbsp;&middot;&nbsp;
+        <a href="privacy_policy.html">Privacy Policy</a> &nbsp;&middot;&nbsp;
+        <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
+    </p>
+</footer>
+
+</body>
+</html>
