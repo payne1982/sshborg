@@ -118,11 +118,26 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         ),
                         columns = columns,
                         rows    = rows,
-                        onHostKeyVerify = { hostname, fingerprint ->
+                        onHostKeyVerify = { hostname, fingerprint, keyLine ->
                             runBlocking {
                                 _state.value = ConnectionState.HostKeyPrompt(hostname, fingerprint)
                                 val accepted = hostKeyResult.first()
-                                if (accepted) _state.value = ConnectionState.Connecting
+                                if (accepted) {
+                                    _state.value = ConnectionState.Connecting
+                                    // Persist immediately so a subsequent failure doesn't re-prompt
+                                    val current = hostDao.getById(hostId)
+                                    if (current != null) {
+                                        if (hostname == host.hostname) {
+                                            if (current.knownHostsEntry == null)
+                                                hostDao.upsert(current.copy(knownHostsEntry = keyLine))
+                                        } else {
+                                            val existing = current.jumpHostKeys
+                                                ?.lines()?.filter { it.isNotBlank() } ?: emptyList()
+                                            if (keyLine !in existing)
+                                                hostDao.upsert(current.copy(jumpHostKeys = (existing + keyLine).joinToString("\n")))
+                                        }
+                                    }
+                                }
                                 accepted
                             }
                         },
@@ -136,13 +151,16 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     val em = _emulator.value
                     synchronized(em) { session.resize(em.buffer.columns, em.buffer.rows) }
                     _state.value = ConnectionState.Connected
-                    if (host.knownHostsEntry == null)
-                        hostDao.upsert(host.copy(knownHostsEntry = session.hostKeyLine))
+                    // Re-read to avoid overwriting keys already persisted by onHostKeyVerify
+                    val saved = hostDao.getById(hostId) ?: host
+                    if (saved.knownHostsEntry == null)
+                        hostDao.upsert(saved.copy(knownHostsEntry = session.hostKeyLine))
                     if (session.newJumpHostKeyLines.isNotEmpty()) {
-                        val current = hostDao.getById(hostId) ?: host
+                        val current = hostDao.getById(hostId) ?: saved
                         val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
-                        val merged = (existing + session.newJumpHostKeyLines).joinToString("\n")
-                        hostDao.upsert(current.copy(jumpHostKeys = merged))
+                        val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
+                        if (toAdd.isNotEmpty())
+                            hostDao.upsert(current.copy(jumpHostKeys = (existing + toAdd).joinToString("\n")))
                     }
                     hostDao.updateLastConnected(hostId, System.currentTimeMillis())
                     startReading(session)

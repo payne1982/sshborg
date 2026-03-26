@@ -19,7 +19,7 @@ object SshManager {
         termType: String = "xterm-256color",
         columns: Int = 80,
         rows: Int = 24,
-        onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): ShellSession = withContext(Dispatchers.IO) {
 
         val (session, jumpSessions, newJumpKeyLines) = createSession(params, onHostKeyVerify)
@@ -48,7 +48,7 @@ object SshManager {
      */
     suspend fun openSftp(
         params: SshConnectionParams,
-        onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): SftpSession = withContext(Dispatchers.IO) {
 
         val (session, jumpSessions, newJumpKeyLines) = createSession(params, onHostKeyVerify)
@@ -76,7 +76,7 @@ object SshManager {
      */
     private fun createSession(
         params: SshConnectionParams,
-        onHostKeyVerify: (hostname: String, fingerprint: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): SessionResult {
         // ── 1. Build jump-host chain ────────────────────────────────────────────
         val jumpSessions = mutableListOf<Session>()
@@ -115,7 +115,7 @@ object SshManager {
                     val fp = message?.lines()
                         ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
                         ?: message ?: "unknown"
-                    return onHostKeyVerify(jump.host, fp)
+                    return onHostKeyVerify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
                 }
                 override fun showMessage(message: String?) {}
             })
@@ -181,7 +181,7 @@ object SshManager {
                 val fp = message?.lines()
                     ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
                     ?: message ?: "unknown"
-                return onHostKeyVerify(params.hostname, fp)
+                return onHostKeyVerify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
             }
             override fun showMessage(message: String?) {}
         })
