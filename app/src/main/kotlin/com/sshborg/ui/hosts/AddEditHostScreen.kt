@@ -99,13 +99,21 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_authentication), style = MaterialTheme.typography.titleSmall)
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = useKey, onCheckedChange = { vm.useKey.value = it })
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    if (useKey) stringResource(R.string.host_auth_ssh_key)
-                    else stringResource(R.string.host_auth_password)
-                )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    RadioButton(selected = !useKey, onClick = { vm.useKey.value = false })
+                    Text(stringResource(R.string.host_auth_password))
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    RadioButton(selected = useKey, onClick = { vm.useKey.value = true })
+                    Text(stringResource(R.string.host_auth_ssh_key))
+                }
             }
 
             if (!useKey) {
