@@ -1,8 +1,13 @@
 package com.sshborg.ui.keys
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -11,9 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
@@ -24,8 +33,18 @@ import com.sshborg.data.db.SshKeyEntity
 fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
     val keys by vm.keys.collectAsState()
     var showGenerateDialog by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var importPem by remember { mutableStateOf("") }
     var keyToDelete by remember { mutableStateOf<SshKeyEntity?>(null) }
     var expandedKeyId by remember { mutableStateOf<Long?>(null) }
+
+    val context = LocalContext.current
+    val importFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            importPem = context.contentResolver.openInputStream(uri)
+                ?.use { it.reader().readText() } ?: ""
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -39,8 +58,16 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showGenerateDialog = true }) {
-                Icon(Icons.Default.Add, stringResource(R.string.keys_generate_cd))
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                SmallFloatingActionButton(onClick = { importPem = ""; showImportDialog = true }) {
+                    Icon(Icons.Default.FileOpen, stringResource(R.string.keys_import_cd))
+                }
+                FloatingActionButton(onClick = { showGenerateDialog = true }) {
+                    Icon(Icons.Default.Add, stringResource(R.string.keys_generate_cd))
+                }
             }
         },
     ) { padding ->
@@ -60,6 +87,18 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
                 }
             }
         }
+    }
+
+    if (showImportDialog) {
+        ImportKeyDialog(
+            pem = importPem,
+            onPemChange = { importPem = it },
+            onLoadFromFile = { importFileLauncher.launch("*/*") },
+            onImport = { label, pem, passphrase, onError ->
+                vm.importKey(label, pem, passphrase, onError) { showImportDialog = false }
+            },
+            onDismiss = { showImportDialog = false },
+        )
     }
 
     if (showGenerateDialog) {
@@ -160,6 +199,104 @@ private fun KeyItem(
         }
         HorizontalDivider(thickness = 0.5.dp)
     }
+}
+
+@Composable
+private fun ImportKeyDialog(
+    pem: String,
+    onPemChange: (String) -> Unit,
+    onLoadFromFile: () -> Unit,
+    onImport: (label: String, pem: String, passphrase: String?, onError: (String) -> Unit) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var label by remember { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
+    var passphraseVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val errorEncrypted   = stringResource(R.string.keys_import_error_encrypted)
+    val errorWrongPass   = stringResource(R.string.keys_import_error_wrong_passphrase)
+    val errorInvalid     = stringResource(R.string.keys_import_error_invalid)
+    val defaultLabel     = stringResource(R.string.keys_import_default_label)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.keys_import_title)) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                OutlinedTextField(
+                    value = label,
+                    onValueChange = { label = it; errorMessage = "" },
+                    label = { Text(stringResource(R.string.keygen_field_label)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedButton(
+                    onClick = onLoadFromFile,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Default.FileOpen, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.keys_import_load_from_file))
+                }
+                OutlinedTextField(
+                    value = pem,
+                    onValueChange = { onPemChange(it); errorMessage = "" },
+                    label = { Text(stringResource(R.string.keys_import_pem_label)) },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
+                    textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace),
+                    maxLines = 8,
+                )
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = { passphrase = it; errorMessage = "" },
+                    label = { Text(stringResource(R.string.keys_import_passphrase_label)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        TextButton(onClick = { passphraseVisible = !passphraseVisible }) {
+                            Text(
+                                if (passphraseVisible) stringResource(R.string.action_hide)
+                                else stringResource(R.string.action_show)
+                            )
+                        }
+                    },
+                )
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onImport(
+                        label.ifBlank { defaultLabel },
+                        pem,
+                        passphrase.takeIf { it.isNotEmpty() },
+                    ) { rawError ->
+                        errorMessage = when (rawError) {
+                            "encrypted"       -> errorEncrypted
+                            "wrong_passphrase" -> errorWrongPass
+                            else              -> errorInvalid
+                        }
+                    }
+                },
+                enabled = pem.isNotBlank(),
+            ) { Text(stringResource(R.string.keys_import_action)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
 }
 
 @Composable

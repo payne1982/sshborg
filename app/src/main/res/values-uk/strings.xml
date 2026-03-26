@@ -87,6 +87,18 @@
     <string name="keys_public_key_label">Публічний ключ (додати до ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Видалити ключ</string>
     <string name="keys_delete_message">Видалити \"%1$s\"? Хости, що використовують цей ключ, перейдуть на автентифікацію за паролем.</string>
+    <string name="keys_import_cd">Імпортувати ключ</string>
+
+    <!-- Import key dialog -->
+    <string name="keys_import_title">Імпортувати SSH-ключ</string>
+    <string name="keys_import_load_from_file">Завантажити з файлу</string>
+    <string name="keys_import_pem_label">Приватний ключ (формат PEM / OpenSSH)</string>
+    <string name="keys_import_passphrase_label">Парольна фраза (якщо зашифровано)</string>
+    <string name="keys_import_default_label">Імпортований ключ</string>
+    <string name="keys_import_action">Імпортувати</string>
+    <string name="keys_import_error_encrypted">Цей ключ зашифровано — введіть парольну фразу</string>
+    <string name="keys_import_error_wrong_passphrase">Неправильна парольна фраза</string>
+    <string name="keys_import_error_invalid">Недійсний або непідтримуваний формат ключа</string>
 
     <string name="keygen_title">Згенерувати SSH-ключ</string>
     <string name="keygen_field_label">Мітка</string>

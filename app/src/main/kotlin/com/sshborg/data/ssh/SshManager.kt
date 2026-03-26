@@ -294,6 +294,37 @@ object SshManager {
         return privOut.toString(Charsets.UTF_8) to pubOut.toString(Charsets.UTF_8)
     }
 
+    /**
+     * Loads a PEM or OpenSSH private key and derives its public key.
+     * @param pem  private key text (PEM / OpenSSH format)
+     * @param passphrase  only needed if the key is encrypted
+     * @return Triple(normalizedPem, publicKeyAuthorizedKeys, keyTypeShort)
+     */
+    fun importPrivateKey(pem: String, passphrase: String? = null): Triple<String, String, String> {
+        val jsch = JSch()
+        val normalizedPem = pem.replace("\r\n", "\n").trim()
+        val kp = KeyPair.load(jsch, normalizedPem.toByteArray(Charsets.UTF_8), null)
+        try {
+            if (kp.isEncrypted) {
+                if (passphrase.isNullOrEmpty()) throw JSchException("encrypted")
+                if (!kp.decrypt(passphrase)) throw JSchException("wrong_passphrase")
+            }
+            val pubOut = java.io.ByteArrayOutputStream()
+            kp.writePublicKey(pubOut, "")
+            val pub = pubOut.toString(Charsets.UTF_8.name()).trim()
+            val algToken = pub.substringBefore(" ")
+            val keyType = when {
+                algToken == "ssh-rsa"        -> "rsa"
+                algToken == "ssh-ed25519"    -> "ed25519"
+                algToken.startsWith("ecdsa") -> "ecdsa"
+                else                         -> algToken
+            }
+            return Triple(normalizedPem, pub, keyType)
+        } finally {
+            kp.dispose()
+        }
+    }
+
     /** Builds a known_hosts line from a JSch HostKey. */
     fun buildKnownHostsLine(hostKey: HostKey): String =
         "${hostKey.host} ${hostKey.type} ${hostKey.getKey()}"

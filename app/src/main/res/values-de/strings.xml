@@ -87,6 +87,18 @@
     <string name="keys_public_key_label">Öffentlicher Schlüssel (zu ~/.ssh/authorized_keys hinzufügen):</string>
     <string name="keys_delete_title">Schlüssel löschen</string>
     <string name="keys_delete_message">\"%1$s\" löschen? Hosts, die diesen Schlüssel verwenden, fallen auf Passwort-Authentifizierung zurück.</string>
+    <string name="keys_import_cd">Schlüssel importieren</string>
+
+    <!-- Import key dialog -->
+    <string name="keys_import_title">SSH-Schlüssel importieren</string>
+    <string name="keys_import_load_from_file">Aus Datei laden</string>
+    <string name="keys_import_pem_label">Privater Schlüssel (PEM / OpenSSH-Format)</string>
+    <string name="keys_import_passphrase_label">Passphrase (falls verschlüsselt)</string>
+    <string name="keys_import_default_label">Importierter Schlüssel</string>
+    <string name="keys_import_action">Importieren</string>
+    <string name="keys_import_error_encrypted">Dieser Schlüssel ist verschlüsselt — Passphrase eingeben</string>
+    <string name="keys_import_error_wrong_passphrase">Falsche Passphrase</string>
+    <string name="keys_import_error_invalid">Ungültiges oder nicht unterstütztes Schlüsselformat</string>
 
     <string name="keygen_title">SSH-Schlüssel generieren</string>
     <string name="keygen_field_label">Bezeichnung</string>

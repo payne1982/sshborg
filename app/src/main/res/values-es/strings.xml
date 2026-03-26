@@ -87,6 +87,18 @@
     <string name="keys_public_key_label">Clave pública (añadir a ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Eliminar clave</string>
     <string name="keys_delete_message">¿Eliminar \"%1$s\"? Los hosts que usen esta clave usarán autenticación por contraseña.</string>
+    <string name="keys_import_cd">Importar clave</string>
+
+    <!-- Import key dialog -->
+    <string name="keys_import_title">Importar Clave SSH</string>
+    <string name="keys_import_load_from_file">Cargar desde archivo</string>
+    <string name="keys_import_pem_label">Clave privada (formato PEM / OpenSSH)</string>
+    <string name="keys_import_passphrase_label">Contraseña (si está cifrada)</string>
+    <string name="keys_import_default_label">Clave importada</string>
+    <string name="keys_import_action">Importar</string>
+    <string name="keys_import_error_encrypted">Esta clave está cifrada — introduzca la contraseña</string>
+    <string name="keys_import_error_wrong_passphrase">Contraseña incorrecta</string>
+    <string name="keys_import_error_invalid">Formato de clave no válido o no compatible</string>
 
     <string name="keygen_title">Generar Clave SSH</string>
     <string name="keygen_field_label">Etiqueta</string>

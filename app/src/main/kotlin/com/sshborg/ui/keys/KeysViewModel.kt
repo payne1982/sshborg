@@ -37,5 +37,29 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
         onDone()
     }
 
+    fun importKey(
+        label: String,
+        pem: String,
+        passphrase: String?,
+        onError: (String) -> Unit,
+        onDone: () -> Unit,
+    ) = viewModelScope.launch {
+        val result = runCatching {
+            withContext(Dispatchers.IO) {
+                SshManager.importPrivateKey(pem, passphrase.takeIf { !it.isNullOrEmpty() })
+            }
+        }
+        val (privPem, pub, keyType) = result.getOrElse { onError(it.message ?: ""); return@launch }
+        val encEnabled = prefs.keystoreEncryption.first()
+        val entity = if (encEnabled) {
+            val blob = withContext(Dispatchers.IO) { KeystoreManager.encrypt(privPem) }
+            SshKeyEntity(label = label, keyType = keyType, privateKeyPem = "", encryptedBlob = blob, publicKey = pub)
+        } else {
+            SshKeyEntity(label = label, keyType = keyType, privateKeyPem = privPem, publicKey = pub)
+        }
+        dao.upsert(entity)
+        onDone()
+    }
+
     fun deleteKey(key: SshKeyEntity) = viewModelScope.launch { dao.delete(key) }
 }

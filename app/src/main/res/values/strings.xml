@@ -91,6 +91,18 @@
     <string name="keys_public_key_label">Public key (add to ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Delete key</string>
     <string name="keys_delete_message">Delete \"%1$s\"? Any hosts using this key will fall back to password auth.</string>
+    <string name="keys_import_cd">Import key</string>
+
+    <!-- Import key dialog -->
+    <string name="keys_import_title">Import SSH Key</string>
+    <string name="keys_import_load_from_file">Load from file</string>
+    <string name="keys_import_pem_label">Private key (PEM / OpenSSH format)</string>
+    <string name="keys_import_passphrase_label">Passphrase (if encrypted)</string>
+    <string name="keys_import_default_label">Imported Key</string>
+    <string name="keys_import_action">Import</string>
+    <string name="keys_import_error_encrypted">This key is encrypted — enter the passphrase</string>
+    <string name="keys_import_error_wrong_passphrase">Wrong passphrase</string>
+    <string name="keys_import_error_invalid">Invalid or unsupported key format</string>
 
     <!-- Generate key dialog -->
     <string name="keygen_title">Generate SSH Key</string>
