@@ -36,11 +36,26 @@ sealed interface SshAuth {
  */
 fun parseJumpHosts(raw: String?, knownKeysBlob: String?): List<JumpHost> {
     if (raw.isNullOrBlank()) return emptyList()
-    // Build a map: hostname -> known_hosts line
+    // Build a map: "host:port" -> known_hosts line.
+    // JSch writes port-22 entries as "hostname ..." and non-22 entries as "[hostname]:port ...".
+    // Normalise both to "host:port" so the lookup below always works regardless of port.
     val keysByHost: Map<String, String> = knownKeysBlob
         ?.lines()
         ?.filter { it.isNotBlank() }
-        ?.associateBy { it.substringBefore(" ") }
+        ?.mapNotNull { line ->
+            val marker = line.substringBefore(" ")
+            val canonical = if (marker.startsWith("[")) {
+                // [host]:port format
+                val h = marker.substringAfter("[").substringBefore("]")
+                val p = marker.substringAfterLast("]:").toIntOrNull() ?: 22
+                "$h:$p"
+            } else {
+                // bare hostname → port 22
+                "$marker:22"
+            }
+            canonical to line
+        }
+        ?.toMap()
         ?: emptyMap()
     return raw.split(",").mapNotNull { token ->
         val trimmed = token.trim()
@@ -77,6 +92,6 @@ fun parseJumpHosts(raw: String?, knownKeysBlob: String?): List<JumpHost> {
             }
         }
 
-        JumpHost(host, port, username, keysByHost[host])
+        JumpHost(host, port, username, keysByHost["$host:$port"])
     }
 }
