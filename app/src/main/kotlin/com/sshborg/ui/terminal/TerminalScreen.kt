@@ -256,7 +256,7 @@ private fun ExtraKeyRow(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .horizontalScroll(rememberScrollState())
             .padding(horizontal = 2.dp, vertical = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(1.dp),
     ) {
         ExtraKey("Ctrl", active = ctrlActive, onClick = onCtrlToggle)
         ExtraKey("Alt",  active = altActive,  onClick = onAltToggle)
@@ -307,9 +307,9 @@ private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit
     TextButton(
         onClick = onClick,
         modifier = Modifier.background(bg, MaterialTheme.shapes.extraSmall),
-        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
     ) {
-        Text(label, fontSize = 13.sp,
+        Text(label, fontSize = 11.sp,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
             maxLines = 1, color = textColor)
     }
