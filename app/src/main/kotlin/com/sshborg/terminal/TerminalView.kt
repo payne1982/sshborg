@@ -313,6 +313,12 @@ class TerminalView @JvmOverloads constructor(
         override fun onLongPress(e: MotionEvent) {
             val buf = emulator?.buffer ?: return
             val sb = StringBuilder()
+            for (i in 0 until buf.scrollbackSize) {
+                val line = buf.getScrollbackLine(i) ?: continue
+                val row = StringBuilder()
+                for (cell in line) row.append(cell.char)
+                sb.appendLine(row.trimEnd())
+            }
             for (row in 0 until buf.rows) {
                 val line = StringBuilder()
                 for (col in 0 until buf.columns) {
