@@ -77,6 +77,10 @@
     <string name="host_field_jump_hosts">Hôtes de saut (optionnel)</string>
     <string name="host_jump_hosts_placeholder">hôte1:22,utilisateur@hôte2:2222</string>
     <string name="host_jump_hosts_supporting">Séparés par des virgules : [utilisateur@]hôte[:port] — par défaut : port 22, même utilisateur</string>
+    <string name="host_section_port_forwarding">Transfert de port</string>
+    <string name="host_field_port_forwarding">Règles de transfert (-L)</string>
+    <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
+    <string name="host_port_forwarding_supporting">Une règle par ligne : [portLocal:hôteDistant:portDistant] ou [bind:portLocal:hôteDistant:portDistant]. Préfixe -L facultatif.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Clés SSH</string>

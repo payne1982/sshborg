@@ -21,4 +21,10 @@ data class HostEntity(
     val jumpHosts: String? = null,
     /** Newline-separated known_hosts lines for each jump host, persisted after first connect */
     val jumpHostKeys: String? = null,
+    /**
+     * Newline-separated local port-forwarding rules in SSH -L syntax:
+     * [bindAddr:]localPort:remoteHost:remotePort
+     * e.g. "8080:localhost:8080"
+     */
+    val portForwardings: String? = null,
 )

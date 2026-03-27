@@ -34,6 +34,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var agentForwarding = MutableStateFlow(false)
     /** Raw jump-hosts string: "host1:port,host2:port,...". Only relevant when agentForwarding=true. */
     var jumpHosts = MutableStateFlow("")
+    /** Newline-separated port-forwarding rules in -L syntax. */
+    var portForwardings = MutableStateFlow("")
 
     private var editingId: Long? = null
 
@@ -57,6 +59,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             selectedKeyId.value = h.keyId
             agentForwarding.value = h.agentForwarding
             jumpHosts.value = h.jumpHosts ?: ""
+            portForwardings.value = h.portForwardings ?: ""
         }
     }
 
@@ -88,6 +91,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             agentForwarding = agentForwarding.value,
             jumpHosts = newJumpHosts,
             jumpHostKeys = preservedJumpHostKeys,
+            portForwardings = portForwardings.value.trim().takeIf { it.isNotEmpty() },
         )
         hostDao.upsert(entity)
         onDone()

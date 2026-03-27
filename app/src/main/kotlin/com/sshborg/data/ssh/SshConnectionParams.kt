@@ -1,5 +1,45 @@
 package com.sshborg.data.ssh
 
+/**
+ * A single local port-forwarding rule (-L).
+ * Connections to [bindAddress]:[localPort] are tunnelled to [remoteHost]:[remotePort]
+ * through the SSH session.
+ */
+data class PortForwarding(
+    val bindAddress: String = "127.0.0.1",
+    val localPort: Int,
+    val remoteHost: String,
+    val remotePort: Int,
+)
+
+/**
+ * Parses a newline-separated list of -L forwarding specs into [PortForwarding] objects.
+ * Accepted formats:  localPort:remoteHost:remotePort
+ *                    bindAddress:localPort:remoteHost:remotePort
+ * Lines that are blank or unparseable are silently skipped.
+ */
+fun parsePortForwardings(raw: String?): List<PortForwarding> {
+    if (raw.isNullOrBlank()) return emptyList()
+    return raw.lines().mapNotNull { line ->
+        val spec = line.trim().removePrefix("-L").trim()
+        if (spec.isEmpty()) return@mapNotNull null
+        val parts = spec.split(":")
+        when (parts.size) {
+            3 -> {
+                val lPort = parts[0].toIntOrNull() ?: return@mapNotNull null
+                val rPort = parts[2].toIntOrNull() ?: return@mapNotNull null
+                PortForwarding(localPort = lPort, remoteHost = parts[1], remotePort = rPort)
+            }
+            4 -> {
+                val lPort = parts[1].toIntOrNull() ?: return@mapNotNull null
+                val rPort = parts[3].toIntOrNull() ?: return@mapNotNull null
+                PortForwarding(bindAddress = parts[0], localPort = lPort, remoteHost = parts[2], remotePort = rPort)
+            }
+            else -> null
+        }
+    }
+}
+
 /** A single jump host in a ProxyJump chain. */
 data class JumpHost(
     val host: String,
@@ -21,6 +61,8 @@ data class SshConnectionParams(
     val knownHostsEntry: String? = null,
     /** Ordered list of SSH jump hosts to tunnel through before reaching the target. */
     val jumpHosts: List<JumpHost> = emptyList(),
+    /** Local port-forwarding rules to activate after connecting. */
+    val portForwardings: List<PortForwarding> = emptyList(),
 )
 
 sealed interface SshAuth {

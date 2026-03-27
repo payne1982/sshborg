@@ -39,6 +39,7 @@ fun AddEditHostScreen(
     val selectedKeyId by vm.selectedKeyId.collectAsState()
     val agentForwarding by vm.agentForwarding.collectAsState()
     val jumpHosts by vm.jumpHosts.collectAsState()
+    val portForwardings by vm.portForwardings.collectAsState()
     val keys by vm.keys.collectAsState()
     val password by vm.password.collectAsState()
 
@@ -185,6 +186,20 @@ fun AddEditHostScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                 )
             }
+
+            HorizontalDivider()
+            Text(stringResource(R.string.host_section_port_forwarding), style = MaterialTheme.typography.titleSmall)
+
+            OutlinedTextField(
+                value = portForwardings,
+                onValueChange = { vm.portForwardings.value = it },
+                label = { Text(stringResource(R.string.host_field_port_forwarding)) },
+                placeholder = { Text(stringResource(R.string.host_port_forwarding_placeholder)) },
+                supportingText = { Text(stringResource(R.string.host_port_forwarding_supporting)) },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            )
 
             Spacer(Modifier.height(8.dp))
 

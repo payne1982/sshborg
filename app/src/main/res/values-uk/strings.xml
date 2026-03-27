@@ -77,6 +77,10 @@
     <string name="host_field_jump_hosts">Проміжні хости (необов\'язково)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">Розділені комами: [user@]host[:порт] — за замовчуванням: порт 22, той самий користувач</string>
+    <string name="host_section_port_forwarding">Переадресація портів</string>
+    <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
+    <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
+    <string name="host_port_forwarding_supporting">Одне правило на рядок: [локПорт:хостВіддалений:портВіддалений] або [bind:локПорт:хостВіддалений:портВіддалений]. Префікс -L необов\'язковий.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-ключі</string>

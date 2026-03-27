@@ -115,6 +115,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             agentForwarding = host.agentForwarding,
                             knownHostsEntry = host.knownHostsEntry,
                             jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
+                            portForwardings = parsePortForwardings(host.portForwardings),
                         ),
                         columns = columns,
                         rows    = rows,

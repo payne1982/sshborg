@@ -77,6 +77,10 @@
     <string name="host_field_jump_hosts">Jump host (opzionale)</string>
     <string name="host_jump_hosts_placeholder">host1:22,utente@host2:2222</string>
     <string name="host_jump_hosts_supporting">Separati da virgola: [utente@]host[:porta] — predefiniti: porta 22, stesso utente</string>
+    <string name="host_section_port_forwarding">Port Forwarding</string>
+    <string name="host_field_port_forwarding">Regole di forwarding (-L)</string>
+    <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
+    <string name="host_port_forwarding_supporting">Una regola per riga: [portaLocale:hostRemoto:portaRemota] oppure [bind:portaLocale:hostRemoto:portaRemota]. Prefisso -L facoltativo.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Chiavi SSH</string>

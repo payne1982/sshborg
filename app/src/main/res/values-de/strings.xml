@@ -77,6 +77,10 @@
     <string name="host_field_jump_hosts">Jump-Hosts (optional)</string>
     <string name="host_jump_hosts_placeholder">host1:22,benutzer@host2:2222</string>
     <string name="host_jump_hosts_supporting">Kommagetrennt: [benutzer@]host[:port] — Standardwerte: Port 22, gleicher Benutzer</string>
+    <string name="host_section_port_forwarding">Port-Weiterleitung</string>
+    <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
+    <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
+    <string name="host_port_forwarding_supporting">Eine Regel pro Zeile: [lokalPort:remoteHost:remotePort] oder [bind:lokalPort:remoteHost:remotePort]. Optionales -L-Präfix.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-Schlüssel</string>

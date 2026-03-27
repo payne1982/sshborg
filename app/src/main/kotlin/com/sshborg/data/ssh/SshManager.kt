@@ -213,6 +213,11 @@ object SshManager {
         // JSch leaves a residual socket read timeout from the connect phase — reset to infinite.
         session.setTimeout(0)
 
+        // Activate local port-forwarding rules (-L).
+        for (pf in params.portForwardings) {
+            session.setPortForwardingL(pf.bindAddress, pf.localPort, pf.remoteHost, pf.remotePort)
+        }
+
         return SessionResult(session, jumpSessions, newJumpKeyLines)
     }
 
