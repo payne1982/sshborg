@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
@@ -304,14 +305,17 @@ private fun ExtraKeyRow(
 private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit) {
     val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-    TextButton(
-        onClick = onClick,
-        modifier = Modifier.background(bg, MaterialTheme.shapes.extraSmall),
-        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
-    ) {
-        Text(label, fontSize = 11.sp,
-            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-            maxLines = 1, color = textColor)
+    @OptIn(ExperimentalMaterial3Api::class)
+    CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+        TextButton(
+            onClick = onClick,
+            modifier = Modifier.background(bg, MaterialTheme.shapes.extraSmall),
+            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+        ) {
+            Text(label, fontSize = 11.sp,
+                fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                maxLines = 1, color = textColor)
+        }
     }
 }
 
