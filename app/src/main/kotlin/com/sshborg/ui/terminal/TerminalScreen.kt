@@ -281,11 +281,11 @@ private fun ExtraKeyRow(
                         ?.toByteArray(Charsets.UTF_8)
                         ?.let { onKey(it) }
                 }
-                .padding(horizontal = 6.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center,
         ) {
             Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
-                modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurface)
+                modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurface)
         }
         Spacer(Modifier.width(4.dp))
         ExtraKey("F1",  onClick = { onKey("\u001bOP".toByteArray()) })
@@ -311,10 +311,10 @@ private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit
         modifier = Modifier
             .background(bg, MaterialTheme.shapes.extraSmall)
             .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 4.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, fontSize = 11.sp,
+        Text(label, fontSize = 12.sp,
             fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
             maxLines = 1, color = textColor)
     }
