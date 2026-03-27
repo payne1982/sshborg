@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.sshborg"
-        minSdk = 30
+        minSdk = 29
         targetSdk = 35
         versionCode = 3
         versionName = "1.0"
