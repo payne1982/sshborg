@@ -4,12 +4,15 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -86,6 +89,7 @@ fun SettingsScreen(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(vertical = 8.dp),
         ) {
             // ── General section ───────────────────────────────────────────────
@@ -234,19 +238,22 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_scrollback_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_scrollback_subtitle)) },
                 trailingContent = {
-                    OutlinedTextField(
-                        value = scrollbackText,
-                        onValueChange = { scrollbackText = it.filter { c -> c.isDigit() } },
-                        modifier = Modifier
-                            .width(100.dp)
-                            .onFocusChanged { if (!it.isFocused) saveScrollback() },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(onDone = { saveScrollback() }),
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = scrollbackText,
+                            onValueChange = { scrollbackText = it.filter { c -> c.isDigit() } },
+                            modifier = Modifier.width(90.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { saveScrollback() }),
+                        )
+                        IconButton(onClick = saveScrollback) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                        }
+                    }
                 },
             )
 
