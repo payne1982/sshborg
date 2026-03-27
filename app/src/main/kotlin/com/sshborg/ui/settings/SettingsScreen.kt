@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,6 +42,7 @@ fun SettingsScreen(
     vm: SettingsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val biometricLock         by vm.biometricLock.collectAsState()
     val lockTimeoutSeconds    by vm.lockTimeoutSeconds.collectAsState()
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
@@ -248,7 +250,7 @@ fun SettingsScreen(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
                             ),
-                            keyboardActions = KeyboardActions(onDone = { saveScrollback() }),
+                            keyboardActions = KeyboardActions(onDone = { saveScrollback(); focusManager.clearFocus() }),
                         )
                         IconButton(onClick = saveScrollback) {
                             Icon(Icons.Default.Check, contentDescription = null)
