@@ -114,6 +114,7 @@
     <!-- ── Settings screen ─────────────────────────────────────────────── -->
     <string name="settings_title">Налаштування</string>
     <string name="settings_section_general">Загальне</string>
+    <string name="settings_section_terminal">Термінал</string>
     <string name="settings_section_security">Безпека</string>
 
     <string name="settings_confirm_exit_title">Підтвердити вихід</string>

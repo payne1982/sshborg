@@ -114,6 +114,7 @@
     <!-- ── Settings screen ─────────────────────────────────────────────── -->
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_general">General</string>
+    <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Seguridad</string>
 
     <string name="settings_confirm_exit_title">Confirmar salida</string>

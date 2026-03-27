@@ -119,6 +119,7 @@
     <!-- ── Settings screen ─────────────────────────────────────────────── -->
     <string name="settings_title">Settings</string>
     <string name="settings_section_general">General</string>
+    <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Security</string>
 
     <string name="settings_theme_title">Theme</string>

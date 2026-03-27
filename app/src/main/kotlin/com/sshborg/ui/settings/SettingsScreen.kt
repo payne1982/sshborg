@@ -2,13 +2,18 @@ package com.sshborg.ui.settings
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
@@ -52,7 +57,7 @@ fun SettingsScreen(
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
-    var scrollbackMenuExpanded by remember { mutableStateOf(false) }
+    var scrollbackText by remember(scrollbackLines) { mutableStateOf(scrollbackLines.toString()) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
@@ -98,17 +103,6 @@ fun SettingsScreen(
                     Switch(
                         checked = confirmExit,
                         onCheckedChange = { vm.setConfirmExit(it) },
-                    )
-                },
-            )
-
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_invert_scroll_title)) },
-                supportingContent = { Text(stringResource(R.string.settings_invert_scroll_subtitle)) },
-                trailingContent = {
-                    Switch(
-                        checked = invertTerminalScroll,
-                        onCheckedChange = { vm.setInvertTerminalScroll(it) },
                     )
                 },
             )
@@ -210,42 +204,49 @@ fun SettingsScreen(
                 },
             )
 
-            // Scrollback lines picker
-            val scrollbackOptions = listOf(500, 1000, 2000, 5000, 10000)
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+            // ── Terminal section ──────────────────────────────────────────────
+            Text(
+                stringResource(R.string.settings_section_terminal),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_invert_scroll_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_invert_scroll_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = invertTerminalScroll,
+                        onCheckedChange = { vm.setInvertTerminalScroll(it) },
+                    )
+                },
+            )
+
+            val saveScrollback = {
+                val n = scrollbackText.toIntOrNull()?.coerceIn(100, 50000) ?: 2000
+                scrollbackText = n.toString()
+                vm.setScrollbackLines(n)
+            }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_scrollback_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_scrollback_subtitle)) },
                 trailingContent = {
-                    ExposedDropdownMenuBox(
-                        expanded = scrollbackMenuExpanded,
-                        onExpandedChange = { scrollbackMenuExpanded = it },
-                    ) {
-                        OutlinedTextField(
-                            value = stringResource(R.string.settings_scrollback_lines, scrollbackLines),
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(scrollbackMenuExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                                .width(140.dp),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            singleLine = true,
-                        )
-                        ExposedDropdownMenu(
-                            expanded = scrollbackMenuExpanded,
-                            onDismissRequest = { scrollbackMenuExpanded = false },
-                        ) {
-                            scrollbackOptions.forEach { n ->
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.settings_scrollback_lines, n)) },
-                                    onClick = {
-                                        vm.setScrollbackLines(n)
-                                        scrollbackMenuExpanded = false
-                                    },
-                                )
-                            }
-                        }
-                    }
+                    OutlinedTextField(
+                        value = scrollbackText,
+                        onValueChange = { scrollbackText = it.filter { c -> c.isDigit() } },
+                        modifier = Modifier
+                            .width(100.dp)
+                            .onFocusChanged { if (!it.isFocused) saveScrollback() },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { saveScrollback() }),
+                    )
                 },
             )
 
