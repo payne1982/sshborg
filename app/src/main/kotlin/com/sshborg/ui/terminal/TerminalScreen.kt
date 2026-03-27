@@ -285,7 +285,7 @@ private fun ExtraKeyRow(
             contentAlignment = Alignment.Center,
         ) {
             Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
-                modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurface)
+                modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
         }
         Spacer(Modifier.width(4.dp))
         ExtraKey("F1",  onClick = { onKey("\u001bOP".toByteArray()) })
