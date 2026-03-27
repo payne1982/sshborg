@@ -121,6 +121,9 @@
 
     <string name="settings_invert_scroll_title">Inverser le défilement du terminal</string>
     <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus récente</string>
+    <string name="settings_scrollback_title">Lignes de défilement</string>
+    <string name="settings_scrollback_subtitle">Lignes d\'historique du terminal conservées en mémoire</string>
+    <string name="settings_scrollback_lines">%d lignes</string>
 
     <string name="settings_biometric_lock_title">Verrouillage biométrique</string>
     <string name="settings_biometric_available">Demander l\'authentification au retour dans l\'application</string>

@@ -121,6 +121,9 @@
 
     <string name="settings_invert_scroll_title">Inverti scorrimento terminale</string>
     <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più recente</string>
+    <string name="settings_scrollback_title">Righe di scrollback</string>
+    <string name="settings_scrollback_subtitle">Righe di cronologia del terminale mantenute in memoria</string>
+    <string name="settings_scrollback_lines">%d righe</string>
 
     <string name="settings_biometric_lock_title">Blocco biometrico</string>
     <string name="settings_biometric_available">Richiedi autenticazione quando torni all\'app</string>

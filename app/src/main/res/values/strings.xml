@@ -131,6 +131,9 @@
 
     <string name="settings_invert_scroll_title">Invert terminal scroll</string>
     <string name="settings_invert_scroll_subtitle">Swipe up to see newer output instead of older</string>
+    <string name="settings_scrollback_title">Scrollback lines</string>
+    <string name="settings_scrollback_subtitle">Lines of terminal history kept in memory</string>
+    <string name="settings_scrollback_lines">%d lines</string>
 
     <string name="settings_biometric_lock_title">Biometric lock</string>
     <string name="settings_biometric_available">Require authentication when returning to the app</string>

@@ -41,6 +41,7 @@ fun SettingsScreen(
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
+    val scrollbackLines       by vm.scrollbackLines.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
@@ -51,6 +52,7 @@ fun SettingsScreen(
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
+    var scrollbackMenuExpanded by remember { mutableStateOf(false) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
@@ -200,6 +202,45 @@ fun SettingsScreen(
                                     onClick = {
                                         themeMenuExpanded = false
                                         vm.setNightMode(mode)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            )
+
+            // Scrollback lines picker
+            val scrollbackOptions = listOf(500, 1000, 2000, 5000, 10000)
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_scrollback_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_scrollback_subtitle)) },
+                trailingContent = {
+                    ExposedDropdownMenuBox(
+                        expanded = scrollbackMenuExpanded,
+                        onExpandedChange = { scrollbackMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = stringResource(R.string.settings_scrollback_lines, scrollbackLines),
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(scrollbackMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .width(140.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = scrollbackMenuExpanded,
+                            onDismissRequest = { scrollbackMenuExpanded = false },
+                        ) {
+                            scrollbackOptions.forEach { n ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.settings_scrollback_lines, n)) },
+                                    onClick = {
+                                        vm.setScrollbackLines(n)
+                                        scrollbackMenuExpanded = false
                                     },
                                 )
                             }

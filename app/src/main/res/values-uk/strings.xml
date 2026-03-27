@@ -121,6 +121,9 @@
 
     <string name="settings_invert_scroll_title">Інвертувати прокручування терміналу</string>
     <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити новіший вивід</string>
+    <string name="settings_scrollback_title">Рядки прокрутки</string>
+    <string name="settings_scrollback_subtitle">Рядки історії терміналу, що зберігаються в пам\'яті</string>
+    <string name="settings_scrollback_lines">%d рядків</string>
 
     <string name="settings_biometric_lock_title">Біометричне блокування</string>
     <string name="settings_biometric_available">Вимагати автентифікацію при поверненні до додатка</string>

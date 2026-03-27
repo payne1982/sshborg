@@ -30,6 +30,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val sessionManager = sshBorgApp.sessionManager
     private val hostDao        = sshBorgApp.db.hostDao()
     private val keyDao         = sshBorgApp.db.sshKeyDao()
+    private val prefs          = sshBorgApp.appPreferences
+
+    private var scrollbackLines = 2000
+    init {
+        viewModelScope.launch {
+            scrollbackLines = prefs.scrollbackLines.first()
+        }
+    }
 
     private var sessionId: String? = null
 
@@ -69,7 +77,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         // Get or create the emulator for this session
-        val em = session.emulator ?: TerminalEmulator(80, 24).also { newEm ->
+        val em = session.emulator ?: TerminalEmulator(80, 24, scrollbackLines).also { newEm ->
             sessionManager.update(id) { it.copy(emulator = newEm) }
         }
         em.onTitleChanged = { t -> _title.value = t }

@@ -24,6 +24,7 @@ class AppPreferences(private val context: Context) {
         val INVERT_TERMINAL_SCROLL    = booleanPreferencesKey("invert_terminal_scroll")
         val NIGHT_MODE                = intPreferencesKey("night_mode")
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
+        val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
     }
 
     val biometricLock: Flow<Boolean> =
@@ -81,5 +82,13 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setAllowScreenshots(enabled: Boolean) {
         context.dataStore.edit { it[Keys.ALLOW_SCREENSHOTS] = enabled }
+    }
+
+    /** Number of scrollback lines kept in memory. Default 2000. */
+    val scrollbackLines: Flow<Int> =
+        context.dataStore.data.map { it[Keys.SCROLLBACK_LINES] ?: 2000 }
+
+    suspend fun setScrollbackLines(lines: Int) {
+        context.dataStore.edit { it[Keys.SCROLLBACK_LINES] = lines }
     }
 }
