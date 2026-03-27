@@ -24,7 +24,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
@@ -273,14 +273,16 @@ private fun ExtraKeyRow(
         ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })
         ExtraKey("PgDn", onClick = { onKey("\u001b[6~".toByteArray()) })
         ExtraKey("Del",  onClick = { onKey("\u001b[3~".toByteArray()) })
-        TextButton(
-            onClick = {
-                clipboardManager.getText()?.text
-                    ?.toByteArray(Charsets.UTF_8)
-                    ?.let { onKey(it) }
-            },
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall),
-            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
+                .clickable {
+                    clipboardManager.getText()?.text
+                        ?.toByteArray(Charsets.UTF_8)
+                        ?.let { onKey(it) }
+                }
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
                 modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurface)
@@ -301,21 +303,20 @@ private fun ExtraKeyRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit) {
     val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-        TextButton(
-            onClick = onClick,
-            modifier = Modifier.background(bg, MaterialTheme.shapes.extraSmall),
-            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
-        ) {
-            Text(label, fontSize = 11.sp,
-                fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                maxLines = 1, color = textColor)
-        }
+    Box(
+        modifier = Modifier
+            .background(bg, MaterialTheme.shapes.extraSmall)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(label, fontSize = 11.sp,
+            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+            maxLines = 1, color = textColor)
     }
 }
 
