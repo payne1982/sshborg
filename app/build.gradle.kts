@@ -89,9 +89,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.coroutines.android)
     // Use local patched JAR with ChannelAgentForwarding removed (our app provides it).
-    // The original com.github.mwiede:jsch:0.2.19 was keeping its own ChannelAgentForwarding
-    // in classes9.dex, which took precedence over our override in classes11.dex.
-    implementation(files("libs/jsch-0.2.19-patched.jar"))
+    // The original com.github.mwiede:jsch:2.27.9 keeps its own ChannelAgentForwarding
+    // which would shadow our override; we remove it from the jar so only ours is loaded.
+    implementation(files("libs/jsch-2.27.9-patched.jar"))
     implementation(libs.bouncycastle)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.appcompat)

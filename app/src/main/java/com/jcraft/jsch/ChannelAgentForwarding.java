@@ -19,10 +19,11 @@ import java.util.Vector;
  */
 class ChannelAgentForwarding extends Channel {
 
-    private static final byte SSH_AGENTC_REQUEST_RSA_IDENTITIES = 1;
-    private static final byte SSH_AGENT_RSA_IDENTITIES_ANSWER   = 2;
-    private static final byte SSH_AGENT_FAILURE                 = 5;
-    private static final byte SSH_AGENT_SUCCESS                 = 6;
+    private static final byte SSH_AGENTC_REQUEST_RSA_IDENTITIES    = 1;
+    private static final byte SSH_AGENT_RSA_IDENTITIES_ANSWER      = 2;
+    private static final byte SSH_AGENT_FAILURE                    = 5;
+    private static final byte SSH_AGENT_SUCCESS                    = 6;
+    private static final byte SSH_AGENTC_REMOVE_ALL_RSA_IDENTITIES = 9;
     private static final byte SSH2_AGENTC_REQUEST_IDENTITIES    = 11;
     private static final byte SSH2_AGENT_IDENTITIES_ANSWER      = 12;
     private static final byte SSH2_AGENTC_SIGN_REQUEST          = 13;
@@ -177,6 +178,10 @@ class ChannelAgentForwarding extends Channel {
 
         } else if (type == SSH2_AGENTC_REMOVE_IDENTITY) {
             repo.remove(rbuf.getString());
+            mbuf.putByte(SSH_AGENT_SUCCESS);
+
+        } else if (type == SSH_AGENTC_REMOVE_ALL_RSA_IDENTITIES) {
+            // SSHv1 remove-all: no-op (we don't manage RSA1 identities), reply SUCCESS
             mbuf.putByte(SSH_AGENT_SUCCESS);
 
         } else if (type == SSH2_AGENTC_REMOVE_ALL_IDENTITIES) {
