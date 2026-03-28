@@ -74,7 +74,8 @@
     <string name="host_key_change">Changer</string>
     <string name="host_key_no_keys">Aucune clé – ajoutez-en une d\'abord</string>
     <string name="host_agent_forwarding">Transfert d\'agent</string>
-    <string name="host_field_jump_hosts">Hôtes de saut (optionnel)</string>
+    <string name="host_section_jump_hosts">Hôtes de Saut</string>
+    <string name="host_field_jump_hosts">Hôtes de saut (-J)</string>
     <string name="host_jump_hosts_placeholder">hôte1:22,utilisateur@hôte2:2222</string>
     <string name="host_jump_hosts_supporting">Séparés par des virgules : [utilisateur@]hôte[:port] — par défaut : port 22, même utilisateur</string>
     <string name="host_section_port_forwarding">Transfert de port</string>

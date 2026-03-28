@@ -174,18 +174,19 @@ fun AddEditHostScreen(
                 Text(stringResource(R.string.host_agent_forwarding))
             }
 
-            if (agentForwarding) {
-                OutlinedTextField(
-                    value = jumpHosts,
-                    onValueChange = { vm.jumpHosts.value = it },
-                    label = { Text(stringResource(R.string.host_field_jump_hosts)) },
-                    placeholder = { Text(stringResource(R.string.host_jump_hosts_placeholder)) },
-                    supportingText = { Text(stringResource(R.string.host_jump_hosts_supporting)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                )
-            }
+            HorizontalDivider()
+            Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
+
+            OutlinedTextField(
+                value = jumpHosts,
+                onValueChange = { vm.jumpHosts.value = it },
+                label = { Text(stringResource(R.string.host_field_jump_hosts)) },
+                placeholder = { Text(stringResource(R.string.host_jump_hosts_placeholder)) },
+                supportingText = { Text(stringResource(R.string.host_jump_hosts_supporting)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            )
 
             HorizontalDivider()
             Text(stringResource(R.string.host_section_port_forwarding), style = MaterialTheme.typography.titleSmall)
