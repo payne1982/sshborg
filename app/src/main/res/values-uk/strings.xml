@@ -88,6 +88,8 @@
     <string name="keys_empty">Немає ключів.\nНатисніть +, щоб згенерувати.</string>
     <string name="keys_generate_cd">Згенерувати ключ</string>
     <string name="keys_show_public_key_cd">Показати публічний ключ</string>
+    <string name="keys_rename_cd">Перейменувати</string>
+    <string name="keys_rename_title">Перейменувати ключ</string>
     <string name="keys_delete_cd">Видалити</string>
     <string name="keys_public_key_label">Публічний ключ (додати до ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Видалити ключ</string>

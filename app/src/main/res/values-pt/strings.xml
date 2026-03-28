@@ -88,6 +88,8 @@
     <string name="keys_empty">Nenhuma chave.\nToque em + para gerar uma.</string>
     <string name="keys_generate_cd">Gerar chave</string>
     <string name="keys_show_public_key_cd">Mostrar chave pública</string>
+    <string name="keys_rename_cd">Renomear</string>
+    <string name="keys_rename_title">Renomear chave</string>
     <string name="keys_delete_cd">Eliminar</string>
     <string name="keys_public_key_label">Chave pública (adicionar a ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Eliminar chave</string>

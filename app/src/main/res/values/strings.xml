@@ -92,6 +92,8 @@
     <string name="keys_empty">No keys yet.\nTap + to generate one.</string>
     <string name="keys_generate_cd">Generate key</string>
     <string name="keys_show_public_key_cd">Show public key</string>
+    <string name="keys_rename_cd">Rename</string>
+    <string name="keys_rename_title">Rename key</string>
     <string name="keys_delete_cd">Delete</string>
     <string name="keys_public_key_label">Public key (add to ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Delete key</string>

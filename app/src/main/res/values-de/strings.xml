@@ -88,6 +88,8 @@
     <string name="keys_empty">Keine Schlüssel.\nTippe auf +, um einen zu generieren.</string>
     <string name="keys_generate_cd">Schlüssel generieren</string>
     <string name="keys_show_public_key_cd">Öffentlichen Schlüssel anzeigen</string>
+    <string name="keys_rename_cd">Umbenennen</string>
+    <string name="keys_rename_title">Schlüssel umbenennen</string>
     <string name="keys_delete_cd">Löschen</string>
     <string name="keys_public_key_label">Öffentlicher Schlüssel (zu ~/.ssh/authorized_keys hinzufügen):</string>
     <string name="keys_delete_title">Schlüssel löschen</string>

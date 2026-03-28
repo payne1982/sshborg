@@ -36,6 +36,7 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
     var showImportDialog by remember { mutableStateOf(false) }
     var importPem by remember { mutableStateOf("") }
     var keyToDelete by remember { mutableStateOf<SshKeyEntity?>(null) }
+    var keyToRename by remember { mutableStateOf<SshKeyEntity?>(null) }
     var expandedKeyId by remember { mutableStateOf<Long?>(null) }
 
     val context = LocalContext.current
@@ -82,6 +83,7 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
                         key = key,
                         expanded = expandedKeyId == key.id,
                         onExpand = { expandedKeyId = if (expandedKeyId == key.id) null else key.id },
+                        onRename = { keyToRename = key },
                         onDelete = { keyToDelete = key },
                     )
                 }
@@ -105,6 +107,14 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
         GenerateKeyDialog(
             onGenerate = { label, type, size -> vm.generateKey(label, type, size) {}; showGenerateDialog = false },
             onDismiss = { showGenerateDialog = false },
+        )
+    }
+
+    keyToRename?.let { key ->
+        RenameKeyDialog(
+            currentLabel = key.label,
+            onRename = { newLabel -> vm.renameKey(key, newLabel); keyToRename = null },
+            onDismiss = { keyToRename = null },
         )
     }
 
@@ -132,6 +142,7 @@ private fun KeyItem(
     key: SshKeyEntity,
     expanded: Boolean,
     onExpand: () -> Unit,
+    onRename: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val clipboard = LocalClipboardManager.current
@@ -155,6 +166,9 @@ private fun KeyItem(
                             if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                             stringResource(R.string.keys_show_public_key_cd)
                         )
+                    }
+                    IconButton(onClick = onRename) {
+                        Icon(Icons.Default.Edit, stringResource(R.string.keys_rename_cd))
                     }
                     IconButton(onClick = onDelete) {
                         Icon(Icons.Default.Delete, stringResource(R.string.keys_delete_cd))
@@ -199,6 +213,46 @@ private fun KeyItem(
         }
         HorizontalDivider(thickness = 0.5.dp)
     }
+}
+
+@Composable
+private fun RenameKeyDialog(
+    currentLabel: String,
+    onRename: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var label by remember { mutableStateOf(currentLabel) }
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.keys_rename_title)) },
+        text = {
+            OutlinedTextField(
+                value = label,
+                onValueChange = { label = it },
+                label = { Text(stringResource(R.string.keygen_field_label)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        if (label.isNotBlank()) onRename(label.trim())
+                    }
+                ),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { focusManager.clearFocus(); if (label.isNotBlank()) onRename(label.trim()) },
+                enabled = label.isNotBlank(),
+            ) { Text(stringResource(R.string.action_save)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
 }
 
 @Composable
@@ -307,6 +361,7 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
     var ecdsaCurve by remember { mutableStateOf("256") }
     val types = listOf("ed25519", "rsa", "ecdsa")
     val ecdsaCurves = listOf("256", "384", "521")
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -365,7 +420,7 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
                 else    -> ""
             }
             TextButton(
-                onClick = { onGenerate(label.ifBlank { type.uppercase() + " Key" }, type, size) },
+                onClick = { focusManager.clearFocus(); onGenerate(label.ifBlank { type.uppercase() + " Key" }, type, size) },
                 enabled = type != "rsa" || rsaBits.toIntOrNull()?.let { it >= 1024 } == true,
             ) { Text(stringResource(R.string.action_generate)) }
         },

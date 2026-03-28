@@ -61,5 +61,9 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
         onDone()
     }
 
+    fun renameKey(key: SshKeyEntity, newLabel: String) = viewModelScope.launch {
+        dao.upsert(key.copy(label = newLabel))
+    }
+
     fun deleteKey(key: SshKeyEntity) = viewModelScope.launch { dao.delete(key) }
 }
