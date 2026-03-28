@@ -156,10 +156,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 val session = result.getOrNull()
                 if (session != null) {
                     shellSession = session
-                    sessionManager.update(id) { it.copy(shellSession = session, status = SessionManager.Status.Connected) }
                     val em = _emulator.value
                     synchronized(em) { session.resize(em.buffer.columns, em.buffer.rows) }
-                    _state.value = ConnectionState.Connected
+                    withContext(Dispatchers.Main.immediate) {
+                        sessionManager.update(id) { it.copy(shellSession = session, status = SessionManager.Status.Connected) }
+                        _state.value = ConnectionState.Connected
+                    }
                     // Re-read to avoid overwriting keys already persisted by onHostKeyVerify
                     val saved = hostDao.getById(hostId) ?: host
                     if (saved.knownHostsEntry == null)
