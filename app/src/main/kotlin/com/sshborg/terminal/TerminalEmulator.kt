@@ -17,7 +17,6 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     // Alternate screen
     private var onAltScreen = false
-    private var mainScreenLines: Array<Array<TerminalBuffer.Cell>>? = null
 
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
@@ -123,7 +122,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
                 val last = params.last()
                 params[params.size - 1] = last * 10 + (b - 0x30)
             }
-            b == ';'.code -> params.add(0) // parameter separator
+            b == ';'.code || b == ':'.code -> params.add(0) // parameter / sub-parameter separator
             b in 0x20..0x2F -> csiIntermediate += b.toChar() // intermediate bytes
             b in 0x40..0x7E -> { // final byte
                 executeCsi(b.toChar())
@@ -363,7 +362,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     private fun switchToAltScreen() {
         if (!onAltScreen) {
-            mainScreenLines = null // not saving full buffer for simplicity
+            buffer.pushScreenToScrollback()
             onAltScreen = true
             buffer.eraseInDisplay(2)
             buffer.cursorRow = 0; buffer.cursorCol = 0

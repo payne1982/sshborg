@@ -106,6 +106,15 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         }
     }
 
+    /** Pushes all current visible screen rows into scrollback (used before switching to alt screen). */
+    fun pushScreenToScrollback() {
+        for (r in 0 until rows) {
+            val line = screen[r].copyOf()
+            if (scrollback.size >= maxScrollback) scrollback.removeAt(0)
+            scrollback.addLast(line)
+        }
+    }
+
     fun eraseInDisplay(mode: Int) {
         when (mode) {
             0 -> { // cursor to end
