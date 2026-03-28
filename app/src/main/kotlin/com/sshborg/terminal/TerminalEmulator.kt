@@ -17,6 +17,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     // Alternate screen
     private var onAltScreen = false
+    private var savedMainScreen: Array<Array<TerminalBuffer.Cell>>? = null
 
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
@@ -362,7 +363,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     private fun switchToAltScreen() {
         if (!onAltScreen) {
-            buffer.pushScreenToScrollback()
+            savedMainScreen = buffer.copyScreen()
             onAltScreen = true
             buffer.eraseInDisplay(2)
             buffer.cursorRow = 0; buffer.cursorCol = 0
@@ -372,8 +373,14 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     private fun switchToMainScreen() {
         if (onAltScreen) {
             onAltScreen = false
-            buffer.eraseInDisplay(2)
-            buffer.cursorRow = 0; buffer.cursorCol = 0
+            val snapshot = savedMainScreen
+            if (snapshot != null) {
+                buffer.restoreScreen(snapshot)
+                savedMainScreen = null
+            } else {
+                buffer.eraseInDisplay(2)
+                buffer.cursorRow = 0; buffer.cursorCol = 0
+            }
         }
     }
 }

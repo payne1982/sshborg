@@ -106,13 +106,13 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         }
     }
 
-    /** Pushes all current visible screen rows into scrollback (used before switching to alt screen). */
-    fun pushScreenToScrollback() {
-        for (r in 0 until rows) {
-            val line = screen[r].copyOf()
-            if (scrollback.size >= maxScrollback) scrollback.removeAt(0)
-            scrollback.addLast(line)
-        }
+    /** Returns a snapshot of the current visible screen (for alt-screen save/restore). */
+    fun copyScreen(): Array<Array<Cell>> = Array(rows) { r -> screen[r].copyOf() }
+
+    /** Restores a previously saved screen snapshot. No-op if dimensions don't match. */
+    fun restoreScreen(snapshot: Array<Array<Cell>>) {
+        if (snapshot.size != rows || snapshot.any { it.size != columns }) return
+        for (r in 0 until rows) screen[r] = snapshot[r].copyOf()
     }
 
     fun eraseInDisplay(mode: Int) {
