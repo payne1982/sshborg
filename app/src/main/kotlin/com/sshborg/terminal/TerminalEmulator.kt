@@ -116,7 +116,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     private fun processCsi(b: Int) {
         when {
-            b == '?'.code && params.isEmpty() && csiIntermediate.isEmpty() -> privMode = true
+            b in 0x3C..0x3F && params.isEmpty() && csiIntermediate.isEmpty() -> privMode = true // ?, >, <, = private markers
             b in 0x30..0x39 -> { // digit
                 if (params.isEmpty()) params.add(0)
                 val last = params.last()
