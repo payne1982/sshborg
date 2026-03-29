@@ -206,21 +206,21 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 _conflictEvent.tryEmit(ConflictData(entry, remotePath, existing))
                 return@launch
             }
-            performDownload(entry.name, remotePath)
+            performDownload(entry, entry.name, remotePath)
         }
     }
 
     fun downloadOverwrite(conflict: ConflictData) {
         viewModelScope.launch(Dispatchers.IO) {
             getApplication<Application>().contentResolver.delete(conflict.existingUri, null, null)
-            performDownload(conflict.entry.name, conflict.remotePath)
+            performDownload(conflict.entry, conflict.entry.name, conflict.remotePath)
         }
     }
 
     fun downloadKeepBoth(conflict: ConflictData) {
         viewModelScope.launch(Dispatchers.IO) {
             val unique = uniqueFilename(conflict.entry.name)
-            performDownload(unique, conflict.remotePath)
+            performDownload(null, unique, conflict.remotePath)
         }
     }
 
@@ -237,9 +237,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private suspend fun performDownload(filename: String, remotePath: String) {
+    private suspend fun performDownload(entry: SftpEntry?, filename: String, remotePath: String) {
         val context = getApplication<Application>()
-        _state.value = State.Downloading(filename, 0L)
         val values = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, filename)
             put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
@@ -249,6 +248,37 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         if (uri == null) {
             _state.value = State.Error(context.getString(R.string.error_cannot_create_file)); return
         }
+        // Detect if MediaStore silently renamed the file due to a filesystem collision
+        // that slipped past findExistingDownload (e.g. stale MediaStore index).
+        val actualFilename = context.contentResolver.query(
+            uri, arrayOf(MediaStore.Downloads.DISPLAY_NAME), null, null, null,
+        )?.use { if (it.moveToFirst()) it.getString(0) else filename } ?: filename
+        if (actualFilename != filename && entry != null) {
+            // Collision still present: clean up the newly created entry and surface the conflict.
+            context.contentResolver.delete(uri, null, null)
+            val existingUri = findExistingDownload(filename)
+            if (existingUri != null) {
+                _conflictEvent.tryEmit(ConflictData(entry, remotePath, existingUri))
+                return
+            }
+            // existingUri is null (filesystem collision without a MediaStore record):
+            // fall through and re-insert; the file will get a unique name automatically.
+            val uri2 = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            if (uri2 == null) {
+                _state.value = State.Error(context.getString(R.string.error_cannot_create_file)); return
+            }
+            val name2 = context.contentResolver.query(
+                uri2, arrayOf(MediaStore.Downloads.DISPLAY_NAME), null, null, null,
+            )?.use { if (it.moveToFirst()) it.getString(0) else filename } ?: filename
+            doDownload(uri2, name2, remotePath)
+            return
+        }
+        doDownload(uri, actualFilename, remotePath)
+    }
+
+    private suspend fun doDownload(uri: Uri, filename: String, remotePath: String) {
+        val context = getApplication<Application>()
+        _state.value = State.Downloading(filename, 0L)
         runCatching {
             context.contentResolver.openOutputStream(uri)!!.use { out ->
                 sftpSession!!.downloadFile(remotePath, out) { bytes ->
@@ -259,16 +289,18 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }.onFailure {
             context.contentResolver.delete(uri, null, null)
             dismissDownloaded()
-            _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_download_failed))
+            _opError.tryEmit(it.message ?: context.getString(R.string.error_download_failed))
         }
     }
 
     private fun findExistingDownload(filename: String): Uri? {
         val context = getApplication<Application>()
+        // Use LIKE for RELATIVE_PATH: MediaStore may normalize it with/without trailing slash
+        // or with different casing depending on device/Android version.
         val projection = arrayOf(MediaStore.Downloads._ID)
         val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ? AND " +
-                        "${MediaStore.Downloads.RELATIVE_PATH} = ?"
-        val selectionArgs = arrayOf(filename, "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg/")
+                        "${MediaStore.Downloads.RELATIVE_PATH} LIKE ?"
+        val selectionArgs = arrayOf(filename, "%SSHBorg%")
         return context.contentResolver.query(
             MediaStore.Downloads.EXTERNAL_CONTENT_URI,
             projection, selection, selectionArgs, null,

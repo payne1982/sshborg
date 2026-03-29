@@ -174,7 +174,11 @@ fun SftpScreen(
                         onRefresh = { isRefreshing = true; vm.refreshListing() },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 240.dp),
+                    ) {
                         // ".." row — go up one level (hidden at root)
                         if (!atRoot) {
                             item(key = "..") {
