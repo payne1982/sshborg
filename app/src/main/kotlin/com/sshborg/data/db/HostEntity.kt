@@ -27,4 +27,14 @@ data class HostEntity(
      * e.g. "8080:localhost:8080"
      */
     val portForwardings: String? = null,
+    /**
+     * Jump host mode: "simple" uses the [jumpHosts] text string,
+     * "host_list" uses [jumpHostIdList] (comma-separated host entity IDs).
+     */
+    val jumpMode: String = "simple",
+    /**
+     * Ordered comma-separated IDs of host entities to use as jump hosts.
+     * Only used when [jumpMode] == "host_list".
+     */
+    val jumpHostIdList: String? = null,
 )

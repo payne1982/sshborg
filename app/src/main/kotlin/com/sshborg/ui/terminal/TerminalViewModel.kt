@@ -110,8 +110,29 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             var auth = buildAuth(host) ?: return@launch
             var wrongPassword = false
 
+            // Pre-load jump host entities for host-list mode so we can look them up in onHostKeyVerify
+            val jumpHostEntities = if (host.jumpMode == "host_list") {
+                buildJumpHostEntities(host.jumpHostIdList)
+            } else emptyList()
+
             while (true) {
                 _state.value = ConnectionState.Connecting
+
+                val jumpHosts = if (host.jumpMode == "host_list") {
+                    jumpHostEntities.mapNotNull { jumpHost ->
+                        val jumpAuth = buildJumpAuth(jumpHost) ?: return@mapNotNull null
+                        JumpHost(
+                            host             = jumpHost.hostname,
+                            port             = jumpHost.port,
+                            username         = jumpHost.username,
+                            knownHostsEntry  = jumpHost.knownHostsEntry,
+                            auth             = jumpAuth,
+                            hostId           = jumpHost.id,
+                        )
+                    }
+                } else {
+                    parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
+                }
 
                 val result = runCatching {
                     SshManager.openShell(
@@ -122,7 +143,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             auth            = auth,
                             agentForwarding = host.agentForwarding,
                             knownHostsEntry = host.knownHostsEntry,
-                            jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
+                            jumpHosts       = jumpHosts,
                             portForwardings = parsePortForwardings(host.portForwardings),
                         ),
                         columns = columns,
@@ -133,13 +154,21 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                                 val accepted = hostKeyResult.first()
                                 if (accepted) {
                                     _state.value = ConnectionState.Connecting
-                                    // Persist immediately so a subsequent failure doesn't re-prompt
                                     val current = hostDao.getById(hostId)
                                     if (current != null) {
                                         if (hostname == host.hostname) {
                                             if (current.knownHostsEntry == null)
                                                 hostDao.upsert(current.copy(knownHostsEntry = keyLine))
+                                        } else if (host.jumpMode == "host_list") {
+                                            // Host-list: persist key to the jump host's own entity
+                                            val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
+                                            if (jumpEntity != null) {
+                                                val jCurrent = hostDao.getById(jumpEntity.id)
+                                                if (jCurrent != null && jCurrent.knownHostsEntry == null)
+                                                    hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                                            }
                                         } else {
+                                            // Simple mode: persist to target's jumpHostKeys blob
                                             val existing = current.jumpHostKeys
                                                 ?.lines()?.filter { it.isNotBlank() } ?: emptyList()
                                             if (keyLine !in existing)
@@ -162,16 +191,22 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         sessionManager.update(id) { it.copy(shellSession = session, status = SessionManager.Status.Connected) }
                         _state.value = ConnectionState.Connected
                     }
-                    // Re-read to avoid overwriting keys already persisted by onHostKeyVerify
                     val saved = hostDao.getById(hostId) ?: host
                     if (saved.knownHostsEntry == null)
                         hostDao.upsert(saved.copy(knownHostsEntry = session.hostKeyLine))
+                    // Simple mode: new jump keys → target's jumpHostKeys blob
                     if (session.newJumpHostKeyLines.isNotEmpty()) {
                         val current = hostDao.getById(hostId) ?: saved
                         val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
                         val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
                         if (toAdd.isNotEmpty())
                             hostDao.upsert(current.copy(jumpHostKeys = (existing + toAdd).joinToString("\n")))
+                    }
+                    // Host-list mode: new jump keys → each jump host's own knownHostsEntry
+                    for ((jumpHostId, keyLine) in session.newJumpHostKeyUpdates) {
+                        val jCurrent = hostDao.getById(jumpHostId) ?: continue
+                        if (jCurrent.knownHostsEntry == null)
+                            hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
                     hostDao.updateLastConnected(hostId, System.currentTimeMillis())
                     startReading(session)
@@ -205,6 +240,24 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                msg.contains("Auth cancel", ignoreCase = true) ||
                msg.contains("USERAUTH", ignoreCase = true) ||
                msg.contains("authentication", ignoreCase = true)
+    }
+
+    private suspend fun buildJumpHostEntities(idList: String?): List<HostEntity> {
+        if (idList.isNullOrBlank()) return emptyList()
+        return idList.split(",").mapNotNull { it.trim().toLongOrNull() }
+            .mapNotNull { hostDao.getById(it) }
+    }
+
+    /** Non-interactive auth for jump hosts — password must already be saved. */
+    private suspend fun buildJumpAuth(host: HostEntity): SshAuth? {
+        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
+        return when {
+            host.keyId != null && keyPem != null -> SshAuth.PublicKey(keyPem)
+            !host.encryptedPassword.isNullOrEmpty() ->
+                runCatching { SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword)) }.getOrNull()
+            !host.password.isNullOrEmpty() -> SshAuth.Password(host.password)
+            else -> null
+        }
     }
 
     private suspend fun buildAuth(host: HostEntity): SshAuth? {

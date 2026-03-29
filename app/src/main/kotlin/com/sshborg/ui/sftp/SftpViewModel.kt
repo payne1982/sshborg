@@ -91,8 +91,28 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             var auth = buildAuth(host) ?: return@launch
             var wrongPassword = false
 
+            val jumpHostEntities = if (host.jumpMode == "host_list") {
+                buildJumpHostEntities(host.jumpHostIdList)
+            } else emptyList()
+
             while (true) {
                 _state.value = State.Connecting
+
+                val jumpHosts = if (host.jumpMode == "host_list") {
+                    jumpHostEntities.mapNotNull { jumpHost ->
+                        val jumpAuth = buildJumpAuth(jumpHost) ?: return@mapNotNull null
+                        JumpHost(
+                            host            = jumpHost.hostname,
+                            port            = jumpHost.port,
+                            username        = jumpHost.username,
+                            knownHostsEntry = jumpHost.knownHostsEntry,
+                            auth            = jumpAuth,
+                            hostId          = jumpHost.id,
+                        )
+                    }
+                } else {
+                    parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
+                }
 
                 val result = runCatching {
                     SshManager.openSftp(
@@ -103,7 +123,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                             auth            = auth,
                             agentForwarding = host.agentForwarding,
                             knownHostsEntry = host.knownHostsEntry,
-                            jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
+                            jumpHosts       = jumpHosts,
                             portForwardings = parsePortForwardings(host.portForwardings),
                         )
                     ) { hostname, fingerprint, keyLine ->
@@ -117,6 +137,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                                     if (hostname == host.hostname) {
                                         if (current.knownHostsEntry == null)
                                             hostDao.upsert(current.copy(knownHostsEntry = keyLine))
+                                    } else if (host.jumpMode == "host_list") {
+                                        val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
+                                        if (jumpEntity != null) {
+                                            val jCurrent = hostDao.getById(jumpEntity.id)
+                                            if (jCurrent != null && jCurrent.knownHostsEntry == null)
+                                                hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                                        }
                                     } else {
                                         val existing = current.jumpHostKeys
                                             ?.lines()?.filter { it.isNotBlank() } ?: emptyList()
@@ -143,6 +170,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                         val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
                         if (toAdd.isNotEmpty())
                             hostDao.upsert(current.copy(jumpHostKeys = (existing + toAdd).joinToString("\n")))
+                    }
+                    for ((jumpHostId, keyLine) in session.newJumpHostKeyUpdates) {
+                        val jCurrent = hostDao.getById(jumpHostId) ?: continue
+                        if (jCurrent.knownHostsEntry == null)
+                            hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
                     navigateTo(session.homePath)
                     return@launch
@@ -405,6 +437,23 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             if (sessionManager.sessions.value.isEmpty()) {
                 SshForegroundService.stop(getApplication())
             }
+        }
+    }
+
+    private suspend fun buildJumpHostEntities(idList: String?): List<HostEntity> {
+        if (idList.isNullOrBlank()) return emptyList()
+        return idList.split(",").mapNotNull { it.trim().toLongOrNull() }
+            .mapNotNull { hostDao.getById(it) }
+    }
+
+    private suspend fun buildJumpAuth(host: HostEntity): SshAuth? {
+        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
+        return when {
+            host.keyId != null && keyPem != null -> SshAuth.PublicKey(keyPem)
+            !host.encryptedPassword.isNullOrEmpty() ->
+                runCatching { SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword)) }.getOrNull()
+            !host.password.isNullOrEmpty() -> SshAuth.Password(host.password)
+            else -> null
         }
     }
 

@@ -78,6 +78,11 @@
     <string name="host_field_jump_hosts">Hôtes de saut (-J)</string>
     <string name="host_jump_hosts_placeholder">hôte1:22,utilisateur@hôte2:2222</string>
     <string name="host_jump_hosts_supporting">Séparés par des virgules : [utilisateur@]hôte[:port] — par défaut : port 22, même utilisateur</string>
+    <string name="host_jump_mode_simple">Simple</string>
+    <string name="host_jump_mode_host_list">Liste d’hôtes</string>
+    <string name="host_jump_select_placeholder">Sélectionner un hôte…</string>
+    <string name="host_jump_add">Ajouter un jump host</string>
+    <string name="host_jump_no_password">Aucun mot de passe enregistré</string>
     <string name="host_section_port_forwarding">Transfert de port</string>
     <string name="host_field_port_forwarding">Règles de transfert (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

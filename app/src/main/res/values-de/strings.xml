@@ -78,6 +78,11 @@
     <string name="host_field_jump_hosts">Jump-Hosts (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,benutzer@host2:2222</string>
     <string name="host_jump_hosts_supporting">Kommagetrennt: [benutzer@]host[:port] — Standardwerte: Port 22, gleicher Benutzer</string>
+    <string name="host_jump_mode_simple">Einfach</string>
+    <string name="host_jump_mode_host_list">Host-Liste</string>
+    <string name="host_jump_select_placeholder">Host auswählen…</string>
+    <string name="host_jump_add">Jump-Host hinzufügen</string>
+    <string name="host_jump_no_password">Kein Passwort gespeichert</string>
     <string name="host_section_port_forwarding">Port-Weiterleitung</string>
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

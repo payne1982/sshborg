@@ -78,6 +78,11 @@
     <string name="host_field_jump_hosts">Проміжні хости (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">Розділені комами: [user@]host[:порт] — за замовчуванням: порт 22, той самий користувач</string>
+    <string name="host_jump_mode_simple">Простий</string>
+    <string name="host_jump_mode_host_list">Список хостів</string>
+    <string name="host_jump_select_placeholder">Оберіть хост…</string>
+    <string name="host_jump_add">Додати jump host</string>
+    <string name="host_jump_no_password">Пароль не збережено</string>
     <string name="host_section_port_forwarding">Переадресація портів</string>
     <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
