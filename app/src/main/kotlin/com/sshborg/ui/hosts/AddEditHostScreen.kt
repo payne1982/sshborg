@@ -78,7 +78,8 @@ fun AddEditHostScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
-                value = hostname, onValueChange = { vm.hostname.value = it },
+                value = hostname,
+                onValueChange = { vm.hostname.value = it.filter { c -> c.isLetterOrDigit() || c in ".-:_" } },
                 label = { Text(stringResource(R.string.host_field_hostname)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
@@ -90,7 +91,8 @@ fun AddEditHostScreen(
                     modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
-                    value = port, onValueChange = { vm.port.value = it },
+                    value = port,
+                    onValueChange = { vm.port.value = it.filter { c -> c.isDigit() } },
                     label = { Text(stringResource(R.string.host_field_port)) },
                     modifier = Modifier.width(90.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
