@@ -1,35 +1,42 @@
 <en-US>
 Jump hosts can now be selected from your saved hosts list, using their stored credentials.
-Fixed SFTP downloads saving files with "(1)" suffix when switching between debug and release builds.
+Fixed SFTP downloads sometimes saving files with a "(1)" suffix in the filename.
 Fixed missing file extension on some file types (e.g. APK) when downloading via SFTP.
+Fixed stray characters appearing in the terminal when using nano (ESC character set sequences).
 </en-US>
 <it-IT>
 I jump host possono ora essere selezionati dalla lista degli host salvati, utilizzando le loro credenziali memorizzate.
-Risolto il problema dei file SFTP salvati con suffisso "(1)" quando si alternava tra build debug e release.
+Risolto il problema dei file SFTP salvati a volte con suffisso "(1)" nel nome del file.
 Risolto il problema dell'estensione mancante su alcuni tipi di file (es. APK) durante il download via SFTP.
+Rimossi i caratteri errati che comparivano nel terminale usando nano (sequenze ESC di set caratteri).
 </it-IT>
 <de-DE>
 Jump-Hosts können jetzt aus der gespeicherten Host-Liste ausgewählt werden und verwenden deren hinterlegte Zugangsdaten.
-Behoben: SFTP-Downloads speicherten Dateien mit dem Suffix "(1)" beim Wechsel zwischen Debug- und Release-Build.
+Behoben: SFTP-Downloads speicherten Dateien manchmal mit dem Suffix "(1)" im Dateinamen.
 Behoben: Fehlende Dateiendung bei bestimmten Dateitypen (z. B. APK) beim SFTP-Download.
+Behoben: Fehlerhafte Zeichen im Terminal bei Verwendung von nano (ESC-Zeichensatzsequenzen).
 </de-DE>
 <es-ES>
 Los jump hosts ahora se pueden seleccionar desde la lista de hosts guardados, usando sus credenciales almacenadas.
-Corregida la descarga SFTP que guardaba archivos con el sufijo "(1)" al alternar entre builds de depuración y release.
+Corregida la descarga SFTP que a veces guardaba archivos con el sufijo "(1)" en el nombre.
 Corregida la extensión de archivo faltante en algunos tipos de archivo (p. ej. APK) al descargar por SFTP.
+Eliminados los caracteres incorrectos que aparecían en el terminal al usar nano (secuencias de escape de juego de caracteres).
 </es-ES>
 <fr-FR>
 Les jump hosts peuvent désormais être sélectionnés depuis la liste des hôtes enregistrés, en utilisant leurs identifiants stockés.
-Correction des téléchargements SFTP sauvegardant des fichiers avec le suffixe "(1)" lors du passage entre build debug et release.
+Correction des téléchargements SFTP sauvegardant parfois des fichiers avec le suffixe "(1)" dans le nom.
 Correction de l'extension manquante sur certains types de fichiers (ex. APK) lors du téléchargement SFTP.
+Suppression des caractères parasites dans le terminal lors de l'utilisation de nano (séquences d'échappement de jeu de caractères).
 </fr-FR>
 <pt-PT>
 Os jump hosts podem agora ser selecionados a partir da lista de hosts guardados, utilizando as suas credenciais armazenadas.
-Corrigidos downloads SFTP que guardavam ficheiros com o sufixo "(1)" ao alternar entre builds de debug e release.
+Corrigidos downloads SFTP que por vezes guardavam ficheiros com o sufixo "(1)" no nome.
 Corrigida a extensão em falta em alguns tipos de ficheiro (ex. APK) ao descarregar via SFTP.
+Removidos caracteres incorretos que apareciam no terminal ao usar o nano (sequências de escape de conjunto de caracteres).
 </pt-PT>
 <uk>
 Jump-хости тепер можна вибирати зі списку збережених хостів, використовуючи їхні збережені облікові дані.
-Виправлено завантаження SFTP, що зберігало файли з суфіксом "(1)" при перемиканні між debug і release збірками.
+Виправлено завантаження SFTP, що іноді зберігало файли з суфіксом "(1)" у назві.
 Виправлено відсутнє розширення файлу для деяких типів файлів (наприклад, APK) при завантаженні через SFTP.
+Виправлено появу зайвих символів у терміналі при використанні nano (ESC-послідовності набору символів).
 </uk>
