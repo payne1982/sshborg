@@ -22,7 +22,7 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): ShellSession = withContext(Dispatchers.IO) {
 
-        val (session, jumpSessions, newJumpKeyLines) = createSession(params, onHostKeyVerify)
+        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, onHostKeyVerify)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
@@ -40,7 +40,7 @@ object SshManager {
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines)
+        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
     }
 
     /**
@@ -51,7 +51,7 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): SftpSession = withContext(Dispatchers.IO) {
 
-        val (session, jumpSessions, newJumpKeyLines) = createSession(params, onHostKeyVerify)
+        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, onHostKeyVerify)
 
         val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
         // Allow multiple SFTP requests in-flight simultaneously (default is 1).
@@ -62,13 +62,19 @@ object SshManager {
 
         val homePath = runCatching { channel.pwd() }.getOrDefault("/")
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, homePath)
+        SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates, homePath)
     }
 
     private data class SessionResult(
         val session: Session,
         val jumpSessions: List<Session>,
+        /** New host-key lines for simple-mode jump hops (no prior stored key). */
         val newJumpKeyLines: List<String>,
+        /**
+         * New host-key lines for host-list-mode jump hops: pairs of (hostId, keyLine).
+         * The caller should persist each keyLine to the corresponding HostEntity.
+         */
+        val newJumpHostKeyUpdates: List<Pair<Long, String>>,
     )
 
     /**
@@ -81,17 +87,20 @@ object SshManager {
         // ── 1. Build jump-host chain ────────────────────────────────────────────
         val jumpSessions = mutableListOf<Session>()
         val newJumpKeyLines = mutableListOf<String>()
+        val newJumpHostKeyUpdates = mutableListOf<Pair<Long, String>>()
         var proxy: com.jcraft.jsch.Proxy? = null
 
         for (jump in params.jumpHosts) {
+            // Use per-hop auth if provided (host-list mode), otherwise fall back to target auth
+            val jumpAuth = jump.auth ?: params.auth
+
             val jumpJsch = JSch()
-            // Jump hosts use the same auth as the target
-            if (params.auth is SshAuth.PublicKey) {
+            if (jumpAuth is SshAuth.PublicKey) {
                 jumpJsch.addIdentity(
                     "key",
-                    params.auth.privateKeyPem.toByteArray(),
+                    jumpAuth.privateKeyPem.toByteArray(),
                     null,
-                    params.auth.passphrase?.toByteArray(),
+                    jumpAuth.passphrase?.toByteArray(),
                 )
             }
             if (!jump.knownHostsEntry.isNullOrBlank()) {
@@ -104,11 +113,11 @@ object SshManager {
             jumpSession.setUserInfo(object : UserInfo {
                 private var passwordUsed = false
                 override fun getPassphrase(): String? = null
-                override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
+                override fun getPassword(): String? = (jumpAuth as? SshAuth.Password)?.password
                 override fun promptPassword(message: String?): Boolean {
                     if (passwordUsed) return false
                     passwordUsed = true
-                    return params.auth is SshAuth.Password
+                    return jumpAuth is SshAuth.Password
                 }
                 override fun promptPassphrase(message: String?) = false
                 override fun promptYesNo(message: String?): Boolean {
@@ -122,7 +131,7 @@ object SshManager {
 
             val jumpConfig = Properties().apply {
                 setProperty("StrictHostKeyChecking", if (jump.knownHostsEntry.isNullOrBlank()) "ask" else "yes")
-                setProperty("PreferredAuthentications", when (params.auth) {
+                setProperty("PreferredAuthentications", when (jumpAuth) {
                     is SshAuth.PublicKey -> "publickey"
                     is SshAuth.Password  -> "password"
                 })
@@ -138,7 +147,14 @@ object SshManager {
 
             // Collect the host key so we can persist it if it was unknown
             if (jump.knownHostsEntry.isNullOrBlank()) {
-                newJumpKeyLines.add(buildKnownHostsLine(jumpSession.hostKey))
+                val keyLine = buildKnownHostsLine(jumpSession.hostKey)
+                if (jump.hostId != null) {
+                    // Host-list mode: associate key update with the jump host entity
+                    newJumpHostKeyUpdates.add(jump.hostId to keyLine)
+                } else {
+                    // Simple mode: accumulate in list; ViewModel saves to target's jumpHostKeys
+                    newJumpKeyLines.add(keyLine)
+                }
             }
 
             jumpSessions.add(jumpSession)
@@ -218,7 +234,7 @@ object SshManager {
             session.setPortForwardingL(pf.bindAddress, pf.localPort, pf.remoteHost, pf.remotePort)
         }
 
-        return SessionResult(session, jumpSessions, newJumpKeyLines)
+        return SessionResult(session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
     }
 
     /** JSch [Proxy] implementation that tunnels through an already-connected SSH [Session]. */
@@ -346,10 +362,15 @@ class ShellSession(
     val hostKeyLine: String,
     private val jumpSessions: List<Session> = emptyList(),
     /**
-     * Known-hosts lines for jump hosts that had no prior stored key (empty on subsequent connects).
-     * Callers should persist these so the user is not prompted again next time.
+     * Simple-mode: new host-key lines for jump hops with no prior stored key.
+     * Persist these to the target host's jumpHostKeys field.
      */
     val newJumpHostKeyLines: List<String> = emptyList(),
+    /**
+     * Host-list-mode: (hostId, keyLine) pairs for jump hops with no prior stored key.
+     * Persist each keyLine to the corresponding HostEntity's knownHostsEntry.
+     */
+    val newJumpHostKeyUpdates: List<Pair<Long, String>> = emptyList(),
 ) {
     val inputStream: java.io.InputStream get() = channelInput
     val outputStream: java.io.OutputStream get() = stdinOutput
@@ -384,6 +405,8 @@ class SftpSession(
     private val jumpSessions: List<Session> = emptyList(),
     /** See [ShellSession.newJumpHostKeyLines]. */
     val newJumpHostKeyLines: List<String> = emptyList(),
+    /** See [ShellSession.newJumpHostKeyUpdates]. */
+    val newJumpHostKeyUpdates: List<Pair<Long, String>> = emptyList(),
     /** The working directory at the time the channel was opened (i.e. the user's home). */
     val homePath: String = "/",
 ) {

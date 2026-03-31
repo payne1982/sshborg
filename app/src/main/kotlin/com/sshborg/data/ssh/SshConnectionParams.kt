@@ -48,6 +48,16 @@ data class JumpHost(
     val username: String?,
     /** Known-hosts line for this jump host — null on first connect, non-null on subsequent connects. */
     val knownHostsEntry: String?,
+    /**
+     * Explicit auth for this hop. If null, the target host's auth is used (simple-mode behaviour).
+     * Set when the jump host comes from the host-list (each hop has its own credentials).
+     */
+    val auth: SshAuth? = null,
+    /**
+     * DB id of the HostEntity this hop was built from (host-list mode only).
+     * Used to persist newly-seen host keys back to the jump host's own record.
+     */
+    val hostId: Long? = null,
 )
 
 /** All parameters needed to open an SSH connection. */

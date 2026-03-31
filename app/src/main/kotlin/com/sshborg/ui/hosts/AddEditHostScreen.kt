@@ -6,6 +6,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +42,9 @@ fun AddEditHostScreen(
     val agentForwarding by vm.agentForwarding.collectAsState()
     val jumpHosts by vm.jumpHosts.collectAsState()
     val portForwardings by vm.portForwardings.collectAsState()
+    val jumpMode by vm.jumpMode.collectAsState()
+    val jumpHostIds by vm.jumpHostIds.collectAsState()
+    val availableJumpHosts by vm.availableJumpHosts.collectAsState()
     val keys by vm.keys.collectAsState()
     val password by vm.password.collectAsState()
 
@@ -179,16 +184,69 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
-            OutlinedTextField(
-                value = jumpHosts,
-                onValueChange = { vm.jumpHosts.value = it },
-                label = { Text(stringResource(R.string.host_field_jump_hosts)) },
-                placeholder = { Text(stringResource(R.string.host_jump_hosts_placeholder)) },
-                supportingText = { Text(stringResource(R.string.host_jump_hosts_supporting)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            )
+            // Mode selector
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    RadioButton(
+                        selected = jumpMode == "simple",
+                        onClick  = { vm.jumpMode.value = "simple" },
+                    )
+                    Text(stringResource(R.string.host_jump_mode_simple))
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    RadioButton(
+                        selected = jumpMode == "host_list",
+                        onClick  = { vm.jumpMode.value = "host_list" },
+                    )
+                    Text(stringResource(R.string.host_jump_mode_host_list))
+                }
+            }
+
+            if (jumpMode == "simple") {
+                OutlinedTextField(
+                    value = jumpHosts,
+                    onValueChange = { vm.jumpHosts.value = it },
+                    label = { Text(stringResource(R.string.host_field_jump_hosts)) },
+                    placeholder = { Text(stringResource(R.string.host_jump_hosts_placeholder)) },
+                    supportingText = { Text(stringResource(R.string.host_jump_hosts_supporting)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                )
+            } else {
+                // Host-list mode: one row per hop
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    jumpHostIds.forEachIndexed { index, selectedId ->
+                        JumpHostRow(
+                            selectedId       = selectedId,
+                            options          = availableJumpHosts,
+                            onSelect         = { newId ->
+                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                    .also { it[index] = newId }
+                            },
+                            onRemove         = {
+                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                    .also { it.removeAt(index) }
+                            },
+                        )
+                    }
+                    OutlinedButton(
+                        onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
+                        modifier  = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null,
+                            modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.host_jump_add))
+                    }
+                }
+            }
 
             HorizontalDivider()
             Text(stringResource(R.string.host_section_port_forwarding), style = MaterialTheme.typography.titleSmall)
@@ -213,6 +271,78 @@ fun AddEditHostScreen(
             ) {
                 Text(stringResource(R.string.action_save))
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun JumpHostRow(
+    selectedId: Long,
+    options: List<AddEditHostViewModel.JumpHostOption>,
+    onSelect: (Long) -> Unit,
+    onRemove: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selected = options.find { it.host.id == selectedId }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+            modifier = Modifier.weight(1f),
+        ) {
+            OutlinedTextField(
+                value = selected?.host?.label
+                    ?: stringResource(R.string.host_jump_select_placeholder),
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                singleLine = true,
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text(
+                                    option.host.label,
+                                    color = if (option.isSelectable) LocalContentColor.current
+                                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                                )
+                                if (!option.isSelectable) {
+                                    Text(
+                                        stringResource(R.string.host_jump_no_password),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            if (option.isSelectable) {
+                                onSelect(option.host.id)
+                                expanded = false
+                            }
+                        },
+                        enabled = option.isSelectable,
+                    )
+                }
+            }
+        }
+        IconButton(onClick = onRemove) {
+            Icon(Icons.Default.Remove, contentDescription = null,
+                tint = MaterialTheme.colorScheme.error)
         }
     }
 }

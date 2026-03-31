@@ -7,7 +7,9 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import androidx.lifecycle.AndroidViewModel
+import com.sshborg.BuildConfig
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
@@ -34,6 +36,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         object Disconnected : State
     }
 
+    /**
+     * Subfolder inside Downloads used for all downloads.
+     * Debug builds get their own folder so they never conflict with the release app,
+     * since Android scoped storage prevents cross-package file visibility/deletion.
+     */
+    val downloadFolder =
+        "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg${if (BuildConfig.DEBUG) "-debug" else ""}/"
+
     private val sshBorgApp    = app as SshBorgApp
     private val sessionManager = sshBorgApp.sessionManager
     private val hostDao        = sshBorgApp.db.hostDao()
@@ -47,7 +57,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     private val _opError = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val opError: SharedFlow<String> = _opError
 
-    /** Emitted when a file to be downloaded already exists in Downloads/SSHBorg/. */
+    /** Emitted when a file to be downloaded already exists in [downloadFolder]. */
     data class ConflictData(val entry: SftpEntry, val remotePath: String, val existingUri: Uri)
     private val _conflictEvent = MutableSharedFlow<ConflictData>(extraBufferCapacity = 1)
     val conflictEvent: SharedFlow<ConflictData> = _conflictEvent
@@ -91,8 +101,28 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             var auth = buildAuth(host) ?: return@launch
             var wrongPassword = false
 
+            val jumpHostEntities = if (host.jumpMode == "host_list") {
+                buildJumpHostEntities(host.jumpHostIdList)
+            } else emptyList()
+
             while (true) {
                 _state.value = State.Connecting
+
+                val jumpHosts = if (host.jumpMode == "host_list") {
+                    jumpHostEntities.mapNotNull { jumpHost ->
+                        val jumpAuth = buildJumpAuth(jumpHost) ?: return@mapNotNull null
+                        JumpHost(
+                            host            = jumpHost.hostname,
+                            port            = jumpHost.port,
+                            username        = jumpHost.username,
+                            knownHostsEntry = jumpHost.knownHostsEntry,
+                            auth            = jumpAuth,
+                            hostId          = jumpHost.id,
+                        )
+                    }
+                } else {
+                    parseJumpHosts(host.jumpHosts, host.jumpHostKeys)
+                }
 
                 val result = runCatching {
                     SshManager.openSftp(
@@ -103,7 +133,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                             auth            = auth,
                             agentForwarding = host.agentForwarding,
                             knownHostsEntry = host.knownHostsEntry,
-                            jumpHosts       = parseJumpHosts(host.jumpHosts, host.jumpHostKeys),
+                            jumpHosts       = jumpHosts,
                             portForwardings = parsePortForwardings(host.portForwardings),
                         )
                     ) { hostname, fingerprint, keyLine ->
@@ -117,6 +147,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                                     if (hostname == host.hostname) {
                                         if (current.knownHostsEntry == null)
                                             hostDao.upsert(current.copy(knownHostsEntry = keyLine))
+                                    } else if (host.jumpMode == "host_list") {
+                                        val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
+                                        if (jumpEntity != null) {
+                                            val jCurrent = hostDao.getById(jumpEntity.id)
+                                            if (jCurrent != null && jCurrent.knownHostsEntry == null)
+                                                hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                                        }
                                     } else {
                                         val existing = current.jumpHostKeys
                                             ?.lines()?.filter { it.isNotBlank() } ?: emptyList()
@@ -143,6 +180,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                         val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
                         if (toAdd.isNotEmpty())
                             hostDao.upsert(current.copy(jumpHostKeys = (existing + toAdd).joinToString("\n")))
+                    }
+                    for ((jumpHostId, keyLine) in session.newJumpHostKeyUpdates) {
+                        val jCurrent = hostDao.getById(jumpHostId) ?: continue
+                        if (jCurrent.knownHostsEntry == null)
+                            hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
                     navigateTo(session.homePath)
                     return@launch
@@ -224,7 +266,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Returns a filename like "file(1).txt" that does not yet exist in Downloads/SSHBorg/. */
+    /** Returns a filename like "file(1).txt" that does not yet exist in [downloadFolder]. */
     private fun uniqueFilename(original: String): String {
         val dot = original.lastIndexOf('.')
         val base = if (dot > 0) original.substring(0, dot) else original
@@ -239,10 +281,12 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     private suspend fun performDownload(entry: SftpEntry?, filename: String, remotePath: String) {
         val context = getApplication<Application>()
+        val ext = filename.substringAfterLast('.', "").lowercase()
+        val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
         val values = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, filename)
-            put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
-            put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg/")
+            put(MediaStore.Downloads.MIME_TYPE, mime)
+            put(MediaStore.Downloads.RELATIVE_PATH, downloadFolder)
         }
         val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
         if (uri == null) {
@@ -300,7 +344,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val projection = arrayOf(MediaStore.Downloads._ID)
         val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ? AND " +
                         "${MediaStore.Downloads.RELATIVE_PATH} LIKE ?"
-        val selectionArgs = arrayOf(filename, "%SSHBorg%")
+        val selectionArgs = arrayOf(filename, "%$downloadFolder%")
         return context.contentResolver.query(
             MediaStore.Downloads.EXTERNAL_CONTENT_URI,
             projection, selection, selectionArgs, null,
@@ -405,6 +449,23 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             if (sessionManager.sessions.value.isEmpty()) {
                 SshForegroundService.stop(getApplication())
             }
+        }
+    }
+
+    private suspend fun buildJumpHostEntities(idList: String?): List<HostEntity> {
+        if (idList.isNullOrBlank()) return emptyList()
+        return idList.split(",").mapNotNull { it.trim().toLongOrNull() }
+            .mapNotNull { hostDao.getById(it) }
+    }
+
+    private suspend fun buildJumpAuth(host: HostEntity): SshAuth? {
+        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
+        return when {
+            host.keyId != null && keyPem != null -> SshAuth.PublicKey(keyPem)
+            !host.encryptedPassword.isNullOrEmpty() ->
+                runCatching { SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword)) }.getOrNull()
+            !host.password.isNullOrEmpty() -> SshAuth.Password(host.password)
+            else -> null
         }
     }
 

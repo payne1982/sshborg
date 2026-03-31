@@ -59,7 +59,7 @@ fun SftpScreen(
         if (state is SftpViewModel.State.Downloaded) {
             val s = state as SftpViewModel.State.Downloaded
             snackbarHostState.showSnackbar(
-                "Saved to $downloadsDir/SSHBorg/${s.filename}"
+                "Saved to ${vm.downloadFolder}${s.filename}"
             )
             vm.dismissDownloaded()
         }
