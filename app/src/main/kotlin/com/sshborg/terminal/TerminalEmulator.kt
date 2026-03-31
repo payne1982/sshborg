@@ -25,7 +25,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     // Called when the terminal must send a response back to the remote (e.g. CPR, DA replies)
     var onSendResponse: ((ByteArray) -> Unit)? = null
 
-    private enum class State { NORMAL, ESC, CSI, OSC, SS3 }
+    private enum class State { NORMAL, ESC, CSI, OSC, SS3, CHARSET }
 
     // UTF-8 multi-byte decoder state
     private var utf8Remaining  = 0
@@ -53,11 +53,12 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     private fun processByte(b: Int) {
         when (state) {
-            State.NORMAL -> processNormal(b)
-            State.ESC    -> processEsc(b)
-            State.CSI    -> processCsi(b)
-            State.OSC    -> processOsc(b)
-            State.SS3    -> processSs3(b)
+            State.NORMAL  -> processNormal(b)
+            State.ESC     -> processEsc(b)
+            State.CSI     -> processCsi(b)
+            State.OSC     -> processOsc(b)
+            State.SS3     -> processSs3(b)
+            State.CHARSET -> state = State.NORMAL // consume designator byte (B, 0, A, …) and ignore
         }
     }
 
@@ -111,6 +112,8 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             'D'.code -> lineFeed()
             'E'.code -> { buffer.cursorCol = 0; lineFeed() }
             'H'.code -> {} // Tab set (ignored)
+            // Character set designation: ESC ( X or ESC ) X — consume the designator byte
+            '('.code, ')'.code, '*'.code, '+'.code -> state = State.CHARSET
             else -> {} // unknown escape
         }
     }
