@@ -1,0 +1,35 @@
+<en-US>
+Jump hosts can now be selected from your saved hosts list, using their stored credentials.
+Fixed SFTP downloads saving files with "(1)" suffix when switching between debug and release builds.
+Fixed missing file extension on some file types (e.g. APK) when downloading via SFTP.
+</en-US>
+<it-IT>
+I jump host possono ora essere selezionati dalla lista degli host salvati, utilizzando le loro credenziali memorizzate.
+Risolto il problema dei file SFTP salvati con suffisso "(1)" quando si alternava tra build debug e release.
+Risolto il problema dell'estensione mancante su alcuni tipi di file (es. APK) durante il download via SFTP.
+</it-IT>
+<de-DE>
+Jump-Hosts können jetzt aus der gespeicherten Host-Liste ausgewählt werden und verwenden deren hinterlegte Zugangsdaten.
+Behoben: SFTP-Downloads speicherten Dateien mit dem Suffix "(1)" beim Wechsel zwischen Debug- und Release-Build.
+Behoben: Fehlende Dateiendung bei bestimmten Dateitypen (z. B. APK) beim SFTP-Download.
+</de-DE>
+<es-ES>
+Los jump hosts ahora se pueden seleccionar desde la lista de hosts guardados, usando sus credenciales almacenadas.
+Corregida la descarga SFTP que guardaba archivos con el sufijo "(1)" al alternar entre builds de depuración y release.
+Corregida la extensión de archivo faltante en algunos tipos de archivo (p. ej. APK) al descargar por SFTP.
+</es-ES>
+<fr-FR>
+Les jump hosts peuvent désormais être sélectionnés depuis la liste des hôtes enregistrés, en utilisant leurs identifiants stockés.
+Correction des téléchargements SFTP sauvegardant des fichiers avec le suffixe "(1)" lors du passage entre build debug et release.
+Correction de l'extension manquante sur certains types de fichiers (ex. APK) lors du téléchargement SFTP.
+</fr-FR>
+<pt-PT>
+Os jump hosts podem agora ser selecionados a partir da lista de hosts guardados, utilizando as suas credenciais armazenadas.
+Corrigidos downloads SFTP que guardavam ficheiros com o sufixo "(1)" ao alternar entre builds de debug e release.
+Corrigida a extensão em falta em alguns tipos de ficheiro (ex. APK) ao descarregar via SFTP.
+</pt-PT>
+<uk>
+Jump-хости тепер можна вибирати зі списку збережених хостів, використовуючи їхні збережені облікові дані.
+Виправлено завантаження SFTP, що зберігало файли з суфіксом "(1)" при перемиканні між debug і release збірками.
+Виправлено відсутнє розширення файлу для деяких типів файлів (наприклад, APK) при завантаженні через SFTP.
+</uk>
