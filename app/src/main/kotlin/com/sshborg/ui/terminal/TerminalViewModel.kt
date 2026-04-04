@@ -14,6 +14,7 @@ import com.sshborg.service.SshForegroundService
 import com.sshborg.terminal.TerminalEmulator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.io.ByteArrayOutputStream
 
 sealed interface ConnectionState {
     object Connecting : ConnectionState
@@ -60,6 +61,24 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
     private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    // ── Command history suggestions ───────────────────────────────────────────
+
+    /** Commands loaded from the server's shell history file, most-recent first. */
+    private val _commandHistory = MutableStateFlow<List<String>>(emptyList())
+
+    /** Filtered suggestions for the current partial input. */
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions: StateFlow<List<String>> = _suggestions
+
+    /** Prompt string detected from first terminal render, used to strip it from the input line. */
+    private var promptPrefix = ""
+    private var promptDetected = false
+    private var promptDetectJob: Job? = null
+    private var suggestionsUpdateJob: Job? = null
+
+    /** Params saved after a successful connect, used to open the SFTP history channel. */
+    private var lastConnectParams: SshConnectionParams? = null
 
     /** Emitted when the remote shell exits cleanly — screen should navigate back automatically. */
     private val _navBack = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -209,7 +228,17 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
                     hostDao.updateLastConnected(hostId, System.currentTimeMillis())
+                    lastConnectParams = SshConnectionParams(
+                        hostname        = host.hostname,
+                        port            = host.port,
+                        username        = host.username,
+                        auth            = auth,
+                        agentForwarding = host.agentForwarding,
+                        knownHostsEntry = session.hostKeyLine,
+                        jumpHosts       = jumpHosts,
+                    )
                     startReading(session)
+                    if (prefs.historySuggestions.first()) loadCommandHistory()
                     return@launch
                 }
 
@@ -292,6 +321,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     if (n < 0) { cleanExit = true; break }
                     synchronized(em) { em.process(buf, 0, n) }
                     onNeedsRedraw?.invoke()
+                    detectPromptIfNeeded()
+                    scheduleUpdateSuggestions()
                 }
                 // Loop exited because session.isConnected flipped (e.g. server closed channel)
                 if (isActive && !cleanExit) cleanExit = true
@@ -322,6 +353,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun sendInput(data: ByteArray) {
+        // Enter (\r or \n) and Ctrl+C immediately clear suggestions — the line is gone.
+        if (data.size == 1 && (data[0] == 0x0D.toByte() || data[0] == 0x0A.toByte() || data[0] == 0x03.toByte())) {
+            _suggestions.value = emptyList()
+        }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 shellSession?.outputStream?.write(data)
@@ -359,6 +394,118 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         _state.value = ConnectionState.Disconnected()
         if (sessionManager.sessions.value.isEmpty()) {
             SshForegroundService.stop(getApplication())
+        }
+    }
+
+    // ── History suggestions helpers ───────────────────────────────────────────
+
+    /**
+     * Opens a brief SFTP connection and tries to read the shell history file.
+     * Tries ~/.bash_history, ~/.zsh_history, and fish history in order.
+     * Silently does nothing if the connection or file read fails.
+     */
+    private fun loadCommandHistory() {
+        val params = lastConnectParams ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val sftp = runCatching {
+                SshManager.openSftp(params) { _, _, _ -> true }
+            }.getOrNull() ?: return@launch
+            try {
+                val home = sftp.homePath
+                val candidates = listOf(
+                    "$home/.bash_history",
+                    "$home/.zsh_history",
+                    "$home/.local/share/fish/fish_history",
+                )
+                for (path in candidates) {
+                    val content = runCatching {
+                        val out = ByteArrayOutputStream()
+                        sftp.downloadFile(path, out) {}
+                        out.toString(Charsets.UTF_8.name())
+                    }.getOrNull() ?: continue
+                    val commands = parseHistory(path, content)
+                    if (commands.isNotEmpty()) {
+                        _commandHistory.value = commands
+                            .reversed()
+                            .filter { it.length > 1 }
+                            .distinct()
+                            .take(100_000)
+                        break
+                    }
+                }
+            } finally {
+                runCatching { sftp.disconnect() }
+            }
+        }
+    }
+
+    private fun parseHistory(path: String, content: String): List<String> {
+        val lines = content.lines()
+        return when {
+            path.endsWith("fish_history") ->
+                // fish format: "- cmd: git status\n  when: 12345"
+                lines.filter { it.startsWith("- cmd: ") }
+                     .map { it.removePrefix("- cmd: ").trim() }
+            path.endsWith("zsh_history") ->
+                // Extended format: ": 1234567890:0;command" — or plain one-per-line
+                lines.map { line ->
+                    Regex("""^: \d+:\d+;(.*)$""").matchEntire(line)?.groupValues?.get(1) ?: line
+                }.filter { it.isNotBlank() }
+            else ->
+                // bash_history: one command per line; timestamp lines start with '#'
+                lines.filter { it.isNotBlank() && !it.startsWith('#') }
+        }
+    }
+
+    /**
+     * Schedules a prompt detection after a short debounce.
+     * Runs only until the prompt is detected for the first time.
+     */
+    private fun detectPromptIfNeeded() {
+        if (promptDetected) return
+        promptDetectJob?.cancel()
+        promptDetectJob = viewModelScope.launch {
+            delay(300)
+            val em = _emulator.value
+            val lineText = synchronized(em) {
+                em.buffer.getRowText(em.buffer.cursorRow).trimEnd()
+            }
+            if (lineText.isEmpty()) return@launch
+            // Match everything up to and including a prompt marker ($, #, %, ❯, >) followed by a space
+            val m = Regex("""^(.*?[\$#%❯>])\s""").find(lineText) ?: return@launch
+            promptPrefix = m.groupValues[1] + " "
+            promptDetected = true
+        }
+    }
+
+    /**
+     * Returns the portion of the current terminal line that the user is typing,
+     * with the shell prompt stripped. Used for suggestion filtering.
+     */
+    fun getCurrentInputForCompletion(): String {
+        if (!promptDetected || promptPrefix.isEmpty()) return ""
+        val em = _emulator.value
+        val lineText = synchronized(em) {
+            em.buffer.getRowText(em.buffer.cursorRow, em.buffer.cursorCol)
+        }
+        if (lineText.startsWith(promptPrefix)) return lineText.removePrefix(promptPrefix)
+        // Prompt changed (e.g. after cd) — heuristic: text after last prompt marker
+        // Return "" rather than the raw line to avoid false positives
+        val m = Regex("""[\$#%❯>]\s(.*)$""").find(lineText)
+        return m?.groupValues?.get(1) ?: ""
+    }
+
+    /** Debounced update of the suggestions list based on current terminal input. */
+    private fun scheduleUpdateSuggestions() {
+        if (!promptDetected) return
+        suggestionsUpdateJob?.cancel()
+        suggestionsUpdateJob = viewModelScope.launch {
+            delay(80)
+            val history = _commandHistory.value
+            if (history.isEmpty()) return@launch
+            val input = getCurrentInputForCompletion()
+            _suggestions.value = if (input.length < 2) emptyList()
+            else history.filter { it.startsWith(input) && it != input }.take(8)
         }
     }
 

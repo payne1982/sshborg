@@ -48,6 +48,7 @@ fun SettingsScreen(
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
     val confirmExit           by vm.confirmExit.collectAsState()
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
+    val historySuggestions    by vm.historySuggestions.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -256,6 +257,17 @@ fun SettingsScreen(
                             Icon(Icons.Default.Check, contentDescription = null)
                         }
                     }
+                },
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_history_suggestions_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_history_suggestions_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = historySuggestions,
+                        onCheckedChange = { vm.setHistorySuggestions(it) },
+                    )
                 },
             )
 

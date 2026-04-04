@@ -143,6 +143,8 @@
     <string name="settings_scrollback_title">Scrollback lines</string>
     <string name="settings_scrollback_subtitle">Lines of terminal history kept in memory</string>
     <string name="settings_scrollback_lines">%d lines</string>
+    <string name="settings_history_suggestions_title">Command history suggestions</string>
+    <string name="settings_history_suggestions_subtitle">Show suggestions from the server shell history while typing in the terminal</string>
 
     <string name="settings_biometric_lock_title">Biometric lock</string>
     <string name="settings_biometric_available">Require authentication when returning to the app</string>

@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -48,7 +51,8 @@ fun TerminalScreen(
     val emulator by vm.emulatorFlow.collectAsState()
 
     val app = LocalContext.current.applicationContext as SshBorgApp
-    val invertScroll by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
+    val invertScroll  by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
+    val suggestions   by vm.suggestions.collectAsState()
 
     // Siblings: other Shell sessions for the same host (for the tab bar)
     val currentSession = sessions.find { it.id == sessionId }
@@ -153,6 +157,24 @@ fun TerminalScreen(
                     )
                 }
 
+                // History suggestion chips — only when keyboard is open and history loaded
+                if (imeVisible && suggestions.isNotEmpty()) {
+                    SuggestionRow(
+                        suggestions = suggestions,
+                        onSelect = { cmd ->
+                            val currentInput = vm.getCurrentInputForCompletion()
+                            if (currentInput.isNotEmpty() && cmd.startsWith(currentInput)) {
+                                // Complete in place: send only the remaining suffix
+                                sendInput(cmd.removePrefix(currentInput).toByteArray(Charsets.UTF_8))
+                            } else {
+                                // Fallback: clear line and retype full command
+                                sendInput(byteArrayOf(0x15))
+                                sendInput(cmd.toByteArray(Charsets.UTF_8))
+                            }
+                        },
+                    )
+                }
+
                 // Extra key bar — only when soft keyboard is open
                 if (imeVisible) {
                     ExtraKeyRow(
@@ -235,6 +257,27 @@ private fun SessionTabRow(
                 onClick   = { if (!selected) onSwitch(session.id) },
                 label     = { Text("#${index + 1}", fontSize = 12.sp) },
                 modifier  = Modifier.height(28.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SuggestionRow(suggestions: List<String>, onSelect: (String) -> Unit) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        items(suggestions) { cmd ->
+            SuggestionChip(
+                onClick = { onSelect(cmd) },
+                label = {
+                    Text(cmd, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                },
+                modifier = Modifier.widthIn(max = 220.dp),
             )
         }
     }

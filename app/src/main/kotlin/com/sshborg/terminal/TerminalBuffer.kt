@@ -32,6 +32,16 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     // --- Read access ---
 
+    /**
+     * Returns the text of [row] from column 0 up to (exclusive) [upToCol], trailing spaces stripped.
+     * Pass [upToCol] = -1 (default) to read the full row width.
+     */
+    fun getRowText(row: Int, upToCol: Int = -1): String {
+        if (row < 0 || row >= rows) return ""
+        val end = if (upToCol < 0) columns else upToCol.coerceIn(0, columns)
+        return buildString { for (c in 0 until end) append(screen[row][c].char) }.trimEnd()
+    }
+
     fun getCell(row: Int, col: Int): Cell {
         if (row < 0 || row >= rows || col < 0 || col >= columns) return Cell()
         return screen[row][col]

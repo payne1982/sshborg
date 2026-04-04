@@ -25,6 +25,7 @@ class AppPreferences(private val context: Context) {
         val NIGHT_MODE                = intPreferencesKey("night_mode")
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
+        val HISTORY_SUGGESTIONS       = booleanPreferencesKey("history_suggestions")
     }
 
     val biometricLock: Flow<Boolean> =
@@ -90,5 +91,13 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setScrollbackLines(lines: Int) {
         context.dataStore.edit { it[Keys.SCROLLBACK_LINES] = lines }
+    }
+
+    /** Whether to show shell history suggestions above the keyboard. Default true. */
+    val historySuggestions: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.HISTORY_SUGGESTIONS] ?: true }
+
+    suspend fun setHistorySuggestions(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.HISTORY_SUGGESTIONS] = enabled }
     }
 }

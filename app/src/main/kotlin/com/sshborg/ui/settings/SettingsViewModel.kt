@@ -40,6 +40,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val scrollbackLines: StateFlow<Int> =
         prefs.scrollbackLines.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 2000)
 
+    val historySuggestions: StateFlow<Boolean> =
+        prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
@@ -88,6 +91,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setScrollbackLines(lines: Int) {
         viewModelScope.launch { prefs.setScrollbackLines(lines) }
+    }
+
+    fun setHistorySuggestions(enabled: Boolean) {
+        viewModelScope.launch { prefs.setHistorySuggestions(enabled) }
     }
 
     /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */
