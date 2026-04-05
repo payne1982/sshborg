@@ -1,6 +1,5 @@
 <en-US>
 • Shell command history suggestions while typing
-• Always-visible suggestion bar in terminal
 • Fixed terminal content being cut off when the keyboard appears
 • Fixed a crash on screen draw
 • Separate SSH and SFTP session counters on each host
@@ -8,7 +7,6 @@
 </en-US>
 <it-IT>
 • Suggerimenti dalla cronologia dei comandi durante la digitazione
-• Barra dei suggerimenti sempre visibile nel terminale
 • Corretto il troncamento del contenuto del terminale all'apertura della tastiera
 • Corretto un crash durante il rendering dello schermo
 • Contatori separati per sessioni SSH e SFTP su ogni host
@@ -16,7 +14,6 @@
 </it-IT>
 <de-DE>
 • Verlaufsvorschläge bei der Befehlseingabe im Terminal
-• Immer sichtbare Vorschlagsleiste im Terminal
 • Fehler behoben: Terminalinhalt wurde beim Öffnen der Tastatur abgeschnitten
 • Absturz beim Zeichnen des Bildschirms behoben
 • Getrennte Zähler für SSH- und SFTP-Sitzungen je Host
@@ -24,7 +21,6 @@
 </de-DE>
 <es-ES>
 • Sugerencias del historial de comandos al escribir
-• Barra de sugerencias siempre visible en el terminal
 • Corregido el recorte del contenido del terminal al abrir el teclado
 • Corregido un error que causaba cierres inesperados al dibujar la pantalla
 • Contadores separados para sesiones SSH y SFTP por host
@@ -32,7 +28,6 @@
 </es-ES>
 <fr-FR>
 • Suggestions de l'historique des commandes lors de la saisie
-• Barre de suggestions toujours visible dans le terminal
 • Correction du contenu tronqué du terminal à l'ouverture du clavier
 • Correction d'un crash lors du rendu de l'écran
 • Compteurs séparés pour les sessions SSH et SFTP par hôte
@@ -40,7 +35,6 @@
 </fr-FR>
 <pt-PT>
 • Sugestões do histórico de comandos ao digitar
-• Barra de sugestões sempre visível no terminal
 • Corrigido o corte do conteúdo do terminal ao abrir o teclado
 • Corrigido um crash ao renderizar o ecrã
 • Contadores separados para sessões SSH e SFTP por host
@@ -48,7 +42,6 @@
 </pt-PT>
 <uk>
 • Підказки з історії команд під час введення
-• Завжди видима панель підказок у терміналі
 • Виправлено обрізання вмісту терміналу при відкритті клавіатури
 • Виправлено збій під час відображення екрана
 • Окремі лічильники для SSH та SFTP-сесій на кожному хості
