@@ -250,4 +250,6 @@
         <item quantity="one">1 sessione attiva</item>
         <item quantity="other">%d sessioni attive</item>
     </plurals>
+    <string name="settings_allow_screenshots_title">Consenti screenshot</string>
+    <string name="settings_allow_screenshots_subtitle">Permetti screenshot e registrazione dello schermo. Disattiva per proteggere i contenuti sensibili.</string>
 </resources>

@@ -250,4 +250,6 @@
         <item quantity="one">1 aktive Sitzung</item>
         <item quantity="other">%d aktive Sitzungen</item>
     </plurals>
+    <string name="settings_allow_screenshots_title">Screenshots erlauben</string>
+    <string name="settings_allow_screenshots_subtitle">Screenshots und Bildschirmaufnahmen erlauben. Deaktivieren, um sensible Inhalte zu schützen.</string>
 </resources>
