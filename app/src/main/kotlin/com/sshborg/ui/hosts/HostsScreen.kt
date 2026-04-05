@@ -12,12 +12,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.db.HostEntity
@@ -242,18 +252,28 @@ private fun HostItem(
             )
         },
         leadingContent = {
-            // Show active session badge if any sessions are running
-            val totalActive = shellCount + sftpCount
-            BadgedBox(
-                badge = {
-                    if (totalActive > 0) {
-                        Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                            Text("$totalActive")
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Icon(Icons.Default.Computer, contentDescription = null)
+                if (shellCount > 0 || sftpCount > 0) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(3.dp),
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        if (shellCount > 0) {
+                            SessionBadge(
+                                count = shellCount,
+                                color = MaterialTheme.colorScheme.primary,
+                                onColor = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        }
+                        if (sftpCount > 0) {
+                            SftpBadge(count = sftpCount)
                         }
                     }
                 }
-            ) {
-                Icon(Icons.Default.Computer, contentDescription = null)
             }
         },
         trailingContent = {
@@ -317,4 +337,45 @@ private fun HostItem(
         },
     )
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+
+@Composable
+private fun SessionBadge(count: Int, color: Color, onColor: Color) {
+    Box(
+        modifier = Modifier
+            .size(16.dp)
+            .background(color, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "$count",
+            color = onColor,
+            fontSize = 9.sp,
+            lineHeight = 9.sp,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+private fun SftpBadge(count: Int) {
+    val textColor = if (isSystemInDarkTheme()) Color.Black else Color.White
+    Box(contentAlignment = Alignment.Center) {
+        Image(
+            painter = rememberVectorPainter(Icons.Default.Folder),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            colorFilter = ColorFilter.tint(Color(0xFFF9A825)),
+            modifier = Modifier.size(width = 18.dp, height = 22.dp),
+        )
+        Text(
+            text = "$count",
+            color = textColor,
+            fontSize = 9.sp,
+            lineHeight = 9.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 3.dp),
+        )
+    }
 }

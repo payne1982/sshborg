@@ -129,10 +129,14 @@
     <string name="settings_confirm_exit_subtitle">Chiedi conferma prima di chiudere l\'app</string>
 
     <string name="settings_invert_scroll_title">Inverti scorrimento terminale</string>
-    <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più recente</string>
+    <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più vecchio invece di quello più recente</string>
     <string name="settings_scrollback_title">Righe di scrollback</string>
     <string name="settings_scrollback_subtitle">Righe di cronologia del terminale mantenute in memoria</string>
     <string name="settings_scrollback_lines">%d righe</string>
+    <string name="settings_history_suggestions_title">Suggerimenti dalla cronologia comandi</string>
+    <string name="settings_history_suggestions_subtitle">Mostra suggerimenti dalla cronologia shell del server mentre si digita nel terminale</string>
+    <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>
+    <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra dei suggerimenti a dimensione fissa per evitare il ridimensionamento del terminale quando i suggerimenti compaiono o scompaiono</string>
 
     <string name="settings_biometric_lock_title">Blocco biometrico</string>
     <string name="settings_biometric_available">Richiedi autenticazione quando torni all\'app</string>
@@ -246,4 +250,6 @@
         <item quantity="one">1 sessione attiva</item>
         <item quantity="other">%d sessioni attive</item>
     </plurals>
+    <string name="settings_allow_screenshots_title">Consenti screenshot</string>
+    <string name="settings_allow_screenshots_subtitle">Permetti screenshot e registrazione dello schermo. Disattiva per proteggere i contenuti sensibili.</string>
 </resources>

@@ -129,10 +129,14 @@
     <string name="settings_confirm_exit_subtitle">Запитувати підтвердження перед закриттям додатка</string>
 
     <string name="settings_invert_scroll_title">Інвертувати прокручування терміналу</string>
-    <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити новіший вивід</string>
+    <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити старіший вивід</string>
     <string name="settings_scrollback_title">Рядки прокрутки</string>
     <string name="settings_scrollback_subtitle">Рядки історії терміналу, що зберігаються в пам\'яті</string>
     <string name="settings_scrollback_lines">%d рядків</string>
+    <string name="settings_history_suggestions_title">Підказки з історії команд</string>
+    <string name="settings_history_suggestions_subtitle">Показувати підказки з історії shell сервера під час введення в терміналі</string>
+    <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>
+    <string name="settings_suggestions_bar_sticky_subtitle">Зберігає панель підказок фіксованої висоти, щоб уникнути зміни розміру терміналу</string>
 
     <string name="settings_biometric_lock_title">Біометричне блокування</string>
     <string name="settings_biometric_available">Вимагати автентифікацію при поверненні до додатка</string>
@@ -248,4 +252,6 @@
         <item quantity="many">%d активних сесій</item>
         <item quantity="other">%d активної сесії</item>
     </plurals>
+    <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
+    <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Вимкніть для захисту конфіденційного вмісту.</string>
 </resources>

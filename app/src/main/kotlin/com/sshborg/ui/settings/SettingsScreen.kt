@@ -48,6 +48,8 @@ fun SettingsScreen(
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
     val confirmExit           by vm.confirmExit.collectAsState()
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
+    val historySuggestions    by vm.historySuggestions.collectAsState()
+    val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -258,6 +260,30 @@ fun SettingsScreen(
                     }
                 },
             )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_history_suggestions_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_history_suggestions_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = historySuggestions,
+                        onCheckedChange = { vm.setHistorySuggestions(it) },
+                    )
+                },
+            )
+
+            if (historySuggestions) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_suggestions_bar_sticky_title)) },
+                    supportingContent = { Text(stringResource(R.string.settings_suggestions_bar_sticky_subtitle)) },
+                    trailingContent = {
+                        Switch(
+                            checked = suggestionsBarSticky,
+                            onCheckedChange = { vm.setSuggestionsBarSticky(it) },
+                        )
+                    },
+                )
+            }
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 

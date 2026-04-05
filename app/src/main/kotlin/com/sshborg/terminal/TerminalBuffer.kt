@@ -32,6 +32,16 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     // --- Read access ---
 
+    /**
+     * Returns the text of [row] from column 0 up to (exclusive) [upToCol], trailing spaces stripped.
+     * Pass [upToCol] = -1 (default) to read the full row width.
+     */
+    fun getRowText(row: Int, upToCol: Int = -1): String {
+        if (row < 0 || row >= rows) return ""
+        val end = if (upToCol < 0) columns else upToCol.coerceIn(0, columns)
+        return buildString { for (c in 0 until end) append(screen[row][c].char) }.trimEnd()
+    }
+
     fun getCell(row: Int, col: Int): Cell {
         if (row < 0 || row >= rows || col < 0 || col >= columns) return Cell()
         return screen[row][col]
@@ -162,20 +172,42 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (c in columns - n until columns) row[c] = Cell()
     }
 
-    /** Resizes the buffer, preserving content as much as possible. */
+    /** Resizes the buffer, preserving content as much as possible.
+     *
+     * When shrinking rows, if the cursor would be clipped, the top lines are
+     * scrolled into scrollback (xterm-style) rather than truncating the bottom,
+     * so the cursor stays at the last row and no visible content is lost.
+     */
     fun resize(newCols: Int, newRows: Int) {
         val oldRows = rows
         val oldCols = columns
-        screen = Array(newRows) { r ->
-            Array(newCols) { c ->
-                if (r < oldRows && c < oldCols) screen[r][c] else Cell()
+        // How many top lines to push into scrollback to keep cursor in view
+        val scrollNeeded = if (newRows < oldRows) (cursorRow - newRows + 1).coerceAtLeast(0) else 0
+        if (scrollNeeded > 0) {
+            for (i in 0 until scrollNeeded) {
+                val evicted = screen[i].copyOf()
+                if (scrollback.size >= maxScrollback) scrollback.removeAt(0)
+                scrollback.addLast(evicted)
+            }
+            screen = Array(newRows) { r ->
+                val oldR = r + scrollNeeded
+                Array(newCols) { c ->
+                    if (oldR < oldRows && c < oldCols) screen[oldR][c] else Cell()
+                }
+            }
+            cursorRow -= scrollNeeded
+        } else {
+            screen = Array(newRows) { r ->
+                Array(newCols) { c ->
+                    if (r < oldRows && c < oldCols) screen[r][c] else Cell()
+                }
             }
         }
         columns = newCols
         rows = newRows
         scrollTop = 0
         scrollBottom = newRows - 1
-        cursorRow = cursorRow.coerceAtMost(newRows - 1)
+        cursorRow = cursorRow.coerceIn(0, newRows - 1)
         cursorCol = cursorCol.coerceAtMost(newCols - 1)
     }
 }

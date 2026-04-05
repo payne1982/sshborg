@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,13 +20,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
@@ -48,7 +53,8 @@ fun TerminalScreen(
     val emulator by vm.emulatorFlow.collectAsState()
 
     val app = LocalContext.current.applicationContext as SshBorgApp
-    val invertScroll by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
+    val invertScroll  by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
+    val suggestions   by vm.suggestions.collectAsState()
 
     // Siblings: other Shell sessions for the same host (for the tab bar)
     val currentSession = sessions.find { it.id == sessionId }
@@ -153,6 +159,27 @@ fun TerminalScreen(
                     )
                 }
 
+                // History suggestion chips — when keyboard is open and there are suggestions,
+                // or always when sticky mode is enabled (to prevent terminal resizing)
+                val suggestionsBarSticky by vm.suggestionsBarSticky.collectAsState()
+                if (imeVisible && (suggestions.isNotEmpty() || suggestionsBarSticky)) {
+                    SuggestionRow(
+                        suggestions = suggestions,
+                        sticky = suggestionsBarSticky,
+                        onSelect = { cmd ->
+                            val currentInput = vm.getCurrentInputForCompletion()
+                            if (currentInput.isNotEmpty() && cmd.startsWith(currentInput)) {
+                                // Complete in place: send only the remaining suffix
+                                sendInput(cmd.removePrefix(currentInput).toByteArray(Charsets.UTF_8))
+                            } else {
+                                // Fallback: clear line and retype full command
+                                sendInput(byteArrayOf(0x15))
+                                sendInput(cmd.toByteArray(Charsets.UTF_8))
+                            }
+                        },
+                    )
+                }
+
                 // Extra key bar — only when soft keyboard is open
                 if (imeVisible) {
                     ExtraKeyRow(
@@ -161,6 +188,7 @@ fun TerminalScreen(
                         onCtrlToggle = { ctrlActive = !ctrlActive },
                         onAltToggle  = { altActive  = !altActive  },
                         onKey        = { bytes -> sendInput(bytes) },
+                        cursorKeys   = { vm.cursorKeyBytes(it) },
                     )
                 }
             }
@@ -241,12 +269,44 @@ private fun SessionTabRow(
 }
 
 @Composable
+private fun SuggestionRow(suggestions: List<String>, sticky: Boolean, onSelect: (String) -> Unit) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .then(if (sticky) Modifier.heightIn(min = 40.dp) else Modifier),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 1.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        items(suggestions) { cmd ->
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 220.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(50))
+                    .clickable { onSelect(cmd) }
+                    .padding(horizontal = 10.dp, vertical = 3.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    cmd,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ExtraKeyRow(
     ctrlActive: Boolean,
     altActive: Boolean,
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit,
     onKey: (ByteArray) -> Unit,
+    cursorKeys: (Char) -> ByteArray,
 ) {
     val clipboardManager = LocalClipboardManager.current
     val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
@@ -264,10 +324,10 @@ private fun ExtraKeyRow(
         Spacer(Modifier.width(4.dp))
         ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
         ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
-        ExtraKey("↑",    onClick = { onKey("\u001b[A".toByteArray()) })
-        ExtraKey("↓",    onClick = { onKey("\u001b[B".toByteArray()) })
-        ExtraKey("←",    onClick = { onKey("\u001b[D".toByteArray()) })
-        ExtraKey("→",    onClick = { onKey("\u001b[C".toByteArray()) })
+        ExtraKey("↑",    onClick = { onKey(cursorKeys('A')) })
+        ExtraKey("↓",    onClick = { onKey(cursorKeys('B')) })
+        ExtraKey("←",    onClick = { onKey(cursorKeys('D')) })
+        ExtraKey("→",    onClick = { onKey(cursorKeys('C')) })
         ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
         ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
         ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })

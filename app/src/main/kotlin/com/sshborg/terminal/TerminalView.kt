@@ -128,7 +128,7 @@ class TerminalView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val cols = termColumns; val rows = termRows
-        emulator?.resize(cols, rows)
+        emulator?.let { em -> synchronized(em) { em.resize(cols, rows) } }
         onResize?.invoke(cols, rows)
     }
 
@@ -137,72 +137,70 @@ class TerminalView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val emu = emulator ?: return
-        val buf = emu.buffer
 
         canvas.drawColor(defaultBg)
 
         val visibleRows = termRows
         val visibleCols = termColumns
 
-        // Total lines: scrollback + screen
-        val totalScrollback = buf.scrollbackSize
-        val viewStart = totalScrollback - scrollbackOffset  // first screen line to show from scrollback perspective
+        synchronized(emu) {
+            val buf = emu.buffer
 
-        for (r in 0 until visibleRows) {
-            val absLine = viewStart + r
-            val cells: Array<TerminalBuffer.Cell> = when {
-                absLine < totalScrollback -> buf.getScrollbackLine(absLine) ?: continue
-                else -> {
-                    val screenRow = absLine - totalScrollback
-                    if (screenRow >= buf.rows) continue
-                    (0 until buf.columns).map { c -> buf.getCell(screenRow, c) }.toTypedArray()
-                }
-            }
+            // Total lines: scrollback + screen
+            val totalScrollback = buf.scrollbackSize
+            val viewStart = totalScrollback - scrollbackOffset
 
-            val top = r * cellH
-            val bottom = top + cellH
-
-            for (c in 0 until visibleCols.coerceAtMost(cells.size)) {
-                val cell = cells[c]
-                val style = cell.style
-                val left = c * cellW
-
-                // Resolve colors (handle inverse)
-                val (fg, bg) = resolveColors(style)
-
-                // Background
-                if (bg != defaultBg) {
-                    textPaint.color = bg
-                    canvas.drawRect(left, top, left + cellW, bottom, textPaint)
-                }
-
-                // Character
-                if (cell.char != ' ' && !style.invisible) {
-                    val paint = if (style.bold) boldPaint else textPaint
-                    paint.color = if (style.bold && style.fg in 0..7) colorPalette[style.fg + 8] else fg
-                    canvas.drawText(cell.char.toString(), left, top + cellBaseline, paint)
-
-                    // Underline
-                    if (style.underline) {
-                        paint.color = fg
-                        canvas.drawLine(left, bottom - 2, left + cellW, bottom - 2, paint)
-                    }
-                    // Strikethrough
-                    if (style.strikethrough) {
-                        val mid = top + cellH / 2
-                        paint.color = fg
-                        canvas.drawLine(left, mid, left + cellW, mid, paint)
+            for (r in 0 until visibleRows) {
+                val absLine = viewStart + r
+                val cells: Array<TerminalBuffer.Cell> = when {
+                    absLine < totalScrollback -> buf.getScrollbackLine(absLine) ?: continue
+                    else -> {
+                        val screenRow = absLine - totalScrollback
+                        if (screenRow >= buf.rows) continue
+                        (0 until buf.columns).map { c -> buf.getCell(screenRow, c) }.toTypedArray()
                     }
                 }
-            }
 
-            // Cursor (only on screen portion, not scrollback)
-            if (scrollbackOffset == 0 && absLine == totalScrollback + buf.cursorRow && buf.cursorVisible) {
-                val cursorLeft = buf.cursorCol * cellW
-                textPaint.color = defaultFg
-                textPaint.alpha = 180
-                canvas.drawRect(cursorLeft, top, cursorLeft + cellW, bottom, textPaint)
-                textPaint.alpha = 255
+                val top = r * cellH
+                val bottom = top + cellH
+
+                for (c in 0 until visibleCols.coerceAtMost(cells.size)) {
+                    val cell = cells[c]
+                    val style = cell.style
+                    val left = c * cellW
+
+                    val (fg, bg) = resolveColors(style)
+
+                    if (bg != defaultBg) {
+                        textPaint.color = bg
+                        canvas.drawRect(left, top, left + cellW, bottom, textPaint)
+                    }
+
+                    if (cell.char != ' ' && !style.invisible) {
+                        val paint = if (style.bold) boldPaint else textPaint
+                        paint.color = if (style.bold && style.fg in 0..7) colorPalette[style.fg + 8] else fg
+                        canvas.drawText(cell.char.toString(), left, top + cellBaseline, paint)
+
+                        if (style.underline) {
+                            paint.color = fg
+                            canvas.drawLine(left, bottom - 2, left + cellW, bottom - 2, paint)
+                        }
+                        if (style.strikethrough) {
+                            val mid = top + cellH / 2
+                            paint.color = fg
+                            canvas.drawLine(left, mid, left + cellW, mid, paint)
+                        }
+                    }
+                }
+
+                // Cursor (only on screen portion, not scrollback)
+                if (scrollbackOffset == 0 && absLine == totalScrollback + buf.cursorRow && buf.cursorVisible) {
+                    val cursorLeft = buf.cursorCol * cellW
+                    textPaint.color = defaultFg
+                    textPaint.alpha = 180
+                    canvas.drawRect(cursorLeft, top, cursorLeft + cellW, bottom, textPaint)
+                    textPaint.alpha = 255
+                }
             }
         }
     }
@@ -258,10 +256,10 @@ class TerminalView @JvmOverloads constructor(
             KeyEvent.KEYCODE_DEL        -> if (ctrl) byteArrayOf(0x08) else byteArrayOf(0x7F)
             KeyEvent.KEYCODE_TAB        -> if (shift) "\u001b[Z".toByteArray() else byteArrayOf(0x09)
             KeyEvent.KEYCODE_ESCAPE     -> byteArrayOf(0x1B)
-            KeyEvent.KEYCODE_DPAD_UP    -> "\u001b[A".toByteArray()
-            KeyEvent.KEYCODE_DPAD_DOWN  -> "\u001b[B".toByteArray()
-            KeyEvent.KEYCODE_DPAD_RIGHT -> "\u001b[C".toByteArray()
-            KeyEvent.KEYCODE_DPAD_LEFT  -> "\u001b[D".toByteArray()
+            KeyEvent.KEYCODE_DPAD_UP    -> if (emulator?.applicationCursorKeys == true) "\u001bOA".toByteArray() else "\u001b[A".toByteArray()
+            KeyEvent.KEYCODE_DPAD_DOWN  -> if (emulator?.applicationCursorKeys == true) "\u001bOB".toByteArray() else "\u001b[B".toByteArray()
+            KeyEvent.KEYCODE_DPAD_RIGHT -> if (emulator?.applicationCursorKeys == true) "\u001bOC".toByteArray() else "\u001b[C".toByteArray()
+            KeyEvent.KEYCODE_DPAD_LEFT  -> if (emulator?.applicationCursorKeys == true) "\u001bOD".toByteArray() else "\u001b[D".toByteArray()
             KeyEvent.KEYCODE_MOVE_HOME  -> "\u001b[H".toByteArray()
             KeyEvent.KEYCODE_MOVE_END   -> "\u001b[F".toByteArray()
             KeyEvent.KEYCODE_PAGE_UP    -> "\u001b[5~".toByteArray()

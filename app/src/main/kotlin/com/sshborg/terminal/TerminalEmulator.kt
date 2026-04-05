@@ -19,6 +19,9 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     private var onAltScreen = false
     private var savedMainScreen: Array<Array<TerminalBuffer.Cell>>? = null
 
+    // Application cursor key mode (DECCKM, set by ESC[?1h / cleared by ESC[?1l)
+    var applicationCursorKeys = false
+
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
     var onBell: (() -> Unit)? = null
@@ -223,14 +226,14 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
         val p = param(0, 0)
         when (final) {
             'h' -> when (p) {
-                1    -> {} // application cursor keys
+                1    -> applicationCursorKeys = true
                 25   -> buffer.cursorVisible = true
                 47, 1047 -> switchToAltScreen()
                 1049 -> { buffer.saveCursor(); switchToAltScreen() }
                 else -> {}
             }
             'l' -> when (p) {
-                1    -> {}
+                1    -> applicationCursorKeys = false
                 25   -> buffer.cursorVisible = false
                 47, 1047 -> switchToMainScreen()
                 1049 -> { switchToMainScreen(); buffer.restoreCursor() }
