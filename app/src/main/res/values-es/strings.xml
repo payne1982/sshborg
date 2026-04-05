@@ -129,10 +129,14 @@
     <string name="settings_confirm_exit_subtitle">Pedir confirmación antes de cerrar la app</string>
 
     <string name="settings_invert_scroll_title">Invertir desplazamiento del terminal</string>
-    <string name="settings_invert_scroll_subtitle">Desliza hacia arriba para ver la salida más reciente</string>
+    <string name="settings_invert_scroll_subtitle">Desliza hacia arriba para ver la salida más antigua</string>
     <string name="settings_scrollback_title">Líneas de scrollback</string>
     <string name="settings_scrollback_subtitle">Líneas del historial del terminal mantenidas en memoria</string>
     <string name="settings_scrollback_lines">%d líneas</string>
+    <string name="settings_history_suggestions_title">Sugerencias del historial de comandos</string>
+    <string name="settings_history_suggestions_subtitle">Mostrar sugerencias del historial de shell del servidor mientras se escribe en el terminal</string>
+    <string name="settings_suggestions_bar_sticky_title">Barra de sugerencias siempre visible</string>
+    <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra de sugerencias a altura fija para evitar el redimensionamiento del terminal</string>
 
     <string name="settings_biometric_lock_title">Bloqueo biométrico</string>
     <string name="settings_biometric_available">Requerir autenticación al volver a la app</string>

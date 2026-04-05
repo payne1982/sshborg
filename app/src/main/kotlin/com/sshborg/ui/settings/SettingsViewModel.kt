@@ -43,6 +43,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
+    val suggestionsBarSticky: StateFlow<Boolean> =
+        prefs.suggestionsBarSticky.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
@@ -95,6 +98,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setHistorySuggestions(enabled: Boolean) {
         viewModelScope.launch { prefs.setHistorySuggestions(enabled) }
+    }
+
+    fun setSuggestionsBarSticky(enabled: Boolean) {
+        viewModelScope.launch { prefs.setSuggestionsBarSticky(enabled) }
     }
 
     /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */

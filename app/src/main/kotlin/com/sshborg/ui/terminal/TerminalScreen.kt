@@ -157,10 +157,13 @@ fun TerminalScreen(
                     )
                 }
 
-                // History suggestion chips — only when keyboard is open and history loaded
-                if (imeVisible && suggestions.isNotEmpty()) {
+                // History suggestion chips — when keyboard is open and there are suggestions,
+                // or always when sticky mode is enabled (to prevent terminal resizing)
+                val suggestionsBarSticky by vm.suggestionsBarSticky.collectAsState()
+                if (imeVisible && (suggestions.isNotEmpty() || suggestionsBarSticky)) {
                     SuggestionRow(
                         suggestions = suggestions,
+                        sticky = suggestionsBarSticky,
                         onSelect = { cmd ->
                             val currentInput = vm.getCurrentInputForCompletion()
                             if (currentInput.isNotEmpty() && cmd.startsWith(currentInput)) {
@@ -183,6 +186,7 @@ fun TerminalScreen(
                         onCtrlToggle = { ctrlActive = !ctrlActive },
                         onAltToggle  = { altActive  = !altActive  },
                         onKey        = { bytes -> sendInput(bytes) },
+                        cursorKeys   = { vm.cursorKeyBytes(it) },
                     )
                 }
             }
@@ -263,11 +267,12 @@ private fun SessionTabRow(
 }
 
 @Composable
-private fun SuggestionRow(suggestions: List<String>, onSelect: (String) -> Unit) {
+private fun SuggestionRow(suggestions: List<String>, sticky: Boolean, onSelect: (String) -> Unit) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface)
+            .then(if (sticky) Modifier.heightIn(min = 40.dp) else Modifier),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -290,6 +295,7 @@ private fun ExtraKeyRow(
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit,
     onKey: (ByteArray) -> Unit,
+    cursorKeys: (Char) -> ByteArray,
 ) {
     val clipboardManager = LocalClipboardManager.current
     val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
@@ -307,10 +313,10 @@ private fun ExtraKeyRow(
         Spacer(Modifier.width(4.dp))
         ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
         ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
-        ExtraKey("↑",    onClick = { onKey("\u001b[A".toByteArray()) })
-        ExtraKey("↓",    onClick = { onKey("\u001b[B".toByteArray()) })
-        ExtraKey("←",    onClick = { onKey("\u001b[D".toByteArray()) })
-        ExtraKey("→",    onClick = { onKey("\u001b[C".toByteArray()) })
+        ExtraKey("↑",    onClick = { onKey(cursorKeys('A')) })
+        ExtraKey("↓",    onClick = { onKey(cursorKeys('B')) })
+        ExtraKey("←",    onClick = { onKey(cursorKeys('D')) })
+        ExtraKey("→",    onClick = { onKey(cursorKeys('C')) })
         ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
         ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
         ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })

@@ -129,10 +129,14 @@
     <string name="settings_confirm_exit_subtitle">Demander confirmation avant de fermer l\'application</string>
 
     <string name="settings_invert_scroll_title">Inverser le défilement du terminal</string>
-    <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus récente</string>
+    <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus ancienne</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
     <string name="settings_scrollback_subtitle">Lignes d\'historique du terminal conservées en mémoire</string>
     <string name="settings_scrollback_lines">%d lignes</string>
+    <string name="settings_history_suggestions_title">Suggestions de l\'historique des commandes</string>
+    <string name="settings_history_suggestions_subtitle">Afficher des suggestions tirées de l\'historique shell du serveur lors de la saisie dans le terminal</string>
+    <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>
+    <string name="settings_suggestions_bar_sticky_subtitle">Maintient la barre de suggestions à hauteur fixe pour éviter le redimensionnement du terminal</string>
 
     <string name="settings_biometric_lock_title">Verrouillage biométrique</string>
     <string name="settings_biometric_available">Demander l\'authentification au retour dans l\'application</string>

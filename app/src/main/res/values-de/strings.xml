@@ -129,10 +129,14 @@
     <string name="settings_confirm_exit_subtitle">Vor dem Schließen der App um Bestätigung bitten</string>
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
-    <string name="settings_invert_scroll_subtitle">Nach oben wischen für neuere Ausgabe</string>
+    <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>
     <string name="settings_scrollback_subtitle">Im Speicher gehaltene Zeilen der Terminal-Historie</string>
     <string name="settings_scrollback_lines">%d Zeilen</string>
+    <string name="settings_history_suggestions_title">Befehlshistorie-Vorschläge</string>
+    <string name="settings_history_suggestions_subtitle">Vorschläge aus der Shell-Historie des Servers beim Tippen im Terminal anzeigen</string>
+    <string name="settings_suggestions_bar_sticky_title">Vorschlagsleiste immer sichtbar</string>
+    <string name="settings_suggestions_bar_sticky_subtitle">Hält die Vorschlagsleiste auf fester Höhe, um Größenänderungen des Terminals zu vermeiden</string>
 
     <string name="settings_biometric_lock_title">Biometrische Sperre</string>
     <string name="settings_biometric_available">Authentifizierung beim Zurückkehren zur App verlangen</string>

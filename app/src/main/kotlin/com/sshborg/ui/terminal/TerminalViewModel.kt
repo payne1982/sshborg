@@ -71,6 +71,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions
 
+    val suggestionsBarSticky: StateFlow<Boolean> =
+        prefs.suggestionsBarSticky.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     /** Prompt string detected from first terminal render, used to strip it from the input line. */
     private var promptPrefix = ""
     private var promptDetected = false
@@ -363,6 +366,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 shellSession?.outputStream?.flush()
             }
         }
+    }
+
+    /** Returns the correct escape sequence for a cursor key, respecting DECCKM mode. */
+    fun cursorKeyBytes(code: Char): ByteArray {
+        val appMode = _emulator.value.applicationCursorKeys
+        return if (appMode) "\u001bO$code".toByteArray() else "\u001b[$code".toByteArray()
     }
 
     fun resize(cols: Int, rows: Int) {
