@@ -27,7 +27,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
@@ -273,17 +275,26 @@ private fun SuggestionRow(suggestions: List<String>, sticky: Boolean, onSelect: 
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
             .then(if (sticky) Modifier.heightIn(min = 40.dp) else Modifier),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 1.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         items(suggestions) { cmd ->
-            SuggestionChip(
-                onClick = { onSelect(cmd) },
-                label = {
-                    Text(cmd, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                },
-                modifier = Modifier.widthIn(max = 220.dp),
-            )
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 220.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(50))
+                    .clickable { onSelect(cmd) }
+                    .padding(horizontal = 10.dp, vertical = 3.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    cmd,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
         }
     }
 }
