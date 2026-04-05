@@ -128,7 +128,7 @@ class TerminalView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val cols = termColumns; val rows = termRows
-        emulator?.resize(cols, rows)
+        emulator?.let { em -> synchronized(em) { em.resize(cols, rows) } }
         onResize?.invoke(cols, rows)
     }
 
@@ -258,10 +258,10 @@ class TerminalView @JvmOverloads constructor(
             KeyEvent.KEYCODE_DEL        -> if (ctrl) byteArrayOf(0x08) else byteArrayOf(0x7F)
             KeyEvent.KEYCODE_TAB        -> if (shift) "\u001b[Z".toByteArray() else byteArrayOf(0x09)
             KeyEvent.KEYCODE_ESCAPE     -> byteArrayOf(0x1B)
-            KeyEvent.KEYCODE_DPAD_UP    -> "\u001b[A".toByteArray()
-            KeyEvent.KEYCODE_DPAD_DOWN  -> "\u001b[B".toByteArray()
-            KeyEvent.KEYCODE_DPAD_RIGHT -> "\u001b[C".toByteArray()
-            KeyEvent.KEYCODE_DPAD_LEFT  -> "\u001b[D".toByteArray()
+            KeyEvent.KEYCODE_DPAD_UP    -> if (emulator?.applicationCursorKeys == true) "\u001bOA".toByteArray() else "\u001b[A".toByteArray()
+            KeyEvent.KEYCODE_DPAD_DOWN  -> if (emulator?.applicationCursorKeys == true) "\u001bOB".toByteArray() else "\u001b[B".toByteArray()
+            KeyEvent.KEYCODE_DPAD_RIGHT -> if (emulator?.applicationCursorKeys == true) "\u001bOC".toByteArray() else "\u001b[C".toByteArray()
+            KeyEvent.KEYCODE_DPAD_LEFT  -> if (emulator?.applicationCursorKeys == true) "\u001bOD".toByteArray() else "\u001b[D".toByteArray()
             KeyEvent.KEYCODE_MOVE_HOME  -> "\u001b[H".toByteArray()
             KeyEvent.KEYCODE_MOVE_END   -> "\u001b[F".toByteArray()
             KeyEvent.KEYCODE_PAGE_UP    -> "\u001b[5~".toByteArray()
