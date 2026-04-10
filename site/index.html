@@ -348,6 +348,29 @@
             margin-top: 20px;
         }
 
+        /* ── Ko-fi tip section ───────────────────────────────── */
+        .tip-section {
+            text-align: center;
+            padding: 48px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .tip-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+            color: var(--copper);
+            text-shadow: 0 0 6px rgba(200,124,48,0.5);
+        }
+        .tip-section p {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-bottom: 28px;
+        }
+        /* override Ko-fi widget button to match site font */
+        #kofi-widget-overlay { display: inline-block; }
+
         /* ── Footer ──────────────────────────────────────────── */
         footer {
             border-top: 1px solid var(--border);
@@ -493,6 +516,16 @@
         </p>
     </div>
 </section>
+
+<!-- Tip -->
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<div class="tip-section">
+    <h2>// LEAVE A TIP</h2>
+    <p>SSHBorg is free, with no ads and no tracking. If it saves you time, a small tip keeps it going.</p>
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+    <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+</div>
 
 <!-- Footer -->
 <footer>
