@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sshborg.com/sitemap.xml

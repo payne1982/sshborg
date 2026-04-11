@@ -1,0 +1,333 @@
+'use strict';
+module.exports = {
+  page_title:        'SSHBorg – Cliente SSH e SFTP para Android',
+  meta_description:  'SSHBorg é um poderoso cliente SSH e SFTP para Android. Gira os seus servidores de forma segura a partir do telemóvel com autenticação por chave, armazenamento cifrado e bloqueio biométrico.',
+
+  nav_features:  'Funcionalidades',
+  nav_security:  'Segurança',
+  nav_guide:     'Guia do utilizador',
+  nav_support:   'Suporte',
+  nav_privacy:   'Privacidade',
+  nav_contact:   'Contacto',
+
+  hero_sub: 'Um poderoso cliente SSH &amp; SFTP para Android.<br>Gira os seus servidores em segurança, diretamente do telemóvel.',
+
+  badge_no_ads:      'Sem publicidade',
+  badge_no_tracking: 'Sem rastreamento',
+  badge_no_cloud:    'Sem cloud',
+  badge_free:        'Gratuito',
+  badge_android:     'Android 10+',
+
+  cta_play: 'Descarregar no Google Play',
+
+  features_title: '// FUNCIONALIDADES',
+
+  feat_terminal_title: 'TERMINAL SSH COMPLETO',
+  feat_terminal_desc:  'Terminal interativo com emulação VT100/xterm, suporte UTF-8 completo e múltiplas sessões simultâneas.',
+  feat_sftp_title:     'GESTOR DE FICHEIROS SFTP',
+  feat_sftp_desc:      'Navegue, carregue, descarregue, renomeie e elimine ficheiros nos seus servidores com um gestor de ficheiros intuitivo.',
+  feat_keys_title:     'AUTENTICAÇÃO POR CHAVE SSH',
+  feat_keys_desc:      'Gere chaves Ed25519, ECDSA e RSA diretamente no seu dispositivo. Sem palavras-passe.',
+  feat_jump_title:     'SUPORTE JUMP HOST',
+  feat_jump_desc:      'Ligue-se através de um ou mais hosts de bastião com tunelamento transparente. Reencaminhamento completo do agente SSH.',
+  feat_biometric_title:'BLOQUEIO BIOMÉTRICO',
+  feat_biometric_desc: 'Proteja o acesso aos seus servidores com impressão digital ou reconhecimento facial. Tempo limite configurável.',
+  feat_multilingual_title: 'MULTILINGUE',
+  feat_multilingual_desc:  'Disponível em inglês, italiano, francês, alemão, espanhol, português e ucraniano.',
+  feat_theme_title:    'TEMA ESCURO E CLARO',
+  feat_theme_desc:     'Segue o tema do sistema ou deixa-o escolher. Perfeitamente legível em qualquer condição de iluminação.',
+  feat_sessions_title: 'MÚLTIPLAS SESSÕES',
+  feat_sessions_desc:  'Mantenha várias sessões SSH e SFTP abertas simultaneamente. Mude entre elas instantaneamente.',
+
+  security_title: '// PRIVACIDADE BY DESIGN',
+  security_desc:  'O SSHBorg nunca recolhe os seus dados. Tudo fica no seu dispositivo — credenciais, chaves, ligações.',
+
+  sec_badge_keystore:   'Cifração Android Keystore',
+  sec_badge_analytics:  'Sem análises',
+  sec_badge_sdks:       'Sem SDKs de terceiros',
+  sec_badge_screenshots:'Proteção de capturas de ecrã',
+  sec_badge_opensource: 'Apenas bibliotecas open source',
+
+  security_pp_link: 'Ler a política de privacidade completa &rarr;',
+
+  tip_title:  '// DEIXAR UMA GORJETA',
+  tip_desc:   'O SSHBorg é gratuito, sem publicidade e sem rastreamento. Se lhe poupar tempo, uma pequena gorjeta ajuda a mantê-lo.',
+  kofi_cta:   'Apoie-me no Ko-fi',
+
+  footer_privacy: 'Privacidade',
+  footer_issues:  'Erros &amp; Feedback',
+  footer_powered: 'Conectividade SSH fornecida por',
+
+  page_title_docs:       'SSHBorg – Guia do utilizador',
+  meta_description_docs: 'Guia operacional do SSHBorg: chaves SSH, jump hosts, reencaminhamento de agente, sugestões de comandos, tmux e muito mais.',
+
+  nav_home:           'Início',
+  nav_getting_started:'Primeiros passos',
+  nav_ssh_keys:       'Chaves SSH',
+  nav_jump_hosts:     'Jump Hosts',
+
+  doc_page_title:    '// GUIA DO UTILIZADOR',
+  doc_page_subtitle: 'Guia operacional — o que fazer, passo a passo, para tirar o máximo partido do SSHBorg.',
+
+  toc_title: '// CONTEÚDO',
+
+  doc_toc: `            <li><a href="#adding-host">Adicionar um host</a></li>
+            <li><a href="#ssh-keys">Chaves SSH</a></li>
+            <li class="sub"><a href="#ssh-keys">Gerar uma chave</a></li>
+            <li class="sub"><a href="#ssh-keys">Autorizar no servidor</a></li>
+            <li class="sub"><a href="#ssh-keys">Segurança das chaves</a></li>
+            <li><a href="#suggestions">Sugestões de comandos</a></li>
+            <li class="sub"><a href="#suggestions">Como funciona</a></li>
+            <li class="sub"><a href="#suggestions">Resolução de problemas</a></li>
+            <li><a href="#agent-forwarding">Reencaminhamento de agente</a></li>
+            <li><a href="#connection-drops">Quedas de ligação</a></li>
+            <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#jump-hosts">Jump Hosts</a></li>
+            <li class="sub"><a href="#jump-hosts">Cadeias multi-salto</a></li>
+            <li><a href="#sessions">Sessões múltiplas</a></li>
+            <li><a href="#security">Segurança da app</a></li>`,
+
+  doc_adding_host: `
+            <h2>// ADICIONAR UM HOST</h2>
+            <p>Toque no botão <strong>+</strong> no ecrã de hosts para adicionar um novo servidor.</p>
+            <h3>Campos obrigatórios</h3>
+            <ul>
+                <li><strong>Hostname / IP</strong> — o endereço ou IP do servidor. São suportados IPv4 e IPv6.</li>
+                <li><strong>Porta</strong> — predefinido como 22. Altere se o seu servidor usa uma porta SSH diferente.</li>
+                <li><strong>Nome de utilizador</strong> — o utilizador Unix com que quer iniciar sessão (ex. <code>ubuntu</code>, <code>root</code>, <code>deploy</code>).</li>
+                <li><strong>Autenticação</strong> — escolha entre palavra-passe ou chave SSH (recomendado).</li>
+            </ul>
+            <h3>Verificação da impressão digital do host</h3>
+            <p>Na primeira ligação, o SSHBorg mostra a impressão digital do servidor e pede que a aceite. É uma verificação de segurança: garante que está a ligar à máquina correta e não a um impostor. Verifique se a impressão digital corresponde à fornecida pelo administrador do servidor antes de aceitar.</p>
+            <p>Uma vez aceite, a impressão digital é guardada localmente. Se mudar numa ligação futura, o SSHBorg avisá-lo-á — pode indicar uma reconstrução do servidor, uma rotação de chaves ou um ataque man-in-the-middle.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                Pode verificar a impressão digital do servidor a qualquer momento com:
+                <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
+            </div>`,
+
+  doc_ssh_keys: `
+            <h2>// CHAVES SSH</h2>
+            <p>A autenticação por chave é mais segura do que as palavras-passe e, após a configuração, não requer memorizar nem digitar nada.</p>
+            <h3>Gerar uma chave</h3>
+            <p>Vá a <strong>Definições → Chaves SSH → Gerar nova chave</strong>. O SSHBorg suporta:</p>
+            <ul>
+                <li><strong>Ed25519</strong> — recomendado. Rápido, compacto e seguro.</li>
+                <li><strong>ECDSA (P-256 / P-384)</strong> — boa compatibilidade com servidores mais antigos.</li>
+                <li><strong>RSA (2048 / 4096 bits)</strong> — compatibilidade máxima, mas mais lento.</li>
+            </ul>
+            <p>Dê à chave um nome significativo (ex. <em>meu-vps</em> ou <em>servidor-trabalho</em>) para a identificar mais tarde.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DE SEGURANÇA</div>
+                O SSHBorg não permite intencionalmente a exportação de chaves privadas. A chave nunca sai do dispositivo. Se precisar da mesma chave noutro dispositivo, gere uma nova lá e autorize-a separadamente nos seus servidores — é a abordagem mais segura.
+            </div>
+            <h3>Autorizar a chave no servidor</h3>
+            <p>Após gerar uma chave, toque nela para ver a <strong>chave pública</strong>. Copie-a e cole-a no ficheiro <code>~/.ssh/authorized_keys</code> do servidor para o utilizador pretendido.</p>
+            <ol class="steps">
+                <li>No telemóvel, abra SSHBorg → Definições → Chaves SSH → toque na chave → copie a chave pública.</li>
+                <li>Inicie sessão no servidor (com palavra-passe ou com outra chave já disponível).</li>
+                <li>Adicione a chave pública ao ficheiro de chaves autorizadas:
+                    <pre><code>mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+echo "ssh-ed25519 AAAA...suachavecopiada..." >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys</code></pre>
+                </li>
+                <li>Tente ligar com o SSHBorg — deverá iniciar sessão sem pedir palavra-passe.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// REQUISITO DO SERVIDOR</div>
+                Certifique-se de que o servidor tem <code>PubkeyAuthentication yes</code> em <code>/etc/ssh/sshd_config</code>. É o predefinido na maioria das distribuições, mas algumas imagens reforçadas desativam-no.
+            </div>
+            <h3>Cifração adicional da chave</h3>
+            <p>O SSHBorg oferece uma <strong>frase-passe adicional</strong> opcional para as suas chaves (Definições → Chaves SSH → toque numa chave → Ativar cifração). Quando ativa, a chave é cifrada com uma frase que o SSHBorg não guarda — será pedida sempre que a chave for usada.</p>
+            <p>Fortemente recomendado se guarda credenciais sensíveis no telemóvel ou se tem o bloqueio biométrico desativado.</p>`,
+
+  doc_suggestions: `
+            <h2>// SUGESTÕES DE COMANDOS</h2>
+            <p>O SSHBorg mostra uma barra de sugestões acima do teclado enquanto digita no terminal. As sugestões provêm do histórico de shell do utilizador com que se ligou.</p>
+            <h3>Como funciona</h3>
+            <p>Quando uma sessão terminal é aberta, o SSHBorg lê o ficheiro de histórico de shell no servidor remoto. Verifica as seguintes localizações por ordem:</p>
+            <ol>
+                <li><code>~/.bash_history</code> — predefinido para shells Bash</li>
+                <li><code>~/.zsh_history</code> — predefinido para Zsh (também verificado como <code>$HISTFILE</code> se definido)</li>
+                <li><code>~/.local/share/fish/fish_history</code> — para utilizadores de Fish shell</li>
+            </ol>
+            <p>O primeiro ficheiro que existe e é legível é utilizado. Enquanto digita, os comandos são filtrados em tempo real e mostrados como chips na barra de sugestões. Toque num chip para inserir o comando.</p>
+            <h3>Resolução de problemas</h3>
+            <p><strong>Não aparecem sugestões</strong></p>
+            <ul>
+                <li>O ficheiro de histórico pode ainda não existir (primeiro início de sessão ou shell não configurado para guardar o histórico).</li>
+                <li>Certifique-se de que o shell está configurado para guardar o histórico. Para Bash, adicione ao <code>~/.bashrc</code>:
+                    <pre><code>HISTFILE=~/.bash_history
+HISTSIZE=10000
+HISTFILESIZE=20000</code></pre>
+                </li>
+                <li>Para Zsh, adicione ao <code>~/.zshrc</code>:
+                    <pre><code>HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
+                </li>
+            </ul>
+            <p><strong>As sugestões pertencem ao utilizador errado</strong></p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// LIMITAÇÃO CONHECIDA</div>
+                Se se ligar como um utilizador e depois executar <code>sudo su - root</code> (ou mudar para outro utilizador com <code>su</code>), a barra de sugestões continua a mostrar o histórico do <em>utilizador de início de sessão original</em>, não de <code>root</code>. Isto porque o SSHBorg lê o ficheiro de histórico antes de o shell iniciar, usando as credenciais de ligação.
+                <br><br>
+                Para obter sugestões do histórico de root, adicione uma entrada de host separada no SSHBorg configurada para iniciar sessão diretamente como <code>root</code> (se o servidor permitir).
+            </div>`,
+
+  doc_agent_forwarding: `
+            <h2>// REENCAMINHAMENTO DE AGENTE</h2>
+            <p>O reencaminhamento de agente SSH permite usar as chaves guardadas no SSHBorg para autenticar ligações adicionais feitas <em>a partir de dentro</em> do servidor remoto — por exemplo, para <code>git clone</code> de um repositório privado, ou para saltar para uma segunda máquina.</p>
+            <h3>Ativar o reencaminhamento no SSHBorg</h3>
+            <p>Ao adicionar ou editar um host, ative o interruptor <strong>Reencaminhamento de agente</strong>. O SSHBorg atuará como agente SSH para essa sessão.</p>
+            <h3>Configuração no servidor</h3>
+            <p>O servidor tem de permitir o reencaminhamento de agente. Verifique <code>/etc/ssh/sshd_config</code>:</p>
+            <pre><code>AllowAgentForwarding yes</code></pre>
+            <p>Este é o predefinido na maioria dos sistemas. Após alteração, reinicie o daemon SSH:</p>
+            <pre><code>sudo systemctl restart sshd</code></pre>
+            <h3>Configuração de cliente por host (opcional)</h3>
+            <p>Se também se liga a este servidor a partir de um portátil ou computador de secretária, pode configurar o reencaminhamento de forma permanente no seu <code>~/.ssh/config</code> local:</p>
+            <pre><code>Host myserver
+    HostName 203.0.113.42
+    User ubuntu
+    ForwardAgent yes</code></pre>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DE SEGURANÇA</div>
+                O reencaminhamento de agente dá ao servidor remoto acesso temporário ao socket do seu agente SSH. Um utilizador root (ou um processo comprometido) nesse servidor poderia usar as suas chaves para se ligar a outros sítios enquanto a sessão está ativa. Ative o reencaminhamento apenas em servidores de confiança.
+            </div>`,
+
+  doc_connection_drops: `
+            <h2>// QUEDAS DE LIGAÇÃO E MULTIPLEXADORES</h2>
+            <p>O SSH é uma ligação TCP ativa entre o seu telemóvel e o servidor. Se a ligação for interrompida — mesmo por um segundo — a sessão e tudo o que estava a correr nela perde-se.</p>
+            <h3>Porque caem as ligações no móvel</h3>
+            <p>As redes móveis são particularmente propensas a quedas de ligação por várias razões:</p>
+            <ul>
+                <li><strong>Mudanças de endereço IP</strong> — ao viajar ou mudar de antena, o seu operador pode atribuir-lhe um novo IP público. Como as ligações TCP estão ligadas ao endereço IP, a sessão SSH existente torna-se imediatamente inválida.</li>
+                <li><strong>Mudança Wi-Fi ↔ dados móveis</strong> — mudar entre uma rede Wi-Fi e dados móveis (ou vice-versa) altera o seu IP e quebra qualquer ligação TCP aberta.</li>
+                <li><strong>Tempos limite de inatividade</strong> — operadores e routers NAT encerram frequentemente ligações inativas após alguns minutos. As sessões ativas mas silenciosas (observar logs, aguardar entrada) são vulneráveis.</li>
+                <li><strong>Perda de sinal</strong> — túneis, parques de estacionamento subterrâneos ou simplesmente um sinal fraco podem interromper brevemente a rede, o que é suficiente para terminar uma sessão.</li>
+            </ul>
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANTE</div>
+                Se estiver a executar um comando longo (uma compilação, uma cópia de segurança, uma migração de base de dados) diretamente no terminal SSH e a ligação cair, o comando é interrompido imediatamente. Qualquer trabalho parcial pode ficar num estado inconsistente.
+            </div>
+            <h3>A solução: tmux ou screen</h3>
+            <p>Um multiplexador de terminal executa uma sessão persistente <em>no servidor</em>, completamente independente da sua ligação SSH. Se a ligação cair, a sessão e tudo o que está a correr continua. Ao religar, reincorpora-se e encontra tudo exatamente como deixou.</p>
+            <p>É o hábito mais útil para quem gere servidores a partir do telemóvel.</p>
+            <h3>Início rápido com tmux</h3>
+            <p><code>tmux</code> está disponível na maioria das distribuições Linux modernas e é a escolha recomendada.</p>
+            <pre><code># Iniciar uma nova sessão com nome
+tmux new -s work
+
+# Desligar da sessão (deixá-la a correr)
+Ctrl+B, depois D
+
+# Listar sessões em execução
+tmux ls
+
+# Religar a uma sessão
+tmux attach -t work
+
+# Religar à sessão mais recente
+tmux attach</code></pre>
+            <h3>Início rápido com screen</h3>
+            <p><code>screen</code> é mais antigo mas disponível em praticamente qualquer sistema Unix, incluindo imagens mínimas onde tmux pode não estar instalado.</p>
+            <pre><code># Iniciar uma nova sessão com nome
+screen -S work
+
+# Desligar da sessão
+Ctrl+A, depois D
+
+# Listar sessões em execução
+screen -ls
+
+# Religar a uma sessão
+screen -r work</code></pre>
+            <h3>Fluxo de trabalho recomendado no móvel</h3>
+            <ol class="steps">
+                <li>Ligue ao servidor com o SSHBorg.</li>
+                <li>Inicie ou reincorpore-se imediatamente a uma sessão tmux/screen: <code>tmux attach || tmux new -s main</code></li>
+                <li>Execute os seus comandos dentro do multiplexador.</li>
+                <li>Se a ligação cair, basta religar — a sessão ainda está lá.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                Pode adicionar <code>tmux attach || tmux new -s main</code> ao seu <code>~/.bashrc</code> ou <code>~/.zshrc</code> no servidor para que uma sessão de multiplexador inicie automaticamente sempre que iniciar sessão via SSHBorg.
+            </div>`,
+
+  doc_jump_hosts: `
+            <h2>// JUMP HOSTS</h2>
+            <p>Um jump host (também chamado bastion host) é um servidor intermédio pelo qual tem de passar para alcançar um servidor alvo não diretamente acessível a partir da internet. O SSHBorg suporta nativamente cadeias de salto simples e multi-salto.</p>
+            <h3>Configurar um jump host no SSHBorg</h3>
+            <ol class="steps">
+                <li>Adicione o servidor bastião como host normal no SSHBorg (ex. <em>bastion</em>).</li>
+                <li>Adicione o servidor alvo como outro host.</li>
+                <li>Nas definições do host alvo, defina <strong>Jump host</strong> para o bastião criado.</li>
+                <li>Ative <strong>Reencaminhamento de agente</strong> na entrada do bastião — isto permite que a sua chave seja reencaminhada através do bastião para autenticação no alvo.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// COMO FUNCIONA</div>
+                O SSHBorg estabelece primeiro uma ligação SSH ao bastião e depois abre um canal TCP reencaminhado através dele para o servidor alvo. A chave privada nunca sai do telemóvel — o bastião apenas faz proxy do fluxo cifrado.
+            </div>
+            <h3>Cadeias multi-salto</h3>
+            <p>Se precisar de saltar por mais de um servidor intermédio (ex. internet → bastião → dmz → alvo), crie uma entrada para cada salto e encadeie-as:</p>
+            <ul>
+                <li><strong>bastion</strong> — sem jump host, reencaminhamento de agente ativo</li>
+                <li><strong>dmz</strong> — jump host = bastion, reencaminhamento de agente ativo</li>
+                <li><strong>target</strong> — jump host = dmz</li>
+            </ul>
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANTE</div>
+                O reencaminhamento de agente tem de estar ativo em <em>cada salto intermédio</em>, não apenas no primeiro. Sem isso, a cadeia de autenticação quebra e a ligação ao servidor final falhará com um erro "permission denied".
+            </div>
+            <h3>Configuração manual equivalente (para referência)</h3>
+            <p>A configuração equivalente num <code>~/.ssh/config</code> de computador tem este aspeto:</p>
+            <pre><code>Host bastion
+    HostName bastion.example.com
+    User admin
+    ForwardAgent yes
+
+Host target
+    HostName 10.0.1.50
+    User ubuntu
+    ProxyJump bastion
+    ForwardAgent yes</code></pre>
+            <p>Com esta configuração, <code>ssh target</code> no seu computador salta transparentemente pelo bastião.</p>
+            <h3>Requisitos de firewall</h3>
+            <ul>
+                <li>O telemóvel tem de conseguir alcançar o bastião na sua porta SSH (normalmente 22).</li>
+                <li>O bastião tem de conseguir alcançar o alvo na sua porta SSH.</li>
+                <li>O alvo <em>não</em> precisa de ser alcançável diretamente a partir do telemóvel.</li>
+            </ul>`,
+
+  doc_sessions: `
+            <h2>// SESSÕES MÚLTIPLAS</h2>
+            <p>O SSHBorg permite manter várias sessões de terminal SSH e gestor de ficheiros SFTP abertas ao mesmo tempo, mesmo para servidores diferentes.</p>
+            <ul>
+                <li>Abra uma sessão a partir do ecrã de hosts tocando em <strong>Terminal</strong> ou <strong>SFTP</strong>.</li>
+                <li>Mude entre sessões abertas usando o seletor de sessões no topo do ecrã.</li>
+                <li>As sessões permanecem ativas em segundo plano enquanto a ligação de rede se mantiver.</li>
+                <li>A lista de hosts mostra um pequeno distintivo junto a cada host com o número de sessões SSH e SFTP ativas, para ver de relance o que está aberto.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                Comandos de longa duração (compilações, cópias de segurança, seguimento de logs) continuam a correr mesmo quando muda para outra sessão. Use um multiplexador de terminal como <code>tmux</code> ou <code>screen</code> no servidor se quiser que sobrevivam mesmo a uma queda de ligação SSH.
+            </div>`,
+
+  doc_security: `
+            <h2>// SEGURANÇA DA APP</h2>
+            <h3>Bloqueio biométrico</h3>
+            <p>Ative o bloqueio biométrico em <strong>Definições → Segurança → Bloqueio biométrico</strong>. Quando ativo, o SSHBorg exige impressão digital ou reconhecimento facial antes de mostrar qualquer host, credencial ou dados de sessão.</p>
+            <p>Pode definir um tempo limite de inatividade — após esse número de minutos em segundo plano, a app bloqueia automaticamente.</p>
+            <h3>Proteção de capturas de ecrã</h3>
+            <p>Por predefinição, o SSHBorg bloqueia capturas de ecrã e gravação de ecrã para evitar que conteúdo sensível do terminal vaze através do ecrã de apps recentes ou ferramentas de captura.</p>
+            <p>Se precisar de fazer uma captura (ex. para partilhar uma saída do terminal), pode desativar temporariamente a proteção em <strong>Definições → Segurança → Permitir capturas</strong>.</p>
+            <h3>Armazenamento de credenciais</h3>
+            <p>Todas as credenciais (palavras-passe, chaves privadas, frases-passe) são guardadas cifradas usando o <strong>Android Keystore</strong> — um enclave seguro baseado em hardware disponível no Android 10+. Nunca são escritas em armazenamento externo nem transmitidas para lado nenhum.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA SOBRE CÓPIAS DE SEGURANÇA</div>
+                Como as chaves são guardadas no Android Keystore, <strong>não podem ser incluídas na cópia de segurança</strong> na cloud do Android e não serão transferidas automaticamente para um novo telemóvel. Antes de mudar de dispositivo, certifique-se de autorizar uma nova chave gerada no novo dispositivo em todos os seus servidores.
+            </div>`,
+};
