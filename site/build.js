@@ -8,13 +8,13 @@ const path = require('path');
 const BASE_URL = 'https://sshborg.com';
 
 const LANGUAGES = [
-  { code: 'en', hreflang: 'en', dir: '',   root: '',    htmlLang: 'en' },
-  { code: 'it', hreflang: 'it', dir: 'it', root: '../', htmlLang: 'it' },
-  { code: 'de', hreflang: 'de', dir: 'de', root: '../', htmlLang: 'de' },
-  { code: 'es', hreflang: 'es', dir: 'es', root: '../', htmlLang: 'es' },
-  { code: 'fr', hreflang: 'fr', dir: 'fr', root: '../', htmlLang: 'fr' },
-  { code: 'pt', hreflang: 'pt', dir: 'pt', root: '../', htmlLang: 'pt' },
-  { code: 'uk', hreflang: 'uk', dir: 'uk', root: '../', htmlLang: 'uk' },
+  { code: 'en', hreflang: 'en', dir: '',   root: '',    htmlLang: 'en', ogLocale: 'en_US' },
+  { code: 'it', hreflang: 'it', dir: 'it', root: '../', htmlLang: 'it', ogLocale: 'it_IT' },
+  { code: 'de', hreflang: 'de', dir: 'de', root: '../', htmlLang: 'de', ogLocale: 'de_DE' },
+  { code: 'es', hreflang: 'es', dir: 'es', root: '../', htmlLang: 'es', ogLocale: 'es_ES' },
+  { code: 'fr', hreflang: 'fr', dir: 'fr', root: '../', htmlLang: 'fr', ogLocale: 'fr_FR' },
+  { code: 'pt', hreflang: 'pt', dir: 'pt', root: '../', htmlLang: 'pt', ogLocale: 'pt_PT' },
+  { code: 'uk', hreflang: 'uk', dir: 'uk', root: '../', htmlLang: 'uk', ogLocale: 'uk_UA' },
 ];
 
 // Pages to generate in all languages (privacy_policy stays English-only)
@@ -93,7 +93,7 @@ function build() {
       const canonical = `    <link rel="canonical" href="${pageUrl(page, lang)}">`;
       let   html      = tpl.replace('<!--HREFLANG-->', `${hreflangBlock(page)}\n${canonical}`);
 
-      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang) });
+      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang), CANONICAL_URL: pageUrl(page, lang), OG_LOCALE: lang.ogLocale });
 
       const outFile = path.join(SITE_DIR, lang.dir, `${page}.html`);
       fs.writeFileSync(outFile, html, 'utf8');

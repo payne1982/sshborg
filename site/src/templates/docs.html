@@ -6,6 +6,31 @@
     <title>{{page_title_docs}}</title>
     <meta name="description" content="{{meta_description_docs}}">
     <!--HREFLANG-->
+    <!-- Open Graph -->
+    <meta property="og:type"        content="article">
+    <meta property="og:site_name"   content="SSHBorg">
+    <meta property="og:url"         content="{{CANONICAL_URL}}">
+    <meta property="og:title"       content="{{page_title_docs}}">
+    <meta property="og:description" content="{{meta_description_docs}}">
+    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:locale"      content="{{OG_LOCALE}}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="{{page_title_docs}}">
+    <meta name="twitter:description" content="{{meta_description_docs}}">
+    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "name": "{{page_title_docs}}",
+      "description": "{{meta_description_docs}}",
+      "url": "{{CANONICAL_URL}}",
+      "inLanguage": "{{LANG}}",
+      "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">

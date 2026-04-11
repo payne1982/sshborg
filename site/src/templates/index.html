@@ -5,7 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{page_title}}</title>
     <meta name="description" content="{{meta_description}}">
+    <meta name="google-site-verification" content="SZtev8mERq_TIrzE1TF875yUkGgf7diHRQi694RJt-M">
     <!--HREFLANG-->
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:site_name"   content="SSHBorg">
+    <meta property="og:url"         content="{{CANONICAL_URL}}">
+    <meta property="og:title"       content="{{page_title}}">
+    <meta property="og:description" content="{{meta_description}}">
+    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:locale"      content="{{OG_LOCALE}}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="{{page_title}}">
+    <meta name="twitter:description" content="{{meta_description}}">
+    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SSHBorg",
+      "operatingSystem": "Android",
+      "applicationCategory": "DeveloperApplication",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "description": "{{meta_description}}",
+      "url": "https://sshborg.com/",
+      "downloadUrl": "https://play.google.com/store/apps/details?id=com.sshborg",
+      "inLanguage": "{{LANG}}"
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
