@@ -1,0 +1,334 @@
+'use strict';
+module.exports = {
+  page_title:        'SSHBorg – Client SSH e SFTP per Android',
+  meta_description:  'SSHBorg è un potente client SSH e SFTP per Android. Gestisci i tuoi server in sicurezza dal telefono con autenticazione a chiave, storage cifrato e blocco biometrico.',
+
+  nav_features:  'Funzionalità',
+  nav_security:  'Sicurezza',
+  nav_guide:     'Guida utente',
+  nav_support:   'Supporto',
+  nav_privacy:   'Privacy Policy',
+  nav_contact:   'Contatto',
+
+  hero_sub: 'Un potente client SSH &amp; SFTP per Android.<br>Gestisci i tuoi server in sicurezza, direttamente dal telefono.',
+
+  badge_no_ads:      'Senza pubblicità',
+  badge_no_tracking: 'Senza tracciamento',
+  badge_no_cloud:    'Senza cloud',
+  badge_free:        'Gratuito',
+  badge_android:     'Android 10+',
+
+  cta_play: 'Scarica su Google Play',
+
+  features_title: '// FUNZIONALITÀ',
+
+  feat_terminal_title: 'TERMINALE SSH COMPLETO',
+  feat_terminal_desc:  'Terminale interattivo con emulazione VT100/xterm, supporto UTF-8 completo e sessioni multiple simultanee.',
+  feat_sftp_title:     'FILE MANAGER SFTP',
+  feat_sftp_desc:      'Naviga, carica, scarica, rinomina ed elimina file sui tuoi server con un file manager intuitivo.',
+  feat_keys_title:     'AUTENTICAZIONE A CHIAVE',
+  feat_keys_desc:      'Genera chiavi Ed25519, ECDSA e RSA direttamente sul tuo dispositivo. Nessuna password necessaria.',
+  feat_jump_title:     'JUMP HOST',
+  feat_jump_desc:      'Connettiti attraverso uno o più bastion host con tunnelling trasparente. Forwarding completo dell\'agente SSH.',
+  feat_biometric_title:'BLOCCO BIOMETRICO',
+  feat_biometric_desc: 'Proteggi l\'accesso ai tuoi server con impronta digitale o riconoscimento facciale. Timeout configurabile.',
+  feat_multilingual_title: 'MULTILINGUA',
+  feat_multilingual_desc:  'Disponibile in inglese, italiano, francese, tedesco, spagnolo, portoghese e ucraino.',
+  feat_theme_title:    'TEMA SCURO E CHIARO',
+  feat_theme_desc:     'Segue il tema di sistema o ti lascia scegliere. Perfettamente leggibile in qualsiasi condizione di luce.',
+  feat_sessions_title: 'SESSIONI MULTIPLE',
+  feat_sessions_desc:  'Tieni aperte più sessioni SSH e SFTP contemporaneamente. Passa da una all\'altra istantaneamente.',
+
+  security_title: '// PRIVACY BY DESIGN',
+  security_desc:  'SSHBorg non raccoglie mai i tuoi dati. Tutto rimane sul tuo dispositivo — credenziali, chiavi, connessioni.',
+
+  sec_badge_keystore:   'Cifratura Android Keystore',
+  sec_badge_analytics:  'Nessuna analisi',
+  sec_badge_sdks:       'Nessun SDK di terze parti',
+  sec_badge_screenshots:'Protezione screenshot',
+  sec_badge_opensource: 'Solo librerie open source',
+
+  security_pp_link: 'Leggi la Privacy Policy completa &rarr;',
+
+  tip_title:  '// LASCIA UNA MANCIA',
+  tip_desc:   'SSHBorg è gratuito, senza pubblicità e senza tracciamento. Se ti fa risparmiare tempo, una piccola mancia aiuta a mantenerlo.',
+  kofi_cta:   'Supportami su Ko-fi',
+
+  footer_privacy: 'Privacy Policy',
+  footer_issues:  'Segnalazioni &amp; Feedback',
+  footer_powered: 'Connettività SSH realizzata con',
+
+  // ── docs.html ──────────────────────────────────────────────────────────────
+  page_title_docs:       'SSHBorg – Guida utente',
+  meta_description_docs: 'Guida operativa di SSHBorg: chiavi SSH, jump host, agent forwarding, suggerimenti comandi, tmux e molto altro.',
+
+  nav_home:           'Home',
+  nav_getting_started:'Per iniziare',
+  nav_ssh_keys:       'Chiavi SSH',
+  nav_jump_hosts:     'Jump Host',
+
+  doc_page_title:    '// GUIDA UTENTE',
+  doc_page_subtitle: 'Guida operativa — cosa fare, passo dopo passo, per sfruttare al massimo SSHBorg.',
+
+  toc_title: '// INDICE',
+
+  doc_toc: `            <li><a href="#adding-host">Aggiungere un host</a></li>
+            <li><a href="#ssh-keys">Chiavi SSH</a></li>
+            <li class="sub"><a href="#ssh-keys">Generare una chiave</a></li>
+            <li class="sub"><a href="#ssh-keys">Autorizzare sul server</a></li>
+            <li class="sub"><a href="#ssh-keys">Sicurezza delle chiavi</a></li>
+            <li><a href="#suggestions">Suggerimenti comandi</a></li>
+            <li class="sub"><a href="#suggestions">Come funziona</a></li>
+            <li class="sub"><a href="#suggestions">Risoluzione problemi</a></li>
+            <li><a href="#agent-forwarding">Agent Forwarding</a></li>
+            <li><a href="#connection-drops">Connessioni instabili</a></li>
+            <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#jump-hosts">Jump Host</a></li>
+            <li class="sub"><a href="#jump-hosts">Catene multi-hop</a></li>
+            <li><a href="#sessions">Sessioni multiple</a></li>
+            <li><a href="#security">Sicurezza dell'app</a></li>`,
+
+  doc_adding_host: `
+            <h2>// AGGIUNGERE UN HOST</h2>
+            <p>Tocca il pulsante <strong>+</strong> nella schermata degli host per aggiungere un nuovo server.</p>
+            <h3>Campi obbligatori</h3>
+            <ul>
+                <li><strong>Hostname / IP</strong> — l'indirizzo o l'IP del server. Sono supportati sia IPv4 che IPv6.</li>
+                <li><strong>Porta</strong> — predefinita a 22. Modificala se il tuo server usa una porta SSH diversa.</li>
+                <li><strong>Nome utente</strong> — l'utente Unix con cui vuoi accedere (es. <code>ubuntu</code>, <code>root</code>, <code>deploy</code>).</li>
+                <li><strong>Autenticazione</strong> — scegli tra password o chiave SSH (consigliata).</li>
+            </ul>
+            <h3>Verifica del fingerprint</h3>
+            <p>Alla prima connessione SSHBorg mostra il fingerprint del server e chiede di accettarlo. È un controllo di sicurezza: garantisce che ti stai connettendo alla macchina giusta e non a un impostore. Verifica che il fingerprint corrisponda a quello fornito dall'amministratore del server o ottenuto tramite un canale affidabile prima di accettare.</p>
+            <p>Una volta accettato, il fingerprint viene salvato localmente. Se cambia in una connessione futura, SSHBorg ti avviserà — potrebbe indicare una reinstallazione del server, una rotazione delle chiavi o un attacco man-in-the-middle.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// SUGGERIMENTO</div>
+                Puoi controllare il fingerprint del server in qualsiasi momento con:
+                <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
+            </div>`,
+
+  doc_ssh_keys: `
+            <h2>// CHIAVI SSH</h2>
+            <p>L'autenticazione tramite chiave è più sicura delle password e, una volta configurata, non richiede di ricordare o digitare nulla.</p>
+            <h3>Generare una chiave</h3>
+            <p>Vai in <strong>Impostazioni → Chiavi SSH → Genera nuova chiave</strong>. SSHBorg supporta:</p>
+            <ul>
+                <li><strong>Ed25519</strong> — consigliata. Veloce, compatta e sicura.</li>
+                <li><strong>ECDSA (P-256 / P-384)</strong> — buona compatibilità con server più vecchi.</li>
+                <li><strong>RSA (2048 / 4096 bit)</strong> — massima compatibilità, ma più lenta.</li>
+            </ul>
+            <p>Dai alla chiave un nome significativo (es. <em>mio-vps</em> o <em>server-lavoro</em>) per riconoscerla in seguito.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DI SICUREZZA</div>
+                SSHBorg non permette intenzionalmente l'esportazione delle chiavi private. La chiave non lascia mai il dispositivo. Se hai bisogno della stessa chiave su un altro dispositivo, genera una nuova chiave su quel dispositivo e autorizzala separatamente sui tuoi server — è l'approccio più sicuro.
+            </div>
+            <h3>Autorizzare la chiave sul server</h3>
+            <p>Dopo aver generato una chiave, toccala per vedere la <strong>chiave pubblica</strong>. Copiala e incollala nel file <code>~/.ssh/authorized_keys</code> del server per l'utente con cui vuoi accedere.</p>
+            <ol class="steps">
+                <li>Sul telefono, apri SSHBorg → Impostazioni → Chiavi SSH → tocca la chiave → copia la chiave pubblica.</li>
+                <li>Accedi al tuo server (con una password, o un'altra chiave già presente).</li>
+                <li>Aggiungi la chiave pubblica al file delle chiavi autorizzate:
+                    <pre><code>mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+echo "ssh-ed25519 AAAA...latuachiave..." >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys</code></pre>
+                </li>
+                <li>Prova a connetterti con SSHBorg — dovrebbe accedere senza chiedere la password.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// REQUISITO SERVER</div>
+                Assicurati che il server abbia <code>PubkeyAuthentication yes</code> in <code>/etc/ssh/sshd_config</code>. È il valore predefinito sulla maggior parte delle distribuzioni, ma alcune immagini hardened lo disabilitano.
+            </div>
+            <h3>Cifratura aggiuntiva della chiave</h3>
+            <p>SSHBorg offre una <strong>passphrase aggiuntiva</strong> opzionale per le tue chiavi (Impostazioni → Chiavi SSH → tocca una chiave → Abilita cifratura). Quando attiva, la chiave viene cifrata con una passphrase che SSHBorg non memorizza — ti verrà chiesta ogni volta che la chiave viene utilizzata.</p>
+            <p>È fortemente consigliata se conservi credenziali sensibili sul telefono, o se hai il blocco biometrico disabilitato.</p>`,
+
+  doc_suggestions: `
+            <h2>// SUGGERIMENTI COMANDI</h2>
+            <p>SSHBorg mostra una barra di suggerimenti sopra la tastiera mentre digiti nel terminale. I suggerimenti vengono presi dalla cronologia della shell dell'utente con cui ti sei connesso.</p>
+            <h3>Come funziona</h3>
+            <p>Quando si apre una sessione terminale, SSHBorg legge il file di cronologia della shell dal server remoto. Cerca i seguenti percorsi in ordine:</p>
+            <ol>
+                <li><code>~/.bash_history</code> — predefinito per le shell Bash</li>
+                <li><code>~/.zsh_history</code> — predefinito per Zsh (verificato anche come <code>$HISTFILE</code> se impostato)</li>
+                <li><code>~/.local/share/fish/fish_history</code> — per gli utenti di Fish shell</li>
+            </ol>
+            <p>Viene utilizzato il primo file esistente e leggibile. Mentre digiti, i comandi vengono filtrati in tempo reale e mostrati come chip nella barra dei suggerimenti. Tocca un chip per inserire il comando.</p>
+            <h3>Risoluzione problemi</h3>
+            <p><strong>Nessun suggerimento appare</strong></p>
+            <ul>
+                <li>Il file di cronologia potrebbe non esistere ancora (primo accesso, o shell non configurata per salvare la cronologia).</li>
+                <li>Assicurati che la tua shell salvi la cronologia. Per Bash, aggiungi a <code>~/.bashrc</code>:
+                    <pre><code>HISTFILE=~/.bash_history
+HISTSIZE=10000
+HISTFILESIZE=20000</code></pre>
+                </li>
+                <li>Per Zsh, aggiungi a <code>~/.zshrc</code>:
+                    <pre><code>HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
+                </li>
+            </ul>
+            <p><strong>I suggerimenti appartengono all'utente sbagliato</strong></p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// LIMITAZIONE NOTA</div>
+                Se ti connetti come un utente e poi esegui <code>sudo su - root</code> (o passi a un altro utente con <code>su</code>), la barra dei suggerimenti mostra ancora la cronologia dell'<em>utente di login originale</em>, non di <code>root</code>. Questo perché SSHBorg legge il file di cronologia prima che la shell avvii, usando le credenziali con cui ti sei connesso.
+                <br><br>
+                Per ottenere i suggerimenti dalla cronologia di root, aggiungi un host separato in SSHBorg configurato per accedere direttamente come <code>root</code> (se il server lo consente).
+            </div>`,
+
+  doc_agent_forwarding: `
+            <h2>// AGENT FORWARDING</h2>
+            <p>L'agent forwarding SSH permette di usare le chiavi memorizzate in SSHBorg per autenticare ulteriori connessioni effettuate <em>dall'interno</em> del server remoto — ad esempio per fare <code>git clone</code> di un repo privato, o per saltare su una seconda macchina.</p>
+            <h3>Abilitare il forwarding in SSHBorg</h3>
+            <p>Quando aggiungi o modifichi un host, abilita il toggle <strong>Agent forwarding</strong>. SSHBorg fungerà da agente SSH per quella sessione.</p>
+            <h3>Configurazione lato server</h3>
+            <p>Il server deve permettere l'agent forwarding. Controlla <code>/etc/ssh/sshd_config</code>:</p>
+            <pre><code>AllowAgentForwarding yes</code></pre>
+            <p>È il valore predefinito sulla maggior parte dei sistemi. Dopo averlo modificato, riavvia il demone SSH:</p>
+            <pre><code>sudo systemctl restart sshd</code></pre>
+            <h3>Configurazione client per host (opzionale)</h3>
+            <p>Se ti connetti a questo server anche da laptop o desktop, puoi configurare il forwarding in modo persistente nel tuo <code>~/.ssh/config</code> locale:</p>
+            <pre><code>Host myserver
+    HostName 203.0.113.42
+    User ubuntu
+    ForwardAgent yes</code></pre>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DI SICUREZZA</div>
+                L'agent forwarding dà al server remoto accesso temporaneo al socket del tuo agente SSH. Un utente root (o un processo compromesso) su quel server potrebbe usare le tue chiavi per connettersi altrove mentre la sessione è attiva. Abilita il forwarding solo su server di cui ti fidi.
+            </div>`,
+
+  doc_connection_drops: `
+            <h2>// CONNESSIONI INSTABILI E MULTIPLEXER</h2>
+            <p>SSH è una connessione TCP attiva tra il telefono e il server. Se la connessione si interrompe — anche solo per un secondo — la sessione e tutto ciò che stava eseguendo va perso.</p>
+            <h3>Perché le connessioni cadono su mobile</h3>
+            <p>Le reti mobili sono particolarmente soggette a interruzioni per diversi motivi:</p>
+            <ul>
+                <li><strong>Cambio di indirizzo IP</strong> — quando sei in viaggio o cambi ripetitore, l'operatore può assegnarti un nuovo IP pubblico. Poiché le connessioni TCP sono legate all'indirizzo IP, la sessione SSH esistente diventa immediatamente non valida.</li>
+                <li><strong>Cambio Wi-Fi ↔ dati mobili</strong> — passare da una rete Wi-Fi ai dati mobili (o viceversa) cambia il tuo IP e interrompe qualsiasi connessione TCP aperta.</li>
+                <li><strong>Timeout di inattività</strong> — operatori e router NAT spesso chiudono le connessioni inattive dopo pochi minuti. Le sessioni attive ma silenziose (guardare log, aspettare input) sono vulnerabili a questo.</li>
+                <li><strong>Perdita di segnale</strong> — tunnel, parcheggi sotterranei o semplicemente un segnale debole possono interrompere brevemente la rete, il che è sufficiente per uccidere una sessione.</li>
+            </ul>
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANTE</div>
+                Se stai eseguendo un comando lungo (una build, un backup, una migrazione del database) direttamente nel terminale SSH e la connessione cade, il comando viene interrotto immediatamente. Qualsiasi lavoro parziale potrebbe essere lasciato in uno stato inconsistente.
+            </div>
+            <h3>La soluzione: tmux o screen</h3>
+            <p>Un multiplexer di terminale esegue una sessione persistente <em>sul server</em>, completamente indipendente dalla connessione SSH. Se la connessione cade, la sessione e tutto ciò che sta eseguendo continua. Quando ti riconnetti, ti riattacchi e trovi tutto esattamente com'era.</p>
+            <p>È l'abitudine più utile per chi gestisce server dal telefono.</p>
+            <h3>Guida rapida a tmux</h3>
+            <p><code>tmux</code> è disponibile sulla maggior parte delle distribuzioni Linux moderne ed è la scelta consigliata.</p>
+            <pre><code># Avvia una nuova sessione con nome
+tmux new -s work
+
+# Distacca dalla sessione (lasciala in esecuzione)
+Ctrl+B, poi D
+
+# Elenca le sessioni in esecuzione
+tmux ls
+
+# Riattacca a una sessione
+tmux attach -t work
+
+# Riattacca alla sessione più recente
+tmux attach</code></pre>
+            <h3>Guida rapida a screen</h3>
+            <p><code>screen</code> è più vecchio ma disponibile su praticamente ogni sistema Unix, incluse le immagini server minimali dove tmux potrebbe non essere installato.</p>
+            <pre><code># Avvia una nuova sessione con nome
+screen -S work
+
+# Distacca dalla sessione
+Ctrl+A, poi D
+
+# Elenca le sessioni in esecuzione
+screen -ls
+
+# Riattacca a una sessione
+screen -r work</code></pre>
+            <h3>Flusso di lavoro consigliato su mobile</h3>
+            <ol class="steps">
+                <li>Connettiti al server con SSHBorg.</li>
+                <li>Avvia o riattacca subito una sessione tmux/screen: <code>tmux attach || tmux new -s main</code></li>
+                <li>Esegui i tuoi comandi all'interno del multiplexer.</li>
+                <li>Se la connessione cade, riconnettiti — la sessione è ancora lì.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// SUGGERIMENTO</div>
+                Puoi aggiungere <code>tmux attach || tmux new -s main</code> al tuo <code>~/.bashrc</code> o <code>~/.zshrc</code> sul server in modo che una sessione multiplexer si avvii automaticamente ogni volta che accedi tramite SSHBorg.
+            </div>`,
+
+  doc_jump_hosts: `
+            <h2>// JUMP HOST</h2>
+            <p>Un jump host (detto anche bastion host) è un server intermedio attraverso cui devi passare per raggiungere un server di destinazione non direttamente accessibile da internet. SSHBorg supporta nativamente catene di salto singole e multi-hop.</p>
+            <h3>Configurare un jump host in SSHBorg</h3>
+            <ol class="steps">
+                <li>Aggiungi il server bastion come host normale in SSHBorg (es. <em>bastion</em>).</li>
+                <li>Aggiungi il server di destinazione come altro host.</li>
+                <li>Nelle impostazioni dell'host di destinazione, imposta <strong>Jump host</strong> al bastion host creato.</li>
+                <li>Abilita <strong>Agent forwarding</strong> sulla voce del bastion — questo permette alla tua chiave di essere inoltrata attraverso il bastion per autenticarsi sulla destinazione.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// COME FUNZIONA</div>
+                SSHBorg stabilisce prima una connessione SSH al bastion, poi apre un canale TCP inoltrato attraverso di esso al server di destinazione. La chiave privata non lascia mai il telefono — il bastion fa solo da proxy per il flusso cifrato.
+            </div>
+            <h3>Catene multi-hop</h3>
+            <p>Se devi saltare attraverso più server intermedi (es. internet → bastion → dmz → target), crea una voce per ogni hop e concatenale:</p>
+            <ul>
+                <li><strong>bastion</strong> — nessun jump host, agent forwarding attivo</li>
+                <li><strong>dmz</strong> — jump host = bastion, agent forwarding attivo</li>
+                <li><strong>target</strong> — jump host = dmz</li>
+            </ul>
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANTE</div>
+                L'agent forwarding deve essere abilitato su <em>ogni hop intermedio</em>, non solo sul primo. Senza di esso, la catena di autenticazione si interrompe e la connessione al server finale fallirà con un errore "permission denied".
+            </div>
+            <h3>Configurazione manuale equivalente (per riferimento)</h3>
+            <p>La configurazione equivalente in un <code>~/.ssh/config</code> su desktop è la seguente:</p>
+            <pre><code>Host bastion
+    HostName bastion.example.com
+    User admin
+    ForwardAgent yes
+
+Host target
+    HostName 10.0.1.50
+    User ubuntu
+    ProxyJump bastion
+    ForwardAgent yes</code></pre>
+            <p>Con questa configurazione, <code>ssh target</code> sul laptop salta trasparentemente attraverso il bastion.</p>
+            <h3>Requisiti del firewall</h3>
+            <ul>
+                <li>Il telefono deve poter raggiungere il bastion sulla sua porta SSH (di solito 22).</li>
+                <li>Il bastion deve poter raggiungere il target sulla sua porta SSH.</li>
+                <li>Il target <em>non</em> deve essere raggiungibile direttamente dal telefono.</li>
+            </ul>`,
+
+  doc_sessions: `
+            <h2>// SESSIONI MULTIPLE</h2>
+            <p>SSHBorg permette di tenere aperte più sessioni di terminale SSH e di file manager SFTP contemporaneamente, anche verso server diversi.</p>
+            <ul>
+                <li>Apri una sessione dalla schermata degli host toccando <strong>Terminale</strong> o <strong>SFTP</strong>.</li>
+                <li>Passa da una sessione all'altra usando il selettore di sessioni in cima alla schermata.</li>
+                <li>Le sessioni rimangono attive in background finché la connessione di rete regge.</li>
+                <li>L'elenco degli host mostra un piccolo badge accanto a ogni host con il numero di sessioni SSH e SFTP attive, così puoi vedere a colpo d'occhio cosa è aperto.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// SUGGERIMENTO</div>
+                I comandi a lunga esecuzione (build, backup, tail di log) continuano a girare anche quando passi a un'altra sessione. Usa un multiplexer di terminale come <code>tmux</code> o <code>screen</code> lato server se vuoi che sopravvivano anche a una caduta della connessione SSH.
+            </div>`,
+
+  doc_security: `
+            <h2>// SICUREZZA DELL'APP</h2>
+            <h3>Blocco biometrico</h3>
+            <p>Abilita il blocco biometrico in <strong>Impostazioni → Sicurezza → Blocco biometrico</strong>. Quando attivo, SSHBorg richiede l'impronta digitale o il riconoscimento facciale prima di mostrare qualsiasi host, credenziale o dato di sessione.</p>
+            <p>Puoi impostare un timeout di inattività — dopo quel numero di minuti in background l'app si blocca automaticamente.</p>
+            <h3>Protezione screenshot</h3>
+            <p>Per impostazione predefinita SSHBorg blocca screenshot e registrazione dello schermo per evitare che il contenuto sensibile del terminale trapeli tramite la schermata delle app recenti o strumenti di cattura dello schermo.</p>
+            <p>Se devi fare uno screenshot (es. per condividere un output del terminale), puoi disabilitare temporaneamente la protezione in <strong>Impostazioni → Sicurezza → Consenti screenshot</strong>.</p>
+            <h3>Archiviazione delle credenziali</h3>
+            <p>Tutte le credenziali (password, chiavi private, passphrase) sono memorizzate cifrate usando l'<strong>Android Keystore</strong> — un enclave sicuro basato su hardware disponibile su Android 10+. Non vengono mai scritte su storage esterno né trasmesse da nessuna parte.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA SUL BACKUP</div>
+                Poiché le chiavi sono memorizzate nell'Android Keystore, <strong>non possono essere salvate nel backup</strong> cloud di Android e non si trasferiranno automaticamente su un nuovo telefono. Prima di cambiare dispositivo, assicurati di autorizzare una nuova chiave generata sul nuovo dispositivo su tutti i tuoi server.
+            </div>`,
+};

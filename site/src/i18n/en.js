@@ -1,373 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSHBorg – User Guide</title>
-    <meta name="description" content="SSHBorg user guide: SSH keys, jump hosts, agent forwarding, command suggestions, tmux, and more.">
-        <link rel="alternate" hreflang="en" href="https://sshborg.app/docs.html">
-    <link rel="alternate" hreflang="it" href="https://sshborg.app/it/docs.html">
-    <link rel="alternate" hreflang="de" href="https://sshborg.app/de/docs.html">
-    <link rel="alternate" hreflang="es" href="https://sshborg.app/es/docs.html">
-    <link rel="alternate" hreflang="fr" href="https://sshborg.app/fr/docs.html">
-    <link rel="alternate" hreflang="pt" href="https://sshborg.app/pt/docs.html">
-    <link rel="alternate" hreflang="uk" href="https://sshborg.app/uk/docs.html">
-    <link rel="alternate" hreflang="x-default" href="https://sshborg.app/docs.html">
-    <link rel="canonical" href="https://sshborg.app/docs.html">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+'use strict';
+module.exports = {
+  // ── index.html ─────────────────────────────────────────────────────────────
+  page_title:        'SSHBorg – SSH & SFTP Client for Android',
+  meta_description:  'SSHBorg is a powerful SSH and SFTP client for Android. Manage your servers securely from your phone with key authentication, encrypted storage, and biometric lock.',
 
-        :root {
-            --bg:          #030a05;
-            --surface:     #060e08;
-            --card:        #081208;
-            --border:      #1a3a20;
-            --border-hi:   #2a6035;
-            --neon-green:  #00ff88;
-            --neon-blue:   #00d4ff;
-            --deep-green:  #00cc66;
-            --copper:      #c87c30;
-            --copper-dim:  #7a4a1a;
-            --text:        #a8d4b4;
-            --muted:       #4a7058;
-            --font-display:'Workbench', sans-serif;
-            --font-mono:   'Bitcount Mono Single', monospace;
-            --font-body:   'Electrolize', sans-serif;
-        }
+  nav_features:  'Features',
+  nav_security:  'Security',
+  nav_guide:     'User Guide',
+  nav_support:   'Support',
+  nav_privacy:   'Privacy Policy',
+  nav_contact:   'Contact',
 
-        html { scroll-behavior: smooth; }
+  hero_sub: 'A powerful SSH &amp; SFTP client for Android.<br>Manage your servers securely, directly from your phone.',
 
-        body {
-            background-color: var(--bg);
-            background-image:
-                linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
-            background-size: 44px 44px;
-            color: var(--text);
-            font-family: var(--font-body);
-            line-height: 1.65;
-        }
+  badge_no_ads:      'No ads',
+  badge_no_tracking: 'No tracking',
+  badge_no_cloud:    'No cloud',
+  badge_free:        'Free',
+  badge_android:     'Android 10+',
 
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg, transparent, transparent 3px,
-                rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
-            );
-            pointer-events: none;
-            z-index: 9998;
-        }
+  cta_play: 'Get it on Google Play',
 
-        a { color: var(--neon-green); text-decoration: none; }
-        a:hover { text-shadow: 0 0 8px var(--neon-green); }
+  features_title: '// SYSTEM CAPABILITIES',
 
-        /* ── Nav ─────────────────────────────────────────────── */
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 40px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: rgba(3,10,5,0.92);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
-        nav::after { display: none; }
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: var(--font-mono);
-            font-size: 1.15em;
-            color: var(--neon-green);
-            text-shadow: 0 0 8px var(--neon-green), 0 0 16px var(--deep-green);
-            letter-spacing: 0.08em;
-        }
-        .nav-brand img { width: 30px; height: 30px; border-radius: 6px; box-shadow: 0 0 8px rgba(0,255,136,0.4); }
-        .nav-links { display: flex; gap: 28px; font-size: 0.85em; letter-spacing: 0.06em; }
-        .nav-links a { color: var(--muted); transition: color 0.2s, text-shadow 0.2s; }
-        .nav-links a:hover { color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); }
+  feat_terminal_title: 'FULL SSH TERMINAL',
+  feat_terminal_desc:  'Interactive terminal with VT100/xterm emulation, full UTF-8 support, and multiple concurrent sessions.',
+  feat_sftp_title:     'SFTP FILE MANAGER',
+  feat_sftp_desc:      'Browse, upload, download, rename, and delete files on your servers with an intuitive file manager.',
+  feat_keys_title:     'SSH KEY AUTH',
+  feat_keys_desc:      'Generate Ed25519, ECDSA, and RSA keys directly on your device. No passwords needed.',
+  feat_jump_title:     'JUMP HOST SUPPORT',
+  feat_jump_desc:      'Connect through one or more bastion hosts with transparent tunnelling. Full SSH agent forwarding.',
+  feat_biometric_title:'BIOMETRIC LOCK',
+  feat_biometric_desc: 'Protect access to your servers with fingerprint or face unlock. Configurable timeout.',
+  feat_multilingual_title: 'MULTILINGUAL',
+  feat_multilingual_desc:  'Available in English, Italian, French, German, Spanish, Portuguese, and Ukrainian.',
+  feat_theme_title:    'DARK &amp; LIGHT THEME',
+  feat_theme_desc:     'Follows the system theme or let you choose. Fully readable in any lighting condition.',
+  feat_sessions_title: 'MULTIPLE SESSIONS',
+  feat_sessions_desc:  'Keep several SSH and SFTP sessions open simultaneously. Switch between them instantly.',
 
-        /* ── Page header ─────────────────────────────────────── */
-        .page-header {
-            text-align: center;
-            padding: 60px 24px 40px;
-            max-width: 820px;
-            margin: 0 auto;
-        }
-        .page-header h1 {
-            font-family: var(--font-display);
-            font-size: 2.8em;
-            color: var(--neon-green);
-            text-shadow: 0 0 6px rgba(0,255,136,0.6), 0 0 14px rgba(0,204,102,0.3);
-            letter-spacing: 0.06em;
-            margin-bottom: 14px;
-        }
-        .page-header p {
-            color: var(--muted);
-            font-size: 0.95em;
-        }
+  security_title: '// PRIVACY FIRST, BY DESIGN',
+  security_desc:  'SSHBorg never collects your data. Everything stays on your device — your credentials, your keys, your connections.',
 
-        /* ── TOC sidebar + content layout ────────────────────── */
-        .docs-layout {
-            display: flex;
-            align-items: flex-start;
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 0 24px 80px;
-            gap: 40px;
-        }
+  sec_badge_keystore:   'Android Keystore encryption',
+  sec_badge_analytics:  'No analytics',
+  sec_badge_sdks:       'No third-party SDKs',
+  sec_badge_screenshots:'Screenshot protection',
+  sec_badge_opensource: 'Open source libraries only',
 
-        /* ── TOC ─────────────────────────────────────────────── */
-        .toc {
-            flex-shrink: 0;
-            width: 220px;
-            position: sticky;
-            top: 72px;
-            border: 1px solid var(--border);
-            padding: 20px 18px;
-            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-            background: var(--card);
-        }
-        .toc-title {
-            font-family: var(--font-mono);
-            font-size: 0.78em;
-            letter-spacing: 0.1em;
-            color: var(--copper);
-            margin-bottom: 14px;
-        }
-        .toc ul { list-style: none; }
-        .toc li { margin-bottom: 8px; }
-        .toc a {
-            font-size: 0.82em;
-            color: var(--muted);
-            letter-spacing: 0.03em;
-            display: block;
-            padding-left: 10px;
-            border-left: 2px solid transparent;
-            transition: color 0.2s, border-color 0.2s;
-        }
-        .toc a:hover, .toc a.active {
-            color: var(--neon-green);
-            border-left-color: var(--neon-green);
-            text-shadow: none;
-        }
-        .toc li.sub a { padding-left: 22px; font-size: 0.78em; }
+  security_pp_link: 'Read the full Privacy Policy &rarr;',
 
-        /* ── Doc content ─────────────────────────────────────── */
-        .doc-content { flex: 1; min-width: 0; }
+  tip_title:  '// LEAVE A TIP',
+  tip_desc:   'SSHBorg is free, with no ads and no tracking. If it saves you time, a small tip keeps it going.',
+  kofi_cta:   'Support me on Ko-fi',
 
-        .doc-section {
-            margin-bottom: 56px;
-            scroll-margin-top: 84px;
-        }
+  footer_privacy: 'Privacy Policy',
+  footer_issues:  'Issues &amp; Feedback',
+  footer_powered: 'SSH connectivity powered by',
 
-        .doc-section h2 {
-            font-family: var(--font-display);
-            font-size: 1.5em;
-            letter-spacing: 0.08em;
-            color: var(--neon-blue);
-            text-shadow: 0 0 6px rgba(0,212,255,0.4);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
+  // ── docs.html ──────────────────────────────────────────────────────────────
+  page_title_docs:       'SSHBorg – User Guide',
+  meta_description_docs: 'SSHBorg user guide: SSH keys, jump hosts, agent forwarding, command suggestions, tmux, and more.',
 
-        .doc-section h3 {
-            font-family: var(--font-mono);
-            font-size: 0.95em;
-            letter-spacing: 0.07em;
-            color: var(--neon-green);
-            text-shadow: 0 0 6px rgba(0,255,136,0.3);
-            margin: 28px 0 10px;
-        }
+  nav_home:          'Home',
+  nav_getting_started:'Getting Started',
+  nav_ssh_keys:      'SSH Keys',
+  nav_jump_hosts:    'Jump Hosts',
 
-        .doc-section p {
-            color: var(--text);
-            font-size: 0.9em;
-            margin-bottom: 12px;
-            opacity: 0.9;
-        }
+  doc_page_title:    '// USER GUIDE',
+  doc_page_subtitle: 'Operational guide — what to do, step by step, to get the most out of SSHBorg.',
 
-        .doc-section ul, .doc-section ol {
-            padding-left: 20px;
-            margin-bottom: 14px;
-        }
-        .doc-section li {
-            font-size: 0.9em;
-            color: var(--text);
-            margin-bottom: 6px;
-            opacity: 0.9;
-        }
-        .doc-section li::marker { color: var(--copper); }
+  toc_title: '// CONTENTS',
 
-        /* ── Code blocks ─────────────────────────────────────── */
-        pre {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--neon-green);
-            padding: 16px 18px;
-            margin: 14px 0 18px;
-            overflow-x: auto;
-            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
-        }
-        pre code {
-            font-family: var(--font-mono);
-            font-size: 0.82em;
-            color: var(--neon-green);
-            letter-spacing: 0.04em;
-            line-height: 1.8;
-        }
-        code {
-            font-family: var(--font-mono);
-            font-size: 0.85em;
-            color: var(--copper);
-            background: rgba(200,124,48,0.08);
-            padding: 1px 5px;
-            border-radius: 3px;
-        }
-        pre code { background: none; padding: 0; color: var(--neon-green); }
-
-        /* ── Info / warning callouts ─────────────────────────── */
-        .callout {
-            padding: 14px 18px;
-            margin: 14px 0 18px;
-            border-left: 3px solid;
-            font-size: 0.88em;
-            line-height: 1.55;
-        }
-        .callout-info {
-            border-color: var(--neon-blue);
-            background: rgba(0,212,255,0.05);
-            color: var(--text);
-        }
-        .callout-warn {
-            border-color: var(--copper);
-            background: rgba(200,124,48,0.07);
-            color: var(--text);
-        }
-        .callout-label {
-            font-family: var(--font-mono);
-            font-size: 0.8em;
-            letter-spacing: 0.1em;
-            margin-bottom: 4px;
-        }
-        .callout-info .callout-label { color: var(--neon-blue); }
-        .callout-warn .callout-label { color: var(--copper); }
-
-        /* ── Steps ───────────────────────────────────────────── */
-        .steps { counter-reset: step; padding-left: 0; list-style: none; margin-bottom: 14px; }
-        .steps li {
-            counter-increment: step;
-            padding: 10px 14px 10px 44px;
-            position: relative;
-            margin-bottom: 8px;
-            border: 1px solid var(--border);
-            background: var(--card);
-        }
-        .steps li::before {
-            content: counter(step);
-            position: absolute;
-            left: 12px;
-            top: 10px;
-            font-family: var(--font-mono);
-            font-size: 0.8em;
-            color: var(--bg);
-            background: var(--neon-green);
-            width: 20px; height: 20px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-        }
-
-        /* ── Gear divider ─────────────────────────────────────── */
-        .gear-divider {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 0 24px;
-            color: var(--copper);
-            margin: 0 0 40px;
-        }
-        .gear-divider::before, .gear-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--copper-dim), var(--copper), var(--copper-dim), transparent);
-        }
-        .gear-divider span {
-            font-size: 1.3em;
-            display: inline-block;
-            animation: gear-spin 18s linear infinite;
-            color: var(--copper);
-            filter: drop-shadow(0 0 4px var(--copper));
-        }
-        .gear-divider span:last-child { animation-direction: reverse; animation-duration: 12s; }
-        @keyframes gear-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* ── Footer ──────────────────────────────────────────── */
-        footer {
-            border-top: 1px solid var(--border);
-            text-align: center;
-            padding: 30px 24px;
-            color: var(--muted);
-            font-size: 0.85em;
-            letter-spacing: 0.04em;
-        }
-        footer a { color: var(--muted); }
-        footer a:hover { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
-
-        /* ── Responsive ──────────────────────────────────────── */
-        @media (max-width: 760px) {
-            nav { padding: 12px 16px; }
-            .nav-links { display: none; }
-            .docs-layout { flex-direction: column; gap: 24px; }
-            .toc { width: 100%; position: static; }
-            .page-header h1 { font-size: 2em; }
-        }
-    </style>
-</head>
-<body>
-
-<!-- Nav -->
-<nav>
-    <div class="nav-brand">
-        <img src="logo.png" alt="SSHBorg logo">
-        SSHBorg
-    </div>
-    <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="#adding-host">Getting Started</a>
-        <a href="#ssh-keys">SSH Keys</a>
-        <a href="#jump-hosts">Jump Hosts</a>
-        <a href="https://github.com/payne1982/sshborg-issues">Support</a>
-        <a href="privacy_policy.html">Privacy Policy</a>
-    </div>
-</nav>
-
-<!-- Page header -->
-<div class="page-header">
-    <h1>// USER GUIDE</h1>
-    <p>Operational guide — what to do, step by step, to get the most out of SSHBorg.</p>
-</div>
-
-<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
-
-<!-- Docs layout -->
-<div class="docs-layout">
-
-    <!-- TOC -->
-    <nav class="toc" aria-label="Table of contents">
-        <div class="toc-title">// CONTENTS</div>
-        <ul>
-            <li><a href="#adding-host">Adding a Host</a></li>
+  doc_toc: `            <li><a href="#adding-host">Adding a Host</a></li>
             <li><a href="#ssh-keys">SSH Keys</a></li>
             <li class="sub"><a href="#ssh-keys">Generating a key</a></li>
             <li class="sub"><a href="#ssh-keys">Authorizing on server</a></li>
@@ -381,15 +87,9 @@
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
-            <li><a href="#security">App Security</a></li>
-        </ul>
-    </nav>
+            <li><a href="#security">App Security</a></li>`,
 
-    <!-- Content -->
-    <div class="doc-content">
-
-        <div class="doc-section" id="adding-host">
-
+  doc_adding_host: `
             <h2>// ADDING A HOST</h2>
             <p>Tap the <strong>+</strong> button on the hosts screen to add a new server.</p>
             <h3>Required fields</h3>
@@ -406,11 +106,9 @@
                 <div class="callout-label">// TIP</div>
                 You can check the server fingerprint at any time with:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
-            </div>
-        </div>
+            </div>`,
 
-        <div class="doc-section" id="ssh-keys">
-
+  doc_ssh_keys: `
             <h2>// SSH KEYS</h2>
             <p>Key-based authentication is more secure than passwords and does not require you to remember or type anything after setup.</p>
             <h3>Generating a key</h3>
@@ -444,11 +142,9 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Additional key encryption</h3>
             <p>SSHBorg offers an optional <strong>additional passphrase</strong> for your keys (Settings → SSH Keys → tap a key → Enable encryption). When enabled, the key is encrypted with a passphrase that SSHBorg does not store — you will be asked to enter it each time the key is used.</p>
-            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you have biometric lock disabled.</p>
-        </div>
+            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you have biometric lock disabled.</p>`,
 
-        <div class="doc-section" id="suggestions">
-
+  doc_suggestions: `
             <h2>// COMMAND SUGGESTIONS</h2>
             <p>SSHBorg shows a suggestion bar above the keyboard while you type in the terminal. Suggestions are drawn from the shell history of the user you connected as.</p>
             <h3>How it works</h3>
@@ -481,11 +177,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 If you connect as one user and then run <code>sudo su - root</code> (or switch to another user with <code>su</code>), the suggestion bar still shows the history of the <em>original login user</em>, not of <code>root</code>. This is because SSHBorg reads the history file before the shell starts, using the credentials you connected with.
                 <br><br>
                 To get root's history suggestions, add a separate host entry in SSHBorg configured to log in directly as <code>root</code> (if your server allows it).
-            </div>
-        </div>
+            </div>`,
 
-        <div class="doc-section" id="agent-forwarding">
-
+  doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>
             <p>SSH agent forwarding lets the keys stored in SSHBorg be used to authenticate further connections made <em>from inside</em> the remote server — for example, to <code>git clone</code> a private repo, or to hop to a second machine.</p>
             <h3>Enabling forwarding in SSHBorg</h3>
@@ -504,11 +198,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// SECURITY NOTE</div>
                 Agent forwarding gives the remote server temporary access to your SSH agent socket. A root user (or a compromised process) on that server could use your keys to connect elsewhere while your session is active. Only enable forwarding on servers you trust.
-            </div>
-        </div>
+            </div>`,
 
-        <div class="doc-section" id="connection-drops">
-
+  doc_connection_drops: `
             <h2>// CONNECTION DROPS &amp; TERMINAL MULTIPLEXERS</h2>
             <p>SSH is a live TCP connection between your phone and the server. If the connection is interrupted — even for a second — the session and everything running inside it is lost.</p>
             <h3>Why connections drop on mobile</h3>
@@ -565,11 +257,9 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// TIP</div>
                 You can add <code>tmux attach || tmux new -s main</code> to your <code>~/.bashrc</code> or <code>~/.zshrc</code> on the server so that a multiplexer session starts automatically every time you log in via SSHBorg.
-            </div>
-        </div>
+            </div>`,
 
-        <div class="doc-section" id="jump-hosts">
-
+  doc_jump_hosts: `
             <h2>// JUMP HOSTS</h2>
             <p>A jump host (also called a bastion host) is an intermediate server you must pass through to reach a target server that is not directly accessible from the internet. SSHBorg supports single and multi-hop jump chains natively.</p>
             <h3>Configuring a jump host in SSHBorg</h3>
@@ -612,11 +302,9 @@ Host target
                 <li>Your phone must be able to reach the bastion on its SSH port (usually 22).</li>
                 <li>The bastion must be able to reach the target on its SSH port.</li>
                 <li>The target does <em>not</em> need to be reachable directly from your phone.</li>
-            </ul>
-        </div>
+            </ul>`,
 
-        <div class="doc-section" id="sessions">
-
+  doc_sessions: `
             <h2>// MULTIPLE SESSIONS</h2>
             <p>SSHBorg lets you keep several SSH terminal sessions and SFTP file manager sessions open at the same time, even to different servers.</p>
             <ul>
@@ -628,11 +316,9 @@ Host target
             <div class="callout callout-info">
                 <div class="callout-label">// TIP</div>
                 Long-running commands (builds, backups, log tailing) keep running even when you switch to another session. Use a terminal multiplexer like <code>tmux</code> or <code>screen</code> on the server side if you want them to survive even if the SSH connection drops.
-            </div>
-        </div>
+            </div>`,
 
-        <div class="doc-section" id="security">
-
+  doc_security: `
             <h2>// APP SECURITY</h2>
             <h3>Biometric lock</h3>
             <p>Enable biometric lock in <strong>Settings → Security → Biometric lock</strong>. When active, SSHBorg requires fingerprint or face unlock before showing any host, credential, or session data.</p>
@@ -645,42 +331,5 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// BACKUP NOTE</div>
                 Because keys are stored in the Android Keystore, they <strong>cannot be backed up</strong> via Android's cloud backup mechanism and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
-            </div>
-        </div>
-
-    </div><!-- /doc-content -->
-</div><!-- /docs-layout -->
-
-<div class="gear-divider" style="max-width:1140px; margin: 0 auto 0; padding: 0 24px;"><span>⚙</span><span>⚙</span><span>⚙</span></div>
-
-<!-- Footer -->
-<footer>
-    <p>
-        &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="privacy_policy.html">Privacy Policy</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg-issues">Issues &amp; Feedback</a> &nbsp;&#9135;&nbsp;
-        <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
-    </p>
-    <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        SSH connectivity powered by <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a>
-    </p>
-</footer>
-
-<!-- TOC active link highlight on scroll -->
-<script>
-    const sections = document.querySelectorAll('.doc-section');
-    const tocLinks = document.querySelectorAll('.toc a');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                tocLinks.forEach(l => l.classList.remove('active'));
-                const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
-                if (active) active.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-    sections.forEach(s => observer.observe(s));
-</script>
-
-</body>
-</html>
+            </div>`,
+};
