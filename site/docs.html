@@ -371,6 +371,8 @@
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-config">Server configuration</a></li>
             <li class="sub"><a href="#jump-chain">Multi-hop chains</a></li>
+            <li><a href="#connection-drops">Connection Drops</a></li>
+            <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
         </ul>
@@ -604,6 +606,89 @@ Host target
                 <li>The bastion must be able to reach the target on its SSH port.</li>
                 <li>The target does <em>not</em> need to be reachable directly from your phone.</li>
             </ul>
+        </div>
+
+        <!-- ── Connection Drops ─────────────────────────────────── -->
+        <div class="doc-section" id="connection-drops">
+            <h2>// CONNECTION DROPS &amp; TERMINAL MULTIPLEXERS</h2>
+            <p>SSH is a live TCP connection between your phone and the server. If the connection is
+               interrupted — even for a second — the session and everything running inside it is lost.</p>
+
+            <h3>Why connections drop on mobile</h3>
+            <p>Mobile networks are particularly prone to connection drops for several reasons:</p>
+            <ul>
+                <li><strong>IP address changes</strong> — when travelling or switching between cell towers,
+                    your carrier may assign you a new public IP. Since TCP connections are tied to the IP
+                    address, the existing SSH session becomes invalid immediately.</li>
+                <li><strong>Wi-Fi ↔ mobile handover</strong> — switching between a Wi-Fi network and
+                    mobile data (or vice versa) changes your IP and breaks any open TCP connection.</li>
+                <li><strong>Idle timeouts</strong> — carriers and NAT routers often drop idle connections
+                    after a few minutes. Long-running but silent sessions (watching logs, waiting for input)
+                    are vulnerable to this.</li>
+                <li><strong>Signal loss</strong> — tunnels, underground car parks, or simply a weak signal
+                    can briefly drop the network, which is enough to kill a session.</li>
+            </ul>
+
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANT</div>
+                If you are running a long command (a build, a backup, a database migration) directly in
+                the SSH terminal and the connection drops, the command is killed immediately.
+                Any partial work may be left in an inconsistent state.
+            </div>
+
+            <h3>The solution: tmux or screen</h3>
+            <p>A terminal multiplexer runs a persistent session <em>on the server</em>, completely
+               independent of your SSH connection. If the connection drops, the session and everything
+               running inside it keeps going. When you reconnect, you re-attach and find everything
+               exactly as you left it.</p>
+            <p>This is the single most useful habit for anyone managing servers from a phone.</p>
+
+            <h3>Quick start with tmux</h3>
+            <p><code>tmux</code> is available on most modern Linux distributions and is the recommended choice.</p>
+            <pre><code># Start a new named session
+tmux new -s work
+
+# Detach from the session (leave it running)
+Ctrl+B, then D
+
+# List running sessions
+tmux ls
+
+# Re-attach to a session
+tmux attach -t work
+
+# Re-attach to the most recent session
+tmux attach</code></pre>
+
+            <h3>Quick start with screen</h3>
+            <p><code>screen</code> is older but available on virtually every Unix system, including minimal
+               server images where tmux may not be installed.</p>
+            <pre><code># Start a new named session
+screen -S work
+
+# Detach from the session
+Ctrl+A, then D
+
+# List running sessions
+screen -ls
+
+# Re-attach to a session
+screen -r work</code></pre>
+
+            <h3>Recommended workflow on mobile</h3>
+            <ol class="steps">
+                <li>Connect to the server with SSHBorg.</li>
+                <li>Start or re-attach a tmux/screen session immediately: <code>tmux attach || tmux new -s main</code></li>
+                <li>Run your commands inside the multiplexer.</li>
+                <li>If the connection drops, just reconnect — your session is still there.</li>
+            </ol>
+
+            <div class="callout callout-info">
+                <div class="callout-label">// TIP</div>
+                You can add <code>tmux attach || tmux new -s main</code> to your <code>~/.bashrc</code>
+                or <code>~/.zshrc</code> on the server so that a multiplexer session starts automatically
+                every time you log in via SSHBorg.
+            </div>
         </div>
 
         <!-- ── Multiple Sessions ─────────────────────────────── -->
