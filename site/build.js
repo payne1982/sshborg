@@ -20,6 +20,16 @@ const LANGUAGES = [
 // Pages to generate in all languages (privacy_policy stays English-only)
 const PAGES = ['index', 'docs'];
 
+const ENDONYMS = {
+  en: 'English',
+  it: 'Italiano',
+  de: 'Deutsch',
+  es: 'Español',
+  fr: 'Français',
+  pt: 'Português',
+  uk: 'Українська',
+};
+
 // ── Paths ──────────────────────────────────────────────────────────────────────
 const SITE_DIR      = __dirname;
 const TEMPLATES_DIR = path.join(SITE_DIR, 'src', 'templates');
@@ -37,6 +47,23 @@ function hreflangBlock(page) {
   );
   lines.push(`    <link rel="alternate" hreflang="x-default" href="${pageUrl(page, LANGUAGES[0])}">`);
   return lines.join('\n');
+}
+
+function langSwitcher(page, currentLang) {
+  const filename = `${page}.html`;
+  const items = LANGUAGES
+    .filter(l => l.code !== currentLang.code)
+    .map(l => {
+      const href = currentLang.root + (l.dir ? l.dir + '/' : '') + filename;
+      return `<a href="${href}">${ENDONYMS[l.code]}</a>`;
+    })
+    .join('\n            ');
+  return `<div class="lang-switcher">
+        <span class="lang-current">${currentLang.code.toUpperCase()} &#9660;</span>
+        <div class="lang-dropdown">
+            ${items}
+        </div>
+    </div>`;
 }
 
 function applyVars(template, vars) {
@@ -66,7 +93,7 @@ function build() {
       const canonical = `    <link rel="canonical" href="${pageUrl(page, lang)}">`;
       let   html      = tpl.replace('<!--HREFLANG-->', `${hreflangBlock(page)}\n${canonical}`);
 
-      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root });
+      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang) });
 
       const outFile = path.join(SITE_DIR, lang.dir, `${page}.html`);
       fs.writeFileSync(outFile, html, 'utf8');

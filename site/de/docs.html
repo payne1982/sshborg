@@ -324,6 +324,55 @@
         footer a { color: var(--muted); }
         footer a:hover { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
 
+        /* ── Language switcher ───────────────────────────────── */
+        .lang-switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .lang-current {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            cursor: default;
+            user-select: none;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switcher:hover .lang-current {
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: rgba(3,10,5,0.97);
+            border: 1px solid var(--border);
+            min-width: 130px;
+            z-index: 200;
+            padding: 4px 0;
+            backdrop-filter: blur(10px);
+        }
+        .lang-switcher:hover .lang-dropdown { display: block; }
+        .lang-dropdown a {
+            display: block;
+            padding: 7px 14px;
+            font-size: 0.83em;
+            letter-spacing: 0.03em;
+            color: var(--muted);
+            transition: color 0.15s, background 0.15s;
+        }
+        .lang-dropdown a:hover {
+            color: var(--neon-green);
+            background: rgba(0,255,136,0.05);
+            text-shadow: none;
+        }
+
         /* ── Responsive ──────────────────────────────────────── */
         @media (max-width: 760px) {
             nav { padding: 12px 16px; }
@@ -349,6 +398,17 @@
         <a href="#jump-hosts">Jump-Hosts</a>
         <a href="https://github.com/payne1982/sshborg-issues">Support</a>
         <a href="../privacy_policy.html">Datenschutz</a>
+    </div>
+    <div class="lang-switcher">
+        <span class="lang-current">DE &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="../docs.html">English</a>
+            <a href="../it/docs.html">Italiano</a>
+            <a href="../es/docs.html">Español</a>
+            <a href="../fr/docs.html">Français</a>
+            <a href="../pt/docs.html">Português</a>
+            <a href="../uk/docs.html">Українська</a>
+        </div>
     </div>
 </nav>
 

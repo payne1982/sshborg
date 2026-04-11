@@ -389,6 +389,55 @@
         footer a { color: var(--muted); }
         footer a:hover { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
 
+        /* ── Language switcher ───────────────────────────────── */
+        .lang-switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .lang-current {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            cursor: default;
+            user-select: none;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switcher:hover .lang-current {
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: rgba(3,10,5,0.97);
+            border: 1px solid var(--border);
+            min-width: 130px;
+            z-index: 200;
+            padding: 4px 0;
+            backdrop-filter: blur(10px);
+        }
+        .lang-switcher:hover .lang-dropdown { display: block; }
+        .lang-dropdown a {
+            display: block;
+            padding: 7px 14px;
+            font-size: 0.83em;
+            letter-spacing: 0.03em;
+            color: var(--muted);
+            transition: color 0.15s, background 0.15s;
+        }
+        .lang-dropdown a:hover {
+            color: var(--neon-green);
+            background: rgba(0,255,136,0.05);
+            text-shadow: none;
+        }
+
         /* ── Responsive ──────────────────────────────────────── */
         @media (max-width: 600px) {
             nav { padding: 12px 16px; }
@@ -414,6 +463,17 @@
         <a href="https://github.com/payne1982/sshborg-issues">Supporto</a>
         <a href="../privacy_policy.html">Privacy Policy</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">Contatto</a>
+    </div>
+    <div class="lang-switcher">
+        <span class="lang-current">IT &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="../index.html">English</a>
+            <a href="../de/index.html">Deutsch</a>
+            <a href="../es/index.html">Español</a>
+            <a href="../fr/index.html">Français</a>
+            <a href="../pt/index.html">Português</a>
+            <a href="../uk/index.html">Українська</a>
+        </div>
     </div>
 </nav>
 
