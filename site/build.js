@@ -5,7 +5,7 @@ const fs   = require('fs');
 const path = require('path');
 
 // ── Configuration ──────────────────────────────────────────────────────────────
-const BASE_URL = 'https://sshborg.app';  // ← change to your actual domain
+const BASE_URL = 'https://sshborg.com';
 
 const LANGUAGES = [
   { code: 'en', hreflang: 'en', dir: '',   root: '',    htmlLang: 'en' },

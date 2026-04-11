@@ -2,28 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://sshborg.app/index.html</loc>
-      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.app/index.html"/>
-      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.app/it/index.html"/>
-      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.app/de/index.html"/>
-      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.app/es/index.html"/>
-      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.app/fr/index.html"/>
-      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.app/pt/index.html"/>
-      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.app/uk/index.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.app/index.html"/>
+    <loc>https://sshborg.com/index.html</loc>
+      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.com/index.html"/>
+      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.com/it/index.html"/>
+      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.com/de/index.html"/>
+      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.com/es/index.html"/>
+      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/index.html"/>
+      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/index.html"/>
+      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/index.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/index.html"/>
   </url>
   <url>
-    <loc>https://sshborg.app/docs.html</loc>
-      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.app/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.app/it/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.app/de/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.app/es/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.app/fr/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.app/pt/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.app/uk/docs.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.app/docs.html"/>
+    <loc>https://sshborg.com/docs.html</loc>
+      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.com/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.com/it/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.com/de/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.com/es/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
-    <loc>https://sshborg.app/privacy_policy.html</loc>
+    <loc>https://sshborg.com/privacy_policy.html</loc>
   </url>
 </urlset>
