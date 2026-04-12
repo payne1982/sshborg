@@ -15,10 +15,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
+import android.content.ClipData
+import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -145,7 +147,8 @@ private fun KeyItem(
     onRename: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     var copied by remember { mutableStateOf(false) }
 
     Column {
@@ -196,7 +199,9 @@ private fun KeyItem(
                     Spacer(Modifier.height(8.dp))
                     Button(
                         onClick = {
-                            clipboard.setText(AnnotatedString(key.publicKey))
+                            scope.launch {
+                                clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("", key.publicKey)))
+                            }
                             copied = true
                         },
                         modifier = Modifier.align(Alignment.End),

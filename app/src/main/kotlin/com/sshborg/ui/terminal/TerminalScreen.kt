@@ -15,8 +15,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -308,7 +309,8 @@ private fun ExtraKeyRow(
     onKey: (ByteArray) -> Unit,
     cursorKeys: (Char) -> ByteArray,
 ) {
-    val clipboardManager = LocalClipboardManager.current
+    val clipboardManager = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
 
     Row(
@@ -337,9 +339,11 @@ private fun ExtraKeyRow(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
                 .clickable {
-                    clipboardManager.getText()?.text
-                        ?.toByteArray(Charsets.UTF_8)
-                        ?.let { onKey(it) }
+                    scope.launch {
+                        clipboardManager.getClipEntry()?.clipData?.getItemAt(0)?.text?.toString()
+                            ?.toByteArray(Charsets.UTF_8)
+                            ?.let { onKey(it) }
+                    }
                 }
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center,
