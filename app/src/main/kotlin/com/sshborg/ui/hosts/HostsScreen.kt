@@ -272,11 +272,17 @@ private fun HostItem(
                         horizontalAlignment = Alignment.Start,
                     ) {
                         if (shellCount > 0) {
-                            SessionBadge(
-                                count = shellCount,
-                                color = MaterialTheme.colorScheme.primary,
-                                onColor = MaterialTheme.colorScheme.onPrimary,
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .clickable { onClick() }
+                                    .padding(4.dp),
+                            ) {
+                                SessionBadge(
+                                    count = shellCount,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    onColor = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
                         }
                         if (sftpCount > 0) {
                             Box(
