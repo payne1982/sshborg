@@ -37,6 +37,9 @@ const I18N_DIR      = path.join(SITE_DIR, 'src', 'i18n');
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function pageUrl(page, lang) {
+  if (page === 'index') {
+    return lang.dir ? `${BASE_URL}/${lang.dir}/` : `${BASE_URL}/`;
+  }
   const file = `${page}.html`;
   return lang.dir ? `${BASE_URL}/${lang.dir}/${file}` : `${BASE_URL}/${file}`;
 }
@@ -110,7 +113,9 @@ function build() {
       `      <xhtml:link rel="alternate" hreflang="${l.hreflang}" href="${pageUrl(page, l)}"/>`
     ).join('\n') + '\n' +
     `      <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl(page, LANGUAGES[0])}"/>`;
-    urlset += `  <url>\n    <loc>${pageUrl(page, LANGUAGES[0])}</loc>\n${alts}\n  </url>\n`;
+    for (const lang of LANGUAGES) {
+      urlset += `  <url>\n    <loc>${pageUrl(page, lang)}</loc>\n${alts}\n  </url>\n`;
+    }
   }
   // Privacy policy (English-only)
   urlset += `  <url>\n    <loc>${BASE_URL}/privacy_policy.html</loc>\n  </url>\n`;
