@@ -1,0 +1,21 @@
+<en-US>
+• Added a help button (?) in the main screen toolbar — tap to open the SSHBorg website with the user guide
+</en-US>
+<it-IT>
+• Aggiunto un pulsante di aiuto (?) nella barra principale — toccalo per aprire il sito di SSHBorg con la guida utente
+</it-IT>
+<de-DE>
+• Hilfe-Schaltfläche (?) in der Hauptleiste hinzugefügt — tippt darauf, um die SSHBorg-Website mit der Benutzeranleitung zu öffnen
+</de-DE>
+<es-ES>
+• Añadido un botón de ayuda (?) en la barra principal — tócalo para abrir el sitio web de SSHBorg con la guía de usuario
+</es-ES>
+<fr-FR>
+• Ajout d'un bouton d'aide (?) dans la barre principale — appuyez dessus pour ouvrir le site SSHBorg avec le guide utilisateur
+</fr-FR>
+<pt-PT>
+• Adicionado botão de ajuda (?) na barra principal — toque para abrir o site do SSHBorg com o guia do utilizador
+</pt-PT>
+<uk>
+• Додано кнопку допомоги (?) на головній панелі — натисніть, щоб відкрити сайт SSHBorg з посібником користувача
+</uk>
