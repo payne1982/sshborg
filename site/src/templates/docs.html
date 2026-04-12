@@ -447,10 +447,6 @@
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
     </div>
-    <div class="nav-right">
-        {{LANG_SWITCHER}}
-        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
-    </div>
     <div class="nav-links">
         <a href="{{ROOT}}index.html">{{nav_home}}</a>
         <a href="#adding-host">{{nav_getting_started}}</a>
@@ -458,6 +454,10 @@
         <a href="#jump-hosts">{{nav_jump_hosts}}</a>
         <a href="https://github.com/payne1982/sshborg-issues">{{nav_support}}</a>
         <a href="{{ROOT}}privacy_policy.html">{{nav_privacy}}</a>
+    </div>
+    <div class="nav-right">
+        {{LANG_SWITCHER}}
+        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
     </div>
 </nav>
 

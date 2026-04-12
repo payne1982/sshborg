@@ -516,10 +516,6 @@
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
     </div>
-    <div class="nav-right">
-        {{LANG_SWITCHER}}
-        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
-    </div>
     <div class="nav-links">
         <a href="#features">{{nav_features}}</a>
         <a href="#security">{{nav_security}}</a>
@@ -527,6 +523,10 @@
         <a href="https://github.com/payne1982/sshborg-issues">{{nav_support}}</a>
         <a href="{{ROOT}}privacy_policy.html">{{nav_privacy}}</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">{{nav_contact}}</a>
+    </div>
+    <div class="nav-right">
+        {{LANG_SWITCHER}}
+        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
     </div>
 </nav>
 
