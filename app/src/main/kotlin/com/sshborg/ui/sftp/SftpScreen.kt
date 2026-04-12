@@ -66,7 +66,8 @@ fun SftpScreen(
         }
         if (state is SftpViewModel.State.Uploaded) {
             val s = state as SftpViewModel.State.Uploaded
-            snackbarHostState.showSnackbar("Uploaded: ${s.filename}")
+            val msg = if (s.totalFiles > 1) "Uploaded ${s.totalFiles} files" else "Uploaded: ${s.filename}"
+            snackbarHostState.showSnackbar(msg)
             vm.dismissUploaded()
         }
     }
@@ -90,8 +91,8 @@ fun SftpScreen(
 
     // File picker — opens system file chooser, result forwarded to ViewModel
     val filePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let { vm.uploadFile(it) } }
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris -> if (uris.isNotEmpty()) vm.uploadFiles(uris) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -233,8 +234,12 @@ fun SftpScreen(
                 }
 
                 is SftpViewModel.State.Uploading -> {
+                    val uploadLabel = buildString {
+                        append(stringResource(R.string.sftp_uploading, s.filename))
+                        if (s.totalFiles > 1) append(" (${s.fileIndex}/${s.totalFiles})")
+                    }
                     TransferProgress(
-                        label   = stringResource(R.string.sftp_uploading, s.filename),
+                        label   = uploadLabel,
                         bytes   = s.bytesSent,
                         icon    = Icons.Default.Upload,
                     )

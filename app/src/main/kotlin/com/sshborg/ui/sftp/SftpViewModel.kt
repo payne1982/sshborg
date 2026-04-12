@@ -30,8 +30,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
         data class Downloading(val filename: String, val bytesReceived: Long) : State
         data class Downloaded(val filename: String) : State
-        data class Uploading(val filename: String, val bytesSent: Long) : State
-        data class Uploaded(val filename: String) : State
+        data class Uploading(val filename: String, val bytesSent: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
+        data class Uploaded(val filename: String, val totalFiles: Int = 1) : State
         data class Error(val message: String) : State
         object Disconnected : State
     }
@@ -358,30 +358,35 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun dismissDownloaded() = refreshListing()
 
-    fun uploadFile(uri: Uri) {
+    fun uploadFiles(uris: List<Uri>) {
+        if (uris.isEmpty()) return
         val context = getApplication<Application>()
         val currentPath = (state.value as? State.Listing)?.path ?: return
-
-        val filename = context.contentResolver
-            .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-            ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
-            ?: uri.lastPathSegment ?: "file"
-
-        val remotePath = "${currentPath.trimEnd('/')}/$filename"
+        val total = uris.size
 
         viewModelScope.launch(Dispatchers.IO) {
-            _state.value = State.Uploading(filename, 0L)
-            runCatching {
-                context.contentResolver.openInputStream(uri)!!.use { stream ->
-                    sftpSession!!.uploadFile(stream, remotePath) { bytes ->
-                        _state.value = State.Uploading(filename, bytes)
+            var lastFilename = ""
+            for ((index, uri) in uris.withIndex()) {
+                val filename = context.contentResolver
+                    .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+                    ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+                    ?: uri.lastPathSegment ?: "file"
+                lastFilename = filename
+                val remotePath = "${currentPath.trimEnd('/')}/$filename"
+                _state.value = State.Uploading(filename, 0L, index + 1, total)
+                val success = runCatching {
+                    context.contentResolver.openInputStream(uri)!!.use { stream ->
+                        sftpSession!!.uploadFile(stream, remotePath) { bytes ->
+                            _state.value = State.Uploading(filename, bytes, index + 1, total)
+                        }
                     }
-                }
-                _state.value = State.Uploaded(filename)
-            }.onFailure {
-                refreshListing()
-                _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_upload_failed))
+                }.onFailure {
+                    refreshListing()
+                    _opError.tryEmit(it.message ?: context.getString(R.string.error_upload_failed))
+                }.isSuccess
+                if (!success) return@launch
             }
+            _state.value = State.Uploaded(lastFilename, total)
         }
     }
 
