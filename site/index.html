@@ -47,6 +47,7 @@
       "inLanguage": "en"
     }
     </script>
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
@@ -147,6 +148,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -279,22 +281,6 @@
                 inset 0 0 20px rgba(0,255,136,0.05);
         }
         .cta-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
-        .tip-btn {
-            display: inline-block;
-            margin-top: 18px;
-            color: var(--copper);
-            font-size: 0.88em;
-            letter-spacing: 0.06em;
-            border: 1px solid var(--copper-dim);
-            padding: 7px 20px;
-            text-decoration: none;
-            transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
-        }
-        .tip-btn:hover {
-            color: var(--copper);
-            border-color: var(--copper);
-            text-shadow: 0 0 8px var(--copper);
-        }
         @keyframes cta-pulse {
             0%, 100% {
                 box-shadow:
@@ -536,10 +522,10 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="index.html">
         <img src="logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#security">Security</a>
@@ -591,8 +577,9 @@
             </svg>
             Get it on Google Play
         </a>
-        <br>
-        <a class="tip-btn" href="#tip">☕ Leave a Tip</a>
+        <div style="margin-top:16px">
+            <script type='text/javascript'>kofiwidget2.init('☕ Leave me a tip', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+        </div>
     </div>
 </div>
 
@@ -680,7 +667,6 @@
 <div class="tip-section" id="tip">
     <h2>// LEAVE A TIP</h2>
     <p>SSHBorg is free, with no ads and no tracking. If it saves you time, a small tip keeps it going.</p>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
 </div>
 

@@ -39,6 +39,7 @@
       "inLanguage": "{{LANG}}"
     }
     </script>
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
@@ -139,6 +140,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -271,22 +273,6 @@
                 inset 0 0 20px rgba(0,255,136,0.05);
         }
         .cta-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
-        .tip-btn {
-            display: inline-block;
-            margin-top: 18px;
-            color: var(--copper);
-            font-size: 0.88em;
-            letter-spacing: 0.06em;
-            border: 1px solid var(--copper-dim);
-            padding: 7px 20px;
-            text-decoration: none;
-            transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
-        }
-        .tip-btn:hover {
-            color: var(--copper);
-            border-color: var(--copper);
-            text-shadow: 0 0 8px var(--copper);
-        }
         @keyframes cta-pulse {
             0%, 100% {
                 box-shadow:
@@ -528,10 +514,10 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="{{ROOT}}index.html">
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="#features">{{nav_features}}</a>
         <a href="#security">{{nav_security}}</a>
@@ -573,8 +559,9 @@
             </svg>
             {{cta_play}}
         </a>
-        <br>
-        <a class="tip-btn" href="#tip">☕ {{nav_tip}}</a>
+        <div style="margin-top:16px">
+            <script type='text/javascript'>kofiwidget2.init('{{kofi_hero_cta}}', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+        </div>
     </div>
 </div>
 
@@ -662,7 +649,6 @@
 <div class="tip-section" id="tip">
     <h2>{{tip_title}}</h2>
     <p>{{tip_desc}}</p>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <script type='text/javascript'>kofiwidget2.init('{{kofi_cta}}', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
 </div>
 

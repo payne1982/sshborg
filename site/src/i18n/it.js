@@ -53,7 +53,8 @@ module.exports = {
 
   tip_title:  '// LASCIA UNA MANCIA',
   tip_desc:   'SSHBorg è gratuito, senza pubblicità e senza tracciamento. Se ti fa risparmiare tempo, una piccola mancia aiuta a mantenerlo.',
-  kofi_cta:   'Supportami su Ko-fi',
+  kofi_cta:        'Supportami su Ko-fi',
+  kofi_hero_cta:   '☕ Lasciami una mancia',
 
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Segnalazioni &amp; Feedback',

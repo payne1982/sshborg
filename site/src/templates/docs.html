@@ -104,6 +104,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -443,10 +444,10 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="{{ROOT}}index.html">
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="{{ROOT}}index.html">{{nav_home}}</a>
         <a href="#adding-host">{{nav_getting_started}}</a>

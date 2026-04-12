@@ -53,7 +53,8 @@ module.exports = {
 
   tip_title:  '// LAISSER UN POURBOIRE',
   tip_desc:   'SSHBorg est gratuit, sans publicité et sans traçage. S\'il vous fait gagner du temps, un petit pourboire aide à le maintenir.',
-  kofi_cta:   'Me soutenir sur Ko-fi',
+  kofi_cta:        'Me soutenir sur Ko-fi',
+  kofi_hero_cta:   '☕ Laissez-moi un pourboire',
 
   footer_privacy: 'Confidentialité',
   footer_issues:  'Bugs &amp; Retours',

@@ -53,7 +53,8 @@ module.exports = {
 
   tip_title:  '// DEJAR UNA PROPINA',
   tip_desc:   'SSHBorg es gratuito, sin publicidad y sin seguimiento. Si te ahorra tiempo, una pequeña propina ayuda a mantenerlo.',
-  kofi_cta:   'Apóyame en Ko-fi',
+  kofi_cta:        'Apóyame en Ko-fi',
+  kofi_hero_cta:   '☕ Déjame una propina',
 
   footer_privacy: 'Privacidad',
   footer_issues:  'Errores &amp; Comentarios',
