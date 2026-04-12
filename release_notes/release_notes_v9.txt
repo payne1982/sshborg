@@ -1,35 +1,35 @@
 <en-US>
-• Updated theme and icon libraries for improved Android 15 compatibility
+• Internal improvements and library updates for better Android 15 compatibility
 • Tap the folder icon next to a host to directly resume the SFTP session
 • SFTP: you can now select and upload multiple files at once — progress shows "file X/Y" during the transfer
 </en-US>
 <it-IT>
-• Aggiornate librerie Temi e Icone per migliorare la compatibilità con Android 15
+• Miglioramenti interni e aggiornamento librerie per una migliore compatibilità con Android 15
 • Aggiunta possibilità di fare tap sull'icona della cartella per ripristinare direttamente la sessione SFTP
 • SFTP: ora puoi selezionare e caricare più file contemporaneamente — il progresso mostra "file X/Y" durante il trasferimento
 </it-IT>
 <de-DE>
-• Aktualisierte Theme- und Icon-Bibliotheken für bessere Android-15-Kompatibilität
+• Interne Verbesserungen und Bibliotheksaktualisierungen für bessere Android-15-Kompatibilität
 • Tippen auf das Ordnersymbol neben einem Host stellt die SFTP-Sitzung direkt wieder her
 • SFTP: Mehrere Dateien können jetzt gleichzeitig ausgewählt und hochgeladen werden — der Fortschritt zeigt „Datei X/Y" während der Übertragung
 </de-DE>
 <es-ES>
-• Actualizadas las librerías de temas e iconos para mejorar la compatibilidad con Android 15
+• Mejoras internas y actualizaciones de librerías para una mejor compatibilidad con Android 15
 • Toca el icono de carpeta junto a un host para reanudar directamente la sesión SFTP
 • SFTP: ahora puedes seleccionar y subir varios archivos a la vez — el progreso muestra "archivo X/Y" durante la transferencia
 </es-ES>
 <fr-FR>
-• Mise à jour des bibliothèques de thèmes et d'icônes pour une meilleure compatibilité avec Android 15
+• Améliorations internes et mises à jour des bibliothèques pour une meilleure compatibilité avec Android 15
 • Appuyez sur l'icône de dossier à côté d'un hôte pour reprendre directement la session SFTP
 • SFTP : vous pouvez maintenant sélectionner et envoyer plusieurs fichiers à la fois — la progression affiche « fichier X/Y » pendant le transfert
 </fr-FR>
 <pt-PT>
-• Atualizadas as bibliotecas de temas e ícones para melhor compatibilidade com o Android 15
+• Melhorias internas e atualização de bibliotecas para melhor compatibilidade com o Android 15
 • Toque no ícone de pasta ao lado de um host para retomar diretamente a sessão SFTP
 • SFTP: agora pode selecionar e carregar vários ficheiros de uma vez — o progresso mostra "ficheiro X/Y" durante a transferência
 </pt-PT>
 <uk>
-• Оновлено бібліотеки тем та іконок для кращої сумісності з Android 15
+• Внутрішні покращення та оновлення бібліотек для кращої сумісності з Android 15
 • Натисніть на іконку папки поряд з хостом, щоб одразу відновити сесію SFTP
 • SFTP: тепер можна вибирати та завантажувати кілька файлів одночасно — прогрес показує «файл X/Y» під час передачі
 </uk>
