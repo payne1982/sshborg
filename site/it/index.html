@@ -279,6 +279,22 @@
                 inset 0 0 20px rgba(0,255,136,0.05);
         }
         .cta-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+        .tip-btn {
+            display: inline-block;
+            margin-top: 18px;
+            color: var(--copper);
+            font-size: 0.88em;
+            letter-spacing: 0.06em;
+            border: 1px solid var(--copper-dim);
+            padding: 7px 20px;
+            text-decoration: none;
+            transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
+        }
+        .tip-btn:hover {
+            color: var(--copper);
+            border-color: var(--copper);
+            text-shadow: 0 0 8px var(--copper);
+        }
         @keyframes cta-pulse {
             0%, 100% {
                 box-shadow:
@@ -530,6 +546,7 @@
         <a href="../docs.html">Guida utente</a>
         <a href="https://github.com/payne1982/sshborg-issues">Supporto</a>
         <a href="../privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="#tip">Lascia una mancia</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">Contatto</a>
     </div>
     <div class="nav-right">
@@ -574,6 +591,8 @@
             </svg>
             Scarica su Google Play
         </a>
+        <br>
+        <a class="tip-btn" href="#tip">☕ Lascia una mancia</a>
     </div>
 </div>
 
@@ -658,7 +677,7 @@
 <!-- Tip -->
 <div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
-<div class="tip-section">
+<div class="tip-section" id="tip">
     <h2>// LASCIA UNA MANCIA</h2>
     <p>SSHBorg è gratuito, senza pubblicità e senza tracciamento. Se ti fa risparmiare tempo, una piccola mancia aiuta a mantenerlo.</p>
     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>

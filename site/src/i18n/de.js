@@ -8,6 +8,7 @@ module.exports = {
   nav_guide:     'Benutzerhandbuch',
   nav_support:   'Support',
   nav_privacy:   'Datenschutz',
+  nav_tip:       'Trinkgeld geben',
   nav_contact:   'Kontakt',
 
   hero_sub: 'Ein leistungsstarker SSH- &amp; SFTP-Client für Android.<br>Verwalte deine Server sicher direkt vom Smartphone aus.',

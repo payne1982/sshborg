@@ -9,6 +9,7 @@ module.exports = {
   nav_guide:     'User Guide',
   nav_support:   'Support',
   nav_privacy:   'Privacy Policy',
+  nav_tip:       'Leave a Tip',
   nav_contact:   'Contact',
 
   hero_sub: 'A powerful SSH &amp; SFTP client for Android.<br>Manage your servers securely, directly from your phone.',

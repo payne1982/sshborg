@@ -8,6 +8,7 @@ module.exports = {
   nav_guide:     'Посібник користувача',
   nav_support:   'Підтримка',
   nav_privacy:   'Конфіденційність',
+  nav_tip:       'Залишити чайові',
   nav_contact:   'Контакт',
 
   hero_sub: 'Потужний SSH &amp; SFTP клієнт для Android.<br>Керуйте своїми серверами безпечно, прямо з телефону.',
