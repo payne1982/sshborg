@@ -39,6 +39,7 @@
     <string name="hosts_add_host_cd">Add host</string>
     <string name="hosts_manage_keys_cd">Manage keys</string>
     <string name="hosts_settings_cd">Settings</string>
+    <string name="hosts_help_cd">Help</string>
     <string name="hosts_options_cd">Options</string>
     <string name="hosts_press_back_to_exit">Press back again to exit</string>
     <string name="hosts_delete_title">Delete host</string>

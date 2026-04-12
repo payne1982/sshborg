@@ -1,6 +1,8 @@
 package com.sshborg.ui.hosts
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -80,6 +82,11 @@ fun HostsScreen(
                     }
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.hosts_settings_cd))
+                    }
+                    IconButton(onClick = {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://sshborg.com")))
+                    }) {
+                        Icon(Icons.Default.HelpOutline, contentDescription = stringResource(R.string.hosts_help_cd))
                     }
                 },
             )

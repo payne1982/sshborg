@@ -37,6 +37,7 @@
     <string name="hosts_add_host_cd">Додати хост</string>
     <string name="hosts_manage_keys_cd">Керувати ключами</string>
     <string name="hosts_settings_cd">Налаштування</string>
+    <string name="hosts_help_cd">Довідка</string>
     <string name="hosts_options_cd">Параметри</string>
     <string name="hosts_press_back_to_exit">Натисніть ще раз для виходу</string>
     <string name="hosts_delete_title">Видалити хост</string>

@@ -37,6 +37,7 @@
     <string name="hosts_add_host_cd">Adicionar host</string>
     <string name="hosts_manage_keys_cd">Gerir chaves</string>
     <string name="hosts_settings_cd">Definições</string>
+    <string name="hosts_help_cd">Ajuda</string>
     <string name="hosts_options_cd">Opções</string>
     <string name="hosts_press_back_to_exit">Prima novamente para sair</string>
     <string name="hosts_delete_title">Eliminar host</string>
