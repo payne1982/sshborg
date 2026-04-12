@@ -54,7 +54,7 @@ module.exports = {
   tip_title:  '// DEIXAR UMA GORJETA',
   tip_desc:   'O SSHBorg é gratuito, sem publicidade e sem rastreamento. Se lhe poupar tempo, uma pequena gorjeta ajuda a mantê-lo.',
   kofi_cta:        'Apoie-me no Ko-fi',
-  kofi_hero_cta:   '☕ Deixe-me uma gorjeta',
+  kofi_hero_cta:   'Deixe-me uma gorjeta',
 
   footer_privacy: 'Privacidade',
   footer_issues:  'Erros &amp; Feedback',

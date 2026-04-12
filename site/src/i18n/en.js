@@ -55,7 +55,7 @@ module.exports = {
   tip_title:  '// LEAVE A TIP',
   tip_desc:   'SSHBorg is free, with no ads and no tracking. If it saves you time, a small tip keeps it going.',
   kofi_cta:        'Support me on Ko-fi',
-  kofi_hero_cta:   '☕ Leave me a tip',
+  kofi_hero_cta:   'Leave me a tip',
 
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Issues &amp; Feedback',

@@ -54,7 +54,7 @@ module.exports = {
   tip_title:  '// TRINKGELD GEBEN',
   tip_desc:   'SSHBorg ist kostenlos, ohne Werbung und ohne Tracking. Wenn es dir Zeit spart, hilft ein kleines Trinkgeld dabei, es am Laufen zu halten.',
   kofi_cta:        'Unterstütze mich auf Ko-fi',
-  kofi_hero_cta:   '☕ Gib mir ein Trinkgeld',
+  kofi_hero_cta:   'Gib mir ein Trinkgeld',
 
   footer_privacy: 'Datenschutz',
   footer_issues:  'Fehler &amp; Feedback',
