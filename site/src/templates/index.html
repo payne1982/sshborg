@@ -39,6 +39,7 @@
       "inLanguage": "{{LANG}}"
     }
     </script>
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
@@ -139,6 +140,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -512,16 +514,17 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="{{ROOT}}index.html">
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="#features">{{nav_features}}</a>
         <a href="#security">{{nav_security}}</a>
         <a href="{{ROOT}}docs.html">{{nav_guide}}</a>
         <a href="https://github.com/payne1982/sshborg-issues">{{nav_support}}</a>
         <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
+        <a href="#tip">{{nav_tip}}</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">{{nav_contact}}</a>
     </div>
     <div class="nav-right">
@@ -556,6 +559,9 @@
             </svg>
             {{cta_play}}
         </a>
+        <div style="margin-top:16px">
+            <script type='text/javascript'>kofiwidget2.init('{{kofi_hero_cta}}', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+        </div>
     </div>
 </div>
 
@@ -632,7 +638,7 @@
             <span class="badge badge-green">{{sec_badge_opensource}}</span>
         </div>
         <p style="margin-top:28px;">
-            <a href="{{ROOT}}privacy_policy.html">{{security_pp_link}}</a>
+            <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{security_pp_link}}</a>
         </p>
     </div>
 </section>
@@ -640,10 +646,9 @@
 <!-- Tip -->
 <div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
-<div class="tip-section">
+<div class="tip-section" id="tip">
     <h2>{{tip_title}}</h2>
     <p>{{tip_desc}}</p>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <script type='text/javascript'>kofiwidget2.init('{{kofi_cta}}', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
 </div>
 
@@ -651,7 +656,7 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="{{ROOT}}privacy_policy.html">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
+        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
         <a href="https://github.com/payne1982/sshborg-issues">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>

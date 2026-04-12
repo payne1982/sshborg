@@ -8,6 +8,7 @@ module.exports = {
   nav_guide:     'Guida utente',
   nav_support:   'Supporto',
   nav_privacy:   'Privacy Policy',
+  nav_tip:       'Lascia una mancia',
   nav_contact:   'Contatto',
 
   hero_sub: 'Un potente client SSH &amp; SFTP per Android.<br>Gestisci i tuoi server in sicurezza, direttamente dal telefono.',
@@ -52,7 +53,8 @@ module.exports = {
 
   tip_title:  '// LASCIA UNA MANCIA',
   tip_desc:   'SSHBorg è gratuito, senza pubblicità e senza tracciamento. Se ti fa risparmiare tempo, una piccola mancia aiuta a mantenerlo.',
-  kofi_cta:   'Supportami su Ko-fi',
+  kofi_cta:        'Supportami su Ko-fi',
+  kofi_hero_cta:   'Lasciami una mancia',
 
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Segnalazioni &amp; Feedback',

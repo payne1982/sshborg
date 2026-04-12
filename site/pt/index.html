@@ -47,6 +47,7 @@
       "inLanguage": "pt"
     }
     </script>
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
@@ -147,6 +148,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -520,16 +522,17 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="../index.html">
         <img src="../logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="#features">Funcionalidades</a>
         <a href="#security">Segurança</a>
         <a href="../docs.html">Guia do utilizador</a>
         <a href="https://github.com/payne1982/sshborg-issues">Suporte</a>
         <a href="../privacy_policy.html" target="_blank" rel="noopener">Privacidade</a>
+        <a href="#tip">Deixar uma gorjeta</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">Contacto</a>
     </div>
     <div class="nav-right">
@@ -574,6 +577,9 @@
             </svg>
             Descarregar no Google Play
         </a>
+        <div style="margin-top:16px">
+            <script type='text/javascript'>kofiwidget2.init('Deixe-me uma gorjeta', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+        </div>
     </div>
 </div>
 
@@ -650,7 +656,7 @@
             <span class="badge badge-green">Apenas bibliotecas open source</span>
         </div>
         <p style="margin-top:28px;">
-            <a href="../privacy_policy.html">Ler a política de privacidade completa &rarr;</a>
+            <a href="../privacy_policy.html" target="_blank" rel="noopener">Ler a política de privacidade completa &rarr;</a>
         </p>
     </div>
 </section>
@@ -658,10 +664,9 @@
 <!-- Tip -->
 <div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
-<div class="tip-section">
+<div class="tip-section" id="tip">
     <h2>// DEIXAR UMA GORJETA</h2>
     <p>O SSHBorg é gratuito, sem publicidade e sem rastreamento. Se lhe poupar tempo, uma pequena gorjeta ajuda a mantê-lo.</p>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <script type='text/javascript'>kofiwidget2.init('Apoie-me no Ko-fi', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
 </div>
 
@@ -669,7 +674,7 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="../privacy_policy.html">Privacidade</a> &nbsp;&#9135;&nbsp;
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">Privacidade</a> &nbsp;&#9135;&nbsp;
         <a href="https://github.com/payne1982/sshborg-issues">Erros &amp; Feedback</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>

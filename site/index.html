@@ -47,6 +47,7 @@
       "inLanguage": "en"
     }
     </script>
+    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
@@ -147,6 +148,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -520,16 +522,17 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="index.html">
         <img src="logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#security">Security</a>
         <a href="docs.html">User Guide</a>
         <a href="https://github.com/payne1982/sshborg-issues">Support</a>
         <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="#tip">Leave a Tip</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">Contact</a>
     </div>
     <div class="nav-right">
@@ -574,6 +577,9 @@
             </svg>
             Get it on Google Play
         </a>
+        <div style="margin-top:16px">
+            <script type='text/javascript'>kofiwidget2.init('Leave me a tip', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+        </div>
     </div>
 </div>
 
@@ -650,7 +656,7 @@
             <span class="badge badge-green">Open source libraries only</span>
         </div>
         <p style="margin-top:28px;">
-            <a href="privacy_policy.html">Read the full Privacy Policy &rarr;</a>
+            <a href="privacy_policy.html" target="_blank" rel="noopener">Read the full Privacy Policy &rarr;</a>
         </p>
     </div>
 </section>
@@ -658,10 +664,9 @@
 <!-- Tip -->
 <div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
-<div class="tip-section">
+<div class="tip-section" id="tip">
     <h2>// LEAVE A TIP</h2>
     <p>SSHBorg is free, with no ads and no tracking. If it saves you time, a small tip keeps it going.</p>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
 </div>
 
@@ -669,7 +674,7 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="privacy_policy.html">Privacy Policy</a> &nbsp;&#9135;&nbsp;
+        <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a> &nbsp;&#9135;&nbsp;
         <a href="https://github.com/payne1982/sshborg-issues">Issues &amp; Feedback</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>

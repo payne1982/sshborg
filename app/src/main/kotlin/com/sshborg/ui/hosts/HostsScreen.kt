@@ -6,11 +6,13 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -86,7 +88,7 @@ fun HostsScreen(
                     IconButton(onClick = {
                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://sshborg.com")))
                     }) {
-                        Icon(Icons.Default.HelpOutline, contentDescription = stringResource(R.string.hosts_help_cd))
+                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = stringResource(R.string.hosts_help_cd))
                     }
                 },
             )
@@ -270,14 +272,26 @@ private fun HostItem(
                         horizontalAlignment = Alignment.Start,
                     ) {
                         if (shellCount > 0) {
-                            SessionBadge(
-                                count = shellCount,
-                                color = MaterialTheme.colorScheme.primary,
-                                onColor = MaterialTheme.colorScheme.onPrimary,
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .clickable { onClick() }
+                                    .padding(4.dp),
+                            ) {
+                                SessionBadge(
+                                    count = shellCount,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    onColor = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
                         }
                         if (sftpCount > 0) {
-                            SftpBadge(count = sftpCount)
+                            Box(
+                                modifier = Modifier
+                                    .clickable { onSftp() }
+                                    .padding(4.dp),
+                            ) {
+                                SftpBadge(count = sftpCount)
+                            }
                         }
                     }
                 }

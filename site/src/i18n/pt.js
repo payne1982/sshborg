@@ -8,6 +8,7 @@ module.exports = {
   nav_guide:     'Guia do utilizador',
   nav_support:   'Suporte',
   nav_privacy:   'Privacidade',
+  nav_tip:       'Deixar uma gorjeta',
   nav_contact:   'Contacto',
 
   hero_sub: 'Um poderoso cliente SSH &amp; SFTP para Android.<br>Gira os seus servidores em segurança, diretamente do telemóvel.',
@@ -52,7 +53,8 @@ module.exports = {
 
   tip_title:  '// DEIXAR UMA GORJETA',
   tip_desc:   'O SSHBorg é gratuito, sem publicidade e sem rastreamento. Se lhe poupar tempo, uma pequena gorjeta ajuda a mantê-lo.',
-  kofi_cta:   'Apoie-me no Ko-fi',
+  kofi_cta:        'Apoie-me no Ko-fi',
+  kofi_hero_cta:   'Deixe-me uma gorjeta',
 
   footer_privacy: 'Privacidade',
   footer_issues:  'Erros &amp; Feedback',

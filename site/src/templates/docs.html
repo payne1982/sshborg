@@ -104,6 +104,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
             font-family: var(--font-mono);
             font-size: 1.15em;
             color: var(--neon-green);
@@ -443,10 +444,10 @@
 
 <!-- Nav -->
 <nav>
-    <div class="nav-brand">
+    <a class="nav-brand" href="{{ROOT}}index.html">
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
-    </div>
+    </a>
     <div class="nav-links">
         <a href="{{ROOT}}index.html">{{nav_home}}</a>
         <a href="#adding-host">{{nav_getting_started}}</a>
@@ -524,7 +525,7 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="{{ROOT}}privacy_policy.html">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
+        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
         <a href="https://github.com/payne1982/sshborg-issues">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>

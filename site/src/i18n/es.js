@@ -8,6 +8,7 @@ module.exports = {
   nav_guide:     'Guía de usuario',
   nav_support:   'Soporte',
   nav_privacy:   'Privacidad',
+  nav_tip:       'Dejar propina',
   nav_contact:   'Contacto',
 
   hero_sub: 'Un potente cliente SSH &amp; SFTP para Android.<br>Gestiona tus servidores de forma segura, directamente desde tu teléfono.',
@@ -52,7 +53,8 @@ module.exports = {
 
   tip_title:  '// DEJAR UNA PROPINA',
   tip_desc:   'SSHBorg es gratuito, sin publicidad y sin seguimiento. Si te ahorra tiempo, una pequeña propina ayuda a mantenerlo.',
-  kofi_cta:   'Apóyame en Ko-fi',
+  kofi_cta:        'Apóyame en Ko-fi',
+  kofi_hero_cta:   'Déjame una propina',
 
   footer_privacy: 'Privacidad',
   footer_issues:  'Errores &amp; Comentarios',

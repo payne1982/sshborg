@@ -100,9 +100,7 @@ class TerminalView @JvmOverloads constructor(
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE)
                 as android.view.inputmethod.InputMethodManager
         imm.restartInput(this)
-        androidx.core.view.ViewCompat.getWindowInsetsController(this)
-            ?.show(androidx.core.view.WindowInsetsCompat.Type.ime())
-        imm.showSoftInput(this, android.view.inputmethod.InputMethodManager.SHOW_FORCED)
+        imm.showSoftInput(this, 0)
     }
 
     private fun updateMetrics() {
@@ -113,7 +111,7 @@ class TerminalView @JvmOverloads constructor(
     }
 
     fun setTextSizeSp(sp: Float) {
-        val px = sp * resources.displayMetrics.scaledDensity
+        val px = android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
         textPaint.textSize = px
         boldPaint.textSize = px
         updateMetrics()
@@ -305,7 +303,7 @@ class TerminalView @JvmOverloads constructor(
         override fun onSingleTapUp(e: MotionEvent): Boolean {
             requestFocus()
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(this@TerminalView, InputMethodManager.SHOW_FORCED)
+            imm.showSoftInput(this@TerminalView, 0)
             return true
         }
         override fun onLongPress(e: MotionEvent) {

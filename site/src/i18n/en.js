@@ -9,6 +9,7 @@ module.exports = {
   nav_guide:     'User Guide',
   nav_support:   'Support',
   nav_privacy:   'Privacy Policy',
+  nav_tip:       'Leave a Tip',
   nav_contact:   'Contact',
 
   hero_sub: 'A powerful SSH &amp; SFTP client for Android.<br>Manage your servers securely, directly from your phone.',
@@ -53,7 +54,8 @@ module.exports = {
 
   tip_title:  '// LEAVE A TIP',
   tip_desc:   'SSHBorg is free, with no ads and no tracking. If it saves you time, a small tip keeps it going.',
-  kofi_cta:   'Support me on Ko-fi',
+  kofi_cta:        'Support me on Ko-fi',
+  kofi_hero_cta:   'Leave me a tip',
 
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Issues &amp; Feedback',

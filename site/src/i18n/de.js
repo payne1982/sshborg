@@ -8,6 +8,7 @@ module.exports = {
   nav_guide:     'Benutzerhandbuch',
   nav_support:   'Support',
   nav_privacy:   'Datenschutz',
+  nav_tip:       'Trinkgeld geben',
   nav_contact:   'Kontakt',
 
   hero_sub: 'Ein leistungsstarker SSH- &amp; SFTP-Client für Android.<br>Verwalte deine Server sicher direkt vom Smartphone aus.',
@@ -52,7 +53,8 @@ module.exports = {
 
   tip_title:  '// TRINKGELD GEBEN',
   tip_desc:   'SSHBorg ist kostenlos, ohne Werbung und ohne Tracking. Wenn es dir Zeit spart, hilft ein kleines Trinkgeld dabei, es am Laufen zu halten.',
-  kofi_cta:   'Unterstütze mich auf Ko-fi',
+  kofi_cta:        'Unterstütze mich auf Ko-fi',
+  kofi_hero_cta:   'Gib mir ein Trinkgeld',
 
   footer_privacy: 'Datenschutz',
   footer_issues:  'Fehler &amp; Feedback',
