@@ -447,9 +447,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         super.onCleared()
         // Don't disconnect — session stays alive in background
-        // Clean up dangling connecting sessions
+        // Clean up sessions that never fully connected (connecting or failed)
         val id = sessionId ?: return
-        if (sessionManager.get(id)?.status == SessionManager.Status.Connecting) {
+        val status = sessionManager.get(id)?.status
+        if (status == SessionManager.Status.Connecting || status == SessionManager.Status.Error) {
             sessionManager.remove(id)
             if (sessionManager.sessions.value.isEmpty()) {
                 SshForegroundService.stop(getApplication())
