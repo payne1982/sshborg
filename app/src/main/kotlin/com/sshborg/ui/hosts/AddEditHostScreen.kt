@@ -81,12 +81,14 @@ fun AddEditHostScreen(
                 value = label, onValueChange = { vm.label.value = it },
                 label = { Text(stringResource(R.string.host_field_label)) },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
             )
             OutlinedTextField(
                 value = hostname,
                 onValueChange = { vm.hostname.value = it.filter { c -> c.isLetterOrDigit() || c in ".-:_" } },
                 label = { Text(stringResource(R.string.host_field_hostname)) },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -94,12 +96,14 @@ fun AddEditHostScreen(
                     value = username, onValueChange = { vm.username.value = it },
                     label = { Text(stringResource(R.string.host_field_username)) },
                     modifier = Modifier.weight(1f),
+                    singleLine = true,
                 )
                 OutlinedTextField(
                     value = port,
                     onValueChange = { vm.port.value = it.filter { c -> c.isDigit() } },
                     label = { Text(stringResource(R.string.host_field_port)) },
                     modifier = Modifier.width(90.dp),
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
             }
@@ -129,6 +133,7 @@ fun AddEditHostScreen(
                     value = password, onValueChange = { vm.password.value = it },
                     label = { Text(stringResource(R.string.host_field_password)) },
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
