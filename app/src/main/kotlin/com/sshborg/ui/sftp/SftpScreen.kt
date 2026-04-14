@@ -101,6 +101,7 @@ fun SftpScreen(
     }
 
     // Dialog states (local UI only — operations go through ViewModel)
+    var pendingBulkDelete by remember { mutableStateOf<List<SftpEntry>?>(null) }
     var entryToDelete    by remember { mutableStateOf<SftpEntry?>(null) }
     var entryToRename    by remember { mutableStateOf<SftpEntry?>(null) }
     var showMkdirDialog  by remember { mutableStateOf(false) }
@@ -156,6 +157,17 @@ fun SftpScreen(
                                 enabled = selectedEntries.isNotEmpty(),
                             ) {
                                 Icon(Icons.Default.Download, stringResource(R.string.sftp_download_selected_cd))
+                            }
+                            IconButton(
+                                onClick = { pendingBulkDelete = selectedEntries.toList() },
+                                enabled = selectedEntries.isNotEmpty(),
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    stringResource(R.string.sftp_delete_selected_cd),
+                                    tint = if (selectedEntries.isNotEmpty()) MaterialTheme.colorScheme.error
+                                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                                )
                             }
                         } else {
                             IconButton(onClick = { selectionMode = true }) {
@@ -294,6 +306,19 @@ fun SftpScreen(
                     }
                 }
 
+                is SftpViewModel.State.Deleting -> {
+                    TransferProgress(
+                        label = buildString {
+                            append(stringResource(R.string.sftp_deleting_label))
+                            if (s.total > 1) append(" (${s.index}/${s.total})")
+                        },
+                        sublabel = s.name,
+                        bytes    = 0L,
+                        icon     = Icons.Default.Delete,
+                        onCancel = vm::cancelDelete,
+                    )
+                }
+
                 is SftpViewModel.State.Downloading -> {
                     TransferProgress(
                         label = buildString {
@@ -346,6 +371,46 @@ fun SftpScreen(
                 }
             }
         }
+    }
+
+    // Bulk delete confirmation dialog
+    pendingBulkDelete?.let { entries ->
+        val folderCount = entries.count { it.isDir }
+        val fileCount   = entries.count { !it.isDir }
+        val message = buildString {
+            append(stringResource(R.string.sftp_bulk_delete_message_prefix))
+            append(" ")
+            if (folderCount > 0) {
+                append(stringResource(R.string.sftp_bulk_delete_folders, folderCount))
+                if (fileCount > 0) append(" ")
+            }
+            if (fileCount > 0) {
+                append(stringResource(R.string.sftp_bulk_delete_files, fileCount))
+            }
+            append("\n")
+            append(stringResource(R.string.sftp_delete_message_suffix))
+        }
+        AlertDialog(
+            onDismissRequest = { pendingBulkDelete = null },
+            title = { Text(stringResource(R.string.sftp_bulk_delete_title)) },
+            text  = { Text(message) },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.deleteEntries(entries, currentPath)
+                    pendingBulkDelete = null
+                    selectionMode = false
+                    selectedEntries = emptySet()
+                }) {
+                    Text(stringResource(R.string.action_delete_all),
+                        color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingBulkDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
     }
 
     // Delete confirmation dialog

@@ -31,6 +31,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
         data class Downloading(val filename: String, val bytesReceived: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
         data class Downloaded(val filename: String, val totalFiles: Int = 1, val skippedFiles: Int = 0) : State
+        data class Deleting(val name: String, val index: Int = 1, val total: Int = 1) : State
         data class Uploading(val filename: String, val bytesSent: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
         data class Uploaded(val filename: String, val totalFiles: Int = 1) : State
         data class Error(val message: String) : State
@@ -533,14 +534,58 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     // ── File operations ───────────────────────────────────────────────────────
 
+    private var deleteJob: Job? = null
+
     fun deleteEntry(entry: SftpEntry, currentPath: String) {
         val path = "${currentPath.trimEnd('/')}/${entry.name}"
-        viewModelScope.launch(Dispatchers.IO) {
+        deleteJob = viewModelScope.launch(Dispatchers.IO) {
+            coroutineContext[Job]!!.invokeOnCompletion { cause ->
+                if (cause is CancellationException) refreshListing()
+            }
+            _state.value = State.Deleting(entry.name)
             runCatching {
-                if (entry.isDir) sftpSession!!.deleteDir(path) else sftpSession!!.deleteFile(path)
-                refreshListing()
+                if (entry.isDir && !entry.isLink) deleteRecursive(path) else sftpSession!!.deleteFile(path)
             }.onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_delete_failed)) }
+            refreshListing()
         }
+    }
+
+    fun deleteEntries(entries: List<SftpEntry>, currentPath: String) {
+        val total = entries.size
+        deleteJob = viewModelScope.launch(Dispatchers.IO) {
+            coroutineContext[Job]!!.invokeOnCompletion { cause ->
+                if (cause is CancellationException) refreshListing()
+            }
+            for ((index, entry) in entries.withIndex()) {
+                ensureActive()
+                _state.value = State.Deleting(entry.name, index + 1, total)
+                val path = "${currentPath.trimEnd('/')}/${entry.name}"
+                runCatching {
+                    if (entry.isDir && !entry.isLink) deleteRecursive(path, index + 1, total)
+                    else sftpSession!!.deleteFile(path)
+                }.onFailure {
+                    _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_delete_failed))
+                }
+            }
+            refreshListing()
+        }
+    }
+
+    fun cancelDelete() {
+        deleteJob?.cancel()
+        deleteJob = null
+    }
+
+    private suspend fun deleteRecursive(path: String, index: Int = 1, total: Int = 1) {
+        for (entry in sftpSession!!.listDir(path)) {
+            currentCoroutineContext().ensureActive()
+            val childPath = "$path/${entry.name}"
+            _state.value = State.Deleting(entry.name, index, total)
+            // Never recurse into symlinks even if they report isDir=true
+            if (entry.isDir && !entry.isLink) deleteRecursive(childPath, index, total)
+            else sftpSession!!.deleteFile(childPath)
+        }
+        sftpSession!!.deleteDir(path)
     }
 
     fun renameEntry(entry: SftpEntry, currentPath: String, newName: String) {
@@ -581,6 +626,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     fun disconnect() {
         batchDownloadJob?.cancel()
         batchDownloadJob = null
+        deleteJob?.cancel()
+        deleteJob = null
         val id = sessionId ?: return
         sftpSession = null
         pathStack.clear()

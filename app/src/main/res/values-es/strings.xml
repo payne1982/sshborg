@@ -203,11 +203,19 @@
 
     <string name="sftp_menu_rename">Renombrar</string>
     <string name="sftp_menu_delete">Eliminar</string>
+    <string name="sftp_delete_selected_cd">Eliminar seleccionados</string>
+    <string name="sftp_bulk_delete_title">Eliminar elementos seleccionados</string>
+    <string name="sftp_bulk_delete_message_prefix">Estás a punto de eliminar:</string>
+    <string name="sftp_bulk_delete_folders">%1$d carpeta(s)</string>
+    <string name="sftp_bulk_delete_files">%1$d archivo(s)</string>
+    <string name="sftp_delete_message_suffix">Esta acción no se puede deshacer.</string>
+    <string name="action_delete_all">Eliminar todo</string>
     <string name="sftp_select_items_cd">Seleccionar elementos</string>
     <string name="sftp_download_selected_cd">Descargar seleccionados</string>
     <string name="sftp_download_folder_cd">Descargar carpeta</string>
     <string name="sftp_n_selected">%1$d seleccionados</string>
     <string name="sftp_preparing">Preparando…</string>
+    <string name="sftp_deleting_label">Eliminando:</string>
     <string name="sftp_nothing_to_download">Nada que descargar</string>
     <string name="sftp_batch_conflict_title">Algunos archivos ya existen</string>
     <string name="sftp_batch_conflict_message">%1$d de %2$d archivos ya existen en Descargas. ¿Qué deseas hacer?</string>

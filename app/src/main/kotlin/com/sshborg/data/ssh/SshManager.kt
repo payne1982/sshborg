@@ -392,6 +392,7 @@ class ShellSession(
 data class SftpEntry(
     val name: String,
     val isDir: Boolean,
+    val isLink: Boolean,       // true if this is a symbolic link
     val size: Long,
     val modTimeSeconds: Int,   // Unix timestamp
 )
@@ -422,6 +423,7 @@ class SftpSession(
                 SftpEntry(
                     name           = e.filename,
                     isDir          = e.attrs.isDir,
+                    isLink         = e.attrs.isLink,
                     size           = e.attrs.size,
                     modTimeSeconds = e.attrs.mTime,
                 )
@@ -465,6 +467,7 @@ class SftpSession(
 
     fun deleteFile(remotePath: String) = channel.rm(remotePath)
     fun deleteDir(remotePath: String)  = channel.rmdir(remotePath)
+
     fun rename(oldPath: String, newPath: String) = channel.rename(oldPath, newPath)
     fun mkdir(remotePath: String)      = channel.mkdir(remotePath)
 
