@@ -198,6 +198,7 @@
     <string name="sftp_go_back">Go back</string>
 
     <string name="sftp_downloading">Downloading %1$s</string>
+    <string name="sftp_downloading_label">Downloading:</string>
     <string name="sftp_uploading">Uploading %1$s</string>
     <string name="sftp_saved_to_downloads">Saved to %1$s/SSHBorg/%2$s</string>
     <string name="sftp_uploaded">Uploaded: %1$s</string>
@@ -217,6 +218,17 @@
 
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
+
+    <string name="sftp_select_items_cd">Select items</string>
+    <string name="sftp_download_selected_cd">Download selected</string>
+    <string name="sftp_download_folder_cd">Download folder</string>
+    <string name="sftp_n_selected">%1$d selected</string>
+    <string name="sftp_preparing">Preparing…</string>
+    <string name="sftp_nothing_to_download">Nothing to download</string>
+    <string name="sftp_batch_conflict_title">Some files already exist</string>
+    <string name="sftp_batch_conflict_message">%1$d of %2$d files already exist in Downloads. What would you like to do?</string>
+    <string name="action_overwrite_all">Overwrite all</string>
+    <string name="action_skip_existing">Skip existing</string>
 
     <!-- ── Host key / password dialogs (shared between Terminal and SFTP) ── -->
     <string name="hostkey_title">Unknown host</string>

@@ -183,6 +183,7 @@
     <string name="sftp_go_back">Voltar</string>
 
     <string name="sftp_downloading">A transferir %1$s</string>
+    <string name="sftp_downloading_label">A transferir:</string>
     <string name="sftp_uploading">A enviar %1$s</string>
     <string name="sftp_saved_to_downloads">Guardado em %1$s/SSHBorg/%2$s</string>
     <string name="sftp_uploaded">Enviado: %1$s</string>
@@ -202,6 +203,16 @@
 
     <string name="sftp_menu_rename">Renomear</string>
     <string name="sftp_menu_delete">Eliminar</string>
+    <string name="sftp_select_items_cd">Selecionar itens</string>
+    <string name="sftp_download_selected_cd">Transferir selecionados</string>
+    <string name="sftp_download_folder_cd">Transferir pasta</string>
+    <string name="sftp_n_selected">%1$d selecionados</string>
+    <string name="sftp_preparing">A preparar…</string>
+    <string name="sftp_nothing_to_download">Nada para transferir</string>
+    <string name="sftp_batch_conflict_title">Alguns ficheiros já existem</string>
+    <string name="sftp_batch_conflict_message">%1$d de %2$d ficheiros já existem nos Transferências. O que pretende fazer?</string>
+    <string name="action_overwrite_all">Substituir tudo</string>
+    <string name="action_skip_existing">Ignorar existentes</string>
 
     <!-- ── Host key / password dialogs ─────────────────────────────────── -->
     <string name="hostkey_title">Host desconhecido</string>

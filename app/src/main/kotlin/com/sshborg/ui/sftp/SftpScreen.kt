@@ -39,6 +39,9 @@ fun SftpScreen(
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var selectionMode by remember { mutableStateOf(false) }
+    var selectedEntries by remember { mutableStateOf(setOf<SftpEntry>()) }
+
     LaunchedEffect(sessionId) {
         vm.attach(sessionId)
         if (vm.state.value == SftpViewModel.State.Connecting) {
@@ -53,15 +56,19 @@ fun SftpScreen(
         }
     }
 
-    val downloadsDir = android.os.Environment.DIRECTORY_DOWNLOADS
-
-    // Downloaded: show snackbar, then refresh listing
+    // Downloaded / Uploaded: show snackbar, then refresh listing
     LaunchedEffect(state) {
         if (state is SftpViewModel.State.Downloaded) {
             val s = state as SftpViewModel.State.Downloaded
-            snackbarHostState.showSnackbar(
-                "Saved to ${vm.downloadFolder}${s.filename}"
-            )
+            val msg = when {
+                s.totalFiles == 1 && s.skippedFiles == 0 ->
+                    "Saved to ${vm.downloadFolder}${s.filename}"
+                s.skippedFiles > 0 ->
+                    "Downloaded ${s.totalFiles} file${if (s.totalFiles != 1) "s" else ""} (${s.skippedFiles} skipped)"
+                else ->
+                    "Downloaded ${s.totalFiles} files"
+            }
+            snackbarHostState.showSnackbar(msg)
             vm.dismissDownloaded()
         }
         if (state is SftpViewModel.State.Uploaded) {
@@ -72,21 +79,39 @@ fun SftpScreen(
         }
     }
 
-    // Hardware back: navigate up in dir tree; at root, disconnect and go back
-    BackHandler { if (!vm.navigateUp()) { vm.disconnect(); onBack() } }
-
     val currentPath = (state as? SftpViewModel.State.Listing)?.path ?: ""
-    val atRoot = currentPath == "/" || currentPath.isEmpty()
+
+    // Clear selection when navigating to a different directory
+    LaunchedEffect(currentPath) {
+        if (selectionMode) {
+            selectionMode = false
+            selectedEntries = emptySet()
+        }
+    }
+
+    val atRoot    = currentPath == "/" || currentPath.isEmpty()
     val isListing = state is SftpViewModel.State.Listing
 
+    // Hardware back: exit selection mode first; then navigate up; at root, disconnect and go back
+    BackHandler {
+        when {
+            selectionMode -> { selectionMode = false; selectedEntries = emptySet() }
+            !vm.navigateUp() -> { vm.disconnect(); onBack() }
+        }
+    }
+
     // Dialog states (local UI only — operations go through ViewModel)
-    var entryToDelete by remember { mutableStateOf<SftpEntry?>(null) }
-    var entryToRename by remember { mutableStateOf<SftpEntry?>(null) }
-    var showMkdirDialog by remember { mutableStateOf(false) }
-    var pendingConflict by remember { mutableStateOf<SftpViewModel.ConflictData?>(null) }
+    var entryToDelete    by remember { mutableStateOf<SftpEntry?>(null) }
+    var entryToRename    by remember { mutableStateOf<SftpEntry?>(null) }
+    var showMkdirDialog  by remember { mutableStateOf(false) }
+    var pendingConflict  by remember { mutableStateOf<SftpViewModel.ConflictData?>(null) }
+    var pendingBatchConflict by remember { mutableStateOf<SftpViewModel.BatchConflictData?>(null) }
 
     LaunchedEffect(Unit) {
         vm.conflictEvent.collect { pendingConflict = it }
+    }
+    LaunchedEffect(Unit) {
+        vm.batchConflictEvent.collect { pendingBatchConflict = it }
     }
 
     // File picker — opens system file chooser, result forwarded to ViewModel
@@ -99,43 +124,67 @@ fun SftpScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        currentPath.ifEmpty { "SFTP" },
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontFamily = FontFamily.Monospace,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    if (selectionMode) {
+                        Text(stringResource(R.string.sftp_n_selected, selectedEntries.size))
+                    } else {
+                        Text(
+                            currentPath.ifEmpty { "SFTP" },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily.Monospace,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 },
                 navigationIcon = {
-                    // Back arrow keeps the session alive; use X to disconnect
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        if (selectionMode) { selectionMode = false; selectedEntries = emptySet() }
+                        else onBack()
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.sftp_back_cd))
                     }
                 },
                 actions = {
                     if (isListing) {
-                        IconButton(onClick = { vm.refreshListing() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.sftp_refresh_cd))
+                        if (selectionMode) {
+                            IconButton(
+                                onClick = {
+                                    vm.downloadEntries(selectedEntries.toList(), currentPath)
+                                    selectionMode = false
+                                    selectedEntries = emptySet()
+                                },
+                                enabled = selectedEntries.isNotEmpty(),
+                            ) {
+                                Icon(Icons.Default.Download, stringResource(R.string.sftp_download_selected_cd))
+                            }
+                        } else {
+                            IconButton(onClick = { selectionMode = true }) {
+                                Icon(Icons.Default.CheckBox, stringResource(R.string.sftp_select_items_cd))
+                            }
+                            IconButton(onClick = { vm.refreshListing() }) {
+                                Icon(Icons.Default.Refresh, stringResource(R.string.sftp_refresh_cd))
+                            }
                         }
                     }
-                    IconButton(onClick = { vm.disconnect(); onBack() }) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.sftp_disconnect_cd))
+                    if (!selectionMode) {
+                        IconButton(onClick = { vm.disconnect(); onBack() }) {
+                            Icon(Icons.Default.Close, stringResource(R.string.sftp_disconnect_cd))
+                        }
                     }
                 },
             )
         },
         floatingActionButton = {
-            if (isListing) {
+            if (isListing && !selectionMode) {
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     SmallFloatingActionButton(onClick = { showMkdirDialog = true }) {
-                        Icon(Icons.Default.CreateNewFolder, contentDescription = stringResource(R.string.sftp_new_folder_cd))
+                        Icon(Icons.Default.CreateNewFolder, stringResource(R.string.sftp_new_folder_cd))
                     }
                     FloatingActionButton(onClick = { filePicker.launch("*/*") }) {
-                        Icon(Icons.Default.Upload, contentDescription = stringResource(R.string.sftp_upload_file_cd))
+                        Icon(Icons.Default.Upload, stringResource(R.string.sftp_upload_file_cd))
                     }
                 }
             }
@@ -146,6 +195,20 @@ fun SftpScreen(
 
                 is SftpViewModel.State.Connecting -> {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+
+                is SftpViewModel.State.Preparing -> {
+                    Column(
+                        Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        CircularProgressIndicator()
+                        Text(stringResource(R.string.sftp_preparing))
+                        TextButton(onClick = { vm.cancelDownload() }) {
+                            Text(stringResource(R.string.action_cancel))
+                        }
+                    }
                 }
 
                 is SftpViewModel.State.HostKeyPrompt -> {
@@ -176,56 +239,71 @@ fun SftpScreen(
                         onRefresh = { isRefreshing = true; vm.refreshListing() },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 240.dp),
-                    ) {
-                        // ".." row — go up one level (hidden at root)
-                        if (!atRoot) {
-                            item(key = "..") {
-                                ListItem(
-                                    modifier = Modifier.clickable { vm.navigateUp() },
-                                    leadingContent = {
-                                        Icon(Icons.Default.SubdirectoryArrowLeft, null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    },
-                                    headlineContent = { Text("..") },
-                                )
-                                HorizontalDivider(thickness = 0.5.dp)
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 240.dp),
+                        ) {
+                            // ".." row — go up one level (hidden at root, not selectable)
+                            if (!atRoot) {
+                                item(key = "..") {
+                                    ListItem(
+                                        modifier = Modifier.clickable { vm.navigateUp() },
+                                        leadingContent = {
+                                            Icon(Icons.Default.SubdirectoryArrowLeft, null,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        },
+                                        headlineContent = { Text("..") },
+                                    )
+                                    HorizontalDivider(thickness = 0.5.dp)
+                                }
                             }
-                        }
-                        if (s.entries.isEmpty()) {
-                            item {
-                                Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                                    Text(
-                                        stringResource(R.string.sftp_empty_directory),
-                                        style = MaterialTheme.typography.bodyLarge
+                            if (s.entries.isEmpty()) {
+                                item {
+                                    Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                                        Text(
+                                            stringResource(R.string.sftp_empty_directory),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                        )
+                                    }
+                                }
+                            } else {
+                                items(s.entries, key = { it.name }) { entry ->
+                                    SftpEntryItem(
+                                        entry          = entry,
+                                        selectionMode  = selectionMode,
+                                        isSelected     = entry in selectedEntries,
+                                        onClick        = {
+                                            if (selectionMode) {
+                                                selectedEntries = if (entry in selectedEntries)
+                                                    selectedEntries - entry
+                                                else
+                                                    selectedEntries + entry
+                                            } else {
+                                                if (entry.isDir) vm.navigateTo("${s.path.trimEnd('/')}/${entry.name}")
+                                                else vm.downloadFile(entry, s.path)
+                                            }
+                                        },
+                                        onDownloadFolder = { vm.downloadEntries(listOf(entry), s.path) },
+                                        onRename       = { entryToRename = entry },
+                                        onDelete       = { entryToDelete = entry },
                                     )
                                 }
                             }
-                        } else {
-                            items(s.entries, key = { it.name }) { entry ->
-                                SftpEntryItem(
-                                    entry       = entry,
-                                    onClick     = {
-                                        if (entry.isDir) vm.navigateTo("${s.path.trimEnd('/')}/${entry.name}")
-                                        else vm.downloadFile(entry, s.path)
-                                    },
-                                    onRename    = { entryToRename = entry },
-                                    onDelete    = { entryToDelete = entry },
-                                )
-                            }
                         }
-                    }
                     }
                 }
 
                 is SftpViewModel.State.Downloading -> {
                     TransferProgress(
-                        label   = stringResource(R.string.sftp_downloading, s.filename),
-                        bytes   = s.bytesReceived,
-                        icon    = Icons.Default.Download,
+                        label = buildString {
+                            append(stringResource(R.string.sftp_downloading_label))
+                            if (s.totalFiles > 1) append(" (${s.fileIndex}/${s.totalFiles})")
+                        },
+                        sublabel = s.filename,
+                        bytes    = s.bytesReceived,
+                        icon     = Icons.Default.Download,
+                        onCancel = if (s.totalFiles > 1) vm::cancelDownload else null,
                     )
                 }
 
@@ -328,7 +406,7 @@ fun SftpScreen(
         )
     }
 
-    // Download conflict dialog
+    // Download conflict dialog (single-file downloads only)
     pendingConflict?.let { conflict ->
         AlertDialog(
             onDismissRequest = { pendingConflict = null },
@@ -345,6 +423,45 @@ fun SftpScreen(
                     TextButton(onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) }) {
                         Text(stringResource(R.string.action_overwrite), color = MaterialTheme.colorScheme.error)
                     }
+                }
+            },
+        )
+    }
+
+    // Batch download conflict dialog
+    pendingBatchConflict?.let { batchConflict ->
+        AlertDialog(
+            onDismissRequest = {
+                pendingBatchConflict = null
+                vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.CANCEL)
+            },
+            title = { Text(stringResource(R.string.sftp_batch_conflict_title)) },
+            text  = {
+                Text(stringResource(R.string.sftp_batch_conflict_message,
+                    batchConflict.conflictCount, batchConflict.totalCount))
+            },
+            confirmButton = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row {
+                        TextButton(onClick = {
+                            pendingBatchConflict = null
+                            vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.SKIP_EXISTING)
+                        }) { Text(stringResource(R.string.action_skip_existing)) }
+                        TextButton(onClick = {
+                            pendingBatchConflict = null
+                            vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.OVERWRITE_ALL)
+                        }) {
+                            Text(stringResource(R.string.action_overwrite_all),
+                                color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                    TextButton(onClick = {
+                        pendingBatchConflict = null
+                        vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.CANCEL)
+                    }) { Text(stringResource(R.string.action_cancel)) }
                 }
             },
         )
@@ -388,11 +505,15 @@ fun SftpScreen(
 @Composable
 private fun BoxScope.TransferProgress(
     label: String,
+    sublabel: String = "",
     bytes: Long,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onCancel: (() -> Unit)? = null,
 ) {
     Column(
-        Modifier.align(Alignment.Center),
+        Modifier
+            .align(Alignment.Center)
+            .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -400,12 +521,28 @@ private fun BoxScope.TransferProgress(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(icon, null, modifier = Modifier.size(18.dp))
-            Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         }
-        if (bytes > 0) {
-            Text(formatSize(bytes), style = MaterialTheme.typography.bodySmall)
+        if (sublabel.isNotEmpty()) {
+            Text(
+                sublabel,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        // Always reserve space for size text to prevent layout shifts when bytes become available
+        Text(
+            if (bytes > 0) formatSize(bytes) else "",
+            style = MaterialTheme.typography.bodySmall,
+        )
+        if (onCancel != null) {
+            TextButton(onClick = onCancel) {
+                Text(stringResource(R.string.action_cancel))
+            }
         }
     }
 }
@@ -414,7 +551,10 @@ private fun BoxScope.TransferProgress(
 @Composable
 private fun SftpEntryItem(
     entry: SftpEntry,
+    selectionMode: Boolean,
+    isSelected: Boolean,
     onClick: () -> Unit,
+    onDownloadFolder: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -427,12 +567,23 @@ private fun SftpEntryItem(
                 onLongClick = { menuExpanded = true },
             ),
             leadingContent = {
-                Icon(
-                    if (entry.isDir) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
-                    contentDescription = null,
-                    tint = if (entry.isDir) MaterialTheme.colorScheme.primary
-                           else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    if (selectionMode) {
+                        Checkbox(
+                            checked = isSelected,
+                            onCheckedChange = null, // row onClick handles toggle
+                        )
+                    }
+                    Icon(
+                        if (entry.isDir) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
+                        contentDescription = null,
+                        tint = if (entry.isDir) MaterialTheme.colorScheme.primary
+                               else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             },
             headlineContent = {
                 Text(entry.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -446,10 +597,25 @@ private fun SftpEntryItem(
                 }
             },
             trailingContent = {
-                if (!entry.isDir) {
-                    Icon(Icons.Default.Download, contentDescription = stringResource(R.string.sftp_download_cd),
+                if (entry.isDir && !selectionMode) {
+                    IconButton(
+                        onClick = onDownloadFolder,
+                        modifier = Modifier.size(40.dp),
+                    ) {
+                        Icon(
+                            Icons.Default.Download,
+                            contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                } else if (!entry.isDir) {
+                    Icon(
+                        Icons.Default.Download,
+                        contentDescription = stringResource(R.string.sftp_download_cd),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp))
+                        modifier = Modifier.size(18.dp),
+                    )
                 }
             },
         )
@@ -463,7 +629,7 @@ private fun SftpEntryItem(
                 text = {
                     Text(
                         stringResource(R.string.sftp_menu_delete),
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                 },
                 leadingIcon = {

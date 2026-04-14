@@ -183,6 +183,7 @@
     <string name="sftp_go_back">Назад</string>
 
     <string name="sftp_downloading">Завантаження %1$s</string>
+    <string name="sftp_downloading_label">Завантаження:</string>
     <string name="sftp_uploading">Вивантаження %1$s</string>
     <string name="sftp_saved_to_downloads">Збережено в %1$s/SSHBorg/%2$s</string>
     <string name="sftp_uploaded">Вивантажено: %1$s</string>
@@ -202,6 +203,16 @@
 
     <string name="sftp_menu_rename">Перейменувати</string>
     <string name="sftp_menu_delete">Видалити</string>
+    <string name="sftp_select_items_cd">Вибрати елементи</string>
+    <string name="sftp_download_selected_cd">Завантажити вибране</string>
+    <string name="sftp_download_folder_cd">Завантажити папку</string>
+    <string name="sftp_n_selected">%1$d вибрано</string>
+    <string name="sftp_preparing">Підготовка…</string>
+    <string name="sftp_nothing_to_download">Нічого завантажувати</string>
+    <string name="sftp_batch_conflict_title">Деякі файли вже існують</string>
+    <string name="sftp_batch_conflict_message">%1$d з %2$d файлів вже є в Завантаженнях. Що ви хочете зробити?</string>
+    <string name="action_overwrite_all">Перезаписати все</string>
+    <string name="action_skip_existing">Пропустити наявні</string>
 
     <!-- ── Host key / password dialogs ─────────────────────────────────── -->
     <string name="hostkey_title">Невідомий хост</string>

@@ -183,6 +183,7 @@
     <string name="sftp_go_back">Torna indietro</string>
 
     <string name="sftp_downloading">Download di %1$s</string>
+    <string name="sftp_downloading_label">Download in corso:</string>
     <string name="sftp_uploading">Caricamento di %1$s</string>
     <string name="sftp_saved_to_downloads">Salvato in %1$s/SSHBorg/%2$s</string>
     <string name="sftp_uploaded">Caricato: %1$s</string>
@@ -202,6 +203,17 @@
 
     <string name="sftp_menu_rename">Rinomina</string>
     <string name="sftp_menu_delete">Elimina</string>
+
+    <string name="sftp_select_items_cd">Seleziona elementi</string>
+    <string name="sftp_download_selected_cd">Scarica selezionati</string>
+    <string name="sftp_download_folder_cd">Scarica cartella</string>
+    <string name="sftp_n_selected">%1$d selezionati</string>
+    <string name="sftp_preparing">Preparazione…</string>
+    <string name="sftp_nothing_to_download">Niente da scaricare</string>
+    <string name="sftp_batch_conflict_title">Alcuni file esistono già</string>
+    <string name="sftp_batch_conflict_message">%1$d di %2$d file esistono già nei Download. Come vuoi procedere?</string>
+    <string name="action_overwrite_all">Sovrascrivi tutto</string>
+    <string name="action_skip_existing">Salta esistenti</string>
 
     <!-- ── Host key / password dialogs ─────────────────────────────────── -->
     <string name="hostkey_title">Host sconosciuto</string>
