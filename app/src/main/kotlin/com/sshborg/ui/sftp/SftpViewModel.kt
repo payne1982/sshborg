@@ -274,21 +274,33 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 _conflictEvent.tryEmit(ConflictData(entry, remotePath, existing, downloadFolder))
                 return@launch
             }
-            performDownload(entry, entry.name, remotePath, downloadFolder)
+            if (performDownload(entry, entry.name, remotePath, downloadFolder)) {
+                _state.value = State.Downloaded(entry.name)
+            } else {
+                refreshListing()
+            }
         }
     }
 
     fun downloadOverwrite(conflict: ConflictData) {
         viewModelScope.launch(Dispatchers.IO) {
             getApplication<Application>().contentResolver.delete(conflict.existingUri, null, null)
-            performDownload(conflict.entry, conflict.entry.name, conflict.remotePath, conflict.localDir)
+            if (performDownload(conflict.entry, conflict.entry.name, conflict.remotePath, conflict.localDir)) {
+                _state.value = State.Downloaded(conflict.entry.name)
+            } else {
+                refreshListing()
+            }
         }
     }
 
     fun downloadKeepBoth(conflict: ConflictData) {
         viewModelScope.launch(Dispatchers.IO) {
             val unique = uniqueFilename(conflict.entry.name, conflict.localDir)
-            performDownload(null, unique, conflict.remotePath, conflict.localDir)
+            if (performDownload(null, unique, conflict.remotePath, conflict.localDir)) {
+                _state.value = State.Downloaded(unique)
+            } else {
+                refreshListing()
+            }
         }
     }
 
