@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -478,15 +479,17 @@ fun SftpScreen(
             title = { Text(stringResource(R.string.sftp_conflict_title)) },
             text  = { Text(stringResource(R.string.sftp_conflict_message, conflict.entry.name)) },
             confirmButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(horizontalAlignment = Alignment.End) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
+                            Text(stringResource(R.string.action_keep_both))
+                        }
+                        TextButton(onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) }) {
+                            Text(stringResource(R.string.action_overwrite), color = MaterialTheme.colorScheme.error)
+                        }
+                    }
                     TextButton(onClick = { pendingConflict = null }) {
                         Text(stringResource(R.string.action_cancel))
-                    }
-                    TextButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
-                        Text(stringResource(R.string.action_keep_both))
-                    }
-                    TextButton(onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) }) {
-                        Text(stringResource(R.string.action_overwrite), color = MaterialTheme.colorScheme.error)
                     }
                 }
             },
@@ -585,17 +588,18 @@ private fun BoxScope.TransferProgress(
         CircularProgressIndicator()
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(icon, null, modifier = Modifier.size(18.dp))
-            Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         if (sublabel.isNotEmpty()) {
             Text(
                 sublabel,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
