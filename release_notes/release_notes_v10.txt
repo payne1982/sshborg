@@ -1,0 +1,42 @@
+<en-US>
+• SFTP: select multiple files and folders using the checkbox button in the toolbar
+• SFTP: download entire folders, including subfolders
+• SFTP: batch download shows progress "file X/Y" and lets you cancel at any time
+• Improved dialog buttons and layout throughout the app
+</en-US>
+<it-IT>
+• SFTP: seleziona più file e cartelle tramite il pulsante di selezione nella barra degli strumenti
+• SFTP: scarica intere cartelle, incluse le sottocartelle
+• SFTP: il download multiplo mostra il progresso "file X/Y" e può essere annullato in qualsiasi momento
+• Migliorati i pulsanti e il layout dei dialog in tutta l'app
+</it-IT>
+<de-DE>
+• SFTP: Mehrere Dateien und Ordner über die Auswahlschaltfläche in der Symbolleiste auswählen
+• SFTP: Ganze Ordner einschließlich Unterordner herunterladen
+• SFTP: Der Batch-Download zeigt den Fortschritt „Datei X/Y" und kann jederzeit abgebrochen werden
+• Verbesserte Schaltflächen und Layout in Dialogen der gesamten App
+</de-DE>
+<es-ES>
+• SFTP: selecciona varios archivos y carpetas con el botón de selección de la barra de herramientas
+• SFTP: descarga carpetas completas, incluidas las subcarpetas
+• SFTP: la descarga múltiple muestra el progreso "archivo X/Y" y se puede cancelar en cualquier momento
+• Mejoras en los botones y el diseño de los diálogos en toda la app
+</es-ES>
+<fr-FR>
+• SFTP : sélectionnez plusieurs fichiers et dossiers via le bouton de sélection dans la barre d'outils
+• SFTP : téléchargez des dossiers entiers, sous-dossiers inclus
+• SFTP : le téléchargement par lot affiche la progression « fichier X/Y » et peut être annulé à tout moment
+• Amélioration des boutons et de la mise en page des boîtes de dialogue dans toute l'application
+</fr-FR>
+<pt-PT>
+• SFTP: selecione vários ficheiros e pastas com o botão de seleção na barra de ferramentas
+• SFTP: transfira pastas inteiras, incluindo subpastas
+• SFTP: a transferência em lote mostra o progresso "ficheiro X/Y" e pode ser cancelada a qualquer momento
+• Melhoria dos botões e do layout dos diálogos em toda a aplicação
+</pt-PT>
+<uk>
+• SFTP: вибирайте кілька файлів і папок за допомогою кнопки вибору на панелі інструментів
+• SFTP: завантажуйте цілі папки разом із підпапками
+• SFTP: пакетне завантаження показує прогрес «файл X/Y» і може бути скасоване в будь-який момент
+• Покращено кнопки та розмітку діалогових вікон у всьому застосунку
+</uk>

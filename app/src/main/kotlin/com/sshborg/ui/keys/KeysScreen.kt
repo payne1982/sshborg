@@ -126,9 +126,11 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
             title = { Text(stringResource(R.string.keys_delete_title)) },
             text = { Text(stringResource(R.string.keys_delete_message, key.label)) },
             confirmButton = {
-                TextButton(onClick = { vm.deleteKey(key); keyToDelete = null }) {
-                    Text(stringResource(R.string.action_delete))
-                }
+                OutlinedButton(
+                    onClick = { vm.deleteKey(key); keyToDelete = null },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+                ) { Text(stringResource(R.string.action_delete)) }
             },
             dismissButton = {
                 TextButton(onClick = { keyToDelete = null }) {
@@ -249,7 +251,7 @@ private fun RenameKeyDialog(
             )
         },
         confirmButton = {
-            TextButton(
+            OutlinedButton(
                 onClick = { focusManager.clearFocus(); if (label.isNotBlank()) onRename(label.trim()) },
                 enabled = label.isNotBlank(),
             ) { Text(stringResource(R.string.action_save)) }
@@ -335,7 +337,7 @@ private fun ImportKeyDialog(
             }
         },
         confirmButton = {
-            TextButton(
+            OutlinedButton(
                 onClick = {
                     onImport(
                         label.ifBlank { defaultLabel },
@@ -424,7 +426,7 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
                 "ecdsa" -> ecdsaCurve
                 else    -> ""
             }
-            TextButton(
+            OutlinedButton(
                 onClick = { focusManager.clearFocus(); onGenerate(label.ifBlank { type.uppercase() + " Key" }, type, size) },
                 enabled = type != "rsa" || rsaBits.toIntOrNull()?.let { it >= 1024 } == true,
             ) { Text(stringResource(R.string.action_generate)) }

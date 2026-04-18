@@ -1,6 +1,7 @@
 package com.sshborg
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -61,7 +62,7 @@ fun AppNavigation() {
             title = { Text(stringResource(R.string.root_warning_title)) },
             text  = { Text(stringResource(R.string.root_warning_body)) },
             confirmButton = {
-                TextButton(onClick = {
+                OutlinedButton(onClick = {
                     showRootWarning = false
                     scope.launch { app.appPreferences.setRootWarningAcknowledged() }
                 }) { Text(stringResource(R.string.action_i_understand)) }
