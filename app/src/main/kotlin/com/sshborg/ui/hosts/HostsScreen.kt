@@ -147,9 +147,11 @@ fun HostsScreen(
             title = { Text(stringResource(R.string.hosts_delete_title)) },
             text  = { Text(stringResource(R.string.hosts_delete_message, host.label)) },
             confirmButton = {
-                TextButton(onClick = { vm.deleteHost(host); hostToDelete = null }) {
-                    Text(stringResource(R.string.action_delete))
-                }
+                OutlinedButton(
+                    onClick = { vm.deleteHost(host); hostToDelete = null },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+                ) { Text(stringResource(R.string.action_delete)) }
             },
             dismissButton = {
                 TextButton(onClick = { hostToDelete = null }) {

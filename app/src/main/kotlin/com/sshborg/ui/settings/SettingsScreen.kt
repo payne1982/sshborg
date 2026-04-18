@@ -395,7 +395,7 @@ fun SettingsScreen(
             title = { Text(stringResource(R.string.settings_encrypt_dialog_title)) },
             text  = { Text(stringResource(R.string.settings_encrypt_dialog_body)) },
             confirmButton = {
-                TextButton(onClick = {
+                OutlinedButton(onClick = {
                     showEnableEncryptionDialog = false
                     vm.enableKeystoreEncryption()
                 }) { Text(stringResource(R.string.action_enable)) }

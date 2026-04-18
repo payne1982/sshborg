@@ -396,15 +396,16 @@ fun SftpScreen(
             title = { Text(stringResource(R.string.sftp_bulk_delete_title)) },
             text  = { Text(message) },
             confirmButton = {
-                TextButton(onClick = {
-                    vm.deleteEntries(entries, currentPath)
-                    pendingBulkDelete = null
-                    selectionMode = false
-                    selectedEntries = emptySet()
-                }) {
-                    Text(stringResource(R.string.action_delete_all),
-                        color = MaterialTheme.colorScheme.error)
-                }
+                OutlinedButton(
+                    onClick = {
+                        vm.deleteEntries(entries, currentPath)
+                        pendingBulkDelete = null
+                        selectionMode = false
+                        selectedEntries = emptySet()
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+                ) { Text(stringResource(R.string.action_delete_all)) }
             },
             dismissButton = {
                 TextButton(onClick = { pendingBulkDelete = null }) {
@@ -426,10 +427,11 @@ fun SftpScreen(
             },
             text  = { Text(stringResource(R.string.sftp_delete_message, entry.name)) },
             confirmButton = {
-                TextButton(onClick = {
-                    vm.deleteEntry(entry, currentPath)
-                    entryToDelete = null
-                }) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) }
+                OutlinedButton(
+                    onClick = { vm.deleteEntry(entry, currentPath); entryToDelete = null },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+                ) { Text(stringResource(R.string.action_delete)) }
             },
             dismissButton = {
                 TextButton(onClick = { entryToDelete = null }) {
@@ -454,7 +456,7 @@ fun SftpScreen(
                 )
             },
             confirmButton = {
-                TextButton(
+                OutlinedButton(
                     onClick = {
                         if (newName.isNotBlank() && newName != entry.name) {
                             vm.renameEntry(entry, currentPath, newName.trim())
@@ -481,13 +483,22 @@ fun SftpScreen(
             confirmButton = {
                 Column(horizontalAlignment = Alignment.End) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TextButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
+                        OutlinedButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
                             Text(stringResource(R.string.action_keep_both))
                         }
-                        TextButton(onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) }) {
-                            Text(stringResource(R.string.action_overwrite), color = MaterialTheme.colorScheme.error)
+                        OutlinedButton(
+                            onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
+                            ),
+                        ) {
+                            Text(stringResource(R.string.action_overwrite))
                         }
                     }
+                    Spacer(Modifier.height(4.dp))
                     TextButton(onClick = { pendingConflict = null }) {
                         Text(stringResource(R.string.action_cancel))
                     }
@@ -550,7 +561,7 @@ fun SftpScreen(
                 )
             },
             confirmButton = {
-                TextButton(
+                OutlinedButton(
                     onClick = {
                         if (folderName.isNotBlank()) {
                             vm.createDirectory(currentPath, folderName.trim())

@@ -438,7 +438,7 @@ private fun PasswordDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(password) }) {
+            OutlinedButton(onClick = { onConfirm(password) }) {
                 Text(stringResource(R.string.action_connect))
             }
         },
@@ -462,10 +462,14 @@ private fun HostKeyDialog(hostname: String, fingerprint: String, onAccept: () ->
             }
         },
         confirmButton = {
-            TextButton(onClick = onAccept) { Text(stringResource(R.string.action_trust)) }
+            OutlinedButton(onClick = onAccept) { Text(stringResource(R.string.action_trust)) }
         },
         dismissButton = {
-            TextButton(onClick = onReject) { Text(stringResource(R.string.action_reject)) }
+            OutlinedButton(
+                onClick = onReject,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+            ) { Text(stringResource(R.string.action_reject)) }
         },
     )
 }
