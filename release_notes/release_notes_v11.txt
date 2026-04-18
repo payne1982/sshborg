@@ -1,0 +1,21 @@
+<en-US>
+• SFTP: fixed a delay of several seconds after completing a download
+</en-US>
+<it-IT>
+• SFTP: corretto un ritardo di diversi secondi al termine di un download
+</it-IT>
+<de-DE>
+• SFTP: Verzögerung von mehreren Sekunden nach Abschluss eines Downloads behoben
+</de-DE>
+<es-ES>
+• SFTP: corregido un retraso de varios segundos al finalizar una descarga
+</es-ES>
+<fr-FR>
+• SFTP : correction d'un délai de plusieurs secondes après la fin d'un téléchargement
+</fr-FR>
+<pt-PT>
+• SFTP: corrigido um atraso de vários segundos após a conclusão de uma transferência
+</pt-PT>
+<uk>
+• SFTP: виправлено затримку на кілька секунд після завершення завантаження
+</uk>

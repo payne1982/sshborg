@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,7 +58,8 @@ fun SftpScreen(
         }
     }
 
-    // Downloaded / Uploaded: show snackbar, then refresh listing
+    // Downloaded / Uploaded: refresh listing immediately, show snackbar concurrently
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     LaunchedEffect(state) {
         if (state is SftpViewModel.State.Downloaded) {
             val s = state as SftpViewModel.State.Downloaded
@@ -69,13 +71,13 @@ fun SftpScreen(
                 else ->
                     "Downloaded ${s.totalFiles} files"
             }
-            snackbarHostState.showSnackbar(msg)
+            scope.launch { snackbarHostState.showSnackbar(msg) }
             vm.dismissDownloaded()
         }
         if (state is SftpViewModel.State.Uploaded) {
             val s = state as SftpViewModel.State.Uploaded
             val msg = if (s.totalFiles > 1) "Uploaded ${s.totalFiles} files" else "Uploaded: ${s.filename}"
-            snackbarHostState.showSnackbar(msg)
+            scope.launch { snackbarHostState.showSnackbar(msg) }
             vm.dismissUploaded()
         }
     }
