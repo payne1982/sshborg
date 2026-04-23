@@ -1,0 +1,49 @@
+<en-US>
+• Android 15 compatibility improvements and minor stability fixes
+• Tap the folder icon next to a host to resume the SFTP session directly
+• SFTP: select and transfer multiple files and folders — progress shows "file X/Y", cancel anytime
+• SFTP: download entire folders including subfolders
+• Improved dialog buttons and layout throughout the app
+</en-US>
+<it-IT>
+• Miglioramenti di compatibilità con Android 15 e piccole correzioni di stabilità
+• Tocca l'icona della cartella accanto a un host per ripristinare direttamente la sessione SFTP
+• SFTP: seleziona e trasferisci più file e cartelle — il progresso mostra "file X/Y", annullabile in qualsiasi momento
+• SFTP: scarica intere cartelle incluse le sottocartelle
+• Migliorati i pulsanti e il layout dei dialog in tutta l'app
+</it-IT>
+<de-DE>
+• Verbesserungen der Android-15-Kompatibilität und kleinere Stabilitätskorrekturen
+• Ordnersymbol neben einem Host antippen, um die SFTP-Sitzung direkt wiederherzustellen
+• SFTP: Mehrere Dateien und Ordner auswählen und übertragen — Fortschritt zeigt „Datei X/Y", jederzeit abbrechbar
+• SFTP: Ganze Ordner einschließlich Unterordner herunterladen
+• Verbesserte Schaltflächen und Layout in Dialogen der gesamten App
+</de-DE>
+<es-ES>
+• Mejoras de compatibilidad con Android 15 y pequeñas correcciones de estabilidad
+• Toca el icono de carpeta junto a un host para reanudar directamente la sesión SFTP
+• SFTP: selecciona y transfiere varios archivos y carpetas — el progreso muestra "archivo X/Y", cancelable en cualquier momento
+• SFTP: descarga carpetas completas incluidas las subcarpetas
+• Mejoras en los botones y el diseño de los diálogos en toda la app
+</es-ES>
+<fr-FR>
+• Améliorations de la compatibilité Android 15 et corrections mineures de stabilité
+• Appuyez sur l'icône de dossier à côté d'un hôte pour reprendre directement la session SFTP
+• SFTP : sélectionnez et transférez plusieurs fichiers et dossiers — la progression affiche « fichier X/Y », annulable à tout moment
+• SFTP : téléchargez des dossiers entiers, sous-dossiers inclus
+• Amélioration des boutons et de la mise en page des boîtes de dialogue dans toute l'application
+</fr-FR>
+<pt-PT>
+• Melhorias de compatibilidade com Android 15 e pequenas correções de estabilidade
+• Toque no ícone de pasta junto a um host para retomar diretamente a sessão SFTP
+• SFTP: selecione e transfira vários ficheiros e pastas — o progresso mostra "ficheiro X/Y", cancelável a qualquer momento
+• SFTP: transfira pastas inteiras incluindo subpastas
+• Melhoria dos botões e do layout dos diálogos em toda a aplicação
+</pt-PT>
+<uk>
+• Покращення сумісності з Android 15 та незначні виправлення стабільності
+• Натисніть іконку папки поряд з хостом, щоб одразу відновити сесію SFTP
+• SFTP: вибирайте та передавайте кілька файлів і папок — прогрес показує «файл X/Y», скасування в будь-який момент
+• SFTP: завантажуйте цілі папки разом із підпапками
+• Покращено кнопки та розмітку діалогових вікон у всьому застосунку
+</uk>

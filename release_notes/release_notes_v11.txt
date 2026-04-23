@@ -1,21 +1,28 @@
 <en-US>
 • SFTP: fixed a delay of several seconds after completing a download
+• Terminal: improved font rendering — characters now display consistently across all devices
 </en-US>
 <it-IT>
 • SFTP: corretto un ritardo di diversi secondi al termine di un download
+• Terminale: migliorato il rendering del font — i caratteri ora vengono visualizzati in modo uniforme su tutti i dispositivi
 </it-IT>
 <de-DE>
 • SFTP: Verzögerung von mehreren Sekunden nach Abschluss eines Downloads behoben
+• Terminal: Verbessertes Schrift-Rendering — Zeichen werden jetzt auf allen Geräten einheitlich dargestellt
 </de-DE>
 <es-ES>
 • SFTP: corregido un retraso de varios segundos al finalizar una descarga
+• Terminal: mejora en el renderizado de la fuente — los caracteres ahora se muestran de forma uniforme en todos los dispositivos
 </es-ES>
 <fr-FR>
 • SFTP : correction d'un délai de plusieurs secondes après la fin d'un téléchargement
+• Terminal : amélioration du rendu de la police — les caractères s'affichent désormais de façon uniforme sur tous les appareils
 </fr-FR>
 <pt-PT>
 • SFTP: corrigido um atraso de vários segundos após a conclusão de uma transferência
+• Terminal: melhoria na renderização da fonte — os caracteres são agora apresentados de forma uniforme em todos os dispositivos
 </pt-PT>
 <uk>
 • SFTP: виправлено затримку на кілька секунд після завершення завантаження
+• Термінал: покращено відображення шрифту — символи тепер відображаються однаково на всіх пристроях
 </uk>
