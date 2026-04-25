@@ -659,12 +659,24 @@ private fun SftpEntryItem(
                             onCheckedChange = null, // row onClick handles toggle
                         )
                     }
-                    Icon(
-                        if (entry.isDir) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
-                        contentDescription = null,
-                        tint = if (entry.isDir) MaterialTheme.colorScheme.primary
-                               else MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Box {
+                        Icon(
+                            if (entry.isDir) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
+                            contentDescription = null,
+                            tint = if (entry.isDir) MaterialTheme.colorScheme.primary
+                                   else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (entry.isLink) {
+                            Icon(
+                                Icons.Default.Link,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(12.dp)
+                                    .align(Alignment.BottomEnd),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
             },
             headlineContent = {
@@ -679,7 +691,7 @@ private fun SftpEntryItem(
                 }
             },
             trailingContent = {
-                if (entry.isDir && !selectionMode) {
+                if (entry.isDir && !entry.isLink && !selectionMode) {
                     IconButton(
                         onClick = onDownloadFolder,
                         modifier = Modifier.size(40.dp),

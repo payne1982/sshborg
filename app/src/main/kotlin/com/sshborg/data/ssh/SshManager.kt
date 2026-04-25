@@ -416,14 +416,22 @@ class SftpSession(
     /** Lists [path], returning entries sorted: dirs first, then files, both alphabetically. */
     @Suppress("UNCHECKED_CAST")
     fun listDir(path: String): List<SftpEntry> {
+        val base = path.trimEnd('/')
         val raw = channel.ls(path) as Collection<com.jcraft.jsch.ChannelSftp.LsEntry>
         return raw
             .filter { it.filename != "." && it.filename != ".." }
             .map { e ->
+                // lstat returns the symlink's own attrs, not the target's.
+                // For symlinks we call stat() so isDir correctly reflects the target type.
+                val isLink = e.attrs.isLink
+                val isDir = if (isLink)
+                    runCatching { channel.stat("$base/${e.filename}").isDir }.getOrDefault(false)
+                else
+                    e.attrs.isDir
                 SftpEntry(
                     name           = e.filename,
-                    isDir          = e.attrs.isDir,
-                    isLink         = e.attrs.isLink,
+                    isDir          = isDir,
+                    isLink         = isLink,
                     size           = e.attrs.size,
                     modTimeSeconds = e.attrs.mTime,
                 )
