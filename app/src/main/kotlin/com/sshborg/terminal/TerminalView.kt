@@ -366,6 +366,13 @@ class TerminalView @JvmOverloads constructor(
             text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
             return true
         }
+        // Silently reject rich content (images, stickers) — returning false would
+        // trigger the system "App doesn't support images" toast on Android 12+.
+        override fun commitContent(
+            inputContentInfo: android.view.inputmethod.InputContentInfo,
+            flags: Int,
+            opts: android.os.Bundle?,
+        ) = true
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
             if (beforeLength > 0) onInput?.invoke(byteArrayOf(0x7F))
             return true
