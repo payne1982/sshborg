@@ -251,6 +251,7 @@
     <string name="error_refresh_failed">Atualização falhada</string>
     <string name="error_encryption_failed">Cifragem falhada</string>
     <string name="error_decryption_failed">Decifragem falhada</string>
+    <string name="error_unknown">Ocorreu um erro</string>
 
     <!-- ── Theme setting ─────────────────────────────────────────────────── -->
     <string name="settings_theme_title">Tema</string>

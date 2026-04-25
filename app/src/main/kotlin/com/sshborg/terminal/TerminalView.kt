@@ -26,11 +26,24 @@ class TerminalView @JvmOverloads constructor(
     var onResize: ((cols: Int, rows: Int) -> Unit)? = null
 
     // --- Fonts and metrics ---
+    private val regularTypeface: Typeface by lazy {
+        context.assets.open("fonts/JetBrainsMono-Regular.ttf").use { stream ->
+            val tmp = java.io.File.createTempFile("jbmono_regular", ".ttf", context.cacheDir)
+            tmp.outputStream().use { stream.copyTo(it) }
+            Typeface.createFromFile(tmp).also { tmp.delete() }
+        }
+    }
+    private val boldTypeface: Typeface by lazy {
+        context.assets.open("fonts/JetBrainsMono-Bold.ttf").use { stream ->
+            val tmp = java.io.File.createTempFile("jbmono_bold", ".ttf", context.cacheDir)
+            tmp.outputStream().use { stream.copyTo(it) }
+            Typeface.createFromFile(tmp).also { tmp.delete() }
+        }
+    }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        typeface = Typeface.MONOSPACE
         textSize = 36f
     }
-    private val boldPaint = Paint(textPaint).apply { typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) }
+    private val boldPaint = Paint(textPaint)
     private var cellW = 0f
     private var cellH = 0f
     private var cellBaseline = 0f
@@ -73,6 +86,8 @@ class TerminalView @JvmOverloads constructor(
     init {
         isFocusable = true
         isFocusableInTouchMode = true
+        textPaint.typeface = regularTypeface
+        boldPaint.typeface = boldTypeface
         updateMetrics()
     }
 
@@ -351,6 +366,13 @@ class TerminalView @JvmOverloads constructor(
             text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
             return true
         }
+        // Silently reject rich content (images, stickers) — returning false would
+        // trigger the system "App doesn't support images" toast on Android 12+.
+        override fun commitContent(
+            inputContentInfo: android.view.inputmethod.InputContentInfo,
+            flags: Int,
+            opts: android.os.Bundle?,
+        ) = true
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
             if (beforeLength > 0) onInput?.invoke(byteArrayOf(0x7F))
             return true

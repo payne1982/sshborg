@@ -281,4 +281,5 @@
     <string name="error_refresh_failed">Refresh failed</string>
     <string name="error_encryption_failed">Encryption failed</string>
     <string name="error_decryption_failed">Decryption failed</string>
+    <string name="error_unknown">Something went wrong</string>
 </resources>

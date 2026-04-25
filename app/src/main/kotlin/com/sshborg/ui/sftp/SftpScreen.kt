@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,13 +52,16 @@ fun SftpScreen(
     }
 
     // Non-fatal operation errors shown as snackbar without leaving listing
+    val unknownError = stringResource(R.string.error_unknown)
     LaunchedEffect(Unit) {
         vm.opError.collect { message ->
-            snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Short)
+            val display = message.takeIf { it.isNotBlank() } ?: unknownError
+            snackbarHostState.showSnackbar(display, duration = SnackbarDuration.Short)
         }
     }
 
-    // Downloaded / Uploaded: show snackbar, then refresh listing
+    // Downloaded / Uploaded: refresh listing immediately, show snackbar concurrently
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     LaunchedEffect(state) {
         if (state is SftpViewModel.State.Downloaded) {
             val s = state as SftpViewModel.State.Downloaded
@@ -69,13 +73,13 @@ fun SftpScreen(
                 else ->
                     "Downloaded ${s.totalFiles} files"
             }
-            snackbarHostState.showSnackbar(msg)
+            scope.launch { snackbarHostState.showSnackbar(msg) }
             vm.dismissDownloaded()
         }
         if (state is SftpViewModel.State.Uploaded) {
             val s = state as SftpViewModel.State.Uploaded
             val msg = if (s.totalFiles > 1) "Uploaded ${s.totalFiles} files" else "Uploaded: ${s.filename}"
-            snackbarHostState.showSnackbar(msg)
+            scope.launch { snackbarHostState.showSnackbar(msg) }
             vm.dismissUploaded()
         }
     }
@@ -657,12 +661,24 @@ private fun SftpEntryItem(
                             onCheckedChange = null, // row onClick handles toggle
                         )
                     }
-                    Icon(
-                        if (entry.isDir) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
-                        contentDescription = null,
-                        tint = if (entry.isDir) MaterialTheme.colorScheme.primary
-                               else MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Box {
+                        Icon(
+                            if (entry.isDir) Icons.Default.Folder else Icons.AutoMirrored.Filled.InsertDriveFile,
+                            contentDescription = null,
+                            tint = if (entry.isDir) MaterialTheme.colorScheme.primary
+                                   else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (entry.isLink) {
+                            Icon(
+                                Icons.Default.Link,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(12.dp)
+                                    .align(Alignment.BottomEnd),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
             },
             headlineContent = {
@@ -677,7 +693,7 @@ private fun SftpEntryItem(
                 }
             },
             trailingContent = {
-                if (entry.isDir && !selectionMode) {
+                if (entry.isDir && !entry.isLink && !selectionMode) {
                     IconButton(
                         onClick = onDownloadFolder,
                         modifier = Modifier.size(40.dp),

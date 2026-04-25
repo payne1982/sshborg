@@ -324,11 +324,12 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val allTasks = mutableListOf<DownloadTask>()
             for (entry in entries) {
                 val entryPath = "${currentPath.trimEnd('/')}/${entry.name}"
-                if (entry.isDir) {
+                if (entry.isDir && !entry.isLink) {
                     collectDirTasks(entryPath, "$downloadFolder${entry.name}/", allTasks)
-                } else {
+                } else if (!entry.isDir) {
                     allTasks.add(DownloadTask(entryPath, entry.name, downloadFolder))
                 }
+                // symlink-to-directory: skip — navigate into it instead
             }
 
             if (allTasks.isEmpty()) {
@@ -393,9 +394,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val entries = sftpSession!!.listDir(remotePath)
             for (entry in entries) {
                 val entryPath = "$remotePath/${entry.name}"
-                if (entry.isDir) {
+                if (entry.isDir && !entry.isLink) {
                     collectDirTasks(entryPath, "$localDir${entry.name}/", tasks)
-                } else {
+                } else if (!entry.isDir) {
                     tasks.add(DownloadTask(entryPath, entry.name, localDir))
                 }
             }

@@ -33,11 +33,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import com.sshborg.R
 import com.sshborg.SshBorgApp
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import kotlinx.coroutines.delay
+
+private val ExtraKeyFont = FontFamily(
+    Font(R.font.roboto_condensed_regular),
+    Font(R.font.roboto_condensed_bold, FontWeight.Bold),
+)
+private val ArrowKeyFont = FontFamily(
+    Font(R.font.jetbrains_mono_regular),
+    Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
+)
 @Suppress("UNUSED_VARIABLE")
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -378,9 +389,15 @@ private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit
             .padding(horizontal = 8.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, fontSize = 12.sp,
-            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-            maxLines = 1, color = textColor)
+        val isArrow = label.length == 1 && label[0] in "↑↓←→"
+        Text(
+            label,
+            fontSize = 12.sp,
+            fontFamily = if (isArrow) ArrowKeyFont else ExtraKeyFont,
+            fontWeight = if (active || isArrow) FontWeight.Bold else FontWeight.Medium,
+            maxLines = 1,
+            color = textColor,
+        )
     }
 }
 
