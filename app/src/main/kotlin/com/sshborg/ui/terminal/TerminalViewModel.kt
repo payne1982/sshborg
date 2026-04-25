@@ -257,7 +257,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     auth = SshAuth.Password(pwd)
                 } else {
-                    _state.value = ConnectionState.Error(err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed))
+                    _state.value = ConnectionState.Error(err?.message?.takeIf { it.isNotBlank() } ?: getApplication<Application>().getString(R.string.error_connection_failed))
                     sessionManager.remove(id)
                     if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
                     return@launch

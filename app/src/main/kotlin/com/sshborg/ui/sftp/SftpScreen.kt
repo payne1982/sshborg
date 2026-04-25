@@ -52,9 +52,11 @@ fun SftpScreen(
     }
 
     // Non-fatal operation errors shown as snackbar without leaving listing
+    val unknownError = stringResource(R.string.error_unknown)
     LaunchedEffect(Unit) {
         vm.opError.collect { message ->
-            snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Short)
+            val display = message.takeIf { it.isNotBlank() } ?: unknownError
+            snackbarHostState.showSnackbar(display, duration = SnackbarDuration.Short)
         }
     }
 

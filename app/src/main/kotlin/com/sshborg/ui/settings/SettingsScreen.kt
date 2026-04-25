@@ -56,8 +56,12 @@ fun SettingsScreen(
     val scrollbackLines       by vm.scrollbackLines.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val unknownError = stringResource(R.string.error_unknown)
     LaunchedEffect(Unit) {
-        vm.error.collect { snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Long) }
+        vm.error.collect { message ->
+            val display = message.takeIf { it.isNotBlank() } ?: unknownError
+            snackbarHostState.showSnackbar(display, duration = SnackbarDuration.Long)
+        }
     }
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
