@@ -88,6 +88,11 @@
     <string name="host_field_port_forwarding">Regole di forwarding (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Una regola per riga: [portaLocale:hostRemoto:portaRemota] oppure [bind:portaLocale:hostRemoto:portaRemota]. Prefisso -L facoltativo.</string>
+    <string name="host_section_start_directory">Cartella iniziale</string>
+    <string name="host_start_mode_last">Ultima cartella visitata</string>
+    <string name="host_start_mode_fixed">Cartella fissa</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Cartella iniziale</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Chiavi SSH</string>

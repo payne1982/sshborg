@@ -47,6 +47,8 @@ fun AddEditHostScreen(
     val availableJumpHosts by vm.availableJumpHosts.collectAsState()
     val keys by vm.keys.collectAsState()
     val password by vm.password.collectAsState()
+    val sftpStartMode by vm.sftpStartMode.collectAsState()
+    val sftpStartDir by vm.sftpStartDir.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var keyMenuExpanded by remember { mutableStateOf(false) }
@@ -264,6 +266,43 @@ fun AddEditHostScreen(
                 supportingText = { Text(stringResource(R.string.host_port_forwarding_supporting)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            )
+
+            HorizontalDivider()
+            Text(stringResource(R.string.host_section_start_directory), style = MaterialTheme.typography.titleSmall)
+
+            Column {
+                listOf(
+                    "last"  to R.string.host_start_mode_last,
+                    "fixed" to R.string.host_start_mode_fixed,
+                    "home"  to R.string.host_start_mode_home,
+                ).forEach { (mode, labelRes) ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        RadioButton(
+                            selected = sftpStartMode == mode,
+                            onClick  = { vm.sftpStartMode.value = mode },
+                        )
+                        Text(stringResource(labelRes))
+                    }
+                }
+            }
+
+            val startDirValue = when (sftpStartMode) {
+                "home" -> "~"
+                else   -> sftpStartDir
+            }
+            OutlinedTextField(
+                value = startDirValue,
+                onValueChange = { if (sftpStartMode == "fixed") vm.sftpStartDir.value = it },
+                label = { Text(stringResource(R.string.host_field_start_directory)) },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = sftpStartMode != "fixed",
+                enabled = sftpStartMode == "fixed",
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             )
 

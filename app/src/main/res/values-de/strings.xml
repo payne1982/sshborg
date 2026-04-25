@@ -88,6 +88,11 @@
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Eine Regel pro Zeile: [lokalPort:remoteHost:remotePort] oder [bind:lokalPort:remoteHost:remotePort]. Optionales -L-Präfix.</string>
+    <string name="host_section_start_directory">Startverzeichnis</string>
+    <string name="host_start_mode_last">Zuletzt besuchter Ordner</string>
+    <string name="host_start_mode_fixed">Festes Verzeichnis</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Startverzeichnis</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-Schlüssel</string>

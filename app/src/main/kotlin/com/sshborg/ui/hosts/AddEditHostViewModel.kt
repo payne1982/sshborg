@@ -40,6 +40,10 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var jumpMode = MutableStateFlow("simple")
     /** Ordered list of host IDs selected as jump hops (host-list mode). 0L = not yet selected. */
     var jumpHostIds = MutableStateFlow<List<Long>>(emptyList())
+    /** SFTP starting directory mode: "last" | "fixed" | "home". */
+    var sftpStartMode = MutableStateFlow("last")
+    /** Path shown/edited in the starting directory field (managed or user-entered). */
+    var sftpStartDir = MutableStateFlow("")
 
     private val _editingId = MutableStateFlow<Long?>(null)
 
@@ -89,6 +93,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             jumpMode.value = h.jumpMode
             jumpHostIds.value = h.jumpHostIdList
                 ?.split(",")?.mapNotNull { it.trim().toLongOrNull() } ?: emptyList()
+            sftpStartMode.value = h.sftpStartMode
+            sftpStartDir.value = h.sftpStartDir ?: ""
         }
     }
 
@@ -116,6 +122,12 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             existing?.jumpHostKeys
         } else null
 
+        val newSftpStartDir = when (sftpStartMode.value) {
+            "home"  -> null
+            "fixed" -> sftpStartDir.value.trim().takeIf { it.isNotEmpty() }
+            else    -> existing?.sftpStartDir  // "last": preserve the auto-managed path
+        }
+
         val entity = HostEntity(
             id               = editingId ?: 0,
             label            = label.value.ifBlank { hostname.value },
@@ -131,6 +143,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             portForwardings  = portForwardings.value.trim().takeIf { it.isNotEmpty() },
             jumpMode         = currentMode,
             jumpHostIdList   = newJumpHostIdList,
+            sftpStartMode    = sftpStartMode.value,
+            sftpStartDir     = newSftpStartDir,
         )
         hostDao.upsert(entity)
         onDone()
