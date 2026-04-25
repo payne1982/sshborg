@@ -670,10 +670,10 @@ private fun SftpEntryItem(
                         )
                         if (entry.isLink) {
                             Icon(
-                                Icons.Default.Link,
+                                Icons.Default.SubdirectoryArrowLeft,
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(12.dp)
+                                    .size(16.dp)
                                     .align(Alignment.BottomEnd),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
