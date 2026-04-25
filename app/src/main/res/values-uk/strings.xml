@@ -88,7 +88,7 @@
     <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Одне правило на рядок: [локПорт:хостВіддалений:портВіддалений] або [bind:локПорт:хостВіддалений:портВіддалений]. Префікс -L необов\'язковий.</string>
-    <string name="host_section_start_directory">Початковий каталог</string>
+    <string name="host_section_start_directory">SFTP: Початковий каталог</string>
     <string name="host_start_mode_last">Остання відвідана папка</string>
     <string name="host_start_mode_fixed">Фіксована папка</string>
     <string name="host_start_mode_home">Home</string>

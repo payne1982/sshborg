@@ -92,7 +92,7 @@
     <string name="host_field_port_forwarding">Forwarding rules (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">One rule per line: [localPort:remoteHost:remotePort] or [bindAddr:localPort:remoteHost:remotePort]. Optional -L prefix.</string>
-    <string name="host_section_start_directory">Starting Directory</string>
+    <string name="host_section_start_directory">SFTP: Starting Directory</string>
     <string name="host_start_mode_last">Last visited folder</string>
     <string name="host_start_mode_fixed">Fixed folder</string>
     <string name="host_start_mode_home">Home</string>

@@ -88,7 +88,7 @@
     <string name="host_field_port_forwarding">Regras de encaminhamento (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Uma regra por linha: [portaLocal:hostRemoto:portaRemota] ou [bind:portaLocal:hostRemoto:portaRemota]. Prefixo -L opcional.</string>
-    <string name="host_section_start_directory">Diretório inicial</string>
+    <string name="host_section_start_directory">SFTP: Diretório inicial</string>
     <string name="host_start_mode_last">Última pasta visitada</string>
     <string name="host_start_mode_fixed">Pasta fixa</string>
     <string name="host_start_mode_home">Home</string>
