@@ -48,9 +48,27 @@ class SshForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_DISCONNECT_ALL) {
-            (application as SshBorgApp).sessionManager.removeAll()
+            val app = application as SshBorgApp
+            saveSftpLastPaths(app)
+            app.sessionManager.removeAll()
         }
         return START_NOT_STICKY
+    }
+
+    private fun saveSftpLastPaths(app: SshBorgApp) {
+        val sftpSessions = app.sessionManager.sessions.value
+            .filter { it.type == SessionManager.SessionType.Sftp }
+        if (sftpSessions.isEmpty()) return
+        CoroutineScope(Dispatchers.IO).launch {
+            for (session in sftpSessions) {
+                val lastPath = session.sftpCurrentPath
+                if (lastPath.isBlank()) continue
+                val host = app.db.hostDao().getById(session.hostId) ?: continue
+                if (host.sftpStartMode == "last") {
+                    app.db.hostDao().upsert(host.copy(sftpStartDir = lastPath))
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
