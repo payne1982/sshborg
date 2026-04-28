@@ -37,8 +37,7 @@ class SshForegroundService : Service() {
             sessionManager.sessions.collect { sessions ->
                 if (sessions.isEmpty()) {
                     // Must call stopForeground before stopSelf, otherwise the notification lingers
-                    @Suppress("DEPRECATION")
-                    stopForeground(true)
+                    stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 } else {
                     updateNotification(sessions.size)
@@ -56,8 +55,7 @@ class SshForegroundService : Service() {
 
     override fun onDestroy() {
         scope.cancel()
-        @Suppress("DEPRECATION")
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
 
