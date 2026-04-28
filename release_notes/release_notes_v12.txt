@@ -1,21 +1,28 @@
 <en-US>
 • SFTP: configurable starting directory — choose between last visited folder, a fixed path, or home
+• Minor bug fixes and improvements
 </en-US>
 <it-IT>
 • SFTP: cartella iniziale configurabile — scegli tra l'ultima cartella visitata, un percorso fisso o la home
+• Piccole correzioni di bug e miglioramenti
 </it-IT>
 <de-DE>
 • SFTP: konfigurierbares Startverzeichnis — wähle zwischen zuletzt besuchtem Ordner, festem Pfad oder Home
+• Kleinere Fehlerbehebungen und Verbesserungen
 </de-DE>
 <es-ES>
 • SFTP: directorio inicial configurable — elige entre la última carpeta visitada, una ruta fija o el home
+• Correcciones menores de errores y mejoras
 </es-ES>
 <fr-FR>
 • SFTP : répertoire de démarrage configurable — choisissez entre le dernier dossier visité, un chemin fixe ou le home
+• Corrections mineures de bugs et améliorations
 </fr-FR>
 <pt-PT>
 • SFTP: diretório inicial configurável — escolha entre a última pasta visitada, um caminho fixo ou o home
+• Pequenas correções de erros e melhorias
 </pt-PT>
 <uk>
 • SFTP: налаштований початковий каталог — оберіть між останньою відвіданою папкою, фіксованим шляхом або home
+• Незначні виправлення помилок та покращення
 </uk>
