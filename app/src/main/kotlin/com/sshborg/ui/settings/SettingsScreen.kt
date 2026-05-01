@@ -148,7 +148,7 @@ fun SettingsScreen(
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(languageMenuExpanded) },
                             modifier = Modifier
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .width(180.dp),
                             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                             singleLine = true,
@@ -193,7 +193,7 @@ fun SettingsScreen(
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(themeMenuExpanded) },
                             modifier = Modifier
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                 .width(180.dp),
                             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                             singleLine = true,
@@ -335,7 +335,7 @@ fun SettingsScreen(
                                 readOnly = true,
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(timeoutMenuExpanded) },
                                 modifier = Modifier
-                                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                     .width(160.dp),
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                                 singleLine = true,

@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.sshborg"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.sshborg"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 11
         versionName = "1.2"
     }
