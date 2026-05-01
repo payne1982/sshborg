@@ -1,42 +1,42 @@
 <en-US>
 • SFTP: configurable starting directory — choose between last visited folder, a fixed path, or home
-• Terminal: text selection with draggable handles — long-press to select, drag to adjust, copy selection or all
+• Terminal: long-press to select and copy text from the terminal output
 • Updated third-party libraries for better security and compatibility
 • Minor bug fixes and improvements
 </en-US>
 <it-IT>
 • SFTP: cartella iniziale configurabile — scegli tra l'ultima cartella visitata, un percorso fisso o la home
-• Terminale: selezione del testo con handle trascinabili — tieni premuto per selezionare, trascina per regolare, copia la selezione o tutto
+• Terminale: tieni premuto per selezionare e copiare il testo dall'output
 • Aggiornamento delle librerie di terze parti per maggiore sicurezza e compatibilità
 • Piccole correzioni di bug e miglioramenti
 </it-IT>
 <de-DE>
 • SFTP: konfigurierbares Startverzeichnis — wähle zwischen zuletzt besuchtem Ordner, festem Pfad oder Home
-• Terminal: Textauswahl mit verschiebbaren Griffen — lange drücken zum Auswählen, ziehen zum Anpassen, Auswahl oder alles kopieren
+• Terminal: Text per langem Drücken auswählen und aus der Terminalausgabe kopieren
 • Aktualisierung von Drittanbieterbibliotheken für mehr Sicherheit und Kompatibilität
 • Kleinere Fehlerbehebungen und Verbesserungen
 </de-DE>
 <es-ES>
 • SFTP: directorio inicial configurable — elige entre la última carpeta visitada, una ruta fija o el home
-• Terminal: selección de texto con controladores arrastrables — mantén pulsado para seleccionar, arrastra para ajustar, copia la selección o todo
+• Terminal: mantén pulsado para seleccionar y copiar texto de la salida del terminal
 • Actualización de bibliotecas de terceros para mayor seguridad y compatibilidad
 • Correcciones menores de errores y mejoras
 </es-ES>
 <fr-FR>
 • SFTP : répertoire de démarrage configurable — choisissez entre le dernier dossier visité, un chemin fixe ou le home
-• Terminal : sélection de texte avec poignées déplaçables — appui long pour sélectionner, glisser pour ajuster, copier la sélection ou tout
+• Terminal : appui long pour sélectionner et copier du texte depuis la sortie du terminal
 • Mise à jour des bibliothèques tierces pour une meilleure sécurité et compatibilité
 • Corrections mineures de bugs et améliorations
 </fr-FR>
 <pt-PT>
 • SFTP: diretório inicial configurável — escolha entre a última pasta visitada, um caminho fixo ou o home
-• Terminal: seleção de texto com alças arrastáveis — pressione longamente para selecionar, arraste para ajustar, copie a seleção ou tudo
+• Terminal: pressione longamente para selecionar e copiar texto da saída do terminal
 • Atualização de bibliotecas de terceiros para maior segurança e compatibilidade
 • Pequenas correções de erros e melhorias
 </pt-PT>
 <uk>
 • SFTP: налаштований початковий каталог — оберіть між останньою відвіданою папкою, фіксованим шляхом або home
-• Термінал: виділення тексту з переміщуваними маркерами — утримуйте для виділення, перетягуйте для налаштування, копіюйте виділене або все
+• Термінал: утримуйте для виділення та копіювання тексту з виводу терміналу
 • Оновлення сторонніх бібліотек для покращення безпеки та сумісності
 • Незначні виправлення помилок та покращення
 </uk>
