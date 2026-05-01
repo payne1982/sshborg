@@ -250,17 +250,24 @@ class TerminalView @JvmOverloads constructor(
             canvas.drawRect(left, top, right, bottom, selectionPaint)
         }
 
-        // Start handle: circle centred on the top-left corner of the first selected cell.
+        // Start handle: stem covers the first selected row, circle above.
         val startScreenRow = s.first - vStart
         if (startScreenRow in 0 until termRows) {
-            canvas.drawCircle(s.second * cellW, startScreenRow * cellH, handleRadius, handlePaint)
+            drawHandle(canvas, s.second * cellW, startScreenRow * cellH, isStart = true)
         }
 
-        // End handle: circle centred on the bottom-right corner of the last selected cell.
+        // End handle: stem covers the last selected row, circle below.
         val endScreenRow = e.first - vStart
         if (endScreenRow in 0 until termRows) {
-            canvas.drawCircle((e.second + 1) * cellW, (endScreenRow + 1) * cellH, handleRadius, handlePaint)
+            drawHandle(canvas, (e.second + 1) * cellW, endScreenRow * cellH, isStart = false)
         }
+    }
+
+    private fun drawHandle(canvas: Canvas, x: Float, rowTop: Float, isStart: Boolean) {
+        val r = handleRadius
+        canvas.drawRect(x - 2f, rowTop, x + 2f, rowTop + cellH, handlePaint)
+        if (isStart) canvas.drawCircle(x, rowTop - r, r, handlePaint)
+        else         canvas.drawCircle(x, rowTop + cellH + r, r, handlePaint)
     }
 
     private fun resolveColors(style: TextStyle): Pair<Int, Int> {
@@ -327,14 +334,14 @@ class TerminalView @JvmOverloads constructor(
         val startRow = s.first - cachedViewStart
         if (startRow in 0 until termRows) {
             val hx = s.second * cellW
-            val hy = startRow * cellH
+            val hy = startRow * cellH - handleRadius          // circle centre above the row
             if (hypot((x - hx).toDouble(), (y - hy).toDouble()) < hitRadius) return 1
         }
 
         val endRow = e.first - cachedViewStart
         if (endRow in 0 until termRows) {
             val hx = (e.second + 1) * cellW
-            val hy = (endRow + 1) * cellH
+            val hy = endRow * cellH + cellH + handleRadius    // circle centre below the row
             if (hypot((x - hx).toDouble(), (y - hy).toDouble()) < hitRadius) return 2
         }
 
