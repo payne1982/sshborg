@@ -61,7 +61,7 @@ class TerminalView @JvmOverloads constructor(
     // Auto-scroll while dragging a handle near the top/bottom edge.
     private val autoScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var autoScrollRunnable: Runnable? = null
-    private var autoScrollDir = 0  // -1 = toward older content (up), +1 = toward newer (down)
+    private var autoScrollDir = 0  // +1 = toward older content (up), -1 = toward newer (down)
 
     val inSelectionMode: Boolean get() = selStart != null
     var onSelectionModeChanged: ((Boolean) -> Unit)? = null
@@ -316,8 +316,8 @@ class TerminalView @JvmOverloads constructor(
                         dragLastX = event.x
                         val triggerZone = cellH * 2f
                         when {
-                            event.y < triggerZone          -> scheduleAutoScroll(-1)
-                            event.y > height - triggerZone -> scheduleAutoScroll(+1)
+                            event.y < triggerZone          -> scheduleAutoScroll(+1)
+                            event.y > height - triggerZone -> scheduleAutoScroll(-1)
                             else -> { cancelAutoScroll(); updateDraggedHandle(event.x, event.y) }
                         }
                         return true
@@ -401,7 +401,7 @@ class TerminalView @JvmOverloads constructor(
                 synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
                 scrollbackOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollback)
                 val viewStart = maxScrollback - scrollbackOffset
-                val edgeRow = if (autoScrollDir > 0) termRows - 1 else 0
+                val edgeRow = if (autoScrollDir > 0) 0 else termRows - 1
                 val col = (dragLastX / cellW).toInt().coerceIn(0, termColumns - 1)
                 applyDraggedAnchor((viewStart + edgeRow) to col)
                 invalidate()
