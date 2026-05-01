@@ -86,6 +86,7 @@ module.exports = {
             <li><a href="#suggestions">Suggestions de commandes</a></li>
             <li class="sub"><a href="#suggestions">Fonctionnement</a></li>
             <li class="sub"><a href="#suggestions">Résolution de problèmes</a></li>
+            <li><a href="#terminal">Gestes du terminal</a></li>
             <li><a href="#agent-forwarding">Transfert d'agent</a></li>
             <li><a href="#connection-drops">Coupures de connexion</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -205,6 +206,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Pour obtenir les suggestions de l'historique root, ajoutez une entrée d'hôte séparée dans SSHBorg configurée pour se connecter directement en tant que <code>root</code> (si votre serveur le permet).
             </div>`,
+
+  doc_terminal: `
+            <h2>// GESTES DU TERMINAL</h2>
+            <p>Le terminal répond à quelques gestes tactiles en plus de la frappe :</p>
+            <ul>
+                <li><strong>Faire défiler l'historique</strong> — glissez vers le haut ou le bas pour parcourir le tampon de défilement du terminal.</li>
+                <li><strong>Zoom</strong> — pincez pour augmenter ou réduire la taille du texte.</li>
+                <li><strong>Copier du texte</strong> — appuyez longuement n'importe où sur le terminal pour entrer en mode sélection. Faites glisser les poignées pour ajuster la zone sélectionnée, puis appuyez sur <em>Copier la sélection</em> pour le texte surligné, ou <em>Tout copier</em> pour toute la sortie. Appuyez en dehors pour annuler.</li>
+                <li><strong>Coller</strong> — utilisez le bouton <em>Coller</em> dans la barre de touches supplémentaires (visible lorsque le clavier est ouvert).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// TRANSFERT D'AGENT</h2>

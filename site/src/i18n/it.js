@@ -87,6 +87,7 @@ module.exports = {
             <li><a href="#suggestions">Suggerimenti comandi</a></li>
             <li class="sub"><a href="#suggestions">Come funziona</a></li>
             <li class="sub"><a href="#suggestions">Risoluzione problemi</a></li>
+            <li><a href="#terminal">Gesture del terminale</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connessioni instabili</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -206,6 +207,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Per ottenere i suggerimenti dalla cronologia di root, aggiungi un host separato in SSHBorg configurato per accedere direttamente come <code>root</code> (se il server lo consente).
             </div>`,
+
+  doc_terminal: `
+            <h2>// GESTURE DEL TERMINALE</h2>
+            <p>Il terminale risponde ad alcune gesture touch oltre alla digitazione:</p>
+            <ul>
+                <li><strong>Scorrere la cronologia</strong> — scorri su o giù per navigare nel buffer di scrollback del terminale.</li>
+                <li><strong>Zoom</strong> — pizzica per aumentare o diminuire la dimensione del testo.</li>
+                <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare.</li>
+                <li><strong>Incollare</strong> — usa il tasto <em>Incolla</em> nella barra dei tasti extra (visibile quando la tastiera è aperta).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>

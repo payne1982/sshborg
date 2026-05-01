@@ -86,6 +86,7 @@ module.exports = {
             <li><a href="#suggestions">Sugestões de comandos</a></li>
             <li class="sub"><a href="#suggestions">Como funciona</a></li>
             <li class="sub"><a href="#suggestions">Resolução de problemas</a></li>
+            <li><a href="#terminal">Gestos do terminal</a></li>
             <li><a href="#agent-forwarding">Reencaminhamento de agente</a></li>
             <li><a href="#connection-drops">Quedas de ligação</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -205,6 +206,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Para obter sugestões do histórico de root, adicione uma entrada de host separada no SSHBorg configurada para iniciar sessão diretamente como <code>root</code> (se o servidor permitir).
             </div>`,
+
+  doc_terminal: `
+            <h2>// GESTOS DO TERMINAL</h2>
+            <p>O terminal responde a alguns gestos tácteis além da digitação:</p>
+            <ul>
+                <li><strong>Rolar o histórico</strong> — deslize para cima ou para baixo para navegar pelo buffer de scrollback do terminal.</li>
+                <li><strong>Zoom</strong> — faça pinça para aumentar ou diminuir o tamanho do texto.</li>
+                <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar.</li>
+                <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// REENCAMINHAMENTO DE AGENTE</h2>

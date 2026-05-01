@@ -88,6 +88,7 @@ module.exports = {
             <li><a href="#suggestions">Command Suggestions</a></li>
             <li class="sub"><a href="#suggestions">How it works</a></li>
             <li class="sub"><a href="#suggestions">Troubleshooting</a></li>
+            <li><a href="#terminal">Terminal Gestures</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -207,6 +208,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 To get root's history suggestions, add a separate host entry in SSHBorg configured to log in directly as <code>root</code> (if your server allows it).
             </div>`,
+
+  doc_terminal: `
+            <h2>// TERMINAL GESTURES</h2>
+            <p>The terminal responds to a few touch gestures beyond typing:</p>
+            <ul>
+                <li><strong>Scroll history</strong> — swipe up or down to browse the terminal's scrollback buffer.</li>
+                <li><strong>Zoom</strong> — pinch to increase or decrease the text size.</li>
+                <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
+                <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>

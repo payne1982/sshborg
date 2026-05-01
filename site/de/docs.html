@@ -508,6 +508,7 @@
             <li><a href="#suggestions">Befehlsvorschläge</a></li>
             <li class="sub"><a href="#suggestions">Funktionsweise</a></li>
             <li class="sub"><a href="#suggestions">Fehlerbehebung</a></li>
+            <li><a href="#terminal">Terminal-Gesten</a></li>
             <li><a href="#agent-forwarding">Agent-Forwarding</a></li>
             <li><a href="#connection-drops">Verbindungsabbrüche</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -639,6 +640,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Um Vorschläge aus der Root-Historie zu erhalten, füge in SSHBorg einen separaten Host-Eintrag hinzu, der direkt als <code>root</code> anmeldet (sofern dein Server dies erlaubt).
             </div>
+        </div>
+
+        <div class="doc-section" id="terminal">
+
+            <h2>// TERMINAL-GESTEN</h2>
+            <p>Das Terminal reagiert neben der Tastatureingabe auf einige Touch-Gesten:</p>
+            <ul>
+                <li><strong>Verlauf scrollen</strong> — nach oben oder unten wischen, um den Scrollback-Puffer zu durchsuchen.</li>
+                <li><strong>Zoom</strong> — mit zwei Fingern zoomen, um die Textgröße anzupassen.</li>
+                <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen.</li>
+                <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
+            </ul>
         </div>
 
         <div class="doc-section" id="agent-forwarding">
