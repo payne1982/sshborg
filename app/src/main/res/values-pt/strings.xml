@@ -172,6 +172,8 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Desligar</string>
     <string name="terminal_paste_cd">Colar</string>
+    <string name="terminal_copy_selection">Copiar seleção</string>
+    <string name="terminal_copy_all">Copiar tudo</string>
     <string name="terminal_connecting">A ligar…</string>
     <string name="terminal_connection_failed">Ligação falhada</string>
     <string name="terminal_disconnected">Desligado</string>

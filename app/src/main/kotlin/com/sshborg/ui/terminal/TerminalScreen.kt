@@ -65,6 +65,8 @@ fun TerminalScreen(
     val emulator by vm.emulatorFlow.collectAsState()
 
     val app = LocalContext.current.applicationContext as SshBorgApp
+    val ctx = LocalContext.current
+    var inSelectionMode by remember { mutableStateOf(false) }
     val invertScroll  by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
     val suggestions   by vm.suggestions.collectAsState()
 
@@ -140,23 +142,25 @@ fun TerminalScreen(
             Column(Modifier.fillMaxSize().imePadding()) {
                 // Terminal view
                 AndroidView(
-                    factory = { ctx ->
-                        TerminalView(ctx).also { view ->
-                            view.emulator    = vm.emulatorFlow.value
-                            view.invertScroll = invertScroll
-                            view.onInput     = sendInput
-                            view.onResize    = { cols, rows -> vm.resize(cols, rows) }
-                            vm.onNeedsRedraw  = { view.postInvalidate() }
-                            vm.terminalViewRef = view
+                    factory = { factoryCtx ->
+                        TerminalView(factoryCtx).also { view ->
+                            view.emulator             = vm.emulatorFlow.value
+                            view.invertScroll          = invertScroll
+                            view.onInput              = sendInput
+                            view.onResize             = { cols, rows -> vm.resize(cols, rows) }
+                            view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                            vm.onNeedsRedraw           = { view.postInvalidate() }
+                            vm.terminalViewRef         = view
                         }
                     },
                     update = { view ->
-                        view.emulator     = emulator
-                        view.invertScroll = invertScroll
-                        view.onInput      = sendInput
-                        view.onResize     = { cols, rows -> vm.resize(cols, rows) }
-                        vm.onNeedsRedraw   = { view.postInvalidate() }
-                        vm.terminalViewRef = view
+                        view.emulator             = emulator
+                        view.invertScroll          = invertScroll
+                        view.onInput              = sendInput
+                        view.onResize             = { cols, rows -> vm.resize(cols, rows) }
+                        view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                        vm.onNeedsRedraw           = { view.postInvalidate() }
+                        vm.terminalViewRef         = view
                         view.postInvalidate()
                     },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -203,6 +207,40 @@ fun TerminalScreen(
                         cursorKeys   = { vm.cursorKeyBytes(it) },
                     )
                 }
+            }
+
+            // Selection action bar — floats at the top of the terminal when in selection mode
+            if (inSelectionMode) {
+                val strCopied    = stringResource(R.string.action_copied)
+                val strSelection = stringResource(R.string.terminal_copy_selection)
+                val strAll       = stringResource(R.string.terminal_copy_all)
+                SelectionBar(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    labelCopySelection = strSelection,
+                    labelCopyAll       = strAll,
+                    onCopySelection = {
+                        val text = vm.terminalViewRef?.getSelectedText() ?: ""
+                        if (text.isNotEmpty()) {
+                            val cb = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                                    as android.content.ClipboardManager
+                            cb.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
+                            android.widget.Toast.makeText(ctx, strCopied, android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                        vm.terminalViewRef?.exitSelectionMode()
+                    },
+                    onCopyAll = {
+                        val text = vm.terminalViewRef?.getAllText() ?: ""
+                        if (text.isNotEmpty()) {
+                            val cb = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                                    as android.content.ClipboardManager
+                            cb.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
+                            android.widget.Toast.makeText(ctx, strCopied, android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                        vm.terminalViewRef?.exitSelectionMode()
+                    },
+                )
             }
 
             // State overlays
@@ -502,6 +540,32 @@ private fun ErrorOverlay(message: String, onBack: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 Button(onClick = onBack) { Text(stringResource(R.string.action_go_back)) }
             }
+        }
+    }
+}
+
+@Composable
+private fun SelectionBar(
+    labelCopySelection: String,
+    labelCopyAll: String,
+    onCopySelection: () -> Unit,
+    onCopyAll: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier       = modifier,
+        color          = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 4.dp,
+        shadowElevation = 4.dp,
+        shape          = MaterialTheme.shapes.medium,
+    ) {
+        Row(
+            modifier              = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment     = Alignment.CenterVertically,
+        ) {
+            TextButton(onClick = onCopySelection) { Text(labelCopySelection) }
+            TextButton(onClick = onCopyAll)       { Text(labelCopyAll) }
         }
     }
 }

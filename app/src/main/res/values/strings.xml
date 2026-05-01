@@ -187,6 +187,8 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Disconnect</string>
     <string name="terminal_paste_cd">Paste</string>
+    <string name="terminal_copy_selection">Copy selection</string>
+    <string name="terminal_copy_all">Copy all</string>
     <string name="terminal_connecting">Connecting…</string>
     <string name="terminal_connection_failed">Connection failed</string>
     <string name="terminal_disconnected">Disconnected</string>
