@@ -56,6 +56,12 @@ class TerminalView @JvmOverloads constructor(
     private var selEnd:   Pair<Int, Int>? = null
     private var draggingHandle = 0  // 0=none, 1=start, 2=end
     private var cachedViewStart = 0 // set each onDraw; safe to read on main thread in touch handlers
+    private var dragLastX = 0f
+
+    // Auto-scroll while dragging a handle near the top/bottom edge.
+    private val autoScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var autoScrollRunnable: Runnable? = null
+    private var autoScrollDir = 0  // -1 = toward older content (up), +1 = toward newer (down)
 
     val inSelectionMode: Boolean get() = selStart != null
     var onSelectionModeChanged: ((Boolean) -> Unit)? = null
@@ -107,6 +113,11 @@ class TerminalView @JvmOverloads constructor(
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         super.onWindowFocusChanged(hasWindowFocus)
         if (hasWindowFocus) post { reattachIme() }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        cancelAutoScroll()
     }
 
     fun showKeyboard() {
@@ -302,12 +313,19 @@ class TerminalView @JvmOverloads constructor(
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (draggingHandle != 0) {
-                        updateDraggedHandle(event.x, event.y)
+                        dragLastX = event.x
+                        val triggerZone = cellH * 2f
+                        when {
+                            event.y < triggerZone          -> scheduleAutoScroll(-1)
+                            event.y > height - triggerZone -> scheduleAutoScroll(+1)
+                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x, event.y) }
+                        }
                         return true
                     }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     if (draggingHandle != 0) {
+                        cancelAutoScroll()
                         draggingHandle = 0
                         return true
                     }
@@ -349,7 +367,11 @@ class TerminalView @JvmOverloads constructor(
     }
 
     private fun updateDraggedHandle(x: Float, y: Float) {
-        val anchor = pixelToAnchor(x, y)
+        applyDraggedAnchor(pixelToAnchor(x, y))
+        invalidate()
+    }
+
+    private fun applyDraggedAnchor(anchor: Pair<Int, Int>) {
         if (draggingHandle == 1) {
             val end = selEnd!!
             if (compareAnchors(anchor, end) > 0) {
@@ -357,7 +379,7 @@ class TerminalView @JvmOverloads constructor(
             } else {
                 selStart = anchor
             }
-        } else {
+        } else if (draggingHandle == 2) {
             val start = selStart!!
             if (compareAnchors(anchor, start) < 0) {
                 selEnd = start; selStart = anchor; draggingHandle = 1
@@ -365,7 +387,35 @@ class TerminalView @JvmOverloads constructor(
                 selEnd = anchor
             }
         }
-        invalidate()
+    }
+
+    private fun scheduleAutoScroll(dir: Int) {
+        if (autoScrollDir == dir) return
+        cancelAutoScroll()
+        autoScrollDir = dir
+        val r = object : Runnable {
+            override fun run() {
+                if (autoScrollDir == 0 || draggingHandle == 0) return
+                val emu = emulator ?: return
+                val maxScrollback: Int
+                synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
+                scrollbackOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollback)
+                val viewStart = maxScrollback - scrollbackOffset
+                val edgeRow = if (autoScrollDir > 0) termRows - 1 else 0
+                val col = (dragLastX / cellW).toInt().coerceIn(0, termColumns - 1)
+                applyDraggedAnchor((viewStart + edgeRow) to col)
+                invalidate()
+                autoScrollHandler.postDelayed(this, 80)
+            }
+        }
+        autoScrollRunnable = r
+        autoScrollHandler.postDelayed(r, 80)
+    }
+
+    private fun cancelAutoScroll() {
+        autoScrollDir = 0
+        autoScrollRunnable?.let { autoScrollHandler.removeCallbacks(it) }
+        autoScrollRunnable = null
     }
 
     private fun compareAnchors(a: Pair<Int, Int>, b: Pair<Int, Int>): Int =
