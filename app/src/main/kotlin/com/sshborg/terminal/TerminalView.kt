@@ -250,28 +250,16 @@ class TerminalView @JvmOverloads constructor(
             canvas.drawRect(left, top, right, bottom, selectionPaint)
         }
 
-        // Start handle: stem going up + circle above the top-left corner of the first selected cell.
+        // Start handle: circle centred on the top-left corner of the first selected cell.
         val startScreenRow = s.first - vStart
         if (startScreenRow in 0 until termRows) {
-            drawHandle(canvas, s.second * cellW, startScreenRow * cellH, isStart = true)
+            canvas.drawCircle(s.second * cellW, startScreenRow * cellH, handleRadius, handlePaint)
         }
 
-        // End handle: stem going down + circle below the bottom-right corner of the last selected cell.
+        // End handle: circle centred on the bottom-right corner of the last selected cell.
         val endScreenRow = e.first - vStart
         if (endScreenRow in 0 until termRows) {
-            drawHandle(canvas, (e.second + 1) * cellW, (endScreenRow + 1) * cellH, isStart = false)
-        }
-    }
-
-    private fun drawHandle(canvas: Canvas, x: Float, y: Float, isStart: Boolean) {
-        val r   = handleRadius
-        val len = r * 1.5f
-        if (isStart) {
-            canvas.drawRect(x - 2f, y - len, x + 2f, y, handlePaint)
-            canvas.drawCircle(x, y - len - r, r, handlePaint)
-        } else {
-            canvas.drawRect(x - 2f, y, x + 2f, y + len, handlePaint)
-            canvas.drawCircle(x, y + len + r, r, handlePaint)
+            canvas.drawCircle((e.second + 1) * cellW, (endScreenRow + 1) * cellH, handleRadius, handlePaint)
         }
     }
 
@@ -339,14 +327,14 @@ class TerminalView @JvmOverloads constructor(
         val startRow = s.first - cachedViewStart
         if (startRow in 0 until termRows) {
             val hx = s.second * cellW
-            val hy = startRow * cellH - handleRadius * 2.5f
+            val hy = startRow * cellH
             if (hypot((x - hx).toDouble(), (y - hy).toDouble()) < hitRadius) return 1
         }
 
         val endRow = e.first - cachedViewStart
         if (endRow in 0 until termRows) {
             val hx = (e.second + 1) * cellW
-            val hy = (endRow + 1) * cellH + handleRadius * 2.5f
+            val hy = (endRow + 1) * cellH
             if (hypot((x - hx).toDouble(), (y - hy).toDouble()) < hitRadius) return 2
         }
 
