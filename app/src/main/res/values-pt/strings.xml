@@ -279,5 +279,5 @@
         <item quantity="other">%d sessões ativas</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>
-    <string name="settings_allow_screenshots_subtitle">Permitir capturas de ecrã e gravação de ecrã. Desativar para proteger conteúdo sensível.</string>
+    <string name="settings_allow_screenshots_subtitle">Permitir capturas de ecrã e gravação de ecrã. Manter desativado para proteger conteúdo sensível.</string>
 </resources>

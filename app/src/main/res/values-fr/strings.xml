@@ -279,5 +279,5 @@
         <item quantity="other">%d sessions actives</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Autoriser les captures d\'écran</string>
-    <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Désactiver pour protéger les contenus sensibles.</string>
+    <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Laisser désactivé pour protéger les contenus sensibles.</string>
 </resources>

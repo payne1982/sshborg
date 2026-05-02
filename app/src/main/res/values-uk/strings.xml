@@ -281,5 +281,5 @@
         <item quantity="other">%d активної сесії</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
-    <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Вимкніть для захисту конфіденційного вмісту.</string>
+    <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Залиште вимкненим для захисту конфіденційного вмісту.</string>
 </resources>

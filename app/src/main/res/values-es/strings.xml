@@ -279,5 +279,5 @@
         <item quantity="other">%d sesiones activas</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de pantalla</string>
-    <string name="settings_allow_screenshots_subtitle">Permitir capturas de pantalla y grabación de pantalla. Desactivar para proteger contenido sensible.</string>
+    <string name="settings_allow_screenshots_subtitle">Permitir capturas de pantalla y grabación de pantalla. Déjalo desactivado para proteger el contenido sensible.</string>
 </resources>
