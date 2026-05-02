@@ -7,15 +7,8 @@ import android.util.AttributeSet
 import android.view.*
 import android.view.inputmethod.*
 import kotlin.math.floor
+import kotlin.math.hypot
 
-/**
- * Android View that renders a [TerminalEmulator] buffer and accepts keyboard/touch input.
- *
- * Usage:
- *  - Set [emulator] to your [TerminalEmulator] instance.
- *  - Call [onInput] callback to receive characters typed by the user.
- *  - Call [invalidate] after feeding data to the emulator to trigger a redraw.
- */
 class TerminalView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -55,6 +48,27 @@ class TerminalView @JvmOverloads constructor(
     var invertScroll: Boolean = false
     private var gestureDetector = GestureDetector(context, GestureListener())
     private var scaleDetector = ScaleGestureDetector(context, ScaleListener())
+
+    // --- Selection state ---
+    // Anchors are (absLine, col) where absLine counts from the top of scrollback + screen.
+    // selStart is always <= selEnd (normalized on every update).
+    private var selStart: Pair<Int, Int>? = null
+    private var selEnd:   Pair<Int, Int>? = null
+    private var draggingHandle = 0  // 0=none, 1=start, 2=end
+    private var cachedViewStart = 0 // set each onDraw; safe to read on main thread in touch handlers
+    private var dragLastX = 0f
+
+    // Auto-scroll while dragging a handle near the top/bottom edge.
+    private val autoScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var autoScrollRunnable: Runnable? = null
+    private var autoScrollDir = 0  // +1 = toward older content (up), -1 = toward newer (down)
+
+    val inSelectionMode: Boolean get() = selStart != null
+    var onSelectionModeChanged: ((Boolean) -> Unit)? = null
+
+    private val selectionPaint = Paint().apply { color = Color.argb(80, 100, 149, 237) }
+    private val handlePaint    = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(100, 149, 237) }
+    private val handleRadius: Float by lazy { 10f * resources.displayMetrics.density }
 
     // --- ANSI color palette ---
     private val colorPalette = IntArray(256).apply {
@@ -101,14 +115,19 @@ class TerminalView @JvmOverloads constructor(
         if (hasWindowFocus) post { reattachIme() }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        cancelAutoScroll()
+    }
+
     fun showKeyboard() {
         post { reattachIme() }
     }
 
     /**
-     * Forza l'IME a riconnettersi a questa view.
-     * Necessario in Compose: la ComposeView parent cattura il focus IME
-     * e bisogna esplicitamente scalzarla con restartInput().
+     * Force IME to reconnect to this view.
+     * Needed in Compose: the ComposeView parent captures IME focus and we must
+     * explicitly displace it with restartInput().
      */
     private fun reattachIme() {
         requestFocus()
@@ -159,9 +178,9 @@ class TerminalView @JvmOverloads constructor(
         synchronized(emu) {
             val buf = emu.buffer
 
-            // Total lines: scrollback + screen
             val totalScrollback = buf.scrollbackSize
             val viewStart = totalScrollback - scrollbackOffset
+            cachedViewStart = viewStart
 
             for (r in 0 until visibleRows) {
                 val absLine = viewStart + r
@@ -216,6 +235,50 @@ class TerminalView @JvmOverloads constructor(
                 }
             }
         }
+
+        if (inSelectionMode) drawSelection(canvas)
+    }
+
+    // --- Selection drawing ---
+
+    private fun drawSelection(canvas: Canvas) {
+        val start = selStart ?: return
+        val end   = selEnd   ?: return
+        val (s, e) = if (compareAnchors(start, end) <= 0) start to end else end to start
+        val vStart = cachedViewStart
+
+        // Highlight selected cells with a semi-transparent overlay.
+        // First line: from s.col to end of row.
+        // Middle lines: entire row.
+        // Last line: from start of row to e.col.
+        for (r in 0 until termRows) {
+            val absLine = vStart + r
+            if (absLine < s.first || absLine > e.first) continue
+            val top    = r * cellH
+            val bottom = top + cellH
+            val left   = if (absLine == s.first) s.second * cellW else 0f
+            val right  = if (absLine == e.first) (e.second + 1) * cellW else width.toFloat()
+            canvas.drawRect(left, top, right, bottom, selectionPaint)
+        }
+
+        // Start handle: stem covers the first selected row, circle above.
+        val startScreenRow = s.first - vStart
+        if (startScreenRow in 0 until termRows) {
+            drawHandle(canvas, s.second * cellW, startScreenRow * cellH, isStart = true)
+        }
+
+        // End handle: stem covers the last selected row, circle below.
+        val endScreenRow = e.first - vStart
+        if (endScreenRow in 0 until termRows) {
+            drawHandle(canvas, (e.second + 1) * cellW, endScreenRow * cellH, isStart = false)
+        }
+    }
+
+    private fun drawHandle(canvas: Canvas, x: Float, rowTop: Float, isStart: Boolean) {
+        val r = handleRadius
+        canvas.drawRect(x - 2f, rowTop, x + 2f, rowTop + cellH, handlePaint)
+        if (isStart) canvas.drawCircle(x, rowTop - r, r, handlePaint)
+        else         canvas.drawCircle(x, rowTop + cellH + r, r, handlePaint)
     }
 
     private fun resolveColors(style: TextStyle): Pair<Int, Int> {
@@ -238,13 +301,184 @@ class TerminalView @JvmOverloads constructor(
         else -> default
     }
 
-    // --- Input ---
+    // --- Touch and selection interaction ---
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (inSelectionMode) {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    draggingHandle = hitTestHandle(event.x, event.y)
+                    if (draggingHandle != 0) return true
+                    // Not on a handle: fall through to gesture detector (allows scroll/tap-to-exit)
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (draggingHandle != 0) {
+                        dragLastX = event.x
+                        val triggerZone = cellH * 2f
+                        when {
+                            event.y < triggerZone          -> scheduleAutoScroll(+1)
+                            event.y > height - triggerZone -> scheduleAutoScroll(-1)
+                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x, event.y) }
+                        }
+                        return true
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (draggingHandle != 0) {
+                        cancelAutoScroll()
+                        draggingHandle = 0
+                        return true
+                    }
+                }
+            }
+        }
         scaleDetector.onTouchEvent(event)
         if (!scaleDetector.isInProgress) gestureDetector.onTouchEvent(event)
         return true
     }
+
+    private fun pixelToAnchor(x: Float, y: Float): Pair<Int, Int> {
+        val row = (y / cellH).toInt().coerceIn(0, termRows - 1)
+        val col = (x / cellW).toInt().coerceIn(0, termColumns - 1)
+        return (cachedViewStart + row) to col
+    }
+
+    private fun hitTestHandle(x: Float, y: Float): Int {
+        val hitRadius = handleRadius * 2.5f
+        val start = selStart ?: return 0
+        val end   = selEnd   ?: return 0
+        val (s, e) = if (compareAnchors(start, end) <= 0) start to end else end to start
+
+        val startRow = s.first - cachedViewStart
+        if (startRow in 0 until termRows) {
+            val hx = s.second * cellW
+            val hy = startRow * cellH - handleRadius          // circle centre above the row
+            if (hypot((x - hx).toDouble(), (y - hy).toDouble()) < hitRadius) return 1
+        }
+
+        val endRow = e.first - cachedViewStart
+        if (endRow in 0 until termRows) {
+            val hx = (e.second + 1) * cellW
+            val hy = endRow * cellH + cellH + handleRadius    // circle centre below the row
+            if (hypot((x - hx).toDouble(), (y - hy).toDouble()) < hitRadius) return 2
+        }
+
+        return 0
+    }
+
+    private fun updateDraggedHandle(x: Float, y: Float) {
+        applyDraggedAnchor(pixelToAnchor(x, y))
+        invalidate()
+    }
+
+    private fun applyDraggedAnchor(anchor: Pair<Int, Int>) {
+        if (draggingHandle == 1) {
+            val end = selEnd!!
+            if (compareAnchors(anchor, end) > 0) {
+                selStart = end; selEnd = anchor; draggingHandle = 2
+            } else {
+                selStart = anchor
+            }
+        } else if (draggingHandle == 2) {
+            val start = selStart!!
+            if (compareAnchors(anchor, start) < 0) {
+                selEnd = start; selStart = anchor; draggingHandle = 1
+            } else {
+                selEnd = anchor
+            }
+        }
+    }
+
+    private fun scheduleAutoScroll(dir: Int) {
+        if (autoScrollDir == dir) return
+        cancelAutoScroll()
+        autoScrollDir = dir
+        val r = object : Runnable {
+            override fun run() {
+                if (autoScrollDir == 0 || draggingHandle == 0) return
+                val emu = emulator ?: return
+                val maxScrollback: Int
+                synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
+                scrollbackOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollback)
+                val viewStart = maxScrollback - scrollbackOffset
+                val edgeRow = if (autoScrollDir > 0) 0 else termRows - 1
+                val col = (dragLastX / cellW).toInt().coerceIn(0, termColumns - 1)
+                applyDraggedAnchor((viewStart + edgeRow) to col)
+                invalidate()
+                autoScrollHandler.postDelayed(this, 80)
+            }
+        }
+        autoScrollRunnable = r
+        autoScrollHandler.postDelayed(r, 80)
+    }
+
+    private fun cancelAutoScroll() {
+        autoScrollDir = 0
+        autoScrollRunnable?.let { autoScrollHandler.removeCallbacks(it) }
+        autoScrollRunnable = null
+    }
+
+    private fun compareAnchors(a: Pair<Int, Int>, b: Pair<Int, Int>): Int =
+        if (a.first != b.first) a.first - b.first else a.second - b.second
+
+    fun exitSelectionMode() {
+        selStart = null
+        selEnd   = null
+        draggingHandle = 0
+        onSelectionModeChanged?.invoke(false)
+        invalidate()
+    }
+
+    fun getSelectedText(): String {
+        val start = selStart ?: return ""
+        val end   = selEnd   ?: return ""
+        val (s, e) = if (compareAnchors(start, end) <= 0) start to end else end to start
+        val emu = emulator ?: return ""
+        val sb = StringBuilder()
+        synchronized(emu) {
+            val buf   = emu.buffer
+            val total = buf.scrollbackSize
+            for (absLine in s.first..e.first) {
+                val cells = getAbsLineCells(absLine, buf, total) ?: continue
+                val from  = if (absLine == s.first) s.second else 0
+                val to    = (if (absLine == e.first) e.second else cells.lastIndex).coerceAtMost(cells.lastIndex)
+                val row   = StringBuilder()
+                for (col in from..to) row.append(cells[col].char)
+                if (absLine < e.first) sb.appendLine(row.trimEnd()) else sb.append(row.trimEnd())
+            }
+        }
+        return sb.toString().trimEnd()
+    }
+
+    fun getAllText(): String {
+        val emu = emulator ?: return ""
+        val sb = StringBuilder()
+        synchronized(emu) {
+            val buf = emu.buffer
+            for (i in 0 until buf.scrollbackSize) {
+                val line = buf.getScrollbackLine(i) ?: continue
+                val row = StringBuilder()
+                for (cell in line) row.append(cell.char)
+                sb.appendLine(row.trimEnd())
+            }
+            for (row in 0 until buf.rows) {
+                val line = StringBuilder()
+                for (col in 0 until buf.columns) line.append(buf.getCell(row, col).char)
+                sb.appendLine(line.trimEnd())
+            }
+        }
+        return sb.toString().trimEnd()
+    }
+
+    private fun getAbsLineCells(absLine: Int, buf: TerminalBuffer, totalScrollback: Int): Array<TerminalBuffer.Cell>? =
+        if (absLine < totalScrollback) {
+            buf.getScrollbackLine(absLine)
+        } else {
+            val sr = absLine - totalScrollback
+            if (sr >= buf.rows) null else (0 until buf.columns).map { buf.getCell(sr, it) }.toTypedArray()
+        }
+
+    // --- Input ---
 
     override fun onCheckIsTextEditor() = true
 
@@ -261,51 +495,50 @@ class TerminalView @JvmOverloads constructor(
     }
 
     private fun keyEventToBytes(keyCode: Int, event: KeyEvent): ByteArray? {
-        val ctrl = event.isCtrlPressed
-        val alt  = event.isAltPressed
+        val ctrl  = event.isCtrlPressed
+        val alt   = event.isAltPressed
         val shift = event.isShiftPressed
         return when (keyCode) {
-            KeyEvent.KEYCODE_ENTER      -> byteArrayOf(0x0D)
-            KeyEvent.KEYCODE_DEL        -> if (ctrl) byteArrayOf(0x08) else byteArrayOf(0x7F)
-            KeyEvent.KEYCODE_TAB        -> if (shift) "\u001b[Z".toByteArray() else byteArrayOf(0x09)
-            KeyEvent.KEYCODE_ESCAPE     -> byteArrayOf(0x1B)
-            KeyEvent.KEYCODE_DPAD_UP    -> if (emulator?.applicationCursorKeys == true) "\u001bOA".toByteArray() else "\u001b[A".toByteArray()
-            KeyEvent.KEYCODE_DPAD_DOWN  -> if (emulator?.applicationCursorKeys == true) "\u001bOB".toByteArray() else "\u001b[B".toByteArray()
-            KeyEvent.KEYCODE_DPAD_RIGHT -> if (emulator?.applicationCursorKeys == true) "\u001bOC".toByteArray() else "\u001b[C".toByteArray()
-            KeyEvent.KEYCODE_DPAD_LEFT  -> if (emulator?.applicationCursorKeys == true) "\u001bOD".toByteArray() else "\u001b[D".toByteArray()
-            KeyEvent.KEYCODE_MOVE_HOME  -> "\u001b[H".toByteArray()
-            KeyEvent.KEYCODE_MOVE_END   -> "\u001b[F".toByteArray()
-            KeyEvent.KEYCODE_PAGE_UP    -> "\u001b[5~".toByteArray()
-            KeyEvent.KEYCODE_PAGE_DOWN  -> "\u001b[6~".toByteArray()
-            KeyEvent.KEYCODE_INSERT     -> "\u001b[2~".toByteArray()
-            KeyEvent.KEYCODE_FORWARD_DEL -> "\u001b[3~".toByteArray()
-            KeyEvent.KEYCODE_F1  -> "\u001bOP".toByteArray()
-            KeyEvent.KEYCODE_F2  -> "\u001bOQ".toByteArray()
-            KeyEvent.KEYCODE_F3  -> "\u001bOR".toByteArray()
-            KeyEvent.KEYCODE_F4  -> "\u001bOS".toByteArray()
-            KeyEvent.KEYCODE_F5  -> "\u001b[15~".toByteArray()
-            KeyEvent.KEYCODE_F6  -> "\u001b[17~".toByteArray()
-            KeyEvent.KEYCODE_F7  -> "\u001b[18~".toByteArray()
-            KeyEvent.KEYCODE_F8  -> "\u001b[19~".toByteArray()
-            KeyEvent.KEYCODE_F9  -> "\u001b[20~".toByteArray()
-            KeyEvent.KEYCODE_F10 -> "\u001b[21~".toByteArray()
-            KeyEvent.KEYCODE_F11 -> "\u001b[23~".toByteArray()
-            KeyEvent.KEYCODE_F12 -> "\u001b[24~".toByteArray()
+            KeyEvent.KEYCODE_ENTER       -> byteArrayOf(0x0D)
+            KeyEvent.KEYCODE_DEL         -> if (ctrl) byteArrayOf(0x08) else byteArrayOf(0x7F)
+            KeyEvent.KEYCODE_TAB         -> if (shift) "[Z".toByteArray() else byteArrayOf(0x09)
+            KeyEvent.KEYCODE_ESCAPE      -> byteArrayOf(0x1B)
+            KeyEvent.KEYCODE_DPAD_UP     -> if (emulator?.applicationCursorKeys == true) "OA".toByteArray() else "[A".toByteArray()
+            KeyEvent.KEYCODE_DPAD_DOWN   -> if (emulator?.applicationCursorKeys == true) "OB".toByteArray() else "[B".toByteArray()
+            KeyEvent.KEYCODE_DPAD_RIGHT  -> if (emulator?.applicationCursorKeys == true) "OC".toByteArray() else "[C".toByteArray()
+            KeyEvent.KEYCODE_DPAD_LEFT   -> if (emulator?.applicationCursorKeys == true) "OD".toByteArray() else "[D".toByteArray()
+            KeyEvent.KEYCODE_MOVE_HOME   -> "[H".toByteArray()
+            KeyEvent.KEYCODE_MOVE_END    -> "[F".toByteArray()
+            KeyEvent.KEYCODE_PAGE_UP     -> "[5~".toByteArray()
+            KeyEvent.KEYCODE_PAGE_DOWN   -> "[6~".toByteArray()
+            KeyEvent.KEYCODE_INSERT      -> "[2~".toByteArray()
+            KeyEvent.KEYCODE_FORWARD_DEL -> "[3~".toByteArray()
+            KeyEvent.KEYCODE_F1  -> "OP".toByteArray()
+            KeyEvent.KEYCODE_F2  -> "OQ".toByteArray()
+            KeyEvent.KEYCODE_F3  -> "OR".toByteArray()
+            KeyEvent.KEYCODE_F4  -> "OS".toByteArray()
+            KeyEvent.KEYCODE_F5  -> "[15~".toByteArray()
+            KeyEvent.KEYCODE_F6  -> "[17~".toByteArray()
+            KeyEvent.KEYCODE_F7  -> "[18~".toByteArray()
+            KeyEvent.KEYCODE_F8  -> "[19~".toByteArray()
+            KeyEvent.KEYCODE_F9  -> "[20~".toByteArray()
+            KeyEvent.KEYCODE_F10 -> "[21~".toByteArray()
+            KeyEvent.KEYCODE_F11 -> "[23~".toByteArray()
+            KeyEvent.KEYCODE_F12 -> "[24~".toByteArray()
             else -> {
                 val ch = event.unicodeChar
                 if (ch == 0) return null
-                val actual = when {
+                when {
                     ctrl && ch in 0x40..0x5F -> byteArrayOf((ch - 0x40).toByte())
                     ctrl && ch in 0x61..0x7A -> byteArrayOf((ch - 0x60).toByte())
-                    alt -> byteArrayOf(0x1B, ch.toByte())
+                    alt  -> byteArrayOf(0x1B, ch.toByte())
                     else -> ch.toChar().toString().toByteArray(Charsets.UTF_8)
                 }
-                actual
             }
         }
     }
 
-    // --- Gesture: scroll and pinch-zoom ---
+    // --- Gesture: scroll, tap, long-press, pinch-zoom ---
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
@@ -316,32 +549,23 @@ class TerminalView @JvmOverloads constructor(
             return true
         }
         override fun onSingleTapUp(e: MotionEvent): Boolean {
+            if (inSelectionMode) {
+                exitSelectionMode()
+                return true
+            }
             requestFocus()
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(this@TerminalView, 0)
             return true
         }
         override fun onLongPress(e: MotionEvent) {
-            val buf = emulator?.buffer ?: return
-            val sb = StringBuilder()
-            for (i in 0 until buf.scrollbackSize) {
-                val line = buf.getScrollbackLine(i) ?: continue
-                val row = StringBuilder()
-                for (cell in line) row.append(cell.char)
-                sb.appendLine(row.trimEnd())
-            }
-            for (row in 0 until buf.rows) {
-                val line = StringBuilder()
-                for (col in 0 until buf.columns) {
-                    line.append(buf.getCell(row, col).char)
-                }
-                sb.appendLine(line.trimEnd())
-            }
-            val text = sb.toString().trimEnd()
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
-                    as android.content.ClipboardManager
-            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
-            android.widget.Toast.makeText(context, "Copied", android.widget.Toast.LENGTH_SHORT).show()
+            if (inSelectionMode) return
+            val anchor = pixelToAnchor(e.x, e.y)
+            selStart = anchor
+            selEnd   = anchor
+            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            onSelectionModeChanged?.invoke(true)
+            invalidate()
         }
     }
 

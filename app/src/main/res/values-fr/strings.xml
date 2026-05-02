@@ -88,6 +88,11 @@
     <string name="host_field_port_forwarding">Règles de transfert (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Une règle par ligne : [portLocal:hôteDistant:portDistant] ou [bind:portLocal:hôteDistant:portDistant]. Préfixe -L facultatif.</string>
+    <string name="host_section_start_directory">SFTP : Répertoire de démarrage</string>
+    <string name="host_start_mode_last">Dernier dossier visité</string>
+    <string name="host_start_mode_fixed">Dossier fixe</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Répertoire de démarrage</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Clés SSH</string>
@@ -167,6 +172,8 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Déconnecter</string>
     <string name="terminal_paste_cd">Coller</string>
+    <string name="terminal_copy_selection">Copier la sélection</string>
+    <string name="terminal_copy_all">Tout copier</string>
     <string name="terminal_connecting">Connexion en cours…</string>
     <string name="terminal_connection_failed">Connexion échouée</string>
     <string name="terminal_disconnected">Déconnecté</string>
@@ -237,6 +244,12 @@
     <string name="root_warning_title">Avertissement de sécurité</string>
     <string name="root_warning_body">Cet appareil semble être rooté. Sur les appareils rootés, les garanties de sécurité de l\'Android Keystore sont affaiblies et d\'autres applications pourraient accéder aux données sensibles. Procédez avec prudence.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Conseil de sécurité</string>
+    <string name="security_reminder_body">Activez le verrouillage biométrique et le chiffrement matériel dans les Paramètres pour protéger vos identifiants.</string>
+    <string name="action_remind_later">Me rappeler plus tard</string>
+    <string name="action_dont_show_again">Ne plus afficher</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Session introuvable</string>
     <string name="error_host_not_found">Hôte introuvable</string>
@@ -272,5 +285,5 @@
         <item quantity="other">%d sessions actives</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Autoriser les captures d\'écran</string>
-    <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Désactiver pour protéger les contenus sensibles.</string>
+    <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Laisser désactivé pour protéger les contenus sensibles.</string>
 </resources>

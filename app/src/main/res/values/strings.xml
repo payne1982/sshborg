@@ -92,6 +92,11 @@
     <string name="host_field_port_forwarding">Forwarding rules (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">One rule per line: [localPort:remoteHost:remotePort] or [bindAddr:localPort:remoteHost:remotePort]. Optional -L prefix.</string>
+    <string name="host_section_start_directory">SFTP: Starting Directory</string>
+    <string name="host_start_mode_last">Last visited folder</string>
+    <string name="host_start_mode_fixed">Fixed folder</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Starting directory</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH Keys</string>
@@ -161,7 +166,7 @@
     <string name="settings_encrypt_subtitle">SSH private keys and host passwords are encrypted using this device\'s secure hardware. If you uninstall the app, encrypted keys will become inaccessible.</string>
 
     <string name="settings_allow_screenshots_title">Allow screenshots</string>
-    <string name="settings_allow_screenshots_subtitle">Permit screenshots and screen recording. Disable to protect sensitive content.</string>
+    <string name="settings_allow_screenshots_subtitle">Permit screenshots and screen recording. Leave disabled to protect sensitive content.</string>
 
     <!-- Encrypt confirmation dialog -->
     <string name="settings_encrypt_dialog_title">Encrypt sensitive data?</string>
@@ -182,6 +187,8 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Disconnect</string>
     <string name="terminal_paste_cd">Paste</string>
+    <string name="terminal_copy_selection">Copy selection</string>
+    <string name="terminal_copy_all">Copy all</string>
     <string name="terminal_connecting">Connecting…</string>
     <string name="terminal_connection_failed">Connection failed</string>
     <string name="terminal_disconnected">Disconnected</string>
@@ -252,6 +259,12 @@
     <!-- ── Root warning dialog ───────────────────────────────────────────── -->
     <string name="root_warning_title">Security warning</string>
     <string name="root_warning_body">This device appears to be rooted. On rooted devices the security guarantees of the Android Keystore are weakened, and other apps may be able to access sensitive data. Proceed with caution.</string>
+
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Security tip</string>
+    <string name="security_reminder_body">Enable biometric lock and hardware encryption in Settings to keep your credentials safe.</string>
+    <string name="action_remind_later">Remind me later</string>
+    <string name="action_dont_show_again">Don\'t show again</string>
 
     <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
     <string name="biometric_prompt_title">SSHBorg</string>

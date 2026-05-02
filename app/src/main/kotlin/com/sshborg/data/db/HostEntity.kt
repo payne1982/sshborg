@@ -37,4 +37,11 @@ data class HostEntity(
      * Only used when [jumpMode] == "host_list".
      */
     val jumpHostIdList: String? = null,
+    /**
+     * SFTP starting directory mode: "last" = auto-save last visited path,
+     * "fixed" = always use [sftpStartDir], "home" = always use server home.
+     */
+    val sftpStartMode: String = "last",
+    /** Persisted last-visited path ("last" mode) or user-specified path ("fixed" mode). */
+    val sftpStartDir: String? = null,
 )

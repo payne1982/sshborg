@@ -459,6 +459,7 @@
     <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="#adding-host">Getting Started</a>
+        <a href="#sftp">SFTP</a>
         <a href="#ssh-keys">SSH Keys</a>
         <a href="#jump-hosts">Jump Hosts</a>
         <a href="https://github.com/payne1982/sshborg-issues">Support</a>
@@ -496,6 +497,10 @@
         <div class="toc-title">// CONTENTS</div>
         <ul>
             <li><a href="#adding-host">Adding a Host</a></li>
+            <li><a href="#sftp">SFTP File Manager</a></li>
+            <li class="sub"><a href="#sftp">Navigation</a></li>
+            <li class="sub"><a href="#sftp">Upload &amp; download</a></li>
+            <li class="sub"><a href="#sftp">Multi-select</a></li>
             <li><a href="#ssh-keys">SSH Keys</a></li>
             <li class="sub"><a href="#ssh-keys">Generating a key</a></li>
             <li class="sub"><a href="#ssh-keys">Authorizing on server</a></li>
@@ -503,6 +508,7 @@
             <li><a href="#suggestions">Command Suggestions</a></li>
             <li class="sub"><a href="#suggestions">How it works</a></li>
             <li class="sub"><a href="#suggestions">Troubleshooting</a></li>
+            <li><a href="#terminal">Terminal Gestures</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -535,6 +541,30 @@
                 You can check the server fingerprint at any time with:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
+        </div>
+
+        <div class="doc-section" id="sftp">
+
+            <h2>// SFTP FILE MANAGER</h2>
+            <p>The SFTP file manager lets you browse, upload, download, rename, and delete files on your server directly from your phone. Open an SFTP session from the hosts screen by tapping <strong>SFTP</strong>.</p>
+            <h3>Navigation</h3>
+            <p>Tap a folder to open it. Use the back arrow or tap any segment of the path bar to jump up the directory tree.</p>
+            <p>Symbolic links are shown with a small link icon badge. Tapping a symlink navigates to its target: if it points to a directory you enter it, if it points to a file it behaves like a regular file.</p>
+            <h3>Uploading files</h3>
+            <p>Tap the <strong>upload</strong> button (↑) to pick one or more files from your phone's storage. The upload starts immediately and progress is shown at the top of the screen.</p>
+            <h3>Downloading files and folders</h3>
+            <p>Tap any file to download it immediately. To download an entire folder, tap the <strong>download</strong> icon next to it — SSHBorg will download the entire directory tree and save it under the <strong>Downloads</strong> folder on your phone.</p>
+            <p>If a file already exists at the destination, a dialog will ask you whether to <strong>overwrite</strong>, <strong>skip</strong> the file, or <strong>cancel</strong> the entire transfer.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// NOTE ON SYMLINKS</div>
+                During a folder download, symbolic links that point to directories are skipped — only regular files (including symlinks to files) are downloaded. This prevents unintended recursive downloads.
+            </div>
+            <h3>Multi-select and batch operations</h3>
+            <p>Long-press any item to enter selection mode, then tap additional items to build up your selection. The toolbar shows actions for the current selection:</p>
+            <ul>
+                <li><strong>Download</strong> — downloads all selected files and folders at once, with a progress dialog and cancellation support.</li>
+                <li><strong>Delete</strong> — deletes all selected items. Deleting a non-empty folder removes all its contents recursively. <em>There is no undo.</em></li>
+            </ul>
         </div>
 
         <div class="doc-section" id="ssh-keys">
@@ -610,6 +640,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 To get root's history suggestions, add a separate host entry in SSHBorg configured to log in directly as <code>root</code> (if your server allows it).
             </div>
+        </div>
+
+        <div class="doc-section" id="terminal">
+
+            <h2>// TERMINAL GESTURES</h2>
+            <p>The terminal responds to a few touch gestures beyond typing:</p>
+            <ul>
+                <li><strong>Scroll history</strong> — swipe up or down to browse the terminal's scrollback buffer.</li>
+                <li><strong>Zoom</strong> — pinch to increase or decrease the text size.</li>
+                <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
+                <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
+            </ul>
         </div>
 
         <div class="doc-section" id="agent-forwarding">

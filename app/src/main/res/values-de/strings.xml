@@ -88,6 +88,11 @@
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Eine Regel pro Zeile: [lokalPort:remoteHost:remotePort] oder [bind:lokalPort:remoteHost:remotePort]. Optionales -L-Präfix.</string>
+    <string name="host_section_start_directory">SFTP: Startverzeichnis</string>
+    <string name="host_start_mode_last">Zuletzt besuchter Ordner</string>
+    <string name="host_start_mode_fixed">Festes Verzeichnis</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Startverzeichnis</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-Schlüssel</string>
@@ -167,6 +172,8 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Trennen</string>
     <string name="terminal_paste_cd">Einfügen</string>
+    <string name="terminal_copy_selection">Auswahl kopieren</string>
+    <string name="terminal_copy_all">Alles kopieren</string>
     <string name="terminal_connecting">Wird verbunden…</string>
     <string name="terminal_connection_failed">Verbindung fehlgeschlagen</string>
     <string name="terminal_disconnected">Getrennt</string>
@@ -237,6 +244,12 @@
     <string name="root_warning_title">Sicherheitswarnung</string>
     <string name="root_warning_body">Dieses Gerät scheint gerootet zu sein. Auf gerooteten Geräten sind die Sicherheitsgarantien des Android Keystores geschwächt, und andere Apps könnten auf sensible Daten zugreifen. Vorsicht geboten.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Sicherheitshinweis</string>
+    <string name="security_reminder_body">Aktiviere biometrische Sperre und Hardware-Verschlüsselung in den Einstellungen, um deine Zugangsdaten zu schützen.</string>
+    <string name="action_remind_later">Später erinnern</string>
+    <string name="action_dont_show_again">Nicht mehr anzeigen</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Sitzung nicht gefunden</string>
     <string name="error_host_not_found">Host nicht gefunden</string>
@@ -272,5 +285,5 @@
         <item quantity="other">%d aktive Sitzungen</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Screenshots erlauben</string>
-    <string name="settings_allow_screenshots_subtitle">Screenshots und Bildschirmaufnahmen erlauben. Deaktivieren, um sensible Inhalte zu schützen.</string>
+    <string name="settings_allow_screenshots_subtitle">Screenshots und Bildschirmaufnahmen erlauben. Deaktiviert lassen, um sensible Inhalte zu schützen.</string>
 </resources>

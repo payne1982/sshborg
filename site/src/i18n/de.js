@@ -67,6 +67,7 @@ module.exports = {
   nav_getting_started:'Erste Schritte',
   nav_ssh_keys:       'SSH-Schlüssel',
   nav_jump_hosts:     'Jump-Hosts',
+  nav_sftp:           'SFTP',
 
   doc_page_title:    '// BENUTZERHANDBUCH',
   doc_page_subtitle: 'Praxisanleitung — Schritt für Schritt, um das Beste aus SSHBorg herauszuholen.',
@@ -74,6 +75,10 @@ module.exports = {
   toc_title: '// INHALT',
 
   doc_toc: `            <li><a href="#adding-host">Host hinzufügen</a></li>
+            <li><a href="#sftp">SFTP-Dateimanager</a></li>
+            <li class="sub"><a href="#sftp">Navigation</a></li>
+            <li class="sub"><a href="#sftp">Hoch- &amp; Herunterladen</a></li>
+            <li class="sub"><a href="#sftp">Mehrfachauswahl</a></li>
             <li><a href="#ssh-keys">SSH-Schlüssel</a></li>
             <li class="sub"><a href="#ssh-keys">Schlüssel generieren</a></li>
             <li class="sub"><a href="#ssh-keys">Auf Server autorisieren</a></li>
@@ -81,6 +86,7 @@ module.exports = {
             <li><a href="#suggestions">Befehlsvorschläge</a></li>
             <li class="sub"><a href="#suggestions">Funktionsweise</a></li>
             <li class="sub"><a href="#suggestions">Fehlerbehebung</a></li>
+            <li><a href="#terminal">Terminal-Gesten</a></li>
             <li><a href="#agent-forwarding">Agent-Forwarding</a></li>
             <li><a href="#connection-drops">Verbindungsabbrüche</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -107,6 +113,28 @@ module.exports = {
                 Den Server-Fingerabdruck kannst du jederzeit überprüfen mit:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
+
+  doc_sftp: `
+            <h2>// SFTP-DATEIMANAGER</h2>
+            <p>Der SFTP-Dateimanager ermöglicht es, Dateien auf dem Server direkt vom Telefon aus zu durchsuchen, hochzuladen, herunterzuladen, umzubenennen und zu löschen. Öffne eine SFTP-Sitzung vom Hosts-Bildschirm aus, indem du auf <strong>SFTP</strong> tippst.</p>
+            <h3>Navigation</h3>
+            <p>Tippe auf einen Ordner, um ihn zu öffnen. Verwende den Zurück-Pfeil oder tippe auf ein Segment der Pfadleiste, um im Verzeichnisbaum nach oben zu navigieren.</p>
+            <p>Symbolische Links werden mit einem kleinen Ketten-Badge angezeigt. Antippen eines Symlinks navigiert zum Ziel: Zeigt er auf ein Verzeichnis, wird es geöffnet; zeigt er auf eine Datei, verhält er sich wie eine normale Datei.</p>
+            <h3>Dateien hochladen</h3>
+            <p>Tippe auf die <strong>Upload</strong>-Schaltfläche (↑), um eine oder mehrere Dateien aus dem Gerätespeicher auszuwählen. Der Upload startet sofort, der Fortschritt wird oben im Bildschirm angezeigt.</p>
+            <h3>Dateien und Ordner herunterladen</h3>
+            <p>Tippe auf eine beliebige Datei, um sie sofort herunterzuladen. Um einen ganzen Ordner herunterzuladen, tippe auf das <strong>Download</strong>-Symbol daneben — SSHBorg lädt den gesamten Verzeichnisbaum herunter und speichert ihn im <strong>Downloads</strong>-Ordner des Telefons.</p>
+            <p>Existiert eine Datei am Ziel bereits, fragt ein Dialog, ob sie <strong>überschrieben</strong>, <strong>übersprungen</strong> oder der gesamte Transfer <strong>abgebrochen</strong> werden soll.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// HINWEIS ZU SYMLINKS</div>
+                Beim Download eines Ordners werden symbolische Links, die auf Verzeichnisse zeigen, übersprungen — es werden nur reguläre Dateien (einschließlich Symlinks auf Dateien) heruntergeladen. Dies verhindert unbeabsichtigte rekursive Downloads.
+            </div>
+            <h3>Mehrfachauswahl und Batch-Operationen</h3>
+            <p>Halte ein Element gedrückt, um den Auswahlmodus zu aktivieren, und tippe dann auf weitere Elemente, um sie zur Auswahl hinzuzufügen. Die Symbolleiste zeigt die verfügbaren Aktionen:</p>
+            <ul>
+                <li><strong>Herunterladen</strong> — lädt alle ausgewählten Dateien und Ordner auf einmal herunter, mit Fortschrittsdialog und Abbruchmöglichkeit.</li>
+                <li><strong>Löschen</strong> — löscht alle ausgewählten Elemente. Das Löschen eines nicht leeren Ordners entfernt alle Inhalte rekursiv. <em>Dies kann nicht rückgängig gemacht werden.</em></li>
+            </ul>`,
 
   doc_ssh_keys: `
             <h2>// SSH-SCHLÜSSEL</h2>
@@ -178,6 +206,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Um Vorschläge aus der Root-Historie zu erhalten, füge in SSHBorg einen separaten Host-Eintrag hinzu, der direkt als <code>root</code> anmeldet (sofern dein Server dies erlaubt).
             </div>`,
+
+  doc_terminal: `
+            <h2>// TERMINAL-GESTEN</h2>
+            <p>Das Terminal reagiert neben der Tastatureingabe auf einige Touch-Gesten:</p>
+            <ul>
+                <li><strong>Verlauf scrollen</strong> — nach oben oder unten wischen, um den Scrollback-Puffer zu durchsuchen.</li>
+                <li><strong>Zoom</strong> — mit zwei Fingern zoomen, um die Textgröße anzupassen.</li>
+                <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen.</li>
+                <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT-FORWARDING</h2>

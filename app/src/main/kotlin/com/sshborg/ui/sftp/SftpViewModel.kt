@@ -209,7 +209,23 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                         if (jCurrent.knownHostsEntry == null)
                             hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
-                    navigateTo(session.homePath)
+                    val startPaths = when (host.sftpStartMode) {
+                        "last", "fixed" -> listOfNotNull(
+                            host.sftpStartDir?.takeIf { it.isNotBlank() },
+                            session.homePath,
+                            "/",
+                        )
+                        else -> listOf(session.homePath, "/")
+                    }
+                    for (path in startPaths) {
+                        val entries = runCatching { sftpSession!!.listDir(path) }.getOrNull() ?: continue
+                        pathStack.add(path)
+                        sessionManager.update(id) { it.copy(sftpCurrentPath = path) }
+                        _state.value = State.Listing(path, entries)
+                        return@launch
+                    }
+                    _state.value = State.Error(getApplication<Application>().getString(R.string.error_cannot_list_directory))
+                    sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
                     return@launch
                 }
 
@@ -642,12 +658,22 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         deleteJob?.cancel()
         deleteJob = null
         val id = sessionId ?: return
+        val hostId   = sessionManager.get(id)?.hostId
+        val lastPath = pathStack.lastOrNull()
         sftpSession = null
         pathStack.clear()
         sessionManager.remove(id)
         _state.value = State.Disconnected
         if (sessionManager.sessions.value.isEmpty()) {
             SshForegroundService.stop(getApplication())
+        }
+        if (hostId != null && !lastPath.isNullOrBlank()) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val host = hostDao.getById(hostId) ?: return@launch
+                if (host.sftpStartMode == "last") {
+                    hostDao.upsert(host.copy(sftpStartDir = lastPath))
+                }
+            }
         }
     }
 

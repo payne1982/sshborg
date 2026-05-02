@@ -4,11 +4,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.WindowManager
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,6 +22,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    private var privacyOverlay: View? = null
+    private var isAuthenticating = false
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op */ }
@@ -39,6 +45,16 @@ class MainActivity : AppCompatActivity() {
                 AppNavigation()
             }
         }
+        // Plain View on top of Compose — visibility controlled directly, no recomposition involved
+        val tv = TypedValue()
+        theme.resolveAttribute(android.R.attr.colorBackground, tv, true)
+        val overlay = View(this).apply { setBackgroundColor(tv.data) }
+        window.addContentView(overlay, android.view.ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        privacyOverlay = overlay
+    }
+
+    private fun setPrivacy(locked: Boolean) {
+        privacyOverlay?.visibility = if (locked) View.VISIBLE else View.GONE
     }
 
     override fun onResume() {
@@ -55,18 +71,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Cover content whenever the app leaves the foreground (including when the biometric/
+        // credential screen appears), so the user never sees app content on return.
+        setPrivacy(true)
+    }
+
     override fun onStart() {
         super.onStart()
+        // Guard against re-entry: DEVICE_CREDENTIAL auth starts a new Activity which causes
+        // onStop/onStart to fire while the original authenticate() call is still suspended.
+        if (isAuthenticating) return
         val app = application as SshBorgApp
         lifecycleScope.launch {
             val biometricEnabled = app.appPreferences.biometricLock.first()
-            if (!biometricEnabled) return@launch
+            if (!biometricEnabled) {
+                setPrivacy(false)
+                return@launch
+            }
             val timeoutMs = app.appPreferences.lockTimeoutSeconds.first() * 1_000L
             val elapsed = System.currentTimeMillis() - app.lastAuthTime
-            if (elapsed <= timeoutMs) return@launch
+            if (elapsed <= timeoutMs) {
+                setPrivacy(false)
+                return@launch
+            }
+            isAuthenticating = true
             val ok = BiometricHelper.authenticate(this@MainActivity)
-            if (ok) app.lastAuthTime = System.currentTimeMillis()
-            else finish()
+            isAuthenticating = false
+            if (ok) {
+                app.lastAuthTime = System.currentTimeMillis()
+                setPrivacy(false)
+            } else {
+                finish()
+            }
         }
     }
 }

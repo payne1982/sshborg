@@ -68,6 +68,7 @@ module.exports = {
   nav_getting_started:'Per iniziare',
   nav_ssh_keys:       'Chiavi SSH',
   nav_jump_hosts:     'Jump Host',
+  nav_sftp:           'SFTP',
 
   doc_page_title:    '// GUIDA UTENTE',
   doc_page_subtitle: 'Guida operativa — cosa fare, passo dopo passo, per sfruttare al massimo SSHBorg.',
@@ -75,6 +76,10 @@ module.exports = {
   toc_title: '// INDICE',
 
   doc_toc: `            <li><a href="#adding-host">Aggiungere un host</a></li>
+            <li><a href="#sftp">File manager SFTP</a></li>
+            <li class="sub"><a href="#sftp">Navigazione</a></li>
+            <li class="sub"><a href="#sftp">Carica e scarica</a></li>
+            <li class="sub"><a href="#sftp">Selezione multipla</a></li>
             <li><a href="#ssh-keys">Chiavi SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Generare una chiave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizzare sul server</a></li>
@@ -82,6 +87,7 @@ module.exports = {
             <li><a href="#suggestions">Suggerimenti comandi</a></li>
             <li class="sub"><a href="#suggestions">Come funziona</a></li>
             <li class="sub"><a href="#suggestions">Risoluzione problemi</a></li>
+            <li><a href="#terminal">Gesture del terminale</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connessioni instabili</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -108,6 +114,28 @@ module.exports = {
                 Puoi controllare il fingerprint del server in qualsiasi momento con:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
+
+  doc_sftp: `
+            <h2>// FILE MANAGER SFTP</h2>
+            <p>Il file manager SFTP ti permette di navigare, caricare, scaricare, rinominare ed eliminare file sul server direttamente dal telefono. Apri una sessione SFTP dalla schermata degli host toccando <strong>SFTP</strong>.</p>
+            <h3>Navigazione</h3>
+            <p>Tocca una cartella per aprirla. Usa la freccia indietro o tocca qualsiasi segmento della barra del percorso per risalire nell'albero delle directory.</p>
+            <p>I link simbolici sono mostrati con un piccolo badge a forma di catena. Toccare un link simbolico naviga verso la sua destinazione: se punta a una cartella la si entra, se punta a un file si comporta come un file normale.</p>
+            <h3>Caricamento file</h3>
+            <p>Tocca il pulsante di <strong>caricamento</strong> (↑) per scegliere uno o più file dallo storage del telefono. Il caricamento inizia immediatamente e il progresso viene mostrato in cima alla schermata.</p>
+            <h3>Download di file e cartelle</h3>
+            <p>Tocca un file qualsiasi per scaricarlo immediatamente. Per scaricare un'intera cartella, tocca l'icona di <strong>download</strong> accanto ad essa — SSHBorg scaricherà l'intero albero di directory e lo salverà nella cartella <strong>Download</strong> del telefono.</p>
+            <p>Se un file esiste già nella destinazione, un dialogo chiederà se <strong>sovrascrivere</strong>, <strong>saltare</strong> il file, oppure <strong>annullare</strong> l'intero trasferimento.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// NOTA SUI LINK SIMBOLICI</div>
+                Durante il download di una cartella, i link simbolici che puntano a directory vengono saltati — vengono scaricati solo i file normali (inclusi i link simbolici che puntano a file). Questo evita download ricorsivi involontari.
+            </div>
+            <h3>Selezione multipla e operazioni batch</h3>
+            <p>Tieni premuto un elemento per entrare in modalità selezione, poi tocca altri elementi per aggiungere alla selezione. La barra degli strumenti mostra le azioni disponibili:</p>
+            <ul>
+                <li><strong>Scarica</strong> — scarica tutti i file e le cartelle selezionati in una volta, con un dialogo di avanzamento e supporto all'annullamento.</li>
+                <li><strong>Elimina</strong> — elimina tutti gli elementi selezionati. L'eliminazione di una cartella non vuota rimuove tutto il suo contenuto ricorsivamente. <em>Non è possibile annullare l'operazione.</em></li>
+            </ul>`,
 
   doc_ssh_keys: `
             <h2>// CHIAVI SSH</h2>
@@ -179,6 +207,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Per ottenere i suggerimenti dalla cronologia di root, aggiungi un host separato in SSHBorg configurato per accedere direttamente come <code>root</code> (se il server lo consente).
             </div>`,
+
+  doc_terminal: `
+            <h2>// GESTURE DEL TERMINALE</h2>
+            <p>Il terminale risponde ad alcune gesture touch oltre alla digitazione:</p>
+            <ul>
+                <li><strong>Scorrere la cronologia</strong> — scorri su o giù per navigare nel buffer di scrollback del terminale.</li>
+                <li><strong>Zoom</strong> — pizzica per aumentare o diminuire la dimensione del testo.</li>
+                <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare.</li>
+                <li><strong>Incollare</strong> — usa il tasto <em>Incolla</em> nella barra dei tasti extra (visibile quando la tastiera è aperta).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>

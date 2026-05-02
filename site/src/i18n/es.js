@@ -67,6 +67,7 @@ module.exports = {
   nav_getting_started:'Primeros pasos',
   nav_ssh_keys:       'Claves SSH',
   nav_jump_hosts:     'Jump Hosts',
+  nav_sftp:           'SFTP',
 
   doc_page_title:    '// GUÍA DE USUARIO',
   doc_page_subtitle: 'Guía operativa — qué hacer, paso a paso, para sacar el máximo partido a SSHBorg.',
@@ -74,6 +75,10 @@ module.exports = {
   toc_title: '// CONTENIDO',
 
   doc_toc: `            <li><a href="#adding-host">Añadir un host</a></li>
+            <li><a href="#sftp">Gestor de archivos SFTP</a></li>
+            <li class="sub"><a href="#sftp">Navegación</a></li>
+            <li class="sub"><a href="#sftp">Subir y descargar</a></li>
+            <li class="sub"><a href="#sftp">Selección múltiple</a></li>
             <li><a href="#ssh-keys">Claves SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Generar una clave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizar en el servidor</a></li>
@@ -81,6 +86,7 @@ module.exports = {
             <li><a href="#suggestions">Sugerencias de comandos</a></li>
             <li class="sub"><a href="#suggestions">Cómo funciona</a></li>
             <li class="sub"><a href="#suggestions">Solución de problemas</a></li>
+            <li><a href="#terminal">Gestos del terminal</a></li>
             <li><a href="#agent-forwarding">Reenvío de agente</a></li>
             <li><a href="#connection-drops">Caídas de conexión</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -107,6 +113,28 @@ module.exports = {
                 Puedes comprobar la huella del servidor en cualquier momento con:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
+
+  doc_sftp: `
+            <h2>// GESTOR DE ARCHIVOS SFTP</h2>
+            <p>El gestor de archivos SFTP te permite explorar, subir, descargar, renombrar y eliminar archivos en tu servidor directamente desde el teléfono. Abre una sesión SFTP desde la pantalla de hosts tocando <strong>SFTP</strong>.</p>
+            <h3>Navegación</h3>
+            <p>Toca una carpeta para abrirla. Usa la flecha de retroceso o toca cualquier segmento de la barra de ruta para subir en el árbol de directorios.</p>
+            <p>Los enlaces simbólicos se muestran con un pequeño distintivo de cadena. Al tocar un enlace simbólico se navega a su destino: si apunta a un directorio se entra en él; si apunta a un archivo se comporta como un archivo normal.</p>
+            <h3>Subir archivos</h3>
+            <p>Toca el botón de <strong>subida</strong> (↑) para seleccionar uno o varios archivos del almacenamiento del teléfono. La subida comienza de inmediato y el progreso se muestra en la parte superior de la pantalla.</p>
+            <h3>Descargar archivos y carpetas</h3>
+            <p>Toca cualquier archivo para descargarlo inmediatamente. Para descargar una carpeta completa, toca el icono de <strong>descarga</strong> que aparece junto a ella — SSHBorg descargará todo el árbol de directorios y lo guardará en la carpeta <strong>Descargas</strong> del teléfono.</p>
+            <p>Si un archivo ya existe en el destino, un diálogo te preguntará si deseas <strong>sobrescribir</strong>, <strong>omitir</strong> el archivo o <strong>cancelar</strong> toda la transferencia.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// NOTA SOBRE ENLACES SIMBÓLICOS</div>
+                Durante la descarga de una carpeta, los enlaces simbólicos que apuntan a directorios se omiten — solo se descargan los archivos normales (incluidos los enlaces a archivos). Esto evita descargas recursivas no deseadas.
+            </div>
+            <h3>Selección múltiple y operaciones por lotes</h3>
+            <p>Mantén pulsado cualquier elemento para entrar en el modo de selección y toca otros elementos para ampliar la selección. La barra de herramientas muestra las acciones disponibles:</p>
+            <ul>
+                <li><strong>Descargar</strong> — descarga todos los archivos y carpetas seleccionados de una vez, con un diálogo de progreso y opción de cancelación.</li>
+                <li><strong>Eliminar</strong> — elimina todos los elementos seleccionados. Eliminar una carpeta no vacía borra todo su contenido de forma recursiva. <em>Esta acción no se puede deshacer.</em></li>
+            </ul>`,
 
   doc_ssh_keys: `
             <h2>// CLAVES SSH</h2>
@@ -178,6 +206,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Para obtener sugerencias del historial de root, añade una entrada de host separada en SSHBorg configurada para iniciar sesión directamente como <code>root</code> (si tu servidor lo permite).
             </div>`,
+
+  doc_terminal: `
+            <h2>// GESTOS DEL TERMINAL</h2>
+            <p>El terminal responde a algunos gestos táctiles además de la escritura:</p>
+            <ul>
+                <li><strong>Desplazar el historial</strong> — desliza hacia arriba o abajo para navegar por el buffer de desplazamiento del terminal.</li>
+                <li><strong>Zoom</strong> — pellizca para aumentar o reducir el tamaño del texto.</li>
+                <li><strong>Copiar texto</strong> — mantén pulsado en cualquier lugar del terminal para entrar en modo selección. Arrastra los controladores para ajustar el área seleccionada, luego toca <em>Copiar selección</em> para copiar solo el texto resaltado, o <em>Copiar todo</em> para copiar toda la salida. Toca fuera para cancelar.</li>
+                <li><strong>Pegar</strong> — usa el botón <em>Pegar</em> en la barra de teclas adicionales (visible cuando el teclado está abierto).</li>
+            </ul>`,
 
   doc_agent_forwarding: `
             <h2>// REENVÍO DE AGENTE</h2>

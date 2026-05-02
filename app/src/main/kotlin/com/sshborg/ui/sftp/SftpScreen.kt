@@ -4,8 +4,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -669,14 +671,23 @@ private fun SftpEntryItem(
                                    else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         if (entry.isLink) {
-                            Icon(
-                                Icons.Default.Link,
-                                contentDescription = null,
+                            Box(
                                 modifier = Modifier
-                                    .size(12.dp)
-                                    .align(Alignment.BottomEnd),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                                    .size(14.dp)
+                                    .align(Alignment.BottomEnd)
+                                    .background(
+                                        color  = MaterialTheme.colorScheme.tertiary,
+                                        shape  = RoundedCornerShape(2.dp),
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    Icons.Default.SubdirectoryArrowLeft,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(11.dp),
+                                    tint = MaterialTheme.colorScheme.onTertiary,
+                                )
+                            }
                         }
                     }
                 }

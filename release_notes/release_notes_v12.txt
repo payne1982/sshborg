@@ -1,0 +1,49 @@
+<en-US>
+• SFTP: configurable starting directory — choose between last visited folder, a fixed path, or home
+• Terminal: long-press to select and copy text from the terminal output
+• Privacy screen shown when switching apps or during biometric unlock
+• Updated third-party libraries for better security and compatibility
+• Minor bug fixes and improvements
+</en-US>
+<it-IT>
+• SFTP: cartella iniziale configurabile — scegli tra l'ultima cartella visitata, un percorso fisso o la home
+• Terminale: tieni premuto per selezionare e copiare il testo dall'output
+• Schermata privacy mostrata quando si cambia app o durante lo sblocco biometrico
+• Aggiornamento delle librerie di terze parti per maggiore sicurezza e compatibilità
+• Piccole correzioni di bug e miglioramenti
+</it-IT>
+<de-DE>
+• SFTP: konfigurierbares Startverzeichnis — wähle zwischen zuletzt besuchtem Ordner, festem Pfad oder Home
+• Terminal: Text per langem Drücken auswählen und aus der Terminalausgabe kopieren
+• Datenschutzbildschirm beim App-Wechsel und während der biometrischen Entsperrung
+• Aktualisierung von Drittanbieterbibliotheken für mehr Sicherheit und Kompatibilität
+• Kleinere Fehlerbehebungen und Verbesserungen
+</de-DE>
+<es-ES>
+• SFTP: directorio inicial configurable — elige entre la última carpeta visitada, una ruta fija o el home
+• Terminal: mantén pulsado para seleccionar y copiar texto de la salida del terminal
+• Pantalla de privacidad al cambiar de app o durante el desbloqueo biométrico
+• Actualización de bibliotecas de terceros para mayor seguridad y compatibilidad
+• Correcciones menores de errores y mejoras
+</es-ES>
+<fr-FR>
+• SFTP : répertoire de démarrage configurable — choisissez entre le dernier dossier visité, un chemin fixe ou le home
+• Terminal : appui long pour sélectionner et copier du texte depuis la sortie du terminal
+• Écran de confidentialité affiché lors du changement d'app ou du déverrouillage biométrique
+• Mise à jour des bibliothèques tierces pour une meilleure sécurité et compatibilité
+• Corrections mineures de bugs et améliorations
+</fr-FR>
+<pt-PT>
+• SFTP: diretório inicial configurável — escolha entre a última pasta visitada, um caminho fixo ou o home
+• Terminal: pressione longamente para selecionar e copiar texto da saída do terminal
+• Ecrã de privacidade ao mudar de app ou durante o desbloqueio biométrico
+• Atualização de bibliotecas de terceiros para maior segurança e compatibilidade
+• Pequenas correções de erros e melhorias
+</pt-PT>
+<uk>
+• SFTP: налаштований початковий каталог — оберіть між останньою відвіданою папкою, фіксованим шляхом або home
+• Термінал: утримуйте для виділення та копіювання тексту з виводу терміналу
+• Екран конфіденційності при перемиканні між додатками або під час біометричного розблокування
+• Оновлення сторонніх бібліотек для покращення безпеки та сумісності
+• Незначні виправлення помилок та покращення
+</uk>

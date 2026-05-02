@@ -459,6 +459,7 @@
     <div class="nav-links">
         <a href="../index.html">Accueil</a>
         <a href="#adding-host">Premiers pas</a>
+        <a href="#sftp">SFTP</a>
         <a href="#ssh-keys">Clés SSH</a>
         <a href="#jump-hosts">Jump Hosts</a>
         <a href="https://github.com/payne1982/sshborg-issues">Support</a>
@@ -496,6 +497,10 @@
         <div class="toc-title">// SOMMAIRE</div>
         <ul>
             <li><a href="#adding-host">Ajouter un hôte</a></li>
+            <li><a href="#sftp">Gestionnaire SFTP</a></li>
+            <li class="sub"><a href="#sftp">Navigation</a></li>
+            <li class="sub"><a href="#sftp">Envoyer et télécharger</a></li>
+            <li class="sub"><a href="#sftp">Sélection multiple</a></li>
             <li><a href="#ssh-keys">Clés SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Générer une clé</a></li>
             <li class="sub"><a href="#ssh-keys">Autoriser sur le serveur</a></li>
@@ -503,6 +508,7 @@
             <li><a href="#suggestions">Suggestions de commandes</a></li>
             <li class="sub"><a href="#suggestions">Fonctionnement</a></li>
             <li class="sub"><a href="#suggestions">Résolution de problèmes</a></li>
+            <li><a href="#terminal">Gestes du terminal</a></li>
             <li><a href="#agent-forwarding">Transfert d'agent</a></li>
             <li><a href="#connection-drops">Coupures de connexion</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -535,6 +541,30 @@
                 Vous pouvez vérifier l'empreinte du serveur à tout moment avec :
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
+        </div>
+
+        <div class="doc-section" id="sftp">
+
+            <h2>// GESTIONNAIRE DE FICHIERS SFTP</h2>
+            <p>Le gestionnaire de fichiers SFTP vous permet de parcourir, envoyer, télécharger, renommer et supprimer des fichiers sur votre serveur directement depuis votre téléphone. Ouvrez une session SFTP depuis l'écran des hôtes en appuyant sur <strong>SFTP</strong>.</p>
+            <h3>Navigation</h3>
+            <p>Appuyez sur un dossier pour l'ouvrir. Utilisez la flèche de retour ou appuyez sur un segment de la barre de chemin pour remonter dans l'arborescence.</p>
+            <p>Les liens symboliques sont affichés avec un petit badge en forme de chaîne. Appuyer sur un lien symbolique navigue vers sa cible : s'il pointe vers un répertoire, vous y entrez ; s'il pointe vers un fichier, il se comporte comme un fichier normal.</p>
+            <h3>Envoyer des fichiers</h3>
+            <p>Appuyez sur le bouton d'<strong>envoi</strong> (↑) pour sélectionner un ou plusieurs fichiers depuis le stockage de votre téléphone. L'envoi commence immédiatement et la progression est affichée en haut de l'écran.</p>
+            <h3>Télécharger des fichiers et des dossiers</h3>
+            <p>Appuyez sur un fichier pour le télécharger immédiatement. Pour télécharger un dossier entier, appuyez sur l'icône de <strong>téléchargement</strong> à côté — SSHBorg télécharge toute l'arborescence et la sauvegarde dans le dossier <strong>Téléchargements</strong> de votre téléphone.</p>
+            <p>Si un fichier existe déjà à la destination, une boîte de dialogue vous demandera si vous souhaitez <strong>écraser</strong>, <strong>ignorer</strong> le fichier ou <strong>annuler</strong> tout le transfert.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// NOTE SUR LES LIENS SYMBOLIQUES</div>
+                Lors du téléchargement d'un dossier, les liens symboliques pointant vers des répertoires sont ignorés — seuls les fichiers normaux (y compris les liens vers des fichiers) sont téléchargés. Cela évite les téléchargements récursifs non souhaités.
+            </div>
+            <h3>Sélection multiple et opérations groupées</h3>
+            <p>Appuyez longuement sur un élément pour activer le mode de sélection, puis appuyez sur d'autres éléments pour les ajouter à la sélection. La barre d'outils affiche les actions disponibles :</p>
+            <ul>
+                <li><strong>Télécharger</strong> — télécharge tous les fichiers et dossiers sélectionnés en une seule fois, avec une boîte de dialogue de progression et la possibilité d'annuler.</li>
+                <li><strong>Supprimer</strong> — supprime tous les éléments sélectionnés. La suppression d'un dossier non vide efface tout son contenu de manière récursive. <em>Cette action est irréversible.</em></li>
+            </ul>
         </div>
 
         <div class="doc-section" id="ssh-keys">
@@ -610,6 +640,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Pour obtenir les suggestions de l'historique root, ajoutez une entrée d'hôte séparée dans SSHBorg configurée pour se connecter directement en tant que <code>root</code> (si votre serveur le permet).
             </div>
+        </div>
+
+        <div class="doc-section" id="terminal">
+
+            <h2>// GESTES DU TERMINAL</h2>
+            <p>Le terminal répond à quelques gestes tactiles en plus de la frappe :</p>
+            <ul>
+                <li><strong>Faire défiler l'historique</strong> — glissez vers le haut ou le bas pour parcourir le tampon de défilement du terminal.</li>
+                <li><strong>Zoom</strong> — pincez pour augmenter ou réduire la taille du texte.</li>
+                <li><strong>Copier du texte</strong> — appuyez longuement n'importe où sur le terminal pour entrer en mode sélection. Faites glisser les poignées pour ajuster la zone sélectionnée, puis appuyez sur <em>Copier la sélection</em> pour le texte surligné, ou <em>Tout copier</em> pour toute la sortie. Appuyez en dehors pour annuler.</li>
+                <li><strong>Coller</strong> — utilisez le bouton <em>Coller</em> dans la barre de touches supplémentaires (visible lorsque le clavier est ouvert).</li>
+            </ul>
         </div>
 
         <div class="doc-section" id="agent-forwarding">

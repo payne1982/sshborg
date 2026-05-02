@@ -88,6 +88,11 @@
     <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Одне правило на рядок: [локПорт:хостВіддалений:портВіддалений] або [bind:локПорт:хостВіддалений:портВіддалений]. Префікс -L необов\'язковий.</string>
+    <string name="host_section_start_directory">SFTP: Початковий каталог</string>
+    <string name="host_start_mode_last">Остання відвідана папка</string>
+    <string name="host_start_mode_fixed">Фіксована папка</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Початковий каталог</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-ключі</string>
@@ -167,6 +172,8 @@
     <string name="terminal_title_default">Термінал</string>
     <string name="terminal_disconnect_cd">Відключитися</string>
     <string name="terminal_paste_cd">Вставити</string>
+    <string name="terminal_copy_selection">Копіювати вибране</string>
+    <string name="terminal_copy_all">Копіювати все</string>
     <string name="terminal_connecting">Підключення…</string>
     <string name="terminal_connection_failed">Не вдалося підключитися</string>
     <string name="terminal_disconnected">Відключено</string>
@@ -237,6 +244,12 @@
     <string name="root_warning_title">Попередження безпеки</string>
     <string name="root_warning_body">Схоже, цей пристрій має root-доступ. На пристроях з root гарантії безпеки Android Keystore послаблені, і інші додатки можуть отримати доступ до конфіденційних даних. Будьте обережні.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Порада з безпеки</string>
+    <string name="security_reminder_body">Увімкніть біометричне блокування та апаратне шифрування в Налаштуваннях для захисту ваших облікових даних.</string>
+    <string name="action_remind_later">Нагадати пізніше</string>
+    <string name="action_dont_show_again">Більше не показувати</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Сесію не знайдено</string>
     <string name="error_host_not_found">Хост не знайдено</string>
@@ -274,5 +287,5 @@
         <item quantity="other">%d активної сесії</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
-    <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Вимкніть для захисту конфіденційного вмісту.</string>
+    <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Залиште вимкненим для захисту конфіденційного вмісту.</string>
 </resources>

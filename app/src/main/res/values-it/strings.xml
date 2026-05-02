@@ -88,6 +88,11 @@
     <string name="host_field_port_forwarding">Regole di forwarding (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Una regola per riga: [portaLocale:hostRemoto:portaRemota] oppure [bind:portaLocale:hostRemoto:portaRemota]. Prefisso -L facoltativo.</string>
+    <string name="host_section_start_directory">SFTP: Cartella iniziale</string>
+    <string name="host_start_mode_last">Ultima cartella visitata</string>
+    <string name="host_start_mode_fixed">Cartella fissa</string>
+    <string name="host_start_mode_home">Home</string>
+    <string name="host_field_start_directory">Cartella iniziale</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Chiavi SSH</string>
@@ -167,6 +172,8 @@
     <string name="terminal_title_default">Terminale</string>
     <string name="terminal_disconnect_cd">Disconnetti</string>
     <string name="terminal_paste_cd">Incolla</string>
+    <string name="terminal_copy_selection">Copia selezione</string>
+    <string name="terminal_copy_all">Copia tutto</string>
     <string name="terminal_connecting">Connessione in corso…</string>
     <string name="terminal_connection_failed">Connessione fallita</string>
     <string name="terminal_disconnected">Disconnesso</string>
@@ -238,6 +245,12 @@
     <string name="root_warning_title">Avviso di sicurezza</string>
     <string name="root_warning_body">Questo dispositivo sembra essere con root. Sui dispositivi con root le garanzie di sicurezza dell\'Android Keystore sono ridotte e altre app potrebbero accedere ai dati sensibili. Procedi con cautela.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Suggerimento di sicurezza</string>
+    <string name="security_reminder_body">Abilita il blocco biometrico e la cifratura hardware nelle Impostazioni per tenere al sicuro le tue credenziali.</string>
+    <string name="action_remind_later">Ricordamelo più tardi</string>
+    <string name="action_dont_show_again">Non mostrare più</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Sessione non trovata</string>
     <string name="error_host_not_found">Host non trovato</string>
@@ -273,5 +286,5 @@
         <item quantity="other">%d sessioni attive</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Consenti screenshot</string>
-    <string name="settings_allow_screenshots_subtitle">Permetti screenshot e registrazione dello schermo. Disattiva per proteggere i contenuti sensibili.</string>
+    <string name="settings_allow_screenshots_subtitle">Permetti screenshot e registrazione dello schermo. Lascia disattivato per proteggere i contenuti sensibili.</string>
 </resources>

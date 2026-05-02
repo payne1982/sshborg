@@ -459,6 +459,7 @@
     <div class="nav-links">
         <a href="../index.html">Início</a>
         <a href="#adding-host">Primeiros passos</a>
+        <a href="#sftp">SFTP</a>
         <a href="#ssh-keys">Chaves SSH</a>
         <a href="#jump-hosts">Jump Hosts</a>
         <a href="https://github.com/payne1982/sshborg-issues">Suporte</a>
@@ -496,6 +497,10 @@
         <div class="toc-title">// CONTEÚDO</div>
         <ul>
             <li><a href="#adding-host">Adicionar um host</a></li>
+            <li><a href="#sftp">Gestor de ficheiros SFTP</a></li>
+            <li class="sub"><a href="#sftp">Navegação</a></li>
+            <li class="sub"><a href="#sftp">Carregar e transferir</a></li>
+            <li class="sub"><a href="#sftp">Seleção múltipla</a></li>
             <li><a href="#ssh-keys">Chaves SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Gerar uma chave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizar no servidor</a></li>
@@ -503,6 +508,7 @@
             <li><a href="#suggestions">Sugestões de comandos</a></li>
             <li class="sub"><a href="#suggestions">Como funciona</a></li>
             <li class="sub"><a href="#suggestions">Resolução de problemas</a></li>
+            <li><a href="#terminal">Gestos do terminal</a></li>
             <li><a href="#agent-forwarding">Reencaminhamento de agente</a></li>
             <li><a href="#connection-drops">Quedas de ligação</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -535,6 +541,30 @@
                 Pode verificar a impressão digital do servidor a qualquer momento com:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
+        </div>
+
+        <div class="doc-section" id="sftp">
+
+            <h2>// GESTOR DE FICHEIROS SFTP</h2>
+            <p>O gestor de ficheiros SFTP permite-lhe explorar, carregar, transferir, renomear e eliminar ficheiros no servidor diretamente a partir do telemóvel. Abra uma sessão SFTP no ecrã de hosts tocando em <strong>SFTP</strong>.</p>
+            <h3>Navegação</h3>
+            <p>Toque numa pasta para a abrir. Use a seta de retrocesso ou toque em qualquer segmento da barra de caminho para subir na árvore de diretórios.</p>
+            <p>As ligações simbólicas são apresentadas com um pequeno crachá em forma de corrente. Tocar numa ligação simbólica navega para o seu destino: se apontar para um diretório, entra nele; se apontar para um ficheiro, comporta-se como um ficheiro normal.</p>
+            <h3>Carregar ficheiros</h3>
+            <p>Toque no botão de <strong>carregamento</strong> (↑) para selecionar um ou mais ficheiros do armazenamento do telemóvel. O carregamento começa imediatamente e o progresso é mostrado no topo do ecrã.</p>
+            <h3>Transferir ficheiros e pastas</h3>
+            <p>Toque em qualquer ficheiro para o transferir imediatamente. Para transferir uma pasta inteira, toque no ícone de <strong>transferência</strong> junto a ela — o SSHBorg transfere toda a árvore de diretórios e guarda-a na pasta <strong>Downloads</strong> do telemóvel.</p>
+            <p>Se um ficheiro já existir no destino, uma caixa de diálogo perguntará se pretende <strong>substituir</strong>, <strong>ignorar</strong> o ficheiro ou <strong>cancelar</strong> toda a transferência.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// NOTA SOBRE LIGAÇÕES SIMBÓLICAS</div>
+                Durante a transferência de uma pasta, as ligações simbólicas que apontam para diretórios são ignoradas — apenas os ficheiros normais (incluindo ligações para ficheiros) são transferidos. Isto evita transferências recursivas não intencionais.
+            </div>
+            <h3>Seleção múltipla e operações em lote</h3>
+            <p>Prima longamente qualquer item para entrar no modo de seleção e toque noutros itens para os adicionar à seleção. A barra de ferramentas mostra as ações disponíveis:</p>
+            <ul>
+                <li><strong>Transferir</strong> — transfere todos os ficheiros e pastas selecionados de uma só vez, com uma caixa de diálogo de progresso e possibilidade de cancelamento.</li>
+                <li><strong>Eliminar</strong> — elimina todos os itens selecionados. Eliminar uma pasta não vazia remove todo o seu conteúdo de forma recursiva. <em>Esta ação não pode ser desfeita.</em></li>
+            </ul>
         </div>
 
         <div class="doc-section" id="ssh-keys">
@@ -610,6 +640,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <br><br>
                 Para obter sugestões do histórico de root, adicione uma entrada de host separada no SSHBorg configurada para iniciar sessão diretamente como <code>root</code> (se o servidor permitir).
             </div>
+        </div>
+
+        <div class="doc-section" id="terminal">
+
+            <h2>// GESTOS DO TERMINAL</h2>
+            <p>O terminal responde a alguns gestos tácteis além da digitação:</p>
+            <ul>
+                <li><strong>Rolar o histórico</strong> — deslize para cima ou para baixo para navegar pelo buffer de scrollback do terminal.</li>
+                <li><strong>Zoom</strong> — faça pinça para aumentar ou diminuir o tamanho do texto.</li>
+                <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar.</li>
+                <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
+            </ul>
         </div>
 
         <div class="doc-section" id="agent-forwarding">
