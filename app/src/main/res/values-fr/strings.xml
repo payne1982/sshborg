@@ -244,6 +244,12 @@
     <string name="root_warning_title">Avertissement de sécurité</string>
     <string name="root_warning_body">Cet appareil semble être rooté. Sur les appareils rootés, les garanties de sécurité de l\'Android Keystore sont affaiblies et d\'autres applications pourraient accéder aux données sensibles. Procédez avec prudence.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Conseil de sécurité</string>
+    <string name="security_reminder_body">Activez le verrouillage biométrique et le chiffrement matériel dans les Paramètres pour protéger vos identifiants.</string>
+    <string name="action_remind_later">Me rappeler plus tard</string>
+    <string name="action_dont_show_again">Ne plus afficher</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Session introuvable</string>
     <string name="error_host_not_found">Hôte introuvable</string>

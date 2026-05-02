@@ -244,6 +244,12 @@
     <string name="root_warning_title">Попередження безпеки</string>
     <string name="root_warning_body">Схоже, цей пристрій має root-доступ. На пристроях з root гарантії безпеки Android Keystore послаблені, і інші додатки можуть отримати доступ до конфіденційних даних. Будьте обережні.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Порада з безпеки</string>
+    <string name="security_reminder_body">Увімкніть біометричне блокування та апаратне шифрування в Налаштуваннях для захисту ваших облікових даних.</string>
+    <string name="action_remind_later">Нагадати пізніше</string>
+    <string name="action_dont_show_again">Більше не показувати</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Сесію не знайдено</string>
     <string name="error_host_not_found">Хост не знайдено</string>

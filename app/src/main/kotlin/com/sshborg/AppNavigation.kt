@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.sshborg.R
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
@@ -66,6 +67,36 @@ fun AppNavigation() {
                     showRootWarning = false
                     scope.launch { app.appPreferences.setRootWarningAcknowledged() }
                 }) { Text(stringResource(R.string.action_i_understand)) }
+            },
+        )
+    }
+
+    // Delayed security reminder (shown if biometric or keystore encryption is not enabled)
+    var showSecurityReminder by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(1500L)
+        val dismissed  = app.appPreferences.securityReminderDismissed.first()
+        if (!dismissed) {
+            val biometric = app.appPreferences.biometricLock.first()
+            val keystore  = app.appPreferences.keystoreEncryption.first()
+            if (!biometric || !keystore) showSecurityReminder = true
+        }
+    }
+    if (showSecurityReminder) {
+        AlertDialog(
+            onDismissRequest = { showSecurityReminder = false },
+            title = { Text(stringResource(R.string.security_reminder_title)) },
+            text  = { Text(stringResource(R.string.security_reminder_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSecurityReminder = false
+                    scope.launch { app.appPreferences.setSecurityReminderDismissed() }
+                }) { Text(stringResource(R.string.action_dont_show_again)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSecurityReminder = false }) {
+                    Text(stringResource(R.string.action_remind_later))
+                }
             },
         )
     }

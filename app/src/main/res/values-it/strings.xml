@@ -245,6 +245,12 @@
     <string name="root_warning_title">Avviso di sicurezza</string>
     <string name="root_warning_body">Questo dispositivo sembra essere con root. Sui dispositivi con root le garanzie di sicurezza dell\'Android Keystore sono ridotte e altre app potrebbero accedere ai dati sensibili. Procedi con cautela.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Suggerimento di sicurezza</string>
+    <string name="security_reminder_body">Abilita il blocco biometrico e la cifratura hardware nelle Impostazioni per tenere al sicuro le tue credenziali.</string>
+    <string name="action_remind_later">Ricordamelo più tardi</string>
+    <string name="action_dont_show_again">Non mostrare più</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Sessione non trovata</string>
     <string name="error_host_not_found">Host non trovato</string>

@@ -244,6 +244,12 @@
     <string name="root_warning_title">Aviso de seguridad</string>
     <string name="root_warning_body">Este dispositivo parece estar rooteado. En dispositivos rooteados, las garantías de seguridad del Android Keystore están debilitadas y otras aplicaciones podrían acceder a datos sensibles. Procede con precaución.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Consejo de seguridad</string>
+    <string name="security_reminder_body">Activa el bloqueo biométrico y el cifrado por hardware en Ajustes para mantener seguras tus credenciales.</string>
+    <string name="action_remind_later">Recordarme más tarde</string>
+    <string name="action_dont_show_again">No mostrar más</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Sesión no encontrada</string>
     <string name="error_host_not_found">Host no encontrado</string>

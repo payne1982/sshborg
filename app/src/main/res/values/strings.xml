@@ -260,6 +260,12 @@
     <string name="root_warning_title">Security warning</string>
     <string name="root_warning_body">This device appears to be rooted. On rooted devices the security guarantees of the Android Keystore are weakened, and other apps may be able to access sensitive data. Proceed with caution.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Security tip</string>
+    <string name="security_reminder_body">Enable biometric lock and hardware encryption in Settings to keep your credentials safe.</string>
+    <string name="action_remind_later">Remind me later</string>
+    <string name="action_dont_show_again">Don\'t show again</string>
+
     <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
     <string name="biometric_prompt_title">SSHBorg</string>
     <string name="biometric_prompt_subtitle">Authenticate to continue</string>

@@ -244,6 +244,12 @@
     <string name="root_warning_title">Sicherheitswarnung</string>
     <string name="root_warning_body">Dieses Gerät scheint gerootet zu sein. Auf gerooteten Geräten sind die Sicherheitsgarantien des Android Keystores geschwächt, und andere Apps könnten auf sensible Daten zugreifen. Vorsicht geboten.</string>
 
+    <!-- ── Security reminder dialog ──────────────────────────────────────── -->
+    <string name="security_reminder_title">Sicherheitshinweis</string>
+    <string name="security_reminder_body">Aktiviere biometrische Sperre und Hardware-Verschlüsselung in den Einstellungen, um deine Zugangsdaten zu schützen.</string>
+    <string name="action_remind_later">Später erinnern</string>
+    <string name="action_dont_show_again">Nicht mehr anzeigen</string>
+
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Sitzung nicht gefunden</string>
     <string name="error_host_not_found">Host nicht gefunden</string>
