@@ -91,13 +91,15 @@ class SshForegroundService : Service() {
 
     private fun createNotificationChannel() {
         val ctx = localizedContext()
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            ctx.getString(R.string.notification_channel_name),
-            NotificationManager.IMPORTANCE_LOW,
-        ).apply { description = ctx.getString(R.string.notification_channel_description) }
-        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-            .createNotificationChannel(channel)
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        nm.createNotificationChannel(
+            NotificationChannel(CHANNEL_ID, ctx.getString(R.string.notification_channel_name), NotificationManager.IMPORTANCE_LOW)
+                .apply { description = ctx.getString(R.string.notification_channel_description) }
+        )
+        nm.createNotificationChannel(
+            NotificationChannel(CHANNEL_ID_TRANSFERS, ctx.getString(R.string.notification_channel_transfers_name), NotificationManager.IMPORTANCE_DEFAULT)
+                .apply { description = ctx.getString(R.string.notification_channel_transfers_description) }
+        )
     }
 
     private fun buildNotification(sessionCount: Int): Notification {
@@ -134,7 +136,10 @@ class SshForegroundService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "ssh_sessions"
+        internal const val CHANNEL_ID_TRANSFERS = "transfers"
         private const val NOTIFICATION_ID = 1
+        private const val NOTIFICATION_ID_DOWNLOAD = 2
+        private const val NOTIFICATION_ID_UPLOAD = 3
         private const val ACTION_DISCONNECT_ALL = "com.sshborg.DISCONNECT_ALL"
 
         fun start(context: Context) {
@@ -143,6 +148,28 @@ class SshForegroundService : Service() {
 
         fun stop(context: Context) {
             context.stopService(Intent(context, SshForegroundService::class.java))
+        }
+
+        fun notifyDownloadComplete(context: Context, message: String) =
+            postTransferNotification(context, context.getString(R.string.sftp_download_complete), message, NOTIFICATION_ID_DOWNLOAD)
+
+        fun notifyUploadComplete(context: Context, message: String) =
+            postTransferNotification(context, context.getString(R.string.sftp_upload_complete), message, NOTIFICATION_ID_UPLOAD)
+
+        private fun postTransferNotification(context: Context, title: String, text: String, notifId: Int) {
+            val nm = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(
+                NotificationChannel(CHANNEL_ID_TRANSFERS, context.getString(R.string.notification_channel_transfers_name), NotificationManager.IMPORTANCE_DEFAULT)
+                    .apply { description = context.getString(R.string.notification_channel_transfers_description) }
+            )
+            if (!nm.areNotificationsEnabled()) return
+            NotificationCompat.Builder(context, CHANNEL_ID_TRANSFERS)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setAutoCancel(true)
+                .build()
+                .also { nm.notify(notifId, it) }
         }
     }
 }

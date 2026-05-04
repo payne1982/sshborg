@@ -192,8 +192,13 @@
     <string name="sftp_downloading">A transferir %1$s</string>
     <string name="sftp_downloading_label">A transferir:</string>
     <string name="sftp_uploading">A enviar %1$s</string>
-    <string name="sftp_saved_to_downloads">Guardado em %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_saved_to_downloads">Guardado: %1$s</string>
     <string name="sftp_uploaded">Enviado: %1$s</string>
+    <string name="sftp_downloaded_n_files">%1$d ficheiros transferidos</string>
+    <string name="sftp_downloaded_n_files_skipped">%1$d ficheiros transferidos (%2$d ignorados)</string>
+    <string name="sftp_uploaded_n_files">%1$d ficheiros enviados</string>
+    <string name="sftp_download_complete">Transferência concluída</string>
+    <string name="sftp_upload_complete">Envio concluído</string>
 
     <string name="sftp_delete_file_title">Eliminar ficheiro</string>
     <string name="sftp_delete_folder_title">Eliminar pasta</string>
@@ -278,6 +283,8 @@
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Sessões SSH ativas</string>
     <string name="notification_channel_description">Mostra as sessões SSH/SFTP ativas</string>
+    <string name="notification_channel_transfers_name">Transferências de ficheiros</string>
+    <string name="notification_channel_transfers_description">Notificações ao fim das transferências</string>
     <string name="notification_no_sessions">Sem sessões ativas</string>
     <string name="notification_disconnect_all">Desligar tudo</string>
     <plurals name="notification_active_sessions">

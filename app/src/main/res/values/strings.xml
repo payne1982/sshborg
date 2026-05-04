@@ -207,8 +207,13 @@
     <string name="sftp_downloading">Downloading %1$s</string>
     <string name="sftp_downloading_label">Downloading:</string>
     <string name="sftp_uploading">Uploading %1$s</string>
-    <string name="sftp_saved_to_downloads">Saved to %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_saved_to_downloads">Saved: %1$s</string>
     <string name="sftp_uploaded">Uploaded: %1$s</string>
+    <string name="sftp_downloaded_n_files">Downloaded %1$d files</string>
+    <string name="sftp_downloaded_n_files_skipped">Downloaded %1$d files (%2$d skipped)</string>
+    <string name="sftp_uploaded_n_files">Uploaded %1$d files</string>
+    <string name="sftp_download_complete">Download complete</string>
+    <string name="sftp_upload_complete">Upload complete</string>
 
     <string name="sftp_delete_file_title">Delete file</string>
     <string name="sftp_delete_folder_title">Delete folder</string>
@@ -273,6 +278,8 @@
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Active SSH sessions</string>
     <string name="notification_channel_description">Shows active SSH/SFTP sessions</string>
+    <string name="notification_channel_transfers_name">File transfers</string>
+    <string name="notification_channel_transfers_description">Notifications when file transfers complete</string>
     <string name="notification_no_sessions">No active sessions</string>
     <string name="notification_disconnect_all">Disconnect all</string>
     <plurals name="notification_active_sessions">

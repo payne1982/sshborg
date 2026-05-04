@@ -192,8 +192,13 @@
     <string name="sftp_downloading">Завантаження %1$s</string>
     <string name="sftp_downloading_label">Завантаження:</string>
     <string name="sftp_uploading">Вивантаження %1$s</string>
-    <string name="sftp_saved_to_downloads">Збережено в %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_saved_to_downloads">Збережено: %1$s</string>
     <string name="sftp_uploaded">Вивантажено: %1$s</string>
+    <string name="sftp_downloaded_n_files">Завантажено %1$d файлів</string>
+    <string name="sftp_downloaded_n_files_skipped">Завантажено %1$d файлів (%2$d пропущено)</string>
+    <string name="sftp_uploaded_n_files">Вивантажено %1$d файлів</string>
+    <string name="sftp_download_complete">Завантаження завершено</string>
+    <string name="sftp_upload_complete">Вивантаження завершено</string>
 
     <string name="sftp_delete_file_title">Видалити файл</string>
     <string name="sftp_delete_folder_title">Видалити папку</string>
@@ -278,6 +283,8 @@
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Активні SSH-сесії</string>
     <string name="notification_channel_description">Показує активні SSH/SFTP-сесії</string>
+    <string name="notification_channel_transfers_name">Передача файлів</string>
+    <string name="notification_channel_transfers_description">Сповіщення після завершення передачі файлів</string>
     <string name="notification_no_sessions">Немає активних сесій</string>
     <string name="notification_disconnect_all">Від\'єднати все</string>
     <plurals name="notification_active_sessions">

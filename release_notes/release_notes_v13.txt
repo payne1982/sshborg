@@ -1,0 +1,28 @@
+<en-US>
+• SFTP: system notification when a file transfer completes
+• Minor bug fixes and improvements
+</en-US>
+<it-IT>
+• SFTP: notifica di sistema al termine di un trasferimento file
+• Piccole correzioni di bug e miglioramenti
+</it-IT>
+<de-DE>
+• SFTP: Systembenachrichtigung nach Abschluss einer Dateiübertragung
+• Kleinere Fehlerbehebungen und Verbesserungen
+</de-DE>
+<es-ES>
+• SFTP: notificación del sistema al finalizar una transferencia de archivos
+• Correcciones menores de errores y mejoras
+</es-ES>
+<fr-FR>
+• SFTP : notification système à la fin d'un transfert de fichiers
+• Corrections mineures de bugs et améliorations
+</fr-FR>
+<pt-PT>
+• SFTP: notificação do sistema ao concluir uma transferência de ficheiros
+• Pequenas correções de erros e melhorias
+</pt-PT>
+<uk>
+• SFTP: системне сповіщення після завершення передачі файлів
+• Незначні виправлення помилок та покращення
+</uk>

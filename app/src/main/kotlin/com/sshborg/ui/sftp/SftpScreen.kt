@@ -42,6 +42,7 @@ fun SftpScreen(
 ) {
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedEntries by remember { mutableStateOf(setOf<SftpEntry>()) }
@@ -69,18 +70,21 @@ fun SftpScreen(
             val s = state as SftpViewModel.State.Downloaded
             val msg = when {
                 s.totalFiles == 1 && s.skippedFiles == 0 ->
-                    "Saved to ${vm.downloadFolder}${s.filename}"
+                    context.getString(R.string.sftp_saved_to_downloads, "${vm.downloadFolder}${s.filename}")
                 s.skippedFiles > 0 ->
-                    "Downloaded ${s.totalFiles} file${if (s.totalFiles != 1) "s" else ""} (${s.skippedFiles} skipped)"
+                    context.getString(R.string.sftp_downloaded_n_files_skipped, s.totalFiles, s.skippedFiles)
                 else ->
-                    "Downloaded ${s.totalFiles} files"
+                    context.getString(R.string.sftp_downloaded_n_files, s.totalFiles)
             }
             scope.launch { snackbarHostState.showSnackbar(msg) }
             vm.dismissDownloaded()
         }
         if (state is SftpViewModel.State.Uploaded) {
             val s = state as SftpViewModel.State.Uploaded
-            val msg = if (s.totalFiles > 1) "Uploaded ${s.totalFiles} files" else "Uploaded: ${s.filename}"
+            val msg = if (s.totalFiles > 1)
+                context.getString(R.string.sftp_uploaded_n_files, s.totalFiles)
+            else
+                context.getString(R.string.sftp_uploaded, s.filename)
             scope.launch { snackbarHostState.showSnackbar(msg) }
             vm.dismissUploaded()
         }

@@ -291,7 +291,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             if (performDownload(entry, entry.name, remotePath, downloadFolder)) {
-                _state.value = State.Downloaded(entry.name)
+                val s = State.Downloaded(entry.name)
+                _state.value = s; postDownloadNotification(s)
             } else {
                 refreshListing()
             }
@@ -302,7 +303,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             getApplication<Application>().contentResolver.delete(conflict.existingUri, null, null)
             if (performDownload(conflict.entry, conflict.entry.name, conflict.remotePath, conflict.localDir)) {
-                _state.value = State.Downloaded(conflict.entry.name)
+                val s = State.Downloaded(conflict.entry.name)
+                _state.value = s; postDownloadNotification(s)
             } else {
                 refreshListing()
             }
@@ -313,7 +315,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             val unique = uniqueFilename(conflict.entry.name, conflict.localDir)
             if (performDownload(null, unique, conflict.remotePath, conflict.localDir)) {
-                _state.value = State.Downloaded(unique)
+                val s = State.Downloaded(unique)
+                _state.value = s; postDownloadNotification(s)
             } else {
                 refreshListing()
             }
@@ -391,7 +394,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 if (!ok) return@launch
             }
 
-            _state.value = State.Downloaded(tasksToDownload.last().filename, total, skipped)
+            val s = State.Downloaded(tasksToDownload.last().filename, total, skipped)
+            _state.value = s; postDownloadNotification(s)
         }
     }
 
@@ -555,11 +559,34 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }.isSuccess
                 if (!success) return@launch
             }
-            _state.value = State.Uploaded(lastFilename, total)
+            val s = State.Uploaded(lastFilename, total)
+            _state.value = s; postUploadNotification(s)
         }
     }
 
     fun dismissUploaded() = refreshListing()
+
+    private fun postDownloadNotification(s: State.Downloaded) {
+        val ctx = getApplication<Application>()
+        val msg = when {
+            s.totalFiles == 1 && s.skippedFiles == 0 ->
+                ctx.getString(R.string.sftp_saved_to_downloads, "$downloadFolder${s.filename}")
+            s.skippedFiles > 0 ->
+                ctx.getString(R.string.sftp_downloaded_n_files_skipped, s.totalFiles, s.skippedFiles)
+            else ->
+                ctx.getString(R.string.sftp_downloaded_n_files, s.totalFiles)
+        }
+        SshForegroundService.notifyDownloadComplete(ctx, msg)
+    }
+
+    private fun postUploadNotification(s: State.Uploaded) {
+        val ctx = getApplication<Application>()
+        val msg = if (s.totalFiles == 1)
+            ctx.getString(R.string.sftp_uploaded, s.filename)
+        else
+            ctx.getString(R.string.sftp_uploaded_n_files, s.totalFiles)
+        SshForegroundService.notifyUploadComplete(ctx, msg)
+    }
 
     // ── File operations ───────────────────────────────────────────────────────
 
