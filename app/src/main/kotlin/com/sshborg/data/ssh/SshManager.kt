@@ -140,7 +140,7 @@ object SshManager {
             }
             jumpSession.setConfig(jumpConfig)
             jumpSession.setServerAliveInterval(30_000)
-            jumpSession.setServerAliveCountMax(Int.MAX_VALUE)
+            jumpSession.setServerAliveCountMax(3)
 
             jumpSession.connect(20_000)
             jumpSession.setTimeout(0)
@@ -213,7 +213,7 @@ object SshManager {
         }
         session.setConfig(config)
         session.setServerAliveInterval(30_000)
-        session.setServerAliveCountMax(Int.MAX_VALUE)
+        session.setServerAliveCountMax(3)
 
         // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
         // channel-level flag but never sets Session.agent_forwarding. Fix via reflection.
