@@ -34,7 +34,7 @@ module.exports = {
   feat_biometric_title:'BLOCCO BIOMETRICO',
   feat_biometric_desc: 'Proteggi l\'accesso ai tuoi server con impronta digitale o riconoscimento facciale. Timeout configurabile.',
   feat_multilingual_title: 'MULTILINGUA',
-  feat_multilingual_desc:  'Disponibile in inglese, italiano, francese, tedesco, spagnolo, portoghese e ucraino.',
+  feat_multilingual_desc:  'Disponibile in inglese, italiano, francese, tedesco, spagnolo, portoghese, ucraino, cinese e giapponese.',
   feat_theme_title:    'TEMA SCURO E CHIARO',
   feat_theme_desc:     'Segue il tema di sistema o ti lascia scegliere. Perfettamente leggibile in qualsiasi condizione di luce.',
   feat_sessions_title: 'SESSIONI MULTIPLE',

@@ -10,6 +10,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -21,6 +23,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -32,6 +36,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -43,6 +49,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -54,6 +62,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -65,6 +75,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -76,6 +88,34 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
+  </url>
+  <url>
+    <loc>https://sshborg.com/zh/</loc>
+      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.com/"/>
+      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.com/it/"/>
+      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.com/de/"/>
+      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.com/es/"/>
+      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
+      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
+      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
+  </url>
+  <url>
+    <loc>https://sshborg.com/ja/</loc>
+      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.com/"/>
+      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.com/it/"/>
+      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.com/de/"/>
+      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.com/es/"/>
+      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/"/>
+      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/"/>
+      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/"/>
   </url>
   <url>
@@ -87,6 +127,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
@@ -98,6 +140,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
@@ -109,6 +153,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
@@ -120,6 +166,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
@@ -131,6 +179,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
@@ -142,6 +192,8 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>
@@ -153,6 +205,34 @@
       <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
       <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
       <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
+  </url>
+  <url>
+    <loc>https://sshborg.com/zh/docs.html</loc>
+      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.com/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.com/it/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.com/de/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.com/es/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
+  </url>
+  <url>
+    <loc>https://sshborg.com/ja/docs.html</loc>
+      <xhtml:link rel="alternate" hreflang="en" href="https://sshborg.com/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="it" href="https://sshborg.com/it/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="de" href="https://sshborg.com/de/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="es" href="https://sshborg.com/es/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html"/>
+      <xhtml:link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html"/>
       <xhtml:link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html"/>
   </url>
   <url>

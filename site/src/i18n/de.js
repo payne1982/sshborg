@@ -34,7 +34,7 @@ module.exports = {
   feat_biometric_title:'BIOMETRISCHE SPERRE',
   feat_biometric_desc: 'Schütze den Zugriff auf deine Server mit Fingerabdruck oder Gesichtserkennung. Konfigurierbares Timeout.',
   feat_multilingual_title: 'MEHRSPRACHIG',
-  feat_multilingual_desc:  'Verfügbar in Englisch, Italienisch, Französisch, Deutsch, Spanisch, Portugiesisch und Ukrainisch.',
+  feat_multilingual_desc:  'Verfügbar in Englisch, Italienisch, Französisch, Deutsch, Spanisch, Portugiesisch, Ukrainisch, Chinesisch und Japanisch.',
   feat_theme_title:    'DUNKLES &amp; HELLES DESIGN',
   feat_theme_desc:     'Folgt dem Systemdesign oder lässt dich selbst wählen. In jeder Lichtsituation gut lesbar.',
   feat_sessions_title: 'MEHRERE SITZUNGEN',

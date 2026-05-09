@@ -35,7 +35,7 @@ module.exports = {
   feat_biometric_title:'BIOMETRIC LOCK',
   feat_biometric_desc: 'Protect access to your servers with fingerprint or face unlock. Configurable timeout.',
   feat_multilingual_title: 'MULTILINGUAL',
-  feat_multilingual_desc:  'Available in English, Italian, French, German, Spanish, Portuguese, and Ukrainian.',
+  feat_multilingual_desc:  'Available in English, Italian, French, German, Spanish, Portuguese, Ukrainian, Chinese, and Japanese.',
   feat_theme_title:    'DARK &amp; LIGHT THEME',
   feat_theme_desc:     'Follows the system theme or let you choose. Fully readable in any lighting condition.',
   feat_sessions_title: 'MULTIPLE SESSIONS',
