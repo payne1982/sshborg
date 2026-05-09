@@ -98,8 +98,10 @@ fun AppNavigation() {
     }
 
     // Delayed security reminder (shown if biometric or keystore encryption is not enabled)
+    // Key on showPrivacyDialog so the reminder waits until privacy policy is accepted
     var showSecurityReminder by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(showPrivacyDialog) {
+        if (showPrivacyDialog) return@LaunchedEffect
         delay(1500L)
         val dismissed  = app.appPreferences.securityReminderDismissed.first()
         if (!dismissed) {
