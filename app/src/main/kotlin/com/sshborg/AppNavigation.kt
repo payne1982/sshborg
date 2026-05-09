@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import com.sshborg.R
 import kotlinx.coroutines.delay
@@ -48,10 +49,35 @@ fun AppNavigation() {
     val app = context.applicationContext as SshBorgApp
     val sessionManager = app.sessionManager
 
+    // Privacy policy — must be accepted on first launch
+    var showPrivacyDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
+    LaunchedEffect(Unit) {
+        if (!app.appPreferences.privacyPolicyAccepted.first()) showPrivacyDialog = true
+    }
+    if (showPrivacyDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(stringResource(R.string.privacy_policy_dialog_title)) },
+            text  = { Text(stringResource(R.string.privacy_policy_dialog_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPrivacyDialog = false
+                    scope.launch { app.appPreferences.setPrivacyPolicyAccepted() }
+                }) { Text(stringResource(R.string.action_accept)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    uriHandler.openUri("https://sshborg.com/privacy_policy.html")
+                }) { Text(stringResource(R.string.action_read_policy)) }
+            },
+        )
+    }
+
     // One-time root warning
     val isRooted = remember { RootDetector.isRooted() }
     var showRootWarning by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         if (isRooted && !app.appPreferences.rootWarningAcknowledged.first()) {
             showRootWarning = true
@@ -72,8 +98,10 @@ fun AppNavigation() {
     }
 
     // Delayed security reminder (shown if biometric or keystore encryption is not enabled)
+    // Key on showPrivacyDialog so the reminder waits until privacy policy is accepted
     var showSecurityReminder by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(showPrivacyDialog) {
+        if (showPrivacyDialog) return@LaunchedEffect
         delay(1500L)
         val dismissed  = app.appPreferences.securityReminderDismissed.first()
         if (!dismissed) {

@@ -176,6 +176,7 @@
     <string name="terminal_copy_all">Copiar tudo</string>
     <string name="terminal_connecting">A ligar…</string>
     <string name="terminal_connection_failed">Ligação falhada</string>
+    <string name="terminal_connection_lost">Ligação perdida</string>
     <string name="terminal_disconnected">Desligado</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
@@ -192,8 +193,13 @@
     <string name="sftp_downloading">A transferir %1$s</string>
     <string name="sftp_downloading_label">A transferir:</string>
     <string name="sftp_uploading">A enviar %1$s</string>
-    <string name="sftp_saved_to_downloads">Guardado em %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_saved_to_downloads">Guardado: %1$s</string>
     <string name="sftp_uploaded">Enviado: %1$s</string>
+    <string name="sftp_downloaded_n_files">%1$d ficheiros transferidos</string>
+    <string name="sftp_downloaded_n_files_skipped">%1$d ficheiros transferidos (%2$d ignorados)</string>
+    <string name="sftp_uploaded_n_files">%1$d ficheiros enviados</string>
+    <string name="sftp_download_complete">Transferência concluída</string>
+    <string name="sftp_upload_complete">Envio concluído</string>
 
     <string name="sftp_delete_file_title">Eliminar ficheiro</string>
     <string name="sftp_delete_folder_title">Eliminar pasta</string>
@@ -244,6 +250,12 @@
     <string name="root_warning_title">Aviso de segurança</string>
     <string name="root_warning_body">Este dispositivo parece ter root. Em dispositivos com root, as garantias de segurança do Android Keystore estão enfraquecidas e outras aplicações podem aceder a dados sensíveis. Proceda com cautela.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Política de privacidade</string>
+    <string name="privacy_policy_dialog_body">Antes de usar o SSHBorg, revise a nossa Política de privacidade. O SSHBorg armazena todos os dados localmente no seu dispositivo — nenhum dado é enviado a nós ou a terceiros.</string>
+    <string name="action_read_policy">Ler política</string>
+    <string name="action_accept">Aceitar</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Dica de segurança</string>
     <string name="security_reminder_body">Ative o bloqueio biométrico e a encriptação por hardware nas Definições para manter as suas credenciais seguras.</string>
@@ -278,6 +290,8 @@
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Sessões SSH ativas</string>
     <string name="notification_channel_description">Mostra as sessões SSH/SFTP ativas</string>
+    <string name="notification_channel_transfers_name">Transferências de ficheiros</string>
+    <string name="notification_channel_transfers_description">Notificações ao fim das transferências</string>
     <string name="notification_no_sessions">Sem sessões ativas</string>
     <string name="notification_disconnect_all">Desligar tudo</string>
     <plurals name="notification_active_sessions">

@@ -176,6 +176,7 @@
     <string name="terminal_copy_all">Alles kopieren</string>
     <string name="terminal_connecting">Wird verbunden…</string>
     <string name="terminal_connection_failed">Verbindung fehlgeschlagen</string>
+    <string name="terminal_connection_lost">Verbindung unterbrochen</string>
     <string name="terminal_disconnected">Getrennt</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
@@ -192,8 +193,13 @@
     <string name="sftp_downloading">%1$s wird heruntergeladen</string>
     <string name="sftp_downloading_label">Herunterladen:</string>
     <string name="sftp_uploading">%1$s wird hochgeladen</string>
-    <string name="sftp_saved_to_downloads">Gespeichert in %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_saved_to_downloads">Gespeichert: %1$s</string>
     <string name="sftp_uploaded">Hochgeladen: %1$s</string>
+    <string name="sftp_downloaded_n_files">%1$d Dateien heruntergeladen</string>
+    <string name="sftp_downloaded_n_files_skipped">%1$d Dateien heruntergeladen (%2$d übersprungen)</string>
+    <string name="sftp_uploaded_n_files">%1$d Dateien hochgeladen</string>
+    <string name="sftp_download_complete">Download abgeschlossen</string>
+    <string name="sftp_upload_complete">Upload abgeschlossen</string>
 
     <string name="sftp_delete_file_title">Datei löschen</string>
     <string name="sftp_delete_folder_title">Ordner löschen</string>
@@ -244,6 +250,12 @@
     <string name="root_warning_title">Sicherheitswarnung</string>
     <string name="root_warning_body">Dieses Gerät scheint gerootet zu sein. Auf gerooteten Geräten sind die Sicherheitsgarantien des Android Keystores geschwächt, und andere Apps könnten auf sensible Daten zugreifen. Vorsicht geboten.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Datenschutzrichtlinie</string>
+    <string name="privacy_policy_dialog_body">Bitte lies unsere Datenschutzrichtlinie, bevor du SSHBorg verwendest. SSHBorg speichert alle Daten lokal auf deinem Gerät – es werden keine Daten an uns oder Dritte übermittelt.</string>
+    <string name="action_read_policy">Richtlinie lesen</string>
+    <string name="action_accept">Akzeptieren</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Sicherheitshinweis</string>
     <string name="security_reminder_body">Aktiviere biometrische Sperre und Hardware-Verschlüsselung in den Einstellungen, um deine Zugangsdaten zu schützen.</string>
@@ -278,6 +290,8 @@
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Aktive SSH-Sitzungen</string>
     <string name="notification_channel_description">Zeigt aktive SSH/SFTP-Sitzungen an</string>
+    <string name="notification_channel_transfers_name">Dateiübertragungen</string>
+    <string name="notification_channel_transfers_description">Benachrichtigungen nach Dateiübertragungen</string>
     <string name="notification_no_sessions">Keine aktiven Sitzungen</string>
     <string name="notification_disconnect_all">Alle trennen</string>
     <plurals name="notification_active_sessions">

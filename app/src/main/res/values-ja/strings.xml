@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SSHBorg</string>
+
+    <!-- ── Language setting ────────────────────────────────────────────── -->
+    <string name="settings_language">言語</string>
+    <string name="settings_language_system">システムのデフォルト</string>
+
+    <!-- ── Common actions ──────────────────────────────────────────────── -->
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_delete">削除</string>
+    <string name="action_save">保存</string>
+    <string name="action_edit">編集</string>
+    <string name="action_back">戻る</string>
+    <string name="action_connect">接続</string>
+    <string name="action_disconnect">切断</string>
+    <string name="action_close">閉じる</string>
+    <string name="action_rename">名前変更</string>
+    <string name="action_create">作成</string>
+    <string name="action_generate">生成</string>
+    <string name="action_enable">有効化</string>
+    <string name="action_copy">コピー</string>
+    <string name="action_copied">コピーしました！</string>
+    <string name="action_show">表示</string>
+    <string name="action_hide">非表示</string>
+    <string name="action_refresh">更新</string>
+    <string name="action_trust">信頼する</string>
+    <string name="action_reject">拒否</string>
+    <string name="action_go_back">戻る</string>
+    <string name="action_back_to_hosts">ホスト一覧に戻る</string>
+    <string name="action_overwrite">上書き</string>
+    <string name="action_keep_both">両方保持</string>
+    <string name="action_i_understand">了解しました</string>
+
+    <!-- ── Hosts screen ──────────────────────────────────────────────── -->
+    <string name="hosts_title">SSHBorg</string>
+    <string name="hosts_empty">ホストがありません。\n+ をタップして追加。</string>
+    <string name="hosts_add_host_cd">ホストを追加</string>
+    <string name="hosts_manage_keys_cd">鍵を管理</string>
+    <string name="hosts_settings_cd">設定</string>
+    <string name="hosts_help_cd">ヘルプ</string>
+    <string name="hosts_options_cd">オプション</string>
+    <string name="hosts_press_back_to_exit">もう一度戻るボタンで終了</string>
+    <string name="hosts_delete_title">ホストを削除</string>
+    <string name="hosts_delete_message">"%1$s" を削除しますか？</string>
+
+    <!-- Host item context menu -->
+    <string name="host_menu_connect">接続</string>
+    <string name="host_menu_resume_terminal">ターミナルを再開（%1$d）</string>
+    <string name="host_menu_new_terminal">新しいターミナル</string>
+    <string name="host_menu_files">ファイル</string>
+    <string name="host_menu_resume_files">ファイルセッションを再開（%1$d）</string>
+    <string name="host_menu_new_files_session">新しいファイルセッション</string>
+
+    <!-- Session picker bottom sheet -->
+    <string name="session_picker_title">%1$s — %2$s セッション</string>
+    <string name="session_picker_session_label">セッション %1$d</string>
+    <string name="session_picker_new_session">新しい %1$s セッション</string>
+    <string name="session_type_terminal">ターミナル</string>
+    <string name="session_type_files">ファイル</string>
+    <string name="session_status_connected">接続済み</string>
+    <string name="session_status_connecting">接続中…</string>
+    <string name="session_status_disconnected">切断済み</string>
+    <string name="session_status_error">エラー</string>
+
+    <!-- ── Add/Edit Host screen ──────────────────────────────────────── -->
+    <string name="add_host_title">ホストを追加</string>
+    <string name="edit_host_title">ホストを編集</string>
+    <string name="host_field_label">ラベル（任意）</string>
+    <string name="host_field_hostname">ホスト名 / IP</string>
+    <string name="host_field_username">ユーザー名</string>
+    <string name="host_field_port">ポート</string>
+    <string name="host_section_authentication">認証</string>
+    <string name="host_auth_ssh_key">SSH 鍵</string>
+    <string name="host_auth_password">パスワード</string>
+    <string name="host_field_password">パスワード</string>
+    <string name="host_key_select_placeholder">鍵を選択…</string>
+    <string name="host_key_change">変更</string>
+    <string name="host_key_no_keys">鍵がありません — 先に追加してください</string>
+    <string name="host_agent_forwarding">エージェント転送</string>
+    <string name="host_section_jump_hosts">踏み台ホスト</string>
+    <string name="host_field_jump_hosts">踏み台ホスト（-J）</string>
+    <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
+    <string name="host_jump_hosts_supporting">カンマ区切り：[user@]host[:port] — デフォルト: ポート 22、同じユーザー名</string>
+    <string name="host_jump_mode_simple">シンプル</string>
+    <string name="host_jump_mode_host_list">ホストリスト</string>
+    <string name="host_jump_select_placeholder">ホストを選択…</string>
+    <string name="host_jump_add">踏み台ホストを追加</string>
+    <string name="host_jump_no_password">保存されたパスワードなし</string>
+    <string name="host_section_port_forwarding">ポートフォワーディング</string>
+    <string name="host_field_port_forwarding">転送ルール（-L）</string>
+    <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
+    <string name="host_port_forwarding_supporting">1行1ルール：[ローカルポート:リモートホスト:リモートポート] または [バインドアドレス:ローカルポート:リモートホスト:リモートポート]。-L プレフィックスは省略可。</string>
+    <string name="host_section_start_directory">SFTP：開始ディレクトリ</string>
+    <string name="host_start_mode_last">前回のフォルダ</string>
+    <string name="host_start_mode_fixed">固定フォルダ</string>
+    <string name="host_start_mode_home">ホーム</string>
+    <string name="host_field_start_directory">開始ディレクトリ</string>
+
+    <!-- ── Keys screen ─────────────────────────────────────────────────── -->
+    <string name="keys_title">SSH 鍵</string>
+    <string name="keys_empty">鍵がありません。\n+ をタップして生成。</string>
+    <string name="keys_generate_cd">鍵を生成</string>
+    <string name="keys_show_public_key_cd">公開鍵を表示</string>
+    <string name="keys_rename_cd">名前変更</string>
+    <string name="keys_rename_title">鍵の名前を変更</string>
+    <string name="keys_delete_cd">削除</string>
+    <string name="keys_public_key_label">公開鍵（~/.ssh/authorized_keys に追加）：</string>
+    <string name="keys_delete_title">鍵を削除</string>
+    <string name="keys_delete_message">"%1$s" を削除しますか？この鍵を使用しているホストはパスワード認証に切り替わります。</string>
+    <string name="keys_import_cd">鍵をインポート</string>
+
+    <!-- Import key dialog -->
+    <string name="keys_import_title">SSH 鍵をインポート</string>
+    <string name="keys_import_load_from_file">ファイルから読み込む</string>
+    <string name="keys_import_pem_label">秘密鍵（PEM / OpenSSH 形式）</string>
+    <string name="keys_import_passphrase_label">パスフレーズ（暗号化されている場合）</string>
+    <string name="keys_import_default_label">インポートした鍵</string>
+    <string name="keys_import_action">インポート</string>
+    <string name="keys_import_error_encrypted">この鍵は暗号化されています — パスフレーズを入力してください</string>
+    <string name="keys_import_error_wrong_passphrase">パスフレーズが正しくありません</string>
+    <string name="keys_import_error_invalid">無効またはサポートされていない鍵の形式です</string>
+
+    <!-- Generate key dialog -->
+    <string name="keygen_title">SSH 鍵を生成</string>
+    <string name="keygen_field_label">ラベル</string>
+    <string name="keygen_key_type">鍵の種類</string>
+    <string name="keygen_fixed_size">固定サイズ：256 ビット</string>
+    <string name="keygen_size_bits">サイズ（ビット）</string>
+    <string name="keygen_curve_bits">曲線（ビット）</string>
+
+    <!-- ── Settings screen ─────────────────────────────────────────────── -->
+    <string name="settings_title">設定</string>
+    <string name="settings_section_general">一般</string>
+    <string name="settings_section_terminal">ターミナル</string>
+    <string name="settings_section_security">セキュリティ</string>
+
+    <string name="settings_theme_title">テーマ</string>
+    <string name="settings_theme_follow_system">システムに従う</string>
+    <string name="settings_theme_light">ライト</string>
+    <string name="settings_theme_dark">ダーク</string>
+
+    <string name="settings_confirm_exit_title">終了の確認</string>
+    <string name="settings_confirm_exit_subtitle">アプリを閉じる前に確認する</string>
+
+    <string name="settings_invert_scroll_title">ターミナルのスクロールを反転</string>
+    <string name="settings_invert_scroll_subtitle">上にスワイプして新しい出力ではなく古い出力を表示</string>
+    <string name="settings_scrollback_title">スクロールバック行数</string>
+    <string name="settings_scrollback_subtitle">メモリに保持するターミナル履歴の行数</string>
+    <string name="settings_scrollback_lines">%d 行</string>
+    <string name="settings_history_suggestions_title">コマンド履歴の候補</string>
+    <string name="settings_history_suggestions_subtitle">ターミナル入力中にサーバーのシェル履歴から候補を表示</string>
+    <string name="settings_suggestions_bar_sticky_title">候補バーを常に表示</string>
+    <string name="settings_suggestions_bar_sticky_subtitle">候補の表示・非表示でターミナルのサイズが変わらないよう、候補バーの高さを固定する</string>
+
+    <string name="settings_biometric_lock_title">生体認証ロック</string>
+    <string name="settings_biometric_available">アプリに戻るときに認証を要求する</string>
+    <string name="settings_biometric_unavailable">このデバイスに生体認証または画面ロックが設定されていません</string>
+
+    <string name="settings_lock_after_title">ロックまでの時間</string>
+    <string name="settings_lock_after_subtitle">再認証が必要になるまでの時間</string>
+    <string name="settings_lock_timeout_fallback">%1$d 秒</string>
+
+    <string name="settings_encrypt_title">機密データを暗号化</string>
+    <string name="settings_encrypt_subtitle">SSH 秘密鍵とホストパスワードはデバイスのセキュアハードウェアで暗号化されます。アプリをアンインストールすると、暗号化された鍵にアクセスできなくなります。</string>
+
+    <string name="settings_allow_screenshots_title">スクリーンショットを許可</string>
+    <string name="settings_allow_screenshots_subtitle">スクリーンショットと画面録画を許可します。機密コンテンツを保護するため、無効のままにすることを推奨します。</string>
+
+    <!-- Encrypt confirmation dialog -->
+    <string name="settings_encrypt_dialog_title">機密データを暗号化しますか？</string>
+    <string name="settings_encrypt_dialog_body">SSH 秘密鍵とホストパスワードは、デバイスのセキュアハードウェアを使って暗号化されます。\n\n暗号化されたデータはこのデバイスとアプリのインストールに紐付けられます。アプリをアンインストールすると、現在の鍵にアクセスできなくなり、新たに鍵を生成してサーバーに登録し直す必要があります。</string>
+
+    <!-- Timeout options -->
+    <string name="timeout_immediately">すぐに</string>
+    <string name="timeout_30_seconds">30 秒</string>
+    <string name="timeout_1_minute">1 分</string>
+    <string name="timeout_3_minutes">3 分</string>
+    <string name="timeout_5_minutes">5 分</string>
+    <string name="timeout_15_minutes">15 分</string>
+    <string name="timeout_30_minutes">30 分</string>
+    <string name="timeout_1_hour">1 時間</string>
+    <string name="timeout_4_hours">4 時間</string>
+
+    <!-- ── Terminal screen ─────────────────────────────────────────────── -->
+    <string name="terminal_title_default">ターミナル</string>
+    <string name="terminal_disconnect_cd">切断</string>
+    <string name="terminal_paste_cd">貼り付け</string>
+    <string name="terminal_copy_selection">選択範囲をコピー</string>
+    <string name="terminal_copy_all">すべてコピー</string>
+    <string name="terminal_connecting">接続中…</string>
+    <string name="terminal_connection_failed">接続に失敗しました</string>
+    <string name="terminal_connection_lost">接続が切れました</string>
+    <string name="terminal_disconnected">切断されました</string>
+
+    <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
+    <string name="sftp_back_cd">ホスト一覧に戻る</string>
+    <string name="sftp_refresh_cd">更新</string>
+    <string name="sftp_disconnect_cd">切断</string>
+    <string name="sftp_new_folder_cd">新しいフォルダ</string>
+    <string name="sftp_upload_file_cd">ファイルをアップロード</string>
+    <string name="sftp_download_cd">ダウンロード</string>
+    <string name="sftp_empty_directory">空のディレクトリ</string>
+    <string name="sftp_disconnected">切断されました</string>
+    <string name="sftp_go_back">戻る</string>
+
+    <string name="sftp_downloading">%1$s をダウンロード中</string>
+    <string name="sftp_downloading_label">ダウンロード中：</string>
+    <string name="sftp_uploading">%1$s をアップロード中</string>
+    <string name="sftp_saved_to_downloads">保存しました：%1$s</string>
+    <string name="sftp_uploaded">アップロードしました：%1$s</string>
+    <string name="sftp_downloaded_n_files">%1$d 件のファイルをダウンロードしました</string>
+    <string name="sftp_downloaded_n_files_skipped">%1$d 件のファイルをダウンロードしました（%2$d 件をスキップ）</string>
+    <string name="sftp_uploaded_n_files">%1$d 件のファイルをアップロードしました</string>
+    <string name="sftp_download_complete">ダウンロード完了</string>
+    <string name="sftp_upload_complete">アップロード完了</string>
+
+    <string name="sftp_delete_file_title">ファイルを削除</string>
+    <string name="sftp_delete_folder_title">フォルダを削除</string>
+    <string name="sftp_delete_message">"%1$s" を削除しますか？\nこの操作は元に戻せません。</string>
+
+    <string name="sftp_rename_title">名前変更</string>
+    <string name="sftp_rename_new_name">新しい名前</string>
+
+    <string name="sftp_conflict_title">ファイルが既に存在します</string>
+    <string name="sftp_conflict_message">"%1$s" は Downloads/SSHBorg/ に既に存在します。</string>
+
+    <string name="sftp_mkdir_title">新しいフォルダ</string>
+    <string name="sftp_mkdir_folder_name">フォルダ名</string>
+
+    <string name="sftp_menu_rename">名前変更</string>
+    <string name="sftp_menu_delete">削除</string>
+    <string name="sftp_delete_selected_cd">選択項目を削除</string>
+    <string name="sftp_bulk_delete_title">選択した項目を削除</string>
+    <string name="sftp_bulk_delete_message_prefix">以下を削除しようとしています：</string>
+    <string name="sftp_bulk_delete_folders">フォルダ %1$d 件</string>
+    <string name="sftp_bulk_delete_files">ファイル %1$d 件</string>
+    <string name="sftp_delete_message_suffix">この操作は元に戻せません。</string>
+    <string name="action_delete_all">すべて削除</string>
+
+    <string name="sftp_select_items_cd">項目を選択</string>
+    <string name="sftp_download_selected_cd">選択項目をダウンロード</string>
+    <string name="sftp_download_folder_cd">フォルダをダウンロード</string>
+    <string name="sftp_n_selected">%1$d 件選択中</string>
+    <string name="sftp_preparing">準備中…</string>
+    <string name="sftp_deleting_label">削除中：</string>
+    <string name="sftp_nothing_to_download">ダウンロードするものがありません</string>
+    <string name="sftp_batch_conflict_title">一部のファイルが既に存在します</string>
+    <string name="sftp_batch_conflict_message">%2$d 件中 %1$d 件のファイルが既にダウンロードフォルダに存在します。どうしますか？</string>
+    <string name="action_overwrite_all">すべて上書き</string>
+    <string name="action_skip_existing">既存をスキップ</string>
+
+    <!-- ── Host key / password dialogs ── -->
+    <string name="hostkey_title">不明なホスト</string>
+    <string name="hostkey_sftp_body">%1$s\n\n%2$s\n\n接続しますか？</string>
+    <string name="hostkey_terminal_host">ホスト：%1$s</string>
+    <string name="hostkey_terminal_fingerprint">フィンガープリント：</string>
+    <string name="hostkey_terminal_trust_question">このホストを信頼しますか？</string>
+
+    <string name="password_dialog_title">%1$s のパスワード</string>
+    <string name="password_field_label">パスワード</string>
+    <string name="password_auth_failed">認証に失敗しました。もう一度お試しください。</string>
+
+    <!-- ── Root warning dialog ── -->
+    <string name="root_warning_title">セキュリティ警告</string>
+    <string name="root_warning_body">このデバイスは root 化されているようです。root 化されたデバイスでは Android Keystore のセキュリティ保証が弱まり、他のアプリが機密データにアクセスできる可能性があります。注意して使用してください。</string>
+
+    <!-- ── Privacy policy dialog (first launch) ── -->
+    <string name="privacy_policy_dialog_title">プライバシーポリシー</string>
+    <string name="privacy_policy_dialog_body">SSHBorg をご利用になる前に、プライバシーポリシーをご確認ください。SSHBorg はすべてのデータをお使いのデバイスのみに保存します — データが私たちや第三者に送信されることは一切ありません。</string>
+    <string name="action_read_policy">ポリシーを読む</string>
+    <string name="action_accept">同意する</string>
+
+    <!-- ── Security reminder dialog ── -->
+    <string name="security_reminder_title">セキュリティのヒント</string>
+    <string name="security_reminder_body">認証情報を安全に保つため、設定で生体認証ロックとハードウェア暗号化を有効にしてください。</string>
+    <string name="action_remind_later">後で通知する</string>
+    <string name="action_dont_show_again">今後表示しない</string>
+
+    <!-- ── Biometric prompt ── -->
+    <string name="biometric_prompt_title">SSHBorg</string>
+    <string name="biometric_prompt_subtitle">続行するには認証してください</string>
+
+    <!-- ── Foreground service notification ── -->
+    <string name="notification_channel_name">アクティブな SSH セッション</string>
+    <string name="notification_channel_description">アクティブな SSH/SFTP セッションを表示</string>
+    <string name="notification_channel_transfers_name">ファイル転送</string>
+    <string name="notification_channel_transfers_description">ファイル転送完了時に通知</string>
+    <string name="notification_no_sessions">アクティブなセッションなし</string>
+    <string name="notification_disconnect_all">すべて切断</string>
+    <plurals name="notification_active_sessions">
+        <item quantity="other">%d 件のアクティブなセッション</item>
+    </plurals>
+
+    <!-- ── Error strings ── -->
+    <string name="error_session_not_found">セッションが見つかりません</string>
+    <string name="error_host_not_found">ホストが見つかりません</string>
+    <string name="error_connection_failed">接続に失敗しました</string>
+    <string name="error_cannot_list_directory">ディレクトリを一覧表示できません</string>
+    <string name="error_cannot_create_file">ダウンロードフォルダにファイルを作成できません</string>
+    <string name="error_download_failed">ダウンロードに失敗しました</string>
+    <string name="error_upload_failed">アップロードに失敗しました</string>
+    <string name="error_delete_failed">削除に失敗しました</string>
+    <string name="error_rename_failed">名前変更に失敗しました</string>
+    <string name="error_create_directory_failed">ディレクトリの作成に失敗しました</string>
+    <string name="error_refresh_failed">更新に失敗しました</string>
+    <string name="error_encryption_failed">暗号化に失敗しました</string>
+    <string name="error_decryption_failed">復号に失敗しました</string>
+    <string name="error_unknown">エラーが発生しました</string>
+</resources>

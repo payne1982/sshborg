@@ -321,14 +321,25 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
-                    if (n < 0) { cleanExit = true; break }
+                    if (n < 0) {
+                        // EOF: clean exit only when the server sent an exit-status (normal shell exit).
+                        // If exitStatus is still -1, JSch killed the connection (e.g. keepalive timeout).
+                        if (session.exitStatus != -1) {
+                            cleanExit = true
+                        } else {
+                            disconnectCause = getApplication<Application>().getString(R.string.terminal_connection_lost)
+                        }
+                        break
+                    }
                     synchronized(em) { em.process(buf, 0, n) }
                     onNeedsRedraw?.invoke()
                     detectPromptIfNeeded()
                     scheduleUpdateSuggestions()
                 }
-                // Loop exited because session.isConnected flipped (e.g. server closed channel)
-                if (isActive && !cleanExit) cleanExit = true
+                // Loop exited because session.isConnected flipped without EOF — unexpected disconnect.
+                if (isActive && !cleanExit && disconnectCause == null) {
+                    disconnectCause = getApplication<Application>().getString(R.string.terminal_connection_lost)
+                }
             } catch (e: Exception) {
                 disconnectCause = if (BuildConfig.DEBUG) e.toString()
                                   else "${e.javaClass.simpleName}${e.message?.let { ": $it" } ?: ""}"

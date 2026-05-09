@@ -19,7 +19,8 @@ module.exports = {
   badge_free:        'Gratuit',
   badge_android:     'Android 10+',
 
-  cta_play: 'Télécharger sur Google Play',
+  cta_play:       'Télécharger sur Google Play',
+  cta_appgallery: 'Découvrir sur AppGallery',
 
   features_title: '// FONCTIONNALITÉS',
 
@@ -34,7 +35,7 @@ module.exports = {
   feat_biometric_title:'VERROUILLAGE BIOMÉTRIQUE',
   feat_biometric_desc: 'Protégez l\'accès à vos serveurs par empreinte digitale ou reconnaissance faciale. Délai configurable.',
   feat_multilingual_title: 'MULTILINGUE',
-  feat_multilingual_desc:  'Disponible en anglais, italien, français, allemand, espagnol, portugais et ukrainien.',
+  feat_multilingual_desc:  'Disponible en anglais, italien, français, allemand, espagnol, portugais, ukrainien, chinois et japonais.',
   feat_theme_title:    'THÈME SOMBRE &amp; CLAIR',
   feat_theme_desc:     'Suit le thème système ou vous laisse choisir. Parfaitement lisible dans toutes les conditions d\'éclairage.',
   feat_sessions_title: 'SESSIONS MULTIPLES',

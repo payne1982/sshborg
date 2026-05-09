@@ -19,7 +19,8 @@ module.exports = {
   badge_free:        'Gratuito',
   badge_android:     'Android 10+',
 
-  cta_play: 'Descarregar no Google Play',
+  cta_play:       'Descarregar no Google Play',
+  cta_appgallery: 'Explorar no AppGallery',
 
   features_title: '// FUNCIONALIDADES',
 
@@ -34,7 +35,7 @@ module.exports = {
   feat_biometric_title:'BLOQUEIO BIOMÉTRICO',
   feat_biometric_desc: 'Proteja o acesso aos seus servidores com impressão digital ou reconhecimento facial. Tempo limite configurável.',
   feat_multilingual_title: 'MULTILINGUE',
-  feat_multilingual_desc:  'Disponível em inglês, italiano, francês, alemão, espanhol, português e ucraniano.',
+  feat_multilingual_desc:  'Disponível em inglês, italiano, francês, alemão, espanhol, português, ucraniano, chinês e japonês.',
   feat_theme_title:    'TEMA ESCURO E CLARO',
   feat_theme_desc:     'Segue o tema do sistema ou deixa-o escolher. Perfeitamente legível em qualquer condição de iluminação.',
   feat_sessions_title: 'MÚLTIPLAS SESSÕES',

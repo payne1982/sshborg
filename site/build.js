@@ -8,13 +8,15 @@ const path = require('path');
 const BASE_URL = 'https://sshborg.com';
 
 const LANGUAGES = [
-  { code: 'en', hreflang: 'en', dir: '',   root: '',    htmlLang: 'en', ogLocale: 'en_US' },
-  { code: 'it', hreflang: 'it', dir: 'it', root: '../', htmlLang: 'it', ogLocale: 'it_IT' },
-  { code: 'de', hreflang: 'de', dir: 'de', root: '../', htmlLang: 'de', ogLocale: 'de_DE' },
-  { code: 'es', hreflang: 'es', dir: 'es', root: '../', htmlLang: 'es', ogLocale: 'es_ES' },
-  { code: 'fr', hreflang: 'fr', dir: 'fr', root: '../', htmlLang: 'fr', ogLocale: 'fr_FR' },
-  { code: 'pt', hreflang: 'pt', dir: 'pt', root: '../', htmlLang: 'pt', ogLocale: 'pt_PT' },
-  { code: 'uk', hreflang: 'uk', dir: 'uk', root: '../', htmlLang: 'uk', ogLocale: 'uk_UA' },
+  { code: 'en', hreflang: 'en',      dir: '',   root: '',    htmlLang: 'en',      ogLocale: 'en_US' },
+  { code: 'it', hreflang: 'it',      dir: 'it', root: '../', htmlLang: 'it',      ogLocale: 'it_IT' },
+  { code: 'de', hreflang: 'de',      dir: 'de', root: '../', htmlLang: 'de',      ogLocale: 'de_DE' },
+  { code: 'es', hreflang: 'es',      dir: 'es', root: '../', htmlLang: 'es',      ogLocale: 'es_ES' },
+  { code: 'fr', hreflang: 'fr',      dir: 'fr', root: '../', htmlLang: 'fr',      ogLocale: 'fr_FR' },
+  { code: 'pt', hreflang: 'pt',      dir: 'pt', root: '../', htmlLang: 'pt',      ogLocale: 'pt_PT' },
+  { code: 'uk', hreflang: 'uk',      dir: 'uk', root: '../', htmlLang: 'uk',      ogLocale: 'uk_UA' },
+  { code: 'zh', hreflang: 'zh-Hans', dir: 'zh', root: '../', htmlLang: 'zh-Hans', ogLocale: 'zh_CN' },
+  { code: 'ja', hreflang: 'ja',      dir: 'ja', root: '../', htmlLang: 'ja',      ogLocale: 'ja_JP' },
 ];
 
 // Pages to generate in all languages (privacy_policy stays English-only)
@@ -28,6 +30,8 @@ const ENDONYMS = {
   fr: 'Français',
   pt: 'Português',
   uk: 'Українська',
+  zh: '中文',
+  ja: '日本語',
 };
 
 // ── Paths ──────────────────────────────────────────────────────────────────────

@@ -131,6 +131,8 @@ fun SettingsScreen(
                     "es" to "Español",
                     "pt" to "Português",
                     "uk" to "Українська",
+                    "zh" to "中文",
+                    "ja" to "日本語",
                 )
             }
             val currentLanguageLabel = languageOptions.find { it.first == currentLocaleTag }?.second

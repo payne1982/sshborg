@@ -176,6 +176,7 @@
     <string name="terminal_copy_all">Tout copier</string>
     <string name="terminal_connecting">Connexion en cours…</string>
     <string name="terminal_connection_failed">Connexion échouée</string>
+    <string name="terminal_connection_lost">Connexion perdue</string>
     <string name="terminal_disconnected">Déconnecté</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
@@ -192,8 +193,13 @@
     <string name="sftp_downloading">Téléchargement de %1$s</string>
     <string name="sftp_downloading_label">Téléchargement :</string>
     <string name="sftp_uploading">Envoi de %1$s</string>
-    <string name="sftp_saved_to_downloads">Enregistré dans %1$s/SSHBorg/%2$s</string>
+    <string name="sftp_saved_to_downloads">Enregistré : %1$s</string>
     <string name="sftp_uploaded">Envoyé : %1$s</string>
+    <string name="sftp_downloaded_n_files">%1$d fichiers téléchargés</string>
+    <string name="sftp_downloaded_n_files_skipped">%1$d fichiers téléchargés (%2$d ignorés)</string>
+    <string name="sftp_uploaded_n_files">%1$d fichiers envoyés</string>
+    <string name="sftp_download_complete">Téléchargement terminé</string>
+    <string name="sftp_upload_complete">Envoi terminé</string>
 
     <string name="sftp_delete_file_title">Supprimer le fichier</string>
     <string name="sftp_delete_folder_title">Supprimer le dossier</string>
@@ -244,6 +250,12 @@
     <string name="root_warning_title">Avertissement de sécurité</string>
     <string name="root_warning_body">Cet appareil semble être rooté. Sur les appareils rootés, les garanties de sécurité de l\'Android Keystore sont affaiblies et d\'autres applications pourraient accéder aux données sensibles. Procédez avec prudence.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Politique de confidentialité</string>
+    <string name="privacy_policy_dialog_body">Avant d\'utiliser SSHBorg, veuillez lire notre Politique de confidentialité. SSHBorg stocke toutes les données localement sur votre appareil — aucune donnée n\'est jamais envoyée à nous ou à des tiers.</string>
+    <string name="action_read_policy">Lire la politique</string>
+    <string name="action_accept">Accepter</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Conseil de sécurité</string>
     <string name="security_reminder_body">Activez le verrouillage biométrique et le chiffrement matériel dans les Paramètres pour protéger vos identifiants.</string>
@@ -278,6 +290,8 @@
     <!-- ── Foreground service notification ─────────────────────────────── -->
     <string name="notification_channel_name">Sessions SSH actives</string>
     <string name="notification_channel_description">Affiche les sessions SSH/SFTP actives</string>
+    <string name="notification_channel_transfers_name">Transferts de fichiers</string>
+    <string name="notification_channel_transfers_description">Notifications à la fin des transferts</string>
     <string name="notification_no_sessions">Aucune session active</string>
     <string name="notification_disconnect_all">Tout déconnecter</string>
     <plurals name="notification_active_sessions">
