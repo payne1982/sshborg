@@ -19,7 +19,8 @@ module.exports = {
   badge_free:        'Gratis',
   badge_android:     'Android 10+',
 
-  cta_play: 'Descárgalo en Google Play',
+  cta_play:       'Descárgalo en Google Play',
+  cta_appgallery: 'Explorar en AppGallery',
 
   features_title: '// FUNCIONES',
 

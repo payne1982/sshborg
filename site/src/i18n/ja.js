@@ -20,7 +20,8 @@ module.exports = {
   badge_free:        '無料',
   badge_android:     'Android 10+',
 
-  cta_play: 'Google Playで入手',
+  cta_play:       'Google Playで入手',
+  cta_appgallery: 'AppGalleryで入手',
 
   features_title: '// システム機能',
 

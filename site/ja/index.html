@@ -245,8 +245,15 @@
             color: var(--neon-blue);
         }
 
-        /* ── CTA button ──────────────────────────────────────── */
+        /* ── CTA buttons ─────────────────────────────────────── */
         .cta-wrap { margin-top: 48px; }
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
         .cta-btn {
             display: inline-flex;
             align-items: center;
@@ -299,6 +306,41 @@
                     0 0 90px rgba(0,204,102,0.4),
                     inset 0 0 18px rgba(0,255,136,0.07);
                 text-shadow: 0 0 14px var(--neon-green), 0 0 28px var(--deep-green);
+            }
+        }
+
+        /* AppGallery button — blue variant */
+        .cta-btn-ag {
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            animation-name: cta-pulse-blue;
+        }
+        .cta-btn-ag::before { background: rgba(0,212,255,0.06); }
+        .cta-btn-ag:hover {
+            background: rgba(0,212,255,0.12);
+            text-shadow: 0 0 12px var(--neon-blue);
+            box-shadow:
+                0 0 20px var(--neon-blue),
+                0 0 40px rgba(0,180,220,0.5),
+                0 0 80px rgba(0,212,255,0.25),
+                inset 0 0 20px rgba(0,212,255,0.05);
+        }
+        @keyframes cta-pulse-blue {
+            0%, 100% {
+                box-shadow:
+                    0 0 10px var(--neon-blue),
+                    0 0 24px rgba(0,180,220,0.5),
+                    0 0 50px rgba(0,212,255,0.25),
+                    inset 0 0 10px rgba(0,212,255,0.04);
+                text-shadow: 0 0 8px var(--neon-blue);
+            }
+            50% {
+                box-shadow:
+                    0 0 18px var(--neon-blue),
+                    0 0 40px rgba(0,180,220,0.6),
+                    0 0 90px rgba(0,212,255,0.35),
+                    inset 0 0 18px rgba(0,212,255,0.07);
+                text-shadow: 0 0 14px var(--neon-blue), 0 0 28px rgba(0,180,220,0.5);
             }
         }
 
@@ -575,13 +617,21 @@
         <span class="badge badge-blue">Android 10+</span>
     </div>
     <div class="cta-wrap">
-        <a class="cta-btn" href="https://play.google.com/store/apps/details?id=com.sshborg">
-            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
-            </svg>
-            Google Playで入手
-        </a>
-        <div style="margin-top:16px">
+        <div class="cta-buttons">
+            <a class="cta-btn" href="https://play.google.com/store/apps/details?id=com.sshborg">
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
+                </svg>
+                Google Playで入手
+            </a>
+            <a class="cta-btn cta-btn-ag" href="https://appgallery.huawei.com/app/C117647135">
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.6c4.634 0 8.4 3.766 8.4 8.4 0 4.634-3.766 8.4-8.4 8.4-4.634 0-8.4-3.766-8.4-8.4 0-4.634 3.766-8.4 8.4-8.4zM8.4 7.1 5.9 11.43 3.4 7.1H1.8l3.2 5.4-3.2 5.4H3.4l2.5-4.33 2.5 4.33h1.6l-3.2-5.4 3.2-5.4H8.4zm7.45.08c-2.42 0-3.85 1.78-3.85 4.04 0 2.74 1.46 4.58 4.1 4.58 1.21 0 2.18-.41 2.92-1.21l-1.05-1.13c-.41.49-.97.74-1.62.74-1.13 0-1.86-.73-2.01-1.86h4.93v-.64c0-2.5-1.37-4.52-3.38-4.52h-.04zm.08 1.46c.97 0 1.62.65 1.7 1.78h-3.47c.08-1.05.73-1.78 1.77-1.78z"/>
+                </svg>
+                AppGalleryで入手
+            </a>
+        </div>
+        <div style="margin-top:20px">
             <script type='text/javascript'>kofiwidget2.init('支援する', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
         </div>
     </div>
