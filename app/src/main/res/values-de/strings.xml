@@ -176,6 +176,7 @@
     <string name="terminal_copy_all">Alles kopieren</string>
     <string name="terminal_connecting">Wird verbunden…</string>
     <string name="terminal_connection_failed">Verbindung fehlgeschlagen</string>
+    <string name="terminal_connection_lost">Verbindung unterbrochen</string>
     <string name="terminal_disconnected">Getrennt</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->

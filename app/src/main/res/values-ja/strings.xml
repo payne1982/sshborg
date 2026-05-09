@@ -190,6 +190,7 @@
     <string name="terminal_copy_all">すべてコピー</string>
     <string name="terminal_connecting">接続中…</string>
     <string name="terminal_connection_failed">接続に失敗しました</string>
+    <string name="terminal_connection_lost">接続が切れました</string>
     <string name="terminal_disconnected">切断されました</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->

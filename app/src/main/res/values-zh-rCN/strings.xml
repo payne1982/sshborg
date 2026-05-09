@@ -190,6 +190,7 @@
     <string name="terminal_copy_all">全部复制</string>
     <string name="terminal_connecting">连接中…</string>
     <string name="terminal_connection_failed">连接失败</string>
+    <string name="terminal_connection_lost">连接已断开</string>
     <string name="terminal_disconnected">已断开连接</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->

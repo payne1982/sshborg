@@ -191,6 +191,7 @@
     <string name="terminal_copy_all">Copy all</string>
     <string name="terminal_connecting">Connecting…</string>
     <string name="terminal_connection_failed">Connection failed</string>
+    <string name="terminal_connection_lost">Connection lost</string>
     <string name="terminal_disconnected">Disconnected</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->

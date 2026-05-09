@@ -176,6 +176,7 @@
     <string name="terminal_copy_all">Копіювати все</string>
     <string name="terminal_connecting">Підключення…</string>
     <string name="terminal_connection_failed">Не вдалося підключитися</string>
+    <string name="terminal_connection_lost">З\'єднання втрачено</string>
     <string name="terminal_disconnected">Відключено</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
