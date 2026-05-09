@@ -250,6 +250,12 @@
     <string name="root_warning_title">Avviso di sicurezza</string>
     <string name="root_warning_body">Questo dispositivo sembra essere con root. Sui dispositivi con root le garanzie di sicurezza dell\'Android Keystore sono ridotte e altre app potrebbero accedere ai dati sensibili. Procedi con cautela.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Informativa sulla privacy</string>
+    <string name="privacy_policy_dialog_body">Prima di usare SSHBorg, leggi la nostra Informativa sulla privacy. SSHBorg conserva tutti i dati localmente sul tuo dispositivo — nessun dato viene mai inviato a noi o a terze parti.</string>
+    <string name="action_read_policy">Leggi l\'informativa</string>
+    <string name="action_accept">Accetta</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Suggerimento di sicurezza</string>
     <string name="security_reminder_body">Abilita il blocco biometrico e la cifratura hardware nelle Impostazioni per tenere al sicuro le tue credenziali.</string>

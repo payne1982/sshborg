@@ -28,6 +28,7 @@ class AppPreferences(private val context: Context) {
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
+        val PRIVACY_POLICY_ACCEPTED      = booleanPreferencesKey("privacy_policy_accepted")
     }
 
     val biometricLock: Flow<Boolean> =
@@ -116,5 +117,12 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setSecurityReminderDismissed() {
         context.dataStore.edit { it[Keys.SECURITY_REMINDER_DISMISSED] = true }
+    }
+
+    val privacyPolicyAccepted: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.PRIVACY_POLICY_ACCEPTED] ?: false }
+
+    suspend fun setPrivacyPolicyAccepted() {
+        context.dataStore.edit { it[Keys.PRIVACY_POLICY_ACCEPTED] = true }
     }
 }

@@ -33,61 +33,160 @@
             margin-top: 12px;
         }
         a { color: #1565C0; }
+        .lang-switcher {
+            margin-bottom: 28px;
+            display: flex;
+            gap: 8px;
+        }
+        .lang-btn {
+            padding: 6px 18px;
+            border: 1.5px solid #1565C0;
+            border-radius: 4px;
+            background: none;
+            color: #1565C0;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+        .lang-btn.active {
+            background: #1565C0;
+            color: #fff;
+        }
+        .lang-section { display: none; }
+        .lang-section.active { display: block; }
+        hr.lang-divider { border: none; border-top: 1px solid #ddd; margin: 32px 0; }
     </style>
 </head>
 <body>
 
-    <h1>Privacy Policy for SSHBorg</h1>
-    <p class="subtitle">Last updated: March 24, 2026</p>
-
-    <h2>Overview</h2>
-    <p>SSHBorg ("the app") is an SSH/SFTP client for Android. This privacy policy explains what data the app handles, how it is stored, and your rights as a user.</p>
-
-    <h2>Data We Collect and Store</h2>
-    <p>SSHBorg stores all data <strong>locally on your device only</strong>. We do not operate any servers, and no data is ever transmitted to us or any third party.</p>
-    <p>The following data is stored locally:</p>
-    <ul>
-        <li><strong>Host configurations</strong> — hostname, port, username, and optionally a saved password for SSH servers you add to the app.</li>
-        <li><strong>SSH private keys</strong> — cryptographic keys you generate or import within the app.</li>
-        <li><strong>App preferences</strong> — settings such as theme, language, biometric lock timeout, and display options.</li>
-    </ul>
-
-    <h2>How Data Is Protected</h2>
-    <ul>
-        <li>SSH private keys and saved passwords can optionally be encrypted using the <strong>Android Keystore</strong>, a hardware-backed secure storage system provided by your device. When enabled, encrypted data is bound to your device and app installation.</li>
-        <li>The app can optionally require <strong>biometric authentication</strong> (fingerprint, face, or device PIN) before granting access.</li>
-        <li>The app prevents screenshots and screen recording via the <code>FLAG_SECURE</code> flag.</li>
-    </ul>
-
-    <h2>Network Connections</h2>
-    <p>SSHBorg connects exclusively to SSH servers that <strong>you explicitly configure</strong>. The app makes no connections to any external services, analytics platforms, advertising networks, or our own servers.</p>
-    <p>All network traffic is SSH protocol traffic between your device and your own servers.</p>
-
-    <h2>Data Sharing</h2>
-    <p>We do not share, sell, or transmit your data to any third party. Ever.</p>
-
-    <h2>Permissions</h2>
-    <p>The app requests the following Android permissions:</p>
-    <ul>
-        <li><strong>INTERNET</strong> — required to establish SSH/SFTP connections to your servers.</li>
-        <li><strong>USE_BIOMETRIC / USE_FINGERPRINT</strong> — optional, used only if you enable biometric lock.</li>
-        <li><strong>FOREGROUND_SERVICE</strong> — used to show a persistent notification while SSH sessions are active.</li>
-    </ul>
-
-    <h2>Data Deletion</h2>
-    <p>All app data can be deleted at any time by uninstalling the app or clearing app data from Android Settings. There is no account or server-side data to delete.</p>
-    <div class="note">
-        <strong>Note:</strong> SSH private keys encrypted with the Android Keystore are permanently inaccessible after uninstalling the app. Export your public keys to your servers before uninstalling if needed.
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLang('en')">English</button>
+        <button class="lang-btn" onclick="switchLang('zh')">中文</button>
     </div>
 
-    <h2>Children's Privacy</h2>
-    <p>SSHBorg is not directed at children under 13 and does not knowingly collect any information from children.</p>
+    <!-- ── English ── -->
+    <div id="section-en" class="lang-section active">
 
-    <h2>Changes to This Policy</h2>
-    <p>If this policy changes, the updated version will be published at the same URL with a new "Last updated" date.</p>
+        <h1>Privacy Policy for SSHBorg</h1>
+        <p class="subtitle">Last updated: March 24, 2026</p>
 
-    <h2>Contact</h2>
-    <p>If you have questions about this privacy policy, you can contact us at: massimiliano.playdev AT gmail.com</p>
+        <h2>Overview</h2>
+        <p>SSHBorg ("the app") is an SSH/SFTP client for Android. This privacy policy explains what data the app handles, how it is stored, and your rights as a user.</p>
+
+        <h2>Data We Collect and Store</h2>
+        <p>SSHBorg stores all data <strong>locally on your device only</strong>. We do not operate any servers, and no data is ever transmitted to us or any third party.</p>
+        <p>The following data is stored locally:</p>
+        <ul>
+            <li><strong>Host configurations</strong> — hostname, port, username, and optionally a saved password for SSH servers you add to the app.</li>
+            <li><strong>SSH private keys</strong> — cryptographic keys you generate or import within the app.</li>
+            <li><strong>App preferences</strong> — settings such as theme, language, biometric lock timeout, and display options.</li>
+        </ul>
+
+        <h2>How Data Is Protected</h2>
+        <ul>
+            <li>SSH private keys and saved passwords can optionally be encrypted using the <strong>Android Keystore</strong>, a hardware-backed secure storage system provided by your device. When enabled, encrypted data is bound to your device and app installation.</li>
+            <li>The app can optionally require <strong>biometric authentication</strong> (fingerprint, face, or device PIN) before granting access.</li>
+            <li>The app prevents screenshots and screen recording via the <code>FLAG_SECURE</code> flag.</li>
+        </ul>
+
+        <h2>Network Connections</h2>
+        <p>SSHBorg connects exclusively to SSH servers that <strong>you explicitly configure</strong>. The app makes no connections to any external services, analytics platforms, advertising networks, or our own servers.</p>
+        <p>All network traffic is SSH protocol traffic between your device and your own servers.</p>
+
+        <h2>Data Sharing</h2>
+        <p>We do not share, sell, or transmit your data to any third party. Ever.</p>
+
+        <h2>Permissions</h2>
+        <p>The app requests the following Android permissions:</p>
+        <ul>
+            <li><strong>INTERNET</strong> — required to establish SSH/SFTP connections to your servers.</li>
+            <li><strong>USE_BIOMETRIC / USE_FINGERPRINT</strong> — optional, used only if you enable biometric lock.</li>
+            <li><strong>FOREGROUND_SERVICE</strong> — used to show a persistent notification while SSH sessions are active.</li>
+        </ul>
+
+        <h2>Data Deletion</h2>
+        <p>All app data can be deleted at any time by uninstalling the app or clearing app data from Android Settings. There is no account or server-side data to delete.</p>
+        <div class="note">
+            <strong>Note:</strong> SSH private keys encrypted with the Android Keystore are permanently inaccessible after uninstalling the app. Export your public keys to your servers before uninstalling if needed.
+        </div>
+
+        <h2>Children's Privacy</h2>
+        <p>SSHBorg is not directed at children under 13 and does not knowingly collect any information from children.</p>
+
+        <h2>Changes to This Policy</h2>
+        <p>If this policy changes, the updated version will be published at the same URL with a new "Last updated" date.</p>
+
+        <h2>Contact</h2>
+        <p>Developer: Massimiliano Ballerini</p>
+        <p>If you have questions about this privacy policy, you can contact us at: massimiliano.playdev AT gmail.com</p>
+
+    </div>
+
+    <!-- ── 中文 ── -->
+    <div id="section-zh" class="lang-section">
+
+        <h1>SSHBorg 隐私政策</h1>
+        <p class="subtitle">最后更新：2026年3月24日</p>
+
+        <h2>概述</h2>
+        <p>SSHBorg（"本应用"）是一款适用于Android设备的SSH/SFTP客户端。本隐私政策说明应用如何处理数据、数据的存储方式以及您作为用户的权利。</p>
+
+        <h2>我们收集和存储的数据</h2>
+        <p>SSHBorg仅在您的设备<strong>本地存储</strong>所有数据。我们不运营任何服务器，也不会向我们或任何第三方传输任何数据。</p>
+        <p>本地存储的数据包括：</p>
+        <ul>
+            <li><strong>主机配置</strong> — 您添加到应用的SSH服务器的主机名、端口、用户名，以及可选的已保存密码。</li>
+            <li><strong>SSH私钥</strong> — 您在应用内生成或导入的加密密钥。</li>
+            <li><strong>应用偏好设置</strong> — 主题、语言、生物识别锁定超时及显示选项等设置。</li>
+        </ul>
+
+        <h2>数据保护方式</h2>
+        <ul>
+            <li>SSH私钥和已保存的密码可选择使用<strong>Android密钥库</strong>进行加密，这是您设备提供的硬件支持的安全存储系统。启用后，加密数据将绑定到您的设备和应用安装实例。</li>
+            <li>应用可选择要求<strong>生物识别认证</strong>（指纹、人脸或设备PIN码）才能访问。</li>
+            <li>应用通过<code>FLAG_SECURE</code>标志禁止截图和录屏。</li>
+        </ul>
+
+        <h2>网络连接</h2>
+        <p>SSHBorg仅连接到<strong>您明确配置</strong>的SSH服务器。本应用不会连接任何外部服务、分析平台、广告网络或我们自己的服务器。</p>
+        <p>所有网络流量均为您的设备与您自己服务器之间的SSH协议流量。</p>
+
+        <h2>数据共享</h2>
+        <p>我们不会与任何第三方共享、出售或传输您的数据。永远不会。</p>
+
+        <h2>权限说明</h2>
+        <p>本应用申请以下Android权限：</p>
+        <ul>
+            <li><strong>INTERNET</strong> — 建立SSH/SFTP连接所必需。</li>
+            <li><strong>USE_BIOMETRIC / USE_FINGERPRINT</strong> — 可选，仅在您启用生物识别锁时使用。</li>
+            <li><strong>FOREGROUND_SERVICE</strong> — 在SSH会话活跃期间显示持久通知。</li>
+        </ul>
+
+        <h2>数据删除</h2>
+        <p>您可以随时通过卸载应用或在Android设置中清除应用数据来删除所有应用数据。没有账户或服务器端数据需要删除。</p>
+        <div class="note">
+            <strong>注意：</strong>使用Android密钥库加密的SSH私钥在卸载应用后将永久无法访问。如需在卸载前备份，请将公钥导出到您的服务器。
+        </div>
+
+        <h2>儿童隐私</h2>
+        <p>SSHBorg不面向13岁以下儿童，不会故意收集儿童的任何信息。</p>
+
+        <h2>政策变更</h2>
+        <p>如果本政策发生变更，更新版本将在相同URL发布，并注明新的"最后更新"日期。</p>
+
+        <h2>联系方式</h2>
+        <p>开发者：Massimiliano Ballerini</p>
+        <p>如果您对本隐私政策有疑问，请联系：massimiliano.playdev AT gmail.com</p>
+
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-section').forEach(function(s) { s.classList.remove('active'); });
+            document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.getElementById('section-' + lang).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
 
 </body>
 </html>
