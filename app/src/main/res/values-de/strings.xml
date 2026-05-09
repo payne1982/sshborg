@@ -249,6 +249,12 @@
     <string name="root_warning_title">Sicherheitswarnung</string>
     <string name="root_warning_body">Dieses Gerät scheint gerootet zu sein. Auf gerooteten Geräten sind die Sicherheitsgarantien des Android Keystores geschwächt, und andere Apps könnten auf sensible Daten zugreifen. Vorsicht geboten.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Datenschutzrichtlinie</string>
+    <string name="privacy_policy_dialog_body">Bitte lies unsere Datenschutzrichtlinie, bevor du SSHBorg verwendest. SSHBorg speichert alle Daten lokal auf deinem Gerät – es werden keine Daten an uns oder Dritte übermittelt.</string>
+    <string name="action_read_policy">Richtlinie lesen</string>
+    <string name="action_accept">Akzeptieren</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Sicherheitshinweis</string>
     <string name="security_reminder_body">Aktiviere biometrische Sperre und Hardware-Verschlüsselung in den Einstellungen, um deine Zugangsdaten zu schützen.</string>

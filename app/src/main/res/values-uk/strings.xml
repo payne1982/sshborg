@@ -249,6 +249,12 @@
     <string name="root_warning_title">Попередження безпеки</string>
     <string name="root_warning_body">Схоже, цей пристрій має root-доступ. На пристроях з root гарантії безпеки Android Keystore послаблені, і інші додатки можуть отримати доступ до конфіденційних даних. Будьте обережні.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Політика конфіденційності</string>
+    <string name="privacy_policy_dialog_body">Перед використанням SSHBorg ознайомтеся з нашою Політикою конфіденційності. SSHBorg зберігає всі дані лише на вашому пристрої — жодні дані не передаються нам або третім особам.</string>
+    <string name="action_read_policy">Читати політику</string>
+    <string name="action_accept">Прийняти</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Порада з безпеки</string>
     <string name="security_reminder_body">Увімкніть біометричне блокування та апаратне шифрування в Налаштуваннях для захисту ваших облікових даних.</string>

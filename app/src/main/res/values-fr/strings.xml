@@ -249,6 +249,12 @@
     <string name="root_warning_title">Avertissement de sécurité</string>
     <string name="root_warning_body">Cet appareil semble être rooté. Sur les appareils rootés, les garanties de sécurité de l\'Android Keystore sont affaiblies et d\'autres applications pourraient accéder aux données sensibles. Procédez avec prudence.</string>
 
+    <!-- ── Privacy policy dialog (first launch) ─────────────────────────── -->
+    <string name="privacy_policy_dialog_title">Politique de confidentialité</string>
+    <string name="privacy_policy_dialog_body">Avant d\'utiliser SSHBorg, veuillez lire notre Politique de confidentialité. SSHBorg stocke toutes les données localement sur votre appareil — aucune donnée n\'est jamais envoyée à nous ou à des tiers.</string>
+    <string name="action_read_policy">Lire la politique</string>
+    <string name="action_accept">Accepter</string>
+
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Conseil de sécurité</string>
     <string name="security_reminder_body">Activez le verrouillage biométrique et le chiffrement matériel dans les Paramètres pour protéger vos identifiants.</string>
