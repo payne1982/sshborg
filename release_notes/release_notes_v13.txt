@@ -1,28 +1,63 @@
 <en-US>
+• Privacy policy shown at first launch — must be accepted before using the app
+• Interface now available in Chinese (Simplified) and Japanese
+• Privacy policy updated
 • SFTP: system notification when a file transfer completes
 • Minor bug fixes and improvements
 </en-US>
 <it-IT>
+• Informativa sulla privacy mostrata al primo avvio — deve essere accettata prima di usare l'app
+• Interfaccia ora disponibile in cinese semplificato e giapponese
+• Informativa sulla privacy aggiornata
 • SFTP: notifica di sistema al termine di un trasferimento file
 • Piccole correzioni di bug e miglioramenti
 </it-IT>
 <de-DE>
+• Datenschutzrichtlinie wird beim ersten Start angezeigt — muss vor der App-Nutzung akzeptiert werden
+• Benutzeroberfläche jetzt auf Vereinfachtes Chinesisch und Japanisch verfügbar
+• Datenschutzrichtlinie aktualisiert
 • SFTP: Systembenachrichtigung nach Abschluss einer Dateiübertragung
 • Kleinere Fehlerbehebungen und Verbesserungen
 </de-DE>
 <es-ES>
+• Política de privacidad mostrada en el primer inicio — debe aceptarse antes de usar la app
+• Interfaz disponible ahora en chino simplificado y japonés
+• Política de privacidad actualizada
 • SFTP: notificación del sistema al finalizar una transferencia de archivos
 • Correcciones menores de errores y mejoras
 </es-ES>
 <fr-FR>
+• Politique de confidentialité affichée au premier lancement — doit être acceptée avant d'utiliser l'app
+• Interface disponible en chinois simplifié et en japonais
+• Politique de confidentialité mise à jour
 • SFTP : notification système à la fin d'un transfert de fichiers
 • Corrections mineures de bugs et améliorations
 </fr-FR>
 <pt-PT>
+• Política de privacidade apresentada no primeiro arranque — deve ser aceite antes de usar a app
+• Interface agora disponível em chinês simplificado e japonês
+• Política de privacidade atualizada
 • SFTP: notificação do sistema ao concluir uma transferência de ficheiros
 • Pequenas correções de erros e melhorias
 </pt-PT>
 <uk>
+• Політика конфіденційності відображається при першому запуску — необхідно прийняти перед використанням
+• Інтерфейс тепер доступний китайською (спрощеною) та японською мовами
+• Політику конфіденційності оновлено
 • SFTP: системне сповіщення після завершення передачі файлів
 • Незначні виправлення помилок та покращення
 </uk>
+<zh-CN>
+• 首次启动时显示隐私政策 — 使用前需同意
+• 界面现已支持简体中文和日语
+• 隐私政策已更新
+• SFTP：文件传输完成时发送系统通知
+• 小错误修复和改进
+</zh-CN>
+<ja-JP>
+• 初回起動時にプライバシーポリシーを表示 — 使用前に同意が必要です
+• インターフェースが中国語（簡体字）と日本語に対応しました
+• プライバシーポリシーを更新しました
+• SFTP：ファイル転送完了時にシステム通知を表示
+• 軽微なバグ修正と改善
+</ja-JP>
