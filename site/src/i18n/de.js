@@ -88,6 +88,7 @@ module.exports = {
             <li class="sub"><a href="#suggestions">Funktionsweise</a></li>
             <li class="sub"><a href="#suggestions">Fehlerbehebung</a></li>
             <li><a href="#terminal">Terminal-Gesten</a></li>
+            <li><a href="#extra-keys">Extra-Tastenleiste</a></li>
             <li><a href="#agent-forwarding">Agent-Forwarding</a></li>
             <li><a href="#connection-drops">Verbindungsabbrüche</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -217,6 +218,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen.</li>
                 <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// EXTRA-TASTENLEISTE</h2>
+            <p>Wenn die Bildschirmtastatur geöffnet ist, erscheint darüber eine Reihe von Schnelltasten. Scrolle die Leiste seitwärts, um alle Tasten zu erreichen.</p>
+            <h3>Modifikatortasten</h3>
+            <p><strong>Ctrl</strong> und <strong>Alt</strong> sind Klebetasten — tippe eine an, dann tippe eine Buchstabentaste, um die Kombination zu senden. Sie setzen sich nach dem nächsten Tastendruck automatisch zurück.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — bricht den laufenden Prozess ab.</li>
+                <li><strong>Ctrl+D</strong> — sendet EOF / schließt die Shell.</li>
+                <li><strong>Ctrl+Z</strong> — hält den Prozess an.</li>
+                <li><strong>Ctrl+L</strong> — löscht den Bildschirminhalt.</li>
+            </ul>
+            <h3>Wortmodus</h3>
+            <p>Das Rechtschreibprüfungs-Symbol schaltet die Tastatur zwischen <em>Terminalmodus</em> und <em>Wortmodus</em> um. Im Terminalmodus (Standard) sind Autokorrektur und Wortvorschläge deaktiviert — ideal für Befehle und Dateipfade. Im Wortmodus verhält sich die Tastatur wie ein normales Textfeld, mit aktivierten Vorschlägen und Autokorrektur. Nützlich beim Tippen natürlicher Sprache über SSH, zum Beispiel mit Claude Code oder anderen interaktiven Werkzeugen.</p>
+            <h3>Navigation und Bearbeitung</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape-Taste.</li>
+                <li><strong>Tab</strong> — Shell-Autovervollständigung.</li>
+                <li><strong>↑ ↓ ← →</strong> — Cursor-Pfeiltasten.</li>
+                <li><strong>Home / End</strong> — zum Anfang oder Ende der Zeile springen.</li>
+                <li><strong>PgUp / PgDn</strong> — Seite hoch / Seite runter.</li>
+                <li><strong>Del</strong> — Vorwärtslöschen (Zeichen rechts vom Cursor).</li>
+                <li><strong>Einfügen</strong> — Zwischenablage in das Terminal einfügen.</li>
+            </ul>
+            <h3>Funktionstasten</h3>
+            <p>Scrolle die Leiste nach rechts, um die Tasten <strong>F1 bis F12</strong> zu erreichen.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT-FORWARDING</h2>

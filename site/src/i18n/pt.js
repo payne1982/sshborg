@@ -88,6 +88,7 @@ module.exports = {
             <li class="sub"><a href="#suggestions">Como funciona</a></li>
             <li class="sub"><a href="#suggestions">Resolução de problemas</a></li>
             <li><a href="#terminal">Gestos do terminal</a></li>
+            <li><a href="#extra-keys">Barra de teclas extra</a></li>
             <li><a href="#agent-forwarding">Reencaminhamento de agente</a></li>
             <li><a href="#connection-drops">Quedas de ligação</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -217,6 +218,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar.</li>
                 <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// BARRA DE TECLAS EXTRA</h2>
+            <p>Quando o teclado virtual está aberto, aparece acima dele uma fila de botões de atalho. Deslize a barra lateralmente para aceder a todas as teclas.</p>
+            <h3>Teclas modificadoras</h3>
+            <p><strong>Ctrl</strong> e <strong>Alt</strong> são alternâncias persistentes — toque numa e depois toque numa tecla de letra para enviar a combinação. Repõem-se automaticamente após o próximo toque.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — interrompe o processo em execução.</li>
+                <li><strong>Ctrl+D</strong> — envia EOF / fecha a shell.</li>
+                <li><strong>Ctrl+Z</strong> — suspende o processo.</li>
+                <li><strong>Ctrl+L</strong> — limpa o ecrã.</li>
+            </ul>
+            <h3>Modo palavra</h3>
+            <p>O ícone de verificação ortográfica alterna o teclado entre o <em>modo terminal</em> e o <em>modo palavra</em>. No modo terminal (predefinido) a autocorreção e as sugestões de palavras estão desativadas — ideal para comandos e caminhos de ficheiros. No modo palavra o teclado comporta-se como um campo de texto normal, com sugestões e autocorreção ativadas. Útil ao escrever linguagem natural via SSH, por exemplo com Claude Code ou outras ferramentas interativas.</p>
+            <h3>Navegação e edição</h3>
+            <ul>
+                <li><strong>ESC</strong> — tecla Escape.</li>
+                <li><strong>Tab</strong> — autocompletar da shell.</li>
+                <li><strong>↑ ↓ ← →</strong> — teclas de seta do cursor.</li>
+                <li><strong>Home / End</strong> — salta para o início ou fim da linha.</li>
+                <li><strong>PgUp / PgDn</strong> — página acima / página abaixo.</li>
+                <li><strong>Del</strong> — eliminar para a frente (carácter à direita do cursor).</li>
+                <li><strong>Colar</strong> — cola a área de transferência no terminal.</li>
+            </ul>
+            <h3>Teclas de função</h3>
+            <p>Deslize a barra para a direita para aceder às teclas <strong>F1 a F12</strong>.</p>`,
 
   doc_agent_forwarding: `
             <h2>// REENCAMINHAMENTO DE AGENTE</h2>

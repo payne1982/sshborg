@@ -513,6 +513,7 @@
             <li class="sub"><a href="#suggestions">How it works</a></li>
             <li class="sub"><a href="#suggestions">Troubleshooting</a></li>
             <li><a href="#terminal">Terminal Gestures</a></li>
+            <li><a href="#extra-keys">Extra Key Bar</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -656,6 +657,34 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
             </ul>
+        </div>
+
+        <div class="doc-section" id="extra-keys">
+
+            <h2>// EXTRA KEY BAR</h2>
+            <p>When the soft keyboard is open, a row of shortcut buttons appears above it. Scroll the bar sideways to reach all the keys.</p>
+            <h3>Modifier keys</h3>
+            <p><strong>Ctrl</strong> and <strong>Alt</strong> are sticky toggles — tap one, then tap a letter key to send the combination. They reset automatically after the next keystroke.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — interrupt the running process.</li>
+                <li><strong>Ctrl+D</strong> — send EOF / close the shell.</li>
+                <li><strong>Ctrl+Z</strong> — suspend the process.</li>
+                <li><strong>Ctrl+L</strong> — clear the screen.</li>
+            </ul>
+            <h3>Word mode</h3>
+            <p>The spellcheck icon toggles the keyboard between <em>terminal mode</em> and <em>word mode</em>. In terminal mode (default) autocorrect and word suggestions are disabled — ideal for commands and file paths. In word mode the keyboard behaves like a normal text field, with suggestions and autocorrect enabled. Useful when typing natural language over SSH, for example with Claude Code or other interactive tools.</p>
+            <h3>Navigation and editing</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape key.</li>
+                <li><strong>Tab</strong> — shell autocomplete.</li>
+                <li><strong>↑ ↓ ← →</strong> — cursor arrow keys.</li>
+                <li><strong>Home / End</strong> — jump to the beginning or end of the line.</li>
+                <li><strong>PgUp / PgDn</strong> — page up / page down.</li>
+                <li><strong>Del</strong> — forward delete (character to the right of the cursor).</li>
+                <li><strong>Paste</strong> — paste the clipboard into the terminal.</li>
+            </ul>
+            <h3>Function keys</h3>
+            <p>Scroll the bar to the right to reach <strong>F1 through F12</strong>.</p>
         </div>
 
         <div class="doc-section" id="agent-forwarding">

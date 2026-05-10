@@ -513,6 +513,7 @@
             <li class="sub"><a href="#suggestions">工作原理</a></li>
             <li class="sub"><a href="#suggestions">故障排除</a></li>
             <li><a href="#terminal">终端手势</a></li>
+            <li><a href="#extra-keys">额外按键栏</a></li>
             <li><a href="#agent-forwarding">代理转发</a></li>
             <li><a href="#connection-drops">连接断开</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -656,6 +657,34 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
             </ul>
+        </div>
+
+        <div class="doc-section" id="extra-keys">
+
+            <h2>// 额外按键栏</h2>
+            <p>软键盘打开时，上方会出现一排快捷按键。左右滑动按键栏可访问所有按键。</p>
+            <h3>修饰键</h3>
+            <p><strong>Ctrl</strong> 和 <strong>Alt</strong> 是粘滞切换键——点击其中一个，再点击字母键即可发送组合键。每次按键后自动重置。</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — 中断正在运行的进程。</li>
+                <li><strong>Ctrl+D</strong> — 发送 EOF / 关闭 shell。</li>
+                <li><strong>Ctrl+Z</strong> — 暂停进程。</li>
+                <li><strong>Ctrl+L</strong> — 清屏。</li>
+            </ul>
+            <h3>文字模式</h3>
+            <p>拼写检查图标可在<em>终端模式</em>和<em>文字模式</em>之间切换键盘。终端模式（默认）下自动更正和词语建议被禁用——适合输入命令和文件路径。文字模式下键盘像普通文本框一样工作，启用词语建议和自动更正。通过 SSH 输入自然语言时很有用，例如使用 Claude Code 或其他交互式工具。</p>
+            <h3>导航与编辑</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape 键。</li>
+                <li><strong>Tab</strong> — shell 自动补全。</li>
+                <li><strong>↑ ↓ ← →</strong> — 光标方向键。</li>
+                <li><strong>Home / End</strong> — 跳到行首或行尾。</li>
+                <li><strong>PgUp / PgDn</strong> — 向上翻页 / 向下翻页。</li>
+                <li><strong>Del</strong> — 向前删除（光标右侧的字符）。</li>
+                <li><strong>粘贴</strong> — 将剪贴板内容粘贴到终端。</li>
+            </ul>
+            <h3>功能键</h3>
+            <p>向右滑动按键栏可访问 <strong>F1 至 F12</strong> 功能键。</p>
         </div>
 
         <div class="doc-section" id="agent-forwarding">

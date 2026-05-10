@@ -89,6 +89,7 @@ module.exports = {
             <li class="sub"><a href="#suggestions">Come funziona</a></li>
             <li class="sub"><a href="#suggestions">Risoluzione problemi</a></li>
             <li><a href="#terminal">Gesture del terminale</a></li>
+            <li><a href="#extra-keys">Barra tasti extra</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connessioni instabili</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -218,6 +219,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare.</li>
                 <li><strong>Incollare</strong> — usa il tasto <em>Incolla</em> nella barra dei tasti extra (visibile quando la tastiera è aperta).</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// BARRA DEI TASTI EXTRA</h2>
+            <p>Quando la tastiera virtuale è aperta, sopra di essa appare una riga di pulsanti scorciatoia. Scorri la barra lateralmente per raggiungere tutti i tasti.</p>
+            <h3>Tasti modificatori</h3>
+            <p><strong>Ctrl</strong> e <strong>Alt</strong> sono toggle persistenti — toccane uno, poi tocca un tasto lettera per inviare la combinazione. Si resettano automaticamente dopo il tasto successivo.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — interrompe il processo in esecuzione.</li>
+                <li><strong>Ctrl+D</strong> — invia EOF / chiude la shell.</li>
+                <li><strong>Ctrl+Z</strong> — sospende il processo.</li>
+                <li><strong>Ctrl+L</strong> — pulisce lo schermo.</li>
+            </ul>
+            <h3>Modalità parole</h3>
+            <p>L'icona di correzione ortografica alterna la tastiera tra <em>modalità terminale</em> e <em>modalità parole</em>. In modalità terminale (predefinita) autocorrettore e suggerimenti di parole sono disabilitati — ideale per comandi e percorsi di file. In modalità parole la tastiera si comporta come un normale campo di testo, con suggerimenti e autocorrettore attivi. Utile quando si digita testo in linguaggio naturale via SSH, ad esempio con Claude Code o altri strumenti interattivi.</p>
+            <h3>Navigazione e modifica</h3>
+            <ul>
+                <li><strong>ESC</strong> — tasto Escape.</li>
+                <li><strong>Tab</strong> — autocompletamento della shell.</li>
+                <li><strong>↑ ↓ ← →</strong> — frecce direzionali.</li>
+                <li><strong>Home / End</strong> — salta all'inizio o alla fine della riga.</li>
+                <li><strong>PgUp / PgDn</strong> — pagina su / pagina giù.</li>
+                <li><strong>Del</strong> — cancella in avanti (il carattere a destra del cursore).</li>
+                <li><strong>Incolla</strong> — incolla gli appunti nel terminale.</li>
+            </ul>
+            <h3>Tasti funzione</h3>
+            <p>Scorri la barra verso destra per raggiungere i tasti <strong>da F1 a F12</strong>.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>

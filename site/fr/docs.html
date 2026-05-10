@@ -513,6 +513,7 @@
             <li class="sub"><a href="#suggestions">Fonctionnement</a></li>
             <li class="sub"><a href="#suggestions">Résolution de problèmes</a></li>
             <li><a href="#terminal">Gestes du terminal</a></li>
+            <li><a href="#extra-keys">Touches supplémentaires</a></li>
             <li><a href="#agent-forwarding">Transfert d'agent</a></li>
             <li><a href="#connection-drops">Coupures de connexion</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -656,6 +657,34 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copier du texte</strong> — appuyez longuement n'importe où sur le terminal pour entrer en mode sélection. Faites glisser les poignées pour ajuster la zone sélectionnée, puis appuyez sur <em>Copier la sélection</em> pour le texte surligné, ou <em>Tout copier</em> pour toute la sortie. Appuyez en dehors pour annuler.</li>
                 <li><strong>Coller</strong> — utilisez le bouton <em>Coller</em> dans la barre de touches supplémentaires (visible lorsque le clavier est ouvert).</li>
             </ul>
+        </div>
+
+        <div class="doc-section" id="extra-keys">
+
+            <h2>// TOUCHES SUPPLÉMENTAIRES</h2>
+            <p>Lorsque le clavier virtuel est ouvert, une rangée de boutons de raccourci apparaît au-dessus. Faites défiler la barre latéralement pour atteindre toutes les touches.</p>
+            <h3>Touches de modification</h3>
+            <p><strong>Ctrl</strong> et <strong>Alt</strong> sont des bascules persistantes — touchez-en une, puis touchez une touche lettre pour envoyer la combinaison. Elles se réinitialisent automatiquement après la prochaine frappe.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — interrompt le processus en cours.</li>
+                <li><strong>Ctrl+D</strong> — envoie EOF / ferme le shell.</li>
+                <li><strong>Ctrl+Z</strong> — suspend le processus.</li>
+                <li><strong>Ctrl+L</strong> — efface l'écran.</li>
+            </ul>
+            <h3>Mode texte</h3>
+            <p>L'icône de vérification orthographique bascule le clavier entre le <em>mode terminal</em> et le <em>mode texte</em>. En mode terminal (par défaut) la correction automatique et les suggestions de mots sont désactivées — idéal pour les commandes et les chemins de fichiers. En mode texte le clavier se comporte comme un champ de texte normal, avec les suggestions et la correction automatique activées. Utile pour taper du langage naturel via SSH, par exemple avec Claude Code ou d'autres outils interactifs.</p>
+            <h3>Navigation et édition</h3>
+            <ul>
+                <li><strong>ESC</strong> — touche Échap.</li>
+                <li><strong>Tab</strong> — auto-complétion du shell.</li>
+                <li><strong>↑ ↓ ← →</strong> — touches fléchées du curseur.</li>
+                <li><strong>Home / End</strong> — aller au début ou à la fin de la ligne.</li>
+                <li><strong>PgUp / PgDn</strong> — page précédente / page suivante.</li>
+                <li><strong>Del</strong> — suppression avant (caractère à droite du curseur).</li>
+                <li><strong>Coller</strong> — coller le presse-papiers dans le terminal.</li>
+            </ul>
+            <h3>Touches de fonction</h3>
+            <p>Faites défiler la barre vers la droite pour atteindre les touches <strong>F1 à F12</strong>.</p>
         </div>
 
         <div class="doc-section" id="agent-forwarding">

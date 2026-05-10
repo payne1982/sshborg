@@ -90,6 +90,7 @@ module.exports = {
             <li class="sub"><a href="#suggestions">仕組み</a></li>
             <li class="sub"><a href="#suggestions">トラブルシューティング</a></li>
             <li><a href="#terminal">端末ジェスチャー</a></li>
+            <li><a href="#extra-keys">追加キーバー</a></li>
             <li><a href="#agent-forwarding">エージェント転送</a></li>
             <li><a href="#connection-drops">接続が切れる場合</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -219,6 +220,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>テキストのコピー</strong> — 端末の任意の場所を長押しして選択モードに入ります。ハンドルをドラッグして選択範囲を調整し、<em>選択をコピー</em> でハイライトされたテキストのみコピー、または <em>すべてコピー</em> で全出力をコピー。他の場所をタップするとキャンセル。</li>
                 <li><strong>貼り付け</strong> — キーボードが開いているときに表示される追加キーバーの <em>貼り付け</em> ボタンを使用。</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// 追加キーバー</h2>
+            <p>ソフトウェアキーボードが開いているとき、その上にショートカットボタンの列が表示されます。バーを横にスクロールすると、すべてのキーにアクセスできます。</p>
+            <h3>修飾キー</h3>
+            <p><strong>Ctrl</strong> と <strong>Alt</strong> はスティッキートグルです。一方をタップしてから文字キーをタップすることで、組み合わせを送信できます。次のキー入力後に自動的にリセットされます。</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — 実行中のプロセスを中断します。</li>
+                <li><strong>Ctrl+D</strong> — EOF を送信 / シェルを終了します。</li>
+                <li><strong>Ctrl+Z</strong> — プロセスを一時停止します。</li>
+                <li><strong>Ctrl+L</strong> — 画面をクリアします。</li>
+            </ul>
+            <h3>ワードモード</h3>
+            <p>スペルチェックアイコンで、キーボードを<em>ターミナルモード</em>と<em>ワードモード</em>の間で切り替えられます。ターミナルモード（デフォルト）では自動修正と単語候補が無効になっており、コマンドやファイルパスの入力に最適です。ワードモードでは候補と自動修正が有効になり、通常のテキストフィールドと同様に動作します。SSH越しに自然言語を入力する際（Claude Code や他のインタラクティブツールの使用時など）に便利です。</p>
+            <h3>ナビゲーションと編集</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape キー。</li>
+                <li><strong>Tab</strong> — シェルの自動補完。</li>
+                <li><strong>↑ ↓ ← →</strong> — カーソル矢印キー。</li>
+                <li><strong>Home / End</strong> — 行頭または行末にジャンプ。</li>
+                <li><strong>PgUp / PgDn</strong> — ページアップ / ページダウン。</li>
+                <li><strong>Del</strong> — 前方削除（カーソルの右側の文字）。</li>
+                <li><strong>貼り付け</strong> — クリップボードの内容をターミナルに貼り付けます。</li>
+            </ul>
+            <h3>ファンクションキー</h3>
+            <p>バーを右にスクロールすると、<strong>F1 から F12</strong> のファンクションキーにアクセスできます。</p>`,
 
   doc_agent_forwarding: `
             <h2>// エージェント転送</h2>

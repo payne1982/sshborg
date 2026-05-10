@@ -513,6 +513,7 @@
             <li class="sub"><a href="#suggestions">Cómo funciona</a></li>
             <li class="sub"><a href="#suggestions">Solución de problemas</a></li>
             <li><a href="#terminal">Gestos del terminal</a></li>
+            <li><a href="#extra-keys">Barra de teclas extra</a></li>
             <li><a href="#agent-forwarding">Reenvío de agente</a></li>
             <li><a href="#connection-drops">Caídas de conexión</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
@@ -656,6 +657,34 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiar texto</strong> — mantén pulsado en cualquier lugar del terminal para entrar en modo selección. Arrastra los controladores para ajustar el área seleccionada, luego toca <em>Copiar selección</em> para copiar solo el texto resaltado, o <em>Copiar todo</em> para copiar toda la salida. Toca fuera para cancelar.</li>
                 <li><strong>Pegar</strong> — usa el botón <em>Pegar</em> en la barra de teclas adicionales (visible cuando el teclado está abierto).</li>
             </ul>
+        </div>
+
+        <div class="doc-section" id="extra-keys">
+
+            <h2>// BARRA DE TECLAS EXTRA</h2>
+            <p>Cuando el teclado virtual está abierto, aparece sobre él una fila de botones de acceso rápido. Desplaza la barra lateralmente para acceder a todas las teclas.</p>
+            <h3>Teclas modificadoras</h3>
+            <p><strong>Ctrl</strong> y <strong>Alt</strong> son conmutadores persistentes — toca uno y luego toca una tecla de letra para enviar la combinación. Se resetean automáticamente tras la siguiente pulsación.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — interrumpe el proceso en ejecución.</li>
+                <li><strong>Ctrl+D</strong> — envía EOF / cierra la shell.</li>
+                <li><strong>Ctrl+Z</strong> — suspende el proceso.</li>
+                <li><strong>Ctrl+L</strong> — limpia la pantalla.</li>
+            </ul>
+            <h3>Modo palabra</h3>
+            <p>El icono de corrección ortográfica alterna el teclado entre <em>modo terminal</em> y <em>modo palabra</em>. En modo terminal (predeterminado) la autocorrección y las sugerencias de palabras están desactivadas — ideal para comandos y rutas de archivo. En modo palabra el teclado funciona como un campo de texto normal, con sugerencias y autocorrección activadas. Útil cuando se escribe lenguaje natural por SSH, por ejemplo con Claude Code u otras herramientas interactivas.</p>
+            <h3>Navegación y edición</h3>
+            <ul>
+                <li><strong>ESC</strong> — tecla Escape.</li>
+                <li><strong>Tab</strong> — autocompletado de la shell.</li>
+                <li><strong>↑ ↓ ← →</strong> — teclas de flecha del cursor.</li>
+                <li><strong>Home / End</strong> — salta al inicio o al final de la línea.</li>
+                <li><strong>PgUp / PgDn</strong> — página arriba / página abajo.</li>
+                <li><strong>Del</strong> — eliminar hacia adelante (carácter a la derecha del cursor).</li>
+                <li><strong>Pegar</strong> — pega el portapapeles en el terminal.</li>
+            </ul>
+            <h3>Teclas de función</h3>
+            <p>Desplaza la barra hacia la derecha para acceder a las teclas <strong>F1 a F12</strong>.</p>
         </div>
 
         <div class="doc-section" id="agent-forwarding">
