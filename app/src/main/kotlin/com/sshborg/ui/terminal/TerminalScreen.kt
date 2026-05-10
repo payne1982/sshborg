@@ -387,13 +387,13 @@ private fun ExtraKeyRow(
                     MaterialTheme.shapes.extraSmall,
                 )
                 .clickable(onClick = onWordModeToggle)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 7.dp),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 Icons.Filled.Spellcheck,
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(18.dp),
                 tint = if (wordMode) MaterialTheme.colorScheme.onPrimaryContainer
                        else MaterialTheme.colorScheme.onSurface,
             )
@@ -401,10 +401,10 @@ private fun ExtraKeyRow(
         Spacer(Modifier.width(4.dp))
         ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
         ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
-        ExtraKey("↑",    onClick = { onKey(cursorKeys('A')) })
-        ExtraKey("↓",    onClick = { onKey(cursorKeys('B')) })
-        ExtraKey("←",    onClick = { onKey(cursorKeys('D')) })
-        ExtraKey("→",    onClick = { onKey(cursorKeys('C')) })
+        ExtraKey("↑", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('A')) })
+        ExtraKey("↓", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('B')) })
+        ExtraKey("←", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('D')) })
+        ExtraKey("→", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('C')) })
         ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
         ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
         ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })
@@ -443,14 +443,14 @@ private fun ExtraKeyRow(
 }
 
 @Composable
-private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit) {
+private fun ExtraKey(label: String, active: Boolean = false, horizontalPadding: androidx.compose.ui.unit.Dp = 8.dp, onClick: () -> Unit) {
     val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
     Box(
         modifier = Modifier
             .background(bg, MaterialTheme.shapes.extraSmall)
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(horizontal = horizontalPadding, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
         val isArrow = label.length == 1 && label[0] in "↑↓←→"
