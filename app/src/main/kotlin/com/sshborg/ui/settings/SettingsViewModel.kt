@@ -1,6 +1,7 @@
 package com.sshborg.ui.settings
 
 import android.app.Application
+import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
@@ -8,9 +9,12 @@ import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.KeystoreManager
+import com.sshborg.data.db.HostEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 
 class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -54,6 +58,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _error = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val error: SharedFlow<String> = _error
+
+    private val _message = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val message: SharedFlow<String> = _message
 
     /** The BCP-47 tag of the currently forced locale, or "" for system default. */
     val currentLocaleTag: String
@@ -124,6 +131,88 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 prefs.setKeystoreEncryption(true)
             }.onFailure { _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_encryption_failed)) }
             _isMigrating.value = false
+        }
+    }
+
+    fun exportHosts(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val hosts = hostDao.getAllOnce()
+                val arr = JSONArray()
+                hosts.forEach { h ->
+                    arr.put(JSONObject().apply {
+                        put("label", h.label)
+                        put("hostname", h.hostname)
+                        put("port", h.port)
+                        put("username", h.username)
+                        put("agentForwarding", h.agentForwarding)
+                        put("jumpMode", h.jumpMode)
+                        put("sftpStartMode", h.sftpStartMode)
+                        h.jumpHosts?.let { put("jumpHosts", it) }
+                        h.jumpHostIdList?.let { put("jumpHostIdList", it) }
+                        h.portForwardings?.let { put("portForwardings", it) }
+                        h.sftpStartDir?.let { put("sftpStartDir", it) }
+                    })
+                }
+                val json = JSONObject().apply {
+                    put("version", 1)
+                    put("exported_at", java.time.Instant.now().toString())
+                    put("hosts", arr)
+                }.toString(2)
+                getApplication<Application>().contentResolver.openOutputStream(uri)?.use {
+                    it.write(json.toByteArray(Charsets.UTF_8))
+                }
+                _message.tryEmit(getApplication<Application>().getString(R.string.backup_export_success, hosts.size))
+            }.onFailure {
+                _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_unknown))
+            }
+        }
+    }
+
+    fun importHosts(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val jsonText = getApplication<Application>().contentResolver
+                    .openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
+                    ?: throw IllegalStateException(getApplication<Application>().getString(R.string.error_unknown))
+                val root = JSONObject(jsonText)
+                val arr = root.getJSONArray("hosts")
+                val toImport = (0 until arr.length()).map { i ->
+                    val o = arr.getJSONObject(i)
+                    HostEntity(
+                        id = 0,
+                        label = o.getString("label"),
+                        hostname = o.getString("hostname"),
+                        port = o.optInt("port", 22),
+                        username = o.getString("username"),
+                        keyId = null,
+                        password = null,
+                        encryptedPassword = null,
+                        knownHostsEntry = null,
+                        agentForwarding = o.optBoolean("agentForwarding", false),
+                        lastConnected = null,
+                        jumpHosts = o.optString("jumpHosts").takeIf { it.isNotEmpty() },
+                        jumpHostKeys = null,
+                        portForwardings = o.optString("portForwardings").takeIf { it.isNotEmpty() },
+                        jumpMode = o.optString("jumpMode", "simple"),
+                        jumpHostIdList = o.optString("jumpHostIdList").takeIf { it.isNotEmpty() },
+                        sftpStartMode = o.optString("sftpStartMode", "last"),
+                        sftpStartDir = o.optString("sftpStartDir").takeIf { it.isNotEmpty() },
+                    )
+                }
+                val existingByLabel = hostDao.getAllOnce().associateBy { it.label }
+                var inserted = 0; var updated = 0
+                toImport.forEach { host ->
+                    val existing = existingByLabel[host.label]
+                    if (existing != null) { hostDao.upsert(host.copy(id = existing.id)); updated++ }
+                    else { hostDao.upsert(host); inserted++ }
+                }
+                _message.tryEmit(
+                    getApplication<Application>().getString(R.string.backup_import_success, inserted, updated)
+                )
+            }.onFailure {
+                _error.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_unknown))
+            }
         }
     }
 

@@ -130,6 +130,7 @@
     <string name="settings_section_general">Allgemein</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Sicherheit</string>
+    <string name="settings_section_backup">Backup</string>
 
     <string name="settings_confirm_exit_title">Beenden bestätigen</string>
     <string name="settings_confirm_exit_subtitle">Vor dem Schließen der App um Bestätigung bitten</string>
@@ -276,6 +277,14 @@
     <string name="error_refresh_failed">Aktualisierung fehlgeschlagen</string>
     <string name="error_encryption_failed">Verschlüsselung fehlgeschlagen</string>
     <string name="error_decryption_failed">Entschlüsselung fehlgeschlagen</string>
+    <string name="settings_backup_export_title">Hosts exportieren</string>
+    <string name="settings_backup_export_subtitle">Host-Konfigurationen in eine JSON-Datei speichern. Passwörter und Schlüssel sind nicht enthalten.</string>
+    <string name="settings_backup_export_action">Exportieren</string>
+    <string name="settings_backup_import_title">Hosts importieren</string>
+    <string name="settings_backup_import_subtitle">Host-Konfigurationen aus einer JSON-Datei laden. Vorhandene Hosts mit demselben Namen werden aktualisiert; Passwörter und Schlüssel werden nicht importiert.</string>
+    <string name="settings_backup_import_action">Importieren</string>
+    <string name="backup_export_success">%1$d Hosts exportiert</string>
+    <string name="backup_import_success">%1$d importiert, %2$d aktualisiert</string>
     <string name="error_unknown">Etwas ist schiefgelaufen</string>
 
     <!-- ── Theme setting ─────────────────────────────────────────────────── -->

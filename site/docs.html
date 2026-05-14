@@ -464,6 +464,7 @@
         <a href="#sftp">SFTP</a>
         <a href="#ssh-keys">SSH Keys</a>
         <a href="#jump-hosts">Jump Hosts</a>
+        <a href="#backup">Backup</a>
         <a href="https://github.com/payne1982/sshborg-issues">Support</a>
         <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a>
     </div>
@@ -521,6 +522,7 @@
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
+            <li><a href="#backup">Configuration Backup</a></li>
         </ul>
     </nav>
 
@@ -848,6 +850,63 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// BACKUP NOTE</div>
                 Because keys are stored in the Android Keystore, they <strong>cannot be backed up</strong> via Android's cloud backup mechanism and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
+            </div>
+        </div>
+
+        <div class="doc-section" id="backup">
+
+            <h2>// CONFIGURATION BACKUP</h2>
+            <p>SSHBorg can export and import host configurations as a JSON file. This lets you transfer your server list to another device or keep a portable backup of your setup.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANT</div>
+                The backup includes only host configurations (address, port, username, settings). <strong>Passwords and SSH keys are never exported</strong> — these must be set up again after importing on a new device.
+            </div>
+            <h3>Exporting</h3>
+            <p>Go to <strong>Settings → Backup → Export hosts</strong>. Choose where to save the file using the system file picker. The file is named <code>sshborg_hosts.json</code> by default.</p>
+            <h3>Importing</h3>
+            <p>Go to <strong>Settings → Backup → Import hosts</strong>. Select the <code>.json</code> file you previously exported (or created manually). SSHBorg merges it with the existing host list:</p>
+            <ul>
+                <li>Hosts whose <strong>label</strong> matches an existing entry are <strong>updated</strong>.</li>
+                <li>Hosts with a new label are <strong>added</strong>.</li>
+                <li>Hosts not present in the file are <strong>left unchanged</strong>.</li>
+            </ul>
+            <h3>JSON format</h3>
+            <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "My VPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>Field reference</h3>
+            <ul>
+                <li><code>label</code> — display name shown in SSHBorg. Used as the unique key for merging on import. <strong>Required.</strong></li>
+                <li><code>hostname</code> — server address or IP (IPv4 or IPv6). <strong>Required.</strong></li>
+                <li><code>port</code> — SSH port. Defaults to <code>22</code>.</li>
+                <li><code>username</code> — login user. <strong>Required.</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code> to enable SSH agent forwarding. Defaults to <code>false</code>.</li>
+                <li><code>jumpMode</code> — <code>"simple"</code> (use the <code>jumpHosts</code> text) or <code>"host_list"</code> (use SSHBorg internal host IDs). Use <code>"simple"</code> when creating the file manually.</li>
+                <li><code>jumpHosts</code> — comma-separated jump hosts in <code>[user@]host[:port]</code> format. Only used when <code>jumpMode</code> is <code>"simple"</code>.</li>
+                <li><code>portForwardings</code> — newline-separated local port-forwarding rules in SSH <code>-L</code> syntax, e.g. <code>"8080:localhost:8080"</code>.</li>
+                <li><code>sftpStartMode</code> — SFTP starting directory: <code>"last"</code> (remember last visited), <code>"fixed"</code> (always use <code>sftpStartDir</code>), <code>"home"</code> (server home). Defaults to <code>"last"</code>.</li>
+                <li><code>sftpStartDir</code> — path to use when <code>sftpStartMode</code> is <code>"fixed"</code>.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// OPTIONAL FIELDS</div>
+                All fields except <code>label</code>, <code>hostname</code>, and <code>username</code> are optional. Omitted fields fall back to their defaults.
             </div>
         </div>
 

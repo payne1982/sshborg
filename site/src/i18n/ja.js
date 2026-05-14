@@ -71,6 +71,7 @@ module.exports = {
   nav_ssh_keys:       'SSH鍵',
   nav_jump_hosts:     '踏み台ホスト',
   nav_sftp:           'SFTP',
+  nav_backup:         'バックアップ',
 
   doc_page_title:    '// ユーザーガイド',
   doc_page_subtitle: '操作ガイド — SSHBorgを最大限に活用するための手順書。',
@@ -97,7 +98,8 @@ module.exports = {
             <li><a href="#jump-hosts">踏み台ホスト</a></li>
             <li class="sub"><a href="#jump-hosts">マルチホップチェーン</a></li>
             <li><a href="#sessions">複数セッション</a></li>
-            <li><a href="#security">アプリのセキュリティ</a></li>`,
+            <li><a href="#security">アプリのセキュリティ</a></li>
+            <li><a href="#backup">設定のバックアップ</a></li>`,
 
   doc_adding_host: `
             <h2>// ホストの追加</h2>
@@ -399,5 +401,60 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// バックアップについて</div>
                 鍵はAndroid Keystoreに保存されているため、Androidのクラウドバックアップ機能でバックアップ<strong>できず</strong>、新しいスマートフォンに自動的に転送されません。デバイスを切り替える前に、新しいデバイスで生成した新しい鍵をすべてのサーバーに登録してください。
+            </div>`,
+
+  doc_backup: `
+            <h2>// 設定のバックアップ</h2>
+            <p>SSHBorgはホストの設定をJSONファイルとしてエクスポート・インポートできます。これにより、サーバーリストを別のデバイスに移したり、設定のポータブルなバックアップを保管したりできます。</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// 重要</div>
+                バックアップにはホスト設定（アドレス、ポート、ユーザー名、設定）のみが含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 新しいデバイスにインポートした後、再設定が必要です。
+            </div>
+            <h3>エクスポート</h3>
+            <p><strong>設定 → バックアップ → ホストをエクスポート</strong> に移動します。システムのファイル選択ツールを使って保存先を選択します。ファイル名はデフォルトで <code>sshborg_hosts.json</code> です。</p>
+            <h3>インポート</h3>
+            <p><strong>設定 → バックアップ → ホストをインポート</strong> に移動します。以前エクスポートした（または手動で作成した）<code>.json</code> ファイルを選択します。SSHBorgは既存のホストリストと統合します：</p>
+            <ul>
+                <li><strong>名前</strong>が既存のエントリと一致するホストは<strong>更新</strong>されます。</li>
+                <li>新しい名前を持つホストは<strong>追加</strong>されます。</li>
+                <li>ファイルにないホストは<strong>変更されません</strong>。</li>
+            </ul>
+            <h3>JSON形式</h3>
+            <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "マイVPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>フィールドリファレンス</h3>
+            <ul>
+                <li><code>label</code> — SSHBorgに表示される名前。インポート時の統合に使われる一意のキー。<strong>必須。</strong></li>
+                <li><code>hostname</code> — サーバーのアドレスまたはIP（IPv4またはIPv6）。<strong>必須。</strong></li>
+                <li><code>port</code> — SSHポート。デフォルト：<code>22</code>。</li>
+                <li><code>username</code> — ログインユーザー名。<strong>必須。</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code> でSSHエージェント転送を有効化。デフォルト：<code>false</code>。</li>
+                <li><code>jumpMode</code> — <code>"simple"</code>（<code>jumpHosts</code>のテキストを使用）または <code>"host_list"</code>（SSHBorgの内部ホストIDを使用）。手動作成時は <code>"simple"</code> を使用してください。</li>
+                <li><code>jumpHosts</code> — <code>[ユーザー@]ホスト[:ポート]</code> 形式のカンマ区切りの踏み台ホスト。<code>jumpMode</code> が <code>"simple"</code> のときのみ使用。</li>
+                <li><code>portForwardings</code> — SSH <code>-L</code> 構文による改行区切りのローカルポート転送ルール（例：<code>"8080:localhost:8080"</code>）。</li>
+                <li><code>sftpStartMode</code> — SFTPの開始ディレクトリ：<code>"last"</code>（最後に訪問したディレクトリを記憶）、<code>"fixed"</code>（常に <code>sftpStartDir</code> を使用）、<code>"home"</code>（サーバーのホームディレクトリ）。デフォルト：<code>"last"</code>。</li>
+                <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// 省略可能なフィールド</div>
+                <code>label</code>、<code>hostname</code>、<code>username</code> 以外のフィールドはすべて省略可能です。省略されたフィールドはデフォルト値が使用されます。
             </div>`,
 };

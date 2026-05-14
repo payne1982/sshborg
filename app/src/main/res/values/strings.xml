@@ -135,6 +135,7 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Security</string>
+    <string name="settings_section_backup">Backup</string>
 
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_follow_system">Follow system</string>
@@ -293,6 +294,16 @@
         <item quantity="one">1 active session</item>
         <item quantity="other">%d active sessions</item>
     </plurals>
+
+    <!-- Backup export/import -->
+    <string name="settings_backup_export_title">Export hosts</string>
+    <string name="settings_backup_export_subtitle">Save host configurations to a JSON file. Passwords and keys are not included.</string>
+    <string name="settings_backup_export_action">Export</string>
+    <string name="settings_backup_import_title">Import hosts</string>
+    <string name="settings_backup_import_subtitle">Load host configurations from a JSON file. Existing hosts with the same name will be updated; passwords and keys will not be imported.</string>
+    <string name="settings_backup_import_action">Import</string>
+    <string name="backup_export_success">Exported %1$d hosts</string>
+    <string name="backup_import_success">Imported %1$d, updated %2$d hosts</string>
 
     <!-- ── Error strings from ViewModels ───────────────────────────────── -->
     <string name="error_session_not_found">Session not found</string>
