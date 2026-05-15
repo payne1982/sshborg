@@ -606,7 +606,7 @@ class TerminalView @JvmOverloads constructor(
             opts: android.os.Bundle?,
         ) = true
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            if (beforeLength > 0) onInput?.invoke(byteArrayOf(0x7F))
+            repeat(beforeLength) { onInput?.invoke(byteArrayOf(0x7F)) }
             return true
         }
         override fun sendKeyEvent(event: KeyEvent): Boolean {
