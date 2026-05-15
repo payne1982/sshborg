@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -78,6 +79,7 @@ fun TerminalScreen(
 
     var ctrlActive by remember { mutableStateOf(false) }
     var altActive  by remember { mutableStateOf(false) }
+    var wordMode   by remember { mutableStateOf(false) }
 
     val sendInput: (ByteArray) -> Unit = { bytes ->
         val out = when {
@@ -161,6 +163,7 @@ fun TerminalScreen(
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         vm.terminalViewRef         = view
+                        view.wordMode              = wordMode
                         view.postInvalidate()
                     },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -199,12 +202,14 @@ fun TerminalScreen(
                 // Extra key bar — only when soft keyboard is open
                 if (imeVisible) {
                     ExtraKeyRow(
-                        ctrlActive  = ctrlActive,
-                        altActive   = altActive,
-                        onCtrlToggle = { ctrlActive = !ctrlActive },
-                        onAltToggle  = { altActive  = !altActive  },
-                        onKey        = { bytes -> sendInput(bytes) },
-                        cursorKeys   = { vm.cursorKeyBytes(it) },
+                        ctrlActive       = ctrlActive,
+                        altActive        = altActive,
+                        wordMode         = wordMode,
+                        onCtrlToggle     = { ctrlActive = !ctrlActive },
+                        onAltToggle      = { altActive  = !altActive  },
+                        onWordModeToggle = { wordMode   = !wordMode   },
+                        onKey            = { bytes -> sendInput(bytes) },
+                        cursorKeys       = { vm.cursorKeyBytes(it) },
                     )
                 }
             }
@@ -353,8 +358,10 @@ private fun SuggestionRow(suggestions: List<String>, sticky: Boolean, onSelect: 
 private fun ExtraKeyRow(
     ctrlActive: Boolean,
     altActive: Boolean,
+    wordMode: Boolean,
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit,
+    onWordModeToggle: () -> Unit,
     onKey: (ByteArray) -> Unit,
     cursorKeys: (Char) -> ByteArray,
 ) {
@@ -372,13 +379,32 @@ private fun ExtraKeyRow(
     ) {
         ExtraKey("Ctrl", active = ctrlActive, onClick = onCtrlToggle)
         ExtraKey("Alt",  active = altActive,  onClick = onAltToggle)
+        Box(
+            modifier = Modifier
+                .background(
+                    if (wordMode) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surface,
+                    MaterialTheme.shapes.extraSmall,
+                )
+                .clickable(onClick = onWordModeToggle)
+                .padding(horizontal = 8.dp, vertical = 7.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Filled.Spellcheck,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = if (wordMode) MaterialTheme.colorScheme.onPrimaryContainer
+                       else MaterialTheme.colorScheme.onSurface,
+            )
+        }
         Spacer(Modifier.width(4.dp))
         ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
         ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
-        ExtraKey("↑",    onClick = { onKey(cursorKeys('A')) })
-        ExtraKey("↓",    onClick = { onKey(cursorKeys('B')) })
-        ExtraKey("←",    onClick = { onKey(cursorKeys('D')) })
-        ExtraKey("→",    onClick = { onKey(cursorKeys('C')) })
+        ExtraKey("↑", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('A')) })
+        ExtraKey("↓", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('B')) })
+        ExtraKey("←", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('D')) })
+        ExtraKey("→", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('C')) })
         ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
         ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
         ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })
@@ -417,14 +443,14 @@ private fun ExtraKeyRow(
 }
 
 @Composable
-private fun ExtraKey(label: String, active: Boolean = false, onClick: () -> Unit) {
+private fun ExtraKey(label: String, active: Boolean = false, horizontalPadding: androidx.compose.ui.unit.Dp = 8.dp, onClick: () -> Unit) {
     val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
     Box(
         modifier = Modifier
             .background(bg, MaterialTheme.shapes.extraSmall)
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(horizontal = horizontalPadding, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
         val isArrow = label.length == 1 && label[0] in "↑↓←→"

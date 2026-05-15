@@ -134,6 +134,7 @@
     <string name="settings_section_general">通用</string>
     <string name="settings_section_terminal">终端</string>
     <string name="settings_section_security">安全</string>
+    <string name="settings_section_backup">备份</string>
 
     <string name="settings_theme_title">主题</string>
     <string name="settings_theme_follow_system">跟随系统</string>
@@ -306,5 +307,13 @@
     <string name="error_refresh_failed">刷新失败</string>
     <string name="error_encryption_failed">加密失败</string>
     <string name="error_decryption_failed">解密失败</string>
+    <string name="settings_backup_export_title">导出主机</string>
+    <string name="settings_backup_export_subtitle">将主机配置保存到 JSON 文件。不包含密码和密钥。</string>
+    <string name="settings_backup_export_action">导出</string>
+    <string name="settings_backup_import_title">导入主机</string>
+    <string name="settings_backup_import_subtitle">从 JSON 文件加载主机配置。同名的现有主机将被更新；密码和密钥不会被导入。</string>
+    <string name="settings_backup_import_action">导入</string>
+    <string name="backup_export_success">已导出 %1$d 个主机</string>
+    <string name="backup_import_success">已导入 %1$d 个，已更新 %2$d 个主机</string>
     <string name="error_unknown">出现错误</string>
 </resources>

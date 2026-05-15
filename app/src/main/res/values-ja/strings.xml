@@ -134,6 +134,7 @@
     <string name="settings_section_general">一般</string>
     <string name="settings_section_terminal">ターミナル</string>
     <string name="settings_section_security">セキュリティ</string>
+    <string name="settings_section_backup">バックアップ</string>
 
     <string name="settings_theme_title">テーマ</string>
     <string name="settings_theme_follow_system">システムに従う</string>
@@ -306,5 +307,13 @@
     <string name="error_refresh_failed">更新に失敗しました</string>
     <string name="error_encryption_failed">暗号化に失敗しました</string>
     <string name="error_decryption_failed">復号に失敗しました</string>
+    <string name="settings_backup_export_title">ホストをエクスポート</string>
+    <string name="settings_backup_export_subtitle">ホストの設定を JSON ファイルに保存します。パスワードと鍵は含まれません。</string>
+    <string name="settings_backup_export_action">エクスポート</string>
+    <string name="settings_backup_import_title">ホストをインポート</string>
+    <string name="settings_backup_import_subtitle">JSON ファイルからホストの設定を読み込みます。同名の既存ホストは更新されます。パスワードと鍵はインポートされません。</string>
+    <string name="settings_backup_import_action">インポート</string>
+    <string name="backup_export_success">%1$d 件のホストをエクスポートしました</string>
+    <string name="backup_import_success">%1$d 件インポート、%2$d 件更新しました</string>
     <string name="error_unknown">エラーが発生しました</string>
 </resources>

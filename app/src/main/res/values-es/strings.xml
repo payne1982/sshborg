@@ -130,6 +130,7 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Seguridad</string>
+    <string name="settings_section_backup">Copia de seguridad</string>
 
     <string name="settings_confirm_exit_title">Confirmar salida</string>
     <string name="settings_confirm_exit_subtitle">Pedir confirmación antes de cerrar la app</string>
@@ -276,6 +277,14 @@
     <string name="error_refresh_failed">Actualización fallida</string>
     <string name="error_encryption_failed">Cifrado fallido</string>
     <string name="error_decryption_failed">Descifrado fallido</string>
+    <string name="settings_backup_export_title">Exportar hosts</string>
+    <string name="settings_backup_export_subtitle">Guardar las configuraciones de los hosts en un archivo JSON. Las contraseñas y claves no están incluidas.</string>
+    <string name="settings_backup_export_action">Exportar</string>
+    <string name="settings_backup_import_title">Importar hosts</string>
+    <string name="settings_backup_import_subtitle">Cargar las configuraciones desde un archivo JSON. Los hosts existentes con el mismo nombre se actualizarán; las contraseñas y claves no se importarán.</string>
+    <string name="settings_backup_import_action">Importar</string>
+    <string name="backup_export_success">%1$d hosts exportados</string>
+    <string name="backup_import_success">%1$d importados, %2$d actualizados</string>
     <string name="error_unknown">Algo salió mal</string>
 
     <!-- ── Theme setting ─────────────────────────────────────────────────── -->

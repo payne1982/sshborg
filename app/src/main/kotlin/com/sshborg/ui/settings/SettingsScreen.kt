@@ -1,5 +1,7 @@
 package com.sshborg.ui.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -62,6 +64,9 @@ fun SettingsScreen(
             val display = message.takeIf { it.isNotBlank() } ?: unknownError
             snackbarHostState.showSnackbar(display, duration = SnackbarDuration.Long)
         }
+    }
+    LaunchedEffect(Unit) {
+        vm.message.collect { snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short) }
     }
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
@@ -389,6 +394,44 @@ fun SettingsScreen(
                                 else vm.disableKeystoreEncryption()
                             },
                         )
+                    }
+                },
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+            // ── Backup section ────────────────────────────────────────────────
+            Text(
+                stringResource(R.string.settings_section_backup),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+
+            val exportLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.CreateDocument("application/json")
+            ) { uri -> if (uri != null) vm.exportHosts(uri) }
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_backup_export_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_backup_export_subtitle)) },
+                trailingContent = {
+                    OutlinedButton(onClick = { exportLauncher.launch("sshborg_hosts.json") }) {
+                        Text(stringResource(R.string.settings_backup_export_action))
+                    }
+                },
+            )
+
+            val importLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.OpenDocument()
+            ) { uri -> if (uri != null) vm.importHosts(uri) }
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_backup_import_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_backup_import_subtitle)) },
+                trailingContent = {
+                    OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
+                        Text(stringResource(R.string.settings_backup_import_action))
                     }
                 },
             )

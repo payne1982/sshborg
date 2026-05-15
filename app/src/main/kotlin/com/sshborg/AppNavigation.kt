@@ -1,5 +1,7 @@
 package com.sshborg
 
+import android.app.Activity
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -60,7 +62,14 @@ fun AppNavigation() {
         AlertDialog(
             onDismissRequest = {},
             title = { Text(stringResource(R.string.privacy_policy_dialog_title)) },
-            text  = { Text(stringResource(R.string.privacy_policy_dialog_body)) },
+            text  = {
+                Column {
+                    Text(stringResource(R.string.privacy_policy_dialog_body))
+                    TextButton(onClick = {
+                        uriHandler.openUri("https://sshborg.com/privacy_policy.html")
+                    }) { Text(stringResource(R.string.action_read_policy)) }
+                }
+            },
             confirmButton = {
                 TextButton(onClick = {
                     showPrivacyDialog = false
@@ -69,8 +78,8 @@ fun AppNavigation() {
             },
             dismissButton = {
                 TextButton(onClick = {
-                    uriHandler.openUri("https://sshborg.com/privacy_policy.html")
-                }) { Text(stringResource(R.string.action_read_policy)) }
+                    (context as Activity).finishAffinity()
+                }) { Text(stringResource(R.string.action_reject)) }
             },
         )
     }

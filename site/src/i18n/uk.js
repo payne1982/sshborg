@@ -69,6 +69,7 @@ module.exports = {
   nav_ssh_keys:       'SSH ключі',
   nav_jump_hosts:     'Jump Hosts',
   nav_sftp:           'SFTP',
+  nav_backup:         'Резервне копіювання',
 
   doc_page_title:    '// ПОСІБНИК КОРИСТУВАЧА',
   doc_page_subtitle: 'Практичний посібник — що робити, крок за кроком, щоб отримати максимум від SSHBorg.',
@@ -88,13 +89,15 @@ module.exports = {
             <li class="sub"><a href="#suggestions">Як це працює</a></li>
             <li class="sub"><a href="#suggestions">Усунення проблем</a></li>
             <li><a href="#terminal">Жести терміналу</a></li>
+            <li><a href="#extra-keys">Додаткові клавіші</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Обриви з'єднання</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Багаторівневі ланцюги</a></li>
             <li><a href="#sessions">Кілька сесій</a></li>
-            <li><a href="#security">Безпека застосунку</a></li>`,
+            <li><a href="#security">Безпека застосунку</a></li>
+            <li><a href="#backup">Резервне копіювання конфігурації</a></li>`,
 
   doc_adding_host: `
             <h2>// ДОДАВАННЯ ХОСТУ</h2>
@@ -217,6 +220,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Копіювання тексту</strong> — утримуйте в будь-якому місці терміналу для входу в режим виділення. Перетягніть маркери для налаштування виділеної області, потім натисніть <em>Копіювати вибране</em> для виділеного тексту, або <em>Копіювати все</em> для всього виводу. Торкніться за межами для скасування.</li>
                 <li><strong>Вставка</strong> — використовуйте кнопку <em>Вставити</em> на панелі додаткових клавіш (видима, коли клавіатура відкрита).</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// ПАНЕЛЬ ДОДАТКОВИХ КЛАВІШ</h2>
+            <p>Коли екранна клавіатура відкрита, над нею з'являється ряд кнопок швидкого доступу. Прокрутіть панель горизонтально, щоб побачити всі клавіші.</p>
+            <h3>Клавіші-модифікатори</h3>
+            <p><strong>Ctrl</strong> та <strong>Alt</strong> — це перемикачі з фіксацією: натисніть один, потім натисніть буквену клавішу для надсилання комбінації. Вони автоматично скидаються після наступного натискання клавіші.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — перериває процес, що виконується.</li>
+                <li><strong>Ctrl+D</strong> — надсилає EOF / закриває shell.</li>
+                <li><strong>Ctrl+Z</strong> — призупиняє процес.</li>
+                <li><strong>Ctrl+L</strong> — очищає екран.</li>
+            </ul>
+            <h3>Режим слів</h3>
+            <p>Іконка перевірки орфографії перемикає клавіатуру між <em>режимом термінала</em> і <em>режимом слів</em>. У режимі термінала (за замовчуванням) автокорекція і підказки слів вимкнені — ідеально для команд і шляхів до файлів. У режимі слів клавіатура поводиться як звичайне текстове поле з увімкненими підказками і автокорекцією. Корисно при введенні природної мови через SSH, наприклад з Claude Code або іншими інтерактивними інструментами.</p>
+            <h3>Навігація та редагування</h3>
+            <ul>
+                <li><strong>ESC</strong> — клавіша Escape.</li>
+                <li><strong>Tab</strong> — автодоповнення shell.</li>
+                <li><strong>↑ ↓ ← →</strong> — клавіші зі стрілками.</li>
+                <li><strong>Home / End</strong> — перейти на початок або кінець рядка.</li>
+                <li><strong>PgUp / PgDn</strong> — сторінка вгору / сторінка вниз.</li>
+                <li><strong>Del</strong> — видалення вперед (символ праворуч від курсора).</li>
+                <li><strong>Вставити</strong> — вставити вміст буфера обміну в термінал.</li>
+            </ul>
+            <h3>Функціональні клавіші</h3>
+            <p>Прокрутіть панель праворуч, щоб дістатися клавіш <strong>від F1 до F12</strong>.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>
@@ -370,5 +399,60 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// ПРИМІТКА ПРО РЕЗЕРВНЕ КОПІЮВАННЯ</div>
                 Оскільки ключі зберігаються в Android Keystore, вони <strong>не можуть бути включені до резервної копії</strong> хмари Android та не переносяться автоматично на новий телефон. Перед зміною пристрою обов'язково авторизуйте новий ключ, згенерований на новому пристрої, на всіх своїх серверах.
+            </div>`,
+
+  doc_backup: `
+            <h2>// РЕЗЕРВНЕ КОПІЮВАННЯ КОНФІГУРАЦІЇ</h2>
+            <p>SSHBorg може експортувати та імпортувати конфігурації хостів у форматі JSON. Це дозволяє перенести список серверів на інший пристрій або зберегти портативну резервну копію налаштувань.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ВАЖЛИВО</div>
+                Резервна копія включає лише конфігурації хостів (адреса, порт, ім'я користувача, налаштування). <strong>Паролі та SSH-ключі ніколи не експортуються</strong> — їх необхідно налаштувати заново після імпорту на новому пристрої.
+            </div>
+            <h3>Експорт</h3>
+            <p>Перейдіть до <strong>Налаштування → Резервна копія → Експортувати хости</strong>. Виберіть місце збереження файлу за допомогою системного вибору файлів. За замовчуванням файл називається <code>sshborg_hosts.json</code>.</p>
+            <h3>Імпорт</h3>
+            <p>Перейдіть до <strong>Налаштування → Резервна копія → Імпортувати хости</strong>. Виберіть файл <code>.json</code>, попередньо експортований (або створений вручну). SSHBorg об'єднає його з наявним списком хостів:</p>
+            <ul>
+                <li>Хости, <strong>назва</strong> яких збігається з наявним записом, <strong>оновлюються</strong>.</li>
+                <li>Хости з новою назвою <strong>додаються</strong>.</li>
+                <li>Хости, відсутні у файлі, залишаються <strong>без змін</strong>.</li>
+            </ul>
+            <h3>Формат JSON</h3>
+            <p>Експортований файл є звичайним об'єктом JSON. Його можна також створити вручну для масового імпорту списку серверів з іншого джерела.</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "Мій VPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>Довідник полів</h3>
+            <ul>
+                <li><code>label</code> — назва, що відображається в SSHBorg. Використовується як унікальний ключ для об'єднання при імпорті. <strong>Обов'язкове.</strong></li>
+                <li><code>hostname</code> — адреса або IP сервера (IPv4 або IPv6). <strong>Обов'язкове.</strong></li>
+                <li><code>port</code> — порт SSH. За замовчуванням: <code>22</code>.</li>
+                <li><code>username</code> — ім'я користувача для входу. <strong>Обов'язкове.</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code> для увімкнення пересилання SSH-агента. За замовчуванням: <code>false</code>.</li>
+                <li><code>jumpMode</code> — <code>"simple"</code> (використовує текст <code>jumpHosts</code>) або <code>"host_list"</code> (використовує внутрішні ID SSHBorg). Використовуйте <code>"simple"</code> під час ручного створення файлу.</li>
+                <li><code>jumpHosts</code> — список jump-хостів через кому у форматі <code>[користувач@]хост[:порт]</code>. Використовується лише коли <code>jumpMode</code> — <code>"simple"</code>.</li>
+                <li><code>portForwardings</code> — правила локального переспрямування портів через новий рядок у синтаксисі SSH <code>-L</code>, напр. <code>"8080:localhost:8080"</code>.</li>
+                <li><code>sftpStartMode</code> — початкова директорія SFTP: <code>"last"</code> (запам'ятати останню відвідану), <code>"fixed"</code> (завжди використовувати <code>sftpStartDir</code>), <code>"home"</code> (домашня директорія сервера). За замовчуванням: <code>"last"</code>.</li>
+                <li><code>sftpStartDir</code> — шлях для використання, коли <code>sftpStartMode</code> — <code>"fixed"</code>.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// НЕОБОВ'ЯЗКОВІ ПОЛЯ</div>
+                Всі поля, крім <code>label</code>, <code>hostname</code> та <code>username</code>, є необов'язковими. Відсутні поля повертаються до значень за замовчуванням.
             </div>`,
 };

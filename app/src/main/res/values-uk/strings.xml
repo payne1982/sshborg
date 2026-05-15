@@ -130,6 +130,7 @@
     <string name="settings_section_general">Загальне</string>
     <string name="settings_section_terminal">Термінал</string>
     <string name="settings_section_security">Безпека</string>
+    <string name="settings_section_backup">Резервна копія</string>
 
     <string name="settings_confirm_exit_title">Підтвердити вихід</string>
     <string name="settings_confirm_exit_subtitle">Запитувати підтвердження перед закриттям додатка</string>
@@ -276,6 +277,14 @@
     <string name="error_refresh_failed">Помилка оновлення</string>
     <string name="error_encryption_failed">Помилка шифрування</string>
     <string name="error_decryption_failed">Помилка розшифрування</string>
+    <string name="settings_backup_export_title">Експортувати хости</string>
+    <string name="settings_backup_export_subtitle">Зберегти конфігурації хостів у файл JSON. Паролі та ключі не включені.</string>
+    <string name="settings_backup_export_action">Експорт</string>
+    <string name="settings_backup_import_title">Імпортувати хости</string>
+    <string name="settings_backup_import_subtitle">Завантажити конфігурації хостів із файлу JSON. Наявні хости з такою самою назвою будуть оновлені; паролі та ключі не будуть імпортовані.</string>
+    <string name="settings_backup_import_action">Імпорт</string>
+    <string name="backup_export_success">Експортовано %1$d хостів</string>
+    <string name="backup_import_success">Імпортовано %1$d, оновлено %2$d хостів</string>
     <string name="error_unknown">Щось пішло не так</string>
 
     <!-- ── Theme setting ─────────────────────────────────────────────────── -->

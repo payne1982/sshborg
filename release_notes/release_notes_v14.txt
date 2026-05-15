@@ -1,0 +1,45 @@
+<en-US>
+• Terminal: new button in the keyboard bar to toggle word suggestions and autocorrect — useful when typing natural language over SSH
+• Fixed status bar icons not adapting when the app theme differs from the system theme
+• Settings: new Backup section to export and import host configurations as a JSON file — passwords and keys are never included
+</en-US>
+<it-IT>
+• Terminale: nuovo pulsante nella barra della tastiera per attivare i suggerimenti di parole e l'autocorrettore — utile quando si digita testo in linguaggio naturale via SSH
+• Corretto: le icone della barra di stato ora si adattano correttamente quando il tema dell'app differisce dal tema di sistema
+• Impostazioni: nuova sezione Backup per esportare e importare le configurazioni degli host in formato JSON — password e chiavi non vengono mai incluse
+</it-IT>
+<de-DE>
+• Terminal: neuer Button in der Tastenleiste zum Ein-/Ausschalten von Wortvorschlägen und Autokorrektur — nützlich beim Tippen natürlicher Sprache über SSH
+• Behoben: Status-Bar-Icons passen sich jetzt korrekt an, wenn das App-Design vom Systemdesign abweicht
+• Einstellungen: neuer Bereich Backup zum Exportieren und Importieren von Host-Konfigurationen als JSON-Datei — Passwörter und Schlüssel werden nicht exportiert
+</de-DE>
+<es-ES>
+• Terminal: nuevo botón en la barra del teclado para activar sugerencias de palabras y autocorrección — útil al escribir lenguaje natural por SSH
+• Corregido: los iconos de la barra de estado ahora se adaptan correctamente cuando el tema de la app difiere del tema del sistema
+• Ajustes: nueva sección Copia de seguridad para exportar e importar configuraciones de hosts en JSON — contraseñas y claves no se exportan nunca
+</es-ES>
+<fr-FR>
+• Terminal : nouveau bouton dans la barre du clavier pour activer les suggestions de mots et la correction automatique — utile lors de la saisie en langage naturel via SSH
+• Corrigé : les icônes de la barre d'état s'adaptent désormais correctement lorsque le thème de l'app diffère du thème système
+• Paramètres : nouvelle section Sauvegarde pour exporter et importer les configurations d'hôtes en JSON — mots de passe et clés ne sont jamais exportés
+</fr-FR>
+<pt-PT>
+• Terminal: novo botão na barra do teclado para ativar sugestões de palavras e autocorreção — útil ao escrever linguagem natural via SSH
+• Corrigido: os ícones da barra de estado adaptam-se agora corretamente quando o tema da app difere do tema do sistema
+• Definições: nova secção Backup para exportar e importar configurações de hosts em JSON — palavras-passe e chaves nunca são exportadas
+</pt-PT>
+<uk>
+• Термінал: нова кнопка на панелі клавіатури для увімкнення підказок слів та автокорекції — корисно при введенні природної мови через SSH
+• Виправлено: іконки рядка стану тепер правильно адаптуються, коли тема застосунку відрізняється від теми системи
+• Налаштування: нова секція Резервна копія для експорту та імпорту конфігурацій хостів у форматі JSON — паролі та ключі ніколи не експортуються
+</uk>
+<zh-CN>
+• 终端：键盘栏新增按钮，可切换词语建议和自动纠错 — 通过 SSH 输入自然语言时非常实用
+• 修复：当应用主题与系统主题不同时，状态栏图标现在能正确适配
+• 设置：新增备份功能，可将主机配置导出/导入为 JSON 文件 — 密码和密钥从不被导出
+</zh-CN>
+<ja-JP>
+• ターミナル：キーボードバーに単語予測・自動修正の切り替えボタンを追加 — SSH越しに自然言語を入力する際に便利です
+• 修正：アプリのテーマがシステムテーマと異なる場合に、ステータスバーのアイコンが正しく適応されない問題を修正しました
+• 設定：ホスト設定をJSONファイルとしてエクスポート・インポートできるバックアップ機能を追加 — パスワードとSSH鍵はエクスポートされません
+</ja-JP>

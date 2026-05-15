@@ -69,6 +69,7 @@ module.exports = {
   nav_ssh_keys:       'SSH-Schlüssel',
   nav_jump_hosts:     'Jump-Hosts',
   nav_sftp:           'SFTP',
+  nav_backup:         'Backup',
 
   doc_page_title:    '// BENUTZERHANDBUCH',
   doc_page_subtitle: 'Praxisanleitung — Schritt für Schritt, um das Beste aus SSHBorg herauszuholen.',
@@ -88,13 +89,15 @@ module.exports = {
             <li class="sub"><a href="#suggestions">Funktionsweise</a></li>
             <li class="sub"><a href="#suggestions">Fehlerbehebung</a></li>
             <li><a href="#terminal">Terminal-Gesten</a></li>
+            <li><a href="#extra-keys">Extra-Tastenleiste</a></li>
             <li><a href="#agent-forwarding">Agent-Forwarding</a></li>
             <li><a href="#connection-drops">Verbindungsabbrüche</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump-Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-Hop-Ketten</a></li>
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
-            <li><a href="#security">App-Sicherheit</a></li>`,
+            <li><a href="#security">App-Sicherheit</a></li>
+            <li><a href="#backup">Konfiguration sichern</a></li>`,
 
   doc_adding_host: `
             <h2>// HOST HINZUFÜGEN</h2>
@@ -217,6 +220,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen.</li>
                 <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// EXTRA-TASTENLEISTE</h2>
+            <p>Wenn die Bildschirmtastatur geöffnet ist, erscheint darüber eine Reihe von Schnelltasten. Scrolle die Leiste seitwärts, um alle Tasten zu erreichen.</p>
+            <h3>Modifikatortasten</h3>
+            <p><strong>Ctrl</strong> und <strong>Alt</strong> sind Klebetasten — tippe eine an, dann tippe eine Buchstabentaste, um die Kombination zu senden. Sie setzen sich nach dem nächsten Tastendruck automatisch zurück.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — bricht den laufenden Prozess ab.</li>
+                <li><strong>Ctrl+D</strong> — sendet EOF / schließt die Shell.</li>
+                <li><strong>Ctrl+Z</strong> — hält den Prozess an.</li>
+                <li><strong>Ctrl+L</strong> — löscht den Bildschirminhalt.</li>
+            </ul>
+            <h3>Wortmodus</h3>
+            <p>Das Rechtschreibprüfungs-Symbol schaltet die Tastatur zwischen <em>Terminalmodus</em> und <em>Wortmodus</em> um. Im Terminalmodus (Standard) sind Autokorrektur und Wortvorschläge deaktiviert — ideal für Befehle und Dateipfade. Im Wortmodus verhält sich die Tastatur wie ein normales Textfeld, mit aktivierten Vorschlägen und Autokorrektur. Nützlich beim Tippen natürlicher Sprache über SSH, zum Beispiel mit Claude Code oder anderen interaktiven Werkzeugen.</p>
+            <h3>Navigation und Bearbeitung</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape-Taste.</li>
+                <li><strong>Tab</strong> — Shell-Autovervollständigung.</li>
+                <li><strong>↑ ↓ ← →</strong> — Cursor-Pfeiltasten.</li>
+                <li><strong>Home / End</strong> — zum Anfang oder Ende der Zeile springen.</li>
+                <li><strong>PgUp / PgDn</strong> — Seite hoch / Seite runter.</li>
+                <li><strong>Del</strong> — Vorwärtslöschen (Zeichen rechts vom Cursor).</li>
+                <li><strong>Einfügen</strong> — Zwischenablage in das Terminal einfügen.</li>
+            </ul>
+            <h3>Funktionstasten</h3>
+            <p>Scrolle die Leiste nach rechts, um die Tasten <strong>F1 bis F12</strong> zu erreichen.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT-FORWARDING</h2>
@@ -370,5 +399,60 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// HINWEIS ZUM BACKUP</div>
                 Da Schlüssel im Android Keystore gespeichert sind, können sie <strong>nicht über Androids Cloud-Backup</strong> gesichert werden und werden nicht automatisch auf ein neues Gerät übertragen. Stelle vor einem Gerätewechsel sicher, dass du einen auf dem neuen Gerät generierten Schlüssel auf allen deinen Servern autorisierst.
+            </div>`,
+
+  doc_backup: `
+            <h2>// KONFIGURATION SICHERN</h2>
+            <p>SSHBorg kann Host-Konfigurationen als JSON-Datei exportieren und importieren. Das ermöglicht es, die Serverliste auf ein anderes Gerät zu übertragen oder ein portables Backup der eigenen Einrichtung aufzubewahren.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// WICHTIG</div>
+                Das Backup enthält nur Host-Konfigurationen (Adresse, Port, Benutzer, Einstellungen). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — sie müssen nach dem Import auf einem neuen Gerät neu eingerichtet werden.
+            </div>
+            <h3>Exportieren</h3>
+            <p>Gehe zu <strong>Einstellungen → Backup → Hosts exportieren</strong>. Wähle über den Systemdatei-Auswähler aus, wo die Datei gespeichert werden soll. Die Datei heißt standardmäßig <code>sshborg_hosts.json</code>.</p>
+            <h3>Importieren</h3>
+            <p>Gehe zu <strong>Einstellungen → Backup → Hosts importieren</strong>. Wähle die zuvor exportierte (oder manuell erstellte) <code>.json</code>-Datei aus. SSHBorg führt sie mit der vorhandenen Host-Liste zusammen:</p>
+            <ul>
+                <li>Hosts, deren <strong>Name</strong> einem vorhandenen Eintrag entspricht, werden <strong>aktualisiert</strong>.</li>
+                <li>Hosts mit einem neuen Namen werden <strong>hinzugefügt</strong>.</li>
+                <li>Hosts, die nicht in der Datei vorhanden sind, bleiben <strong>unverändert</strong>.</li>
+            </ul>
+            <h3>JSON-Format</h3>
+            <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "Mein VPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>Feldreferenz</h3>
+            <ul>
+                <li><code>label</code> — in SSHBorg angezeigter Name. Wird beim Import als eindeutiger Schlüssel für die Zusammenführung verwendet. <strong>Pflichtfeld.</strong></li>
+                <li><code>hostname</code> — Serveradresse oder IP (IPv4 oder IPv6). <strong>Pflichtfeld.</strong></li>
+                <li><code>port</code> — SSH-Port. Standard: <code>22</code>.</li>
+                <li><code>username</code> — Anmeldebenutzer. <strong>Pflichtfeld.</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code>, um SSH-Agent-Forwarding zu aktivieren. Standard: <code>false</code>.</li>
+                <li><code>jumpMode</code> — <code>"simple"</code> (verwendet den <code>jumpHosts</code>-Text) oder <code>"host_list"</code> (verwendet interne SSHBorg-Host-IDs). Verwende <code>"simple"</code> beim manuellen Erstellen.</li>
+                <li><code>jumpHosts</code> — kommagetrennte Jump-Hosts im Format <code>[benutzer@]host[:port]</code>. Nur verwendet, wenn <code>jumpMode</code> <code>"simple"</code> ist.</li>
+                <li><code>portForwardings</code> — zeilengetrennte lokale Port-Weiterleitungsregeln in SSH-<code>-L</code>-Syntax, z.B. <code>"8080:localhost:8080"</code>.</li>
+                <li><code>sftpStartMode</code> — SFTP-Startverzeichnis: <code>"last"</code> (letztes besuchtes merken), <code>"fixed"</code> (immer <code>sftpStartDir</code> verwenden), <code>"home"</code> (Server-Home). Standard: <code>"last"</code>.</li>
+                <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// OPTIONALE FELDER</div>
+                Alle Felder außer <code>label</code>, <code>hostname</code> und <code>username</code> sind optional. Weggelassene Felder erhalten ihre Standardwerte.
             </div>`,
 };

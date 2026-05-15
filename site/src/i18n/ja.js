@@ -71,6 +71,7 @@ module.exports = {
   nav_ssh_keys:       'SSH鍵',
   nav_jump_hosts:     '踏み台ホスト',
   nav_sftp:           'SFTP',
+  nav_backup:         'バックアップ',
 
   doc_page_title:    '// ユーザーガイド',
   doc_page_subtitle: '操作ガイド — SSHBorgを最大限に活用するための手順書。',
@@ -90,13 +91,15 @@ module.exports = {
             <li class="sub"><a href="#suggestions">仕組み</a></li>
             <li class="sub"><a href="#suggestions">トラブルシューティング</a></li>
             <li><a href="#terminal">端末ジェスチャー</a></li>
+            <li><a href="#extra-keys">追加キーバー</a></li>
             <li><a href="#agent-forwarding">エージェント転送</a></li>
             <li><a href="#connection-drops">接続が切れる場合</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">踏み台ホスト</a></li>
             <li class="sub"><a href="#jump-hosts">マルチホップチェーン</a></li>
             <li><a href="#sessions">複数セッション</a></li>
-            <li><a href="#security">アプリのセキュリティ</a></li>`,
+            <li><a href="#security">アプリのセキュリティ</a></li>
+            <li><a href="#backup">設定のバックアップ</a></li>`,
 
   doc_adding_host: `
             <h2>// ホストの追加</h2>
@@ -219,6 +222,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>テキストのコピー</strong> — 端末の任意の場所を長押しして選択モードに入ります。ハンドルをドラッグして選択範囲を調整し、<em>選択をコピー</em> でハイライトされたテキストのみコピー、または <em>すべてコピー</em> で全出力をコピー。他の場所をタップするとキャンセル。</li>
                 <li><strong>貼り付け</strong> — キーボードが開いているときに表示される追加キーバーの <em>貼り付け</em> ボタンを使用。</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// 追加キーバー</h2>
+            <p>ソフトウェアキーボードが開いているとき、その上にショートカットボタンの列が表示されます。バーを横にスクロールすると、すべてのキーにアクセスできます。</p>
+            <h3>修飾キー</h3>
+            <p><strong>Ctrl</strong> と <strong>Alt</strong> はスティッキートグルです。一方をタップしてから文字キーをタップすることで、組み合わせを送信できます。次のキー入力後に自動的にリセットされます。</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — 実行中のプロセスを中断します。</li>
+                <li><strong>Ctrl+D</strong> — EOF を送信 / シェルを終了します。</li>
+                <li><strong>Ctrl+Z</strong> — プロセスを一時停止します。</li>
+                <li><strong>Ctrl+L</strong> — 画面をクリアします。</li>
+            </ul>
+            <h3>ワードモード</h3>
+            <p>スペルチェックアイコンで、キーボードを<em>ターミナルモード</em>と<em>ワードモード</em>の間で切り替えられます。ターミナルモード（デフォルト）では自動修正と単語候補が無効になっており、コマンドやファイルパスの入力に最適です。ワードモードでは候補と自動修正が有効になり、通常のテキストフィールドと同様に動作します。SSH越しに自然言語を入力する際（Claude Code や他のインタラクティブツールの使用時など）に便利です。</p>
+            <h3>ナビゲーションと編集</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape キー。</li>
+                <li><strong>Tab</strong> — シェルの自動補完。</li>
+                <li><strong>↑ ↓ ← →</strong> — カーソル矢印キー。</li>
+                <li><strong>Home / End</strong> — 行頭または行末にジャンプ。</li>
+                <li><strong>PgUp / PgDn</strong> — ページアップ / ページダウン。</li>
+                <li><strong>Del</strong> — 前方削除（カーソルの右側の文字）。</li>
+                <li><strong>貼り付け</strong> — クリップボードの内容をターミナルに貼り付けます。</li>
+            </ul>
+            <h3>ファンクションキー</h3>
+            <p>バーを右にスクロールすると、<strong>F1 から F12</strong> のファンクションキーにアクセスできます。</p>`,
 
   doc_agent_forwarding: `
             <h2>// エージェント転送</h2>
@@ -372,5 +401,60 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// バックアップについて</div>
                 鍵はAndroid Keystoreに保存されているため、Androidのクラウドバックアップ機能でバックアップ<strong>できず</strong>、新しいスマートフォンに自動的に転送されません。デバイスを切り替える前に、新しいデバイスで生成した新しい鍵をすべてのサーバーに登録してください。
+            </div>`,
+
+  doc_backup: `
+            <h2>// 設定のバックアップ</h2>
+            <p>SSHBorgはホストの設定をJSONファイルとしてエクスポート・インポートできます。これにより、サーバーリストを別のデバイスに移したり、設定のポータブルなバックアップを保管したりできます。</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// 重要</div>
+                バックアップにはホスト設定（アドレス、ポート、ユーザー名、設定）のみが含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 新しいデバイスにインポートした後、再設定が必要です。
+            </div>
+            <h3>エクスポート</h3>
+            <p><strong>設定 → バックアップ → ホストをエクスポート</strong> に移動します。システムのファイル選択ツールを使って保存先を選択します。ファイル名はデフォルトで <code>sshborg_hosts.json</code> です。</p>
+            <h3>インポート</h3>
+            <p><strong>設定 → バックアップ → ホストをインポート</strong> に移動します。以前エクスポートした（または手動で作成した）<code>.json</code> ファイルを選択します。SSHBorgは既存のホストリストと統合します：</p>
+            <ul>
+                <li><strong>名前</strong>が既存のエントリと一致するホストは<strong>更新</strong>されます。</li>
+                <li>新しい名前を持つホストは<strong>追加</strong>されます。</li>
+                <li>ファイルにないホストは<strong>変更されません</strong>。</li>
+            </ul>
+            <h3>JSON形式</h3>
+            <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "マイVPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>フィールドリファレンス</h3>
+            <ul>
+                <li><code>label</code> — SSHBorgに表示される名前。インポート時の統合に使われる一意のキー。<strong>必須。</strong></li>
+                <li><code>hostname</code> — サーバーのアドレスまたはIP（IPv4またはIPv6）。<strong>必須。</strong></li>
+                <li><code>port</code> — SSHポート。デフォルト：<code>22</code>。</li>
+                <li><code>username</code> — ログインユーザー名。<strong>必須。</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code> でSSHエージェント転送を有効化。デフォルト：<code>false</code>。</li>
+                <li><code>jumpMode</code> — <code>"simple"</code>（<code>jumpHosts</code>のテキストを使用）または <code>"host_list"</code>（SSHBorgの内部ホストIDを使用）。手動作成時は <code>"simple"</code> を使用してください。</li>
+                <li><code>jumpHosts</code> — <code>[ユーザー@]ホスト[:ポート]</code> 形式のカンマ区切りの踏み台ホスト。<code>jumpMode</code> が <code>"simple"</code> のときのみ使用。</li>
+                <li><code>portForwardings</code> — SSH <code>-L</code> 構文による改行区切りのローカルポート転送ルール（例：<code>"8080:localhost:8080"</code>）。</li>
+                <li><code>sftpStartMode</code> — SFTPの開始ディレクトリ：<code>"last"</code>（最後に訪問したディレクトリを記憶）、<code>"fixed"</code>（常に <code>sftpStartDir</code> を使用）、<code>"home"</code>（サーバーのホームディレクトリ）。デフォルト：<code>"last"</code>。</li>
+                <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// 省略可能なフィールド</div>
+                <code>label</code>、<code>hostname</code>、<code>username</code> 以外のフィールドはすべて省略可能です。省略されたフィールドはデフォルト値が使用されます。
             </div>`,
 };

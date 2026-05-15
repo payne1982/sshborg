@@ -130,6 +130,7 @@
     <string name="settings_section_general">Général</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Sécurité</string>
+    <string name="settings_section_backup">Sauvegarde</string>
 
     <string name="settings_confirm_exit_title">Confirmer la sortie</string>
     <string name="settings_confirm_exit_subtitle">Demander confirmation avant de fermer l\'application</string>
@@ -276,6 +277,14 @@
     <string name="error_refresh_failed">Actualisation échouée</string>
     <string name="error_encryption_failed">Chiffrement échoué</string>
     <string name="error_decryption_failed">Déchiffrement échoué</string>
+    <string name="settings_backup_export_title">Exporter les hôtes</string>
+    <string name="settings_backup_export_subtitle">Enregistrer les configurations des hôtes dans un fichier JSON. Les mots de passe et les clés ne sont pas inclus.</string>
+    <string name="settings_backup_export_action">Exporter</string>
+    <string name="settings_backup_import_title">Importer les hôtes</string>
+    <string name="settings_backup_import_subtitle">Charger les configurations depuis un fichier JSON. Les hôtes existants avec le même nom seront mis à jour ; mots de passe et clés ne seront pas importés.</string>
+    <string name="settings_backup_import_action">Importer</string>
+    <string name="backup_export_success">%1$d hôtes exportés</string>
+    <string name="backup_import_success">%1$d importés, %2$d mis à jour</string>
     <string name="error_unknown">Une erreur est survenue</string>
 
     <!-- ── Theme setting ─────────────────────────────────────────────────── -->

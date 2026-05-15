@@ -482,8 +482,16 @@ class TerminalView @JvmOverloads constructor(
 
     override fun onCheckIsTextEditor() = true
 
+    var wordMode: Boolean = false
+        set(value) {
+            if (field != value) { field = value; post { reattachIme() } }
+        }
+
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection {
-        outAttrs.inputType = InputType.TYPE_NULL
+        outAttrs.inputType = if (wordMode)
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
+        else
+            InputType.TYPE_NULL
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN
         return TerminalInputConnection(this)
     }
@@ -598,7 +606,7 @@ class TerminalView @JvmOverloads constructor(
             opts: android.os.Bundle?,
         ) = true
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            if (beforeLength > 0) onInput?.invoke(byteArrayOf(0x7F))
+            repeat(beforeLength) { onInput?.invoke(byteArrayOf(0x7F)) }
             return true
         }
         override fun sendKeyEvent(event: KeyEvent): Boolean {

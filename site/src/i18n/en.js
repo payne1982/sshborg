@@ -71,6 +71,7 @@ module.exports = {
   nav_ssh_keys:      'SSH Keys',
   nav_jump_hosts:    'Jump Hosts',
   nav_sftp:          'SFTP',
+  nav_backup:        'Backup',
 
   doc_page_title:    '// USER GUIDE',
   doc_page_subtitle: 'Operational guide — what to do, step by step, to get the most out of SSHBorg.',
@@ -90,13 +91,15 @@ module.exports = {
             <li class="sub"><a href="#suggestions">How it works</a></li>
             <li class="sub"><a href="#suggestions">Troubleshooting</a></li>
             <li><a href="#terminal">Terminal Gestures</a></li>
+            <li><a href="#extra-keys">Extra Key Bar</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
-            <li><a href="#security">App Security</a></li>`,
+            <li><a href="#security">App Security</a></li>
+            <li><a href="#backup">Configuration Backup</a></li>`,
 
   doc_adding_host: `
             <h2>// ADDING A HOST</h2>
@@ -219,6 +222,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// EXTRA KEY BAR</h2>
+            <p>When the soft keyboard is open, a row of shortcut buttons appears above it. Scroll the bar sideways to reach all the keys.</p>
+            <h3>Modifier keys</h3>
+            <p><strong>Ctrl</strong> and <strong>Alt</strong> are sticky toggles — tap one, then tap a letter key to send the combination. They reset automatically after the next keystroke.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — interrupt the running process.</li>
+                <li><strong>Ctrl+D</strong> — send EOF / close the shell.</li>
+                <li><strong>Ctrl+Z</strong> — suspend the process.</li>
+                <li><strong>Ctrl+L</strong> — clear the screen.</li>
+            </ul>
+            <h3>Word mode</h3>
+            <p>The spellcheck icon toggles the keyboard between <em>terminal mode</em> and <em>word mode</em>. In terminal mode (default) autocorrect and word suggestions are disabled — ideal for commands and file paths. In word mode the keyboard behaves like a normal text field, with suggestions and autocorrect enabled. Useful when typing natural language over SSH, for example with Claude Code or other interactive tools.</p>
+            <h3>Navigation and editing</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape key.</li>
+                <li><strong>Tab</strong> — shell autocomplete.</li>
+                <li><strong>↑ ↓ ← →</strong> — cursor arrow keys.</li>
+                <li><strong>Home / End</strong> — jump to the beginning or end of the line.</li>
+                <li><strong>PgUp / PgDn</strong> — page up / page down.</li>
+                <li><strong>Del</strong> — forward delete (character to the right of the cursor).</li>
+                <li><strong>Paste</strong> — paste the clipboard into the terminal.</li>
+            </ul>
+            <h3>Function keys</h3>
+            <p>Scroll the bar to the right to reach <strong>F1 through F12</strong>.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>
@@ -372,5 +401,60 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// BACKUP NOTE</div>
                 Because keys are stored in the Android Keystore, they <strong>cannot be backed up</strong> via Android's cloud backup mechanism and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
+            </div>`,
+
+  doc_backup: `
+            <h2>// CONFIGURATION BACKUP</h2>
+            <p>SSHBorg can export and import host configurations as a JSON file. This lets you transfer your server list to another device or keep a portable backup of your setup.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// IMPORTANT</div>
+                The backup includes only host configurations (address, port, username, settings). <strong>Passwords and SSH keys are never exported</strong> — these must be set up again after importing on a new device.
+            </div>
+            <h3>Exporting</h3>
+            <p>Go to <strong>Settings → Backup → Export hosts</strong>. Choose where to save the file using the system file picker. The file is named <code>sshborg_hosts.json</code> by default.</p>
+            <h3>Importing</h3>
+            <p>Go to <strong>Settings → Backup → Import hosts</strong>. Select the <code>.json</code> file you previously exported (or created manually). SSHBorg merges it with the existing host list:</p>
+            <ul>
+                <li>Hosts whose <strong>label</strong> matches an existing entry are <strong>updated</strong>.</li>
+                <li>Hosts with a new label are <strong>added</strong>.</li>
+                <li>Hosts not present in the file are <strong>left unchanged</strong>.</li>
+            </ul>
+            <h3>JSON format</h3>
+            <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "My VPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>Field reference</h3>
+            <ul>
+                <li><code>label</code> — display name shown in SSHBorg. Used as the unique key for merging on import. <strong>Required.</strong></li>
+                <li><code>hostname</code> — server address or IP (IPv4 or IPv6). <strong>Required.</strong></li>
+                <li><code>port</code> — SSH port. Defaults to <code>22</code>.</li>
+                <li><code>username</code> — login user. <strong>Required.</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code> to enable SSH agent forwarding. Defaults to <code>false</code>.</li>
+                <li><code>jumpMode</code> — <code>"simple"</code> (use the <code>jumpHosts</code> text) or <code>"host_list"</code> (use SSHBorg internal host IDs). Use <code>"simple"</code> when creating the file manually.</li>
+                <li><code>jumpHosts</code> — comma-separated jump hosts in <code>[user@]host[:port]</code> format. Only used when <code>jumpMode</code> is <code>"simple"</code>.</li>
+                <li><code>portForwardings</code> — newline-separated local port-forwarding rules in SSH <code>-L</code> syntax, e.g. <code>"8080:localhost:8080"</code>.</li>
+                <li><code>sftpStartMode</code> — SFTP starting directory: <code>"last"</code> (remember last visited), <code>"fixed"</code> (always use <code>sftpStartDir</code>), <code>"home"</code> (server home). Defaults to <code>"last"</code>.</li>
+                <li><code>sftpStartDir</code> — path to use when <code>sftpStartMode</code> is <code>"fixed"</code>.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// OPTIONAL FIELDS</div>
+                All fields except <code>label</code>, <code>hostname</code>, and <code>username</code> are optional. Omitted fields fall back to their defaults.
             </div>`,
 };

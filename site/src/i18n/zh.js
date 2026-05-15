@@ -71,6 +71,7 @@ module.exports = {
   nav_ssh_keys:       'SSH 密钥',
   nav_jump_hosts:     '跳板机',
   nav_sftp:           'SFTP',
+  nav_backup:         '备份',
 
   doc_page_title:    '// 用户指南',
   doc_page_subtitle: '操作指南——逐步指导，充分利用 SSHBorg。',
@@ -90,13 +91,15 @@ module.exports = {
             <li class="sub"><a href="#suggestions">工作原理</a></li>
             <li class="sub"><a href="#suggestions">故障排除</a></li>
             <li><a href="#terminal">终端手势</a></li>
+            <li><a href="#extra-keys">额外按键栏</a></li>
             <li><a href="#agent-forwarding">代理转发</a></li>
             <li><a href="#connection-drops">连接断开</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">跳板机</a></li>
             <li class="sub"><a href="#jump-hosts">多跳链</a></li>
             <li><a href="#sessions">多会话</a></li>
-            <li><a href="#security">应用安全</a></li>`,
+            <li><a href="#security">应用安全</a></li>
+            <li><a href="#backup">配置备份</a></li>`,
 
   doc_adding_host: `
             <h2>// 添加主机</h2>
@@ -219,6 +222,32 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
             </ul>`,
+
+  doc_extra_keys: `
+            <h2>// 额外按键栏</h2>
+            <p>软键盘打开时，上方会出现一排快捷按键。左右滑动按键栏可访问所有按键。</p>
+            <h3>修饰键</h3>
+            <p><strong>Ctrl</strong> 和 <strong>Alt</strong> 是粘滞切换键——点击其中一个，再点击字母键即可发送组合键。每次按键后自动重置。</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — 中断正在运行的进程。</li>
+                <li><strong>Ctrl+D</strong> — 发送 EOF / 关闭 shell。</li>
+                <li><strong>Ctrl+Z</strong> — 暂停进程。</li>
+                <li><strong>Ctrl+L</strong> — 清屏。</li>
+            </ul>
+            <h3>文字模式</h3>
+            <p>拼写检查图标可在<em>终端模式</em>和<em>文字模式</em>之间切换键盘。终端模式（默认）下自动更正和词语建议被禁用——适合输入命令和文件路径。文字模式下键盘像普通文本框一样工作，启用词语建议和自动更正。通过 SSH 输入自然语言时很有用，例如使用 Claude Code 或其他交互式工具。</p>
+            <h3>导航与编辑</h3>
+            <ul>
+                <li><strong>ESC</strong> — Escape 键。</li>
+                <li><strong>Tab</strong> — shell 自动补全。</li>
+                <li><strong>↑ ↓ ← →</strong> — 光标方向键。</li>
+                <li><strong>Home / End</strong> — 跳到行首或行尾。</li>
+                <li><strong>PgUp / PgDn</strong> — 向上翻页 / 向下翻页。</li>
+                <li><strong>Del</strong> — 向前删除（光标右侧的字符）。</li>
+                <li><strong>粘贴</strong> — 将剪贴板内容粘贴到终端。</li>
+            </ul>
+            <h3>功能键</h3>
+            <p>向右滑动按键栏可访问 <strong>F1 至 F12</strong> 功能键。</p>`,
 
   doc_agent_forwarding: `
             <h2>// 代理转发</h2>
@@ -372,5 +401,60 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// 备份说明</div>
                 由于密钥存储在 Android 密钥库中，它们<strong>无法</strong>通过 Android 云备份机制备份，也不会自动迁移到新手机。更换设备前，请确保在新设备上生成新密钥并在所有服务器上授权。
+            </div>`,
+
+  doc_backup: `
+            <h2>// 配置备份</h2>
+            <p>SSHBorg 可以将主机配置导出并导入为 JSON 文件。这样您可以将服务器列表转移到另一台设备，或保留一份可移植的配置备份。</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// 重要</div>
+                备份仅包含主机配置（地址、端口、用户名、设置）。<strong>密码和 SSH 密钥从不导出</strong> — 在新设备上导入后需要重新设置。
+            </div>
+            <h3>导出</h3>
+            <p>前往 <strong>设置 → 备份 → 导出主机</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_hosts.json</code>。</p>
+            <h3>导入</h3>
+            <p>前往 <strong>设置 → 备份 → 导入主机</strong>。选择之前导出（或手动创建）的 <code>.json</code> 文件。SSHBorg 将其与现有主机列表合并：</p>
+            <ul>
+                <li><strong>名称</strong>与现有条目匹配的主机将被<strong>更新</strong>。</li>
+                <li>具有新名称的主机将被<strong>添加</strong>。</li>
+                <li>文件中不存在的主机保持<strong>不变</strong>。</li>
+            </ul>
+            <h3>JSON 格式</h3>
+            <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
+            <pre><code>{
+  "version": 1,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "hosts": [
+    {
+      "label":           "我的 VPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null
+    }
+  ]
+}</code></pre>
+            <h3>字段说明</h3>
+            <ul>
+                <li><code>label</code> — SSHBorg 中显示的名称。导入时用作唯一合并键。<strong>必填。</strong></li>
+                <li><code>hostname</code> — 服务器地址或 IP（IPv4 或 IPv6）。<strong>必填。</strong></li>
+                <li><code>port</code> — SSH 端口。默认值：<code>22</code>。</li>
+                <li><code>username</code> — 登录用户名。<strong>必填。</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code> 启用 SSH 代理转发。默认值：<code>false</code>。</li>
+                <li><code>jumpMode</code> — <code>"simple"</code>（使用 <code>jumpHosts</code> 文本）或 <code>"host_list"</code>（使用 SSHBorg 内部主机 ID）。手动创建文件时请使用 <code>"simple"</code>。</li>
+                <li><code>jumpHosts</code> — 以逗号分隔的跳板机列表，格式为 <code>[用户名@]主机[:端口]</code>。仅在 <code>jumpMode</code> 为 <code>"simple"</code> 时使用。</li>
+                <li><code>portForwardings</code> — 以换行符分隔的本地端口转发规则，使用 SSH <code>-L</code> 语法，例如 <code>"8080:localhost:8080"</code>。</li>
+                <li><code>sftpStartMode</code> — SFTP 起始目录：<code>"last"</code>（记住上次访问的目录）、<code>"fixed"</code>（始终使用 <code>sftpStartDir</code>）、<code>"home"</code>（服务器主目录）。默认值：<code>"last"</code>。</li>
+                <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// 可选字段</div>
+                除 <code>label</code>、<code>hostname</code> 和 <code>username</code> 外，所有字段均为可选。省略的字段将使用默认值。
             </div>`,
 };
