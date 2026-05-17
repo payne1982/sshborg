@@ -4,7 +4,7 @@ An SSH client for Android. Full terminal emulation, SFTP file manager, SSH key m
 
 [![Get it on Google Play](https://img.shields.io/badge/Google-Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.sshborg) &nbsp; [![Explore it on AppGallery](https://img.shields.io/badge/Huawei-AppGallery-CF0A2C?style=for-the-badge&logo=huawei&logoColor=white)](https://appgallery.huawei.com/app/C117647135)
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE) &nbsp; [![Leave a tip on Ko-fi](https://img.shields.io/badge/Ko--fi-tip-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/massimilianoplaydev)
 
 ## Features
 
