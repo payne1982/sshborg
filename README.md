@@ -26,6 +26,10 @@ Requires Android 10 (API 29) or later.
 git clone https://github.com/payne1982/sshborg.git
 cd sshborg
 
+# Copy the example config and set your SDK path
+cp local.properties.example local.properties
+# edit local.properties: set sdk.dir or export ANDROID_HOME=/path/to/sdk
+
 # Build a debug APK
 JAVA_HOME=/path/to/jdk21 ./gradlew assembleDebug
 ```

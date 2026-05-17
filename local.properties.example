@@ -1,0 +1,12 @@
+# Copy this file to local.properties and fill in the values.
+# local.properties is gitignored and never committed.
+
+# Path to your Android SDK installation.
+# Alternatively, set the ANDROID_HOME environment variable.
+sdk.dir=/path/to/android/sdk
+
+# Signing configuration — required only for release builds.
+signing.storeFile=/path/to/keystore.jks
+signing.storePassword=
+signing.keyAlias=
+signing.keyPassword=
