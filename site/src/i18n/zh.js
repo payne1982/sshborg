@@ -49,7 +49,7 @@ module.exports = {
   sec_badge_analytics:  '无分析追踪',
   sec_badge_sdks:       '无第三方 SDK',
   sec_badge_screenshots:'截图保护',
-  sec_badge_opensource: '仅使用开源库',
+  sec_badge_opensource: '开源 — GPL v3',
 
   security_pp_link: '阅读完整隐私政策 &rarr;',
 
@@ -60,6 +60,7 @@ module.exports = {
 
   footer_privacy: '隐私政策',
   footer_issues:  '问题与反馈',
+  footer_source:  '源代码',
   footer_powered: 'SSH 连接由以下驱动',
 
   // ── docs.html ──────────────────────────────────────────────────────────────

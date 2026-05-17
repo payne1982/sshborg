@@ -48,7 +48,7 @@ module.exports = {
   sec_badge_analytics:  'Без аналітики',
   sec_badge_sdks:       'Без SDK третіх сторін',
   sec_badge_screenshots:'Захист знімків екрана',
-  sec_badge_opensource: 'Лише бібліотеки з відкритим кодом',
+  sec_badge_opensource: 'Відкритий код — GPL v3',
 
   security_pp_link: 'Читати повну політику конфіденційності &rarr;',
 
@@ -59,6 +59,7 @@ module.exports = {
 
   footer_privacy: 'Конфіденційність',
   footer_issues:  'Помилки &amp; Відгуки',
+  footer_source:  'Вихідний код',
   footer_powered: 'SSH-з\'єднання реалізовано за допомогою',
 
   page_title_docs:       'SSHBorg – Посібник користувача',

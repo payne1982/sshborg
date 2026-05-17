@@ -49,7 +49,7 @@ module.exports = {
   sec_badge_analytics:  '解析なし',
   sec_badge_sdks:       'サードパーティSDKなし',
   sec_badge_screenshots:'スクリーンショット保護',
-  sec_badge_opensource: 'オープンソースライブラリのみ使用',
+  sec_badge_opensource: 'オープンソース — GPL v3',
 
   security_pp_link: '完全なプライバシーポリシーを読む &rarr;',
 
@@ -60,6 +60,7 @@ module.exports = {
 
   footer_privacy: 'プライバシーポリシー',
   footer_issues:  '問題・フィードバック',
+  footer_source:  'ソースコード',
   footer_powered: 'SSH接続は以下で動作',
 
   // ── docs.html ──────────────────────────────────────────────────────────────

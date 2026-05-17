@@ -49,7 +49,7 @@ module.exports = {
   sec_badge_analytics:  'No analytics',
   sec_badge_sdks:       'No third-party SDKs',
   sec_badge_screenshots:'Screenshot protection',
-  sec_badge_opensource: 'Open source libraries only',
+  sec_badge_opensource: 'Open source — GPL v3',
 
   security_pp_link: 'Read the full Privacy Policy &rarr;',
 
@@ -60,6 +60,7 @@ module.exports = {
 
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Issues &amp; Feedback',
+  footer_source:  'Source Code',
   footer_powered: 'SSH connectivity powered by',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
