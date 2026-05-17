@@ -48,7 +48,7 @@ module.exports = {
   sec_badge_analytics:  'Sin analíticas',
   sec_badge_sdks:       'Sin SDKs de terceros',
   sec_badge_screenshots:'Protección de capturas',
-  sec_badge_opensource: 'Solo librerías de código abierto',
+  sec_badge_opensource: 'Código abierto — GPL v3',
 
   security_pp_link: 'Leer la política de privacidad completa &rarr;',
 
@@ -59,6 +59,7 @@ module.exports = {
 
   footer_privacy: 'Privacidad',
   footer_issues:  'Errores &amp; Comentarios',
+  footer_source:  'Código fuente',
   footer_powered: 'Conectividad SSH proporcionada por',
 
   page_title_docs:       'SSHBorg – Guía de usuario',
