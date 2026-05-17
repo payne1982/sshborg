@@ -493,6 +493,8 @@ class TerminalView @JvmOverloads constructor(
         else
             InputType.TYPE_NULL
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN
+        outAttrs.initialSelStart = 0
+        outAttrs.initialSelEnd = 0
         return TerminalInputConnection(this)
     }
 
@@ -593,11 +595,68 @@ class TerminalView @JvmOverloads constructor(
     }
 
     /** Handles soft keyboard input. */
-    private inner class TerminalInputConnection(view: View) : BaseInputConnection(view, false) {
-        override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
-            text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
-            return true
+    private inner class TerminalInputConnection(view: View) : BaseInputConnection(view, true) {
+        // fullEditor=true keeps a real Editable in sync so the IME can read back text
+        // via getTextBeforeCursor / getSurroundingText for spell-correction flows.
+        // composingText mirrors what is currently in the terminal as composing chars,
+        // so we can back-track and replace on commitText.
+        private var composingText = ""
+
+        override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            val newText = text?.toString() ?: ""
+            var common = 0
+            while (common < composingText.length && common < newText.length
+                   && composingText[common] == newText[common]) common++
+            val toDelete = composingText.substring(common).toByteArray(Charsets.UTF_8).size
+            repeat(toDelete) { onInput?.invoke(byteArrayOf(0x7F)) }
+            val newSuffix = newText.substring(common)
+            if (newSuffix.isNotEmpty()) onInput?.invoke(newSuffix.toByteArray(Charsets.UTF_8))
+            composingText = newText
+            return super.setComposingText(text, newCursorPosition)
         }
+
+        override fun finishComposingText(): Boolean {
+            composingText = ""
+            return super.finishComposingText()
+        }
+
+        override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            repeat(composingText.toByteArray(Charsets.UTF_8).size) { onInput?.invoke(byteArrayOf(0x7F)) }
+            composingText = ""
+            text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
+            val result = super.commitText(text, newCursorPosition)
+            invalidateIme()
+            return result
+        }
+
+        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            repeat(beforeLength) { onInput?.invoke(byteArrayOf(0x7F)) }
+            val result = super.deleteSurroundingText(beforeLength, afterLength)
+            invalidateIme()
+            return result
+        }
+
+        // Android 13+ (Gboard on Android 16): replaces a range of editable text directly.
+        @androidx.annotation.RequiresApi(33)
+        override fun replaceText(start: Int, end: Int, text: CharSequence,
+                                 newCursorPosition: Int,
+                                 textAttribute: android.view.inputmethod.TextAttribute?): Boolean {
+            repeat((end - start).coerceAtLeast(0)) { onInput?.invoke(byteArrayOf(0x7F)) }
+            text.toString().toByteArray(Charsets.UTF_8).let { onInput?.invoke(it) }
+            return super.replaceText(start, end, text, newCursorPosition, textAttribute)
+        }
+
+        // After each text change, tell the IME to re-read the editor state.
+        // Required on Android 13+ so Gboard re-reads getSurroundingText and enables
+        // suggestion replacement for the next suggestion tap.
+        private fun invalidateIme() {
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                (context.getSystemService(Context.INPUT_METHOD_SERVICE)
+                        as android.view.inputmethod.InputMethodManager)
+                    .invalidateInput(this@TerminalView)
+            }
+        }
+
         // Silently reject rich content (images, stickers) — returning false would
         // trigger the system "App doesn't support images" toast on Android 12+.
         override fun commitContent(
@@ -605,14 +664,20 @@ class TerminalView @JvmOverloads constructor(
             flags: Int,
             opts: android.os.Bundle?,
         ) = true
-        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            repeat(beforeLength) { onInput?.invoke(byteArrayOf(0x7F)) }
-            return true
-        }
+
         override fun sendKeyEvent(event: KeyEvent): Boolean {
             if (event.action == KeyEvent.ACTION_DOWN) {
+                if (composingText.isNotEmpty()) return true
                 val bytes = keyEventToBytes(event.keyCode, event)
-                if (bytes != null) { onInput?.invoke(bytes); return true }
+                if (bytes != null) {
+                    onInput?.invoke(bytes)
+                    if (event.keyCode == KeyEvent.KEYCODE_DEL) {
+                        val ed = getEditable() ?: return true
+                        val cur = android.text.Selection.getSelectionEnd(ed)
+                        if (cur > 0) ed.delete(cur - 1, cur)
+                    }
+                    return true
+                }
             }
             return super.sendKeyEvent(event)
         }
