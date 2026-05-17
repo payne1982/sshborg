@@ -2,7 +2,9 @@ package com.sshborg.data.ssh
 
 import com.jcraft.jsch.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.ByteArrayInputStream
 import java.util.Properties
 
@@ -60,7 +62,14 @@ object SshManager {
         channel.setBulkRequests(16)
         channel.connect(10_000)
 
-        val homePath = runCatching { channel.pwd() }.getOrDefault("/")
+        val homePath = withTimeoutOrNull(5_000) {
+            runInterruptible { runCatching { channel.pwd() }.getOrDefault("/") }
+        } ?: run {
+            runCatching { channel.disconnect() }
+            runCatching { session.disconnect() }
+            jumpSessions.forEach { runCatching { it.disconnect() } }
+            throw JSchException("Connection timed out")
+        }
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
         SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates, homePath)
     }
@@ -328,7 +337,7 @@ object SshManager {
         try {
             if (kp.isEncrypted) {
                 if (passphrase.isNullOrEmpty()) throw JSchException("encrypted")
-                if (!kp.decrypt(passphrase)) throw JSchException("wrong_passphrase")
+                if (!kp.decrypt(passphrase.toByteArray(Charsets.UTF_8))) throw JSchException("wrong_passphrase")
             }
             val pubOut = java.io.ByteArrayOutputStream()
             kp.writePublicKey(pubOut, "")
