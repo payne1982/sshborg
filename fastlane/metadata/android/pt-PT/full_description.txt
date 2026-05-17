@@ -1,0 +1,25 @@
+SSHBorg é um poderoso cliente SSH e SFTP para Android. Gira os seus servidores de forma segura a partir do telemóvel com autenticação por chave, armazenamento cifrado e bloqueio biométrico.
+
+FUNCIONALIDADES
+
+• Terminal SSH Completo — Terminal interativo com emulação VT100/xterm, suporte UTF-8 completo e múltiplas sessões simultâneas.
+• Gestor de Ficheiros SFTP — Navegue, carregue, descarregue, renomeie e elimine ficheiros nos seus servidores com um gestor de ficheiros intuitivo.
+• Autenticação por Chave SSH — Gere chaves Ed25519, ECDSA e RSA diretamente no seu dispositivo. Sem palavras-passe.
+• Suporte Jump Host — Ligue-se através de um ou mais hosts de bastião com tunelamento transparente. Reencaminhamento completo do agente SSH.
+• Bloqueio Biométrico — Proteja o acesso aos seus servidores com impressão digital ou reconhecimento facial. Tempo limite configurável.
+• Multilingue — Disponível em inglês, italiano, francês, alemão, espanhol, português, ucraniano, chinês e japonês.
+• Tema Escuro e Claro — Segue o tema do sistema ou deixa-o escolher. Perfeitamente legível em qualquer condição de iluminação.
+• Múltiplas Sessões — Mantenha várias sessões SSH e SFTP abertas simultaneamente. Mude entre elas instantaneamente.
+
+PRIVACIDADE EM PRIMEIRO LUGAR
+
+O SSHBorg nunca recolhe os seus dados. Tudo fica no seu dispositivo — credenciais, chaves, ligações.
+
+• Sem publicidade
+• Sem rastreamento
+• Sem cloud
+• Código aberto — GPL v3
+• Sem SDKs de terceiros
+• Cifração Android Keystore
+
+sshborg.com

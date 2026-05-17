@@ -1,0 +1,2 @@
+• Terminal: Fehlermeldung „Verbindung unterbrochen" nach normalem Beenden (exit/logout) behoben
+• JSch SSH-Bibliothek auf Version 2.28.2 aktualisiert, die einen Fix für Agent-Forwarding enthält, wenn der Client eine Erweiterungsnachricht (SSH2_AGENTC_EXTENSION) sendet

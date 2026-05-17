@@ -1,0 +1,2 @@
+• Terminal: corrigida a mensagem "Ligação perdida" que aparecia após uma saída normal (comando exit/logout)
+• Atualizada a biblioteca SSH JSch para a versão 2.28.2, que inclui uma correção para o reencaminhamento de agente quando o cliente envia uma mensagem de extensão (SSH2_AGENTC_EXTENSION)

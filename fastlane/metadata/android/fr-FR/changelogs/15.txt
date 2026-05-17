@@ -1,0 +1,2 @@
+• Terminal : correction du message « Connexion perdue » apparaissant après une sortie normale (commande exit/logout)
+• Mise à jour de la bibliothèque SSH JSch vers la version 2.28.2, qui inclut un correctif pour le transfert d'agent lorsque le client envoie un message d'extension (SSH2_AGENTC_EXTENSION)

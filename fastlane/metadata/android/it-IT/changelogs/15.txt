@@ -1,0 +1,2 @@
+• Terminale: corretto il messaggio "Connessione persa" che appariva dopo un'uscita normale (comando exit/logout)
+• Aggiornata la libreria SSH JSch alla versione 2.28.2, che include una correzione per l'agent forwarding quando il client invia un messaggio di estensione (SSH2_AGENTC_EXTENSION)
