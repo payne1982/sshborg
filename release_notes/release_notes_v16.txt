@@ -1,38 +1,29 @@
 <en-US>
 • SFTP: fixed a hang when connecting via jump host on mobile networks — the connection now times out and shows an error instead of spinning indefinitely
-• Fixed a deprecation warning in private key handling (JSch decrypt API)
 </en-US>
 <it-IT>
 • SFTP: corretto un blocco durante la connessione tramite jump host su reti mobili — la connessione ora va in timeout e mostra un errore invece di girare all'infinito
-• Corretta una deprecazione nell'elaborazione delle chiavi private (API JSch decrypt)
 </it-IT>
 <de-DE>
 • SFTP: Endlosschleife beim Verbinden über Jump-Host in Mobilfunknetzen behoben — die Verbindung bricht jetzt mit einer Fehlermeldung ab, statt unbegrenzt zu laden
-• Veraltete API-Nutzung bei der Verarbeitung privater Schlüssel behoben (JSch decrypt API)
 </de-DE>
 <es-ES>
 • SFTP: corregido un bloqueo al conectar mediante jump host en redes móviles — la conexión ahora expira y muestra un error en lugar de girar indefinidamente
-• Corregido un aviso de deprecación en el manejo de claves privadas (API JSch decrypt)
 </es-ES>
 <fr-FR>
 • SFTP : correction d'un blocage lors de la connexion via un jump host sur les réseaux mobiles — la connexion expire désormais avec un message d'erreur au lieu de tourner indéfiniment
-• Correction d'un avertissement de dépréciation dans le traitement des clés privées (API JSch decrypt)
 </fr-FR>
 <pt-PT>
 • SFTP: corrigido um bloqueio ao ligar através de jump host em redes móveis — a ligação expira agora com uma mensagem de erro em vez de ficar a carregar indefinidamente
-• Corrigido um aviso de depreciação no tratamento de chaves privadas (API JSch decrypt)
 </pt-PT>
 <uk>
 • SFTP: виправлено зависання при підключенні через jump host у мобільних мережах — тепер з'єднання завершується помилкою замість нескінченного очікування
-• Виправлено попередження про застарілий API при роботі з приватними ключами (JSch decrypt API)
 </uk>
 <zh-CN>
 • SFTP：修复通过跳板机在移动网络连接时卡死的问题——现在连接超时后会显示错误，而非无限转圈
-• 修复私钥处理中的弃用警告（JSch decrypt API）
 </zh-CN>
 <ja-JP>
 • SFTP：モバイルネットワークでジャンプホスト経由接続時に無限に待ち続ける問題を修正しました。接続はタイムアウトしてエラーを表示するようになりました
-• 秘密鍵の処理における非推奨APIの警告を修正しました（JSch decrypt API）
 </ja-JP>
 </content>
 </invoke>
