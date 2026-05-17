@@ -1,0 +1,2 @@
+• Terminal: fixed "connection lost" message appearing after a normal exit (exit/logout command)
+• Updated JSch SSH library to version 2.28.2, which includes a fix for agent forwarding when the client sends an extension message (SSH2_AGENTC_EXTENSION)

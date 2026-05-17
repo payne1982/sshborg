@@ -1,0 +1,36 @@
+<en-US>
+• Terminal: fixed "connection lost" message appearing after a normal exit (exit/logout command)
+• Updated JSch SSH library to version 2.28.2, which includes a fix for agent forwarding when the client sends an extension message (SSH2_AGENTC_EXTENSION)
+</en-US>
+<it-IT>
+• Terminale: corretto il messaggio "Connessione persa" che appariva dopo un'uscita normale (comando exit/logout)
+• Aggiornata la libreria SSH JSch alla versione 2.28.2, che include una correzione per l'agent forwarding quando il client invia un messaggio di estensione (SSH2_AGENTC_EXTENSION)
+</it-IT>
+<de-DE>
+• Terminal: Fehlermeldung „Verbindung unterbrochen" nach normalem Beenden (exit/logout) behoben
+• JSch SSH-Bibliothek auf Version 2.28.2 aktualisiert, die einen Fix für Agent-Forwarding enthält, wenn der Client eine Erweiterungsnachricht (SSH2_AGENTC_EXTENSION) sendet
+</de-DE>
+<es-ES>
+• Terminal: corregido el mensaje "Conexión perdida" que aparecía tras salir normalmente (comando exit/logout)
+• Actualizada la biblioteca SSH JSch a la versión 2.28.2, que incluye una corrección para el reenvío de agente cuando el cliente envía un mensaje de extensión (SSH2_AGENTC_EXTENSION)
+</es-ES>
+<fr-FR>
+• Terminal : correction du message « Connexion perdue » apparaissant après une sortie normale (commande exit/logout)
+• Mise à jour de la bibliothèque SSH JSch vers la version 2.28.2, qui inclut un correctif pour le transfert d'agent lorsque le client envoie un message d'extension (SSH2_AGENTC_EXTENSION)
+</fr-FR>
+<pt-PT>
+• Terminal: corrigida a mensagem "Ligação perdida" que aparecia após uma saída normal (comando exit/logout)
+• Atualizada a biblioteca SSH JSch para a versão 2.28.2, que inclui uma correção para o reencaminhamento de agente quando o cliente envia uma mensagem de extensão (SSH2_AGENTC_EXTENSION)
+</pt-PT>
+<uk>
+• Термінал: виправлено повідомлення «З'єднання втрачено» після нормального виходу (команда exit/logout)
+• Оновлено бібліотеку SSH JSch до версії 2.28.2, яка містить виправлення для пересилання агента при отриманні повідомлення розширення (SSH2_AGENTC_EXTENSION)
+</uk>
+<zh-CN>
+• 终端：修复正常退出（exit/logout 命令）后显示"连接已断开"消息的问题
+• 将 JSch SSH 库更新至 2.28.2 版本，修复了客户端发送扩展消息（SSH2_AGENTC_EXTENSION）时代理转发的问题
+</zh-CN>
+<ja-JP>
+• ターミナル：通常の終了（exit/logout コマンド）後に「接続が切れました」と表示される問題を修正しました
+• JSch SSHライブラリをバージョン2.28.2に更新。クライアントが拡張メッセージ（SSH2_AGENTC_EXTENSION）を送信した際のエージェント転送の不具合を修正しています
+</ja-JP>

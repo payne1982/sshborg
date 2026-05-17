@@ -1,0 +1,2 @@
+• Terminal: corregido el mensaje "Conexión perdida" que aparecía tras salir normalmente (comando exit/logout)
+• Actualizada la biblioteca SSH JSch a la versión 2.28.2, que incluye una corrección para el reenvío de agente cuando el cliente envía un mensaje de extensión (SSH2_AGENTC_EXTENSION)

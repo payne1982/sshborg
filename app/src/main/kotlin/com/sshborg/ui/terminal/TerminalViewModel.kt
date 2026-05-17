@@ -322,8 +322,11 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
                     if (n < 0) {
-                        // EOF: clean exit only when the server sent an exit-status (normal shell exit).
-                        // If exitStatus is still -1, JSch killed the connection (e.g. keepalive timeout).
+                        var waited = 0
+                        while (session.exitStatus == -1 && waited < 1000) {
+                            kotlinx.coroutines.delay(50)
+                            waited += 50
+                        }
                         if (session.exitStatus != -1) {
                             cleanExit = true
                         } else {
@@ -338,11 +341,22 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 // Loop exited because session.isConnected flipped without EOF — unexpected disconnect.
                 if (isActive && !cleanExit && disconnectCause == null) {
-                    disconnectCause = getApplication<Application>().getString(R.string.terminal_connection_lost)
+                    if (session.exitStatus != -1) {
+                        cleanExit = true
+                    } else {
+                        disconnectCause = getApplication<Application>().getString(R.string.terminal_connection_lost)
+                    }
                 }
             } catch (e: Exception) {
-                disconnectCause = if (BuildConfig.DEBUG) e.toString()
-                                  else "${e.javaClass.simpleName}${e.message?.let { ": $it" } ?: ""}"
+                // JSch may close the pipe via disconnect() before or instead of returning EOF,
+                // causing read() to throw IOException even on a clean exit. If exit-status is
+                // already set, treat it as a clean exit rather than an error.
+                if (session.exitStatus != -1) {
+                    cleanExit = true
+                } else {
+                    disconnectCause = if (BuildConfig.DEBUG) e.toString()
+                                      else "${e.javaClass.simpleName}${e.message?.let { ": $it" } ?: ""}"
+                }
             }
 
             // If the job was cancelled (background() called), don't touch the session
@@ -356,10 +370,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     SshForegroundService.stop(getApplication())
                 }
                 if (cleanExit) {
-                    // Shell exited normally (exit/logout) — go back automatically
                     _navBack.tryEmit(Unit)
                 } else {
-                    // Unexpected disconnect — show overlay so the user knows
                     _state.value = ConnectionState.Disconnected(disconnectCause)
                 }
             }
