@@ -2,7 +2,9 @@
 
 An SSH client for Android. Full terminal emulation, SFTP file manager, SSH key management, jump hosts, agent forwarding, and biometric lock — with no ads, no tracking, and no cloud.
 
-[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="60">](https://play.google.com/store/apps/details?id=com.sshborg)
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="60" alt="Get it on Google Play">](https://play.google.com/store/apps/details?id=com.sshborg)
+[<img src="https://huawei-appgallery-badge.netlify.app/badge/en_badge_web_generic.png" height="60" alt="Explore it on AppGallery">](https://appgallery.huawei.com/app/C117647135)
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 ## Features
