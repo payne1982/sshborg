@@ -601,8 +601,14 @@ class TerminalView @JvmOverloads constructor(
         // composingText mirrors what is currently in the terminal as composing chars,
         // so we can back-track and replace on commitText.
         private var composingText = ""
+        // On Android ≤12 some keyboards call commitText THEN deleteSurroundingText for
+        // spell correction (Editable-style: insert new text, then erase old region).
+        // commitText already sent the backspaces for composingText; we record how many
+        // so deleteSurroundingText can subtract them and not double-delete.
+        private var composingDeletedByCommit = 0
 
         override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            composingDeletedByCommit = 0
             val newText = text?.toString() ?: ""
             var common = 0
             while (common < composingText.length && common < newText.length
@@ -617,11 +623,14 @@ class TerminalView @JvmOverloads constructor(
 
         override fun finishComposingText(): Boolean {
             composingText = ""
+            composingDeletedByCommit = 0
             return super.finishComposingText()
         }
 
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
-            repeat(composingText.toByteArray(Charsets.UTF_8).size) { onInput?.invoke(byteArrayOf(0x7F)) }
+            val deleted = composingText.toByteArray(Charsets.UTF_8).size
+            repeat(deleted) { onInput?.invoke(byteArrayOf(0x7F)) }
+            composingDeletedByCommit = deleted
             composingText = ""
             text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
             val result = super.commitText(text, newCursorPosition)
@@ -630,10 +639,15 @@ class TerminalView @JvmOverloads constructor(
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            repeat(beforeLength) { onInput?.invoke(byteArrayOf(0x7F)) }
-            val result = super.deleteSurroundingText(beforeLength, afterLength)
-            invalidateIme()
-            return result
+            // Subtract backspaces already sent by the preceding commitText (Android ≤12
+            // spell-correction order: commitText first, then deleteSurroundingText).
+            val effective = (beforeLength - composingDeletedByCommit).coerceAtLeast(0)
+            composingDeletedByCommit = 0
+            repeat(effective) { onInput?.invoke(byteArrayOf(0x7F)) }
+            // Do NOT call invalidateIme() here: on Android 13 it causes Gboard to abort
+            // a multi-step spell correction (deleteSurroundingText + insert) mid-sequence.
+            // invalidateIme() in commitText is sufficient to keep Gboard in sync.
+            return super.deleteSurroundingText(beforeLength, afterLength)
         }
 
         // Android 13+ (Gboard on Android 16): replaces a range of editable text directly.
