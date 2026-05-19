@@ -1,0 +1,3 @@
+• SFTP: Endlosschleife beim Verbinden über Jump-Host in Mobilfunknetzen behoben — die Verbindung bricht jetzt mit einer Fehlermeldung ab, statt unbegrenzt zu laden
+• Terminal: Wortmodus — das Antippen eines Korrekturvorschlags ersetzt die falsch geschriebene Wort nun korrekt (Android 13+)
+• Kleinere Fehlerbehebungen und Verbesserungen

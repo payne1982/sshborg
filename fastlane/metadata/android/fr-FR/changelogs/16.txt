@@ -1,0 +1,3 @@
+• SFTP : correction d'un blocage lors de la connexion via un jump host sur les réseaux mobiles — la connexion expire désormais avec un message d'erreur au lieu de tourner indéfiniment
+• Terminal : mode mot — appuyer sur une suggestion de correction remplace désormais correctement le mot mal orthographié (Android 13+)
+• Corrections mineures de bugs et améliorations
