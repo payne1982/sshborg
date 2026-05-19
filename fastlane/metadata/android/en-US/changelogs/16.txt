@@ -1,0 +1,3 @@
+• SFTP: fixed a hang when connecting via jump host on mobile networks — the connection now times out and shows an error instead of spinning indefinitely
+• Terminal: word mode — tapping a spell correction suggestion now correctly replaces the mistyped word (Android 13+)
+• Minor bug fixes and improvements
