@@ -14,7 +14,7 @@ android {
         applicationId = "com.sshborg"
         minSdk = 29
         targetSdk = 36
-        versionCode = 15
+        versionCode = 16
         versionName = "1.6"
     }
 

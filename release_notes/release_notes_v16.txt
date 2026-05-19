@@ -1,0 +1,45 @@
+<en-US>
+• SFTP: fixed a hang when connecting via jump host on mobile networks — the connection now times out and shows an error instead of spinning indefinitely
+• Terminal: word mode — tapping a spell correction suggestion now correctly replaces the mistyped word (Android 13+)
+• Minor bug fixes and improvements
+</en-US>
+<it-IT>
+• SFTP: corretto un blocco durante la connessione tramite jump host su reti mobili — la connessione ora va in timeout e mostra un errore invece di girare all'infinito
+• Terminale: modalità parola — toccare un suggerimento di correzione ora sostituisce correttamente la parola errata (Android 13+)
+• Piccole correzioni di bug e miglioramenti
+</it-IT>
+<de-DE>
+• SFTP: Endlosschleife beim Verbinden über Jump-Host in Mobilfunknetzen behoben — die Verbindung bricht jetzt mit einer Fehlermeldung ab, statt unbegrenzt zu laden
+• Terminal: Wortmodus — das Antippen eines Korrekturvorschlags ersetzt die falsch geschriebene Wort nun korrekt (Android 13+)
+• Kleinere Fehlerbehebungen und Verbesserungen
+</de-DE>
+<es-ES>
+• SFTP: corregido un bloqueo al conectar mediante jump host en redes móviles — la conexión ahora expira y muestra un error en lugar de girar indefinidamente
+• Terminal: modo palabra — tocar una sugerencia de corrección ahora reemplaza correctamente la palabra mal escrita (Android 13+)
+• Correcciones menores de errores y mejoras
+</es-ES>
+<fr-FR>
+• SFTP : correction d'un blocage lors de la connexion via un jump host sur les réseaux mobiles — la connexion expire désormais avec un message d'erreur au lieu de tourner indéfiniment
+• Terminal : mode mot — appuyer sur une suggestion de correction remplace désormais correctement le mot mal orthographié (Android 13+)
+• Corrections mineures de bugs et améliorations
+</fr-FR>
+<pt-PT>
+• SFTP: corrigido um bloqueio ao ligar através de jump host em redes móveis — a ligação expira agora com uma mensagem de erro em vez de ficar a carregar indefinidamente
+• Terminal: modo palavra — tocar numa sugestão de correção substitui agora corretamente a palavra escrita incorretamente (Android 13+)
+• Pequenas correções de erros e melhorias
+</pt-PT>
+<uk>
+• SFTP: виправлено зависання при підключенні через jump host у мобільних мережах — тепер з'єднання завершується помилкою замість нескінченного очікування
+• Термінал: режим слова — натискання на підказку виправлення тепер правильно замінює слово з помилкою (Android 13+)
+• Незначні виправлення помилок та покращення
+</uk>
+<zh-CN>
+• SFTP：修复通过跳板机在移动网络连接时卡死的问题——现在连接超时后会显示错误，而非无限转圈
+• 终端：单词模式 — 点击拼写纠正建议现在能正确替换输入错误的单词（Android 13+）
+• 小错误修复和改进
+</zh-CN>
+<ja-JP>
+• SFTP：モバイルネットワークでジャンプホスト経由接続時に無限に待ち続ける問題を修正しました。接続はタイムアウトしてエラーを表示するようになりました
+• ターミナル：単語モード — スペル修正の候補をタップすると、誤入力した単語が正しく置き換えられるようになりました（Android 13+）
+• 軽微なバグ修正と改善
+</ja-JP>
