@@ -2,12 +2,10 @@ package com.sshborg.ui.sftp
 
 import android.app.Application
 import android.content.ContentUris
-import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import android.webkit.MimeTypeMap
 import androidx.lifecycle.AndroidViewModel
 import com.sshborg.BuildConfig
 import com.sshborg.R
@@ -16,8 +14,10 @@ import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
+import com.sshborg.service.BackgroundTransfer
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
+import com.sshborg.service.TransferTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -46,10 +46,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     val downloadFolder =
         "${Environment.DIRECTORY_DOWNLOADS}/SSHBorg${if (BuildConfig.DEBUG) "-debug" else ""}/"
 
-    private val sshBorgApp     = app as SshBorgApp
-    private val sessionManager = sshBorgApp.sessionManager
-    private val hostDao        = sshBorgApp.db.hostDao()
-    private val keyDao         = sshBorgApp.db.sshKeyDao()
+    private val sshBorgApp      = app as SshBorgApp
+    private val sessionManager  = sshBorgApp.sessionManager
+    private val transferManager = sshBorgApp.transferManager
+    private val hostDao         = sshBorgApp.db.hostDao()
+    private val keyDao          = sshBorgApp.db.sshKeyDao()
 
     private var sessionId: String? = null
 
@@ -81,14 +82,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun resolveBatchConflict(decision: BatchConflictDecision) { batchConflictDecision.tryEmit(decision) }
 
-    /** Job for batch downloads (downloadEntries); cancellable via [cancelDownload]. */
-    private var batchDownloadJob: Job? = null
-
-    private data class DownloadTask(
-        val remotePath: String,
-        val filename: String,
-        val localDir: String,
-    )
+    /** Job covering the Preparing phase of a batch download. */
+    private var preparationJob: Job? = null
+    /** ID of the transfer currently shown in the foreground (mirrored to [_state]). */
+    private val _foregroundTransferId = MutableStateFlow<String?>(null)
+    private var foregroundTransferId: String?
+        get() = _foregroundTransferId.value
+        set(value) { _foregroundTransferId.value = value }
+    private var foregroundObserveJob: Job? = null
 
     // ── Session attach / connect ──────────────────────────────────────────────
 
@@ -283,6 +284,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     // ── Single-file download (shows conflict dialog on collision) ─────────────
 
     fun downloadFile(entry: SftpEntry, currentPath: String) {
+        val session = sftpSession ?: return
+        val id = sessionId ?: return
         val remotePath = "${currentPath.trimEnd('/')}/${entry.name}"
         viewModelScope.launch(Dispatchers.IO) {
             val existing = findExistingDownload(entry.name, downloadFolder)
@@ -290,36 +293,25 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 _conflictEvent.tryEmit(ConflictData(entry, remotePath, existing, downloadFolder))
                 return@launch
             }
-            if (performDownload(entry, entry.name, remotePath, downloadFolder)) {
-                val s = State.Downloaded(entry.name)
-                _state.value = s; postDownloadNotification(s)
-            } else {
-                refreshListing()
-            }
+            startForegroundObservation(transferManager.enqueue(id, session, remotePath, entry.name))
         }
     }
 
     fun downloadOverwrite(conflict: ConflictData) {
+        val session = sftpSession ?: return
+        val id = sessionId ?: return
         viewModelScope.launch(Dispatchers.IO) {
             getApplication<Application>().contentResolver.delete(conflict.existingUri, null, null)
-            if (performDownload(conflict.entry, conflict.entry.name, conflict.remotePath, conflict.localDir)) {
-                val s = State.Downloaded(conflict.entry.name)
-                _state.value = s; postDownloadNotification(s)
-            } else {
-                refreshListing()
-            }
+            startForegroundObservation(transferManager.enqueue(id, session, conflict.remotePath, conflict.entry.name, conflict.localDir))
         }
     }
 
     fun downloadKeepBoth(conflict: ConflictData) {
+        val session = sftpSession ?: return
+        val id = sessionId ?: return
         viewModelScope.launch(Dispatchers.IO) {
             val unique = uniqueFilename(conflict.entry.name, conflict.localDir)
-            if (performDownload(null, unique, conflict.remotePath, conflict.localDir)) {
-                val s = State.Downloaded(unique)
-                _state.value = s; postDownloadNotification(s)
-            } else {
-                refreshListing()
-            }
+            startForegroundObservation(transferManager.enqueue(id, session, conflict.remotePath, unique, conflict.localDir))
         }
     }
 
@@ -331,24 +323,22 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * Cancellable via [cancelDownload].
      */
     fun downloadEntries(entries: List<SftpEntry>, currentPath: String) {
+        val session = sftpSession ?: return
+        val id = sessionId ?: return
         val context = getApplication<Application>()
-        batchDownloadJob = viewModelScope.launch(Dispatchers.IO) {
-            // On cancellation (user pressed cancel), restore the listing
-            coroutineContext[Job]!!.invokeOnCompletion { cause ->
-                if (cause is CancellationException) refreshListing()
-            }
+        preparationJob = viewModelScope.launch(Dispatchers.IO) {
             _state.value = State.Preparing
 
             // Phase 1: collect all file tasks (expand folders recursively)
-            val allTasks = mutableListOf<DownloadTask>()
+            val allTasks = mutableListOf<TransferTask>()
             for (entry in entries) {
+                ensureActive()
                 val entryPath = "${currentPath.trimEnd('/')}/${entry.name}"
                 if (entry.isDir && !entry.isLink) {
                     collectDirTasks(entryPath, "$downloadFolder${entry.name}/", allTasks)
                 } else if (!entry.isDir) {
-                    allTasks.add(DownloadTask(entryPath, entry.name, downloadFolder))
+                    allTasks.add(TransferTask(entryPath, entry.name, downloadFolder))
                 }
-                // symlink-to-directory: skip — navigate into it instead
             }
 
             if (allTasks.isEmpty()) {
@@ -359,7 +349,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
             // Phase 2: detect conflicts and ask the user how to proceed
             val conflicting = allTasks.filter { findExistingDownload(it.filename, it.localDir) != null }
-            var tasksToDownload: List<DownloadTask>
+            val tasksToDownload: List<TransferTask>
             if (conflicting.isEmpty()) {
                 tasksToDownload = allTasks
             } else {
@@ -370,7 +360,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                         tasksToDownload = allTasks.filter { it !in conflicting }
                     }
                     BatchConflictDecision.OVERWRITE_ALL -> {
-                        // Delete existing files so performDownload gets a clean slate
                         conflicting.forEach { task ->
                             findExistingDownload(task.filename, task.localDir)
                                 ?.let { context.contentResolver.delete(it, null, null) }
@@ -380,35 +369,100 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }
 
-            if (tasksToDownload.isEmpty()) {
-                refreshListing()
-                return@launch
-            }
+            if (tasksToDownload.isEmpty()) { refreshListing(); return@launch }
 
-            // Phase 3: download sequentially
-            val total = tasksToDownload.size
-            val skipped = allTasks.size - total
-            for ((index, task) in tasksToDownload.withIndex()) {
-                ensureActive()
-                val ok = performDownload(null, task.filename, task.remotePath, task.localDir, index + 1, total)
-                if (!ok) return@launch
-            }
-
-            val s = State.Downloaded(tasksToDownload.last().filename, total, skipped)
-            _state.value = s; postDownloadNotification(s)
+            preparationJob = null
+            startForegroundObservation(transferManager.enqueue(id, session, tasksToDownload))
         }
     }
 
     fun cancelDownload() {
-        batchDownloadJob?.cancel()
-        batchDownloadJob = null
-        // refreshListing() is called by invokeOnCompletion in downloadEntries
+        preparationJob?.cancel()
+        preparationJob = null
+        val tid = foregroundTransferId
+        foregroundObserveJob?.cancel()
+        foregroundObserveJob = null
+        foregroundTransferId = null
+        tid?.let { transferManager.cancel(it) }
+        refreshListing()
     }
+
+    fun sendToBackground() {
+        foregroundObserveJob?.cancel()
+        foregroundObserveJob = null
+        foregroundTransferId = null
+        refreshListing()
+    }
+
+    private fun startForegroundObservation(transferId: String) {
+        foregroundObserveJob?.cancel()
+        foregroundTransferId = transferId
+        foregroundObserveJob = viewModelScope.launch {
+            val thisJob = coroutineContext[Job]!!
+            transferManager.transfers
+                .mapNotNull { list -> list.find { it.id == transferId } }
+                .collect { t ->
+                    when (t.status) {
+                        BackgroundTransfer.Status.Running ->
+                            _state.value = State.Downloading(t.filename, t.bytesReceived, t.fileIndex, t.totalFiles)
+                        BackgroundTransfer.Status.Done -> {
+                            transferManager.dismiss(transferId)
+                            _state.value = State.Downloaded(t.filename, t.totalFiles, t.skippedFiles)
+                            foregroundTransferId = null
+                            foregroundObserveJob = null
+                            thisJob.cancel()
+                        }
+                        BackgroundTransfer.Status.Error -> {
+                            transferManager.dismiss(transferId)
+                            refreshListing()
+                            _opError.tryEmit(getApplication<Application>().getString(R.string.error_download_failed))
+                            foregroundTransferId = null
+                            foregroundObserveJob = null
+                            thisJob.cancel()
+                        }
+                        BackgroundTransfer.Status.Cancelled -> {
+                            transferManager.dismiss(transferId)
+                            refreshListing()
+                            foregroundTransferId = null
+                            foregroundObserveJob = null
+                            thisJob.cancel()
+                        }
+                    }
+                }
+        }
+    }
+
+    // ── Background downloads (from context menu — never blocks foreground) ──────
+
+    /** Transfers for this session visible in the background panel (excludes the foreground transfer). */
+    val backgroundTransfers: StateFlow<List<BackgroundTransfer>> =
+        combine(transferManager.transfers, _foregroundTransferId) { transfers, fgId ->
+            transfers.filter { it.sessionId == sessionId && it.id != fgId }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /** Starts a background download without blocking the UI. Skips if the file already exists. */
+    fun downloadFileInBackground(entry: SftpEntry, currentPath: String) {
+        val session = sftpSession ?: return
+        val id = sessionId ?: return
+        val remotePath = "${currentPath.trimEnd('/')}/${entry.name}"
+        if (findExistingDownload(entry.name, downloadFolder) != null) {
+            _opError.tryEmit(getApplication<Application>().getString(R.string.sftp_background_skipped_exists, entry.name))
+            return
+        }
+        transferManager.enqueue(id, session, remotePath, entry.name)
+    }
+
+    fun cancelBackgroundTransfer(transferId: String) = transferManager.cancel(transferId)
+    fun dismissBackgroundTransfer(transferId: String) = transferManager.dismiss(transferId)
+
+    // ── Download helpers ──────────────────────────────────────────────────────
+
+    fun dismissDownloaded() = refreshListing()
 
     private suspend fun collectDirTasks(
         remotePath: String,
         localDir: String,
-        tasks: MutableList<DownloadTask>,
+        tasks: MutableList<TransferTask>,
     ) {
         runCatching {
             val entries = sftpSession!!.listDir(remotePath)
@@ -417,86 +471,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 if (entry.isDir && !entry.isLink) {
                     collectDirTasks(entryPath, "$localDir${entry.name}/", tasks)
                 } else if (!entry.isDir) {
-                    tasks.add(DownloadTask(entryPath, entry.name, localDir))
+                    tasks.add(TransferTask(entryPath, entry.name, localDir))
                 }
             }
         } // swallow per-subtree errors — remaining tasks continue
-    }
-
-    // ── Download helpers ──────────────────────────────────────────────────────
-
-    fun dismissDownloaded() = refreshListing()
-
-    private suspend fun performDownload(
-        entry: SftpEntry?,
-        filename: String,
-        remotePath: String,
-        localDir: String = downloadFolder,
-        fileIndex: Int = 1,
-        totalFiles: Int = 1,
-    ): Boolean {
-        val context = getApplication<Application>()
-        val ext = filename.substringAfterLast('.', "").lowercase()
-        val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
-        val values = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, filename)
-            put(MediaStore.Downloads.MIME_TYPE, mime)
-            put(MediaStore.Downloads.RELATIVE_PATH, localDir)
-        }
-        val uri = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-        if (uri == null) {
-            _opError.tryEmit(context.getString(R.string.error_cannot_create_file))
-            return false
-        }
-        // Detect if MediaStore silently renamed the file due to a filesystem collision
-        // that slipped past findExistingDownload (e.g. stale MediaStore index).
-        val actualFilename = context.contentResolver.query(
-            uri, arrayOf(MediaStore.Downloads.DISPLAY_NAME), null, null, null,
-        )?.use { if (it.moveToFirst()) it.getString(0) else filename } ?: filename
-        if (actualFilename != filename && entry != null) {
-            // Collision still present: clean up the newly created entry and surface the conflict.
-            context.contentResolver.delete(uri, null, null)
-            val existingUri = findExistingDownload(filename, localDir)
-            if (existingUri != null) {
-                _conflictEvent.tryEmit(ConflictData(entry, remotePath, existingUri, localDir))
-                return false
-            }
-            // existingUri is null (filesystem collision without a MediaStore record):
-            // fall through and re-insert; the file will get a unique name automatically.
-            val uri2 = context.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-            if (uri2 == null) {
-                _opError.tryEmit(context.getString(R.string.error_cannot_create_file))
-                return false
-            }
-            val name2 = context.contentResolver.query(
-                uri2, arrayOf(MediaStore.Downloads.DISPLAY_NAME), null, null, null,
-            )?.use { if (it.moveToFirst()) it.getString(0) else filename } ?: filename
-            return doDownload(uri2, name2, remotePath, fileIndex, totalFiles)
-        }
-        return doDownload(uri, actualFilename, remotePath, fileIndex, totalFiles)
-    }
-
-    private suspend fun doDownload(
-        uri: Uri,
-        filename: String,
-        remotePath: String,
-        fileIndex: Int = 1,
-        totalFiles: Int = 1,
-    ): Boolean {
-        val context = getApplication<Application>()
-        _state.value = State.Downloading(filename, 0L, fileIndex, totalFiles)
-        return runCatching {
-            context.contentResolver.openOutputStream(uri)!!.use { out ->
-                sftpSession!!.downloadFile(remotePath, out) { bytes ->
-                    _state.value = State.Downloading(filename, bytes, fileIndex, totalFiles)
-                }
-            }
-            true
-        }.getOrElse {
-            context.contentResolver.delete(uri, null, null)
-            _opError.tryEmit(it.message ?: context.getString(R.string.error_download_failed))
-            false
-        }
     }
 
     private fun findExistingDownload(filename: String, localDir: String): Uri? {
@@ -565,19 +543,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun dismissUploaded() = refreshListing()
-
-    private fun postDownloadNotification(s: State.Downloaded) {
-        val ctx = getApplication<Application>()
-        val msg = when {
-            s.totalFiles == 1 && s.skippedFiles == 0 ->
-                ctx.getString(R.string.sftp_saved_to_downloads, "$downloadFolder${s.filename}")
-            s.skippedFiles > 0 ->
-                ctx.getString(R.string.sftp_downloaded_n_files_skipped, s.totalFiles, s.skippedFiles)
-            else ->
-                ctx.getString(R.string.sftp_downloaded_n_files, s.totalFiles)
-        }
-        SshForegroundService.notifyDownloadComplete(ctx, msg)
-    }
 
     private fun postUploadNotification(s: State.Uploaded) {
         val ctx = getApplication<Application>()
@@ -680,10 +645,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Disconnects and removes the session from [SessionManager]. */
     fun disconnect() {
-        batchDownloadJob?.cancel()
-        batchDownloadJob = null
+        preparationJob?.cancel()
+        preparationJob = null
+        foregroundObserveJob?.cancel()
+        foregroundObserveJob = null
+        foregroundTransferId = null
         deleteJob?.cancel()
         deleteJob = null
+        sessionId?.let { transferManager.cancelBySession(it) }
         val id = sessionId ?: return
         val hostId   = sessionManager.get(id)?.hostId
         val lastPath = pathStack.lastOrNull()

@@ -230,6 +230,12 @@
     <string name="sftp_mkdir_folder_name">フォルダ名</string>
 
     <string name="sftp_menu_rename">名前変更</string>
+    <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
+    <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>
+    <string name="sftp_background_download_failed">ダウンロード失敗</string>
+    <string name="sftp_background_skipped_exists">"%1$s"はダウンロードフォルダに既に存在します。スキップしました。</string>
+    <string name="sftp_send_to_background">バックグラウンド</string>
+    <string name="sftp_background_dismiss_cd">閉じる</string>
     <string name="sftp_menu_delete">削除</string>
     <string name="sftp_delete_selected_cd">選択項目を削除</string>
     <string name="sftp_bulk_delete_title">選択した項目を削除</string>
@@ -291,6 +297,9 @@
     <string name="notification_disconnect_all">すべて切断</string>
     <plurals name="notification_active_sessions">
         <item quantity="other">%d 件のアクティブなセッション</item>
+    </plurals>
+    <plurals name="notification_bg_downloads">
+        <item quantity="other">%d 件のファイルをダウンロード中</item>
     </plurals>
 
     <!-- ── Error strings ── -->

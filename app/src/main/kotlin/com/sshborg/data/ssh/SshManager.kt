@@ -488,6 +488,13 @@ class SftpSession(
     fun rename(oldPath: String, newPath: String) = channel.rename(oldPath, newPath)
     fun mkdir(remotePath: String)      = channel.mkdir(remotePath)
 
+    /** Opens a second SFTP channel on the same authenticated session for background transfers. */
+    fun openBackgroundChannel(): com.jcraft.jsch.ChannelSftp {
+        val ch = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
+        ch.connect()
+        return ch
+    }
+
     fun disconnect() {
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }

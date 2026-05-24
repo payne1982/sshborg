@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.ssh.SftpEntry
+import com.sshborg.service.BackgroundTransfer
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,6 +42,7 @@ fun SftpScreen(
     vm: SftpViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsState()
+    val backgroundTransfers by vm.backgroundTransfers.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = androidx.compose.ui.platform.LocalContext.current
 
@@ -308,6 +310,9 @@ fun SftpScreen(
                                             }
                                         },
                                         onDownloadFolder = { vm.downloadEntries(listOf(entry), s.path) },
+                                        onDownloadInBackground = if (!entry.isDir) {
+                                            { vm.downloadFileInBackground(entry, s.path) }
+                                        } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
                                     )
@@ -336,10 +341,11 @@ fun SftpScreen(
                             append(stringResource(R.string.sftp_downloading_label))
                             if (s.totalFiles > 1) append(" (${s.fileIndex}/${s.totalFiles})")
                         },
-                        sublabel = s.filename,
-                        bytes    = s.bytesReceived,
-                        icon     = Icons.Default.Download,
-                        onCancel = if (s.totalFiles > 1) vm::cancelDownload else null,
+                        sublabel     = s.filename,
+                        bytes        = s.bytesReceived,
+                        icon         = Icons.Default.Download,
+                        onCancel     = vm::cancelDownload,
+                        onBackground = vm::sendToBackground,
                     )
                 }
 
@@ -380,6 +386,16 @@ fun SftpScreen(
                 SftpViewModel.State.Disconnected -> {
                     Text(stringResource(R.string.sftp_disconnected), Modifier.align(Alignment.Center))
                 }
+            }
+
+            // Background downloads panel — shown whenever there are active or recent transfers
+            if (backgroundTransfers.isNotEmpty()) {
+                BackgroundTransfersPanel(
+                    transfers = backgroundTransfers,
+                    onCancel  = vm::cancelBackgroundTransfer,
+                    onDismiss = vm::dismissBackgroundTransfer,
+                    modifier  = Modifier.align(Alignment.BottomCenter),
+                )
             }
         }
     }
@@ -598,6 +614,7 @@ private fun BoxScope.TransferProgress(
     bytes: Long,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onCancel: (() -> Unit)? = null,
+    onBackground: (() -> Unit)? = null,
 ) {
     Column(
         Modifier
@@ -629,9 +646,18 @@ private fun BoxScope.TransferProgress(
             if (bytes > 0) formatSize(bytes) else "",
             style = MaterialTheme.typography.bodySmall,
         )
-        if (onCancel != null) {
-            TextButton(onClick = onCancel) {
-                Text(stringResource(R.string.action_cancel))
+        if (onBackground != null || onCancel != null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (onBackground != null) {
+                    TextButton(onClick = onBackground) {
+                        Text(stringResource(R.string.sftp_send_to_background))
+                    }
+                }
+                if (onCancel != null) {
+                    TextButton(onClick = onCancel) {
+                        Text(stringResource(R.string.action_cancel))
+                    }
+                }
             }
         }
     }
@@ -645,6 +671,7 @@ private fun SftpEntryItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     onDownloadFolder: () -> Unit,
+    onDownloadInBackground: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -731,6 +758,13 @@ private fun SftpEntryItem(
             },
         )
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            if (onDownloadInBackground != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.sftp_menu_download_in_background)) },
+                    leadingIcon = { Icon(Icons.Default.DownloadForOffline, null) },
+                    onClick = { menuExpanded = false; onDownloadInBackground() },
+                )
+            }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.sftp_menu_rename)) },
                 leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) },
@@ -751,6 +785,88 @@ private fun SftpEntryItem(
         }
     }
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+@Composable
+private fun BackgroundTransfersPanel(
+    transfers: List<BackgroundTransfer>,
+    onCancel: (String) -> Unit,
+    onDismiss: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
+    ) {
+        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+            Text(
+                text = stringResource(R.string.sftp_background_downloads_title),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+            transfers.forEach { t ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Icon(
+                        imageVector = when (t.status) {
+                            BackgroundTransfer.Status.Done      -> Icons.Default.CheckCircle
+                            BackgroundTransfer.Status.Error     -> Icons.Default.ErrorOutline
+                            BackgroundTransfer.Status.Cancelled -> Icons.Default.Cancel
+                            BackgroundTransfer.Status.Running   -> Icons.Default.Downloading
+                        },
+                        contentDescription = null,
+                        tint = when (t.status) {
+                            BackgroundTransfer.Status.Done      -> MaterialTheme.colorScheme.primary
+                            BackgroundTransfer.Status.Error     -> MaterialTheme.colorScheme.error
+                            BackgroundTransfer.Status.Cancelled -> MaterialTheme.colorScheme.onSurfaceVariant
+                            BackgroundTransfer.Status.Running   -> MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Text(
+                        text = t.filename,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (t.bytesReceived > 0) {
+                        Text(
+                            text = formatSize(t.bytesReceived),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            if (t.status == BackgroundTransfer.Status.Running) onCancel(t.id)
+                            else onDismiss(t.id)
+                        },
+                        modifier = Modifier.size(32.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(
+                                if (t.status == BackgroundTransfer.Status.Running)
+                                    R.string.action_cancel
+                                else
+                                    R.string.sftp_background_dismiss_cd,
+                            ),
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 private fun formatSize(bytes: Long): String = when {

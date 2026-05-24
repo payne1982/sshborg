@@ -230,6 +230,12 @@
     <string name="sftp_mkdir_folder_name">文件夹名称</string>
 
     <string name="sftp_menu_rename">重命名</string>
+    <string name="sftp_menu_download_in_background">在后台下载</string>
+    <string name="sftp_background_downloads_title">后台下载</string>
+    <string name="sftp_background_download_failed">下载失败</string>
+    <string name="sftp_background_skipped_exists">"%1$s"已存在于下载目录中。已跳过下载。</string>
+    <string name="sftp_send_to_background">后台</string>
+    <string name="sftp_background_dismiss_cd">关闭</string>
     <string name="sftp_menu_delete">删除</string>
     <string name="sftp_delete_selected_cd">删除所选</string>
     <string name="sftp_bulk_delete_title">删除所选项目</string>
@@ -291,6 +297,9 @@
     <string name="notification_disconnect_all">断开所有连接</string>
     <plurals name="notification_active_sessions">
         <item quantity="other">%d 个活跃会话</item>
+    </plurals>
+    <plurals name="notification_bg_downloads">
+        <item quantity="other">%d 个文件正在下载</item>
     </plurals>
 
     <!-- ── Error strings ── -->

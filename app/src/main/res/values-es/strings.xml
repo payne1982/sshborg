@@ -216,6 +216,12 @@
     <string name="sftp_mkdir_folder_name">Nombre de carpeta</string>
 
     <string name="sftp_menu_rename">Renombrar</string>
+    <string name="sftp_menu_download_in_background">Descargar en segundo plano</string>
+    <string name="sftp_background_downloads_title">Descargas en segundo plano</string>
+    <string name="sftp_background_download_failed">Descarga fallida</string>
+    <string name="sftp_background_skipped_exists">"%1$s" ya existe en Descargas. Descarga omitida.</string>
+    <string name="sftp_send_to_background">Segundo plano</string>
+    <string name="sftp_background_dismiss_cd">Cerrar</string>
     <string name="sftp_menu_delete">Eliminar</string>
     <string name="sftp_delete_selected_cd">Eliminar seleccionados</string>
     <string name="sftp_bulk_delete_title">Eliminar elementos seleccionados</string>
@@ -306,6 +312,10 @@
     <plurals name="notification_active_sessions">
         <item quantity="one">1 sesión activa</item>
         <item quantity="other">%d sesiones activas</item>
+    </plurals>
+    <plurals name="notification_bg_downloads">
+        <item quantity="one">1 archivo descargando</item>
+        <item quantity="other">%d archivos descargando</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de pantalla</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de pantalla y grabación de pantalla. Déjalo desactivado para proteger el contenido sensible.</string>

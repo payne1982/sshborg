@@ -232,6 +232,12 @@
 
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
+    <string name="sftp_menu_download_in_background">Download in background</string>
+    <string name="sftp_background_downloads_title">Background downloads</string>
+    <string name="sftp_background_download_failed">Download failed</string>
+    <string name="sftp_background_skipped_exists">"%1$s" already exists in Downloads. Download skipped.</string>
+    <string name="sftp_background_dismiss_cd">Dismiss</string>
+    <string name="sftp_send_to_background">Background</string>
     <string name="sftp_delete_selected_cd">Delete selected</string>
     <string name="sftp_bulk_delete_title">Delete selected items</string>
     <string name="sftp_bulk_delete_message_prefix">You are about to delete:</string>
@@ -293,6 +299,10 @@
     <plurals name="notification_active_sessions">
         <item quantity="one">1 active session</item>
         <item quantity="other">%d active sessions</item>
+    </plurals>
+    <plurals name="notification_bg_downloads">
+        <item quantity="one">1 file downloading</item>
+        <item quantity="other">%d files downloading</item>
     </plurals>
 
     <!-- Backup export/import -->
