@@ -1,0 +1,3 @@
+• SFTP: background downloads — download files without blocking the file browser; long-press a file for the "Download in background" option
+• SFTP: active downloads can be sent to background at any time using the "Background" button
+• Minor bug fixes and improvements

@@ -1,0 +1,3 @@
+• SFTP: Hintergrunddownloads — Dateien herunterladen, ohne den Dateibrowser zu blockieren; Datei lang drücken für „Im Hintergrund herunterladen"
+• SFTP: laufende Downloads können jederzeit mit der Schaltfläche „Hintergrund" in den Hintergrund verschoben werden
+• Kleinere Fehlerbehebungen und Verbesserungen

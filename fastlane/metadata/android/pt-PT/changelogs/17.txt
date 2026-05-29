@@ -1,0 +1,3 @@
+• SFTP: transferências em segundo plano — descarregue ficheiros sem bloquear o navegador; toque prolongado num ficheiro para "Descarregar em segundo plano"
+• SFTP: as transferências ativas podem ser enviadas para segundo plano a qualquer momento com o botão "Segundo plano"
+• Pequenas correções de erros e melhorias

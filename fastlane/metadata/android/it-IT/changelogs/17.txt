@@ -1,0 +1,3 @@
+• SFTP: download in background — scarica file senza bloccare la navigazione; tieni premuto un file per l'opzione "Scarica in background"
+• SFTP: i download attivi possono essere spostati in background in qualsiasi momento con il pulsante "In background"
+• Piccole correzioni di bug e miglioramenti

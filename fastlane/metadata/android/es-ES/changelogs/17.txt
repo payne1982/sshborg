@@ -1,0 +1,3 @@
+• SFTP: descargas en segundo plano — descarga archivos sin bloquear el navegador de archivos; mantén pulsado un archivo para "Descargar en segundo plano"
+• SFTP: las descargas activas pueden enviarse al segundo plano en cualquier momento con el botón "Segundo plano"
+• Correcciones menores de errores y mejoras

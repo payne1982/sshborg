@@ -1,0 +1,45 @@
+<en-US>
+• SFTP: background downloads — download files without blocking the file browser; long-press a file for the "Download in background" option
+• SFTP: active downloads can be sent to background at any time using the "Background" button
+• Minor bug fixes and improvements
+</en-US>
+<it-IT>
+• SFTP: download in background — scarica file senza bloccare la navigazione; tieni premuto un file per l'opzione "Scarica in background"
+• SFTP: i download attivi possono essere spostati in background in qualsiasi momento con il pulsante "In background"
+• Piccole correzioni di bug e miglioramenti
+</it-IT>
+<de-DE>
+• SFTP: Hintergrunddownloads — Dateien herunterladen, ohne den Dateibrowser zu blockieren; Datei lang drücken für „Im Hintergrund herunterladen"
+• SFTP: laufende Downloads können jederzeit mit der Schaltfläche „Hintergrund" in den Hintergrund verschoben werden
+• Kleinere Fehlerbehebungen und Verbesserungen
+</de-DE>
+<es-ES>
+• SFTP: descargas en segundo plano — descarga archivos sin bloquear el navegador de archivos; mantén pulsado un archivo para "Descargar en segundo plano"
+• SFTP: las descargas activas pueden enviarse al segundo plano en cualquier momento con el botón "Segundo plano"
+• Correcciones menores de errores y mejoras
+</es-ES>
+<fr-FR>
+• SFTP : téléchargements en arrière-plan — téléchargez des fichiers sans bloquer le navigateur ; appuyez longuement sur un fichier pour « Télécharger en arrière-plan »
+• SFTP : les téléchargements actifs peuvent être envoyés en arrière-plan à tout moment avec le bouton « Arrière-plan »
+• Corrections mineures de bugs et améliorations
+</fr-FR>
+<pt-PT>
+• SFTP: transferências em segundo plano — descarregue ficheiros sem bloquear o navegador; toque prolongado num ficheiro para "Descarregar em segundo plano"
+• SFTP: as transferências ativas podem ser enviadas para segundo plano a qualquer momento com o botão "Segundo plano"
+• Pequenas correções de erros e melhorias
+</pt-PT>
+<uk>
+• SFTP: фонові завантаження — завантажуйте файли без блокування браузера; утримуйте файл для вибору «Завантажити у фоні»
+• SFTP: активні завантаження можна перемістити у фон у будь-який момент кнопкою «У фон»
+• Незначні виправлення помилок та покращення
+</uk>
+<zh-CN>
+• SFTP：后台下载 — 下载文件时不阻塞文件浏览器；长按文件选择"后台下载"
+• SFTP：点击"后台"按钮可随时将正在进行的下载切换至后台
+• 小错误修复和改进
+</zh-CN>
+<ja-JP>
+• SFTP：バックグラウンドダウンロード — ファイルブラウザをブロックせずにファイルをダウンロードできます。ファイルを長押しして「バックグラウンドでダウンロード」を選択
+• SFTP：「バックグラウンド」ボタンでアクティブなダウンロードをいつでもバックグラウンドに移動できます
+• 軽微なバグ修正と改善
+</ja-JP>
