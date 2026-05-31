@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
@@ -388,13 +389,15 @@ fun SftpScreen(
                 }
             }
 
-            // Background downloads panel — shown whenever there are active or recent transfers
+            // Background downloads panel — shown whenever there are active or recent transfers.
+            // Right padding avoids the FAB column when it is visible.
             if (backgroundTransfers.isNotEmpty()) {
                 BackgroundTransfersPanel(
-                    transfers = backgroundTransfers,
-                    onCancel  = vm::cancelBackgroundTransfer,
-                    onDismiss = vm::dismissBackgroundTransfer,
-                    modifier  = Modifier.align(Alignment.BottomCenter),
+                    transfers  = backgroundTransfers,
+                    onCancel   = vm::cancelBackgroundTransfer,
+                    onDismiss  = vm::dismissBackgroundTransfer,
+                    modifier   = Modifier.align(Alignment.BottomCenter),
+                    endPadding = if (isListing && !selectionMode) 80.dp else 12.dp,
                 )
             }
         }
@@ -793,11 +796,12 @@ private fun BackgroundTransfersPanel(
     onCancel: (String) -> Unit,
     onDismiss: (String) -> Unit,
     modifier: Modifier = Modifier,
+    endPadding: Dp = 12.dp,
 ) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(start = 12.dp, end = endPadding, top = 8.dp, bottom = 8.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
     ) {
         Column(modifier = Modifier.padding(vertical = 4.dp)) {
