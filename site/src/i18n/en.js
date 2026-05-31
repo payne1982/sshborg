@@ -20,8 +20,10 @@ module.exports = {
   badge_free:        'Free',
   badge_android:     'Android 10+',
 
-  cta_play:       'Get it on Google Play',
-  cta_appgallery: 'Explore on AppGallery',
+  cta_download:   'DOWNLOAD',
+  cta_play:       'Google Play',
+  cta_appgallery: 'AppGallery',
+  cta_fdroid:     'F-Droid',
 
   features_title: '// SYSTEM CAPABILITIES',
 

@@ -19,8 +19,10 @@ module.exports = {
   badge_free:        'Gratuito',
   badge_android:     'Android 10+',
 
-  cta_play:       'Scarica su Google Play',
-  cta_appgallery: 'Esplora su AppGallery',
+  cta_download:   'SCARICA',
+  cta_play:       'Google Play',
+  cta_appgallery: 'AppGallery',
+  cta_fdroid:     'F-Droid',
 
   features_title: '// FUNZIONALITÀ',
 

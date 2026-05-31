@@ -20,8 +20,10 @@ module.exports = {
   badge_free:        '免费',
   badge_android:     'Android 10+',
 
-  cta_play:       '在 Google Play 上获取',
-  cta_appgallery: '在 AppGallery 获取',
+  cta_download:   '下载',
+  cta_play:       'Google Play',
+  cta_appgallery: 'AppGallery',
+  cta_fdroid:     'F-Droid',
 
   features_title: '// 系统功能',
 

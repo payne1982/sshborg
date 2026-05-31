@@ -309,40 +309,69 @@
             }
         }
 
-        /* AppGallery button — blue variant */
-        .cta-btn-ag {
-            color: var(--neon-blue);
-            border-color: var(--neon-blue);
-            animation-name: cta-pulse-blue;
+        /* ── Download dropdown ───────────────────────────────── */
+        .dl-toggle {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
         }
-        .cta-btn-ag::before { background: rgba(0,212,255,0.06); }
-        .cta-btn-ag:hover {
-            background: rgba(0,212,255,0.12);
-            text-shadow: 0 0 12px var(--neon-blue);
-            box-shadow:
-                0 0 20px var(--neon-blue),
-                0 0 40px rgba(0,180,220,0.5),
-                0 0 80px rgba(0,212,255,0.25),
-                inset 0 0 20px rgba(0,212,255,0.05);
+        .dl-toggle:focus-visible {
+            outline: 2px solid var(--neon-green);
+            outline-offset: 3px;
         }
-        @keyframes cta-pulse-blue {
-            0%, 100% {
-                box-shadow:
-                    0 0 10px var(--neon-blue),
-                    0 0 24px rgba(0,180,220,0.5),
-                    0 0 50px rgba(0,212,255,0.25),
-                    inset 0 0 10px rgba(0,212,255,0.04);
-                text-shadow: 0 0 8px var(--neon-blue);
-            }
-            50% {
-                box-shadow:
-                    0 0 18px var(--neon-blue),
-                    0 0 40px rgba(0,180,220,0.6),
-                    0 0 90px rgba(0,212,255,0.35),
-                    inset 0 0 18px rgba(0,212,255,0.07);
-                text-shadow: 0 0 14px var(--neon-blue), 0 0 28px rgba(0,180,220,0.5);
-            }
+        .dl-dropdown.open .dl-toggle { animation: none; }
+        .dl-arrow {
+            font-size: 0.7em;
+            display: inline-block;
+            transition: transform 0.22s ease;
+            margin-left: 4px;
         }
+        .dl-dropdown.open .dl-arrow { transform: rotate(180deg); }
+        .dl-panel {
+            visibility: hidden;
+            pointer-events: none;
+            opacity: 0;
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px);
+            width: 280px;
+            max-width: calc(100vw - 32px);
+            background: rgba(6,14,8,0.98);
+            border: 1px solid var(--border-hi);
+            backdrop-filter: blur(14px);
+            z-index: 50;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+        }
+        .dl-dropdown.open .dl-panel {
+            visibility: visible;
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
+        }
+        .dl-dropdown { display: inline-block; position: relative; }
+        .dl-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .dl-option:last-child { border-bottom: none; }
+        .dl-option svg { flex-shrink: 0; }
+        .dl-play   { color: var(--neon-green); }
+        .dl-ag     { color: var(--neon-blue); }
+        .dl-fdroid { color: var(--copper); }
+        .dl-play:hover   { background: rgba(0,255,136,0.08);  text-shadow: 0 0 8px var(--neon-green); }
+        .dl-ag:hover     { background: rgba(0,212,255,0.08);  text-shadow: 0 0 8px var(--neon-blue); }
+        .dl-fdroid:hover { background: rgba(200,124,48,0.10); text-shadow: 0 0 8px var(--copper); }
 
         /* ── Section layout ──────────────────────────────────── */
         section {
@@ -617,19 +646,43 @@
         <span class="badge badge-blue">Android 10+</span>
     </div>
     <div class="cta-wrap">
-        <div class="cta-buttons">
-            <a class="cta-btn" href="https://play.google.com/store/apps/details?id=com.sshborg">
-                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
+        <div class="dl-dropdown" id="dlDropdown">
+            <button class="cta-btn dl-toggle"
+                    onclick="toggleDl()"
+                    aria-expanded="false"
+                    aria-controls="dlPanel">
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                 </svg>
-                Bei Google Play herunterladen
-            </a>
-            <a class="cta-btn cta-btn-ag" href="https://appgallery.huawei.com/app/C117647135">
-                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.6c4.634 0 8.4 3.766 8.4 8.4 0 4.634-3.766 8.4-8.4 8.4-4.634 0-8.4-3.766-8.4-8.4 0-4.634 3.766-8.4 8.4-8.4zM8.4 7.1 5.9 11.43 3.4 7.1H1.8l3.2 5.4-3.2 5.4H3.4l2.5-4.33 2.5 4.33h1.6l-3.2-5.4 3.2-5.4H8.4zm7.45.08c-2.42 0-3.85 1.78-3.85 4.04 0 2.74 1.46 4.58 4.1 4.58 1.21 0 2.18-.41 2.92-1.21l-1.05-1.13c-.41.49-.97.74-1.62.74-1.13 0-1.86-.73-2.01-1.86h4.93v-.64c0-2.5-1.37-4.52-3.38-4.52h-.04zm.08 1.46c.97 0 1.62.65 1.7 1.78h-3.47c.08-1.05.73-1.78 1.77-1.78z"/>
-                </svg>
-                Im AppGallery entdecken
-            </a>
+                DOWNLOAD
+                <span class="dl-arrow">&#9660;</span>
+            </button>
+            <div class="dl-panel" id="dlPanel" role="menu" aria-label="DOWNLOAD">
+                <a class="dl-option dl-play"
+                   href="https://play.google.com/store/apps/details?id=com.sshborg"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
+                    </svg>
+                    <span>Google Play</span>
+                </a>
+                <a class="dl-option dl-ag"
+                   href="https://appgallery.huawei.com/app/C117647135"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.6c4.634 0 8.4 3.766 8.4 8.4 0 4.634-3.766 8.4-8.4 8.4-4.634 0-8.4-3.766-8.4-8.4 0-4.634 3.766-8.4 8.4-8.4zM8.4 7.1 5.9 11.43 3.4 7.1H1.8l3.2 5.4-3.2 5.4H3.4l2.5-4.33 2.5 4.33h1.6l-3.2-5.4 3.2-5.4H8.4zm7.45.08c-2.42 0-3.85 1.78-3.85 4.04 0 2.74 1.46 4.58 4.1 4.58 1.21 0 2.18-.41 2.92-1.21l-1.05-1.13c-.41.49-.97.74-1.62.74-1.13 0-1.86-.73-2.01-1.86h4.93v-.64c0-2.5-1.37-4.52-3.38-4.52h-.04zm.08 1.46c.97 0 1.62.65 1.7 1.78h-3.47c.08-1.05.73-1.78 1.77-1.78z"/>
+                    </svg>
+                    <span>AppGallery</span>
+                </a>
+                <a class="dl-option dl-fdroid"
+                   href="https://f-droid.org/en/packages/com.sshborg/"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.43-.65-3.05-1.01-4.77-1.01s-3.34.36-4.77 1.01L4.89 5.67c-.19-.29-.54-.37-.83-.22-.3.16-.42.54-.26.85L5.64 9.48A10.78 10.78 0 0 0 1 18h22a10.78 10.78 0 0 0-4.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25S8.25 13.31 8.25 14 7.69 15.25 7 15.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/>
+                    </svg>
+                    <span>F-Droid</span>
+                </a>
+            </div>
         </div>
         <div style="margin-top:20px">
             <script type='text/javascript'>kofiwidget2.init('Gib mir ein Trinkgeld', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
@@ -738,5 +791,30 @@
     </p>
 </footer>
 
+<script>
+function toggleDl() {
+    var dd = document.getElementById('dlDropdown');
+    var btn = dd.querySelector('.dl-toggle');
+    var open = dd.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+document.addEventListener('click', function(e) {
+    var dd = document.getElementById('dlDropdown');
+    if (dd && !dd.contains(e.target) && dd.classList.contains('open')) {
+        dd.classList.remove('open');
+        dd.querySelector('.dl-toggle').setAttribute('aria-expanded', 'false');
+    }
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        var dd = document.getElementById('dlDropdown');
+        if (dd && dd.classList.contains('open')) {
+            dd.classList.remove('open');
+            dd.querySelector('.dl-toggle').setAttribute('aria-expanded', 'false');
+            dd.querySelector('.dl-toggle').focus();
+        }
+    }
+});
+</script>
 </body>
 </html>
