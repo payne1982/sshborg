@@ -94,6 +94,7 @@ module.exports = {
             <li><a href="#terminal">Gestos del terminal</a></li>
             <li><a href="#extra-keys">Barra de teclas extra</a></li>
             <li><a href="#agent-forwarding">Reenvío de agente</a></li>
+            <li><a href="#legacy-ciphers">Cifrados heredados</a></li>
             <li><a href="#connection-drops">Caídas de conexión</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
@@ -269,6 +270,22 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA DE SEGURIDAD</div>
                 El reenvío de agente da al servidor remoto acceso temporal al socket de tu agente SSH. Un usuario root (o un proceso comprometido) en ese servidor podría usar tus claves para conectarse a otros sitios mientras tu sesión está activa. Activa el reenvío solo en servidores de confianza.
+            </div>`,
+
+  doc_legacy_ciphers: `
+            <h2>// CIFRADOS HEREDADOS</h2>
+            <p>Algunos servidores más antiguos — equipos de red, dispositivos embebidos o sistemas con versiones obsoletas de OpenSSH — solo soportan algoritmos de cifrado que los clientes SSH modernos ya no anuncian por defecto.</p>
+            <p>Al activar el interruptor <strong>Permitir cifrados heredados</strong> en la configuración del host, SSHBorg añade los siguientes algoritmos a la lista de negociación:</p>
+            <h3>Algoritmos añadidos</h3>
+            <ul>
+                <li><strong>Cifrados:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Intercambio de claves:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Tipo de clave de host:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>El servidor siempre negocia el algoritmo más fuerte soportado por ambas partes, por lo que activar esta opción no debilita las conexiones a servidores modernos.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DE SEGURIDAD</div>
+                Los algoritmos de esta lista se consideran criptográficamente débiles. Active esta opción solo para servidores que no pueda actualizar.
             </div>`,
 
   doc_connection_drops: `

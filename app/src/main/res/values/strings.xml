@@ -79,6 +79,7 @@
     <string name="host_key_change">Change</string>
     <string name="host_key_no_keys">No keys – go add one first</string>
     <string name="host_agent_forwarding">Agent Forwarding</string>
+    <string name="host_allow_legacy_ciphers">Allow Legacy Ciphers</string>
     <string name="host_section_jump_hosts">Jump Hosts</string>
     <string name="host_field_jump_hosts">Jump hosts (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>

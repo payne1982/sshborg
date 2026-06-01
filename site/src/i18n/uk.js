@@ -94,6 +94,7 @@ module.exports = {
             <li><a href="#terminal">Жести терміналу</a></li>
             <li><a href="#extra-keys">Додаткові клавіші</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
+            <li><a href="#legacy-ciphers">Застарілі шифри</a></li>
             <li><a href="#connection-drops">Обриви з'єднання</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
@@ -269,6 +270,22 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// ПРИМІТКА З БЕЗПЕКИ</div>
                 Agent forwarding надає віддаленому серверу тимчасовий доступ до вашого SSH агент-сокету. Користувач root (або скомпрометований процес) на цьому сервері може використовувати ваші ключі для підключення деінде, поки ваша сесія активна. Вмикайте forwarding лише на серверах, яким довіряєте.
+            </div>`,
+
+  doc_legacy_ciphers: `
+            <h2>// ЗАСТАРІЛІ ШИФРИ</h2>
+            <p>Деякі старіші сервери — мережеве обладнання, вбудовані пристрої або системи з застарілими версіями OpenSSH — підтримують лише алгоритми шифрування, які сучасні SSH-клієнти більше не оголошують за замовчуванням.</p>
+            <p>При активації перемикача <strong>Дозволити застарілі шифри</strong> в налаштуваннях хоста SSHBorg додає такі алгоритми до списку переговорів:</p>
+            <h3>Додані алгоритми</h3>
+            <ul>
+                <li><strong>Шифри:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Обмін ключами:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Тип ключа хоста:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>Сервер завжди узгоджує найсильніший алгоритм, підтримуваний обома сторонами, тому увімкнення цього параметра не послаблює з'єднання з сучасними серверами.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ПРИМІТКА ЩОДО БЕЗПЕКИ</div>
+                Алгоритми у цьому списку вважаються криптографічно слабкими. Вмикайте цей параметр лише для серверів, які неможливо оновити.
             </div>`,
 
   doc_connection_drops: `

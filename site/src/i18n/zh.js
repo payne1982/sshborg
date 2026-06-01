@@ -96,6 +96,7 @@ module.exports = {
             <li><a href="#terminal">终端手势</a></li>
             <li><a href="#extra-keys">额外按键栏</a></li>
             <li><a href="#agent-forwarding">代理转发</a></li>
+            <li><a href="#legacy-ciphers">旧版加密算法</a></li>
             <li><a href="#connection-drops">连接断开</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">跳板机</a></li>
@@ -271,6 +272,22 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// 安全说明</div>
                 代理转发使远程服务器暂时获得访问您的 SSH 代理套接字的权限。在会话活跃期间，该服务器上的 root 用户（或受攻击的进程）可能使用您的密钥连接其他地方。仅在您信任的服务器上启用转发。
+            </div>`,
+
+  doc_legacy_ciphers: `
+            <h2>// 旧版加密算法支持</h2>
+            <p>一些旧版服务器——网络设备、嵌入式设备或运行过时 OpenSSH 版本的系统——仅支持现代 SSH 客户端默认不再通告的加密算法。</p>
+            <p>在主机设置中启用<strong>允许旧版加密</strong>开关后，SSHBorg 会将以下算法追加到协商列表：</p>
+            <h3>新增算法</h3>
+            <ul>
+                <li><strong>加密算法：</strong> <code>aes128-cbc</code>、<code>aes192-cbc</code>、<code>aes256-cbc</code>、<code>3des-cbc</code></li>
+                <li><strong>密钥交换：</strong> <code>diffie-hellman-group14-sha1</code>、<code>diffie-hellman-group-exchange-sha1</code>、<code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>主机密钥类型：</strong> <code>ssh-dss</code>（DSA 1024-bit）</li>
+            </ul>
+            <p>服务器始终协商双方都支持的最强算法，因此启用此选项不会削弱与现代服务器的连接安全性。</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// 安全提示</div>
+                此列表中的算法在密码学上被认为较弱。仅对无法升级的服务器启用此选项。
             </div>`,
 
   doc_connection_drops: `

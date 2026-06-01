@@ -159,14 +159,15 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 val result = runCatching {
                     SshManager.openShell(
                         params = SshConnectionParams(
-                            hostname        = host.hostname,
-                            port            = host.port,
-                            username        = host.username,
-                            auth            = auth,
-                            agentForwarding = host.agentForwarding,
-                            knownHostsEntry = host.knownHostsEntry,
-                            jumpHosts       = jumpHosts,
-                            portForwardings = parsePortForwardings(host.portForwardings),
+                            hostname           = host.hostname,
+                            port               = host.port,
+                            username           = host.username,
+                            auth               = auth,
+                            agentForwarding    = host.agentForwarding,
+                            knownHostsEntry    = host.knownHostsEntry,
+                            jumpHosts          = jumpHosts,
+                            portForwardings    = parsePortForwardings(host.portForwardings),
+                            allowLegacyCiphers = host.allowLegacyCiphers,
                         ),
                         columns = columns,
                         rows    = rows,
@@ -232,13 +233,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     hostDao.updateLastConnected(hostId, System.currentTimeMillis())
                     lastConnectParams = SshConnectionParams(
-                        hostname        = host.hostname,
-                        port            = host.port,
-                        username        = host.username,
-                        auth            = auth,
-                        agentForwarding = host.agentForwarding,
-                        knownHostsEntry = session.hostKeyLine,
-                        jumpHosts       = jumpHosts,
+                        hostname           = host.hostname,
+                        port               = host.port,
+                        username           = host.username,
+                        auth               = auth,
+                        agentForwarding    = host.agentForwarding,
+                        knownHostsEntry    = session.hostKeyLine,
+                        jumpHosts          = jumpHosts,
+                        allowLegacyCiphers = host.allowLegacyCiphers,
                     )
                     startReading(session)
                     if (prefs.historySuggestions.first()) loadCommandHistory()

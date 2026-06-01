@@ -151,14 +151,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 val result = runCatching {
                     SshManager.openSftp(
                         SshConnectionParams(
-                            hostname        = host.hostname,
-                            port            = host.port,
-                            username        = host.username,
-                            auth            = auth,
-                            agentForwarding = host.agentForwarding,
-                            knownHostsEntry = host.knownHostsEntry,
-                            jumpHosts       = jumpHosts,
-                            portForwardings = parsePortForwardings(host.portForwardings),
+                            hostname           = host.hostname,
+                            port               = host.port,
+                            username           = host.username,
+                            auth               = auth,
+                            agentForwarding    = host.agentForwarding,
+                            knownHostsEntry    = host.knownHostsEntry,
+                            jumpHosts          = jumpHosts,
+                            portForwardings    = parsePortForwardings(host.portForwardings),
+                            allowLegacyCiphers = host.allowLegacyCiphers,
                         )
                     ) { hostname, fingerprint, keyLine ->
                         runBlocking {

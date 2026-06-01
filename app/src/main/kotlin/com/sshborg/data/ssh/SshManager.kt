@@ -146,6 +146,7 @@ object SshManager {
                 })
                 setProperty("HashKnownHosts", "no")
                 setProperty("TCPKeepAlive", "yes")
+                if (params.allowLegacyCiphers) applyLegacyCiphers(this)
             }
             jumpSession.setConfig(jumpConfig)
             jumpSession.setServerAliveInterval(30_000)
@@ -219,6 +220,7 @@ object SshManager {
             })
             setProperty("HashKnownHosts", "no")
             setProperty("TCPKeepAlive", "yes")
+            if (params.allowLegacyCiphers) applyLegacyCiphers(this)
         }
         session.setConfig(config)
         session.setServerAliveInterval(30_000)
@@ -358,6 +360,16 @@ object SshManager {
     /** Builds a known_hosts line from a JSch HostKey. */
     fun buildKnownHostsLine(hostKey: HostKey): String =
         "${hostKey.host} ${hostKey.type} ${hostKey.getKey()}"
+
+    private fun applyLegacyCiphers(config: Properties) {
+        val legacyCiphers = "aes128-cbc,aes192-cbc,aes256-cbc,3des-cbc"
+        val legacyKex     = "diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1"
+        val legacyHostKey = "ssh-dss"
+        config.setProperty("cipher.s2c", "${JSch.getConfig("cipher.s2c")},$legacyCiphers")
+        config.setProperty("cipher.c2s", "${JSch.getConfig("cipher.c2s")},$legacyCiphers")
+        config.setProperty("kex",              "${JSch.getConfig("kex")},$legacyKex")
+        config.setProperty("server_host_key",  "${JSch.getConfig("server_host_key")},$legacyHostKey")
+    }
 }
 
 /** A live interactive SSH shell. */

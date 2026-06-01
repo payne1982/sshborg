@@ -525,6 +525,7 @@
             <li><a href="#terminal">Gestos do terminal</a></li>
             <li><a href="#extra-keys">Barra de teclas extra</a></li>
             <li><a href="#agent-forwarding">Reencaminhamento de agente</a></li>
+            <li><a href="#legacy-ciphers">Cifras legadas</a></li>
             <li><a href="#connection-drops">Quedas de ligação</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
@@ -718,6 +719,24 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA DE SEGURANÇA</div>
                 O reencaminhamento de agente dá ao servidor remoto acesso temporário ao socket do seu agente SSH. Um utilizador root (ou um processo comprometido) nesse servidor poderia usar as suas chaves para se ligar a outros sítios enquanto a sessão está ativa. Ative o reencaminhamento apenas em servidores de confiança.
+            </div>
+        </div>
+
+        <div class="doc-section" id="legacy-ciphers">
+
+            <h2>// SUPORTE A CIFRAS LEGADAS</h2>
+            <p>Alguns servidores mais antigos — equipamentos de rede, dispositivos embebidos ou sistemas com versões obsoletas do OpenSSH — suportam apenas algoritmos de cifra que os clientes SSH modernos já não anunciam por predefinição.</p>
+            <p>Ao ativar o interruptor <strong>Permitir cifras legadas</strong> nas definições do host, o SSHBorg adiciona os seguintes algoritmos à lista de negociação:</p>
+            <h3>Algoritmos adicionados</h3>
+            <ul>
+                <li><strong>Cifras:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Troca de chaves:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Tipo de chave de host:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>O servidor negoceia sempre o algoritmo mais forte suportado por ambos os lados, pelo que ativar esta opção não enfraquece as ligações a servidores modernos.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DE SEGURANÇA</div>
+                Os algoritmos desta lista são considerados criptograficamente fracos. Ative esta opção apenas para servidores que não pode atualizar.
             </div>
         </div>
 

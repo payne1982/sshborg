@@ -73,6 +73,8 @@ data class SshConnectionParams(
     val jumpHosts: List<JumpHost> = emptyList(),
     /** Local port-forwarding rules to activate after connecting. */
     val portForwardings: List<PortForwarding> = emptyList(),
+    /** If true, legacy/weak ciphers are appended to the negotiation list (for old servers). */
+    val allowLegacyCiphers: Boolean = false,
 )
 
 sealed interface SshAuth {

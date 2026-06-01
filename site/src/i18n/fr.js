@@ -94,6 +94,7 @@ module.exports = {
             <li><a href="#terminal">Gestes du terminal</a></li>
             <li><a href="#extra-keys">Touches supplémentaires</a></li>
             <li><a href="#agent-forwarding">Transfert d'agent</a></li>
+            <li><a href="#legacy-ciphers">Chiffrements legacy</a></li>
             <li><a href="#connection-drops">Coupures de connexion</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
@@ -269,6 +270,22 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTE DE SÉCURITÉ</div>
                 Le transfert d'agent donne au serveur distant un accès temporaire à votre socket d'agent SSH. Un utilisateur root (ou un processus compromis) sur ce serveur pourrait utiliser vos clés pour se connecter ailleurs pendant que votre session est active. N'activez le transfert que sur les serveurs de confiance.
+            </div>`,
+
+  doc_legacy_ciphers: `
+            <h2>// CHIFFREMENTS LEGACY</h2>
+            <p>Certains serveurs anciens — équipements réseau, appareils embarqués ou systèmes avec des versions obsolètes d'OpenSSH — ne supportent que des algorithmes de chiffrement que les clients SSH modernes n'annoncent plus par défaut.</p>
+            <p>En activant le commutateur <strong>Autoriser les chiffrements legacy</strong> dans les paramètres de l'hôte, SSHBorg ajoute les algorithmes suivants à la liste de négociation :</p>
+            <h3>Algorithmes ajoutés</h3>
+            <ul>
+                <li><strong>Chiffrements :</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Échange de clés :</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Type de clé hôte :</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>Le serveur négocie toujours l'algorithme le plus fort supporté des deux côtés, donc activer cette option n'affaiblit pas les connexions aux serveurs modernes.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTE DE SÉCURITÉ</div>
+                Les algorithmes de cette liste sont considérés comme cryptographiquement faibles. N'activez cette option que pour les serveurs que vous ne pouvez pas mettre à jour.
             </div>`,
 
   doc_connection_drops: `
