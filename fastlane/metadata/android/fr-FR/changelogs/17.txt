@@ -1,3 +1,4 @@
 • SFTP : téléchargements en arrière-plan — téléchargez des fichiers sans bloquer le navigateur ; appuyez longuement sur un fichier pour « Télécharger en arrière-plan »
 • SFTP : les téléchargements actifs peuvent être envoyés en arrière-plan à tout moment avec le bouton « Arrière-plan »
+• Paramètres de l'hôte : option « Chiffrements legacy » pour se connecter à d'anciens serveurs ne supportant que des algorithmes obsolètes (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Corrections mineures de bugs et améliorations

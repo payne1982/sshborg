@@ -1,45 +1,54 @@
 <en-US>
 • SFTP: background downloads — download files without blocking the file browser; long-press a file for the "Download in background" option
 • SFTP: active downloads can be sent to background at any time using the "Background" button
+• Host settings: "Allow Legacy Ciphers" option for connecting to old servers that only support outdated algorithms (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Minor bug fixes and improvements
 </en-US>
 <it-IT>
 • SFTP: download in background — scarica file senza bloccare la navigazione; tieni premuto un file per l'opzione "Scarica in background"
 • SFTP: i download attivi possono essere spostati in background in qualsiasi momento con il pulsante "In background"
+• Configurazione host: opzione "Cifrature Legacy" per connettersi a server vecchi che supportano solo algoritmi obsoleti (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Piccole correzioni di bug e miglioramenti
 </it-IT>
 <de-DE>
 • SFTP: Hintergrunddownloads — Dateien herunterladen, ohne den Dateibrowser zu blockieren; Datei lang drücken für „Im Hintergrund herunterladen"
 • SFTP: laufende Downloads können jederzeit mit der Schaltfläche „Hintergrund" in den Hintergrund verschoben werden
+• Host-Einstellungen: Option „Legacy-Verschlüsselung" für die Verbindung zu alten Servern, die nur veraltete Algorithmen unterstützen (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Kleinere Fehlerbehebungen und Verbesserungen
 </de-DE>
 <es-ES>
 • SFTP: descargas en segundo plano — descarga archivos sin bloquear el navegador de archivos; mantén pulsado un archivo para "Descargar en segundo plano"
 • SFTP: las descargas activas pueden enviarse al segundo plano en cualquier momento con el botón "Segundo plano"
+• Configuración del host: opción "Cifrados heredados" para conectarse a servidores antiguos que solo admiten algoritmos obsoletos (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Correcciones menores de errores y mejoras
 </es-ES>
 <fr-FR>
 • SFTP : téléchargements en arrière-plan — téléchargez des fichiers sans bloquer le navigateur ; appuyez longuement sur un fichier pour « Télécharger en arrière-plan »
 • SFTP : les téléchargements actifs peuvent être envoyés en arrière-plan à tout moment avec le bouton « Arrière-plan »
+• Paramètres de l'hôte : option « Chiffrements legacy » pour se connecter à d'anciens serveurs ne supportant que des algorithmes obsolètes (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Corrections mineures de bugs et améliorations
 </fr-FR>
 <pt-PT>
 • SFTP: transferências em segundo plano — descarregue ficheiros sem bloquear o navegador; toque prolongado num ficheiro para "Descarregar em segundo plano"
 • SFTP: as transferências ativas podem ser enviadas para segundo plano a qualquer momento com o botão "Segundo plano"
+• Configuração do host: opção "Cifras legadas" para ligar a servidores antigos que suportam apenas algoritmos obsoletos (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Pequenas correções de erros e melhorias
 </pt-PT>
 <uk>
 • SFTP: фонові завантаження — завантажуйте файли без блокування браузера; утримуйте файл для вибору «Завантажити у фоні»
 • SFTP: активні завантаження можна перемістити у фон у будь-який момент кнопкою «У фон»
+• Налаштування хоста: опція «Застарілі шифри» для підключення до старих серверів, що підтримують лише застарілі алгоритми (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Незначні виправлення помилок та покращення
 </uk>
 <zh-CN>
 • SFTP：后台下载 — 下载文件时不阻塞文件浏览器；长按文件选择"后台下载"
 • SFTP：点击"后台"按钮可随时将正在进行的下载切换至后台
+• 主机设置：新增"允许旧版加密"选项，用于连接仅支持过时算法的旧服务器（AES-CBC、3DES、DH-group1/14-sha1、DSA）
 • 小错误修复和改进
 </zh-CN>
 <ja-JP>
 • SFTP：バックグラウンドダウンロード — ファイルブラウザをブロックせずにファイルをダウンロードできます。ファイルを長押しして「バックグラウンドでダウンロード」を選択
 • SFTP：「バックグラウンド」ボタンでアクティブなダウンロードをいつでもバックグラウンドに移動できます
+• ホスト設定：古いアルゴリズムのみ対応する旧式サーバー接続用「レガシー暗号を許可」オプションを追加（AES-CBC、3DES、DH-group1/14-sha1、DSA）
 • 軽微なバグ修正と改善
 </ja-JP>

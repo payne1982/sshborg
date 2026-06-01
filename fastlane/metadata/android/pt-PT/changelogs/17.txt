@@ -1,3 +1,4 @@
 • SFTP: transferências em segundo plano — descarregue ficheiros sem bloquear o navegador; toque prolongado num ficheiro para "Descarregar em segundo plano"
 • SFTP: as transferências ativas podem ser enviadas para segundo plano a qualquer momento com o botão "Segundo plano"
+• Configuração do host: opção "Cifras legadas" para ligar a servidores antigos que suportam apenas algoritmos obsoletos (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
 • Pequenas correções de erros e melhorias
