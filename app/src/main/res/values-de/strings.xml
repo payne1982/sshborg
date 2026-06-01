@@ -75,6 +75,7 @@
     <string name="host_key_change">Ändern</string>
     <string name="host_key_no_keys">Keine Schlüssel – zuerst einen hinzufügen</string>
     <string name="host_agent_forwarding">Agent-Weiterleitung</string>
+    <string name="host_allow_legacy_ciphers">Legacy-Verschlüsselung</string>
     <string name="host_section_jump_hosts">Jump-Hosts</string>
     <string name="host_field_jump_hosts">Jump-Hosts (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,benutzer@host2:2222</string>

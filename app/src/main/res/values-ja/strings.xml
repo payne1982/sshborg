@@ -78,6 +78,7 @@
     <string name="host_key_change">変更</string>
     <string name="host_key_no_keys">鍵がありません — 先に追加してください</string>
     <string name="host_agent_forwarding">エージェント転送</string>
+    <string name="host_allow_legacy_ciphers">レガシー暗号を許可</string>
     <string name="host_section_jump_hosts">踏み台ホスト</string>
     <string name="host_field_jump_hosts">踏み台ホスト（-J）</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>

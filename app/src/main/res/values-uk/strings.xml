@@ -75,6 +75,7 @@
     <string name="host_key_change">Змінити</string>
     <string name="host_key_no_keys">Немає ключів – спочатку додайте один</string>
     <string name="host_agent_forwarding">Пересилання агента</string>
+    <string name="host_allow_legacy_ciphers">Застарілі шифри</string>
     <string name="host_section_jump_hosts">Проміжні хости</string>
     <string name="host_field_jump_hosts">Проміжні хости (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
