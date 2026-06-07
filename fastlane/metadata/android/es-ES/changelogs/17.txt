@@ -1,4 +1,5 @@
 • SFTP: descargas en segundo plano — descarga archivos sin bloquear el navegador de archivos; mantén pulsado un archivo para "Descargar en segundo plano"
 • SFTP: las descargas activas pueden enviarse al segundo plano en cualquier momento con el botón "Segundo plano"
 • Configuración del host: opción "Cifrados heredados" para conectarse a servidores antiguos que solo admiten algoritmos obsoletos (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
+• Terminal: corregida la autocorrección/corrección ortográfica del teclado que a veces alteraba palabras en Android 13+
 • Correcciones menores de errores y mejoras

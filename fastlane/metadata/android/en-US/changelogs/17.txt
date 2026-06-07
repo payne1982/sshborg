@@ -1,4 +1,5 @@
 • SFTP: background downloads — download files without blocking the file browser; long-press a file for the "Download in background" option
 • SFTP: active downloads can be sent to background at any time using the "Background" button
 • Host settings: "Allow Legacy Ciphers" option for connecting to old servers that only support outdated algorithms (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
+• Terminal: fixed keyboard autocorrect/spell-check sometimes garbling words on Android 13+
 • Minor bug fixes and improvements
