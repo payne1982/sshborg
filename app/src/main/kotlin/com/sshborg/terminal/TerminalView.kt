@@ -614,9 +614,9 @@ class TerminalView @JvmOverloads constructor(
             while (common < composingText.length && common < newText.length
                    && composingText[common] == newText[common]) common++
             val toDelete = composingText.substring(common).toByteArray(Charsets.UTF_8).size
-            repeat(toDelete) { onInput?.invoke(byteArrayOf(0x7F)) }
             val newSuffix = newText.substring(common)
-            if (newSuffix.isNotEmpty()) onInput?.invoke(newSuffix.toByteArray(Charsets.UTF_8))
+            val bytes = ByteArray(toDelete) { 0x7F } + newSuffix.toByteArray(Charsets.UTF_8)
+            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
             composingText = newText
             return super.setComposingText(text, newCursorPosition)
         }
@@ -629,13 +629,12 @@ class TerminalView @JvmOverloads constructor(
 
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
             val deleted = composingText.toByteArray(Charsets.UTF_8).size
-            repeat(deleted) { onInput?.invoke(byteArrayOf(0x7F)) }
             composingDeletedByCommit = deleted
             composingText = ""
-            text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
-            val result = super.commitText(text, newCursorPosition)
-            invalidateIme()
-            return result
+            val addBytes = text?.toString()?.toByteArray(Charsets.UTF_8) ?: byteArrayOf()
+            val bytes = ByteArray(deleted) { 0x7F } + addBytes
+            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
+            return super.commitText(text, newCursorPosition)
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
@@ -643,7 +642,7 @@ class TerminalView @JvmOverloads constructor(
             // spell-correction order: commitText first, then deleteSurroundingText).
             val effective = (beforeLength - composingDeletedByCommit).coerceAtLeast(0)
             composingDeletedByCommit = 0
-            repeat(effective) { onInput?.invoke(byteArrayOf(0x7F)) }
+            if (effective > 0) onInput?.invoke(ByteArray(effective) { 0x7F })
             // Do NOT call invalidateIme() here: on Android 13 it causes Gboard to abort
             // a multi-step spell correction (deleteSurroundingText + insert) mid-sequence.
             // invalidateIme() in commitText is sufficient to keep Gboard in sync.
@@ -655,9 +654,16 @@ class TerminalView @JvmOverloads constructor(
         override fun replaceText(start: Int, end: Int, text: CharSequence,
                                  newCursorPosition: Int,
                                  textAttribute: android.view.inputmethod.TextAttribute?): Boolean {
-            repeat((end - start).coerceAtLeast(0)) { onInput?.invoke(byteArrayOf(0x7F)) }
-            text.toString().toByteArray(Charsets.UTF_8).let { onInput?.invoke(it) }
-            return super.replaceText(start, end, text, newCursorPosition, textAttribute)
+            android.util.Log.d("TIC", "replaceText($start,$end,\"$text\") composing=\"$composingText\"")
+            composingText = ""
+            composingDeletedByCommit = 0
+            val count = (end - start).coerceAtLeast(0)
+            val bytes = ByteArray(count) { 0x7F } + text.toString().toByteArray(Charsets.UTF_8)
+            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
+            super.replaceText(start, end, text, newCursorPosition, textAttribute)
+            super.finishComposingText()
+            invalidateIme()
+            return true
         }
 
         // After each text change, tell the IME to re-read the editor state.
