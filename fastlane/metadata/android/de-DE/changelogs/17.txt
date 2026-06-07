@@ -1,5 +1,5 @@
 • SFTP: Hintergrunddownloads — Dateien herunterladen, ohne den Dateibrowser zu blockieren; Datei lang drücken für „Im Hintergrund herunterladen"
 • SFTP: laufende Downloads können jederzeit mit der Schaltfläche „Hintergrund" in den Hintergrund verschoben werden
 • Host-Einstellungen: Option „Legacy-Verschlüsselung" für die Verbindung zu alten Servern, die nur veraltete Algorithmen unterstützen (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
-• Terminal: Tastatur-Autokorrektur/Rechtschreibprüfung, die unter Android 13+ manchmal Wörter verfälschte, behoben
+• Terminal: Rechtschreibmodus verbessert
 • Kleinere Fehlerbehebungen und Verbesserungen

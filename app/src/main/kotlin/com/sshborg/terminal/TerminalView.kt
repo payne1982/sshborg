@@ -625,26 +625,38 @@ class TerminalView @JvmOverloads constructor(
             return result
         }
 
+        // When composing restarts from empty, reconcile the new composing text with the word
+        // already before the cursor. Returns the byte delta to send, or null when this is a
+        // brand-new / unrelated word the caller should just append.
+        private fun readoptWordBytes(newText: String): ByteArray? {
+            val textBefore = getTextBeforeCursor(newText.length * 2 + 20, 0)?.toString() ?: ""
+            val lastSpace = textBefore.lastIndexOf(' ')
+            val wordBefore = if (lastSpace >= 0) textBefore.substring(lastSpace + 1) else textBefore
+            // Only re-adopt when one string is a prefix of the other (Gboard shortening or
+            // extending the same word, e.g. "ho" -> "h"). Unrelated text is left to the caller
+            // so a fresh letter never erases a committed word the user is not editing.
+            if (wordBefore.isEmpty() ||
+                !(wordBefore.startsWith(newText) || newText.startsWith(wordBefore))) return null
+            var common = 0
+            while (common < wordBefore.length && common < newText.length
+                   && wordBefore[common] == newText[common]) common++
+            val toDelete = wordBefore.substring(common).toByteArray(Charsets.UTF_8).size
+            val newSuffix = newText.substring(common)
+            return ByteArray(toDelete) { 0x7F } + newSuffix.toByteArray(Charsets.UTF_8)
+        }
+
         override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
             composingDeletedByCommit = 0
             val newText = text?.toString() ?: ""
             val bytes: ByteArray
-            if (composingText.isEmpty() && newText.length > 1) {
-                // Multi-char jump from empty composing: Gboard is re-adopting / restoring the
-                // word already before the cursor (undo-correction, or recomposing an adjacent
-                // word while backspacing). Use the Editable's current last word as the baseline
-                // and emit only the prefix-diff, so re-adopting an unchanged word is a no-op
-                // instead of erasing and rewriting it (which would resurrect already-deleted
-                // characters when the terminal and Editable have drifted).
-                val textBefore = getTextBeforeCursor(newText.length * 2 + 20, 0)?.toString() ?: ""
-                val lastSpace = textBefore.lastIndexOf(' ')
-                val wordBefore = if (lastSpace >= 0) textBefore.substring(lastSpace + 1) else textBefore
-                var common = 0
-                while (common < wordBefore.length && common < newText.length
-                       && wordBefore[common] == newText[common]) common++
-                val toDelete = wordBefore.substring(common).toByteArray(Charsets.UTF_8).size
-                val newSuffix = newText.substring(common)
-                bytes = ByteArray(toDelete) { 0x7F } + newSuffix.toByteArray(Charsets.UTF_8)
+            val readoptBytes = if (composingText.isEmpty() && newText.isNotEmpty())
+                readoptWordBytes(newText) else null
+            if (readoptBytes != null) {
+                // Composing started from empty and Gboard is re-adopting the word already before
+                // the cursor (recomposing while backspacing, or undo-correction): emit only the
+                // prefix-diff against that word. See readoptWordBytes for the prefix guard that
+                // keeps a brand-new letter from erasing an unrelated committed word.
+                bytes = readoptBytes
             } else {
                 var common = 0
                 while (common < composingText.length && common < newText.length
