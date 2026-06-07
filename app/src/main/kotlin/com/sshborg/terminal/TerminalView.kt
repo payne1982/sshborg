@@ -602,10 +602,28 @@ class TerminalView @JvmOverloads constructor(
         // so we can back-track and replace on commitText.
         private var composingText = ""
         // On Android ≤12 some keyboards call commitText THEN deleteSurroundingText for
-        // spell correction (Editable-style: insert new text, then erase old region).
-        // commitText already sent the backspaces for composingText; we record how many
-        // so deleteSurroundingText can subtract them and not double-delete.
+        // spell correction (Editable-style: insert new text, then erase old region),
+        // both inside the SAME batch edit. commitText already sent the backspaces for
+        // composingText; we record how many so the redundant deleteSurroundingText in that
+        // batch can subtract them and not double-delete. The count is scoped to the batch:
+        // it is cleared when the batch closes (batchDepth → 0), so it can never bleed into a
+        // later, independent user backspace (which arrives in its own separate batch).
         private var composingDeletedByCommit = 0
+        private var batchDepth = 0
+
+        override fun beginBatchEdit(): Boolean {
+            batchDepth++
+            return super.beginBatchEdit()
+        }
+
+        override fun endBatchEdit(): Boolean {
+            val result = super.endBatchEdit()
+            if (batchDepth > 0) batchDepth--
+            // Outermost batch closed: a redundant in-batch deleteSurroundingText (if any) has
+            // already consumed the count. Drop it so a later user backspace isn't swallowed.
+            if (batchDepth == 0) composingDeletedByCommit = 0
+            return result
+        }
 
         override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
             composingDeletedByCommit = 0
@@ -699,7 +717,17 @@ class TerminalView @JvmOverloads constructor(
 
         override fun sendKeyEvent(event: KeyEvent): Boolean {
             if (event.action == KeyEvent.ACTION_DOWN) {
-                if (composingText.isNotEmpty()) return true
+                // While a word is composing (span kept alive for auto-space/suggestions),
+                // the IME drives deletions via setComposingText, so swallow only backspace
+                // KeyEvents to avoid double-deleting. Any other key (Enter, arrows, …) ends
+                // the word — it is already echoed in the terminal — so finalize the composing
+                // state and let the key pass through (Enter would otherwise be swallowed).
+                if (composingText.isNotEmpty()) {
+                    if (event.keyCode == KeyEvent.KEYCODE_DEL) return true
+                    composingText = ""
+                    composingDeletedByCommit = 0
+                    super.finishComposingText()
+                }
                 val bytes = keyEventToBytes(event.keyCode, event)
                 if (bytes != null) {
                     onInput?.invoke(bytes)
