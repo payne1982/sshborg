@@ -707,11 +707,14 @@ class TerminalView @JvmOverloads constructor(
         override fun replaceText(start: Int, end: Int, text: CharSequence,
                                  newCursorPosition: Int,
                                  textAttribute: android.view.inputmethod.TextAttribute?): Boolean {
-            // Keep composingText = replacement so the delta-tracking in setComposingText /
-            // commitText stays correct when Gboard auto-spaces (commitText("finocchio ") →
-            // 9 BS + "finocchio " rather than 0 BS + "finocchio " which would repeat the word).
-            // Leaving the composing span alive also lets Gboard show next-word suggestions.
-            composingText = text.toString()
+            // replaceText commits the text (framework uses composing=false) — it leaves NO live
+            // composing span — so the correct post-state is composingText = "". Do NOT carry the
+            // replacement forward as composing: on Gboards that drive smart-punctuation through
+            // replaceText (e.g. Motorola Android 16: replaceText(" "→".")), a stale composingText
+            // would be consumed by the next commitText(" "), which would backspace and eat the
+            // just-inserted punctuation. A setComposingText that legitimately continues the word
+            // after this is reconciled against the real Editable by readoptWordBytes.
+            composingText = ""
             composingDeletedByCommit = 0
             val count = (end - start).coerceAtLeast(0)
             val bytes = ByteArray(count) { 0x7F } + text.toString().toByteArray(Charsets.UTF_8)
