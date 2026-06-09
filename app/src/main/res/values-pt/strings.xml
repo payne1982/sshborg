@@ -75,6 +75,7 @@
     <string name="host_key_change">Alterar</string>
     <string name="host_key_no_keys">Sem chaves – adicione uma primeiro</string>
     <string name="host_agent_forwarding">Encaminhamento de agente</string>
+    <string name="host_allow_legacy_ciphers">Cifras legadas</string>
     <string name="host_section_jump_hosts">Hosts de Salto</string>
     <string name="host_field_jump_hosts">Hosts de salto (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,utilizador@host2:2222</string>
@@ -216,6 +217,12 @@
     <string name="sftp_mkdir_folder_name">Nome da pasta</string>
 
     <string name="sftp_menu_rename">Renomear</string>
+    <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
+    <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
+    <string name="sftp_background_download_failed">Transferência falhada</string>
+    <string name="sftp_background_skipped_exists">"%1$s" já existe em Transferências. Transferência ignorada.</string>
+    <string name="sftp_send_to_background">Segundo plano</string>
+    <string name="sftp_background_dismiss_cd">Fechar</string>
     <string name="sftp_menu_delete">Eliminar</string>
     <string name="sftp_delete_selected_cd">Eliminar selecionados</string>
     <string name="sftp_bulk_delete_title">Eliminar itens selecionados</string>
@@ -306,6 +313,10 @@
     <plurals name="notification_active_sessions">
         <item quantity="one">1 sessão ativa</item>
         <item quantity="other">%d sessões ativas</item>
+    </plurals>
+    <plurals name="notification_bg_downloads">
+        <item quantity="one">1 ficheiro a transferir</item>
+        <item quantity="other">%d ficheiros a transferir</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de ecrã e gravação de ecrã. Manter desativado para proteger conteúdo sensível.</string>

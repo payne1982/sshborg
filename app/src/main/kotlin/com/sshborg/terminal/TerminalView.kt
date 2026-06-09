@@ -602,21 +602,70 @@ class TerminalView @JvmOverloads constructor(
         // so we can back-track and replace on commitText.
         private var composingText = ""
         // On Android ≤12 some keyboards call commitText THEN deleteSurroundingText for
-        // spell correction (Editable-style: insert new text, then erase old region).
-        // commitText already sent the backspaces for composingText; we record how many
-        // so deleteSurroundingText can subtract them and not double-delete.
+        // spell correction (Editable-style: insert new text, then erase old region),
+        // both inside the SAME batch edit. commitText already sent the backspaces for
+        // composingText; we record how many so the redundant deleteSurroundingText in that
+        // batch can subtract them and not double-delete. The count is scoped to the batch:
+        // it is cleared when the batch closes (batchDepth → 0), so it can never bleed into a
+        // later, independent user backspace (which arrives in its own separate batch).
         private var composingDeletedByCommit = 0
+        private var batchDepth = 0
+
+        override fun beginBatchEdit(): Boolean {
+            batchDepth++
+            return super.beginBatchEdit()
+        }
+
+        override fun endBatchEdit(): Boolean {
+            val result = super.endBatchEdit()
+            if (batchDepth > 0) batchDepth--
+            // Outermost batch closed: a redundant in-batch deleteSurroundingText (if any) has
+            // already consumed the count. Drop it so a later user backspace isn't swallowed.
+            if (batchDepth == 0) composingDeletedByCommit = 0
+            return result
+        }
+
+        // When composing restarts from empty, reconcile the new composing text with the word
+        // already before the cursor. Returns the byte delta to send, or null when this is a
+        // brand-new / unrelated word the caller should just append.
+        private fun readoptWordBytes(newText: String): ByteArray? {
+            val textBefore = getTextBeforeCursor(newText.length * 2 + 20, 0)?.toString() ?: ""
+            val lastSpace = textBefore.lastIndexOf(' ')
+            val wordBefore = if (lastSpace >= 0) textBefore.substring(lastSpace + 1) else textBefore
+            // Only re-adopt when one string is a prefix of the other (Gboard shortening or
+            // extending the same word, e.g. "ho" -> "h"). Unrelated text is left to the caller
+            // so a fresh letter never erases a committed word the user is not editing.
+            if (wordBefore.isEmpty() ||
+                !(wordBefore.startsWith(newText) || newText.startsWith(wordBefore))) return null
+            var common = 0
+            while (common < wordBefore.length && common < newText.length
+                   && wordBefore[common] == newText[common]) common++
+            val toDelete = wordBefore.substring(common).toByteArray(Charsets.UTF_8).size
+            val newSuffix = newText.substring(common)
+            return ByteArray(toDelete) { 0x7F } + newSuffix.toByteArray(Charsets.UTF_8)
+        }
 
         override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
             composingDeletedByCommit = 0
             val newText = text?.toString() ?: ""
-            var common = 0
-            while (common < composingText.length && common < newText.length
-                   && composingText[common] == newText[common]) common++
-            val toDelete = composingText.substring(common).toByteArray(Charsets.UTF_8).size
-            repeat(toDelete) { onInput?.invoke(byteArrayOf(0x7F)) }
-            val newSuffix = newText.substring(common)
-            if (newSuffix.isNotEmpty()) onInput?.invoke(newSuffix.toByteArray(Charsets.UTF_8))
+            val bytes: ByteArray
+            val readoptBytes = if (composingText.isEmpty() && newText.isNotEmpty())
+                readoptWordBytes(newText) else null
+            if (readoptBytes != null) {
+                // Composing started from empty and Gboard is re-adopting the word already before
+                // the cursor (recomposing while backspacing, or undo-correction): emit only the
+                // prefix-diff against that word. See readoptWordBytes for the prefix guard that
+                // keeps a brand-new letter from erasing an unrelated committed word.
+                bytes = readoptBytes
+            } else {
+                var common = 0
+                while (common < composingText.length && common < newText.length
+                       && composingText[common] == newText[common]) common++
+                val toDelete = composingText.substring(common).toByteArray(Charsets.UTF_8).size
+                val newSuffix = newText.substring(common)
+                bytes = ByteArray(toDelete) { 0x7F } + newSuffix.toByteArray(Charsets.UTF_8)
+            }
+            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
             composingText = newText
             return super.setComposingText(text, newCursorPosition)
         }
@@ -629,13 +678,16 @@ class TerminalView @JvmOverloads constructor(
 
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
             val deleted = composingText.toByteArray(Charsets.UTF_8).size
-            repeat(deleted) { onInput?.invoke(byteArrayOf(0x7F)) }
-            composingDeletedByCommit = deleted
+            // Apply cdc only when replacing composing text with a correction (non-empty text).
+            // When deleting composing text via commitText(""), the subsequent
+            // deleteSurroundingText targets a different character (the one before the composing
+            // region, e.g. a space), so the cdc subtraction must not apply.
+            composingDeletedByCommit = if (!text.isNullOrEmpty()) deleted else 0
             composingText = ""
-            text?.toString()?.toByteArray(Charsets.UTF_8)?.let { onInput?.invoke(it) }
-            val result = super.commitText(text, newCursorPosition)
-            invalidateIme()
-            return result
+            val addBytes = text?.toString()?.toByteArray(Charsets.UTF_8) ?: byteArrayOf()
+            val bytes = ByteArray(deleted) { 0x7F } + addBytes
+            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
+            return super.commitText(text, newCursorPosition)
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
@@ -643,7 +695,7 @@ class TerminalView @JvmOverloads constructor(
             // spell-correction order: commitText first, then deleteSurroundingText).
             val effective = (beforeLength - composingDeletedByCommit).coerceAtLeast(0)
             composingDeletedByCommit = 0
-            repeat(effective) { onInput?.invoke(byteArrayOf(0x7F)) }
+            if (effective > 0) onInput?.invoke(ByteArray(effective) { 0x7F })
             // Do NOT call invalidateIme() here: on Android 13 it causes Gboard to abort
             // a multi-step spell correction (deleteSurroundingText + insert) mid-sequence.
             // invalidateIme() in commitText is sufficient to keep Gboard in sync.
@@ -655,20 +707,19 @@ class TerminalView @JvmOverloads constructor(
         override fun replaceText(start: Int, end: Int, text: CharSequence,
                                  newCursorPosition: Int,
                                  textAttribute: android.view.inputmethod.TextAttribute?): Boolean {
-            repeat((end - start).coerceAtLeast(0)) { onInput?.invoke(byteArrayOf(0x7F)) }
-            text.toString().toByteArray(Charsets.UTF_8).let { onInput?.invoke(it) }
+            // replaceText commits the text (framework uses composing=false) — it leaves NO live
+            // composing span — so the correct post-state is composingText = "". Do NOT carry the
+            // replacement forward as composing: on Gboards that drive smart-punctuation through
+            // replaceText (e.g. Motorola Android 16: replaceText(" "→".")), a stale composingText
+            // would be consumed by the next commitText(" "), which would backspace and eat the
+            // just-inserted punctuation. A setComposingText that legitimately continues the word
+            // after this is reconciled against the real Editable by readoptWordBytes.
+            composingText = ""
+            composingDeletedByCommit = 0
+            val count = (end - start).coerceAtLeast(0)
+            val bytes = ByteArray(count) { 0x7F } + text.toString().toByteArray(Charsets.UTF_8)
+            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
             return super.replaceText(start, end, text, newCursorPosition, textAttribute)
-        }
-
-        // After each text change, tell the IME to re-read the editor state.
-        // Required on Android 13+ so Gboard re-reads getSurroundingText and enables
-        // suggestion replacement for the next suggestion tap.
-        private fun invalidateIme() {
-            if (android.os.Build.VERSION.SDK_INT >= 33) {
-                (context.getSystemService(Context.INPUT_METHOD_SERVICE)
-                        as android.view.inputmethod.InputMethodManager)
-                    .invalidateInput(this@TerminalView)
-            }
         }
 
         // Silently reject rich content (images, stickers) — returning false would
@@ -681,7 +732,17 @@ class TerminalView @JvmOverloads constructor(
 
         override fun sendKeyEvent(event: KeyEvent): Boolean {
             if (event.action == KeyEvent.ACTION_DOWN) {
-                if (composingText.isNotEmpty()) return true
+                // While a word is composing (span kept alive for auto-space/suggestions),
+                // the IME drives deletions via setComposingText, so swallow only backspace
+                // KeyEvents to avoid double-deleting. Any other key (Enter, arrows, …) ends
+                // the word — it is already echoed in the terminal — so finalize the composing
+                // state and let the key pass through (Enter would otherwise be swallowed).
+                if (composingText.isNotEmpty()) {
+                    if (event.keyCode == KeyEvent.KEYCODE_DEL) return true
+                    composingText = ""
+                    composingDeletedByCommit = 0
+                    super.finishComposingText()
+                }
                 val bytes = keyEventToBytes(event.keyCode, event)
                 if (bytes != null) {
                     onInput?.invoke(bytes)

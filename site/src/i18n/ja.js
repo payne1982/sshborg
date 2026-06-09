@@ -20,8 +20,10 @@ module.exports = {
   badge_free:        '無料',
   badge_android:     'Android 10+',
 
-  cta_play:       'Google Playで入手',
-  cta_appgallery: 'AppGalleryで入手',
+  cta_download:   'ダウンロード',
+  cta_play:       'Google Play',
+  cta_appgallery: 'AppGallery',
+  cta_fdroid:     'F-Droid',
 
   features_title: '// システム機能',
 
@@ -94,6 +96,7 @@ module.exports = {
             <li><a href="#terminal">端末ジェスチャー</a></li>
             <li><a href="#extra-keys">追加キーバー</a></li>
             <li><a href="#agent-forwarding">エージェント転送</a></li>
+            <li><a href="#legacy-ciphers">レガシー暗号</a></li>
             <li><a href="#connection-drops">接続が切れる場合</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">踏み台ホスト</a></li>
@@ -269,6 +272,22 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// セキュリティについて</div>
                 エージェント転送はリモートサーバーにSSHエージェントソケットへの一時的なアクセスを与えます。セッションがアクティブな間、そのサーバーのrootユーザー（または侵害されたプロセス）があなたの鍵を使って他の場所に接続できる可能性があります。信頼できるサーバーでのみ転送を有効にしてください。
+            </div>`,
+
+  doc_legacy_ciphers: `
+            <h2>// レガシー暗号のサポート</h2>
+            <p>一部の旧式サーバー——ネットワーク機器、組み込みデバイス、または古い OpenSSH バージョンを実行するシステム——は、現代の SSH クライアントがデフォルトでは提示しなくなった暗号アルゴリズムのみをサポートしています。</p>
+            <p>ホスト設定で<strong>レガシー暗号を許可</strong>トグルを有効にすると、SSHBorg は以下のアルゴリズムをネゴシエーションリストに追加します：</p>
+            <h3>追加されるアルゴリズム</h3>
+            <ul>
+                <li><strong>暗号：</strong> <code>aes128-cbc</code>、<code>aes192-cbc</code>、<code>aes256-cbc</code>、<code>3des-cbc</code></li>
+                <li><strong>鍵交換：</strong> <code>diffie-hellman-group14-sha1</code>、<code>diffie-hellman-group-exchange-sha1</code>、<code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>ホスト鍵タイプ：</strong> <code>ssh-dss</code>（DSA 1024-bit）</li>
+            </ul>
+            <p>サーバーは常に双方がサポートする最強のアルゴリズムをネゴシエートするため、このオプションを有効にしても現代のサーバーへの接続のセキュリティは低下しません。</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// セキュリティ注意</div>
+                このリストのアルゴリズムは暗号学的に弱いとみなされています。アップグレードできないサーバーにのみこのオプションを有効にしてください。
             </div>`,
 
   doc_connection_drops: `

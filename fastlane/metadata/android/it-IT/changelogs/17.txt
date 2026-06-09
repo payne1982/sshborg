@@ -1,0 +1,5 @@
+• SFTP: download in background — scarica file senza bloccare la navigazione
+• SFTP: i download attivi possono essere spostati in background in qualsiasi momento con il pulsante "In background"
+• Configurazione host: opzione "Cifrature Legacy" per connettersi a server vecchi che supportano solo algoritmi obsoleti (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
+• Terminale: migliorata la modalità spellcheck
+• Piccole correzioni di bug e miglioramenti

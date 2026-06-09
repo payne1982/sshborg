@@ -19,8 +19,10 @@ module.exports = {
   badge_free:        'Gratuito',
   badge_android:     'Android 10+',
 
-  cta_play:       'Scarica su Google Play',
-  cta_appgallery: 'Esplora su AppGallery',
+  cta_download:   'SCARICA',
+  cta_play:       'Google Play',
+  cta_appgallery: 'AppGallery',
+  cta_fdroid:     'F-Droid',
 
   features_title: '// FUNZIONALITÀ',
 
@@ -93,6 +95,7 @@ module.exports = {
             <li><a href="#terminal">Gesture del terminale</a></li>
             <li><a href="#extra-keys">Barra tasti extra</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
+            <li><a href="#legacy-ciphers">Cifrature Legacy</a></li>
             <li><a href="#connection-drops">Connessioni instabili</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Host</a></li>
@@ -268,6 +271,22 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA DI SICUREZZA</div>
                 L'agent forwarding dà al server remoto accesso temporaneo al socket del tuo agente SSH. Un utente root (o un processo compromesso) su quel server potrebbe usare le tue chiavi per connettersi altrove mentre la sessione è attiva. Abilita il forwarding solo su server di cui ti fidi.
+            </div>`,
+
+  doc_legacy_ciphers: `
+            <h2>// CIFRATURE LEGACY</h2>
+            <p>Alcuni server più vecchi — apparati di rete, dispositivi embedded o sistemi con versioni obsolete di OpenSSH — supportano solo algoritmi di cifratura che i client SSH moderni non annunciano più di default.</p>
+            <p>Abilitando il toggle <strong>Cifrature Legacy</strong> nella configurazione dell'host, SSHBorg aggiunge i seguenti algoritmi alla lista di negoziazione:</p>
+            <h3>Algoritmi aggiunti</h3>
+            <ul>
+                <li><strong>Cifrature:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Key exchange:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Tipo chiave host:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>Il server negozia sempre l'algoritmo più forte disponibile su entrambi i lati, quindi abilitare questa opzione non indebolisce le connessioni ai server moderni — gli algoritmi legacy vengono usati solo se il server non può offrire nulla di meglio.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// NOTA DI SICUREZZA</div>
+                Gli algoritmi in questo elenco sono considerati crittograficamente deboli. Abilitare questa opzione solo per server che non è possibile aggiornare.
             </div>`,
 
   doc_connection_drops: `

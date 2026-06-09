@@ -1,0 +1,5 @@
+• SFTP: descargas en segundo plano — descarga archivos sin bloquear el navegador de archivos
+• SFTP: las descargas activas pueden enviarse al segundo plano en cualquier momento con el botón "Segundo plano"
+• Configuración del host: opción "Cifrados heredados" para conectarse a servidores antiguos que solo admiten algoritmos obsoletos (AES-CBC, 3DES, DH-group1/14-sha1, DSA)
+• Terminal: mejorado el modo de corrección ortográfica
+• Correcciones menores de errores y mejoras

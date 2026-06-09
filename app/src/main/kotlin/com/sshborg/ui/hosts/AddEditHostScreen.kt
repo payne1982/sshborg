@@ -49,6 +49,7 @@ fun AddEditHostScreen(
     val password by vm.password.collectAsState()
     val sftpStartMode by vm.sftpStartMode.collectAsState()
     val sftpStartDir by vm.sftpStartDir.collectAsState()
+    val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var keyMenuExpanded by remember { mutableStateOf(false) }
@@ -186,6 +187,12 @@ fun AddEditHostScreen(
                 Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.host_agent_forwarding))
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = allowLegacyCiphers, onCheckedChange = { vm.allowLegacyCiphers.value = it })
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.host_allow_legacy_ciphers))
             }
 
             HorizontalDivider()

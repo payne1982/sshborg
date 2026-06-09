@@ -525,6 +525,7 @@
             <li><a href="#terminal">Terminal Gestures</a></li>
             <li><a href="#extra-keys">Extra Key Bar</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
+            <li><a href="#legacy-ciphers">Legacy Ciphers</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
@@ -718,6 +719,24 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// SECURITY NOTE</div>
                 Agent forwarding gives the remote server temporary access to your SSH agent socket. A root user (or a compromised process) on that server could use your keys to connect elsewhere while your session is active. Only enable forwarding on servers you trust.
+            </div>
+        </div>
+
+        <div class="doc-section" id="legacy-ciphers">
+
+            <h2>// LEGACY CIPHER SUPPORT</h2>
+            <p>Some older servers — network appliances, embedded devices, or systems running outdated OpenSSH versions — only support cipher algorithms that modern SSH clients no longer advertise by default.</p>
+            <p>When you enable the <strong>Allow Legacy Ciphers</strong> toggle in the host settings, SSHBorg appends the following additional algorithms to the negotiation list:</p>
+            <h3>Added algorithms</h3>
+            <ul>
+                <li><strong>Ciphers:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Key exchange:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Host key type:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>The server always negotiates the strongest algorithm both sides support, so enabling this option does not weaken connections to modern servers — the legacy algorithms are only used when the server cannot offer anything better.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// SECURITY NOTE</div>
+                The algorithms in this list are considered cryptographically weak. Enable this option only for servers you cannot upgrade.
             </div>
         </div>
 

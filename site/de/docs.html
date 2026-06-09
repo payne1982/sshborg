@@ -525,6 +525,7 @@
             <li><a href="#terminal">Terminal-Gesten</a></li>
             <li><a href="#extra-keys">Extra-Tastenleiste</a></li>
             <li><a href="#agent-forwarding">Agent-Forwarding</a></li>
+            <li><a href="#legacy-ciphers">Legacy-Verschlüsselung</a></li>
             <li><a href="#connection-drops">Verbindungsabbrüche</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#jump-hosts">Jump-Hosts</a></li>
@@ -718,6 +719,24 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <div class="callout callout-warn">
                 <div class="callout-label">// SICHERHEITSHINWEIS</div>
                 Agent-Forwarding gibt dem Remote-Server vorübergehend Zugriff auf deinen SSH-Agent-Socket. Ein Root-Benutzer (oder ein kompromittierter Prozess) auf diesem Server könnte deine Schlüssel verwenden, um sich anderswo zu verbinden, solange deine Sitzung aktiv ist. Aktiviere Forwarding nur auf Servern, denen du vertraust.
+            </div>
+        </div>
+
+        <div class="doc-section" id="legacy-ciphers">
+
+            <h2>// LEGACY-VERSCHLÜSSELUNG</h2>
+            <p>Einige ältere Server — Netzwerkgeräte, Embedded-Systeme oder Systeme mit veralteten OpenSSH-Versionen — unterstützen nur Algorithmen, die moderne SSH-Clients standardmäßig nicht mehr anbieten.</p>
+            <p>Wenn Sie den Schalter <strong>Legacy-Verschlüsselung zulassen</strong> in den Host-Einstellungen aktivieren, fügt SSHBorg die folgenden Algorithmen zur Aushandlungsliste hinzu:</p>
+            <h3>Hinzugefügte Algorithmen</h3>
+            <ul>
+                <li><strong>Verschlüsselung:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Schlüsselaustausch:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Host-Schlüsseltyp:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
+            </ul>
+            <p>Der Server handelt immer den stärksten von beiden Seiten unterstützten Algorithmus aus. Die Legacy-Algorithmen werden nur verwendet, wenn der Server nichts Besseres anbieten kann.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// SICHERHEITSHINWEIS</div>
+                Die Algorithmen in dieser Liste gelten als kryptografisch schwach. Aktivieren Sie diese Option nur für Server, die nicht aktualisiert werden können.
             </div>
         </div>
 

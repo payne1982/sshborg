@@ -75,6 +75,7 @@
     <string name="host_key_change">Змінити</string>
     <string name="host_key_no_keys">Немає ключів – спочатку додайте один</string>
     <string name="host_agent_forwarding">Пересилання агента</string>
+    <string name="host_allow_legacy_ciphers">Застарілі шифри</string>
     <string name="host_section_jump_hosts">Проміжні хости</string>
     <string name="host_field_jump_hosts">Проміжні хости (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
@@ -216,6 +217,12 @@
     <string name="sftp_mkdir_folder_name">Назва папки</string>
 
     <string name="sftp_menu_rename">Перейменувати</string>
+    <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
+    <string name="sftp_background_downloads_title">Фонові завантаження</string>
+    <string name="sftp_background_download_failed">Помилка завантаження</string>
+    <string name="sftp_background_skipped_exists">"%1$s" вже є в Завантаженнях. Завантаження пропущено.</string>
+    <string name="sftp_send_to_background">У фоні</string>
+    <string name="sftp_background_dismiss_cd">Закрити</string>
     <string name="sftp_menu_delete">Видалити</string>
     <string name="sftp_delete_selected_cd">Видалити вибране</string>
     <string name="sftp_bulk_delete_title">Видалити вибрані елементи</string>
@@ -308,6 +315,12 @@
         <item quantity="few">%d активні сесії</item>
         <item quantity="many">%d активних сесій</item>
         <item quantity="other">%d активної сесії</item>
+    </plurals>
+    <plurals name="notification_bg_downloads">
+        <item quantity="one">1 файл завантажується</item>
+        <item quantity="few">%d файли завантажуються</item>
+        <item quantity="many">%d файлів завантажується</item>
+        <item quantity="other">%d файли завантажуються</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
     <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Залиште вимкненим для захисту конфіденційного вмісту.</string>

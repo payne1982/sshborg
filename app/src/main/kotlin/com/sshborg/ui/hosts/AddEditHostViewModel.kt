@@ -44,6 +44,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var sftpStartMode = MutableStateFlow("last")
     /** Path shown/edited in the starting directory field (managed or user-entered). */
     var sftpStartDir = MutableStateFlow("")
+    var allowLegacyCiphers = MutableStateFlow(false)
 
     private val _editingId = MutableStateFlow<Long?>(null)
 
@@ -95,6 +96,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
                 ?.split(",")?.mapNotNull { it.trim().toLongOrNull() } ?: emptyList()
             sftpStartMode.value = h.sftpStartMode
             sftpStartDir.value = h.sftpStartDir ?: ""
+            allowLegacyCiphers.value = h.allowLegacyCiphers
         }
     }
 
@@ -143,8 +145,9 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             portForwardings  = portForwardings.value.trim().takeIf { it.isNotEmpty() },
             jumpMode         = currentMode,
             jumpHostIdList   = newJumpHostIdList,
-            sftpStartMode    = sftpStartMode.value,
-            sftpStartDir     = newSftpStartDir,
+            sftpStartMode        = sftpStartMode.value,
+            sftpStartDir         = newSftpStartDir,
+            allowLegacyCiphers   = allowLegacyCiphers.value,
         )
         hostDao.upsert(entity)
         onDone()

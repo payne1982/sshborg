@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
 
 class SshForegroundService : Service() {
 
@@ -32,15 +33,16 @@ class SshForegroundService : Service() {
     }
 
     private fun observeSessionCount() {
-        val sessionManager = (application as SshBorgApp).sessionManager
+        val app = application as SshBorgApp
         observeJob = scope.launch {
-            sessionManager.sessions.collect { sessions ->
-                if (sessions.isEmpty()) {
-                    // Must call stopForeground before stopSelf, otherwise the notification lingers
+            combine(app.sessionManager.sessions, app.transferManager.transfers) { sessions, transfers ->
+                Pair(sessions.size, transfers.count { it.status == BackgroundTransfer.Status.Running })
+            }.collect { (sessionCount, downloadCount) ->
+                if (sessionCount == 0) {
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 } else {
-                    updateNotification(sessions.size)
+                    updateNotification(sessionCount, downloadCount)
                 }
             }
         }
@@ -102,7 +104,7 @@ class SshForegroundService : Service() {
         )
     }
 
-    private fun buildNotification(sessionCount: Int): Notification {
+    private fun buildNotification(sessionCount: Int, downloadCount: Int = 0): Notification {
         val ctx = localizedContext()
         val tapIntent = PendingIntent.getActivity(
             this, 0,
@@ -119,9 +121,13 @@ class SshForegroundService : Service() {
         } else {
             ctx.resources.getQuantityString(R.plurals.notification_active_sessions, sessionCount, sessionCount)
         }
+        val subText = if (downloadCount > 0)
+            ctx.resources.getQuantityString(R.plurals.notification_bg_downloads, downloadCount, downloadCount)
+        else null
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(ctx.getString(R.string.app_name))
             .setContentText(text)
+            .apply { if (subText != null) setSubText(subText) }
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(tapIntent)
             .setOngoing(true)
@@ -129,9 +135,9 @@ class SshForegroundService : Service() {
             .build()
     }
 
-    private fun updateNotification(sessionCount: Int) {
+    private fun updateNotification(sessionCount: Int, downloadCount: Int = 0) {
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-            .notify(NOTIFICATION_ID, buildNotification(sessionCount))
+            .notify(NOTIFICATION_ID, buildNotification(sessionCount, downloadCount))
     }
 
     companion object {
@@ -140,6 +146,7 @@ class SshForegroundService : Service() {
         private const val NOTIFICATION_ID = 1
         private const val NOTIFICATION_ID_DOWNLOAD = 2
         private const val NOTIFICATION_ID_UPLOAD = 3
+        private const val NOTIFICATION_ID_DOWNLOAD_ERROR = 4
         private const val ACTION_DISCONNECT_ALL = "com.sshborg.DISCONNECT_ALL"
 
         fun start(context: Context) {
@@ -152,6 +159,14 @@ class SshForegroundService : Service() {
 
         fun notifyDownloadComplete(context: Context, message: String) =
             postTransferNotification(context, context.getString(R.string.sftp_download_complete), message, NOTIFICATION_ID_DOWNLOAD)
+
+        fun notifyDownloadError(context: Context, filename: String) =
+            postTransferNotification(
+                context,
+                context.getString(R.string.sftp_background_download_failed),
+                filename,
+                NOTIFICATION_ID_DOWNLOAD_ERROR,
+            )
 
         fun notifyUploadComplete(context: Context, message: String) =
             postTransferNotification(context, context.getString(R.string.sftp_upload_complete), message, NOTIFICATION_ID_UPLOAD)

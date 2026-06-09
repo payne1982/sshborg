@@ -44,4 +44,6 @@ data class HostEntity(
     val sftpStartMode: String = "last",
     /** Persisted last-visited path ("last" mode) or user-specified path ("fixed" mode). */
     val sftpStartDir: String? = null,
+    /** If true, legacy/weak cipher algorithms are appended to the negotiation list (for old servers). */
+    val allowLegacyCiphers: Boolean = false,
 )
