@@ -1,0 +1,27 @@
+<en-US>
+• SSH agent forwarding: fixed a message-framing bug that could break sessions with recent OpenSSH servers (jsch 2.28.3)
+</en-US>
+<it-IT>
+• Agent forwarding SSH: corretto un bug di framing dei messaggi che poteva interrompere le sessioni con server OpenSSH recenti (jsch 2.28.3)
+</it-IT>
+<de-DE>
+• SSH-Agent-Weiterleitung: Fehler im Nachrichten-Framing behoben, der Sitzungen mit neueren OpenSSH-Servern stören konnte (jsch 2.28.3)
+</de-DE>
+<es-ES>
+• Reenvío de agente SSH: corregido un error de tramado de mensajes que podía interrumpir sesiones con servidores OpenSSH recientes (jsch 2.28.3)
+</es-ES>
+<fr-FR>
+• Transfert d'agent SSH : correction d'un bug de tramage des messages pouvant interrompre les sessions avec des serveurs OpenSSH récents (jsch 2.28.3)
+</fr-FR>
+<pt-PT>
+• Encaminhamento de agente SSH: corrigido um erro de enquadramento de mensagens que podia interromper sessões com servidores OpenSSH recentes (jsch 2.28.3)
+</pt-PT>
+<uk>
+• Переадресація агента SSH: виправлено помилку кадрування повідомлень, що могла переривати сеанси з новими серверами OpenSSH (jsch 2.28.3)
+</uk>
+<zh-CN>
+• SSH 代理转发：修复了可能导致与较新 OpenSSH 服务器会话中断的消息分帧错误（jsch 2.28.3）
+</zh-CN>
+<ja-JP>
+• SSHエージェント転送：新しいOpenSSHサーバーとのセッションを中断させる可能性があったメッセージフレーミングのバグを修正（jsch 2.28.3）
+</ja-JP>
