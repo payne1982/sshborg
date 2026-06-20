@@ -15,6 +15,7 @@
     <string name="action_connect">连接</string>
     <string name="action_disconnect">断开连接</string>
     <string name="action_close">关闭</string>
+    <string name="action_done">完成</string>
     <string name="action_rename">重命名</string>
     <string name="action_create">创建</string>
     <string name="action_generate">生成</string>
@@ -216,6 +217,8 @@
     <string name="sftp_uploaded_n_files">已上传 %1$d 个文件</string>
     <string name="sftp_download_complete">下载完成</string>
     <string name="sftp_upload_complete">上传完成</string>
+    <string name="sftp_started_at">开始：%1$s</string>
+    <string name="sftp_finished_at">完成：%1$s</string>
 
     <string name="sftp_delete_file_title">删除文件</string>
     <string name="sftp_delete_folder_title">删除文件夹</string>

@@ -15,6 +15,7 @@
     <string name="action_connect">接続</string>
     <string name="action_disconnect">切断</string>
     <string name="action_close">閉じる</string>
+    <string name="action_done">完了</string>
     <string name="action_rename">名前変更</string>
     <string name="action_create">作成</string>
     <string name="action_generate">生成</string>
@@ -216,6 +217,8 @@
     <string name="sftp_uploaded_n_files">%1$d 件のファイルをアップロードしました</string>
     <string name="sftp_download_complete">ダウンロード完了</string>
     <string name="sftp_upload_complete">アップロード完了</string>
+    <string name="sftp_started_at">開始: %1$s</string>
+    <string name="sftp_finished_at">完了: %1$s</string>
 
     <string name="sftp_delete_file_title">ファイルを削除</string>
     <string name="sftp_delete_folder_title">フォルダを削除</string>
