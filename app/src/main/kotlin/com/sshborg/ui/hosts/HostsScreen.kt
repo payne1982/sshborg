@@ -104,7 +104,13 @@ fun HostsScreen(
                 Text(stringResource(R.string.hosts_empty), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
-            LazyColumn(Modifier.fillMaxSize().padding(padding)) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                // Extra bottom space so the last host row can scroll clear of the
+                // floating "+" button (FAB ~56dp + 16dp margins), which otherwise
+                // covers it when the list fills the screen.
+                contentPadding = PaddingValues(bottom = 88.dp),
+            ) {
                 items(hosts, key = { it.id }) { host ->
                     val shellSessions = sessions.filter {
                         it.hostId == host.id && it.type == SessionManager.SessionType.Shell
