@@ -1,3 +1,4 @@
 • SSH agent forwarding: fixed a message-framing bug that could break sessions with recent OpenSSH servers (jsch 2.28.3)
 • Hosts list: the last host is no longer hidden behind the add button when the list fills the screen
-• Downloads: show start and finish date/time; foreground downloads now end on a completion screen with a Done button
+• Downloads: show start and finish date/time; foreground downloads end on a completion screen with a Done button
+• Session tabs: new browser-style tab bar, and the keyboard stays open when you switch tabs

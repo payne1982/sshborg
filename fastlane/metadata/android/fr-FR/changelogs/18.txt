@@ -1,3 +1,4 @@
 • Transfert d'agent SSH : correction d'un bug de tramage des messages pouvant interrompre les sessions avec des serveurs OpenSSH récents (jsch 2.28.3)
 • Liste des hôtes : le dernier hôte n'est plus masqué par le bouton d'ajout lorsque la liste remplit l'écran
-• Téléchargements : affichent l'heure de début et de fin ; au premier plan, ils se terminent par un écran de fin avec un bouton Terminé
+• Téléchargements : affichent l'heure de début et de fin ; au premier plan, fin sur un écran avec un bouton Terminé
+• Onglets de session : nouvelle barre façon navigateur et le clavier reste ouvert au changement d'onglet

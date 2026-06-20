@@ -1,3 +1,4 @@
 • SSH-Agent-Weiterleitung: Fehler im Nachrichten-Framing behoben, der Sitzungen mit neueren OpenSSH-Servern stören konnte (jsch 2.28.3)
 • Hostliste: Der letzte Host wird nicht mehr von der Hinzufügen-Schaltfläche verdeckt, wenn die Liste den Bildschirm füllt
-• Downloads: zeigen Start- und Endzeit; Vordergrund-Downloads enden jetzt mit einem Abschlussbildschirm und einer Fertig-Schaltfläche
+• Downloads: zeigen Start- und Endzeit; im Vordergrund enden sie mit einem Abschlussbildschirm und Fertig-Schaltfläche
+• Sitzungs-Tabs: neue Tab-Leiste im Browser-Stil, und die Tastatur bleibt beim Wechsel offen
