@@ -1,0 +1,4 @@
+• Reenvío de agente SSH: corregido un error de tramado de mensajes que podía interrumpir sesiones con servidores OpenSSH recientes (jsch 2.28.3)
+• Lista de hosts: el último host ya no queda oculto tras el botón de añadir cuando la lista llena la pantalla
+• Descargas: muestran fecha y hora de inicio y fin; en primer plano terminan en una pantalla con un botón Hecho
+• Pestañas de sesión: nueva barra estilo navegador y el teclado permanece abierto al cambiar de pestaña

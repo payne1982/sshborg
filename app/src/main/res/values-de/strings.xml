@@ -14,6 +14,7 @@
     <string name="action_connect">Verbinden</string>
     <string name="action_disconnect">Trennen</string>
     <string name="action_close">Schließen</string>
+    <string name="action_done">Fertig</string>
     <string name="action_rename">Umbenennen</string>
     <string name="action_create">Erstellen</string>
     <string name="action_generate">Generieren</string>
@@ -202,6 +203,8 @@
     <string name="sftp_uploaded_n_files">%1$d Dateien hochgeladen</string>
     <string name="sftp_download_complete">Download abgeschlossen</string>
     <string name="sftp_upload_complete">Upload abgeschlossen</string>
+    <string name="sftp_started_at">Gestartet: %1$s</string>
+    <string name="sftp_finished_at">Beendet: %1$s</string>
 
     <string name="sftp_delete_file_title">Datei löschen</string>
     <string name="sftp_delete_folder_title">Ordner löschen</string>

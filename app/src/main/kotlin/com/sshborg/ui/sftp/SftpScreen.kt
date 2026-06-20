@@ -66,22 +66,11 @@ fun SftpScreen(
         }
     }
 
-    // Downloaded / Uploaded: refresh listing immediately, show snackbar concurrently
+    // Uploaded: refresh listing immediately, show snackbar concurrently.
+    // (Foreground downloads now show a persistent completion screen with a Done button —
+    //  see the State.Downloaded branch below — so they are not handled here.)
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     LaunchedEffect(state) {
-        if (state is SftpViewModel.State.Downloaded) {
-            val s = state as SftpViewModel.State.Downloaded
-            val msg = when {
-                s.totalFiles == 1 && s.skippedFiles == 0 ->
-                    context.getString(R.string.sftp_saved_to_downloads, "${vm.downloadFolder}${s.filename}")
-                s.skippedFiles > 0 ->
-                    context.getString(R.string.sftp_downloaded_n_files_skipped, s.totalFiles, s.skippedFiles)
-                else ->
-                    context.getString(R.string.sftp_downloaded_n_files, s.totalFiles)
-            }
-            scope.launch { snackbarHostState.showSnackbar(msg) }
-            vm.dismissDownloaded()
-        }
         if (state is SftpViewModel.State.Uploaded) {
             val s = state as SftpViewModel.State.Uploaded
             val msg = if (s.totalFiles > 1)
@@ -345,13 +334,21 @@ fun SftpScreen(
                         sublabel     = s.filename,
                         bytes        = s.bytesReceived,
                         icon         = Icons.Default.Download,
+                        startedAt    = s.startedAt,
                         onCancel     = vm::cancelDownload,
                         onBackground = vm::sendToBackground,
                     )
                 }
 
                 is SftpViewModel.State.Downloaded -> {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    DownloadComplete(
+                        filename     = s.filename,
+                        totalFiles   = s.totalFiles,
+                        skippedFiles = s.skippedFiles,
+                        startedAt    = s.startedAt,
+                        completedAt  = s.completedAt,
+                        onDone       = vm::dismissDownloaded,
+                    )
                 }
 
                 is SftpViewModel.State.Uploading -> {
@@ -616,6 +613,7 @@ private fun BoxScope.TransferProgress(
     sublabel: String = "",
     bytes: Long,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    startedAt: Long = 0L,
     onCancel: (() -> Unit)? = null,
     onBackground: (() -> Unit)? = null,
 ) {
@@ -649,6 +647,9 @@ private fun BoxScope.TransferProgress(
             if (bytes > 0) formatSize(bytes) else "",
             style = MaterialTheme.typography.bodySmall,
         )
+        if (startedAt > 0L) {
+            TransferTimestamps(startedAt = startedAt, completedAt = null)
+        }
         if (onBackground != null || onCancel != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (onBackground != null) {
@@ -835,19 +836,30 @@ private fun BackgroundTransfersPanel(
                         },
                         modifier = Modifier.size(18.dp),
                     )
-                    Text(
-                        text = t.filename,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (t.bytesReceived > 0) {
-                        Text(
-                            text = formatSize(t.bytesReceived),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    Column(modifier = Modifier.weight(1f)) {
+                        // Filename and byte count share the top line; the size is pinned
+                        // to the right so it never overlaps the timestamp lines below.
+                        // A very long filename is ellipsised to make room for the size.
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = t.filename,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.weight(1f),
+                            )
+                            if (t.bytesReceived > 0) {
+                                Text(
+                                    text = formatSize(t.bytesReceived),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        TransferTimestamps(startedAt = t.startedAt, completedAt = t.completedAt)
                     }
                     IconButton(
                         onClick = {
@@ -878,6 +890,126 @@ private fun formatSize(bytes: Long): String = when {
     bytes < 1_048_576           -> "%.1f KB".format(bytes / 1_024.0)
     bytes < 1_073_741_824       -> "%.1f MB".format(bytes / 1_048_576.0)
     else                        -> "%.2f GB".format(bytes / 1_073_741_824.0)
+}
+
+// "2026/06/20 15:36:01 CEST" — fixed numeric format, locale-independent digits.
+private val transferDateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US)
+
+// Android's ICU often returns only "GMT+2" for non-US zones; this curated map
+// restores the usual abbreviation (e.g. CEST) for the regions SSHBorg ships in.
+// Pair = (standard-time abbreviation, daylight-time abbreviation).
+private val ZONE_ABBREV: Map<String, Pair<String, String>> = mapOf(
+    "Europe/Rome"       to ("CET" to "CEST"),
+    "Europe/Berlin"     to ("CET" to "CEST"),
+    "Europe/Paris"      to ("CET" to "CEST"),
+    "Europe/Madrid"     to ("CET" to "CEST"),
+    "Europe/Amsterdam"  to ("CET" to "CEST"),
+    "Europe/Brussels"   to ("CET" to "CEST"),
+    "Europe/Vienna"     to ("CET" to "CEST"),
+    "Europe/Zurich"     to ("CET" to "CEST"),
+    "Europe/Warsaw"     to ("CET" to "CEST"),
+    "Europe/Prague"     to ("CET" to "CEST"),
+    "Europe/Stockholm"  to ("CET" to "CEST"),
+    "Europe/Copenhagen" to ("CET" to "CEST"),
+    "Europe/Oslo"       to ("CET" to "CEST"),
+    "Europe/Budapest"   to ("CET" to "CEST"),
+    "Europe/Lisbon"     to ("WET" to "WEST"),
+    "Europe/London"     to ("GMT" to "BST"),
+    "Europe/Dublin"     to ("GMT" to "IST"),
+    "Europe/Kyiv"       to ("EET" to "EEST"),
+    "Europe/Kiev"       to ("EET" to "EEST"),
+    "Europe/Athens"     to ("EET" to "EEST"),
+    "Europe/Helsinki"   to ("EET" to "EEST"),
+    "Europe/Bucharest"  to ("EET" to "EEST"),
+)
+
+private fun zoneAbbreviation(zone: TimeZone, instant: Long): String {
+    val daylight = zone.inDaylightTime(Date(instant))
+    val icu = zone.getDisplayName(daylight, TimeZone.SHORT, Locale.US)
+    // ICU gave a real abbreviation (e.g. "CEST") — use it.
+    if (!icu.startsWith("GMT") && !icu.startsWith("UTC")) return icu
+    // ICU fell back to a GMT/UTC offset; restore the abbreviation when we know it.
+    val mapped = ZONE_ABBREV[zone.id] ?: return icu
+    return if (daylight) mapped.second else mapped.first
+}
+
+private fun formatTransferTime(epochMillis: Long): String {
+    val zone = TimeZone.getDefault()
+    return "${transferDateFormat.format(Date(epochMillis))} ${zoneAbbreviation(zone, epochMillis)}"
+}
+
+/** Small, dimmed start/finish timestamps shown under a transfer. */
+@Composable
+private fun TransferTimestamps(startedAt: Long, completedAt: Long?) {
+    val color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+    if (startedAt > 0L) {
+        Text(
+            text = stringResource(R.string.sftp_started_at, formatTransferTime(startedAt)),
+            style = MaterialTheme.typography.labelSmall,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+    if (completedAt != null && completedAt > 0L) {
+        Text(
+            text = stringResource(R.string.sftp_finished_at, formatTransferTime(completedAt)),
+            style = MaterialTheme.typography.labelSmall,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/** Persistent foreground download-complete screen with start/finish times and a Done button. */
+@Composable
+private fun BoxScope.DownloadComplete(
+    filename: String,
+    totalFiles: Int,
+    skippedFiles: Int,
+    startedAt: Long,
+    completedAt: Long,
+    onDone: () -> Unit,
+) {
+    Column(
+        Modifier
+            .align(Alignment.Center)
+            .padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Icon(
+            Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(48.dp),
+        )
+        Text(
+            stringResource(R.string.sftp_download_complete),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        val summary = when {
+            totalFiles == 1 && skippedFiles == 0 -> filename
+            skippedFiles > 0 ->
+                stringResource(R.string.sftp_downloaded_n_files_skipped, totalFiles - skippedFiles, skippedFiles)
+            else ->
+                stringResource(R.string.sftp_downloaded_n_files, totalFiles)
+        }
+        Text(
+            text = summary,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            TransferTimestamps(startedAt = startedAt, completedAt = completedAt)
+        }
+        Button(onClick = onDone) {
+            Text(stringResource(R.string.action_done))
+        }
+    }
 }
 
 @Composable

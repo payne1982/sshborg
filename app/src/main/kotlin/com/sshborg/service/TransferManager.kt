@@ -28,6 +28,10 @@ data class BackgroundTransfer(
     val bytesReceived: Long = 0L,
     val skippedFiles: Int = 0,
     val status: Status = Status.Running,
+    /** Epoch millis when the transfer was enqueued. */
+    val startedAt: Long = System.currentTimeMillis(),
+    /** Epoch millis when the transfer reached a terminal state; null while running. */
+    val completedAt: Long? = null,
 ) {
     enum class Status { Running, Done, Error, Cancelled }
 }
@@ -104,7 +108,7 @@ class TransferManager(private val app: Application) {
 
                 if (thisJob.isActive) {
                     jobMap.remove(id)
-                    update(id) { it.copy(status = BackgroundTransfer.Status.Done, skippedFiles = skipped) }
+                    update(id) { it.copy(status = BackgroundTransfer.Status.Done, skippedFiles = skipped, completedAt = System.currentTimeMillis()) }
                     val last = tasks.last()
                     val msg = when {
                         tasks.size == 1 -> app.getString(R.string.sftp_saved_to_downloads, "${last.localDir}${last.filename}")
@@ -113,12 +117,12 @@ class TransferManager(private val app: Application) {
                     }
                     SshForegroundService.notifyDownloadComplete(app, msg)
                 } else if (jobMap.remove(id) != null) {
-                    update(id) { it.copy(status = BackgroundTransfer.Status.Cancelled) }
+                    update(id) { it.copy(status = BackgroundTransfer.Status.Cancelled, completedAt = System.currentTimeMillis()) }
                 }
             } catch (e: Exception) {
                 if (jobMap.remove(id) != null) {
                     val cancelled = e is CancellationException || !thisJob.isActive
-                    update(id) { it.copy(status = if (cancelled) BackgroundTransfer.Status.Cancelled else BackgroundTransfer.Status.Error) }
+                    update(id) { it.copy(status = if (cancelled) BackgroundTransfer.Status.Cancelled else BackgroundTransfer.Status.Error, completedAt = System.currentTimeMillis()) }
                     if (!cancelled) SshForegroundService.notifyDownloadError(app, tasks.firstOrNull()?.filename ?: "")
                 }
             } finally {
@@ -144,7 +148,7 @@ class TransferManager(private val app: Application) {
         jobMap.remove(id)?.cancel()
         channelMap.remove(id)?.let { runCatching { it.disconnect() } }
         _transfers.update { list ->
-            list.map { if (it.id == id && it.status == BackgroundTransfer.Status.Running) it.copy(status = BackgroundTransfer.Status.Cancelled) else it }
+            list.map { if (it.id == id && it.status == BackgroundTransfer.Status.Running) it.copy(status = BackgroundTransfer.Status.Cancelled, completedAt = System.currentTimeMillis()) else it }
         }
     }
 

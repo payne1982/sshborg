@@ -29,8 +29,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         data class HostKeyPrompt(val hostname: String, val fingerprint: String) : State
         data class PasswordPrompt(val hostname: String, val wrongPassword: Boolean = false) : State
         data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
-        data class Downloading(val filename: String, val bytesReceived: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
-        data class Downloaded(val filename: String, val totalFiles: Int = 1, val skippedFiles: Int = 0) : State
+        data class Downloading(val filename: String, val bytesReceived: Long, val fileIndex: Int = 1, val totalFiles: Int = 1, val startedAt: Long = 0L) : State
+        data class Downloaded(
+            val filename: String,
+            val totalFiles: Int = 1,
+            val skippedFiles: Int = 0,
+            val startedAt: Long = 0L,
+            val completedAt: Long = 0L,
+        ) : State
         data class Deleting(val name: String, val index: Int = 1, val total: Int = 1) : State
         data class Uploading(val filename: String, val bytesSent: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
         data class Uploaded(val filename: String, val totalFiles: Int = 1) : State
@@ -405,10 +411,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 .collect { t ->
                     when (t.status) {
                         BackgroundTransfer.Status.Running ->
-                            _state.value = State.Downloading(t.filename, t.bytesReceived, t.fileIndex, t.totalFiles)
+                            _state.value = State.Downloading(t.filename, t.bytesReceived, t.fileIndex, t.totalFiles, t.startedAt)
                         BackgroundTransfer.Status.Done -> {
                             transferManager.dismiss(transferId)
-                            _state.value = State.Downloaded(t.filename, t.totalFiles, t.skippedFiles)
+                            _state.value = State.Downloaded(
+                                t.filename, t.totalFiles, t.skippedFiles,
+                                t.startedAt, t.completedAt ?: System.currentTimeMillis(),
+                            )
                             foregroundTransferId = null
                             foregroundObserveJob = null
                             thisJob.cancel()

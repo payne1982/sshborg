@@ -32,6 +32,15 @@ class SessionManager {
     private val _sessions = MutableStateFlow<List<ActiveSession>>(emptyList())
     val sessions: StateFlow<List<ActiveSession>> = _sessions.asStateFlow()
 
+    /**
+     * Transient flag set while the terminal is switching between sibling tabs.
+     * The leaving screen consumes it to skip hiding the soft keyboard, so the
+     * keyboard stays up across a tab switch instead of being dismissed by the
+     * outgoing screen's onDispose. Not part of session state on purpose.
+     */
+    @Volatile
+    var switchingTab: Boolean = false
+
     fun create(hostId: Long, hostLabel: String, type: SessionType): String {
         val id = UUID.randomUUID().toString()
         _sessions.update { it + ActiveSession(id, hostId, hostLabel, type) }

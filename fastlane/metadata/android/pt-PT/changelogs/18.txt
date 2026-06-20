@@ -1,0 +1,4 @@
+• Encaminhamento de agente SSH: corrigido um erro de enquadramento de mensagens que podia interromper sessões com servidores OpenSSH recentes (jsch 2.28.3)
+• Lista de hosts: o último host deixa de ficar escondido atrás do botão de adicionar quando a lista preenche o ecrã
+• Transferências: mostram data e hora de início e fim; em primeiro plano terminam num ecrã com um botão Concluído
+• Separadores de sessão: nova barra ao estilo de navegador e o teclado permanece aberto ao mudar de separador

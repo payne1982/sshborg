@@ -1,0 +1,4 @@
+• Agent forwarding SSH: corretto un bug di framing che poteva interrompere le sessioni con server OpenSSH recenti (jsch 2.28.3)
+• Elenco host: l'ultimo host non resta più nascosto dietro il pulsante di aggiunta quando la lista riempie lo schermo
+• Download: mostrano data e ora di inizio e fine; in primo piano terminano con una schermata di completamento e un pulsante Fatto
+• Schede sessione: nuova barra in stile browser e la tastiera resta aperta quando cambi scheda

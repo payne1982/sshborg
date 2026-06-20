@@ -1,0 +1,54 @@
+<en-US>
+• SSH agent forwarding: fixed a message-framing bug that could break sessions with recent OpenSSH servers (jsch 2.28.3)
+• Hosts list: the last host is no longer hidden behind the add button when the list fills the screen
+• Downloads: show start and finish date/time; foreground downloads end on a completion screen with a Done button
+• Session tabs: new browser-style tab bar, and the keyboard stays open when you switch tabs
+</en-US>
+<it-IT>
+• Agent forwarding SSH: corretto un bug di framing che poteva interrompere le sessioni con server OpenSSH recenti (jsch 2.28.3)
+• Elenco host: l'ultimo host non resta più nascosto dietro il pulsante di aggiunta quando la lista riempie lo schermo
+• Download: mostrano data e ora di inizio e fine; in primo piano terminano con una schermata di completamento e un pulsante Fatto
+• Schede sessione: nuova barra in stile browser e la tastiera resta aperta quando cambi scheda
+</it-IT>
+<de-DE>
+• SSH-Agent-Weiterleitung: Fehler im Nachrichten-Framing behoben, der Sitzungen mit neueren OpenSSH-Servern stören konnte (jsch 2.28.3)
+• Hostliste: Der letzte Host wird nicht mehr von der Hinzufügen-Schaltfläche verdeckt, wenn die Liste den Bildschirm füllt
+• Downloads: zeigen Start- und Endzeit; im Vordergrund enden sie mit einem Abschlussbildschirm und Fertig-Schaltfläche
+• Sitzungs-Tabs: neue Tab-Leiste im Browser-Stil, und die Tastatur bleibt beim Wechsel offen
+</de-DE>
+<es-ES>
+• Reenvío de agente SSH: corregido un error de tramado de mensajes que podía interrumpir sesiones con servidores OpenSSH recientes (jsch 2.28.3)
+• Lista de hosts: el último host ya no queda oculto tras el botón de añadir cuando la lista llena la pantalla
+• Descargas: muestran fecha y hora de inicio y fin; en primer plano terminan en una pantalla con un botón Hecho
+• Pestañas de sesión: nueva barra estilo navegador y el teclado permanece abierto al cambiar de pestaña
+</es-ES>
+<fr-FR>
+• Transfert d'agent SSH : correction d'un bug de tramage des messages pouvant interrompre les sessions avec des serveurs OpenSSH récents (jsch 2.28.3)
+• Liste des hôtes : le dernier hôte n'est plus masqué par le bouton d'ajout lorsque la liste remplit l'écran
+• Téléchargements : affichent l'heure de début et de fin ; au premier plan, fin sur un écran avec un bouton Terminé
+• Onglets de session : nouvelle barre façon navigateur et le clavier reste ouvert au changement d'onglet
+</fr-FR>
+<pt-PT>
+• Encaminhamento de agente SSH: corrigido um erro de enquadramento de mensagens que podia interromper sessões com servidores OpenSSH recentes (jsch 2.28.3)
+• Lista de hosts: o último host deixa de ficar escondido atrás do botão de adicionar quando a lista preenche o ecrã
+• Transferências: mostram data e hora de início e fim; em primeiro plano terminam num ecrã com um botão Concluído
+• Separadores de sessão: nova barra ao estilo de navegador e o teclado permanece aberto ao mudar de separador
+</pt-PT>
+<uk>
+• Переадресація агента SSH: виправлено помилку кадрування повідомлень, що могла переривати сеанси з новими серверами OpenSSH (jsch 2.28.3)
+• Список хостів: останній хост більше не ховається за кнопкою додавання, коли список заповнює екран
+• Завантаження: показують дату й час початку та завершення; на передньому плані завершуються екраном з кнопкою «Готово»
+• Вкладки сеансів: нова панель у стилі браузера, і клавіатура залишається відкритою під час перемикання
+</uk>
+<zh-CN>
+• SSH 代理转发：修复了可能导致与较新 OpenSSH 服务器会话中断的消息分帧错误（jsch 2.28.3）
+• 主机列表：当列表占满屏幕时，最后一个主机不再被添加按钮遮挡
+• 下载：显示开始和完成的日期时间；前台下载现在以带有“完成”按钮的完成界面结束
+• 会话标签：以浏览器风格重新设计了多会话标签栏，切换标签时键盘现在保持打开
+</zh-CN>
+<ja-JP>
+• SSHエージェント転送：新しいOpenSSHサーバーとのセッションを中断させる可能性があったメッセージフレーミングのバグを修正（jsch 2.28.3）
+• ホスト一覧：リストが画面いっぱいになっても、最後のホストが追加ボタンに隠れなくなりました
+• ダウンロード：開始と完了の日時を表示。フォアグラウンドのダウンロードは「完了」ボタン付きの完了画面で終わります
+• セッションタブ：複数セッションのタブバーをブラウザ風に刷新し、タブを切り替えてもキーボードが開いたままになります
+</ja-JP>
