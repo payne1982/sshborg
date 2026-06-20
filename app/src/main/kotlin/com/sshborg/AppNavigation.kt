@@ -192,6 +192,10 @@ fun AppNavigation() {
                 sessions  = sessions,
                 onBack    = { navController.popBackStack() },
                 onSwitchSession = { newId ->
+                    // Keep the soft keyboard up across the tab switch: the
+                    // outgoing screen's onDispose checks this flag and skips
+                    // hiding the IME (see TerminalScreen).
+                    sessionManager.switchingTab = true
                     navController.navigate(Screen.Terminal.routeFor(newId)) {
                         popUpTo(Screen.Terminal.routeFor(sessionId)) { inclusive = true }
                     }

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.font.Font
@@ -286,13 +287,18 @@ fun TerminalScreen(
         vm.navBack.collect { onBack() }
     }
 
-    // Dismiss keyboard on screen exit
+    // Dismiss keyboard on screen exit — unless we're just switching to a
+    // sibling tab, in which case the incoming screen keeps the keyboard up.
     val view = LocalView.current
     DisposableEffect(Unit) {
         onDispose {
-            val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
-                    as android.view.inputmethod.InputMethodManager
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
+            if (app.sessionManager.switchingTab) {
+                app.sessionManager.switchingTab = false
+            } else {
+                val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+                        as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
         }
     }
 }
@@ -303,22 +309,46 @@ private fun SessionTabRow(
     currentId: String,
     onSwitch: (String) -> Unit,
 ) {
+    // Browser-style tabs: rounded only at the top so each tab reads as a
+    // little "page tab" sitting under the terminal. The active tab is filled
+    // (surface, matching the terminal) with bold primary text; the inactive
+    // ones are flat and dim with a thin outline so they look recessed.
+    val tabShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 4.dp, vertical = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+            .padding(horizontal = 4.dp)
+            .padding(top = 3.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.Bottom,
     ) {
         sessions.forEachIndexed { index, session ->
             val selected = session.id == currentId
-            FilterChip(
-                selected  = selected,
-                onClick   = { if (!selected) onSwitch(session.id) },
-                label     = { Text("#${index + 1}", fontSize = 12.sp) },
-                modifier  = Modifier.height(28.dp),
-            )
+            Box(
+                modifier = Modifier
+                    .clip(tabShape)
+                    .background(
+                        if (selected) MaterialTheme.colorScheme.surface
+                        else MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    .then(
+                        if (selected) Modifier
+                        else Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, tabShape)
+                    )
+                    .clickable(enabled = !selected) { onSwitch(session.id) }
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text       = "#${index + 1}",
+                    fontSize   = 12.sp,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                    color      = if (selected) MaterialTheme.colorScheme.primary
+                                 else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                )
+            }
         }
     }
 }
