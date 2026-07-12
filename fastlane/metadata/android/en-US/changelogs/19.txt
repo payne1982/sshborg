@@ -1,0 +1,3 @@
+• SFTP: cancelling a download no longer breaks the connection ("Already closed" / "Pipe closed" errors and a stuck progress screen)
+• SFTP: if the connection is lost, the file browser now shows a Connection lost screen instead of freezing
+• Background downloads: cancelled transfers are now labelled "Cancelled" instead of "Finished"

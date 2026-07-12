@@ -1,0 +1,3 @@
+• SFTP : annuler un téléchargement n'interrompt plus la connexion (erreurs « Already closed » / « Pipe closed » et écran de progression bloqué)
+• SFTP : en cas de perte de connexion, l'explorateur de fichiers affiche un écran « Connexion perdue » au lieu de se figer
+• Téléchargements en arrière-plan : les transferts annulés sont désormais marqués « Annulé » au lieu de « Terminé »
