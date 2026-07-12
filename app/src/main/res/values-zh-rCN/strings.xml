@@ -219,6 +219,7 @@
     <string name="sftp_upload_complete">上传完成</string>
     <string name="sftp_started_at">开始：%1$s</string>
     <string name="sftp_finished_at">完成：%1$s</string>
+    <string name="sftp_cancelled_at">已取消：%1$s</string>
 
     <string name="sftp_delete_file_title">删除文件</string>
     <string name="sftp_delete_folder_title">删除文件夹</string>

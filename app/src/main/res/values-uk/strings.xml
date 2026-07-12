@@ -205,6 +205,7 @@
     <string name="sftp_upload_complete">Вивантаження завершено</string>
     <string name="sftp_started_at">Початок: %1$s</string>
     <string name="sftp_finished_at">Завершено: %1$s</string>
+    <string name="sftp_cancelled_at">Скасовано: %1$s</string>
 
     <string name="sftp_delete_file_title">Видалити файл</string>
     <string name="sftp_delete_folder_title">Видалити папку</string>

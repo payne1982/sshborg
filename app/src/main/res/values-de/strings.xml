@@ -205,6 +205,7 @@
     <string name="sftp_upload_complete">Upload abgeschlossen</string>
     <string name="sftp_started_at">Gestartet: %1$s</string>
     <string name="sftp_finished_at">Beendet: %1$s</string>
+    <string name="sftp_cancelled_at">Abgebrochen: %1$s</string>
 
     <string name="sftp_delete_file_title">Datei löschen</string>
     <string name="sftp_delete_folder_title">Ordner löschen</string>
