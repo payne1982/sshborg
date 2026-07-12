@@ -1,3 +1,4 @@
 • SFTP: cancelar una descarga ya no interrumpe la conexión (errores "Already closed" / "Pipe closed" y una pantalla de progreso bloqueada)
 • SFTP: si se pierde la conexión, el explorador de archivos muestra una pantalla de "Conexión perdida" en lugar de bloquearse
 • Descargas en segundo plano: las transferencias canceladas ahora se marcan como "Cancelado" en lugar de "Finalizado"
+• Bloqueo de la app: desbloqueo solo biométrico (PIN/patrón solo sin biometría registrada)

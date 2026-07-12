@@ -2,44 +2,53 @@
 • SFTP: cancelling a download no longer breaks the connection ("Already closed" / "Pipe closed" errors and a stuck progress screen)
 • SFTP: if the connection is lost, the file browser now shows a Connection lost screen instead of freezing
 • Background downloads: cancelled transfers are now labelled "Cancelled" instead of "Finished"
+• App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)
 </en-US>
 <it-IT>
 • SFTP: annullare un download non interrompe più la connessione (errori "Already closed" / "Pipe closed" e schermata di avanzamento bloccata)
 • SFTP: se la connessione cade, il browser dei file mostra una schermata "Connessione persa" invece di bloccarsi
 • Download in background: i trasferimenti annullati ora riportano "Annullato" invece di "Completato"
+• Blocco app: sblocco solo biometrico (PIN/sequenza solo senza biometrie registrate)
 </it-IT>
 <de-DE>
 • SFTP: Das Abbrechen eines Downloads unterbricht die Verbindung nicht mehr (Fehler wie „Already closed“ / „Pipe closed“ und hängender Fortschrittsbildschirm)
 • SFTP: Bei Verbindungsabbruch zeigt der Dateibrowser jetzt einen „Verbindung verloren“-Bildschirm statt einzufrieren
 • Hintergrund-Downloads: Abgebrochene Übertragungen werden jetzt als „Abgebrochen“ statt „Beendet“ angezeigt
+• App-Sperre: Entsperrung nur noch per Biometrie (PIN/Muster nur ohne registrierte Biometrie)
 </de-DE>
 <es-ES>
 • SFTP: cancelar una descarga ya no interrumpe la conexión (errores "Already closed" / "Pipe closed" y una pantalla de progreso bloqueada)
 • SFTP: si se pierde la conexión, el explorador de archivos muestra una pantalla de "Conexión perdida" en lugar de bloquearse
 • Descargas en segundo plano: las transferencias canceladas ahora se marcan como "Cancelado" en lugar de "Finalizado"
+• Bloqueo de la app: desbloqueo solo biométrico (PIN/patrón solo sin biometría registrada)
 </es-ES>
 <fr-FR>
 • SFTP : annuler un téléchargement n'interrompt plus la connexion (erreurs « Already closed » / « Pipe closed » et écran de progression bloqué)
 • SFTP : en cas de perte de connexion, l'explorateur de fichiers affiche un écran « Connexion perdue » au lieu de se figer
 • Téléchargements en arrière-plan : les transferts annulés sont désormais marqués « Annulé » au lieu de « Terminé »
+• Verrouillage de l'app : déverrouillage uniquement biométrique (PIN/schéma seulement sans biométrie enregistrée)
 </fr-FR>
 <pt-PT>
 • SFTP: cancelar uma transferência já não interrompe a ligação (erros "Already closed" / "Pipe closed" e um ecrã de progresso bloqueado)
 • SFTP: se a ligação cair, o explorador de ficheiros mostra um ecrã de "Ligação perdida" em vez de bloquear
 • Transferências em segundo plano: as transferências canceladas passam a indicar "Cancelado" em vez de "Concluído"
+• Bloqueio da app: desbloqueio apenas biométrico (PIN/padrão só sem biometria registada)
 </pt-PT>
 <uk>
 • SFTP: скасування завантаження більше не розриває з'єднання (помилки "Already closed" / "Pipe closed" і завислий екран перебігу)
 • SFTP: у разі втрати з'єднання файловий менеджер показує екран «З'єднання втрачено» замість зависання
 • Фонові завантаження: скасовані передачі тепер позначаються «Скасовано» замість «Завершено»
+• Блокування застосунку: розблокування лише біометричне (PIN/ключ — лише якщо біометрію не налаштовано)
 </uk>
 <zh-CN>
 • SFTP：取消下载不再中断连接（不再出现 "Already closed" / "Pipe closed" 错误和卡住的进度界面）
 • SFTP：连接断开时，文件浏览器会显示“连接已断开”界面，而不再卡死
 • 后台下载：已取消的传输现在显示“已取消”，而不是“完成”
+• 应用锁定：解锁仅限生物识别（仅在未录入生物识别时才可用 PIN/图案）
 </zh-CN>
 <ja-JP>
 • SFTP：ダウンロードのキャンセルで接続が切れなくなりました（「Already closed」「Pipe closed」エラーや進行画面のフリーズを解消）
 • SFTP：接続が失われた場合、ファイルブラウザがフリーズせず「接続が失われました」画面を表示します
 • バックグラウンドダウンロード：キャンセルした転送は「完了」ではなく「キャンセル」と表示されます
+• アプリロック：ロック解除は生体認証のみに（生体認証未登録の場合のみPIN/パターン）
 </ja-JP>

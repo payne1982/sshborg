@@ -1,3 +1,4 @@
 • SFTP: Das Abbrechen eines Downloads unterbricht die Verbindung nicht mehr (Fehler wie „Already closed“ / „Pipe closed“ und hängender Fortschrittsbildschirm)
 • SFTP: Bei Verbindungsabbruch zeigt der Dateibrowser jetzt einen „Verbindung verloren“-Bildschirm statt einzufrieren
 • Hintergrund-Downloads: Abgebrochene Übertragungen werden jetzt als „Abgebrochen“ statt „Beendet“ angezeigt
+• App-Sperre: Entsperrung nur noch per Biometrie (PIN/Muster nur ohne registrierte Biometrie)
