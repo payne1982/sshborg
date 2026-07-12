@@ -1,4 +1,4 @@
-• SFTP: cancelar uma transferência já não interrompe a ligação (erros "Already closed" / "Pipe closed" e um ecrã de progresso bloqueado)
-• SFTP: se a ligação cair, o explorador de ficheiros mostra um ecrã de "Ligação perdida" em vez de bloquear
+• SFTP: cancelar uma transferência já não interrompe a ligação; se a ligação cair, aparece um ecrã de "Ligação perdida" em vez de uma interface bloqueada
 • Transferências em segundo plano: as transferências canceladas passam a indicar "Cancelado" em vez de "Concluído"
 • Bloqueio da app: desbloqueio apenas biométrico (PIN/padrão só sem biometria registada)
+• Bibliotecas internas atualizadas

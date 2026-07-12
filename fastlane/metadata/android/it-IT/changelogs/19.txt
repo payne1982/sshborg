@@ -1,4 +1,4 @@
-• SFTP: annullare un download non interrompe più la connessione (errori "Already closed" / "Pipe closed" e schermata di avanzamento bloccata)
-• SFTP: se la connessione cade, il browser dei file mostra una schermata "Connessione persa" invece di bloccarsi
+• SFTP: annullare un download non interrompe più la connessione; se la connessione cade compare la schermata "Connessione persa" invece di un'interfaccia bloccata
 • Download in background: i trasferimenti annullati ora riportano "Annullato" invece di "Completato"
 • Blocco app: sblocco solo biometrico (PIN/sequenza solo senza biometrie registrate)
+• Aggiornate le librerie interne

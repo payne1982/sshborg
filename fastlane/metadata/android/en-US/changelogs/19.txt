@@ -1,4 +1,4 @@
-• SFTP: cancelling a download no longer breaks the connection ("Already closed" / "Pipe closed" errors and a stuck progress screen)
-• SFTP: if the connection is lost, the file browser now shows a Connection lost screen instead of freezing
+• SFTP: cancelling a download no longer breaks the connection; if the connection drops, a Connection lost screen appears instead of a stuck interface
 • Background downloads: cancelled transfers are now labelled "Cancelled" instead of "Finished"
 • App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)
+• Updated internal libraries

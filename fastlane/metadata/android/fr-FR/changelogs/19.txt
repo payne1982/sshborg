@@ -1,4 +1,4 @@
-• SFTP : annuler un téléchargement n'interrompt plus la connexion (erreurs « Already closed » / « Pipe closed » et écran de progression bloqué)
-• SFTP : en cas de perte de connexion, l'explorateur de fichiers affiche un écran « Connexion perdue » au lieu de se figer
+• SFTP : annuler un téléchargement n'interrompt plus la connexion ; en cas de perte de connexion, un écran « Connexion perdue » s'affiche au lieu d'une interface bloquée
 • Téléchargements en arrière-plan : les transferts annulés sont désormais marqués « Annulé » au lieu de « Terminé »
 • Verrouillage de l'app : déverrouillage uniquement biométrique (PIN/schéma seulement sans biométrie enregistrée)
+• Bibliothèques internes mises à jour
