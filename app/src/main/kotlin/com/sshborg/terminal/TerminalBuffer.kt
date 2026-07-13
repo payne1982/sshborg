@@ -13,6 +13,11 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     // Visible screen lines
     private var screen = Array(rows) { Array(columns) { Cell() } }
 
+    // Wrap flags, parallel to scrollback/screen: true = the line continues onto the
+    // next one because of auto-wrap, i.e. the line break is not a real newline.
+    private val scrollbackWrapped = ArrayDeque<Boolean>(maxScrollback)
+    private var screenWrapped = BooleanArray(rows)
+
     // --- Cursor ---
     var cursorRow = 0
     var cursorCol = 0
@@ -52,6 +57,14 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     val scrollbackSize: Int get() = scrollback.size
 
+    fun isLineWrapped(row: Int): Boolean = row in 0 until rows && screenWrapped[row]
+
+    fun setLineWrapped(row: Int, wrapped: Boolean) {
+        if (row in 0 until rows) screenWrapped[row] = wrapped
+    }
+
+    fun isScrollbackLineWrapped(index: Int): Boolean = scrollbackWrapped.getOrNull(index) == true
+
     // --- Write access ---
 
     fun setChar(row: Int, col: Int, char: Char, style: TextStyle = currentStyle) {
@@ -74,13 +87,16 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         repeat(count) {
             // Push top line into scrollback
             val evicted = screen[scrollTop].copyOf()
-            if (scrollback.size >= maxScrollback) scrollback.removeAt(0)
+            if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
             scrollback.addLast(evicted)
+            scrollbackWrapped.addLast(screenWrapped[scrollTop])
             // Shift lines up within scroll region
             for (r in scrollTop until scrollBottom) {
                 screen[r] = screen[r + 1]
+                screenWrapped[r] = screenWrapped[r + 1]
             }
             screen[scrollBottom] = Array(columns) { Cell() }
+            screenWrapped[scrollBottom] = false
         }
     }
 
@@ -89,8 +105,10 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         repeat(count) {
             for (r in scrollBottom downTo scrollTop + 1) {
                 screen[r] = screen[r - 1]
+                screenWrapped[r] = screenWrapped[r - 1]
             }
             screen[scrollTop] = Array(columns) { Cell() }
+            screenWrapped[scrollTop] = false
         }
     }
 
@@ -99,9 +117,11 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         val n = count.coerceAtMost(scrollBottom - row + 1)
         for (r in scrollBottom downTo row + n) {
             screen[r] = screen[r - n]
+            screenWrapped[r] = screenWrapped[r - n]
         }
         for (r in row until row + n) {
             screen[r] = Array(columns) { Cell() }
+            screenWrapped[r] = false
         }
     }
 
@@ -110,9 +130,11 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         val n = count.coerceAtMost(scrollBottom - row + 1)
         for (r in row..scrollBottom - n) {
             screen[r] = screen[r + n]
+            screenWrapped[r] = screenWrapped[r + n]
         }
         for (r in scrollBottom - n + 1..scrollBottom) {
             screen[r] = Array(columns) { Cell() }
+            screenWrapped[r] = false
         }
     }
 
@@ -125,28 +147,50 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (r in 0 until rows) screen[r] = snapshot[r].copyOf()
     }
 
+    /** Returns a snapshot of the screen wrap flags (for alt-screen save/restore). */
+    fun copyWrapFlags(): BooleanArray = screenWrapped.copyOf()
+
+    /** Restores previously saved wrap flags. No-op if dimensions don't match. */
+    fun restoreWrapFlags(flags: BooleanArray) {
+        if (flags.size != rows) return
+        screenWrapped = flags.copyOf()
+    }
+
     fun eraseInDisplay(mode: Int) {
         when (mode) {
             0 -> { // cursor to end
                 eraseInLine(0)
-                for (r in cursorRow + 1 until rows) screen[r] = Array(columns) { Cell() }
+                for (r in cursorRow + 1 until rows) {
+                    screen[r] = Array(columns) { Cell() }
+                    screenWrapped[r] = false
+                }
             }
             1 -> { // beginning to cursor
-                for (r in 0 until cursorRow) screen[r] = Array(columns) { Cell() }
+                for (r in 0 until cursorRow) {
+                    screen[r] = Array(columns) { Cell() }
+                    screenWrapped[r] = false
+                }
                 eraseInLine(1)
             }
             2, 3 -> { // whole screen (3 also clears scrollback)
                 for (r in 0 until rows) screen[r] = Array(columns) { Cell() }
-                if (mode == 3) scrollback.clear()
+                screenWrapped.fill(false)
+                if (mode == 3) { scrollback.clear(); scrollbackWrapped.clear() }
             }
         }
     }
 
     fun eraseInLine(mode: Int) {
         when (mode) {
-            0 -> for (c in cursorCol until columns) screen[cursorRow][c] = Cell()
+            0 -> {
+                for (c in cursorCol until columns) screen[cursorRow][c] = Cell()
+                screenWrapped[cursorRow] = false
+            }
             1 -> for (c in 0..cursorCol) screen[cursorRow][c] = Cell()
-            2 -> screen[cursorRow] = Array(columns) { Cell() }
+            2 -> {
+                screen[cursorRow] = Array(columns) { Cell() }
+                screenWrapped[cursorRow] = false
+            }
         }
     }
 
@@ -154,6 +198,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (c in cursorCol until (cursorCol + count).coerceAtMost(columns)) {
             screen[cursorRow][c] = Cell()
         }
+        if (cursorCol + count >= columns) screenWrapped[cursorRow] = false
     }
 
     fun insertChars(count: Int) {
@@ -163,6 +208,8 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
             row[c] = row[c - n]
         }
         for (c in cursorCol until cursorCol + n) row[c] = Cell()
+        // The tail of the line changed, so any auto-wrap continuation is broken
+        screenWrapped[cursorRow] = false
     }
 
     fun deleteChars(count: Int) {
@@ -170,6 +217,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         val n = count.coerceAtMost(columns - cursorCol)
         for (c in cursorCol until columns - n) row[c] = row[c + n]
         for (c in columns - n until columns) row[c] = Cell()
+        screenWrapped[cursorRow] = false
     }
 
     /** Resizes the buffer, preserving content as much as possible.
@@ -186,14 +234,20 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         if (scrollNeeded > 0) {
             for (i in 0 until scrollNeeded) {
                 val evicted = screen[i].copyOf()
-                if (scrollback.size >= maxScrollback) scrollback.removeAt(0)
+                if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
                 scrollback.addLast(evicted)
+                scrollbackWrapped.addLast(screenWrapped[i])
             }
             screen = Array(newRows) { r ->
                 val oldR = r + scrollNeeded
                 Array(newCols) { c ->
                     if (oldR < oldRows && c < oldCols) screen[oldR][c] else Cell()
                 }
+            }
+            // No reflow: flags follow their line but become approximate if newCols != oldCols
+            screenWrapped = BooleanArray(newRows) { r ->
+                val oldR = r + scrollNeeded
+                oldR < oldRows && screenWrapped[oldR]
             }
             cursorRow -= scrollNeeded
         } else {
@@ -202,6 +256,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
                     if (r < oldRows && c < oldCols) screen[r][c] else Cell()
                 }
             }
+            screenWrapped = BooleanArray(newRows) { r -> r < oldRows && screenWrapped[r] }
         }
         columns = newCols
         rows = newRows

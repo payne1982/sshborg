@@ -18,6 +18,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     // Alternate screen
     private var onAltScreen = false
     private var savedMainScreen: Array<Array<TerminalBuffer.Cell>>? = null
+    private var savedMainWrapFlags: BooleanArray? = null
 
     // Application cursor key mode (DECCKM, set by ESC[?1h / cleared by ESC[?1l)
     var applicationCursorKeys = false
@@ -326,6 +327,9 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
         for (ch in chars) {
             lastPrintedChar = ch
             if (buffer.cursorCol >= buffer.columns) {
+                // Auto-wrap: mark the full line as continuing onto the next one,
+                // so copy/paste can join the two without inserting a fake newline
+                buffer.setLineWrapped(buffer.cursorRow, true)
                 buffer.cursorCol = 0
                 lineFeed()
             }
@@ -370,6 +374,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     private fun switchToAltScreen() {
         if (!onAltScreen) {
             savedMainScreen = buffer.copyScreen()
+            savedMainWrapFlags = buffer.copyWrapFlags()
             onAltScreen = true
             buffer.eraseInDisplay(2)
             buffer.cursorRow = 0; buffer.cursorCol = 0
@@ -382,7 +387,9 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             val snapshot = savedMainScreen
             if (snapshot != null) {
                 buffer.restoreScreen(snapshot)
+                savedMainWrapFlags?.let { buffer.restoreWrapFlags(it) }
                 savedMainScreen = null
+                savedMainWrapFlags = null
             } else {
                 buffer.eraseInDisplay(2)
                 buffer.cursorRow = 0; buffer.cursorCol = 0

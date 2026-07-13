@@ -444,7 +444,13 @@ class TerminalView @JvmOverloads constructor(
                 val to    = (if (absLine == e.first) e.second else cells.lastIndex).coerceAtMost(cells.lastIndex)
                 val row   = StringBuilder()
                 for (col in from..to) row.append(cells[col].char)
-                if (absLine < e.first) sb.appendLine(row.trimEnd()) else sb.append(row.trimEnd())
+                when {
+                    absLine == e.first -> sb.append(row.trimEnd())
+                    // Auto-wrapped line: it continues on the next one, so no newline
+                    // and no trimEnd (trailing spaces are real content of the full line)
+                    isAbsLineWrapped(absLine, buf, total) -> sb.append(row)
+                    else -> sb.appendLine(row.trimEnd())
+                }
             }
         }
         return sb.toString().trimEnd()
@@ -459,12 +465,12 @@ class TerminalView @JvmOverloads constructor(
                 val line = buf.getScrollbackLine(i) ?: continue
                 val row = StringBuilder()
                 for (cell in line) row.append(cell.char)
-                sb.appendLine(row.trimEnd())
+                if (buf.isScrollbackLineWrapped(i)) sb.append(row) else sb.appendLine(row.trimEnd())
             }
             for (row in 0 until buf.rows) {
                 val line = StringBuilder()
                 for (col in 0 until buf.columns) line.append(buf.getCell(row, col).char)
-                sb.appendLine(line.trimEnd())
+                if (buf.isLineWrapped(row)) sb.append(line) else sb.appendLine(line.trimEnd())
             }
         }
         return sb.toString().trimEnd()
@@ -477,6 +483,10 @@ class TerminalView @JvmOverloads constructor(
             val sr = absLine - totalScrollback
             if (sr >= buf.rows) null else (0 until buf.columns).map { buf.getCell(sr, it) }.toTypedArray()
         }
+
+    private fun isAbsLineWrapped(absLine: Int, buf: TerminalBuffer, totalScrollback: Int): Boolean =
+        if (absLine < totalScrollback) buf.isScrollbackLineWrapped(absLine)
+        else buf.isLineWrapped(absLine - totalScrollback)
 
     // --- Input ---
 
