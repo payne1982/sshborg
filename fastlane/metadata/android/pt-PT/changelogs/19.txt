@@ -1,4 +1,5 @@
 • SFTP: corrigidos vários problemas ao cancelar transferências
 • Terminal: os marcadores de seleção são mais fáceis de arrastar e o texto copiado já não inclui quebras de linha falsas quando as linhas longas continuam na seguinte
+• Nova definição: tamanho de letra predefinido do terminal
 • Bloqueio da app: desbloqueio apenas biométrico (PIN/padrão só sem biometria registada)
 • Bibliotecas internas atualizadas

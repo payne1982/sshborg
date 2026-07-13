@@ -1,4 +1,5 @@
 • SFTP : correction de plusieurs problèmes lors de l'annulation des téléchargements
 • Terminal : les poignées de sélection sont plus faciles à déplacer et le texte copié ne contient plus de sauts de ligne factices lorsque les longues lignes continuent sur la suivante
+• Nouveau réglage : taille par défaut du texte du terminal
 • Verrouillage de l'app : déverrouillage uniquement biométrique (PIN/schéma seulement sans biométrie enregistrée)
 • Bibliothèques internes mises à jour

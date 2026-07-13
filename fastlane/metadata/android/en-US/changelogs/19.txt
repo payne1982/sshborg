@@ -1,4 +1,5 @@
 • SFTP: fixed several issues when cancelling downloads
 • Terminal: selection handles are easier to drag, and copied text no longer contains fake line breaks where long lines wrap
+• New setting: default terminal font size
 • App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)
 • Updated internal libraries
