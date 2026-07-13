@@ -139,6 +139,8 @@
 
     <string name="settings_invert_scroll_title">Inverti scorrimento terminale</string>
     <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più vecchio invece di quello più recente</string>
+    <string name="settings_font_size_title">Dimensione carattere</string>
+    <string name="settings_font_size_subtitle">Dimensione predefinita del testo del terminale (sp); il pinch la cambia nella sessione</string>
     <string name="settings_scrollback_title">Righe di scrollback</string>
     <string name="settings_scrollback_subtitle">Righe di cronologia del terminale mantenute in memoria</string>
     <string name="settings_scrollback_lines">%d righe</string>

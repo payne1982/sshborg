@@ -44,6 +44,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val scrollbackLines: StateFlow<Int> =
         prefs.scrollbackLines.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 2000)
 
+    val terminalFontSize: StateFlow<Int> =
+        prefs.terminalFontSize.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.DEFAULT_TERMINAL_FONT_SIZE,
+        )
+
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -101,6 +107,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setScrollbackLines(lines: Int) {
         viewModelScope.launch { prefs.setScrollbackLines(lines) }
+    }
+
+    fun setTerminalFontSize(sp: Int) {
+        viewModelScope.launch { prefs.setTerminalFontSize(sp) }
     }
 
     fun setHistorySuggestions(enabled: Boolean) {

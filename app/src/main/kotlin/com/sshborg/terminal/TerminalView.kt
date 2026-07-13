@@ -46,6 +46,18 @@ class TerminalView @JvmOverloads constructor(
 
     /** When true, swipe up = see newer content (inverted from natural scroll). */
     var invertScroll: Boolean = false
+
+    /**
+     * Default font size from settings. Applied as long as the user hasn't pinch-zoomed:
+     * once they do, the pinched size takes over for the rest of the session.
+     */
+    var fontSizeSp: Float = 0f
+        set(value) {
+            if (value == field) return
+            field = value
+            if (!userScaled && value > 0f) setTextSizeSp(value)
+        }
+    private var userScaled = false
     private var gestureDetector = GestureDetector(context, GestureListener())
     private var scaleDetector = ScaleGestureDetector(context, ScaleListener())
 
@@ -150,9 +162,12 @@ class TerminalView @JvmOverloads constructor(
 
     fun setTextSizeSp(sp: Float) {
         val px = android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
+        if (px == textPaint.textSize) return
         textPaint.textSize = px
         boldPaint.textSize = px
         updateMetrics()
+        // Cell size changed, so the grid dimensions did too (no-op before first layout)
+        if (width > 0 && height > 0) onResize?.invoke(termColumns, termRows)
         invalidate()
     }
 
@@ -612,6 +627,7 @@ class TerminalView @JvmOverloads constructor(
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
+            userScaled = true
             val newSize = (textPaint.textSize * detector.scaleFactor).coerceIn(20f, 80f)
             textPaint.textSize = newSize
             boldPaint.textSize = newSize
