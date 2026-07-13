@@ -1,4 +1,4 @@
 • SFTP: risolti vari problemi nell'annullamento dei download
-• Terminale: il testo copiato non contiene più a-capo fittizi dove le righe lunghe proseguono su quella successiva
+• Terminale: puntatori di selezione più facili da trascinare e il testo copiato non contiene più a-capo fittizi dove le righe lunghe proseguono su quella successiva
 • Blocco app: sblocco solo biometrico (PIN/sequenza solo senza biometrie registrate)
 • Aggiornate le librerie interne

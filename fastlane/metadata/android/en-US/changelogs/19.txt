@@ -1,4 +1,4 @@
 • SFTP: fixed several issues when cancelling downloads
-• Terminal: copied text no longer contains fake line breaks where long lines wrap
+• Terminal: selection handles are easier to drag, and copied text no longer contains fake line breaks where long lines wrap
 • App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)
 • Updated internal libraries
