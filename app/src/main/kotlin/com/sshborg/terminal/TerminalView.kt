@@ -57,6 +57,10 @@ class TerminalView @JvmOverloads constructor(
     private var draggingHandle = 0  // 0=none, 1=start, 2=end
     private var cachedViewStart = 0 // set each onDraw; safe to read on main thread in touch handlers
     private var dragLastX = 0f
+    // Finger-to-anchor offset captured at grab time, so the handle can be dragged by its
+    // round knob (above/below the row) without the selection jumping to the finger's row.
+    private var dragOffsetX = 0f
+    private var dragOffsetY = 0f
 
     // Auto-scroll while dragging a handle near the top/bottom edge.
     private val autoScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -308,17 +312,20 @@ class TerminalView @JvmOverloads constructor(
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     draggingHandle = hitTestHandle(event.x, event.y)
-                    if (draggingHandle != 0) return true
+                    if (draggingHandle != 0) {
+                        captureDragOffset(event.x, event.y)
+                        return true
+                    }
                     // Not on a handle: fall through to gesture detector (allows scroll/tap-to-exit)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (draggingHandle != 0) {
-                        dragLastX = event.x
+                        dragLastX = event.x + dragOffsetX
                         val triggerZone = cellH * 2f
                         when {
                             event.y < triggerZone          -> scheduleAutoScroll(+1)
                             event.y > height - triggerZone -> scheduleAutoScroll(-1)
-                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x, event.y) }
+                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x + dragOffsetX, event.y + dragOffsetY) }
                         }
                         return true
                     }
@@ -364,6 +371,20 @@ class TerminalView @JvmOverloads constructor(
         }
 
         return 0
+    }
+
+    /**
+     * Records the offset between the finger and the centre of the cell the grabbed
+     * handle is anchored to. Applying it to every move keeps the anchor exactly where
+     * it was at grab time, no matter which part of the handle the finger landed on.
+     */
+    private fun captureDragOffset(x: Float, y: Float) {
+        val start = selStart ?: return
+        val end   = selEnd   ?: return
+        val (s, e) = if (compareAnchors(start, end) <= 0) start to end else end to start
+        val anchor = if (draggingHandle == 1) s else e
+        dragOffsetX = (anchor.second + 0.5f) * cellW - x
+        dragOffsetY = (anchor.first - cachedViewStart + 0.5f) * cellH - y
     }
 
     private fun updateDraggedHandle(x: Float, y: Float) {
