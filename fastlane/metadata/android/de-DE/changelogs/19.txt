@@ -1,4 +1,4 @@
-• SFTP: Das Abbrechen eines Downloads unterbricht die Verbindung nicht mehr; bei Verbindungsabbruch erscheint ein „Verbindung verloren“-Bildschirm statt einer hängenden Oberfläche
-• Hintergrund-Downloads: Abgebrochene Übertragungen werden jetzt als „Abgebrochen“ statt „Beendet“ angezeigt
+• SFTP: Mehrere Probleme beim Abbrechen von Downloads behoben
+• Terminal: Kopierter Text enthält keine falschen Zeilenumbrüche mehr, wenn lange Zeilen umbrechen
 • App-Sperre: Entsperrung nur noch per Biometrie (PIN/Muster nur ohne registrierte Biometrie)
 • Interne Bibliotheken aktualisiert

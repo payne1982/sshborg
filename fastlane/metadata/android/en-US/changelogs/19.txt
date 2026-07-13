@@ -1,4 +1,4 @@
-• SFTP: cancelling a download no longer breaks the connection; if the connection drops, a Connection lost screen appears instead of a stuck interface
-• Background downloads: cancelled transfers are now labelled "Cancelled" instead of "Finished"
+• SFTP: fixed several issues when cancelling downloads
+• Terminal: copied text no longer contains fake line breaks where long lines wrap
 • App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)
 • Updated internal libraries

@@ -1,4 +1,4 @@
-• SFTP: annullare un download non interrompe più la connessione; se la connessione cade compare la schermata "Connessione persa" invece di un'interfaccia bloccata
-• Download in background: i trasferimenti annullati ora riportano "Annullato" invece di "Completato"
+• SFTP: risolti vari problemi nell'annullamento dei download
+• Terminale: il testo copiato non contiene più a-capo fittizi dove le righe lunghe proseguono su quella successiva
 • Blocco app: sblocco solo biometrico (PIN/sequenza solo senza biometrie registrate)
 • Aggiornate le librerie interne
