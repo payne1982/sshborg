@@ -139,6 +139,8 @@
 
     <string name="settings_invert_scroll_title">Інвертувати прокручування терміналу</string>
     <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити старіший вивід</string>
+    <string name="settings_font_size_title">Розмір шрифту</string>
+    <string name="settings_font_size_subtitle">Типовий розмір тексту термінала (sp); жест масштабування діє в сеансі</string>
     <string name="settings_scrollback_title">Рядки прокрутки</string>
     <string name="settings_scrollback_subtitle">Рядки історії терміналу, що зберігаються в пам\'яті</string>
     <string name="settings_scrollback_lines">%d рядків</string>
@@ -205,6 +207,7 @@
     <string name="sftp_upload_complete">Вивантаження завершено</string>
     <string name="sftp_started_at">Початок: %1$s</string>
     <string name="sftp_finished_at">Завершено: %1$s</string>
+    <string name="sftp_cancelled_at">Скасовано: %1$s</string>
 
     <string name="sftp_delete_file_title">Видалити файл</string>
     <string name="sftp_delete_folder_title">Видалити папку</string>

@@ -70,6 +70,9 @@ fun TerminalScreen(
     val ctx = LocalContext.current
     var inSelectionMode by remember { mutableStateOf(false) }
     val invertScroll  by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
+    val fontSize      by app.appPreferences.terminalFontSize.collectAsState(
+        initial = com.sshborg.data.AppPreferences.DEFAULT_TERMINAL_FONT_SIZE
+    )
     val suggestions   by vm.suggestions.collectAsState()
 
     // Siblings: other Shell sessions for the same host (for the tab bar)
@@ -148,6 +151,7 @@ fun TerminalScreen(
                     factory = { factoryCtx ->
                         TerminalView(factoryCtx).also { view ->
                             view.emulator             = vm.emulatorFlow.value
+                            view.fontSizeSp            = fontSize.toFloat()
                             view.invertScroll          = invertScroll
                             view.onInput              = sendInput
                             view.onResize             = { cols, rows -> vm.resize(cols, rows) }
@@ -158,6 +162,7 @@ fun TerminalScreen(
                     },
                     update = { view ->
                         view.emulator             = emulator
+                        view.fontSizeSp            = fontSize.toFloat()
                         view.invertScroll          = invertScroll
                         view.onInput              = sendInput
                         view.onResize             = { cols, rows -> vm.resize(cols, rows) }

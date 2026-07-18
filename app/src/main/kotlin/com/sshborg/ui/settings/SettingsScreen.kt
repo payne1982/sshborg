@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
 import com.sshborg.R
+import com.sshborg.data.AppPreferences
 
 private val TIMEOUT_OPTIONS = listOf(
     0     to R.string.timeout_immediately,
@@ -56,6 +57,7 @@ fun SettingsScreen(
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
     val scrollbackLines       by vm.scrollbackLines.collectAsState()
+    val terminalFontSize      by vm.terminalFontSize.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val unknownError = stringResource(R.string.error_unknown)
@@ -74,6 +76,7 @@ fun SettingsScreen(
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var scrollbackText by remember(scrollbackLines) { mutableStateOf(scrollbackLines.toString()) }
+    var fontSizeText by remember(terminalFontSize) { mutableStateOf(terminalFontSize.toString()) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
@@ -241,6 +244,36 @@ fun SettingsScreen(
                         checked = invertTerminalScroll,
                         onCheckedChange = { vm.setInvertTerminalScroll(it) },
                     )
+                },
+            )
+
+            val saveFontSize = {
+                val n = fontSizeText.toIntOrNull()
+                    ?.coerceIn(AppPreferences.MIN_TERMINAL_FONT_SIZE, AppPreferences.MAX_TERMINAL_FONT_SIZE)
+                    ?: AppPreferences.DEFAULT_TERMINAL_FONT_SIZE
+                fontSizeText = n.toString()
+                vm.setTerminalFontSize(n)
+            }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_font_size_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_font_size_subtitle)) },
+                trailingContent = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = fontSizeText,
+                            onValueChange = { fontSizeText = it.filter { c -> c.isDigit() } },
+                            modifier = Modifier.width(90.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { saveFontSize(); focusManager.clearFocus() }),
+                        )
+                        IconButton(onClick = saveFontSize) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                        }
+                    }
                 },
             )
 

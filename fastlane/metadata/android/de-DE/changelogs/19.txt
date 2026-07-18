@@ -1,0 +1,5 @@
+• SFTP: Mehrere Probleme beim Abbrechen von Downloads behoben
+• Terminal: Auswahlgriffe lassen sich leichter ziehen und kopierter Text enthält keine falschen Zeilenumbrüche mehr, wenn lange Zeilen umbrechen
+• Neue Einstellung: Standard-Schriftgröße des Terminals
+• App-Sperre: Entsperrung nur noch per Biometrie (PIN/Muster nur ohne registrierte Biometrie)
+• Interne Bibliotheken aktualisiert

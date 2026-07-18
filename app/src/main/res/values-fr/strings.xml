@@ -139,6 +139,8 @@
 
     <string name="settings_invert_scroll_title">Inverser le défilement du terminal</string>
     <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus ancienne</string>
+    <string name="settings_font_size_title">Taille du texte</string>
+    <string name="settings_font_size_subtitle">Taille par défaut du texte du terminal (sp) ; pincez pour zoomer dans la session</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
     <string name="settings_scrollback_subtitle">Lignes d\'historique du terminal conservées en mémoire</string>
     <string name="settings_scrollback_lines">%d lignes</string>
@@ -205,6 +207,7 @@
     <string name="sftp_upload_complete">Envoi terminé</string>
     <string name="sftp_started_at">Démarré : %1$s</string>
     <string name="sftp_finished_at">Terminé : %1$s</string>
+    <string name="sftp_cancelled_at">Annulé : %1$s</string>
 
     <string name="sftp_delete_file_title">Supprimer le fichier</string>
     <string name="sftp_delete_folder_title">Supprimer le dossier</string>

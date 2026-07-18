@@ -859,7 +859,11 @@ private fun BackgroundTransfersPanel(
                                 )
                             }
                         }
-                        TransferTimestamps(startedAt = t.startedAt, completedAt = t.completedAt)
+                        TransferTimestamps(
+                            startedAt   = t.startedAt,
+                            completedAt = t.completedAt,
+                            cancelled   = t.status == BackgroundTransfer.Status.Cancelled,
+                        )
                     }
                     IconButton(
                         onClick = {
@@ -940,7 +944,7 @@ private fun formatTransferTime(epochMillis: Long): String {
 
 /** Small, dimmed start/finish timestamps shown under a transfer. */
 @Composable
-private fun TransferTimestamps(startedAt: Long, completedAt: Long?) {
+private fun TransferTimestamps(startedAt: Long, completedAt: Long?, cancelled: Boolean = false) {
     val color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
     if (startedAt > 0L) {
         Text(
@@ -953,7 +957,10 @@ private fun TransferTimestamps(startedAt: Long, completedAt: Long?) {
     }
     if (completedAt != null && completedAt > 0L) {
         Text(
-            text = stringResource(R.string.sftp_finished_at, formatTransferTime(completedAt)),
+            text = stringResource(
+                if (cancelled) R.string.sftp_cancelled_at else R.string.sftp_finished_at,
+                formatTransferTime(completedAt),
+            ),
             style = MaterialTheme.typography.labelSmall,
             color = color,
             maxLines = 1,

@@ -139,6 +139,8 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_font_size_title">Schriftgröße</string>
+    <string name="settings_font_size_subtitle">Standard-Textgröße des Terminals (sp); Zoomen per Fingergeste in der Sitzung</string>
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>
     <string name="settings_scrollback_subtitle">Im Speicher gehaltene Zeilen der Terminal-Historie</string>
     <string name="settings_scrollback_lines">%d Zeilen</string>
@@ -205,6 +207,7 @@
     <string name="sftp_upload_complete">Upload abgeschlossen</string>
     <string name="sftp_started_at">Gestartet: %1$s</string>
     <string name="sftp_finished_at">Beendet: %1$s</string>
+    <string name="sftp_cancelled_at">Abgebrochen: %1$s</string>
 
     <string name="sftp_delete_file_title">Datei löschen</string>
     <string name="sftp_delete_folder_title">Ordner löschen</string>

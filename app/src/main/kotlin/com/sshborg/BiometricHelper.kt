@@ -16,9 +16,18 @@ object BiometricHelper {
         BiometricManager.from(context)
             .canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS
 
+    /** True if a strong biometric is enrolled and usable right now. */
+    private fun biometricAvailable(context: Context): Boolean =
+        BiometricManager.from(context)
+            .canAuthenticate(BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
+
     /**
-     * Shows a biometric/device-credential prompt. Suspends until the user authenticates,
+     * Shows an authentication prompt. Suspends until the user authenticates,
      * cancels, or exhausts all attempts.
+     *
+     * Biometric-only by design (no PIN/pattern fallback). The device credential is
+     * accepted only when no usable biometric is enrolled, so a user who enabled the
+     * lock and later removed all fingerprints is not locked out of the app forever.
      * @return true on success, false on cancellation or permanent failure.
      */
     suspend fun authenticate(activity: FragmentActivity): Boolean =
@@ -37,7 +46,15 @@ object BiometricHelper {
             val info = BiometricPrompt.PromptInfo.Builder()
                 .setTitle(activity.getString(R.string.biometric_prompt_title))
                 .setSubtitle(activity.getString(R.string.biometric_prompt_subtitle))
-                .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+                .apply {
+                    if (biometricAvailable(activity)) {
+                        // A negative button is mandatory when DEVICE_CREDENTIAL is not allowed
+                        setAllowedAuthenticators(BIOMETRIC_STRONG)
+                        setNegativeButtonText(activity.getString(R.string.action_cancel))
+                    } else {
+                        setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+                    }
+                }
                 .build()
 
             prompt.authenticate(info)

@@ -390,7 +390,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         foregroundObserveJob?.cancel()
         foregroundObserveJob = null
         foregroundTransferId = null
-        tid?.let { transferManager.cancel(it) }
+        // Dismiss too: the observer that normally dismisses terminal transfers was just
+        // cancelled, so without this the entry would linger in the background panel.
+        tid?.let { transferManager.cancel(it); transferManager.dismiss(it) }
         refreshListing()
     }
 
@@ -641,7 +643,16 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
-            }.onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_refresh_failed)) }
+            }.onFailure {
+                // If the session is gone, a snackbar alone would leave the current state
+                // (e.g. the Downloading overlay) on screen with no way out.
+                if (sftpSession?.isConnected != true) {
+                    _state.value = State.Error(getApplication<Application>().getString(R.string.terminal_connection_lost))
+                    sessionId?.let { id -> sessionManager.update(id) { s -> s.copy(status = SessionManager.Status.Error) } }
+                } else {
+                    _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_refresh_failed))
+                }
+            }
         }
     }
 

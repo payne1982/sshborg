@@ -148,6 +148,8 @@
 
     <string name="settings_invert_scroll_title">ターミナルのスクロールを反転</string>
     <string name="settings_invert_scroll_subtitle">上にスワイプして新しい出力ではなく古い出力を表示</string>
+    <string name="settings_font_size_title">文字サイズ</string>
+    <string name="settings_font_size_subtitle">ターミナルの既定の文字サイズ（sp）。セッション中はピンチで拡大縮小できます</string>
     <string name="settings_scrollback_title">スクロールバック行数</string>
     <string name="settings_scrollback_subtitle">メモリに保持するターミナル履歴の行数</string>
     <string name="settings_scrollback_lines">%d 行</string>
@@ -219,6 +221,7 @@
     <string name="sftp_upload_complete">アップロード完了</string>
     <string name="sftp_started_at">開始: %1$s</string>
     <string name="sftp_finished_at">完了: %1$s</string>
+    <string name="sftp_cancelled_at">キャンセル: %1$s</string>
 
     <string name="sftp_delete_file_title">ファイルを削除</string>
     <string name="sftp_delete_folder_title">フォルダを削除</string>

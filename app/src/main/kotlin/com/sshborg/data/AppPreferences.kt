@@ -25,6 +25,7 @@ class AppPreferences(private val context: Context) {
         val NIGHT_MODE                = intPreferencesKey("night_mode")
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
+        val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
@@ -94,6 +95,20 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setScrollbackLines(lines: Int) {
         context.dataStore.edit { it[Keys.SCROLLBACK_LINES] = lines }
+    }
+
+    /** Default terminal font size in sp. 13sp ≈ the 36px the app used before this setting. */
+    val terminalFontSize: Flow<Int> =
+        context.dataStore.data.map { it[Keys.TERMINAL_FONT_SIZE] ?: DEFAULT_TERMINAL_FONT_SIZE }
+
+    suspend fun setTerminalFontSize(sp: Int) {
+        context.dataStore.edit { it[Keys.TERMINAL_FONT_SIZE] = sp }
+    }
+
+    companion object {
+        const val DEFAULT_TERMINAL_FONT_SIZE = 13
+        const val MIN_TERMINAL_FONT_SIZE = 8
+        const val MAX_TERMINAL_FONT_SIZE = 32
     }
 
     /** Whether to show shell history suggestions above the keyboard. Default true. */

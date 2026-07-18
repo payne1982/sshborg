@@ -46,6 +46,18 @@ class TerminalView @JvmOverloads constructor(
 
     /** When true, swipe up = see newer content (inverted from natural scroll). */
     var invertScroll: Boolean = false
+
+    /**
+     * Default font size from settings. Applied as long as the user hasn't pinch-zoomed:
+     * once they do, the pinched size takes over for the rest of the session.
+     */
+    var fontSizeSp: Float = 0f
+        set(value) {
+            if (value == field) return
+            field = value
+            if (!userScaled && value > 0f) setTextSizeSp(value)
+        }
+    private var userScaled = false
     private var gestureDetector = GestureDetector(context, GestureListener())
     private var scaleDetector = ScaleGestureDetector(context, ScaleListener())
 
@@ -57,6 +69,10 @@ class TerminalView @JvmOverloads constructor(
     private var draggingHandle = 0  // 0=none, 1=start, 2=end
     private var cachedViewStart = 0 // set each onDraw; safe to read on main thread in touch handlers
     private var dragLastX = 0f
+    // Finger-to-anchor offset captured at grab time, so the handle can be dragged by its
+    // round knob (above/below the row) without the selection jumping to the finger's row.
+    private var dragOffsetX = 0f
+    private var dragOffsetY = 0f
 
     // Auto-scroll while dragging a handle near the top/bottom edge.
     private val autoScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -146,9 +162,12 @@ class TerminalView @JvmOverloads constructor(
 
     fun setTextSizeSp(sp: Float) {
         val px = android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
+        if (px == textPaint.textSize) return
         textPaint.textSize = px
         boldPaint.textSize = px
         updateMetrics()
+        // Cell size changed, so the grid dimensions did too (no-op before first layout)
+        if (width > 0 && height > 0) onResize?.invoke(termColumns, termRows)
         invalidate()
     }
 
@@ -308,17 +327,20 @@ class TerminalView @JvmOverloads constructor(
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     draggingHandle = hitTestHandle(event.x, event.y)
-                    if (draggingHandle != 0) return true
+                    if (draggingHandle != 0) {
+                        captureDragOffset(event.x, event.y)
+                        return true
+                    }
                     // Not on a handle: fall through to gesture detector (allows scroll/tap-to-exit)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (draggingHandle != 0) {
-                        dragLastX = event.x
+                        dragLastX = event.x + dragOffsetX
                         val triggerZone = cellH * 2f
                         when {
                             event.y < triggerZone          -> scheduleAutoScroll(+1)
                             event.y > height - triggerZone -> scheduleAutoScroll(-1)
-                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x, event.y) }
+                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x + dragOffsetX, event.y + dragOffsetY) }
                         }
                         return true
                     }
@@ -364,6 +386,20 @@ class TerminalView @JvmOverloads constructor(
         }
 
         return 0
+    }
+
+    /**
+     * Records the offset between the finger and the centre of the cell the grabbed
+     * handle is anchored to. Applying it to every move keeps the anchor exactly where
+     * it was at grab time, no matter which part of the handle the finger landed on.
+     */
+    private fun captureDragOffset(x: Float, y: Float) {
+        val start = selStart ?: return
+        val end   = selEnd   ?: return
+        val (s, e) = if (compareAnchors(start, end) <= 0) start to end else end to start
+        val anchor = if (draggingHandle == 1) s else e
+        dragOffsetX = (anchor.second + 0.5f) * cellW - x
+        dragOffsetY = (anchor.first - cachedViewStart + 0.5f) * cellH - y
     }
 
     private fun updateDraggedHandle(x: Float, y: Float) {
@@ -444,7 +480,13 @@ class TerminalView @JvmOverloads constructor(
                 val to    = (if (absLine == e.first) e.second else cells.lastIndex).coerceAtMost(cells.lastIndex)
                 val row   = StringBuilder()
                 for (col in from..to) row.append(cells[col].char)
-                if (absLine < e.first) sb.appendLine(row.trimEnd()) else sb.append(row.trimEnd())
+                when {
+                    absLine == e.first -> sb.append(row.trimEnd())
+                    // Auto-wrapped line: it continues on the next one, so no newline
+                    // and no trimEnd (trailing spaces are real content of the full line)
+                    isAbsLineWrapped(absLine, buf, total) -> sb.append(row)
+                    else -> sb.appendLine(row.trimEnd())
+                }
             }
         }
         return sb.toString().trimEnd()
@@ -459,12 +501,12 @@ class TerminalView @JvmOverloads constructor(
                 val line = buf.getScrollbackLine(i) ?: continue
                 val row = StringBuilder()
                 for (cell in line) row.append(cell.char)
-                sb.appendLine(row.trimEnd())
+                if (buf.isScrollbackLineWrapped(i)) sb.append(row) else sb.appendLine(row.trimEnd())
             }
             for (row in 0 until buf.rows) {
                 val line = StringBuilder()
                 for (col in 0 until buf.columns) line.append(buf.getCell(row, col).char)
-                sb.appendLine(line.trimEnd())
+                if (buf.isLineWrapped(row)) sb.append(line) else sb.appendLine(line.trimEnd())
             }
         }
         return sb.toString().trimEnd()
@@ -477,6 +519,10 @@ class TerminalView @JvmOverloads constructor(
             val sr = absLine - totalScrollback
             if (sr >= buf.rows) null else (0 until buf.columns).map { buf.getCell(sr, it) }.toTypedArray()
         }
+
+    private fun isAbsLineWrapped(absLine: Int, buf: TerminalBuffer, totalScrollback: Int): Boolean =
+        if (absLine < totalScrollback) buf.isScrollbackLineWrapped(absLine)
+        else buf.isLineWrapped(absLine - totalScrollback)
 
     // --- Input ---
 
@@ -581,6 +627,7 @@ class TerminalView @JvmOverloads constructor(
 
     private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
+            userScaled = true
             val newSize = (textPaint.textSize * detector.scaleFactor).coerceIn(20f, 80f)
             textPaint.textSize = newSize
             boldPaint.textSize = newSize

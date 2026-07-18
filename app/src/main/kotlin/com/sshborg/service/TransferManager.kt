@@ -146,7 +146,10 @@ class TransferManager(private val app: Application) {
 
     fun cancel(id: String) {
         jobMap.remove(id)?.cancel()
-        channelMap.remove(id)?.let { runCatching { it.disconnect() } }
+        // Disconnect on the IO scope: channel.disconnect() writes an SSH packet, and a
+        // network write on the main thread throws after JSch has already advanced its
+        // cipher state, corrupting the whole SSH connection.
+        channelMap.remove(id)?.let { ch -> scope.launch { runCatching { ch.disconnect() } } }
         _transfers.update { list ->
             list.map { if (it.id == id && it.status == BackgroundTransfer.Status.Running) it.copy(status = BackgroundTransfer.Status.Cancelled, completedAt = System.currentTimeMillis()) else it }
         }

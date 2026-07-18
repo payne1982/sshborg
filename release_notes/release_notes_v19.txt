@@ -1,0 +1,63 @@
+<en-US>
+• SFTP: fixed several issues when cancelling downloads
+• Terminal: selection handles are easier to drag, and copied text no longer contains fake line breaks where long lines wrap
+• New setting: default terminal font size
+• App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)
+• Updated internal libraries
+</en-US>
+<it-IT>
+• SFTP: risolti vari problemi nell'annullamento dei download
+• Terminale: puntatori di selezione più facili da trascinare e il testo copiato non contiene più a-capo fittizi dove le righe lunghe proseguono su quella successiva
+• Nuova impostazione: dimensione predefinita del carattere del terminale
+• Blocco app: sblocco solo biometrico (PIN/sequenza solo senza biometrie registrate)
+• Aggiornate le librerie interne
+</it-IT>
+<de-DE>
+• SFTP: Mehrere Probleme beim Abbrechen von Downloads behoben
+• Terminal: Auswahlgriffe lassen sich leichter ziehen und kopierter Text enthält keine falschen Zeilenumbrüche mehr, wenn lange Zeilen umbrechen
+• Neue Einstellung: Standard-Schriftgröße des Terminals
+• App-Sperre: Entsperrung nur noch per Biometrie (PIN/Muster nur ohne registrierte Biometrie)
+• Interne Bibliotheken aktualisiert
+</de-DE>
+<es-ES>
+• SFTP: corregidos varios problemas al cancelar descargas
+• Terminal: los marcadores de selección son más fáciles de arrastrar y el texto copiado ya no incluye saltos de línea falsos cuando las líneas largas continúan en la siguiente
+• Nuevo ajuste: tamaño de letra predeterminado del terminal
+• Bloqueo de la app: desbloqueo solo biométrico (PIN/patrón solo sin biometría registrada)
+• Bibliotecas internas actualizadas
+</es-ES>
+<fr-FR>
+• SFTP : correction de plusieurs problèmes lors de l'annulation des téléchargements
+• Terminal : les poignées de sélection sont plus faciles à déplacer et le texte copié ne contient plus de sauts de ligne factices lorsque les longues lignes continuent sur la suivante
+• Nouveau réglage : taille par défaut du texte du terminal
+• Verrouillage de l'app : déverrouillage uniquement biométrique (PIN/schéma seulement sans biométrie enregistrée)
+• Bibliothèques internes mises à jour
+</fr-FR>
+<pt-PT>
+• SFTP: corrigidos vários problemas ao cancelar transferências
+• Terminal: os marcadores de seleção são mais fáceis de arrastar e o texto copiado já não inclui quebras de linha falsas quando as linhas longas continuam na seguinte
+• Nova definição: tamanho de letra predefinido do terminal
+• Bloqueio da app: desbloqueio apenas biométrico (PIN/padrão só sem biometria registada)
+• Bibliotecas internas atualizadas
+</pt-PT>
+<uk>
+• SFTP: виправлено кілька проблем під час скасування завантажень
+• Термінал: маркери виділення легше перетягувати, а скопійований текст більше не містить зайвих розривів рядків там, де довгі рядки переносяться
+• Нове налаштування: типовий розмір шрифту термінала
+• Блокування застосунку: розблокування лише біометричне (PIN/ключ — лише якщо біометрію не налаштовано)
+• Оновлено внутрішні бібліотеки
+</uk>
+<zh-CN>
+• SFTP：修复了取消下载时的多个问题
+• 终端：选择手柄更易拖动，复制的文本不再在长行自动换行处插入多余的换行符
+• 新增设置：终端默认字体大小
+• 应用锁定：解锁仅限生物识别（仅在未录入生物识别时才可用 PIN/图案）
+• 更新了内部库
+</zh-CN>
+<ja-JP>
+• SFTP：ダウンロードのキャンセル時の複数の問題を修正しました
+• ターミナル：選択ハンドルがドラッグしやすくなり、長い行の折り返し位置に余分な改行が入らずにコピーできるようになりました
+• 新しい設定：ターミナルの既定の文字サイズ
+• アプリロック：ロック解除は生体認証のみに（生体認証未登録の場合のみPIN/パターン）
+• 内部ライブラリを更新しました
+</ja-JP>
