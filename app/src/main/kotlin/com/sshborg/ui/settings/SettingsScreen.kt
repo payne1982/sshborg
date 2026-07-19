@@ -51,6 +51,7 @@ fun SettingsScreen(
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
     val confirmExit           by vm.confirmExit.collectAsState()
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
+    val keepScreenOn          by vm.keepScreenOn.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
@@ -243,6 +244,17 @@ fun SettingsScreen(
                     Switch(
                         checked = invertTerminalScroll,
                         onCheckedChange = { vm.setInvertTerminalScroll(it) },
+                    )
+                },
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_keep_screen_on_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_keep_screen_on_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = keepScreenOn,
+                        onCheckedChange = { vm.setKeepScreenOn(it) },
                     )
                 },
             )

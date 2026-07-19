@@ -139,6 +139,8 @@
 
     <string name="settings_invert_scroll_title">Inverter scroll do terminal</string>
     <string name="settings_invert_scroll_subtitle">Deslize para cima para ver a saída mais antiga</string>
+    <string name="settings_keep_screen_on_title">Manter o ecrã ligado</string>
+    <string name="settings_keep_screen_on_subtitle">Impede que o ecrã se desligue enquanto um terminal está aberto</string>
     <string name="settings_font_size_title">Tamanho da letra</string>
     <string name="settings_font_size_subtitle">Tamanho de texto predefinido do terminal (sp); belisque para ampliar na sessão</string>
     <string name="settings_scrollback_title">Linhas de scrollback</string>

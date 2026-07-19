@@ -149,6 +149,8 @@
 
     <string name="settings_invert_scroll_title">Invert terminal scroll</string>
     <string name="settings_invert_scroll_subtitle">Swipe up to see older output instead of newer</string>
+    <string name="settings_keep_screen_on_title">Keep screen on</string>
+    <string name="settings_keep_screen_on_subtitle">Prevent the screen from turning off while a terminal is open</string>
     <string name="settings_font_size_title">Font size</string>
     <string name="settings_font_size_subtitle">Default terminal text size (sp); pinch to zoom in a session</string>
     <string name="settings_scrollback_title">Scrollback lines</string>

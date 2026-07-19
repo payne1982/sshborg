@@ -26,6 +26,7 @@ class AppPreferences(private val context: Context) {
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
+        val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
@@ -103,6 +104,14 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setTerminalFontSize(sp: Int) {
         context.dataStore.edit { it[Keys.TERMINAL_FONT_SIZE] = sp }
+    }
+
+    /** Keep the screen awake while a terminal is open. Default false (saves battery). */
+    val keepScreenOn: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.KEEP_SCREEN_ON] ?: false }
+
+    suspend fun setKeepScreenOn(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.KEEP_SCREEN_ON] = enabled }
     }
 
     companion object {

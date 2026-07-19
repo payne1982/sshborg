@@ -50,6 +50,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
             com.sshborg.data.AppPreferences.DEFAULT_TERMINAL_FONT_SIZE,
         )
 
+    val keepScreenOn: StateFlow<Boolean> =
+        prefs.keepScreenOn.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -111,6 +114,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setTerminalFontSize(sp: Int) {
         viewModelScope.launch { prefs.setTerminalFontSize(sp) }
+    }
+
+    fun setKeepScreenOn(enabled: Boolean) {
+        viewModelScope.launch { prefs.setKeepScreenOn(enabled) }
     }
 
     fun setHistorySuggestions(enabled: Boolean) {

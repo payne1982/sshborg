@@ -139,6 +139,8 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_keep_screen_on_title">Bildschirm eingeschaltet lassen</string>
+    <string name="settings_keep_screen_on_subtitle">Verhindert das Ausschalten des Bildschirms, solange ein Terminal geöffnet ist</string>
     <string name="settings_font_size_title">Schriftgröße</string>
     <string name="settings_font_size_subtitle">Standard-Textgröße des Terminals (sp); Zoomen per Fingergeste in der Sitzung</string>
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>
