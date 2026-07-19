@@ -579,6 +579,7 @@
                 <li><strong>編集</strong> — ヘッダーを長押しして<em>編集</em>を選ぶと、グループ名の変更や色の変更ができます。</li>
                 <li><strong>削除</strong> — ヘッダーを長押しして<em>削除</em>を選びます。グループ内のホストは削除<em>されず</em>、グループなしに戻るだけです。</li>
             </ul>
+            <p>色はクイックスウォッチから選ぶことも、RGB スライダーで自由に作ることもできます。ホストには<strong>専用の色</strong>も設定でき（ホスト編集画面のグループのすぐ下）、グループの色より優先され、グループのないホストでも使えます。</p>
             <p>グループのないホストは一覧の先頭に表示されます。グループを作らなければ、一覧の見た目も動作も従来とまったく同じです。</p>
         </div>
 
@@ -972,6 +973,7 @@ Host target
                 <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> にすると、前述のレガシー暗号アルゴリズムが有効になります。既定は <code>false</code> です。</li>
                 <li><code>group</code> — ホストが属するグループ名。グループはトップレベルの <code>groups</code> 配列に <code>name</code> と <code>color</code>（符号付き 32 ビット整数の ARGB）で記載します。配列にないグループをホストが参照している場合は既定の色で自動作成されるため、手書きの場合は配列を丸ごと省略してもかまいません。</li>
+                <li><code>color</code> — ホストごとの任意の色（符号付き 32 ビット整数の ARGB）。グループの色より優先されます。</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// 省略可能なフィールド</div>

@@ -140,6 +140,7 @@ module.exports = {
                 <li><strong>Modifier</strong> — appuyez longuement sur l'en-tête et choisissez <em>Modifier</em> pour renommer le groupe ou changer sa couleur.</li>
                 <li><strong>Supprimer</strong> — appuyez longuement sur l'en-tête et choisissez <em>Supprimer</em>. Les hôtes du groupe ne sont <em>pas</em> supprimés : ils redeviennent simplement sans groupe.</li>
             </ul>
+            <p>Les couleurs se choisissent parmi les pastilles rapides ou librement avec les curseurs RVB. Un hôte peut aussi avoir sa <strong>propre couleur</strong> — définie dans l'éditeur d'hôte, juste sous le groupe — qui prime sur la couleur du groupe et fonctionne aussi pour les hôtes sans groupe.</p>
             <p>Les hôtes sans groupe restent en haut de la liste et, si vous ne créez aucun groupe, la liste garde exactement l'aspect et le comportement d'avant.</p>`,
 
   doc_sftp: `
@@ -507,6 +508,7 @@ Host target
                 <li><code>sftpStartDir</code> — chemin à utiliser quand <code>sftpStartMode</code> est <code>"fixed"</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> pour activer les algorithmes hérités décrits plus haut. Par défaut : <code>false</code>.</li>
                 <li><code>group</code> — nom du groupe auquel appartient l'hôte. Les groupes figurent dans le tableau <code>groups</code> au niveau racine, avec <code>name</code> et <code>color</code> (ARGB en entier 32 bits signé). Si un hôte référence un groupe absent du tableau, celui-ci est créé automatiquement avec une couleur par défaut — vous pouvez donc omettre le tableau en écrivant le fichier à la main.</li>
+                <li><code>color</code> — couleur facultative de l'hôte (ARGB en entier 32 bits signé). Elle prime sur la couleur du groupe.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// CHAMPS OPTIONNELS</div>

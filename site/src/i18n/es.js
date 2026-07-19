@@ -140,6 +140,7 @@ module.exports = {
                 <li><strong>Editar</strong> — mantén pulsada la cabecera y elige <em>Editar</em> para renombrar el grupo o cambiar su color.</li>
                 <li><strong>Eliminar</strong> — mantén pulsada la cabecera y elige <em>Eliminar</em>. Los hosts del grupo <em>no</em> se borran: simplemente quedan sin grupo.</li>
             </ul>
+            <p>Los colores se eligen de las muestras rápidas o libremente con los controles RGB. Un host también puede tener un <strong>color propio</strong> — se define en el editor del host, justo debajo del grupo — que prevalece sobre el color del grupo y funciona también para hosts sin grupo.</p>
             <p>Los hosts sin grupo permanecen al principio de la lista y, si no creas ningún grupo, la lista se ve y se comporta exactamente como antes.</p>`,
 
   doc_sftp: `
@@ -507,6 +508,7 @@ Host target
                 <li><code>sftpStartDir</code> — ruta a usar cuando <code>sftpStartMode</code> es <code>"fixed"</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> para habilitar los algoritmos heredados descritos más arriba. Por defecto <code>false</code>.</li>
                 <li><code>group</code> — nombre del grupo al que pertenece el host. Los grupos se listan en el array <code>groups</code> del nivel superior, con <code>name</code> y <code>color</code> (ARGB como entero de 32 bits con signo). Si un host hace referencia a un grupo que no está en el array, se crea automáticamente con un color por defecto — al escribir el archivo a mano puedes omitir el array.</li>
+                <li><code>color</code> — color opcional del host (ARGB como entero de 32 bits con signo). Prevalece sobre el color del grupo.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// CAMPOS OPCIONALES</div>

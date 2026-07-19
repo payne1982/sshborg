@@ -579,6 +579,7 @@
                 <li><strong>编辑</strong> — 长按分组标题并选择<em>编辑</em>，可重命名分组或更换颜色。</li>
                 <li><strong>删除</strong> — 长按标题并选择<em>删除</em>。组内的主机<em>不会</em>被删除，只是变为未分组。</li>
             </ul>
+            <p>颜色可以从快捷色板中选择，也可以用 RGB 滑块自由调配。主机还可以拥有<strong>自己的颜色</strong>——在主机编辑器中、分组下方设置——它会覆盖分组颜色，对未分组的主机同样有效。</p>
             <p>未分组的主机始终显示在列表顶部；如果不创建任何分组，列表的外观和行为与以前完全相同。</p>
         </div>
 
@@ -972,6 +973,7 @@ Host target
                 <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
                 <li><code>allowLegacyCiphers</code> — 设为 <code>true</code> 可启用上文介绍的旧式加密算法。默认为 <code>false</code>。</li>
                 <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
+                <li><code>color</code> — 主机的可选颜色（ARGB，带符号 32 位整数），会覆盖分组颜色。</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// 可选字段</div>

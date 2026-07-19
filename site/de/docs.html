@@ -579,6 +579,7 @@
                 <li><strong>Bearbeiten</strong> — halte die Überschrift gedrückt und wähle <em>Bearbeiten</em>, um die Gruppe umzubenennen oder die Farbe zu ändern.</li>
                 <li><strong>Löschen</strong> — halte die Überschrift gedrückt und wähle <em>Löschen</em>. Die Hosts der Gruppe werden <em>nicht</em> gelöscht — sie sind danach einfach ohne Gruppe.</li>
             </ul>
+            <p>Farben lassen sich aus den Schnellauswahl-Feldern wählen oder frei mit den RGB-Reglern mischen. Ein Host kann auch eine <strong>eigene Farbe</strong> haben — einstellbar im Host-Editor direkt unter der Gruppe —, die die Gruppenfarbe überschreibt und auch für Hosts ohne Gruppe funktioniert.</p>
             <p>Hosts ohne Gruppe bleiben oben in der Liste, und solange du keine Gruppe erstellst, sieht die Liste genauso aus und verhält sich genauso wie bisher.</p>
         </div>
 
@@ -972,6 +973,7 @@ Host target
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
+                <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// OPTIONALE FELDER</div>
