@@ -1,2 +1,3 @@
+• Nuovo schema colori chiaro per il terminale (nero su bianco), che può anche seguire il tema dell'app
 • Nuova impostazione per mantenere lo schermo acceso mentre un terminale è aperto
 • Risolto un crash nella generazione delle chiavi SSH su Android 12 e precedenti, più correzioni minori

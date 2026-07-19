@@ -53,6 +53,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val keepScreenOn: StateFlow<Boolean> =
         prefs.keepScreenOn.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val terminalColorScheme: StateFlow<Int> =
+        prefs.terminalColorScheme.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.TERMINAL_SCHEME_DARK,
+        )
+
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -118,6 +124,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setKeepScreenOn(enabled: Boolean) {
         viewModelScope.launch { prefs.setKeepScreenOn(enabled) }
+    }
+
+    fun setTerminalColorScheme(scheme: Int) {
+        viewModelScope.launch { prefs.setTerminalColorScheme(scheme) }
     }
 
     fun setHistorySuggestions(enabled: Boolean) {

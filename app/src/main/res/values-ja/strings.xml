@@ -150,6 +150,8 @@
     <string name="settings_invert_scroll_subtitle">上にスワイプして新しい出力ではなく古い出力を表示</string>
     <string name="settings_keep_screen_on_title">画面をオンのまま維持</string>
     <string name="settings_keep_screen_on_subtitle">ターミナルを開いている間、画面が消灯しないようにします</string>
+    <string name="settings_terminal_colors_title">ターミナルの配色</string>
+    <string name="settings_terminal_colors_follow_app">アプリのテーマに合わせる</string>
     <string name="settings_font_size_title">文字サイズ</string>
     <string name="settings_font_size_subtitle">ターミナルの既定の文字サイズ（sp）。セッション中はピンチで拡大縮小できます</string>
     <string name="settings_scrollback_title">スクロールバック行数</string>

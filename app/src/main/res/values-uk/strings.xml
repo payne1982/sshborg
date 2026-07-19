@@ -141,6 +141,8 @@
     <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити старіший вивід</string>
     <string name="settings_keep_screen_on_title">Не вимикати екран</string>
     <string name="settings_keep_screen_on_subtitle">Запобігає вимкненню екрана, поки відкрито термінал</string>
+    <string name="settings_terminal_colors_title">Кольори термінала</string>
+    <string name="settings_terminal_colors_follow_app">Як тема застосунку</string>
     <string name="settings_font_size_title">Розмір шрифту</string>
     <string name="settings_font_size_subtitle">Типовий розмір тексту термінала (sp); жест масштабування діє в сеансі</string>
     <string name="settings_scrollback_title">Рядки прокрутки</string>

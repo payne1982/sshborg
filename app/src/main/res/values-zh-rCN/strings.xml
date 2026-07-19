@@ -150,6 +150,8 @@
     <string name="settings_invert_scroll_subtitle">向上滑动查看较早的输出而非较新的</string>
     <string name="settings_keep_screen_on_title">保持屏幕常亮</string>
     <string name="settings_keep_screen_on_subtitle">终端打开时防止屏幕关闭</string>
+    <string name="settings_terminal_colors_title">终端配色</string>
+    <string name="settings_terminal_colors_follow_app">跟随应用主题</string>
     <string name="settings_font_size_title">字体大小</string>
     <string name="settings_font_size_subtitle">终端默认文字大小（sp）；会话中可双指缩放</string>
     <string name="settings_scrollback_title">滚动回看行数</string>

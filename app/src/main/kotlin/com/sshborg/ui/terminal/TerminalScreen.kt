@@ -1,7 +1,9 @@
 package com.sshborg.ui.terminal
 
 import androidx.activity.compose.BackHandler
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.sshborg.R
 import com.sshborg.SshBorgApp
+import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import kotlinx.coroutines.delay
@@ -74,6 +77,23 @@ fun TerminalScreen(
         initial = com.sshborg.data.AppPreferences.DEFAULT_TERMINAL_FONT_SIZE
     )
     val keepScreenOn  by app.appPreferences.keepScreenOn.collectAsState(initial = false)
+    val terminalScheme by app.appPreferences.terminalColorScheme.collectAsState(
+        initial = AppPreferences.TERMINAL_SCHEME_DARK
+    )
+    val nightMode     by app.appPreferences.nightMode.collectAsState(
+        initial = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    )
+    // Mirrors SshBorgTheme's darkTheme resolution so "follow app" matches the chrome
+    val appDark = when (nightMode) {
+        AppCompatDelegate.MODE_NIGHT_YES -> true
+        AppCompatDelegate.MODE_NIGHT_NO  -> false
+        else -> isSystemInDarkTheme()
+    }
+    val terminalLight = when (terminalScheme) {
+        AppPreferences.TERMINAL_SCHEME_LIGHT      -> true
+        AppPreferences.TERMINAL_SCHEME_FOLLOW_APP -> !appDark
+        else                                      -> false
+    }
     val suggestions   by vm.suggestions.collectAsState()
 
     // Siblings: other Shell sessions for the same host (for the tab bar)
@@ -155,6 +175,7 @@ fun TerminalScreen(
                             view.fontSizeSp            = fontSize.toFloat()
                             view.invertScroll          = invertScroll
                             view.keepScreenOn          = keepScreenOn
+                            view.lightScheme           = terminalLight
                             view.onInput              = sendInput
                             view.onResize             = { cols, rows -> vm.resize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
@@ -167,6 +188,7 @@ fun TerminalScreen(
                         view.fontSizeSp            = fontSize.toFloat()
                         view.invertScroll          = invertScroll
                         view.keepScreenOn          = keepScreenOn
+                        view.lightScheme           = terminalLight
                         view.onInput              = sendInput
                         view.onResize             = { cols, rows -> vm.resize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }

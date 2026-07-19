@@ -87,7 +87,7 @@ class TerminalView @JvmOverloads constructor(
     private val handleRadius: Float by lazy { 10f * resources.displayMetrics.density }
 
     // --- ANSI color palette ---
-    private val colorPalette = IntArray(256).apply {
+    private val darkPalette = IntArray(256).apply {
         // 0-7: standard
         this[0] = Color.rgb(0, 0, 0);       this[1] = Color.rgb(170, 0, 0)
         this[2] = Color.rgb(0, 170, 0);     this[3] = Color.rgb(170, 85, 0)
@@ -110,8 +110,34 @@ class TerminalView @JvmOverloads constructor(
             this[i] = Color.rgb(v, v, v)
         }
     }
-    private val defaultFg = Color.rgb(204, 204, 204)
-    private val defaultBg = Color.BLACK
+
+    // Light-scheme palette: same hues, but the entries that are unreadable on a
+    // white background (light grey and most brights) are darkened. Cube and
+    // grayscale (16-255) are shared with the dark palette, as explicit colors.
+    private val lightPalette = darkPalette.copyOf().apply {
+        this[7]  = Color.rgb(115, 115, 115)
+        this[9]  = Color.rgb(220, 50, 50)
+        this[10] = Color.rgb(0, 135, 0)
+        this[11] = Color.rgb(140, 120, 0)
+        this[13] = Color.rgb(200, 50, 200)
+        this[14] = Color.rgb(0, 145, 160)
+        this[15] = Color.rgb(50, 50, 50)
+    }
+
+    private var colorPalette = darkPalette
+    private var defaultFg = DARK_FG
+    private var defaultBg = DARK_BG
+
+    /** Black-on-white color scheme; cells with explicit colors are unaffected. */
+    var lightScheme: Boolean = false
+        set(value) {
+            if (value == field) return
+            field = value
+            colorPalette = if (value) lightPalette else darkPalette
+            defaultFg = if (value) LIGHT_FG else DARK_FG
+            defaultBg = if (value) LIGHT_BG else DARK_BG
+            invalidate()
+        }
 
     init {
         isFocusable = true
@@ -803,5 +829,12 @@ class TerminalView @JvmOverloads constructor(
             }
             return super.sendKeyEvent(event)
         }
+    }
+
+    companion object {
+        private val DARK_FG  = Color.rgb(204, 204, 204)
+        private val DARK_BG  = Color.BLACK
+        private val LIGHT_FG = Color.rgb(51, 51, 51)
+        private val LIGHT_BG = Color.WHITE
     }
 }

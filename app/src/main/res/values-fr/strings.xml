@@ -141,6 +141,8 @@
     <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus ancienne</string>
     <string name="settings_keep_screen_on_title">Garder l\'écran allumé</string>
     <string name="settings_keep_screen_on_subtitle">Empêche l\'écran de s\'éteindre tant qu\'un terminal est ouvert</string>
+    <string name="settings_terminal_colors_title">Couleurs du terminal</string>
+    <string name="settings_terminal_colors_follow_app">Selon le thème de l\'appli</string>
     <string name="settings_font_size_title">Taille du texte</string>
     <string name="settings_font_size_subtitle">Taille par défaut du texte du terminal (sp) ; pincez pour zoomer dans la session</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
