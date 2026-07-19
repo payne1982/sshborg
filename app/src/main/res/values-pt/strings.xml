@@ -51,6 +51,11 @@
     <string name="group_dialog_name">Nome</string>
     <string name="group_delete_title">Eliminar grupo</string>
     <string name="group_delete_message">Eliminar \"%1$s\"? Os hosts serão mantidos, sem grupo.</string>
+    <string name="host_color_label">Cor</string>
+    <string name="host_color_auto">Automática</string>
+    <string name="host_color_custom">Personalizada</string>
+    <string name="host_color_dialog_title">Cor do host</string>
+    <string name="host_color_remove">Remover cor personalizada</string>
 
     <string name="host_menu_connect">Ligar</string>
     <string name="host_menu_resume_terminal">Retomar terminal (%1$d)</string>

@@ -53,6 +53,11 @@
     <string name="group_dialog_name">Name</string>
     <string name="group_delete_title">Delete group</string>
     <string name="group_delete_message">Delete \"%1$s\"? Its hosts will be kept, without a group.</string>
+    <string name="host_color_label">Color</string>
+    <string name="host_color_auto">Automatic</string>
+    <string name="host_color_custom">Custom</string>
+    <string name="host_color_dialog_title">Host color</string>
+    <string name="host_color_remove">Remove custom color</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">Connect</string>

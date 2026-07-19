@@ -52,6 +52,11 @@
     <string name="group_dialog_name">名前</string>
     <string name="group_delete_title">グループを削除</string>
     <string name="group_delete_message">\"%1$s\" を削除しますか？ホストはグループなしで保持されます。</string>
+    <string name="host_color_label">色</string>
+    <string name="host_color_auto">自動</string>
+    <string name="host_color_custom">カスタム</string>
+    <string name="host_color_dialog_title">ホストの色</string>
+    <string name="host_color_remove">カスタムの色を削除</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">接続</string>

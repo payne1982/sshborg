@@ -1,6 +1,8 @@
 package com.sshborg.ui.hosts
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -56,11 +58,13 @@ fun AddEditHostScreen(
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
+    val hostColor by vm.hostColor.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var keyMenuExpanded by remember { mutableStateOf(false) }
     var groupMenuExpanded by remember { mutableStateOf(false) }
     var showNewGroupDialog by remember { mutableStateOf(false) }
+    var showHostColorDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -158,6 +162,39 @@ fun AddEditHostScreen(
                         leadingIcon = { Icon(Icons.Default.Add, null) },
                         text = { Text(stringResource(R.string.host_group_new)) },
                         onClick = { groupMenuExpanded = false; showNewGroupDialog = true },
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showHostColorDialog = true }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                val groupColor = groups.find { it.id == groupId }?.color
+                val shownColor = hostColor ?: groupColor
+                Box(
+                    Modifier
+                        .size(28.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                        .padding(3.dp)
+                        .then(
+                            if (shownColor != null)
+                                Modifier.background(Color(shownColor), CircleShape)
+                            else Modifier
+                        )
+                )
+                Column {
+                    Text(stringResource(R.string.host_color_label), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(
+                            if (hostColor != null) R.string.host_color_custom
+                            else R.string.host_color_auto
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -374,6 +411,17 @@ fun AddEditHostScreen(
                 Text(stringResource(R.string.action_save))
             }
         }
+    }
+
+    if (showHostColorDialog) {
+        HostColorDialog(
+            initialColor = hostColor,
+            onConfirm    = { color ->
+                vm.hostColor.value = color
+                showHostColorDialog = false
+            },
+            onDismiss    = { showHostColorDialog = false },
+        )
     }
 
     if (showNewGroupDialog) {

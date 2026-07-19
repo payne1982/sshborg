@@ -397,7 +397,8 @@ private fun HostItem(
                 Icon(
                     Icons.Default.Computer,
                     contentDescription = null,
-                    tint = groupColor ?: LocalContentColor.current,
+                    // Host's own color wins over the group color
+                    tint = host.color?.let { Color(it) } ?: groupColor ?: LocalContentColor.current,
                 )
                 if (shellCount > 0 || sftpCount > 0) {
                     Column(

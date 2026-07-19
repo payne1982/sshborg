@@ -52,6 +52,11 @@
     <string name="group_dialog_name">名称</string>
     <string name="group_delete_title">删除分组</string>
     <string name="group_delete_message">删除 \"%1$s\"？主机将被保留，不属于任何分组。</string>
+    <string name="host_color_label">颜色</string>
+    <string name="host_color_auto">自动</string>
+    <string name="host_color_custom">自定义</string>
+    <string name="host_color_dialog_title">主机颜色</string>
+    <string name="host_color_remove">移除自定义颜色</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">连接</string>

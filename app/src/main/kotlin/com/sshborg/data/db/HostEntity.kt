@@ -48,4 +48,6 @@ data class HostEntity(
     val allowLegacyCiphers: Boolean = false,
     /** Null = ungrouped; otherwise ID of the [GroupEntity] this host belongs to. */
     val groupId: Long? = null,
+    /** Optional per-host ARGB color; overrides the group color. Null = group color or default. */
+    val color: Int? = null,
 )

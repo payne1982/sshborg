@@ -191,6 +191,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         h.portForwardings?.let { put("portForwardings", it) }
                         h.sftpStartDir?.let { put("sftpStartDir", it) }
                         h.groupId?.let { gid -> groupNameById[gid]?.let { put("group", it) } }
+                        h.color?.let { put("color", it) }
                     })
                 }
                 val json = JSONObject().apply {
@@ -269,6 +270,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         sftpStartDir = o.optString("sftpStartDir").takeIf { it.isNotEmpty() },
                         allowLegacyCiphers = o.optBoolean("allowLegacyCiphers", false),
                         groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
+                        color = if (o.has("color")) o.getInt("color") else null,
                     )
                 }
                 val existingByLabel = hostDao.getAllOnce().associateBy { it.label }

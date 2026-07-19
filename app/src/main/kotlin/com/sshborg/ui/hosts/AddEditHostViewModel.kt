@@ -52,6 +52,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var allowLegacyCiphers = MutableStateFlow(false)
     /** Null = ungrouped; otherwise the selected group's ID. */
     var groupId = MutableStateFlow<Long?>(null)
+    /** Optional per-host ARGB color; overrides the group color. */
+    var hostColor = MutableStateFlow<Int?>(null)
 
     private val _editingId = MutableStateFlow<Long?>(null)
 
@@ -105,6 +107,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir.value = h.sftpStartDir ?: ""
             allowLegacyCiphers.value = h.allowLegacyCiphers
             groupId.value = h.groupId
+            hostColor.value = h.color
         }
     }
 
@@ -162,6 +165,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir         = newSftpStartDir,
             allowLegacyCiphers   = allowLegacyCiphers.value,
             groupId              = groupId.value,
+            color                = hostColor.value,
         )
         hostDao.upsert(entity)
         onDone()

@@ -51,6 +51,11 @@
     <string name="group_dialog_name">Nom</string>
     <string name="group_delete_title">Supprimer le groupe</string>
     <string name="group_delete_message">Supprimer \"%1$s\" ? Les hôtes seront conservés, sans groupe.</string>
+    <string name="host_color_label">Couleur</string>
+    <string name="host_color_auto">Automatique</string>
+    <string name="host_color_custom">Personnalisée</string>
+    <string name="host_color_dialog_title">Couleur de l\'hôte</string>
+    <string name="host_color_remove">Supprimer la couleur personnalisée</string>
 
     <string name="host_menu_connect">Connecter</string>
     <string name="host_menu_resume_terminal">Reprendre le terminal (%1$d)</string>
