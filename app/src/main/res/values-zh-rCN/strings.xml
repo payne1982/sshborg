@@ -44,6 +44,14 @@
     <string name="hosts_press_back_to_exit">再按一次返回键退出</string>
     <string name="hosts_delete_title">删除主机</string>
     <string name="hosts_delete_message">删除"%1$s"？</string>
+    <string name="host_group_label">分组</string>
+    <string name="host_group_none">无分组</string>
+    <string name="host_group_new">新建分组…</string>
+    <string name="group_dialog_title_new">新建分组</string>
+    <string name="group_dialog_title_edit">编辑分组</string>
+    <string name="group_dialog_name">名称</string>
+    <string name="group_delete_title">删除分组</string>
+    <string name="group_delete_message">删除 \"%1$s\"？主机将被保留，不属于任何分组。</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">连接</string>

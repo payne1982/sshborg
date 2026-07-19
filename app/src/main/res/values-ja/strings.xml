@@ -44,6 +44,14 @@
     <string name="hosts_press_back_to_exit">もう一度戻るボタンで終了</string>
     <string name="hosts_delete_title">ホストを削除</string>
     <string name="hosts_delete_message">"%1$s" を削除しますか？</string>
+    <string name="host_group_label">グループ</string>
+    <string name="host_group_none">グループなし</string>
+    <string name="host_group_new">新しいグループ…</string>
+    <string name="group_dialog_title_new">新しいグループ</string>
+    <string name="group_dialog_title_edit">グループを編集</string>
+    <string name="group_dialog_name">名前</string>
+    <string name="group_delete_title">グループを削除</string>
+    <string name="group_delete_message">\"%1$s\" を削除しますか？ホストはグループなしで保持されます。</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">接続</string>

@@ -43,6 +43,14 @@
     <string name="hosts_press_back_to_exit">Натисніть ще раз для виходу</string>
     <string name="hosts_delete_title">Видалити хост</string>
     <string name="hosts_delete_message">Видалити \"%1$s\"?</string>
+    <string name="host_group_label">Група</string>
+    <string name="host_group_none">Без групи</string>
+    <string name="host_group_new">Нова група…</string>
+    <string name="group_dialog_title_new">Нова група</string>
+    <string name="group_dialog_title_edit">Редагувати групу</string>
+    <string name="group_dialog_name">Назва</string>
+    <string name="group_delete_title">Видалити групу</string>
+    <string name="group_delete_message">Видалити \"%1$s\"? Хости буде збережено, без групи.</string>
 
     <string name="host_menu_connect">Підключитися</string>
     <string name="host_menu_resume_terminal">Відновити термінал (%1$d)</string>

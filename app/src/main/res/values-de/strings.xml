@@ -43,6 +43,14 @@
     <string name="hosts_press_back_to_exit">Nochmal drücken zum Beenden</string>
     <string name="hosts_delete_title">Host löschen</string>
     <string name="hosts_delete_message">\"%1$s\" löschen?</string>
+    <string name="host_group_label">Gruppe</string>
+    <string name="host_group_none">Keine Gruppe</string>
+    <string name="host_group_new">Neue Gruppe…</string>
+    <string name="group_dialog_title_new">Neue Gruppe</string>
+    <string name="group_dialog_title_edit">Gruppe bearbeiten</string>
+    <string name="group_dialog_name">Name</string>
+    <string name="group_delete_title">Gruppe löschen</string>
+    <string name="group_delete_message">\"%1$s\" löschen? Die Hosts bleiben erhalten, ohne Gruppe.</string>
 
     <string name="host_menu_connect">Verbinden</string>
     <string name="host_menu_resume_terminal">Terminal fortsetzen (%1$d)</string>

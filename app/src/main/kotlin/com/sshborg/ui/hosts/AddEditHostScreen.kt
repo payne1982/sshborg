@@ -1,7 +1,9 @@
 package com.sshborg.ui.hosts
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.Screen
+import com.sshborg.data.db.GroupEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,9 +54,13 @@ fun AddEditHostScreen(
     val sftpStartMode by vm.sftpStartMode.collectAsState()
     val sftpStartDir by vm.sftpStartDir.collectAsState()
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
+    val groups by vm.groups.collectAsState()
+    val groupId by vm.groupId.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var keyMenuExpanded by remember { mutableStateOf(false) }
+    var groupMenuExpanded by remember { mutableStateOf(false) }
+    var showNewGroupDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -109,6 +117,49 @@ fun AddEditHostScreen(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
+            }
+            ExposedDropdownMenuBox(
+                expanded = groupMenuExpanded,
+                onExpandedChange = { groupMenuExpanded = it },
+            ) {
+                val selectedGroup = groups.find { it.id == groupId }
+                OutlinedTextField(
+                    value = selectedGroup?.name ?: stringResource(R.string.host_group_none),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.host_group_label)) },
+                    leadingIcon = selectedGroup?.let { g ->
+                        { Box(Modifier.size(14.dp).background(Color(g.color), CircleShape)) }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(groupMenuExpanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    singleLine = true,
+                )
+                ExposedDropdownMenu(
+                    expanded = groupMenuExpanded,
+                    onDismissRequest = { groupMenuExpanded = false },
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.host_group_none)) },
+                        onClick = { vm.groupId.value = null; groupMenuExpanded = false },
+                    )
+                    groups.forEach { group ->
+                        DropdownMenuItem(
+                            leadingIcon = { Box(Modifier.size(14.dp).background(Color(group.color), CircleShape)) },
+                            text = { Text(group.name) },
+                            onClick = { vm.groupId.value = group.id; groupMenuExpanded = false },
+                        )
+                    }
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        leadingIcon = { Icon(Icons.Default.Add, null) },
+                        text = { Text(stringResource(R.string.host_group_new)) },
+                        onClick = { groupMenuExpanded = false; showNewGroupDialog = true },
+                    )
+                }
             }
 
             HorizontalDivider()
@@ -323,6 +374,21 @@ fun AddEditHostScreen(
                 Text(stringResource(R.string.action_save))
             }
         }
+    }
+
+    if (showNewGroupDialog) {
+        GroupDialog(
+            title        = stringResource(R.string.group_dialog_title_new),
+            initialName  = "",
+            // Default to the first swatch no existing group uses yet
+            initialColor = GroupEntity.SWATCHES.firstOrNull { c -> groups.none { it.color == c } }
+                ?: GroupEntity.SWATCHES.first(),
+            onConfirm    = { name, color ->
+                vm.createGroup(name, color)
+                showNewGroupDialog = false
+            },
+            onDismiss    = { showNewGroupDialog = false },
+        )
     }
 }
 

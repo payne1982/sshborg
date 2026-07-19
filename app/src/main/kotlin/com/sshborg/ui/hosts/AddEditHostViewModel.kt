@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.sshborg.Screen
 import com.sshborg.SshBorgApp
 import com.sshborg.data.KeystoreManager
+import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.db.SshKeyEntity
 import kotlinx.coroutines.Dispatchers
@@ -16,12 +17,16 @@ import kotlinx.coroutines.withContext
 class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
 
     private val sshBorgApp = app as SshBorgApp
-    private val hostDao = sshBorgApp.db.hostDao()
-    private val keyDao  = sshBorgApp.db.sshKeyDao()
-    private val prefs   = sshBorgApp.appPreferences
+    private val hostDao  = sshBorgApp.db.hostDao()
+    private val keyDao   = sshBorgApp.db.sshKeyDao()
+    private val groupDao = sshBorgApp.db.groupDao()
+    private val prefs    = sshBorgApp.appPreferences
 
     val keys: StateFlow<List<SshKeyEntity>> =
         keyDao.getAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val groups: StateFlow<List<GroupEntity>> =
+        groupDao.getAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Form state
     var label = MutableStateFlow("")
@@ -45,6 +50,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /** Path shown/edited in the starting directory field (managed or user-entered). */
     var sftpStartDir = MutableStateFlow("")
     var allowLegacyCiphers = MutableStateFlow(false)
+    /** Null = ungrouped; otherwise the selected group's ID. */
+    var groupId = MutableStateFlow<Long?>(null)
 
     private val _editingId = MutableStateFlow<Long?>(null)
 
@@ -97,7 +104,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartMode.value = h.sftpStartMode
             sftpStartDir.value = h.sftpStartDir ?: ""
             allowLegacyCiphers.value = h.allowLegacyCiphers
+            groupId.value = h.groupId
         }
+    }
+
+    /** Creates a new group and selects it for this host. */
+    fun createGroup(name: String, color: Int) = viewModelScope.launch {
+        groupId.value = groupDao.upsert(GroupEntity(name = name, color = color))
     }
 
     fun save(onDone: () -> Unit) = viewModelScope.launch {
@@ -148,6 +161,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartMode        = sftpStartMode.value,
             sftpStartDir         = newSftpStartDir,
             allowLegacyCiphers   = allowLegacyCiphers.value,
+            groupId              = groupId.value,
         )
         hostDao.upsert(entity)
         onDone()

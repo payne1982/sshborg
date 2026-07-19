@@ -43,6 +43,14 @@
     <string name="hosts_press_back_to_exit">Premi di nuovo per uscire</string>
     <string name="hosts_delete_title">Elimina host</string>
     <string name="hosts_delete_message">Eliminare \"%1$s\"?</string>
+    <string name="host_group_label">Gruppo</string>
+    <string name="host_group_none">Nessun gruppo</string>
+    <string name="host_group_new">Nuovo gruppo…</string>
+    <string name="group_dialog_title_new">Nuovo gruppo</string>
+    <string name="group_dialog_title_edit">Modifica gruppo</string>
+    <string name="group_dialog_name">Nome</string>
+    <string name="group_delete_title">Elimina gruppo</string>
+    <string name="group_delete_message">Eliminare \"%1$s\"? Gli host verranno mantenuti, senza gruppo.</string>
 
     <string name="host_menu_connect">Connetti</string>
     <string name="host_menu_resume_terminal">Riprendi terminale (%1$d)</string>

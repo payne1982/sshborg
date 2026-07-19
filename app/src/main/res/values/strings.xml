@@ -45,6 +45,14 @@
     <string name="hosts_press_back_to_exit">Press back again to exit</string>
     <string name="hosts_delete_title">Delete host</string>
     <string name="hosts_delete_message">Delete \"%1$s\"?</string>
+    <string name="host_group_label">Group</string>
+    <string name="host_group_none">No group</string>
+    <string name="host_group_new">New group…</string>
+    <string name="group_dialog_title_new">New group</string>
+    <string name="group_dialog_title_edit">Edit group</string>
+    <string name="group_dialog_name">Name</string>
+    <string name="group_delete_title">Delete group</string>
+    <string name="group_delete_message">Delete \"%1$s\"? Its hosts will be kept, without a group.</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">Connect</string>
