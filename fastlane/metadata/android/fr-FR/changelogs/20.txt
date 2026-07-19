@@ -1,3 +1,4 @@
+• Les hôtes peuvent désormais être organisés en groupes repliables à code couleur
 • Nouveau schéma de couleurs clair pour le terminal (noir sur blanc), pouvant aussi suivre le thème de l'appli
 • Nouveau réglage pour garder l'écran allumé tant qu'un terminal est ouvert
 • Correction d'un plantage lors de la génération de clés SSH sous Android 12 et antérieur, plus des correctifs mineurs

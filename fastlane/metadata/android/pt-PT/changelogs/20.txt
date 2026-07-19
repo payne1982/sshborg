@@ -1,3 +1,4 @@
+• Os hosts agora podem ser organizados em grupos recolhíveis com cores
 • Novo esquema de cores claro para o terminal (preto sobre branco), que também pode seguir o tema do app
 • Nova opção para manter o ecrã ligado enquanto um terminal está aberto
 • Corrigida uma falha ao gerar chaves SSH no Android 12 ou anterior, além de correções menores
