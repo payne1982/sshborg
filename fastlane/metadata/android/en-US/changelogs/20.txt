@@ -1,0 +1,1 @@
+• Fixed a crash when generating SSH keys on Android 12 and older, plus minor fixes

@@ -293,7 +293,7 @@
     <string name="action_dont_show_again">Don\'t show again</string>
 
     <!-- ── Biometric prompt ──────────────────────────────────────────────── -->
-    <string name="biometric_prompt_title">SSHBorg</string>
+    <string name="biometric_prompt_title" translatable="false">SSHBorg</string>
     <string name="biometric_prompt_subtitle">Authenticate to continue</string>
 
     <!-- ── Foreground service notification ─────────────────────────────── -->

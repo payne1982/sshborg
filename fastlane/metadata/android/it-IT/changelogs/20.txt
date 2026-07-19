@@ -1,0 +1,1 @@
+• Risolto un crash nella generazione delle chiavi SSH su Android 12 e precedenti, più correzioni minori

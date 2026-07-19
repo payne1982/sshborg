@@ -292,7 +292,6 @@
     <string name="action_dont_show_again">不再显示</string>
 
     <!-- ── Biometric prompt ── -->
-    <string name="biometric_prompt_title">SSHBorg</string>
     <string name="biometric_prompt_subtitle">请验证身份以继续</string>
 
     <!-- ── Foreground service notification ── -->

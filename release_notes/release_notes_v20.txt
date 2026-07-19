@@ -1,0 +1,27 @@
+<en-US>
+• Fixed a crash when generating SSH keys on Android 12 and older, plus minor fixes
+</en-US>
+<it-IT>
+• Risolto un crash nella generazione delle chiavi SSH su Android 12 e precedenti, più correzioni minori
+</it-IT>
+<de-DE>
+• Absturz beim Erzeugen von SSH-Schlüsseln unter Android 12 und älter behoben, plus kleinere Korrekturen
+</de-DE>
+<es-ES>
+• Corregido un cierre inesperado al generar claves SSH en Android 12 o anterior, además de correcciones menores
+</es-ES>
+<fr-FR>
+• Correction d'un plantage lors de la génération de clés SSH sous Android 12 et antérieur, plus des correctifs mineurs
+</fr-FR>
+<pt-PT>
+• Corrigida uma falha ao gerar chaves SSH no Android 12 ou anterior, além de correções menores
+</pt-PT>
+<uk>
+• Виправлено збій під час створення SSH-ключів на Android 12 і старіших, а також дрібні виправлення
+</uk>
+<zh-CN>
+• 修复了在 Android 12 及更早版本上生成 SSH 密钥时的崩溃，以及其他小修复
+</zh-CN>
+<ja-JP>
+• Android 12 以前で SSH 鍵を生成する際のクラッシュを修正、その他軽微な修正
+</ja-JP>

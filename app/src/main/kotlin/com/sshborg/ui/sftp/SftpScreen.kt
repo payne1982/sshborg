@@ -45,7 +45,6 @@ fun SftpScreen(
     val state by vm.state.collectAsState()
     val backgroundTransfers by vm.backgroundTransfers.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = androidx.compose.ui.platform.LocalContext.current
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedEntries by remember { mutableStateOf(setOf<SftpEntry>()) }
@@ -70,14 +69,13 @@ fun SftpScreen(
     // (Foreground downloads now show a persistent completion screen with a Done button —
     //  see the State.Downloaded branch below — so they are not handled here.)
     val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val uploadedMsg = (state as? SftpViewModel.State.Uploaded)?.let { s ->
+        if (s.totalFiles > 1) stringResource(R.string.sftp_uploaded_n_files, s.totalFiles)
+        else stringResource(R.string.sftp_uploaded, s.filename)
+    }
     LaunchedEffect(state) {
         if (state is SftpViewModel.State.Uploaded) {
-            val s = state as SftpViewModel.State.Uploaded
-            val msg = if (s.totalFiles > 1)
-                context.getString(R.string.sftp_uploaded_n_files, s.totalFiles)
-            else
-                context.getString(R.string.sftp_uploaded, s.filename)
-            scope.launch { snackbarHostState.showSnackbar(msg) }
+            uploadedMsg?.let { scope.launch { snackbarHostState.showSnackbar(it) } }
             vm.dismissUploaded()
         }
     }
@@ -732,7 +730,8 @@ private fun SftpEntryItem(
             },
             supportingContent = {
                 if (!entry.isDir) {
-                    val date = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
+                    val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+                    val date = SimpleDateFormat("dd MMM yyyy HH:mm", locale)
                         .format(Date(entry.modTimeSeconds.toLong() * 1000))
                     Text("${formatSize(entry.size)}  ·  $date",
                         style = MaterialTheme.typography.bodySmall)

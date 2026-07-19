@@ -1,0 +1,1 @@
+• Correction d'un plantage lors de la génération de clés SSH sous Android 12 et antérieur, plus des correctifs mineurs

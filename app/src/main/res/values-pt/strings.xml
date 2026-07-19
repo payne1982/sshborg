@@ -317,11 +317,11 @@
     <string name="notification_no_sessions">Sem sessões ativas</string>
     <string name="notification_disconnect_all">Desligar tudo</string>
     <plurals name="notification_active_sessions">
-        <item quantity="one">1 sessão ativa</item>
+        <item quantity="one">%d sessão ativa</item>
         <item quantity="other">%d sessões ativas</item>
     </plurals>
     <plurals name="notification_bg_downloads">
-        <item quantity="one">1 ficheiro a transferir</item>
+        <item quantity="one">%d ficheiro a transferir</item>
         <item quantity="other">%d ficheiros a transferir</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>

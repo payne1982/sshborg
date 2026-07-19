@@ -1,0 +1,1 @@
+• Corrigida uma falha ao gerar chaves SSH no Android 12 ou anterior, além de correções menores

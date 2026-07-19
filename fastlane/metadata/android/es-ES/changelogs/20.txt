@@ -1,0 +1,1 @@
+• Corregido un cierre inesperado al generar claves SSH en Android 12 o anterior, además de correcciones menores

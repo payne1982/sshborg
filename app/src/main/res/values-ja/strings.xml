@@ -292,7 +292,6 @@
     <string name="action_dont_show_again">今後表示しない</string>
 
     <!-- ── Biometric prompt ── -->
-    <string name="biometric_prompt_title">SSHBorg</string>
     <string name="biometric_prompt_subtitle">続行するには認証してください</string>
 
     <!-- ── Foreground service notification ── -->
