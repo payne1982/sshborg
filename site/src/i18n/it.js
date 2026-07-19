@@ -141,7 +141,7 @@ module.exports = {
                 <li><strong>Modifica</strong> — tieni premuta l'intestazione e scegli <em>Modifica</em> per rinominare il gruppo o cambiarne il colore.</li>
                 <li><strong>Elimina</strong> — tieni premuta l'intestazione e scegli <em>Elimina</em>. Gli host del gruppo <em>non</em> vengono cancellati: tornano semplicemente senza gruppo.</li>
             </ul>
-            <p>I colori si scelgono dagli swatch rapidi o liberamente con gli slider RGB. Un host può anche avere un <strong>colore proprio</strong> — si imposta nell'editor dell'host, subito sotto il gruppo — che prevale sul colore del gruppo e funziona anche per gli host senza gruppo.</p>
+            <p>I colori si scelgono dagli swatch rapidi o liberamente con il selettore a gradiente. Un host può anche avere un <strong>colore proprio</strong> — si imposta nell'editor dell'host, subito sotto il gruppo — che prevale sul colore del gruppo e funziona anche per gli host senza gruppo.</p>
             <p>Gli host senza gruppo restano in cima all'elenco e, se non crei alcun gruppo, l'elenco appare e si comporta esattamente come prima.</p>`,
 
   doc_sftp: `
