@@ -1,1 +1,2 @@
+• Neue Einstellung, um den Bildschirm eingeschaltet zu lassen, solange ein Terminal geöffnet ist
 • Absturz beim Erzeugen von SSH-Schlüsseln unter Android 12 und älter behoben, plus kleinere Korrekturen

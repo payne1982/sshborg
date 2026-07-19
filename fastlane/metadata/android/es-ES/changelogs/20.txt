@@ -1,1 +1,2 @@
+• Nueva opción para mantener la pantalla encendida mientras un terminal está abierto
 • Corregido un cierre inesperado al generar claves SSH en Android 12 o anterior, además de correcciones menores
