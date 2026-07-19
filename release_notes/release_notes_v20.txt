@@ -1,53 +1,53 @@
 <en-US>
-• Hosts can now be organized into collapsible color-coded groups
+• Hosts can now be organized into collapsible color-coded groups, with custom per-host colors too
 • New light terminal color scheme (black on white), also able to follow the app theme
 • New setting to keep the screen on while a terminal is open
 • Fixed a crash when generating SSH keys on Android 12 and older, plus minor fixes
 </en-US>
 <it-IT>
-• Gli host ora possono essere organizzati in gruppi richiudibili con colori personalizzati
+• Gli host ora possono essere organizzati in gruppi richiudibili e colorati, con colori personalizzati anche per singolo host
 • Nuovo schema colori chiaro per il terminale (nero su bianco), che può anche seguire il tema dell'app
 • Nuova impostazione per mantenere lo schermo acceso mentre un terminale è aperto
 • Risolto un crash nella generazione delle chiavi SSH su Android 12 e precedenti, più correzioni minori
 </it-IT>
 <de-DE>
-• Hosts können jetzt in einklappbare, farblich markierte Gruppen organisiert werden
+• Hosts können jetzt in einklappbare, farbige Gruppen organisiert werden, mit eigenen Farben auch pro Host
 • Neues helles Terminal-Farbschema (Schwarz auf Weiß), das auch dem App-Design folgen kann
 • Neue Einstellung, um den Bildschirm eingeschaltet zu lassen, solange ein Terminal geöffnet ist
 • Absturz beim Erzeugen von SSH-Schlüsseln unter Android 12 und älter behoben, plus kleinere Korrekturen
 </de-DE>
 <es-ES>
-• Los hosts ahora pueden organizarse en grupos plegables con códigos de color
+• Los hosts ahora pueden organizarse en grupos plegables con colores, también personalizables por host
 • Nuevo esquema de colores claro para el terminal (negro sobre blanco), que también puede seguir el tema de la app
 • Nueva opción para mantener la pantalla encendida mientras un terminal está abierto
 • Corregido un cierre inesperado al generar claves SSH en Android 12 o anterior, además de correcciones menores
 </es-ES>
 <fr-FR>
-• Les hôtes peuvent désormais être organisés en groupes repliables à code couleur
+• Les hôtes peuvent désormais être organisés en groupes repliables et colorés, avec des couleurs personnalisées par hôte
 • Nouveau schéma de couleurs clair pour le terminal (noir sur blanc), pouvant aussi suivre le thème de l'appli
 • Nouveau réglage pour garder l'écran allumé tant qu'un terminal est ouvert
 • Correction d'un plantage lors de la génération de clés SSH sous Android 12 et antérieur, plus des correctifs mineurs
 </fr-FR>
 <pt-PT>
-• Os hosts agora podem ser organizados em grupos recolhíveis com cores
+• Os hosts agora podem ser organizados em grupos recolhíveis com cores, também personalizáveis por host
 • Novo esquema de cores claro para o terminal (preto sobre branco), que também pode seguir o tema do app
 • Nova opção para manter o ecrã ligado enquanto um terminal está aberto
 • Corrigida uma falha ao gerar chaves SSH no Android 12 ou anterior, além de correções menores
 </pt-PT>
 <uk>
-• Хости тепер можна впорядковувати в згортувані групи з кольоровим позначенням
+• Хости тепер можна впорядковувати в згортувані кольорові групи, а також задавати власний колір окремим хостам
 • Нова світла колірна схема термінала (чорне на білому), яка може також відповідати темі застосунку
 • Нове налаштування, щоб не вимикати екран, поки відкрито термінал
 • Виправлено збій під час створення SSH-ключів на Android 12 і старіших, а також дрібні виправлення
 </uk>
 <zh-CN>
-• 主机现在可以整理到可折叠的彩色分组中
+• 主机现在可以整理到可折叠的彩色分组中，也可为单个主机自定义颜色
 • 新增终端浅色配色（白底黑字），也可跟随应用主题
 • 新增设置：终端打开时保持屏幕常亮
 • 修复了在 Android 12 及更早版本上生成 SSH 密钥时的崩溃，以及其他小修复
 </zh-CN>
 <ja-JP>
-• ホストを折りたたみ可能な色分けグループに整理できるようになりました
+• ホストを折りたたみ可能な色分けグループに整理でき、ホストごとのカスタム色にも対応しました
 • ターミナルの新しいライト配色（白地に黒）を追加、アプリのテーマに合わせることも可能
 • ターミナルを開いている間、画面をオンのまま維持する設定を追加
 • Android 12 以前で SSH 鍵を生成する際のクラッシュを修正、その他軽微な修正
