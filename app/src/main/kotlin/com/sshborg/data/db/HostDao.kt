@@ -22,4 +22,7 @@ interface HostDao {
 
     @Query("UPDATE hosts SET lastConnected = :ts WHERE id = :id")
     suspend fun updateLastConnected(id: Long, ts: Long)
+
+    @Query("UPDATE hosts SET groupId = NULL WHERE groupId = :groupId")
+    suspend fun clearGroup(groupId: Long)
 }
