@@ -511,6 +511,7 @@
         <div class="toc-title">// CONTENTS</div>
         <ul>
             <li><a href="#adding-host">Adding a Host</a></li>
+            <li><a href="#host-groups">Host Groups</a></li>
             <li><a href="#sftp">SFTP File Manager</a></li>
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Upload &amp; download</a></li>
@@ -523,6 +524,7 @@
             <li class="sub"><a href="#suggestions">How it works</a></li>
             <li class="sub"><a href="#suggestions">Troubleshooting</a></li>
             <li><a href="#terminal">Terminal Gestures</a></li>
+            <li><a href="#terminal-settings">Terminal Settings</a></li>
             <li><a href="#extra-keys">Extra Key Bar</a></li>
             <li><a href="#agent-forwarding">Agent Forwarding</a></li>
             <li><a href="#legacy-ciphers">Legacy Ciphers</a></li>
@@ -558,6 +560,26 @@
                 You can check the server fingerprint at any time with:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
+        </div>
+
+        <div class="doc-section" id="host-groups">
+
+            <h2>// HOST GROUPS</h2>
+            <p>When the server list grows, you can organize hosts into collapsible, color-coded groups — for example <em>Production</em>, <em>Home lab</em>, <em>Clients</em>.</p>
+            <h3>Creating a group</h3>
+            <ol class="steps">
+                <li>Add or edit a host and open the <strong>Group</strong> dropdown.</li>
+                <li>Choose <strong>New group…</strong>, type a name and pick one of the predefined colors.</li>
+                <li>Save the host — the host list now shows the group as its own section.</li>
+            </ol>
+            <h3>Working with groups</h3>
+            <ul>
+                <li><strong>Collapse / expand</strong> — tap a group header to fold or reopen it. The state is remembered, even after restarting the app.</li>
+                <li><strong>Color</strong> — the group color appears as a dot in the header and as the tint of the host icons inside the group.</li>
+                <li><strong>Edit</strong> — long-press the group header and choose <em>Edit</em> to rename the group or change its color.</li>
+                <li><strong>Delete</strong> — long-press the header and choose <em>Delete</em>. The hosts in the group are <em>not</em> deleted — they simply become ungrouped.</li>
+            </ul>
+            <p>Hosts without a group stay at the top of the list, and if you never create a group the list looks and behaves exactly as before.</p>
         </div>
 
         <div class="doc-section" id="sftp">
@@ -668,6 +690,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — pinch to increase or decrease the text size.</li>
                 <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="terminal-settings">
+
+            <h2>// TERMINAL SETTINGS</h2>
+            <p>Under <strong>Settings → Terminal</strong> you can adapt the terminal to your needs:</p>
+            <ul>
+                <li><strong>Terminal colors</strong> — the classic <em>dark</em> scheme (white on black), a <em>light</em> scheme (black on white) that is easier to read in bright daylight, or <em>match app theme</em>, which switches automatically together with the app theme. The change applies immediately, including to sessions that are already open.</li>
+                <li><strong>Keep screen on</strong> — prevents the display from turning off while a terminal is open. Handy when watching logs or long-running commands. Off by default.</li>
+                <li><strong>Default font size</strong> — the text size new terminal sessions start with; you can still pinch-zoom each session individually.</li>
+                <li><strong>Scrollback</strong>, <strong>inverted scrolling</strong> and <strong>command suggestions</strong> — control how much output history is kept, the scroll direction, and the suggestion bar described above.</li>
             </ul>
         </div>
 
@@ -901,8 +935,11 @@ Host target
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{
-  "version": 1,
+  "version": 2,
   "exported_at": "2026-05-14T10:00:00Z",
+  "groups": [
+    { "name": "Production", "color": -1754827 }
+  ],
   "hosts": [
     {
       "label":           "My VPS",
@@ -915,7 +952,9 @@ Host target
       "jumpHostIdList":  null,
       "portForwardings": null,
       "sftpStartMode":   "last",
-      "sftpStartDir":    null
+      "sftpStartDir":    null,
+      "allowLegacyCiphers": false,
+      "group":           "Production"
     }
   ]
 }</code></pre>
@@ -931,6 +970,8 @@ Host target
                 <li><code>portForwardings</code> — newline-separated local port-forwarding rules in SSH <code>-L</code> syntax, e.g. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — SFTP starting directory: <code>"last"</code> (remember last visited), <code>"fixed"</code> (always use <code>sftpStartDir</code>), <code>"home"</code> (server home). Defaults to <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — path to use when <code>sftpStartMode</code> is <code>"fixed"</code>.</li>
+                <li><code>allowLegacyCiphers</code> — <code>true</code> to enable the legacy cipher algorithms described above. Defaults to <code>false</code>.</li>
+                <li><code>group</code> — name of the group the host belongs to. Groups are listed in the top-level <code>groups</code> array with their <code>name</code> and <code>color</code> (ARGB as a signed 32-bit integer). If a host references a group that is not in the array, it is created automatically with a default color — so you can omit the array entirely when writing the file by hand.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// OPTIONAL FIELDS</div>

@@ -82,6 +82,7 @@ module.exports = {
   toc_title: '// 目次',
 
   doc_toc: `            <li><a href="#adding-host">ホストの追加</a></li>
+            <li><a href="#host-groups">ホストグループ</a></li>
             <li><a href="#sftp">SFTPファイルマネージャー</a></li>
             <li class="sub"><a href="#sftp">ナビゲーション</a></li>
             <li class="sub"><a href="#sftp">アップロード＆ダウンロード</a></li>
@@ -94,6 +95,7 @@ module.exports = {
             <li class="sub"><a href="#suggestions">仕組み</a></li>
             <li class="sub"><a href="#suggestions">トラブルシューティング</a></li>
             <li><a href="#terminal">端末ジェスチャー</a></li>
+            <li><a href="#terminal-settings">ターミナル設定</a></li>
             <li><a href="#extra-keys">追加キーバー</a></li>
             <li><a href="#agent-forwarding">エージェント転送</a></li>
             <li><a href="#legacy-ciphers">レガシー暗号</a></li>
@@ -123,6 +125,24 @@ module.exports = {
                 サーバーのフィンガープリントはいつでも以下のコマンドで確認できます：
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
+
+  doc_host_groups: `
+            <h2>// ホストグループ</h2>
+            <p>サーバーの一覧が増えてきたら、ホストを折りたたみ可能な色分けグループに整理できます。例：<em>本番</em>、<em>自宅ラボ</em>、<em>クライアント</em>。</p>
+            <h3>グループの作成</h3>
+            <ol class="steps">
+                <li>ホストを追加または編集し、<strong>グループ</strong>のドロップダウンを開きます。</li>
+                <li><strong>新しいグループ…</strong>を選び、名前を入力して、あらかじめ用意された色から 1 つ選びます。</li>
+                <li>ホストを保存すると、ホスト一覧にそのグループが独立したセクションとして表示されます。</li>
+            </ol>
+            <h3>グループの操作</h3>
+            <ul>
+                <li><strong>折りたたみ / 展開</strong> — グループのヘッダーをタップすると折りたたみ・再展開できます。状態は記憶され、アプリを再起動しても保持されます。</li>
+                <li><strong>色</strong> — グループの色はヘッダーのドットとして表示され、グループ内のホストアイコンにも同じ色が付きます。</li>
+                <li><strong>編集</strong> — ヘッダーを長押しして<em>編集</em>を選ぶと、グループ名の変更や色の変更ができます。</li>
+                <li><strong>削除</strong> — ヘッダーを長押しして<em>削除</em>を選びます。グループ内のホストは削除<em>されず</em>、グループなしに戻るだけです。</li>
+            </ul>
+            <p>グループのないホストは一覧の先頭に表示されます。グループを作らなければ、一覧の見た目も動作も従来とまったく同じです。</p>`,
 
   doc_sftp: `
             <h2>// SFTPファイルマネージャー</h2>
@@ -225,6 +245,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>ズーム</strong> — ピンチ操作でフォントサイズを拡大・縮小。</li>
                 <li><strong>テキストのコピー</strong> — 端末の任意の場所を長押しして選択モードに入ります。ハンドルをドラッグして選択範囲を調整し、<em>選択をコピー</em> でハイライトされたテキストのみコピー、または <em>すべてコピー</em> で全出力をコピー。他の場所をタップするとキャンセル。</li>
                 <li><strong>貼り付け</strong> — キーボードが開いているときに表示される追加キーバーの <em>貼り付け</em> ボタンを使用。</li>
+            </ul>`,
+
+  doc_terminal_settings: `
+            <h2>// ターミナル設定</h2>
+            <p><strong>設定 → ターミナル</strong>で、ターミナルを好みに合わせて調整できます：</p>
+            <ul>
+                <li><strong>ターミナルの配色</strong> — 定番の<em>ダーク</em>配色（黒地に白）、日中の明るい場所でも読みやすい<em>ライト</em>配色（白地に黒）、またはアプリのテーマと連動して自動で切り替わる<em>アプリのテーマに合わせる</em>。変更は開いているセッションも含めて即座に反映されます。</li>
+                <li><strong>画面をオンのまま維持</strong> — ターミナルを開いている間、画面が消灯しないようにします。ログの監視や長時間かかるコマンドに便利です。既定ではオフです。</li>
+                <li><strong>既定のフォントサイズ</strong> — 新しいセッション開始時の文字サイズ。各セッションでのピンチズームは引き続き使えます。</li>
+                <li><strong>スクロールバック</strong>、<strong>スクロール方向の反転</strong>、<strong>コマンド候補</strong> — 保持する出力履歴の量、スクロールの向き、前述の候補バーを制御します。</li>
             </ul>`,
 
   doc_extra_keys: `
@@ -442,8 +472,11 @@ Host target
             <h3>JSON形式</h3>
             <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
             <pre><code>{
-  "version": 1,
+  "version": 2,
   "exported_at": "2026-05-14T10:00:00Z",
+  "groups": [
+    { "name": "本番", "color": -1754827 }
+  ],
   "hosts": [
     {
       "label":           "マイVPS",
@@ -456,7 +489,9 @@ Host target
       "jumpHostIdList":  null,
       "portForwardings": null,
       "sftpStartMode":   "last",
-      "sftpStartDir":    null
+      "sftpStartDir":    null,
+      "allowLegacyCiphers": false,
+      "group":           "本番"
     }
   ]
 }</code></pre>
@@ -472,6 +507,8 @@ Host target
                 <li><code>portForwardings</code> — SSH <code>-L</code> 構文による改行区切りのローカルポート転送ルール（例：<code>"8080:localhost:8080"</code>）。</li>
                 <li><code>sftpStartMode</code> — SFTPの開始ディレクトリ：<code>"last"</code>（最後に訪問したディレクトリを記憶）、<code>"fixed"</code>（常に <code>sftpStartDir</code> を使用）、<code>"home"</code>（サーバーのホームディレクトリ）。デフォルト：<code>"last"</code>。</li>
                 <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
+                <li><code>allowLegacyCiphers</code> — <code>true</code> にすると、前述のレガシー暗号アルゴリズムが有効になります。既定は <code>false</code> です。</li>
+                <li><code>group</code> — ホストが属するグループ名。グループはトップレベルの <code>groups</code> 配列に <code>name</code> と <code>color</code>（符号付き 32 ビット整数の ARGB）で記載します。配列にないグループをホストが参照している場合は既定の色で自動作成されるため、手書きの場合は配列を丸ごと省略してもかまいません。</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// 省略可能なフィールド</div>

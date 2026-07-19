@@ -511,6 +511,7 @@
         <div class="toc-title">// INHALT</div>
         <ul>
             <li><a href="#adding-host">Host hinzufügen</a></li>
+            <li><a href="#host-groups">Host-Gruppen</a></li>
             <li><a href="#sftp">SFTP-Dateimanager</a></li>
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Hoch- &amp; Herunterladen</a></li>
@@ -523,6 +524,7 @@
             <li class="sub"><a href="#suggestions">Funktionsweise</a></li>
             <li class="sub"><a href="#suggestions">Fehlerbehebung</a></li>
             <li><a href="#terminal">Terminal-Gesten</a></li>
+            <li><a href="#terminal-settings">Terminal-Einstellungen</a></li>
             <li><a href="#extra-keys">Extra-Tastenleiste</a></li>
             <li><a href="#agent-forwarding">Agent-Forwarding</a></li>
             <li><a href="#legacy-ciphers">Legacy-Verschlüsselung</a></li>
@@ -558,6 +560,26 @@
                 Den Server-Fingerabdruck kannst du jederzeit überprüfen mit:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
+        </div>
+
+        <div class="doc-section" id="host-groups">
+
+            <h2>// HOST-GRUPPEN</h2>
+            <p>Wenn die Serverliste wächst, kannst du Hosts in einklappbare, farblich markierte Gruppen organisieren — zum Beispiel <em>Produktion</em>, <em>Homelab</em>, <em>Kunden</em>.</p>
+            <h3>Eine Gruppe erstellen</h3>
+            <ol class="steps">
+                <li>Füge einen Host hinzu oder bearbeite ihn und öffne das Dropdown <strong>Gruppe</strong>.</li>
+                <li>Wähle <strong>Neue Gruppe…</strong>, gib einen Namen ein und wähle eine der vordefinierten Farben.</li>
+                <li>Speichere den Host — die Hostliste zeigt die Gruppe nun als eigenen Abschnitt.</li>
+            </ol>
+            <h3>Mit Gruppen arbeiten</h3>
+            <ul>
+                <li><strong>Ein-/Ausklappen</strong> — tippe auf die Gruppenüberschrift, um sie zu- oder wieder aufzuklappen. Der Zustand wird gemerkt, auch nach einem Neustart der App.</li>
+                <li><strong>Farbe</strong> — die Gruppenfarbe erscheint als Punkt in der Überschrift und als Einfärbung der Host-Symbole in der Gruppe.</li>
+                <li><strong>Bearbeiten</strong> — halte die Überschrift gedrückt und wähle <em>Bearbeiten</em>, um die Gruppe umzubenennen oder die Farbe zu ändern.</li>
+                <li><strong>Löschen</strong> — halte die Überschrift gedrückt und wähle <em>Löschen</em>. Die Hosts der Gruppe werden <em>nicht</em> gelöscht — sie sind danach einfach ohne Gruppe.</li>
+            </ul>
+            <p>Hosts ohne Gruppe bleiben oben in der Liste, und solange du keine Gruppe erstellst, sieht die Liste genauso aus und verhält sich genauso wie bisher.</p>
         </div>
 
         <div class="doc-section" id="sftp">
@@ -668,6 +690,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — mit zwei Fingern zoomen, um die Textgröße anzupassen.</li>
                 <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen.</li>
                 <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="terminal-settings">
+
+            <h2>// TERMINAL-EINSTELLUNGEN</h2>
+            <p>Unter <strong>Einstellungen → Terminal</strong> kannst du das Terminal an deine Bedürfnisse anpassen:</p>
+            <ul>
+                <li><strong>Terminalfarben</strong> — das klassische <em>dunkle</em> Schema (Weiß auf Schwarz), ein <em>helles</em> Schema (Schwarz auf Weiß), das bei Tageslicht besser lesbar ist, oder <em>dem App-Design folgen</em>, das automatisch zusammen mit dem App-Design wechselt. Die Änderung gilt sofort, auch für bereits geöffnete Sitzungen.</li>
+                <li><strong>Bildschirm eingeschaltet lassen</strong> — verhindert, dass sich der Bildschirm ausschaltet, solange ein Terminal geöffnet ist. Praktisch beim Beobachten von Logs oder lang laufenden Befehlen. Standardmäßig aus.</li>
+                <li><strong>Standard-Schriftgröße</strong> — die Textgröße, mit der neue Terminalsitzungen starten; in jeder Sitzung kannst du weiterhin per Pinch-Geste zoomen.</li>
+                <li><strong>Scrollback</strong>, <strong>umgekehrtes Scrollen</strong> und <strong>Befehlsvorschläge</strong> — steuern, wie viel Ausgabeverlauf behalten wird, die Scrollrichtung und die oben beschriebene Vorschlagsleiste.</li>
             </ul>
         </div>
 
@@ -901,8 +935,11 @@ Host target
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 1,
+  "version": 2,
   "exported_at": "2026-05-14T10:00:00Z",
+  "groups": [
+    { "name": "Produktion", "color": -1754827 }
+  ],
   "hosts": [
     {
       "label":           "Mein VPS",
@@ -915,7 +952,9 @@ Host target
       "jumpHostIdList":  null,
       "portForwardings": null,
       "sftpStartMode":   "last",
-      "sftpStartDir":    null
+      "sftpStartDir":    null,
+      "allowLegacyCiphers": false,
+      "group":           "Produktion"
     }
   ]
 }</code></pre>
@@ -931,6 +970,8 @@ Host target
                 <li><code>portForwardings</code> — zeilengetrennte lokale Port-Weiterleitungsregeln in SSH-<code>-L</code>-Syntax, z.B. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — SFTP-Startverzeichnis: <code>"last"</code> (letztes besuchtes merken), <code>"fixed"</code> (immer <code>sftpStartDir</code> verwenden), <code>"home"</code> (Server-Home). Standard: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
+                <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
+                <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// OPTIONALE FELDER</div>
