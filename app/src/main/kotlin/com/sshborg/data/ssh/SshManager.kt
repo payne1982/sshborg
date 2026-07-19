@@ -323,7 +323,8 @@ object SshManager {
         val pubOut = java.io.ByteArrayOutputStream()
         kp.writePublicKey(pubOut, comment)
         kp.dispose()
-        return privOut.toString(Charsets.UTF_8) to pubOut.toString(Charsets.UTF_8)
+        // ByteArrayOutputStream.toString(Charset) needs API 33; the String overload works everywhere
+        return privOut.toString(Charsets.UTF_8.name()) to pubOut.toString(Charsets.UTF_8.name())
     }
 
     /**
