@@ -1,4 +1,5 @@
 • Gli host ora possono essere organizzati in gruppi richiudibili e colorati, con colori personalizzati anche per singolo host
 • Nuovo schema colori chiaro per il terminale (nero su bianco), che può anche seguire il tema dell'app
 • Nuova impostazione per mantenere lo schermo acceso mentre un terminale è aperto
+• Tastiera fisica: i tasti Ctrl e Alt ora funzionano nel terminale
 • Risolto un crash nella generazione delle chiavi SSH su Android 12 e precedenti, più correzioni minori
