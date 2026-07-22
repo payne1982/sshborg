@@ -578,7 +578,10 @@ class TerminalView @JvmOverloads constructor(
 
     private fun keyEventToBytes(keyCode: Int, event: KeyEvent): ByteArray? {
         val ctrl  = event.isCtrlPressed
-        val alt   = event.isAltPressed
+        // AltGr composes characters (@ # [ ] on the Italian layout, …); it must not be
+        // treated as the ESC-prefix Alt.
+        val altGr = event.metaState and KeyEvent.META_ALT_RIGHT_ON != 0
+        val alt   = event.isAltPressed && !altGr
         val shift = event.isShiftPressed
         return when (keyCode) {
             KeyEvent.KEYCODE_ENTER       -> byteArrayOf(0x0D)
@@ -608,13 +611,25 @@ class TerminalView @JvmOverloads constructor(
             KeyEvent.KEYCODE_F11 -> "[23~".toByteArray()
             KeyEvent.KEYCODE_F12 -> "[24~".toByteArray()
             else -> {
-                val ch = event.unicodeChar
+                // KeyCharacterMap matches ctrl/alt/meta exactly: looking a key up with those
+                // bits set finds no behavior and returns 0, which would drop every Ctrl+<key>
+                // combo before it reaches the branches below. Strip them for the lookup, but
+                // keep shift/caps-lock — and keep AltGr, which is a composition modifier.
+                var bitsToClear = KeyEvent.META_CTRL_MASK or KeyEvent.META_META_MASK
+                if (!altGr) bitsToClear = bitsToClear or KeyEvent.META_ALT_MASK
+                val ch = event.getUnicodeChar(event.metaState and bitsToClear.inv())
                 if (ch == 0) return null
+                val ctrlByte: Byte? = when {
+                    !ctrl            -> null
+                    ch == 0x20       -> 0            // Ctrl+Space → NUL
+                    ch in 0x40..0x5F -> (ch - 0x40).toByte()
+                    ch in 0x61..0x7A -> (ch - 0x60).toByte()
+                    else             -> null
+                }
                 when {
-                    ctrl && ch in 0x40..0x5F -> byteArrayOf((ch - 0x40).toByte())
-                    ctrl && ch in 0x61..0x7A -> byteArrayOf((ch - 0x60).toByte())
-                    alt  -> byteArrayOf(0x1B, ch.toByte())
-                    else -> ch.toChar().toString().toByteArray(Charsets.UTF_8)
+                    ctrlByte != null -> if (alt) byteArrayOf(0x1B, ctrlByte) else byteArrayOf(ctrlByte)
+                    alt              -> byteArrayOf(0x1B, ch.toByte())
+                    else             -> ch.toChar().toString().toByteArray(Charsets.UTF_8)
                 }
             }
         }
