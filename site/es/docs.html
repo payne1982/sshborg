@@ -158,23 +158,21 @@
 
         /* ── TOC ─────────────────────────────────────────────── */
         .toc {
+            /* override the global <nav> rule (this is a <nav> too): stack the
+               title above the list, don't stick to the top, and drop the
+               inherited z-index:100 — as a flex item it would otherwise paint
+               on top of the sticky top nav and cover its links */
+            display: block;
+            position: static;
+            z-index: auto;
+            backdrop-filter: none;
             flex-shrink: 0;
             width: 260px;
-            position: sticky;
-            top: 72px;
-            max-height: calc(100vh - 90px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
             border: 1px solid var(--border);
             padding: 20px 18px;
             clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
             background: var(--card);
         }
-        .toc::-webkit-scrollbar { width: 4px; }
-        .toc::-webkit-scrollbar-track { background: transparent; }
-        .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
         .toc-title {
             font-family: var(--font-mono);
             font-size: 0.78em;
