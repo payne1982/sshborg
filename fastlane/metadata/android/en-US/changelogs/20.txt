@@ -1,0 +1,5 @@
+• Hosts can now be organized into collapsible color-coded groups, with custom per-host colors too
+• New light terminal color scheme (black on white), also able to follow the app theme
+• New setting to keep the screen on while a terminal is open
+• Physical keyboard: Ctrl and Alt key combinations now work in the terminal
+• Fixed a crash when generating SSH keys on Android 12 and older, plus minor fixes

@@ -43,6 +43,19 @@
     <string name="hosts_press_back_to_exit">Appuyez à nouveau pour quitter</string>
     <string name="hosts_delete_title">Supprimer l\'hôte</string>
     <string name="hosts_delete_message">Supprimer \"%1$s\" ?</string>
+    <string name="host_group_label">Groupe</string>
+    <string name="host_group_none">Aucun groupe</string>
+    <string name="host_group_new">Nouveau groupe…</string>
+    <string name="group_dialog_title_new">Nouveau groupe</string>
+    <string name="group_dialog_title_edit">Modifier le groupe</string>
+    <string name="group_dialog_name">Nom</string>
+    <string name="group_delete_title">Supprimer le groupe</string>
+    <string name="group_delete_message">Supprimer \"%1$s\" ? Les hôtes seront conservés, sans groupe.</string>
+    <string name="host_color_label">Couleur</string>
+    <string name="host_color_auto">Automatique</string>
+    <string name="host_color_custom">Personnalisée</string>
+    <string name="host_color_dialog_title">Couleur de l\'hôte</string>
+    <string name="host_color_remove">Supprimer la couleur personnalisée</string>
 
     <string name="host_menu_connect">Connecter</string>
     <string name="host_menu_resume_terminal">Reprendre le terminal (%1$d)</string>
@@ -139,6 +152,10 @@
 
     <string name="settings_invert_scroll_title">Inverser le défilement du terminal</string>
     <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus ancienne</string>
+    <string name="settings_keep_screen_on_title">Garder l\'écran allumé</string>
+    <string name="settings_keep_screen_on_subtitle">Empêche l\'écran de s\'éteindre tant qu\'un terminal est ouvert</string>
+    <string name="settings_terminal_colors_title">Couleurs du terminal</string>
+    <string name="settings_terminal_colors_follow_app">Selon le thème de l\'appli</string>
     <string name="settings_font_size_title">Taille du texte</string>
     <string name="settings_font_size_subtitle">Taille par défaut du texte du terminal (sp) ; pincez pour zoomer dans la session</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
@@ -317,11 +334,11 @@
     <string name="notification_no_sessions">Aucune session active</string>
     <string name="notification_disconnect_all">Tout déconnecter</string>
     <plurals name="notification_active_sessions">
-        <item quantity="one">1 session active</item>
+        <item quantity="one">%d session active</item>
         <item quantity="other">%d sessions actives</item>
     </plurals>
     <plurals name="notification_bg_downloads">
-        <item quantity="one">1 fichier en téléchargement</item>
+        <item quantity="one">%d fichier en téléchargement</item>
         <item quantity="other">%d fichiers en téléchargement</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Autoriser les captures d\'écran</string>

@@ -43,6 +43,19 @@
     <string name="hosts_press_back_to_exit">Prima novamente para sair</string>
     <string name="hosts_delete_title">Eliminar host</string>
     <string name="hosts_delete_message">Eliminar \"%1$s\"?</string>
+    <string name="host_group_label">Grupo</string>
+    <string name="host_group_none">Sem grupo</string>
+    <string name="host_group_new">Novo grupo…</string>
+    <string name="group_dialog_title_new">Novo grupo</string>
+    <string name="group_dialog_title_edit">Editar grupo</string>
+    <string name="group_dialog_name">Nome</string>
+    <string name="group_delete_title">Eliminar grupo</string>
+    <string name="group_delete_message">Eliminar \"%1$s\"? Os hosts serão mantidos, sem grupo.</string>
+    <string name="host_color_label">Cor</string>
+    <string name="host_color_auto">Automática</string>
+    <string name="host_color_custom">Personalizada</string>
+    <string name="host_color_dialog_title">Cor do host</string>
+    <string name="host_color_remove">Remover cor personalizada</string>
 
     <string name="host_menu_connect">Ligar</string>
     <string name="host_menu_resume_terminal">Retomar terminal (%1$d)</string>
@@ -139,6 +152,10 @@
 
     <string name="settings_invert_scroll_title">Inverter scroll do terminal</string>
     <string name="settings_invert_scroll_subtitle">Deslize para cima para ver a saída mais antiga</string>
+    <string name="settings_keep_screen_on_title">Manter o ecrã ligado</string>
+    <string name="settings_keep_screen_on_subtitle">Impede que o ecrã se desligue enquanto um terminal está aberto</string>
+    <string name="settings_terminal_colors_title">Cores do terminal</string>
+    <string name="settings_terminal_colors_follow_app">Conforme o tema do app</string>
     <string name="settings_font_size_title">Tamanho da letra</string>
     <string name="settings_font_size_subtitle">Tamanho de texto predefinido do terminal (sp); belisque para ampliar na sessão</string>
     <string name="settings_scrollback_title">Linhas de scrollback</string>
@@ -317,11 +334,11 @@
     <string name="notification_no_sessions">Sem sessões ativas</string>
     <string name="notification_disconnect_all">Desligar tudo</string>
     <plurals name="notification_active_sessions">
-        <item quantity="one">1 sessão ativa</item>
+        <item quantity="one">%d sessão ativa</item>
         <item quantity="other">%d sessões ativas</item>
     </plurals>
     <plurals name="notification_bg_downloads">
-        <item quantity="one">1 ficheiro a transferir</item>
+        <item quantity="one">%d ficheiro a transferir</item>
         <item quantity="other">%d ficheiros a transferir</item>
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>

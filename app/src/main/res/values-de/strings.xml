@@ -43,6 +43,19 @@
     <string name="hosts_press_back_to_exit">Nochmal drücken zum Beenden</string>
     <string name="hosts_delete_title">Host löschen</string>
     <string name="hosts_delete_message">\"%1$s\" löschen?</string>
+    <string name="host_group_label">Gruppe</string>
+    <string name="host_group_none">Keine Gruppe</string>
+    <string name="host_group_new">Neue Gruppe…</string>
+    <string name="group_dialog_title_new">Neue Gruppe</string>
+    <string name="group_dialog_title_edit">Gruppe bearbeiten</string>
+    <string name="group_dialog_name">Name</string>
+    <string name="group_delete_title">Gruppe löschen</string>
+    <string name="group_delete_message">\"%1$s\" löschen? Die Hosts bleiben erhalten, ohne Gruppe.</string>
+    <string name="host_color_label">Farbe</string>
+    <string name="host_color_auto">Automatisch</string>
+    <string name="host_color_custom">Benutzerdefiniert</string>
+    <string name="host_color_dialog_title">Host-Farbe</string>
+    <string name="host_color_remove">Eigene Farbe entfernen</string>
 
     <string name="host_menu_connect">Verbinden</string>
     <string name="host_menu_resume_terminal">Terminal fortsetzen (%1$d)</string>
@@ -139,6 +152,10 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_keep_screen_on_title">Bildschirm eingeschaltet lassen</string>
+    <string name="settings_keep_screen_on_subtitle">Verhindert das Ausschalten des Bildschirms, solange ein Terminal geöffnet ist</string>
+    <string name="settings_terminal_colors_title">Terminalfarben</string>
+    <string name="settings_terminal_colors_follow_app">Wie das App-Design</string>
     <string name="settings_font_size_title">Schriftgröße</string>
     <string name="settings_font_size_subtitle">Standard-Textgröße des Terminals (sp); Zoomen per Fingergeste in der Sitzung</string>
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>

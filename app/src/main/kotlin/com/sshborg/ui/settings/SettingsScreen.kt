@@ -51,6 +51,8 @@ fun SettingsScreen(
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
     val confirmExit           by vm.confirmExit.collectAsState()
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
+    val keepScreenOn          by vm.keepScreenOn.collectAsState()
+    val terminalColorScheme   by vm.terminalColorScheme.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
@@ -75,6 +77,7 @@ fun SettingsScreen(
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
+    var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
     var scrollbackText by remember(scrollbackLines) { mutableStateOf(scrollbackLines.toString()) }
     var fontSizeText by remember(terminalFontSize) { mutableStateOf(terminalFontSize.toString()) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
@@ -236,6 +239,50 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
 
+            // Terminal color scheme picker
+            val terminalColorOptions = listOf(
+                AppPreferences.TERMINAL_SCHEME_DARK       to stringResource(R.string.settings_theme_dark),
+                AppPreferences.TERMINAL_SCHEME_LIGHT      to stringResource(R.string.settings_theme_light),
+                AppPreferences.TERMINAL_SCHEME_FOLLOW_APP to stringResource(R.string.settings_terminal_colors_follow_app),
+            )
+            val currentTerminalColorsLabel = terminalColorOptions.find { it.first == terminalColorScheme }?.second
+                ?: terminalColorOptions.first().second
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_terminal_colors_title)) },
+                trailingContent = {
+                    ExposedDropdownMenuBox(
+                        expanded = terminalColorsMenuExpanded,
+                        onExpandedChange = { terminalColorsMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = currentTerminalColorsLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(terminalColorsMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .width(180.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = terminalColorsMenuExpanded,
+                            onDismissRequest = { terminalColorsMenuExpanded = false },
+                        ) {
+                            terminalColorOptions.forEach { (scheme, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        terminalColorsMenuExpanded = false
+                                        vm.setTerminalColorScheme(scheme)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            )
+
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_invert_scroll_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_invert_scroll_subtitle)) },
@@ -243,6 +290,17 @@ fun SettingsScreen(
                     Switch(
                         checked = invertTerminalScroll,
                         onCheckedChange = { vm.setInvertTerminalScroll(it) },
+                    )
+                },
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_keep_screen_on_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_keep_screen_on_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = keepScreenOn,
+                        onCheckedChange = { vm.setKeepScreenOn(it) },
                     )
                 },
             )

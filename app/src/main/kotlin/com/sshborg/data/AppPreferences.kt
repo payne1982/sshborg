@@ -26,6 +26,8 @@ class AppPreferences(private val context: Context) {
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
+        val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
+        val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
@@ -105,10 +107,30 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.TERMINAL_FONT_SIZE] = sp }
     }
 
+    /** Keep the screen awake while a terminal is open. Default false (saves battery). */
+    val keepScreenOn: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.KEEP_SCREEN_ON] ?: false }
+
+    suspend fun setKeepScreenOn(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.KEEP_SCREEN_ON] = enabled }
+    }
+
+    /** Terminal color scheme: dark (default), light, or following the app theme. */
+    val terminalColorScheme: Flow<Int> =
+        context.dataStore.data.map { it[Keys.TERMINAL_COLOR_SCHEME] ?: TERMINAL_SCHEME_DARK }
+
+    suspend fun setTerminalColorScheme(scheme: Int) {
+        context.dataStore.edit { it[Keys.TERMINAL_COLOR_SCHEME] = scheme }
+    }
+
     companion object {
         const val DEFAULT_TERMINAL_FONT_SIZE = 13
         const val MIN_TERMINAL_FONT_SIZE = 8
         const val MAX_TERMINAL_FONT_SIZE = 32
+
+        const val TERMINAL_SCHEME_DARK = 0
+        const val TERMINAL_SCHEME_LIGHT = 1
+        const val TERMINAL_SCHEME_FOLLOW_APP = 2
     }
 
     /** Whether to show shell history suggestions above the keyboard. Default true. */

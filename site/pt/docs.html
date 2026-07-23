@@ -158,23 +158,21 @@
 
         /* ── TOC ─────────────────────────────────────────────── */
         .toc {
+            /* override the global <nav> rule (this is a <nav> too): stack the
+               title above the list, don't stick to the top, and drop the
+               inherited z-index:100 — as a flex item it would otherwise paint
+               on top of the sticky top nav and cover its links */
+            display: block;
+            position: static;
+            z-index: auto;
+            backdrop-filter: none;
             flex-shrink: 0;
             width: 260px;
-            position: sticky;
-            top: 72px;
-            max-height: calc(100vh - 90px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
             border: 1px solid var(--border);
             padding: 20px 18px;
             clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
             background: var(--card);
         }
-        .toc::-webkit-scrollbar { width: 4px; }
-        .toc::-webkit-scrollbar-track { background: transparent; }
-        .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
         .toc-title {
             font-family: var(--font-mono);
             font-size: 0.78em;
@@ -511,6 +509,7 @@
         <div class="toc-title">// CONTEÚDO</div>
         <ul>
             <li><a href="#adding-host">Adicionar um host</a></li>
+            <li><a href="#host-groups">Grupos de hosts</a></li>
             <li><a href="#sftp">Gestor de ficheiros SFTP</a></li>
             <li class="sub"><a href="#sftp">Navegação</a></li>
             <li class="sub"><a href="#sftp">Carregar e transferir</a></li>
@@ -523,6 +522,7 @@
             <li class="sub"><a href="#suggestions">Como funciona</a></li>
             <li class="sub"><a href="#suggestions">Resolução de problemas</a></li>
             <li><a href="#terminal">Gestos do terminal</a></li>
+            <li><a href="#terminal-settings">Definições do terminal</a></li>
             <li><a href="#extra-keys">Barra de teclas extra</a></li>
             <li><a href="#agent-forwarding">Reencaminhamento de agente</a></li>
             <li><a href="#legacy-ciphers">Cifras legadas</a></li>
@@ -558,6 +558,27 @@
                 Pode verificar a impressão digital do servidor a qualquer momento com:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
+        </div>
+
+        <div class="doc-section" id="host-groups">
+
+            <h2>// GRUPOS DE HOSTS</h2>
+            <p>Quando a lista de servidores cresce, pode organizar os hosts em grupos recolhíveis com cores — por exemplo <em>Produção</em>, <em>Lab de casa</em>, <em>Clientes</em>.</p>
+            <h3>Criar um grupo</h3>
+            <ol class="steps">
+                <li>Adicione ou edite um host e abra o menu <strong>Grupo</strong>.</li>
+                <li>Escolha <strong>Novo grupo…</strong>, escreva um nome e selecione uma das cores predefinidas.</li>
+                <li>Guarde o host — a lista de hosts passa a mostrar o grupo como uma secção própria.</li>
+            </ol>
+            <h3>Trabalhar com grupos</h3>
+            <ul>
+                <li><strong>Recolher / expandir</strong> — toque no cabeçalho de um grupo para o recolher ou reabrir. O estado é lembrado, mesmo depois de reiniciar a app.</li>
+                <li><strong>Cor</strong> — a cor do grupo aparece como um ponto no cabeçalho e como tonalidade dos ícones dos hosts do grupo.</li>
+                <li><strong>Editar</strong> — mantenha premido o cabeçalho e escolha <em>Editar</em> para renomear o grupo ou mudar a cor.</li>
+                <li><strong>Eliminar</strong> — mantenha premido o cabeçalho e escolha <em>Eliminar</em>. Os hosts do grupo <em>não</em> são apagados: ficam simplesmente sem grupo.</li>
+            </ul>
+            <p>As cores escolhem-se das amostras rápidas ou livremente com o seletor de gradiente. Um host também pode ter uma <strong>cor própria</strong> — definida no editor do host, logo abaixo do grupo — que prevalece sobre a cor do grupo e funciona também para hosts sem grupo.</p>
+            <p>Os hosts sem grupo permanecem no topo da lista e, se nunca criar um grupo, a lista mantém exatamente o aspeto e o comportamento de sempre.</p>
         </div>
 
         <div class="doc-section" id="sftp">
@@ -668,6 +689,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — faça pinça para aumentar ou diminuir o tamanho do texto.</li>
                 <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar.</li>
                 <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="terminal-settings">
+
+            <h2>// DEFINIÇÕES DO TERMINAL</h2>
+            <p>Em <strong>Definições → Terminal</strong> pode adaptar o terminal às suas necessidades:</p>
+            <ul>
+                <li><strong>Cores do terminal</strong> — o clássico esquema <em>escuro</em> (branco sobre preto), um esquema <em>claro</em> (preto sobre branco) mais legível à luz do dia, ou <em>seguir o tema da app</em>, que muda automaticamente com o tema da app. A alteração aplica-se de imediato, incluindo às sessões já abertas.</li>
+                <li><strong>Manter o ecrã ligado</strong> — impede que o ecrã se desligue enquanto um terminal está aberto. Útil ao acompanhar logs ou comandos demorados. Desativado por predefinição.</li>
+                <li><strong>Tamanho de letra predefinido</strong> — o tamanho do texto com que as novas sessões começam; continua a poder fazer zoom com dois dedos em cada sessão.</li>
+                <li><strong>Scrollback</strong>, <strong>deslocamento invertido</strong> e <strong>sugestões de comandos</strong> — controlam quanto histórico de saída é mantido, a direção do deslocamento e a barra de sugestões descrita acima.</li>
             </ul>
         </div>
 
@@ -901,8 +934,11 @@ Host target
             <h3>Formato JSON</h3>
             <p>O ficheiro exportado é um objeto JSON simples. Também pode criá-lo manualmente para importar em bloco uma lista de servidores de outra fonte.</p>
             <pre><code>{
-  "version": 1,
+  "version": 2,
   "exported_at": "2026-05-14T10:00:00Z",
+  "groups": [
+    { "name": "Produção", "color": -1754827 }
+  ],
   "hosts": [
     {
       "label":           "O meu VPS",
@@ -915,7 +951,9 @@ Host target
       "jumpHostIdList":  null,
       "portForwardings": null,
       "sftpStartMode":   "last",
-      "sftpStartDir":    null
+      "sftpStartDir":    null,
+      "allowLegacyCiphers": false,
+      "group":           "Produção"
     }
   ]
 }</code></pre>
@@ -931,6 +969,9 @@ Host target
                 <li><code>portForwardings</code> — regras de reencaminhamento de porta local separadas por nova linha em sintaxe SSH <code>-L</code>, ex. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — diretório inicial SFTP: <code>"last"</code> (lembrar o último visitado), <code>"fixed"</code> (usar sempre <code>sftpStartDir</code>), <code>"home"</code> (diretório pessoal do servidor). Predefinição: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — caminho a usar quando <code>sftpStartMode</code> é <code>"fixed"</code>.</li>
+                <li><code>allowLegacyCiphers</code> — <code>true</code> para ativar os algoritmos legados descritos acima. Predefinição: <code>false</code>.</li>
+                <li><code>group</code> — nome do grupo a que o host pertence. Os grupos estão no array <code>groups</code> de nível superior, com <code>name</code> e <code>color</code> (ARGB como inteiro de 32 bits com sinal). Se um host referir um grupo ausente do array, este é criado automaticamente com uma cor predefinida — ao escrever o ficheiro à mão pode omitir o array.</li>
+                <li><code>color</code> — cor opcional do host (ARGB como inteiro de 32 bits com sinal). Prevalece sobre a cor do grupo.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// CAMPOS OPCIONAIS</div>

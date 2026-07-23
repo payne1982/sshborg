@@ -22,6 +22,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val prefs        = sshBorgApp.appPreferences
     private val keyDao       = sshBorgApp.db.sshKeyDao()
     private val hostDao      = sshBorgApp.db.hostDao()
+    private val groupDao     = sshBorgApp.db.groupDao()
 
     val biometricLock: StateFlow<Boolean> =
         prefs.biometricLock.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -48,6 +49,15 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         prefs.terminalFontSize.stateIn(
             viewModelScope, SharingStarted.WhileSubscribed(5000),
             com.sshborg.data.AppPreferences.DEFAULT_TERMINAL_FONT_SIZE,
+        )
+
+    val keepScreenOn: StateFlow<Boolean> =
+        prefs.keepScreenOn.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val terminalColorScheme: StateFlow<Int> =
+        prefs.terminalColorScheme.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.TERMINAL_SCHEME_DARK,
         )
 
     val historySuggestions: StateFlow<Boolean> =
@@ -113,6 +123,14 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setTerminalFontSize(sp) }
     }
 
+    fun setKeepScreenOn(enabled: Boolean) {
+        viewModelScope.launch { prefs.setKeepScreenOn(enabled) }
+    }
+
+    fun setTerminalColorScheme(scheme: Int) {
+        viewModelScope.launch { prefs.setTerminalColorScheme(scheme) }
+    }
+
     fun setHistorySuggestions(enabled: Boolean) {
         viewModelScope.launch { prefs.setHistorySuggestions(enabled) }
     }
@@ -148,6 +166,15 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val hosts = hostDao.getAllOnce()
+                val groups = groupDao.getAllOnce()
+                val groupNameById = groups.associate { it.id to it.name }
+                val groupsArr = JSONArray()
+                groups.forEach { g ->
+                    groupsArr.put(JSONObject().apply {
+                        put("name", g.name)
+                        put("color", g.color)
+                    })
+                }
                 val arr = JSONArray()
                 hosts.forEach { h ->
                     arr.put(JSONObject().apply {
@@ -158,15 +185,19 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         put("agentForwarding", h.agentForwarding)
                         put("jumpMode", h.jumpMode)
                         put("sftpStartMode", h.sftpStartMode)
+                        put("allowLegacyCiphers", h.allowLegacyCiphers)
                         h.jumpHosts?.let { put("jumpHosts", it) }
                         h.jumpHostIdList?.let { put("jumpHostIdList", it) }
                         h.portForwardings?.let { put("portForwardings", it) }
                         h.sftpStartDir?.let { put("sftpStartDir", it) }
+                        h.groupId?.let { gid -> groupNameById[gid]?.let { put("group", it) } }
+                        h.color?.let { put("color", it) }
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 1)
+                    put("version", 2)
                     put("exported_at", java.time.Instant.now().toString())
+                    put("groups", groupsArr)
                     put("hosts", arr)
                 }.toString(2)
                 getApplication<Application>().contentResolver.openOutputStream(uri)?.use {
@@ -186,6 +217,35 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     .openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
                     ?: throw IllegalStateException(getApplication<Application>().getString(R.string.error_unknown))
                 val root = JSONObject(jsonText)
+
+                // Groups (backup version >= 2): upsert by name, keeping existing IDs.
+                val groupIdByName = mutableMapOf<String, Long>()
+                root.optJSONArray("groups")?.let { groupsArr ->
+                    for (i in 0 until groupsArr.length()) {
+                        val g = groupsArr.getJSONObject(i)
+                        val name = g.getString("name")
+                        val color = g.optInt("color", com.sshborg.data.db.GroupEntity.SWATCHES[0])
+                        val existing = groupDao.getByName(name)
+                        groupIdByName[name] =
+                            if (existing != null) {
+                                groupDao.upsert(existing.copy(color = color)); existing.id
+                            } else {
+                                groupDao.upsert(com.sshborg.data.db.GroupEntity(name = name, color = color))
+                            }
+                    }
+                }
+                suspend fun resolveGroupId(name: String?): Long? {
+                    if (name.isNullOrEmpty()) return null
+                    groupIdByName[name]?.let { return it }
+                    // Host references a group missing from the backup: recreate it.
+                    val existing = groupDao.getByName(name)
+                    val id = existing?.id ?: groupDao.upsert(
+                        com.sshborg.data.db.GroupEntity(name = name, color = com.sshborg.data.db.GroupEntity.SWATCHES[0])
+                    )
+                    groupIdByName[name] = id
+                    return id
+                }
+
                 val arr = root.getJSONArray("hosts")
                 val toImport = (0 until arr.length()).map { i ->
                     val o = arr.getJSONObject(i)
@@ -208,6 +268,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         jumpHostIdList = o.optString("jumpHostIdList").takeIf { it.isNotEmpty() },
                         sftpStartMode = o.optString("sftpStartMode", "last"),
                         sftpStartDir = o.optString("sftpStartDir").takeIf { it.isNotEmpty() },
+                        allowLegacyCiphers = o.optBoolean("allowLegacyCiphers", false),
+                        groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
+                        color = if (o.has("color")) o.getInt("color") else null,
                     )
                 }
                 val existingByLabel = hostDao.getAllOnce().associateBy { it.label }

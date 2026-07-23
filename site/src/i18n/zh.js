@@ -82,6 +82,7 @@ module.exports = {
   toc_title: '// 目录',
 
   doc_toc: `            <li><a href="#adding-host">添加主机</a></li>
+            <li><a href="#host-groups">主机分组</a></li>
             <li><a href="#sftp">SFTP 文件管理器</a></li>
             <li class="sub"><a href="#sftp">浏览</a></li>
             <li class="sub"><a href="#sftp">上传与下载</a></li>
@@ -94,6 +95,7 @@ module.exports = {
             <li class="sub"><a href="#suggestions">工作原理</a></li>
             <li class="sub"><a href="#suggestions">故障排除</a></li>
             <li><a href="#terminal">终端手势</a></li>
+            <li><a href="#terminal-settings">终端设置</a></li>
             <li><a href="#extra-keys">额外按键栏</a></li>
             <li><a href="#agent-forwarding">代理转发</a></li>
             <li><a href="#legacy-ciphers">旧版加密算法</a></li>
@@ -123,6 +125,25 @@ module.exports = {
                 您可以随时用以下命令检查服务器指纹：
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
+
+  doc_host_groups: `
+            <h2>// 主机分组</h2>
+            <p>当服务器列表越来越长时，可以把主机整理到可折叠的彩色分组中，例如<em>生产</em>、<em>家庭实验室</em>、<em>客户</em>。</p>
+            <h3>创建分组</h3>
+            <ol class="steps">
+                <li>添加或编辑主机，打开<strong>分组</strong>下拉菜单。</li>
+                <li>选择<strong>新建分组…</strong>，输入名称并从预设颜色中挑选一个。</li>
+                <li>保存主机后，主机列表会将该分组显示为独立的区块。</li>
+            </ol>
+            <h3>使用分组</h3>
+            <ul>
+                <li><strong>折叠 / 展开</strong> — 点按分组标题即可折叠或重新展开。状态会被记住，重启应用后也不会丢失。</li>
+                <li><strong>颜色</strong> — 分组颜色显示为标题上的圆点，并作为组内主机图标的着色。</li>
+                <li><strong>编辑</strong> — 长按分组标题并选择<em>编辑</em>，可重命名分组或更换颜色。</li>
+                <li><strong>删除</strong> — 长按标题并选择<em>删除</em>。组内的主机<em>不会</em>被删除，只是变为未分组。</li>
+            </ul>
+            <p>颜色可以从快捷色板中选择，也可以用渐变取色器自由调配。主机还可以拥有<strong>自己的颜色</strong>——在主机编辑器中、分组下方设置——它会覆盖分组颜色，对未分组的主机同样有效。</p>
+            <p>未分组的主机始终显示在列表顶部；如果不创建任何分组，列表的外观和行为与以前完全相同。</p>`,
 
   doc_sftp: `
             <h2>// SFTP 文件管理器</h2>
@@ -225,6 +246,16 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>缩放</strong> — 捏合手势放大或缩小文字。</li>
                 <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
+            </ul>`,
+
+  doc_terminal_settings: `
+            <h2>// 终端设置</h2>
+            <p>在<strong>设置 → 终端</strong>中可以按需调整终端：</p>
+            <ul>
+                <li><strong>终端配色</strong> — 经典<em>深色</em>方案（黑底白字）、在强光下更易读的<em>浅色</em>方案（白底黑字），或<em>跟随应用主题</em>（随应用深浅色主题自动切换）。更改立即生效，包括已打开的会话。</li>
+                <li><strong>保持屏幕常亮</strong> — 终端打开时阻止屏幕熄灭。查看日志或运行长时间命令时很实用。默认关闭。</li>
+                <li><strong>默认字体大小</strong> — 新终端会话的初始文字大小；每个会话中仍可用双指缩放。</li>
+                <li><strong>回滚缓冲区</strong>、<strong>反向滚动</strong>和<strong>命令建议</strong> — 分别控制保留多少输出历史、滚动方向，以及上文介绍的建议栏。</li>
             </ul>`,
 
   doc_extra_keys: `
@@ -442,8 +473,11 @@ Host target
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 1,
+  "version": 2,
   "exported_at": "2026-05-14T10:00:00Z",
+  "groups": [
+    { "name": "生产", "color": -1754827 }
+  ],
   "hosts": [
     {
       "label":           "我的 VPS",
@@ -456,7 +490,9 @@ Host target
       "jumpHostIdList":  null,
       "portForwardings": null,
       "sftpStartMode":   "last",
-      "sftpStartDir":    null
+      "sftpStartDir":    null,
+      "allowLegacyCiphers": false,
+      "group":           "生产"
     }
   ]
 }</code></pre>
@@ -472,6 +508,9 @@ Host target
                 <li><code>portForwardings</code> — 以换行符分隔的本地端口转发规则，使用 SSH <code>-L</code> 语法，例如 <code>"8080:localhost:8080"</code>。</li>
                 <li><code>sftpStartMode</code> — SFTP 起始目录：<code>"last"</code>（记住上次访问的目录）、<code>"fixed"</code>（始终使用 <code>sftpStartDir</code>）、<code>"home"</code>（服务器主目录）。默认值：<code>"last"</code>。</li>
                 <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
+                <li><code>allowLegacyCiphers</code> — 设为 <code>true</code> 可启用上文介绍的旧式加密算法。默认为 <code>false</code>。</li>
+                <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
+                <li><code>color</code> — 主机的可选颜色（ARGB，带符号 32 位整数），会覆盖分组颜色。</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// 可选字段</div>

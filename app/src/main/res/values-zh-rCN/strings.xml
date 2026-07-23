@@ -44,6 +44,19 @@
     <string name="hosts_press_back_to_exit">再按一次返回键退出</string>
     <string name="hosts_delete_title">删除主机</string>
     <string name="hosts_delete_message">删除"%1$s"？</string>
+    <string name="host_group_label">分组</string>
+    <string name="host_group_none">无分组</string>
+    <string name="host_group_new">新建分组…</string>
+    <string name="group_dialog_title_new">新建分组</string>
+    <string name="group_dialog_title_edit">编辑分组</string>
+    <string name="group_dialog_name">名称</string>
+    <string name="group_delete_title">删除分组</string>
+    <string name="group_delete_message">删除 \"%1$s\"？主机将被保留，不属于任何分组。</string>
+    <string name="host_color_label">颜色</string>
+    <string name="host_color_auto">自动</string>
+    <string name="host_color_custom">自定义</string>
+    <string name="host_color_dialog_title">主机颜色</string>
+    <string name="host_color_remove">移除自定义颜色</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">连接</string>
@@ -148,6 +161,10 @@
 
     <string name="settings_invert_scroll_title">反转终端滚动</string>
     <string name="settings_invert_scroll_subtitle">向上滑动查看较早的输出而非较新的</string>
+    <string name="settings_keep_screen_on_title">保持屏幕常亮</string>
+    <string name="settings_keep_screen_on_subtitle">终端打开时防止屏幕关闭</string>
+    <string name="settings_terminal_colors_title">终端配色</string>
+    <string name="settings_terminal_colors_follow_app">跟随应用主题</string>
     <string name="settings_font_size_title">字体大小</string>
     <string name="settings_font_size_subtitle">终端默认文字大小（sp）；会话中可双指缩放</string>
     <string name="settings_scrollback_title">滚动回看行数</string>
@@ -292,7 +309,6 @@
     <string name="action_dont_show_again">不再显示</string>
 
     <!-- ── Biometric prompt ── -->
-    <string name="biometric_prompt_title">SSHBorg</string>
     <string name="biometric_prompt_subtitle">请验证身份以继续</string>
 
     <!-- ── Foreground service notification ── -->

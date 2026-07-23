@@ -44,6 +44,19 @@
     <string name="hosts_press_back_to_exit">もう一度戻るボタンで終了</string>
     <string name="hosts_delete_title">ホストを削除</string>
     <string name="hosts_delete_message">"%1$s" を削除しますか？</string>
+    <string name="host_group_label">グループ</string>
+    <string name="host_group_none">グループなし</string>
+    <string name="host_group_new">新しいグループ…</string>
+    <string name="group_dialog_title_new">新しいグループ</string>
+    <string name="group_dialog_title_edit">グループを編集</string>
+    <string name="group_dialog_name">名前</string>
+    <string name="group_delete_title">グループを削除</string>
+    <string name="group_delete_message">\"%1$s\" を削除しますか？ホストはグループなしで保持されます。</string>
+    <string name="host_color_label">色</string>
+    <string name="host_color_auto">自動</string>
+    <string name="host_color_custom">カスタム</string>
+    <string name="host_color_dialog_title">ホストの色</string>
+    <string name="host_color_remove">カスタムの色を削除</string>
 
     <!-- Host item context menu -->
     <string name="host_menu_connect">接続</string>
@@ -148,6 +161,10 @@
 
     <string name="settings_invert_scroll_title">ターミナルのスクロールを反転</string>
     <string name="settings_invert_scroll_subtitle">上にスワイプして新しい出力ではなく古い出力を表示</string>
+    <string name="settings_keep_screen_on_title">画面をオンのまま維持</string>
+    <string name="settings_keep_screen_on_subtitle">ターミナルを開いている間、画面が消灯しないようにします</string>
+    <string name="settings_terminal_colors_title">ターミナルの配色</string>
+    <string name="settings_terminal_colors_follow_app">アプリのテーマに合わせる</string>
     <string name="settings_font_size_title">文字サイズ</string>
     <string name="settings_font_size_subtitle">ターミナルの既定の文字サイズ（sp）。セッション中はピンチで拡大縮小できます</string>
     <string name="settings_scrollback_title">スクロールバック行数</string>
@@ -292,7 +309,6 @@
     <string name="action_dont_show_again">今後表示しない</string>
 
     <!-- ── Biometric prompt ── -->
-    <string name="biometric_prompt_title">SSHBorg</string>
     <string name="biometric_prompt_subtitle">続行するには認証してください</string>
 
     <!-- ── Foreground service notification ── -->

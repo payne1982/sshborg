@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
+import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
 import com.sshborg.service.SessionManager
 
@@ -52,6 +54,7 @@ fun HostsScreen(
     vm: HostsViewModel = viewModel(),
 ) {
     val hosts       by vm.hosts.collectAsState()
+    val groups      by vm.groups.collectAsState()
     val confirmExit by vm.confirmExit.collectAsState()
     val context     = LocalContext.current
 
@@ -68,7 +71,9 @@ fun HostsScreen(
         }
     }
 
-    var hostToDelete by remember { mutableStateOf<HostEntity?>(null) }
+    var hostToDelete  by remember { mutableStateOf<HostEntity?>(null) }
+    var groupToEdit   by remember { mutableStateOf<GroupEntity?>(null) }
+    var groupToDelete by remember { mutableStateOf<GroupEntity?>(null) }
 
     // Bottom sheet state for session picker
     var sessionPickerHost by remember { mutableStateOf<HostEntity?>(null) }
@@ -99,11 +104,55 @@ fun HostsScreen(
             }
         },
     ) { padding ->
-        if (hosts.isEmpty()) {
+        // Host rows for one section; groupColor tints the leading icon (null = default).
+        fun LazyListScope.hostItems(list: List<HostEntity>, groupColor: Color?) {
+            items(list, key = { it.id }) { host ->
+                val shellSessions = sessions.filter {
+                    it.hostId == host.id && it.type == SessionManager.SessionType.Shell
+                }
+                val sftpSessions = sessions.filter {
+                    it.hostId == host.id && it.type == SessionManager.SessionType.Sftp
+                }
+                HostItem(
+                    host          = host,
+                    groupColor    = groupColor,
+                    shellCount    = shellSessions.size,
+                    sftpCount     = sftpSessions.size,
+                    onClick       = {
+                        when (shellSessions.size) {
+                            0    -> onNewTerminal(host.id, host.label)
+                            1    -> onResumeTerminal(shellSessions[0].id)
+                            else -> { sessionPickerHost = host; sessionPickerType = SessionManager.SessionType.Shell }
+                        }
+                    },
+                    onSftp        = {
+                        when (sftpSessions.size) {
+                            0    -> onNewSftp(host.id, host.label)
+                            1    -> onResumeSftp(sftpSessions[0].id)
+                            else -> { sessionPickerHost = host; sessionPickerType = SessionManager.SessionType.Sftp }
+                        }
+                    },
+                    onEdit        = { onEditHost(host.id) },
+                    onDelete      = { hostToDelete = host },
+                    onNewTerminal = { onNewTerminal(host.id, host.label) },
+                    onNewSftp     = { onNewSftp(host.id, host.label) },
+                )
+            }
+        }
+
+        if (hosts.isEmpty() && groups.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.hosts_empty), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
+            // Ungrouped hosts first (no header — with zero groups the list looks
+            // exactly as it always did), then one collapsible section per group.
+            // Hosts pointing at a missing group (e.g. odd imports) fall back to ungrouped.
+            val groupIds = groups.map { it.id }.toSet()
+            val ungrouped = hosts.filter { it.groupId == null || it.groupId !in groupIds }
+            val hostsByGroup = hosts.filter { it.groupId != null && it.groupId in groupIds }
+                .groupBy { it.groupId!! }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 // Extra bottom space so the last host row can scroll clear of the
@@ -111,36 +160,20 @@ fun HostsScreen(
                 // covers it when the list fills the screen.
                 contentPadding = PaddingValues(bottom = 88.dp),
             ) {
-                items(hosts, key = { it.id }) { host ->
-                    val shellSessions = sessions.filter {
-                        it.hostId == host.id && it.type == SessionManager.SessionType.Shell
+                hostItems(ungrouped, groupColor = null)
+                groups.forEach { group ->
+                    item(key = "g-${group.id}") {
+                        GroupHeader(
+                            group    = group,
+                            count    = hostsByGroup[group.id].orEmpty().size,
+                            onToggle = { vm.toggleGroupCollapsed(group) },
+                            onEdit   = { groupToEdit = group },
+                            onDelete = { groupToDelete = group },
+                        )
                     }
-                    val sftpSessions = sessions.filter {
-                        it.hostId == host.id && it.type == SessionManager.SessionType.Sftp
+                    if (!group.collapsed) {
+                        hostItems(hostsByGroup[group.id].orEmpty(), groupColor = Color(group.color))
                     }
-                    HostItem(
-                        host          = host,
-                        shellCount    = shellSessions.size,
-                        sftpCount     = sftpSessions.size,
-                        onClick       = {
-                            when (shellSessions.size) {
-                                0    -> onNewTerminal(host.id, host.label)
-                                1    -> onResumeTerminal(shellSessions[0].id)
-                                else -> { sessionPickerHost = host; sessionPickerType = SessionManager.SessionType.Shell }
-                            }
-                        },
-                        onSftp        = {
-                            when (sftpSessions.size) {
-                                0    -> onNewSftp(host.id, host.label)
-                                1    -> onResumeSftp(sftpSessions[0].id)
-                                else -> { sessionPickerHost = host; sessionPickerType = SessionManager.SessionType.Sftp }
-                            }
-                        },
-                        onEdit        = { onEditHost(host.id) },
-                        onDelete      = { hostToDelete = host },
-                        onNewTerminal = { onNewTerminal(host.id, host.label) },
-                        onNewSftp     = { onNewSftp(host.id, host.label) },
-                    )
                 }
             }
         }
@@ -161,6 +194,41 @@ fun HostsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { hostToDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
+    // Group edit (rename / recolor)
+    groupToEdit?.let { group ->
+        GroupDialog(
+            title        = stringResource(R.string.group_dialog_title_edit),
+            initialName  = group.name,
+            initialColor = group.color,
+            onConfirm    = { name, color ->
+                vm.saveGroup(group.copy(name = name, color = color))
+                groupToEdit = null
+            },
+            onDismiss    = { groupToEdit = null },
+        )
+    }
+
+    // Group delete confirmation (hosts are kept, they just become ungrouped)
+    groupToDelete?.let { group ->
+        AlertDialog(
+            onDismissRequest = { groupToDelete = null },
+            title = { Text(stringResource(R.string.group_delete_title)) },
+            text  = { Text(stringResource(R.string.group_delete_message, group.name)) },
+            confirmButton = {
+                OutlinedButton(
+                    onClick = { vm.deleteGroup(group); groupToDelete = null },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+                ) { Text(stringResource(R.string.action_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { groupToDelete = null }) {
                     Text(stringResource(R.string.action_cancel))
                 }
             },
@@ -242,8 +310,61 @@ private fun SessionPickerSheet(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+private fun GroupHeader(
+    group: GroupEntity,
+    count: Int,
+    onToggle: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Box {
+        ListItem(
+            modifier = Modifier.combinedClickable(
+                onClick     = onToggle,
+                onLongClick = { menuExpanded = true },
+            ),
+            leadingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Icon(
+                        if (group.collapsed) Icons.Default.ChevronRight else Icons.Default.ExpandMore,
+                        contentDescription = null,
+                    )
+                    Box(Modifier.size(12.dp).background(Color(group.color), CircleShape))
+                }
+            },
+            headlineContent = {
+                Text(
+                    "${group.name} ($count)",
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            },
+        )
+        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_edit)) },
+                leadingIcon = { Icon(Icons.Default.Edit, null) },
+                onClick = { menuExpanded = false; onEdit() },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_delete)) },
+                leadingIcon = { Icon(Icons.Default.Delete, null) },
+                onClick = { menuExpanded = false; onDelete() },
+            )
+        }
+    }
+    HorizontalDivider(thickness = 0.5.dp)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
 private fun HostItem(
     host: HostEntity,
+    groupColor: Color?,
     shellCount: Int,
     sftpCount: Int,
     onClick: () -> Unit,
@@ -273,7 +394,12 @@ private fun HostItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Icon(Icons.Default.Computer, contentDescription = null)
+                Icon(
+                    Icons.Default.Computer,
+                    contentDescription = null,
+                    // Host's own color wins over the group color
+                    tint = host.color?.let { Color(it) } ?: groupColor ?: LocalContentColor.current,
+                )
                 if (shellCount > 0 || sftpCount > 0) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(3.dp),
