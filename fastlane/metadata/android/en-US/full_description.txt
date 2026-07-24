@@ -7,7 +7,7 @@ FEATURES
 • SSH Key Auth — Generate Ed25519, ECDSA, and RSA keys directly on your device. No passwords needed.
 • Jump Host Support — Connect through one or more bastion hosts with transparent tunnelling. Full SSH agent forwarding.
 • Biometric Lock — Protect access to your servers with fingerprint or face unlock. Configurable timeout.
-• Multilingual — Available in English, Italian, French, German, Spanish, Portuguese, Ukrainian, Chinese, and Japanese.
+• Multilingual — Available in English, Italian, French, German, Spanish, Portuguese, Ukrainian, Russian, Chinese, and Japanese.
 • Dark & Light Theme — Follows the system theme or let you choose. Fully readable in any lighting condition.
 • Multiple Sessions — Keep several SSH and SFTP sessions open simultaneously. Switch between them instantly.
 

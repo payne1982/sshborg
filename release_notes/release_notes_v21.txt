@@ -1,0 +1,30 @@
+<en-US>
+• The app is now available in Russian, thanks to a community translation
+</en-US>
+<it-IT>
+• L'app è ora disponibile in russo, grazie a una traduzione della community
+</it-IT>
+<de-DE>
+• Die App ist dank einer Community-Übersetzung jetzt auch auf Russisch verfügbar
+</de-DE>
+<es-ES>
+• La app ya está disponible en ruso, gracias a una traducción de la comunidad
+</es-ES>
+<fr-FR>
+• L'application est désormais disponible en russe, grâce à une traduction de la communauté
+</fr-FR>
+<pt-PT>
+• A aplicação está agora disponível em russo, graças a uma tradução da comunidade
+</pt-PT>
+<uk>
+• Застосунок тепер доступний російською мовою завдяки перекладу від спільноти
+</uk>
+<ru-RU>
+• Приложение теперь доступно на русском языке благодаря переводу от сообщества
+</ru-RU>
+<zh-CN>
+• 应用现已支持俄语，感谢社区贡献的翻译
+</zh-CN>
+<ja-JP>
+• コミュニティによる翻訳のおかげで、アプリがロシア語に対応しました
+</ja-JP>
