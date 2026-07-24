@@ -50,10 +50,7 @@
       "inLanguage": "es"
     }
     </script>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -71,7 +68,7 @@
             --text:        #a8d4b4;
             --muted:       #4a7058;
             --font-display:'Workbench', sans-serif;
-            --font-mono:   'Bitcount Mono Single', monospace;
+            --font-mono:   'Bitcount Grid Single', monospace;
             --font-body:   'Electrolize', sans-serif;
         }
 
@@ -291,6 +288,29 @@
                 inset 0 0 20px rgba(0,255,136,0.05);
         }
         .cta-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+        /* ── Ko-fi tip button (self-hosted, no third-party widget) ── */
+        .kofi-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            color: var(--copper);
+            font-family: var(--font-display);
+            font-size: 1.1em;
+            letter-spacing: 0.1em;
+            padding: 14px 32px;
+            border: 2px solid var(--copper);
+            clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+            text-decoration: none;
+            transition: background 0.2s, box-shadow 0.2s, text-shadow 0.2s;
+        }
+        .kofi-btn:hover {
+            background: rgba(200,124,48,0.12);
+            text-shadow: 0 0 12px var(--copper);
+            box-shadow: 0 0 20px rgba(200,124,48,0.4), inset 0 0 20px rgba(200,124,48,0.05);
+        }
+        .kofi-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
         @keyframes cta-pulse {
             0%, 100% {
                 box-shadow:
@@ -687,7 +707,10 @@
             </div>
         </div>
         <div style="margin-top:20px">
-            <script type='text/javascript'>kofiwidget2.init('Déjame una propina', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+            <a class="kofi-btn" href="https://ko-fi.com/R5R21XLAV5" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+                <span>Déjame una propina</span>
+            </a>
         </div>
     </div>
 </div>
@@ -776,7 +799,10 @@
 <div class="tip-section" id="tip">
     <h2>// DEJAR UNA PROPINA</h2>
     <p>SSHBorg es gratuito, sin publicidad y sin seguimiento. Si te ahorra tiempo, una pequeña propina ayuda a mantenerlo.</p>
-    <script type='text/javascript'>kofiwidget2.init('Apóyame en Ko-fi', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+    <a class="kofi-btn" href="https://ko-fi.com/R5R21XLAV5" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+        <span>Apóyame en Ko-fi</span>
+    </a>
 </div>
 
 <!-- Footer -->
