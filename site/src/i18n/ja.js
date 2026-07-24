@@ -38,7 +38,7 @@ module.exports = {
   feat_biometric_title:'生体認証ロック',
   feat_biometric_desc: '指紋や顔認証でサーバーへのアクセスを保護。タイムアウトは設定可能。',
   feat_multilingual_title: '多言語対応',
-  feat_multilingual_desc:  '英語、イタリア語、フランス語、ドイツ語、スペイン語、ポルトガル語、ウクライナ語、中国語、日本語に対応。',
+  feat_multilingual_desc:  '英語、イタリア語、フランス語、ドイツ語、スペイン語、ポルトガル語、ウクライナ語、ロシア語、中国語、日本語に対応。',
   feat_theme_title:    'ダーク＆ライトテーマ',
   feat_theme_desc:     'システムテーマに追従するか、手動で選択。どんな照明条件でも読みやすい。',
   feat_sessions_title: 'マルチセッション',

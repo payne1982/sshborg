@@ -37,7 +37,7 @@ module.exports = {
   feat_biometric_title:'BLOQUEO BIOMÉTRICO',
   feat_biometric_desc: 'Protege el acceso a tus servidores con huella dactilar o reconocimiento facial. Tiempo de espera configurable.',
   feat_multilingual_title: 'MULTIIDIOMA',
-  feat_multilingual_desc:  'Disponible en inglés, italiano, francés, alemán, español, portugués, ucraniano, chino y japonés.',
+  feat_multilingual_desc:  'Disponible en inglés, italiano, francés, alemán, español, portugués, ucraniano, ruso, chino y japonés.',
   feat_theme_title:    'TEMA OSCURO Y CLARO',
   feat_theme_desc:     'Sigue el tema del sistema o déjate elegir. Perfectamente legible en cualquier condición de iluminación.',
   feat_sessions_title: 'MÚLTIPLES SESIONES',

@@ -38,7 +38,7 @@ module.exports = {
   feat_biometric_title:'生物识别锁',
   feat_biometric_desc: '通过指纹或人脸解锁保护服务器访问权限，超时时间可自定义。',
   feat_multilingual_title: '多语言',
-  feat_multilingual_desc:  '支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、中文和日语。',
+  feat_multilingual_desc:  '支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、俄语、中文和日语。',
   feat_theme_title:    '深色与浅色主题',
   feat_theme_desc:     '跟随系统主题，或手动选择。在任何光线条件下均清晰可读。',
   feat_sessions_title: '多会话',
