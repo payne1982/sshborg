@@ -12,7 +12,6 @@
     <string name="action_edit">Editar</string>
     <string name="action_back">Atrás</string>
     <string name="action_connect">Conectar</string>
-    <string name="action_disconnect">Desconectar</string>
     <string name="action_close">Cerrar</string>
     <string name="action_done">Hecho</string>
     <string name="action_rename">Renombrar</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">¡Copiado!</string>
     <string name="action_show">Mostrar</string>
     <string name="action_hide">Ocultar</string>
-    <string name="action_refresh">Actualizar</string>
     <string name="action_trust">Confiar</string>
     <string name="action_reject">Rechazar</string>
     <string name="action_go_back">Volver</string>
-    <string name="action_back_to_hosts">Volver a hosts</string>
     <string name="action_overwrite">Sobrescribir</string>
     <string name="action_keep_both">Guardar ambos</string>
     <string name="action_i_understand">Entendido</string>
@@ -160,7 +157,6 @@
     <string name="settings_font_size_subtitle">Tamaño de texto predeterminado del terminal (sp); pellizca para hacer zoom en la sesión</string>
     <string name="settings_scrollback_title">Líneas de scrollback</string>
     <string name="settings_scrollback_subtitle">Líneas del historial del terminal mantenidas en memoria</string>
-    <string name="settings_scrollback_lines">%d líneas</string>
     <string name="settings_history_suggestions_title">Sugerencias del historial de comandos</string>
     <string name="settings_history_suggestions_subtitle">Mostrar sugerencias del historial de shell del servidor mientras se escribe en el terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barra de sugerencias siempre visible</string>
@@ -210,9 +206,7 @@
     <string name="sftp_download_cd">Descargar</string>
     <string name="sftp_empty_directory">Directorio vacío</string>
     <string name="sftp_disconnected">Desconectado</string>
-    <string name="sftp_go_back">Volver</string>
 
-    <string name="sftp_downloading">Descargando %1$s</string>
     <string name="sftp_downloading_label">Descargando:</string>
     <string name="sftp_uploading">Subiendo %1$s</string>
     <string name="sftp_saved_to_downloads">Guardado: %1$s</string>
@@ -298,7 +292,6 @@
     <string name="error_host_not_found">Host no encontrado</string>
     <string name="error_connection_failed">Conexión fallida</string>
     <string name="error_cannot_list_directory">No se puede listar el directorio</string>
-    <string name="error_cannot_create_file">No se puede crear el archivo en Descargas</string>
     <string name="error_download_failed">Descarga fallida</string>
     <string name="error_upload_failed">Subida fallida</string>
     <string name="error_delete_failed">Eliminación fallida</string>

@@ -12,7 +12,6 @@
     <string name="action_edit">Editar</string>
     <string name="action_back">Voltar</string>
     <string name="action_connect">Ligar</string>
-    <string name="action_disconnect">Desligar</string>
     <string name="action_close">Fechar</string>
     <string name="action_done">Concluído</string>
     <string name="action_rename">Renomear</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">Copiado!</string>
     <string name="action_show">Mostrar</string>
     <string name="action_hide">Ocultar</string>
-    <string name="action_refresh">Atualizar</string>
     <string name="action_trust">Confiar</string>
     <string name="action_reject">Rejeitar</string>
     <string name="action_go_back">Voltar</string>
-    <string name="action_back_to_hosts">Voltar aos hosts</string>
     <string name="action_overwrite">Substituir</string>
     <string name="action_keep_both">Manter ambos</string>
     <string name="action_i_understand">Entendi</string>
@@ -160,7 +157,6 @@
     <string name="settings_font_size_subtitle">Tamanho de texto predefinido do terminal (sp); belisque para ampliar na sessão</string>
     <string name="settings_scrollback_title">Linhas de scrollback</string>
     <string name="settings_scrollback_subtitle">Linhas do histórico do terminal mantidas em memória</string>
-    <string name="settings_scrollback_lines">%d linhas</string>
     <string name="settings_history_suggestions_title">Sugestões do histórico de comandos</string>
     <string name="settings_history_suggestions_subtitle">Mostrar sugestões do histórico de shell do servidor ao digitar no terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barra de sugestões sempre visível</string>
@@ -210,9 +206,7 @@
     <string name="sftp_download_cd">Transferir</string>
     <string name="sftp_empty_directory">Diretório vazio</string>
     <string name="sftp_disconnected">Desligado</string>
-    <string name="sftp_go_back">Voltar</string>
 
-    <string name="sftp_downloading">A transferir %1$s</string>
     <string name="sftp_downloading_label">A transferir:</string>
     <string name="sftp_uploading">A enviar %1$s</string>
     <string name="sftp_saved_to_downloads">Guardado: %1$s</string>
@@ -298,7 +292,6 @@
     <string name="error_host_not_found">Host não encontrado</string>
     <string name="error_connection_failed">Ligação falhada</string>
     <string name="error_cannot_list_directory">Não é possível listar o diretório</string>
-    <string name="error_cannot_create_file">Não é possível criar o ficheiro em Transferências</string>
     <string name="error_download_failed">Transferência falhada</string>
     <string name="error_upload_failed">Envio falhado</string>
     <string name="error_delete_failed">Eliminação falhada</string>

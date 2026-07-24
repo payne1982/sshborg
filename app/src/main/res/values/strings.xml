@@ -14,7 +14,6 @@
     <string name="action_edit">Edit</string>
     <string name="action_back">Back</string>
     <string name="action_connect">Connect</string>
-    <string name="action_disconnect">Disconnect</string>
     <string name="action_close">Close</string>
     <string name="action_done">Done</string>
     <string name="action_rename">Rename</string>
@@ -25,11 +24,9 @@
     <string name="action_copied">Copied!</string>
     <string name="action_show">Show</string>
     <string name="action_hide">Hide</string>
-    <string name="action_refresh">Refresh</string>
     <string name="action_trust">Trust</string>
     <string name="action_reject">Reject</string>
     <string name="action_go_back">Go back</string>
-    <string name="action_back_to_hosts">Back to hosts</string>
     <string name="action_overwrite">Overwrite</string>
     <string name="action_keep_both">Keep both</string>
     <string name="action_i_understand">I understand</string>
@@ -170,7 +167,6 @@
     <string name="settings_font_size_subtitle">Default terminal text size (sp); pinch to zoom in a session</string>
     <string name="settings_scrollback_title">Scrollback lines</string>
     <string name="settings_scrollback_subtitle">Lines of terminal history kept in memory</string>
-    <string name="settings_scrollback_lines">%d lines</string>
     <string name="settings_history_suggestions_title">Command history suggestions</string>
     <string name="settings_history_suggestions_subtitle">Show suggestions from the server shell history while typing in the terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Always-visible suggestion bar</string>
@@ -225,9 +221,7 @@
     <string name="sftp_download_cd">Download</string>
     <string name="sftp_empty_directory">Empty directory</string>
     <string name="sftp_disconnected">Disconnected</string>
-    <string name="sftp_go_back">Go back</string>
 
-    <string name="sftp_downloading">Downloading %1$s</string>
     <string name="sftp_downloading_label">Downloading:</string>
     <string name="sftp_uploading">Uploading %1$s</string>
     <string name="sftp_saved_to_downloads">Saved: %1$s</string>
@@ -344,7 +338,6 @@
     <string name="error_host_not_found">Host not found</string>
     <string name="error_connection_failed">Connection failed</string>
     <string name="error_cannot_list_directory">Cannot list directory</string>
-    <string name="error_cannot_create_file">Cannot create file in Downloads</string>
     <string name="error_download_failed">Download failed</string>
     <string name="error_upload_failed">Upload failed</string>
     <string name="error_delete_failed">Delete failed</string>

@@ -13,7 +13,6 @@
     <string name="action_edit">編集</string>
     <string name="action_back">戻る</string>
     <string name="action_connect">接続</string>
-    <string name="action_disconnect">切断</string>
     <string name="action_close">閉じる</string>
     <string name="action_done">完了</string>
     <string name="action_rename">名前変更</string>
@@ -24,11 +23,9 @@
     <string name="action_copied">コピーしました！</string>
     <string name="action_show">表示</string>
     <string name="action_hide">非表示</string>
-    <string name="action_refresh">更新</string>
     <string name="action_trust">信頼する</string>
     <string name="action_reject">拒否</string>
     <string name="action_go_back">戻る</string>
-    <string name="action_back_to_hosts">ホスト一覧に戻る</string>
     <string name="action_overwrite">上書き</string>
     <string name="action_keep_both">両方保持</string>
     <string name="action_i_understand">了解しました</string>
@@ -169,7 +166,6 @@
     <string name="settings_font_size_subtitle">ターミナルの既定の文字サイズ（sp）。セッション中はピンチで拡大縮小できます</string>
     <string name="settings_scrollback_title">スクロールバック行数</string>
     <string name="settings_scrollback_subtitle">メモリに保持するターミナル履歴の行数</string>
-    <string name="settings_scrollback_lines">%d 行</string>
     <string name="settings_history_suggestions_title">コマンド履歴の候補</string>
     <string name="settings_history_suggestions_subtitle">ターミナル入力中にサーバーのシェル履歴から候補を表示</string>
     <string name="settings_suggestions_bar_sticky_title">候補バーを常に表示</string>
@@ -224,9 +220,7 @@
     <string name="sftp_download_cd">ダウンロード</string>
     <string name="sftp_empty_directory">空のディレクトリ</string>
     <string name="sftp_disconnected">切断されました</string>
-    <string name="sftp_go_back">戻る</string>
 
-    <string name="sftp_downloading">%1$s をダウンロード中</string>
     <string name="sftp_downloading_label">ダウンロード中：</string>
     <string name="sftp_uploading">%1$s をアップロード中</string>
     <string name="sftp_saved_to_downloads">保存しました：%1$s</string>
@@ -330,7 +324,6 @@
     <string name="error_host_not_found">ホストが見つかりません</string>
     <string name="error_connection_failed">接続に失敗しました</string>
     <string name="error_cannot_list_directory">ディレクトリを一覧表示できません</string>
-    <string name="error_cannot_create_file">ダウンロードフォルダにファイルを作成できません</string>
     <string name="error_download_failed">ダウンロードに失敗しました</string>
     <string name="error_upload_failed">アップロードに失敗しました</string>
     <string name="error_delete_failed">削除に失敗しました</string>

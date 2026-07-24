@@ -14,7 +14,6 @@
     <string name="action_edit">Изменить</string>
     <string name="action_back">Назад</string>
     <string name="action_connect">Подключить</string>
-    <string name="action_disconnect">Отключить</string>
     <string name="action_close">Закрыть</string>
     <string name="action_done">Готово</string>
     <string name="action_rename">Переименовать</string>
@@ -25,11 +24,9 @@
     <string name="action_copied">Скопировано!</string>
     <string name="action_show">Показать</string>
     <string name="action_hide">Скрыть</string>
-    <string name="action_refresh">Обновить</string>
     <string name="action_trust">Доверять</string>
     <string name="action_reject">Отклонить</string>
     <string name="action_go_back">Назад</string>
-    <string name="action_back_to_hosts">К списку хостов</string>
     <string name="action_overwrite">Заменить</string>
     <string name="action_keep_both">Оставить оба</string>
     <string name="action_i_understand">Понятно</string>
@@ -170,7 +167,6 @@
     <string name="settings_font_size_subtitle">Размер текста терминала по умолчанию (sp); в сессии можно менять жестом</string>
     <string name="settings_scrollback_title">Строки истории прокрутки</string>
     <string name="settings_scrollback_subtitle">Сколько строк истории терминала хранится в памяти</string>
-    <string name="settings_scrollback_lines">%d строк</string>
     <string name="settings_history_suggestions_title">Подсказки из истории команд</string>
     <string name="settings_history_suggestions_subtitle">Показывать подсказки из истории команд сервера при вводе в терминале</string>
     <string name="settings_suggestions_bar_sticky_title">Всегда видимая панель подсказок</string>
@@ -225,9 +221,7 @@
     <string name="sftp_download_cd">Скачать</string>
     <string name="sftp_empty_directory">Пустая папка</string>
     <string name="sftp_disconnected">Отключено</string>
-    <string name="sftp_go_back">Назад</string>
 
-    <string name="sftp_downloading">Скачивание %1$s</string>
     <string name="sftp_downloading_label">Скачивание:</string>
     <string name="sftp_uploading">Загрузка %1$s</string>
     <string name="sftp_saved_to_downloads">Сохранено: %1$s</string>
@@ -347,7 +341,6 @@
     <string name="error_host_not_found">Хост не найден</string>
     <string name="error_connection_failed">Не удалось подключиться</string>
     <string name="error_cannot_list_directory">Не удалось получить список файлов</string>
-    <string name="error_cannot_create_file">Не удалось создать файл в Downloads</string>
     <string name="error_download_failed">Не удалось скачать</string>
     <string name="error_upload_failed">Не удалось загрузить</string>
     <string name="error_delete_failed">Не удалось удалить</string>

@@ -12,7 +12,6 @@
     <string name="action_edit">Редагувати</string>
     <string name="action_back">Назад</string>
     <string name="action_connect">Підключитися</string>
-    <string name="action_disconnect">Відключитися</string>
     <string name="action_close">Закрити</string>
     <string name="action_done">Готово</string>
     <string name="action_rename">Перейменувати</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">Скопійовано!</string>
     <string name="action_show">Показати</string>
     <string name="action_hide">Приховати</string>
-    <string name="action_refresh">Оновити</string>
     <string name="action_trust">Довіряти</string>
     <string name="action_reject">Відхилити</string>
     <string name="action_go_back">Назад</string>
-    <string name="action_back_to_hosts">Назад до хостів</string>
     <string name="action_overwrite">Перезаписати</string>
     <string name="action_keep_both">Зберегти обидва</string>
     <string name="action_i_understand">Зрозуміло</string>
@@ -160,7 +157,6 @@
     <string name="settings_font_size_subtitle">Типовий розмір тексту термінала (sp); жест масштабування діє в сеансі</string>
     <string name="settings_scrollback_title">Рядки прокрутки</string>
     <string name="settings_scrollback_subtitle">Рядки історії терміналу, що зберігаються в пам\'яті</string>
-    <string name="settings_scrollback_lines">%d рядків</string>
     <string name="settings_history_suggestions_title">Підказки з історії команд</string>
     <string name="settings_history_suggestions_subtitle">Показувати підказки з історії shell сервера під час введення в терміналі</string>
     <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>
@@ -210,9 +206,7 @@
     <string name="sftp_download_cd">Завантажити</string>
     <string name="sftp_empty_directory">Порожня директорія</string>
     <string name="sftp_disconnected">Відключено</string>
-    <string name="sftp_go_back">Назад</string>
 
-    <string name="sftp_downloading">Завантаження %1$s</string>
     <string name="sftp_downloading_label">Завантаження:</string>
     <string name="sftp_uploading">Вивантаження %1$s</string>
     <string name="sftp_saved_to_downloads">Збережено: %1$s</string>
@@ -298,7 +292,6 @@
     <string name="error_host_not_found">Хост не знайдено</string>
     <string name="error_connection_failed">Не вдалося підключитися</string>
     <string name="error_cannot_list_directory">Неможливо відобразити вміст директорії</string>
-    <string name="error_cannot_create_file">Неможливо створити файл у Завантаженнях</string>
     <string name="error_download_failed">Помилка завантаження</string>
     <string name="error_upload_failed">Помилка вивантаження</string>
     <string name="error_delete_failed">Помилка видалення</string>
