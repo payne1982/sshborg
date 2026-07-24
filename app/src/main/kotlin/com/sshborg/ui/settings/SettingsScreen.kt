@@ -142,6 +142,7 @@ fun SettingsScreen(
                     "es" to "Español",
                     "pt" to "Português",
                     "uk" to "Українська",
+                    "ru" to "Русский",
                     "zh" to "中文",
                     "ja" to "日本語",
                 )
