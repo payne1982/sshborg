@@ -72,6 +72,9 @@ fun TerminalScreen(
     val app = LocalContext.current.applicationContext as SshBorgApp
     val ctx = LocalContext.current
     var inSelectionMode by remember { mutableStateOf(false) }
+    // Held here rather than in the ViewModel: the ViewModel outlives the composition,
+    // so a View reference there keeps the Activity alive after the screen is gone.
+    var terminalView by remember { mutableStateOf<TerminalView?>(null) }
     val invertScroll  by app.appPreferences.invertTerminalScroll.collectAsState(initial = false)
     val fontSize      by app.appPreferences.terminalFontSize.collectAsState(
         initial = com.sshborg.data.AppPreferences.DEFAULT_TERMINAL_FONT_SIZE
@@ -131,7 +134,7 @@ fun TerminalScreen(
     LaunchedEffect(state) {
         if (state is ConnectionState.Connected) {
             delay(300)
-            vm.terminalViewRef?.showKeyboard()
+            terminalView?.showKeyboard()
         }
     }
 
@@ -180,7 +183,7 @@ fun TerminalScreen(
                             view.onResize             = { cols, rows -> vm.resize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
                             vm.onNeedsRedraw           = { view.postInvalidate() }
-                            vm.terminalViewRef         = view
+                            terminalView               = view
                         }
                     },
                     update = { view ->
@@ -193,9 +196,14 @@ fun TerminalScreen(
                         view.onResize             = { cols, rows -> vm.resize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
-                        vm.terminalViewRef         = view
+                        terminalView               = view
                         view.wordMode              = wordMode
                         view.postInvalidate()
+                    },
+                    onRelease = {
+                        // onNeedsRedraw captures the view, so it has to go too
+                        terminalView     = null
+                        vm.onNeedsRedraw = null
                     },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 )
@@ -257,24 +265,24 @@ fun TerminalScreen(
                     labelCopySelection = strSelection,
                     labelCopyAll       = strAll,
                     onCopySelection = {
-                        val text = vm.terminalViewRef?.getSelectedText() ?: ""
+                        val text = terminalView?.getSelectedText() ?: ""
                         if (text.isNotEmpty()) {
                             val cb = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
                                     as android.content.ClipboardManager
                             cb.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
                             android.widget.Toast.makeText(ctx, strCopied, android.widget.Toast.LENGTH_SHORT).show()
                         }
-                        vm.terminalViewRef?.exitSelectionMode()
+                        terminalView?.exitSelectionMode()
                     },
                     onCopyAll = {
-                        val text = vm.terminalViewRef?.getAllText() ?: ""
+                        val text = terminalView?.getAllText() ?: ""
                         if (text.isNotEmpty()) {
                             val cb = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
                                     as android.content.ClipboardManager
                             cb.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
                             android.widget.Toast.makeText(ctx, strCopied, android.widget.Toast.LENGTH_SHORT).show()
                         }
-                        vm.terminalViewRef?.exitSelectionMode()
+                        terminalView?.exitSelectionMode()
                     },
                 )
             }

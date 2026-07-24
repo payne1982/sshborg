@@ -1,1 +1,2 @@
 • A aplicação está agora disponível em russo, graças a uma tradução da comunidade
+• Corrigida uma fuga de memória ao sair de uma sessão de terminal

@@ -1,1 +1,2 @@
 • Die App ist dank einer Community-Übersetzung jetzt auch auf Russisch verfügbar
+• Speicherleck beim Verlassen einer Terminal-Sitzung behoben

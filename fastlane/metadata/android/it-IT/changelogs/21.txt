@@ -1,1 +1,2 @@
 • L'app è ora disponibile in russo, grazie a una traduzione della community
+• Risolta una perdita di memoria all'uscita da una sessione terminale
