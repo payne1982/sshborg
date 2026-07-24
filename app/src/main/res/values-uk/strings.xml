@@ -86,7 +86,7 @@
     <string name="host_key_change">Змінити</string>
     <string name="host_key_no_keys">Немає ключів – спочатку додайте один</string>
     <string name="host_agent_forwarding">Пересилання агента</string>
-    <string name="host_allow_legacy_ciphers">Застарілі шифри</string>
+    <string name="host_allow_legacy_ciphers">Дозволити застарілі шифри</string>
     <string name="host_section_jump_hosts">Проміжні хости</string>
     <string name="host_field_jump_hosts">Проміжні хости (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
@@ -94,7 +94,7 @@
     <string name="host_jump_mode_simple">Простий</string>
     <string name="host_jump_mode_host_list">Список хостів</string>
     <string name="host_jump_select_placeholder">Оберіть хост…</string>
-    <string name="host_jump_add">Додати jump host</string>
+    <string name="host_jump_add">Додати проміжний хост</string>
     <string name="host_jump_no_password">Пароль не збережено</string>
     <string name="host_section_port_forwarding">Переадресація портів</string>
     <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
@@ -103,7 +103,7 @@
     <string name="host_section_start_directory">SFTP: Початковий каталог</string>
     <string name="host_start_mode_last">Остання відвідана папка</string>
     <string name="host_start_mode_fixed">Фіксована папка</string>
-    <string name="host_start_mode_home">Home</string>
+    <string name="host_start_mode_home">Домашня папка</string>
     <string name="host_field_start_directory">Початковий каталог</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
@@ -330,7 +330,7 @@
         <item quantity="one">%d активна сесія</item>
         <item quantity="few">%d активні сесії</item>
         <item quantity="many">%d активних сесій</item>
-        <item quantity="other">%d активної сесії</item>
+        <item quantity="other">%d активних сесій</item>
     </plurals>
     <plurals name="notification_bg_downloads">
         <item quantity="one">%d файл завантажується</item>
