@@ -41,8 +41,18 @@ class TerminalView @JvmOverloads constructor(
     private var cellH = 0f
     private var cellBaseline = 0f
 
+    // Reused single-char buffer for drawText, so each drawn cell no longer allocates a
+    // String (cell.char.toString()) every frame. Positioning is unchanged: still one
+    // glyph per cell at its grid x, so the rendered pixels are identical.
+    private val charBuf = CharArray(1)
+
     // Scroll offset (in lines) for viewing scrollback
     private var scrollbackOffset = 0
+
+    // Sub-cell scroll remainder. onScroll's dy is a per-event delta; truncating
+    // (dy / cellH) to whole lines every event discarded the fraction, so slow drags
+    // never accumulated enough to move and felt laggy/dropped. Carry it across events.
+    private var scrollRemainderY = 0f
 
     /** When true, swipe up = see newer content (inverted from natural scroll). */
     var invertScroll: Boolean = false
@@ -60,6 +70,11 @@ class TerminalView @JvmOverloads constructor(
     private var userScaled = false
     private var gestureDetector = GestureDetector(context, GestureListener())
     private var scaleDetector = ScaleGestureDetector(context, ScaleListener())
+
+    // Momentum scrolling (fling). The scroller runs in a pixel space of
+    // scrollbackOffset * cellH, so its position maps straight back to whole lines.
+    private val scroller = android.widget.OverScroller(context)
+    private var flingRunnable: Runnable? = null
 
     // --- Selection state ---
     // Anchors are (absLine, col) where absLine counts from the top of scrollback + screen.
@@ -160,6 +175,7 @@ class TerminalView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         cancelAutoScroll()
+        cancelFling()
     }
 
     fun showKeyboard() {
@@ -207,6 +223,12 @@ class TerminalView @JvmOverloads constructor(
         val cols = termColumns; val rows = termRows
         emulator?.let { em -> synchronized(em) { em.resize(cols, rows) } }
         onResize?.invoke(cols, rows)
+        // Claim the whole terminal so the system back-gesture (Android 10+ gesture nav)
+        // doesn't steal drags that start near the left/right edge — otherwise those
+        // scroll touches get eaten by the OS before reaching us.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            systemGestureExclusionRects = listOf(Rect(0, 0, w, h))
+        }
     }
 
     // --- Drawing ---
@@ -256,7 +278,8 @@ class TerminalView @JvmOverloads constructor(
                     if (cell.char != ' ' && !style.invisible) {
                         val paint = if (style.bold) boldPaint else textPaint
                         paint.color = if (style.bold && style.fg in 0..7) colorPalette[style.fg + 8] else fg
-                        canvas.drawText(cell.char.toString(), left, top + cellBaseline, paint)
+                        charBuf[0] = cell.char
+                        canvas.drawText(charBuf, 0, 1, left, top + cellBaseline, paint)
 
                         if (style.underline) {
                             paint.color = fg
@@ -480,6 +503,37 @@ class TerminalView @JvmOverloads constructor(
         autoScrollRunnable = null
     }
 
+    /**
+     * Momentum scroll after a flick. [velocity] is in the same (accumulator) pixel
+     * space as onScroll, i.e. already sign-adjusted for invertScroll by the caller.
+     */
+    private fun startFling(velocity: Float) {
+        val buf = emulator?.buffer ?: return
+        if (cellH <= 0f) return
+        cancelFling()
+        val maxPixels = (buf.scrollbackSize * cellH).toInt()
+        if (maxPixels <= 0) return
+        val startY = (scrollbackOffset * cellH).toInt().coerceIn(0, maxPixels)
+        scroller.fling(0, startY, 0, velocity.toInt(), 0, 0, 0, maxPixels)
+        val r = object : Runnable {
+            override fun run() {
+                if (!scroller.computeScrollOffset()) { flingRunnable = null; return }
+                val maxOff = emulator?.buffer?.scrollbackSize ?: 0
+                scrollbackOffset = (scroller.currY / cellH).toInt().coerceIn(0, maxOff)
+                invalidate()
+                if (scroller.isFinished) flingRunnable = null else postOnAnimation(this)
+            }
+        }
+        flingRunnable = r
+        postOnAnimation(r)
+    }
+
+    private fun cancelFling() {
+        flingRunnable?.let { removeCallbacks(it) }
+        flingRunnable = null
+        if (!scroller.isFinished) scroller.abortAnimation()
+    }
+
     private fun compareAnchors(a: Pair<Int, Int>, b: Pair<Int, Int>): Int =
         if (a.first != b.first) a.first - b.first else a.second - b.second
 
@@ -638,11 +692,30 @@ class TerminalView @JvmOverloads constructor(
     // --- Gesture: scroll, tap, long-press, pinch-zoom ---
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent): Boolean {
+            // Start each gesture with a clean accumulator so leftover fraction from a
+            // previous drag can't nudge the view on the next touch-down.
+            scrollRemainderY = 0f
+            // A new touch stops any in-flight momentum (tap-to-halt, like a scroll view).
+            cancelFling()
+            return true
+        }
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+            if (inSelectionMode) return false
+            // Match onScroll's sign convention so momentum continues the drag direction.
+            startFling(if (invertScroll) -velocityY else velocityY)
+            return true
+        }
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
             val buf = emulator?.buffer ?: return false
-            val lines = ((if (invertScroll) dy else -dy) / cellH).toInt()
-            scrollbackOffset = (scrollbackOffset + lines).coerceIn(0, buf.scrollbackSize)
-            invalidate()
+            if (cellH <= 0f) return false
+            scrollRemainderY += if (invertScroll) dy else -dy
+            val lines = (scrollRemainderY / cellH).toInt()
+            if (lines != 0) {
+                scrollRemainderY -= lines * cellH
+                scrollbackOffset = (scrollbackOffset + lines).coerceIn(0, buf.scrollbackSize)
+                invalidate()
+            }
             return true
         }
         override fun onSingleTapUp(e: MotionEvent): Boolean {
