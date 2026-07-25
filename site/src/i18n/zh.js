@@ -256,6 +256,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>保持屏幕常亮</strong> — 终端打开时阻止屏幕熄灭。查看日志或运行长时间命令时很实用。默认关闭。</li>
                 <li><strong>默认字体大小</strong> — 新终端会话的初始文字大小；每个会话中仍可用双指缩放。</li>
                 <li><strong>回滚缓冲区</strong>、<strong>反向滚动</strong>和<strong>命令建议</strong> — 分别控制保留多少输出历史、滚动方向，以及上文介绍的建议栏。</li>
+                <li><strong>双击操作</strong> — 可选：在终端双击时发送 <em>Tab</em>（自动补全），或连按两次 <em>Tab</em>（列出所有候选项）。默认关闭。</li>
             </ul>`,
 
   doc_extra_keys: `

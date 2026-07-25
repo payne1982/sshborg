@@ -2,3 +2,4 @@
 • Speicherleck beim Verlassen einer Terminal-Sitzung behoben
 • Flüssigeres, reaktionsschnelleres Scrollen im Terminal
 • Das Terminal springt beim Tippen wieder ans Ende
+• Optionales Doppeltippen zum Senden von Tab (Autovervollständigung)

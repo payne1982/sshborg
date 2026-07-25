@@ -254,6 +254,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Bildschirm eingeschaltet lassen</strong> — verhindert, dass sich der Bildschirm ausschaltet, solange ein Terminal geöffnet ist. Praktisch beim Beobachten von Logs oder lang laufenden Befehlen. Standardmäßig aus.</li>
                 <li><strong>Standard-Schriftgröße</strong> — die Textgröße, mit der neue Terminalsitzungen starten; in jeder Sitzung kannst du weiterhin per Pinch-Geste zoomen.</li>
                 <li><strong>Scrollback</strong>, <strong>umgekehrtes Scrollen</strong> und <strong>Befehlsvorschläge</strong> — steuern, wie viel Ausgabeverlauf behalten wird, die Scrollrichtung und die oben beschriebene Vorschlagsleiste.</li>
+                <li><strong>Doppeltipp-Aktion</strong> — optional sendet ein Doppeltippen im Terminal <em>Tab</em> (Autovervollständigung) oder zweimal <em>Tab</em> (listet alle Kandidaten auf). Standardmäßig aus.</li>
             </ul>`,
 
   doc_extra_keys: `

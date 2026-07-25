@@ -2,3 +2,4 @@
 • Fixed a memory leak when leaving a terminal session
 • Smoother, more responsive terminal scrolling
 • The terminal now returns to the bottom when you type
+• Optional double-tap to send Tab (auto-complete)

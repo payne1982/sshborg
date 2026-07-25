@@ -254,6 +254,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Manter o ecrã ligado</strong> — impede que o ecrã se desligue enquanto um terminal está aberto. Útil ao acompanhar logs ou comandos demorados. Desativado por predefinição.</li>
                 <li><strong>Tamanho de letra predefinido</strong> — o tamanho do texto com que as novas sessões começam; continua a poder fazer zoom com dois dedos em cada sessão.</li>
                 <li><strong>Scrollback</strong>, <strong>deslocamento invertido</strong> e <strong>sugestões de comandos</strong> — controlam quanto histórico de saída é mantido, a direção do deslocamento e a barra de sugestões descrita acima.</li>
+                <li><strong>Ação de toque duplo</strong> — se quiser, um toque duplo no terminal envia <em>Tab</em> (conclusão automática) ou <em>Tab</em> duas vezes (lista todos os candidatos). Desativado por predefinição.</li>
             </ul>`,
 
   doc_extra_keys: `

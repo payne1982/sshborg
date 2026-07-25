@@ -2,3 +2,4 @@
 • Correction d'une fuite mémoire en quittant une session terminal
 • Défilement du terminal plus fluide et réactif
 • Le terminal revient en bas lorsque vous tapez
+• Double appui optionnel pour envoyer Tab (autocomplétion)

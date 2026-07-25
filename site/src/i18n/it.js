@@ -255,6 +255,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Mantieni lo schermo acceso</strong> — impedisce lo spegnimento dello schermo mentre un terminale è aperto. Comodo quando osservi log o comandi di lunga durata. Disattivato di default.</li>
                 <li><strong>Dimensione carattere predefinita</strong> — la dimensione del testo con cui partono le nuove sessioni; puoi comunque usare il pinch-zoom in ogni sessione.</li>
                 <li><strong>Scrollback</strong>, <strong>scorrimento invertito</strong> e <strong>suggerimenti dei comandi</strong> — controllano quanta cronologia di output viene conservata, la direzione dello scorrimento e la barra dei suggerimenti descritta sopra.</li>
+                <li><strong>Azione doppio tocco</strong> — se vuoi, un doppio tocco sul terminale invia <em>Tab</em> (autocompletamento) o due volte <em>Tab</em> (elenca tutti i candidati). Disattivato di default.</li>
             </ul>`,
 
   doc_extra_keys: `

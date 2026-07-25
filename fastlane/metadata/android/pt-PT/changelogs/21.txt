@@ -2,3 +2,4 @@
 • Corrigida uma fuga de memória ao sair de uma sessão de terminal
 • Deslocamento do terminal mais fluido e reativo
 • O terminal volta ao fundo quando escreve
+• Toque duplo opcional para enviar Tab (conclusão automática)
