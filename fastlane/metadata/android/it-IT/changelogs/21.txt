@@ -1,2 +1,4 @@
 • L'app è ora disponibile in russo, grazie a una traduzione della community
 • Risolta una perdita di memoria all'uscita da una sessione terminale
+• Scorrimento del terminale più fluido e reattivo
+• Il terminale torna in fondo quando digiti

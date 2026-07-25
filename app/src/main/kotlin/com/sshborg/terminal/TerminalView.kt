@@ -624,9 +624,23 @@ class TerminalView @JvmOverloads constructor(
         return TerminalInputConnection(this)
     }
 
+    /**
+     * Sends user input to the shell. Any keystroke snaps the view back to the bottom
+     * (the live prompt), like every standard terminal — otherwise typing while scrolled
+     * up in the history happens off-screen. Server output does NOT trigger this.
+     */
+    private fun emitInput(bytes: ByteArray) {
+        if (scrollbackOffset != 0) {
+            cancelFling()
+            scrollbackOffset = 0
+            invalidate()
+        }
+        onInput?.invoke(bytes)
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         val bytes = keyEventToBytes(keyCode, event) ?: return super.onKeyDown(keyCode, event)
-        onInput?.invoke(bytes)
+        emitInput(bytes)
         return true
     }
 
@@ -826,7 +840,7 @@ class TerminalView @JvmOverloads constructor(
                 val newSuffix = newText.substring(common)
                 bytes = ByteArray(toDelete) { 0x7F } + newSuffix.toByteArray(Charsets.UTF_8)
             }
-            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
+            if (bytes.isNotEmpty()) emitInput(bytes)
             composingText = newText
             return super.setComposingText(text, newCursorPosition)
         }
@@ -847,7 +861,7 @@ class TerminalView @JvmOverloads constructor(
             composingText = ""
             val addBytes = text?.toString()?.toByteArray(Charsets.UTF_8) ?: byteArrayOf()
             val bytes = ByteArray(deleted) { 0x7F } + addBytes
-            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
+            if (bytes.isNotEmpty()) emitInput(bytes)
             return super.commitText(text, newCursorPosition)
         }
 
@@ -856,7 +870,7 @@ class TerminalView @JvmOverloads constructor(
             // spell-correction order: commitText first, then deleteSurroundingText).
             val effective = (beforeLength - composingDeletedByCommit).coerceAtLeast(0)
             composingDeletedByCommit = 0
-            if (effective > 0) onInput?.invoke(ByteArray(effective) { 0x7F })
+            if (effective > 0) emitInput(ByteArray(effective) { 0x7F })
             // Do NOT call invalidateIme() here: on Android 13 it causes Gboard to abort
             // a multi-step spell correction (deleteSurroundingText + insert) mid-sequence.
             // invalidateIme() in commitText is sufficient to keep Gboard in sync.
@@ -879,7 +893,7 @@ class TerminalView @JvmOverloads constructor(
             composingDeletedByCommit = 0
             val count = (end - start).coerceAtLeast(0)
             val bytes = ByteArray(count) { 0x7F } + text.toString().toByteArray(Charsets.UTF_8)
-            if (bytes.isNotEmpty()) onInput?.invoke(bytes)
+            if (bytes.isNotEmpty()) emitInput(bytes)
             return super.replaceText(start, end, text, newCursorPosition, textAttribute)
         }
 
@@ -906,7 +920,7 @@ class TerminalView @JvmOverloads constructor(
                 }
                 val bytes = keyEventToBytes(event.keyCode, event)
                 if (bytes != null) {
-                    onInput?.invoke(bytes)
+                    emitInput(bytes)
                     if (event.keyCode == KeyEvent.KEYCODE_DEL) {
                         val ed = getEditable() ?: return true
                         val cur = android.text.Selection.getSelectionEnd(ed)

@@ -1,40 +1,60 @@
 <en-US>
 • The app is now available in Russian, thanks to a community translation
 • Fixed a memory leak when leaving a terminal session
+• Smoother, more responsive terminal scrolling
+• The terminal now returns to the bottom when you type
 </en-US>
 <it-IT>
 • L'app è ora disponibile in russo, grazie a una traduzione della community
 • Risolta una perdita di memoria all'uscita da una sessione terminale
+• Scorrimento del terminale più fluido e reattivo
+• Il terminale torna in fondo quando digiti
 </it-IT>
 <de-DE>
 • Die App ist dank einer Community-Übersetzung jetzt auch auf Russisch verfügbar
 • Speicherleck beim Verlassen einer Terminal-Sitzung behoben
+• Flüssigeres, reaktionsschnelleres Scrollen im Terminal
+• Das Terminal springt beim Tippen wieder ans Ende
 </de-DE>
 <es-ES>
 • La app ya está disponible en ruso, gracias a una traducción de la comunidad
 • Corregida una fuga de memoria al salir de una sesión de terminal
+• Desplazamiento del terminal más fluido y ágil
+• El terminal vuelve al final al escribir
 </es-ES>
 <fr-FR>
 • L'application est désormais disponible en russe, grâce à une traduction de la communauté
 • Correction d'une fuite mémoire en quittant une session terminal
+• Défilement du terminal plus fluide et réactif
+• Le terminal revient en bas lorsque vous tapez
 </fr-FR>
 <pt-PT>
 • A aplicação está agora disponível em russo, graças a uma tradução da comunidade
 • Corrigida uma fuga de memória ao sair de uma sessão de terminal
+• Deslocamento do terminal mais fluido e reativo
+• O terminal volta ao fundo quando escreve
 </pt-PT>
 <uk>
 • Застосунок тепер доступний російською мовою завдяки перекладу від спільноти
 • Виправлено витік пам'яті під час виходу із сесії термінала
+• Плавніше та чутливіше гортання термінала
+• Термінал повертається донизу під час введення
 </uk>
 <ru-RU>
 • Приложение теперь доступно на русском языке благодаря переводу от сообщества
 • Исправлена утечка памяти при выходе из сессии терминала
+• Более плавная и отзывчивая прокрутка терминала
+• Терминал возвращается вниз при вводе текста
 </ru-RU>
 <zh-CN>
 • 应用现已支持俄语，感谢社区贡献的翻译
 • 修复了退出终端会话时的内存泄漏
+• 终端滚动更流畅、更灵敏
+• 输入时终端自动回到底部
 </zh-CN>
 <ja-JP>
 • コミュニティによる翻訳のおかげで、アプリがロシア語に対応しました
 • ターミナルセッションを終了する際のメモリリークを修正
+• ターミナルのスクロールがより滑らかで応答的になりました
+• 入力するとターミナルが最下部に戻るようになりました
 </ja-JP>

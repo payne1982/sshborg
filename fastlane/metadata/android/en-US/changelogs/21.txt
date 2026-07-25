@@ -1,2 +1,4 @@
 • The app is now available in Russian, thanks to a community translation
 • Fixed a memory leak when leaving a terminal session
+• Smoother, more responsive terminal scrolling
+• The terminal now returns to the bottom when you type
