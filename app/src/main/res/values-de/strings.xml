@@ -149,6 +149,11 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_double_tap_title">Doppeltipp-Aktion</string>
+    <string name="settings_double_tap_subtitle">Was ein Doppeltippen im Terminal an die Shell sendet</string>
+    <string name="settings_double_tap_none">Nichts</string>
+    <string name="settings_double_tap_tab">Tab senden</string>
+    <string name="settings_double_tap_tab_twice">Tab zweimal senden</string>
     <string name="settings_keep_screen_on_title">Bildschirm eingeschaltet lassen</string>
     <string name="settings_keep_screen_on_subtitle">Verhindert das Ausschalten des Bildschirms, solange ein Terminal geöffnet ist</string>
     <string name="settings_terminal_colors_title">Terminalfarben</string>

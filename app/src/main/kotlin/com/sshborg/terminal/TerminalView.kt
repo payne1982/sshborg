@@ -6,6 +6,7 @@ import android.text.InputType
 import android.util.AttributeSet
 import android.view.*
 import android.view.inputmethod.*
+import com.sshborg.data.AppPreferences
 import kotlin.math.floor
 import kotlin.math.hypot
 
@@ -56,6 +57,12 @@ class TerminalView @JvmOverloads constructor(
 
     /** When true, swipe up = see newer content (inverted from natural scroll). */
     var invertScroll: Boolean = false
+
+    /**
+     * What a double-tap sends to the shell: one of AppPreferences.DOUBLE_TAP_*.
+     * Default NONE, so the gesture does nothing unless the user opts in (issue #4).
+     */
+    var doubleTapAction: Int = AppPreferences.DOUBLE_TAP_NONE
 
     /**
      * Default font size from settings. Applied as long as the user hasn't pinch-zoomed:
@@ -740,6 +747,18 @@ class TerminalView @JvmOverloads constructor(
             requestFocus()
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(this@TerminalView, 0)
+            return true
+        }
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            if (inSelectionMode) return false
+            // Opt-in shell auto-completion (issue #4). One Tab completes; two Tabs
+            // (sent back-to-back) make readline list the candidates. emitInput also
+            // snaps the view back to the live prompt, like any other input.
+            when (doubleTapAction) {
+                AppPreferences.DOUBLE_TAP_TAB       -> emitInput(byteArrayOf(0x09))
+                AppPreferences.DOUBLE_TAP_TAB_TWICE -> emitInput(byteArrayOf(0x09, 0x09))
+                else -> return false
+            }
             return true
         }
         override fun onLongPress(e: MotionEvent) {

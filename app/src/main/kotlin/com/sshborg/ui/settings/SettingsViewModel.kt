@@ -60,6 +60,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
             com.sshborg.data.AppPreferences.TERMINAL_SCHEME_DARK,
         )
 
+    val doubleTapAction: StateFlow<Int> =
+        prefs.doubleTapAction.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.DOUBLE_TAP_NONE,
+        )
+
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -125,6 +131,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setKeepScreenOn(enabled: Boolean) {
         viewModelScope.launch { prefs.setKeepScreenOn(enabled) }
+    }
+
+    fun setDoubleTapAction(action: Int) {
+        viewModelScope.launch { prefs.setDoubleTapAction(action) }
     }
 
     fun setTerminalColorScheme(scheme: Int) {

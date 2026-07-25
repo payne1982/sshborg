@@ -28,6 +28,7 @@ class AppPreferences(private val context: Context) {
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
+        val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
@@ -123,6 +124,14 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.TERMINAL_COLOR_SCHEME] = scheme }
     }
 
+    /** What a double-tap on the terminal sends: nothing (default), one Tab, or two Tabs. */
+    val doubleTapAction: Flow<Int> =
+        context.dataStore.data.map { it[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE }
+
+    suspend fun setDoubleTapAction(action: Int) {
+        context.dataStore.edit { it[Keys.DOUBLE_TAP_ACTION] = action }
+    }
+
     companion object {
         const val DEFAULT_TERMINAL_FONT_SIZE = 13
         const val MIN_TERMINAL_FONT_SIZE = 8
@@ -131,6 +140,10 @@ class AppPreferences(private val context: Context) {
         const val TERMINAL_SCHEME_DARK = 0
         const val TERMINAL_SCHEME_LIGHT = 1
         const val TERMINAL_SCHEME_FOLLOW_APP = 2
+
+        const val DOUBLE_TAP_NONE = 0
+        const val DOUBLE_TAP_TAB = 1
+        const val DOUBLE_TAP_TAB_TWICE = 2
     }
 
     /** Whether to show shell history suggestions above the keyboard. Default true. */

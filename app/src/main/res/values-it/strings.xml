@@ -149,6 +149,11 @@
 
     <string name="settings_invert_scroll_title">Inverti scorrimento terminale</string>
     <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più vecchio invece di quello più recente</string>
+    <string name="settings_double_tap_title">Azione doppio tocco</string>
+    <string name="settings_double_tap_subtitle">Cosa invia alla shell un doppio tocco sul terminale</string>
+    <string name="settings_double_tap_none">Niente</string>
+    <string name="settings_double_tap_tab">Invia Tab</string>
+    <string name="settings_double_tap_tab_twice">Invia Tab due volte</string>
     <string name="settings_keep_screen_on_title">Mantieni lo schermo acceso</string>
     <string name="settings_keep_screen_on_subtitle">Impedisce lo spegnimento dello schermo mentre un terminale è aperto</string>
     <string name="settings_terminal_colors_title">Colori del terminale</string>

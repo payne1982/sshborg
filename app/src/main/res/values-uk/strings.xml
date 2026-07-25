@@ -149,6 +149,11 @@
 
     <string name="settings_invert_scroll_title">Інвертувати прокручування терміналу</string>
     <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити старіший вивід</string>
+    <string name="settings_double_tap_title">Дія подвійного дотику</string>
+    <string name="settings_double_tap_subtitle">Що подвійний дотик до термінала надсилає в оболонку</string>
+    <string name="settings_double_tap_none">Нічого</string>
+    <string name="settings_double_tap_tab">Надіслати Tab</string>
+    <string name="settings_double_tap_tab_twice">Надіслати Tab двічі</string>
     <string name="settings_keep_screen_on_title">Не вимикати екран</string>
     <string name="settings_keep_screen_on_subtitle">Запобігає вимкненню екрана, поки відкрито термінал</string>
     <string name="settings_terminal_colors_title">Кольори термінала</string>

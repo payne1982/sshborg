@@ -158,6 +158,11 @@
 
     <string name="settings_invert_scroll_title">反转终端滚动</string>
     <string name="settings_invert_scroll_subtitle">向上滑动查看较早的输出而非较新的</string>
+    <string name="settings_double_tap_title">双击操作</string>
+    <string name="settings_double_tap_subtitle">在终端双击时向 shell 发送的内容</string>
+    <string name="settings_double_tap_none">无</string>
+    <string name="settings_double_tap_tab">发送 Tab</string>
+    <string name="settings_double_tap_tab_twice">发送两次 Tab</string>
     <string name="settings_keep_screen_on_title">保持屏幕常亮</string>
     <string name="settings_keep_screen_on_subtitle">终端打开时防止屏幕关闭</string>
     <string name="settings_terminal_colors_title">终端配色</string>

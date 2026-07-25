@@ -53,6 +53,7 @@ fun SettingsScreen(
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
     val keepScreenOn          by vm.keepScreenOn.collectAsState()
     val terminalColorScheme   by vm.terminalColorScheme.collectAsState()
+    val doubleTapAction       by vm.doubleTapAction.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
@@ -78,6 +79,7 @@ fun SettingsScreen(
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
+    var doubleTapMenuExpanded by remember { mutableStateOf(false) }
     var scrollbackText by remember(scrollbackLines) { mutableStateOf(scrollbackLines.toString()) }
     var fontSizeText by remember(terminalFontSize) { mutableStateOf(terminalFontSize.toString()) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
@@ -276,6 +278,51 @@ fun SettingsScreen(
                                     onClick = {
                                         terminalColorsMenuExpanded = false
                                         vm.setTerminalColorScheme(scheme)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            )
+
+            // Double-tap action picker
+            val doubleTapOptions = listOf(
+                AppPreferences.DOUBLE_TAP_NONE      to stringResource(R.string.settings_double_tap_none),
+                AppPreferences.DOUBLE_TAP_TAB       to stringResource(R.string.settings_double_tap_tab),
+                AppPreferences.DOUBLE_TAP_TAB_TWICE to stringResource(R.string.settings_double_tap_tab_twice),
+            )
+            val currentDoubleTapLabel = doubleTapOptions.find { it.first == doubleTapAction }?.second
+                ?: doubleTapOptions.first().second
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_double_tap_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_double_tap_subtitle)) },
+                trailingContent = {
+                    ExposedDropdownMenuBox(
+                        expanded = doubleTapMenuExpanded,
+                        onExpandedChange = { doubleTapMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = currentDoubleTapLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(doubleTapMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .width(180.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = doubleTapMenuExpanded,
+                            onDismissRequest = { doubleTapMenuExpanded = false },
+                        ) {
+                            doubleTapOptions.forEach { (action, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        doubleTapMenuExpanded = false
+                                        vm.setDoubleTapAction(action)
                                     },
                                 )
                             }

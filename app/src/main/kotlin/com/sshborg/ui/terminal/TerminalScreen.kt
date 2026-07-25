@@ -83,6 +83,9 @@ fun TerminalScreen(
     val terminalScheme by app.appPreferences.terminalColorScheme.collectAsState(
         initial = AppPreferences.TERMINAL_SCHEME_DARK
     )
+    val doubleTapAction by app.appPreferences.doubleTapAction.collectAsState(
+        initial = AppPreferences.DOUBLE_TAP_NONE
+    )
     val nightMode     by app.appPreferences.nightMode.collectAsState(
         initial = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     )
@@ -177,6 +180,7 @@ fun TerminalScreen(
                             view.emulator             = vm.emulatorFlow.value
                             view.fontSizeSp            = fontSize.toFloat()
                             view.invertScroll          = invertScroll
+                            view.doubleTapAction       = doubleTapAction
                             view.keepScreenOn          = keepScreenOn
                             view.lightScheme           = terminalLight
                             view.onInput              = sendInput
@@ -190,6 +194,7 @@ fun TerminalScreen(
                         view.emulator             = emulator
                         view.fontSizeSp            = fontSize.toFloat()
                         view.invertScroll          = invertScroll
+                        view.doubleTapAction       = doubleTapAction
                         view.keepScreenOn          = keepScreenOn
                         view.lightScheme           = terminalLight
                         view.onInput              = sendInput

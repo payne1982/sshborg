@@ -149,6 +149,11 @@
 
     <string name="settings_invert_scroll_title">Invertir desplazamiento del terminal</string>
     <string name="settings_invert_scroll_subtitle">Desliza hacia arriba para ver la salida más antigua</string>
+    <string name="settings_double_tap_title">Acción de doble toque</string>
+    <string name="settings_double_tap_subtitle">Qué envía a la shell un doble toque en el terminal</string>
+    <string name="settings_double_tap_none">Nada</string>
+    <string name="settings_double_tap_tab">Enviar Tab</string>
+    <string name="settings_double_tap_tab_twice">Enviar Tab dos veces</string>
     <string name="settings_keep_screen_on_title">Mantener la pantalla encendida</string>
     <string name="settings_keep_screen_on_subtitle">Evita que la pantalla se apague mientras un terminal está abierto</string>
     <string name="settings_terminal_colors_title">Colores del terminal</string>

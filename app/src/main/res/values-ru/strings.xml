@@ -159,6 +159,11 @@
 
     <string name="settings_invert_scroll_title">Инвертировать прокрутку терминала</string>
     <string name="settings_invert_scroll_subtitle">Смахивание вверх покажет старый вывод вместо нового</string>
+    <string name="settings_double_tap_title">Действие двойного касания</string>
+    <string name="settings_double_tap_subtitle">Что двойное касание терминала отправляет в оболочку</string>
+    <string name="settings_double_tap_none">Ничего</string>
+    <string name="settings_double_tap_tab">Отправить Tab</string>
+    <string name="settings_double_tap_tab_twice">Отправить Tab дважды</string>
     <string name="settings_keep_screen_on_title">Не выключать экран</string>
     <string name="settings_keep_screen_on_subtitle">Не давать экрану гаснуть, пока открыт терминал</string>
     <string name="settings_terminal_colors_title">Цвета терминала</string>
