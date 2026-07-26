@@ -468,7 +468,8 @@ Host target
                 <li>Les hôtes dont le <strong>nom</strong> correspond à une entrée existante sont <strong>mis à jour</strong>.</li>
                 <li>Les hôtes avec un nouveau nom sont <strong>ajoutés</strong>.</li>
                 <li>Les hôtes absents du fichier restent <strong>inchangés</strong>.</li>
-            </ul>
+                <li>Un hôte mis à jour conserve son mot de passe, sa clé et sa clé d'hôte acceptée — la sauvegarde ne les contient jamais.</li>
+</ul>
             <h3>Format JSON</h3>
             <p>Le fichier exporté est un objet JSON standard. Vous pouvez également le créer manuellement pour importer en masse une liste de serveurs depuis une autre source.</p>
             <pre><code>{

@@ -931,7 +931,8 @@ Host target
                 <li>Hosts whose <strong>label</strong> matches an existing entry are <strong>updated</strong>.</li>
                 <li>Hosts with a new label are <strong>added</strong>.</li>
                 <li>Hosts not present in the file are <strong>left unchanged</strong>.</li>
-            </ul>
+                <li>An updated host keeps its saved password, key and accepted host key — the backup never carries them.</li>
+</ul>
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{

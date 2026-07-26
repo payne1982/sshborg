@@ -468,7 +468,8 @@ Host target
                 <li>Os hosts cujo <strong>nome</strong> corresponde a uma entrada existente são <strong>atualizados</strong>.</li>
                 <li>Os hosts com um novo nome são <strong>adicionados</strong>.</li>
                 <li>Os hosts não presentes no ficheiro ficam <strong>inalterados</strong>.</li>
-            </ul>
+                <li>Um host atualizado mantém a palavra-passe, a chave e a chave de host aceite guardadas — a cópia nunca as contém.</li>
+</ul>
             <h3>Formato JSON</h3>
             <p>O ficheiro exportado é um objeto JSON simples. Também pode criá-lo manualmente para importar em bloco uma lista de servidores de outra fonte.</p>
             <pre><code>{

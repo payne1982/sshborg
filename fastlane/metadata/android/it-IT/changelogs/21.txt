@@ -3,3 +3,5 @@
 • Scorrimento del terminale più fluido e reattivo
 • Il terminale torna in fondo quando digiti
 • Doppio tocco opzionale per inviare Tab (autocompletamento)
+• Il backup ora include anche le impostazioni dell'app
+• Nuova opzione per azzerare la chiave accettata di un host

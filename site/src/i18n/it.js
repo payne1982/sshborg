@@ -469,7 +469,8 @@ Host target
                 <li>Gli host il cui <strong>nome</strong> corrisponde a un host esistente vengono <strong>aggiornati</strong>.</li>
                 <li>Gli host con un nome nuovo vengono <strong>aggiunti</strong>.</li>
                 <li>Gli host non presenti nel file rimangono <strong>invariati</strong>.</li>
-            </ul>
+                <li>Un host aggiornato mantiene password, chiave e chiave host accettata già salvate — il backup non le contiene.</li>
+</ul>
             <h3>Formato JSON</h3>
             <p>Il file esportato è un normale oggetto JSON. È possibile crearlo manualmente per importare in blocco una lista di server da un'altra fonte.</p>
             <pre><code>{

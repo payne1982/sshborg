@@ -3,3 +3,5 @@
 • Deslocamento do terminal mais fluido e reativo
 • O terminal volta ao fundo quando escreve
 • Toque duplo opcional para enviar Tab (conclusão automática)
+• As cópias de segurança agora incluem as definições da aplicação
+• Nova opção para repor a chave aceite de um host
