@@ -52,7 +52,6 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title
 
-    var terminalViewRef: com.sshborg.terminal.TerminalView? = null
     var onNeedsRedraw: (() -> Unit)? = null
 
     private var shellSession: ShellSession? = null

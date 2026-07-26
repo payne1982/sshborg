@@ -13,7 +13,6 @@
     <string name="action_edit">编辑</string>
     <string name="action_back">返回</string>
     <string name="action_connect">连接</string>
-    <string name="action_disconnect">断开连接</string>
     <string name="action_close">关闭</string>
     <string name="action_done">完成</string>
     <string name="action_rename">重命名</string>
@@ -24,11 +23,9 @@
     <string name="action_copied">已复制！</string>
     <string name="action_show">显示</string>
     <string name="action_hide">隐藏</string>
-    <string name="action_refresh">刷新</string>
     <string name="action_trust">信任</string>
     <string name="action_reject">拒绝</string>
     <string name="action_go_back">返回</string>
-    <string name="action_back_to_hosts">返回主机列表</string>
     <string name="action_overwrite">覆盖</string>
     <string name="action_keep_both">保留两者</string>
     <string name="action_i_understand">我已了解</string>
@@ -111,6 +108,9 @@
     <string name="host_start_mode_fixed">固定目录</string>
     <string name="host_start_mode_home">主目录</string>
     <string name="host_field_start_directory">起始目录</string>
+    <string name="host_reset_host_keys">重置已接受的主机密钥</string>
+    <string name="host_reset_host_keys_pending">保存时将重置密钥</string>
+    <string name="host_reset_host_keys_hint">忘记已保存的主机密钥和缓存的跳板主机密钥。下次连接时将重新验证服务器。</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH 密钥</string>
@@ -161,6 +161,11 @@
 
     <string name="settings_invert_scroll_title">反转终端滚动</string>
     <string name="settings_invert_scroll_subtitle">向上滑动查看较早的输出而非较新的</string>
+    <string name="settings_double_tap_title">双击操作</string>
+    <string name="settings_double_tap_subtitle">在终端双击时向 shell 发送的内容</string>
+    <string name="settings_double_tap_none">无</string>
+    <string name="settings_double_tap_tab">发送 Tab</string>
+    <string name="settings_double_tap_tab_twice">发送两次 Tab</string>
     <string name="settings_keep_screen_on_title">保持屏幕常亮</string>
     <string name="settings_keep_screen_on_subtitle">终端打开时防止屏幕关闭</string>
     <string name="settings_terminal_colors_title">终端配色</string>
@@ -169,7 +174,6 @@
     <string name="settings_font_size_subtitle">终端默认文字大小（sp）；会话中可双指缩放</string>
     <string name="settings_scrollback_title">滚动回看行数</string>
     <string name="settings_scrollback_subtitle">终端历史记录在内存中保留的行数</string>
-    <string name="settings_scrollback_lines">%d 行</string>
     <string name="settings_history_suggestions_title">命令历史建议</string>
     <string name="settings_history_suggestions_subtitle">在终端输入时显示服务器 shell 历史记录中的建议</string>
     <string name="settings_suggestions_bar_sticky_title">始终显示建议栏</string>
@@ -224,9 +228,7 @@
     <string name="sftp_download_cd">下载</string>
     <string name="sftp_empty_directory">空目录</string>
     <string name="sftp_disconnected">已断开连接</string>
-    <string name="sftp_go_back">返回</string>
 
-    <string name="sftp_downloading">正在下载 %1$s</string>
     <string name="sftp_downloading_label">正在下载：</string>
     <string name="sftp_uploading">正在上传 %1$s</string>
     <string name="sftp_saved_to_downloads">已保存：%1$s</string>
@@ -330,7 +332,6 @@
     <string name="error_host_not_found">找不到主机</string>
     <string name="error_connection_failed">连接失败</string>
     <string name="error_cannot_list_directory">无法列出目录</string>
-    <string name="error_cannot_create_file">无法在下载目录中创建文件</string>
     <string name="error_download_failed">下载失败</string>
     <string name="error_upload_failed">上传失败</string>
     <string name="error_delete_failed">删除失败</string>
@@ -339,11 +340,11 @@
     <string name="error_refresh_failed">刷新失败</string>
     <string name="error_encryption_failed">加密失败</string>
     <string name="error_decryption_failed">解密失败</string>
-    <string name="settings_backup_export_title">导出主机</string>
-    <string name="settings_backup_export_subtitle">将主机配置保存到 JSON 文件。不包含密码和密钥。</string>
+    <string name="settings_backup_export_title">导出备份</string>
+    <string name="settings_backup_export_subtitle">将主机配置和应用设置保存到 JSON 文件。不包含密码和密钥。</string>
     <string name="settings_backup_export_action">导出</string>
-    <string name="settings_backup_import_title">导入主机</string>
-    <string name="settings_backup_import_subtitle">从 JSON 文件加载主机配置。同名的现有主机将被更新；密码和密钥不会被导入。</string>
+    <string name="settings_backup_import_title">导入备份</string>
+    <string name="settings_backup_import_subtitle">从 JSON 文件加载主机配置和应用设置。同名的现有主机将被更新；密码和密钥不会被导入。</string>
     <string name="settings_backup_import_action">导入</string>
     <string name="backup_export_success">已导出 %1$d 个主机</string>
     <string name="backup_import_success">已导入 %1$d 个，已更新 %2$d 个主机</string>

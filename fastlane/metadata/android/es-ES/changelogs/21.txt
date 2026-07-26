@@ -1,0 +1,7 @@
+• La app ya está disponible en ruso, gracias a una traducción de la comunidad
+• Corregida una fuga de memoria al salir de una sesión de terminal
+• Desplazamiento del terminal más fluido y ágil
+• El terminal vuelve al final al escribir
+• Doble toque opcional para enviar Tab (autocompletado)
+• Las copias ahora incluyen también los ajustes de la app
+• Nueva opción para restablecer la clave aceptada de un host

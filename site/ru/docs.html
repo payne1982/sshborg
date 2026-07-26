@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSHBorg – Руководство пользователя</title>
+    <meta name="description" content="Руководство пользователя SSHBorg: SSH-ключи, jump hosts, проброс агента, подсказки команд, tmux и многое другое.">
+    <link rel="icon" type="image/x-icon"  href="../favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+        <link rel="alternate" hreflang="en" href="https://sshborg.com/docs.html">
+    <link rel="alternate" hreflang="it" href="https://sshborg.com/it/docs.html">
+    <link rel="alternate" hreflang="de" href="https://sshborg.com/de/docs.html">
+    <link rel="alternate" hreflang="es" href="https://sshborg.com/es/docs.html">
+    <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html">
+    <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html">
+    <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/docs.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html">
+    <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html">
+    <link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html">
+    <link rel="canonical" href="https://sshborg.com/ru/docs.html">
+    <!-- Open Graph -->
+    <meta property="og:type"        content="article">
+    <meta property="og:site_name"   content="SSHBorg">
+    <meta property="og:url"         content="https://sshborg.com/ru/docs.html">
+    <meta property="og:title"       content="SSHBorg – Руководство пользователя">
+    <meta property="og:description" content="Руководство пользователя SSHBorg: SSH-ключи, jump hosts, проброс агента, подсказки команд, tmux и многое другое.">
+    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:locale"      content="ru_RU">
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="SSHBorg – Руководство пользователя">
+    <meta name="twitter:description" content="Руководство пользователя SSHBorg: SSH-ключи, jump hosts, проброс агента, подсказки команд, tmux и многое другое.">
+    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "name": "SSHBorg – Руководство пользователя",
+      "description": "Руководство пользователя SSHBorg: SSH-ключи, jump hosts, проброс агента, подсказки команд, tmux и многое другое.",
+      "url": "https://sshborg.com/ru/docs.html",
+      "inLanguage": "ru",
+      "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
+    }
+    </script>
+    <link rel="stylesheet" href="../fonts.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:          #030a05;
+            --surface:     #060e08;
+            --card:        #081208;
+            --border:      #1a3a20;
+            --border-hi:   #2a6035;
+            --neon-green:  #00ff88;
+            --neon-blue:   #00d4ff;
+            --deep-green:  #00cc66;
+            --copper:      #c87c30;
+            --copper-dim:  #7a4a1a;
+            --text:        #a8d4b4;
+            --muted:       #4a7058;
+            --font-display:'Workbench', sans-serif;
+            --font-mono:   'Bitcount Grid Single', monospace;
+            --font-body:   'Electrolize', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
+            background-size: 44px 44px;
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.65;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 3px,
+                rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        a { color: var(--neon-green); text-decoration: none; }
+        a:hover { text-shadow: 0 0 8px var(--neon-green); }
+
+        /* ── Nav ─────────────────────────────────────────────── */
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 14px 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(3,10,5,0.92);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        nav::after { display: none; }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 1.15em;
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green), 0 0 16px var(--deep-green);
+            letter-spacing: 0.08em;
+        }
+        .nav-brand img { width: 30px; height: 30px; border-radius: 6px; box-shadow: 0 0 8px rgba(0,255,136,0.4); }
+        .nav-links { display: flex; gap: 28px; font-size: 0.85em; letter-spacing: 0.06em; margin-left: auto; }
+        .nav-links a { color: var(--muted); transition: color 0.2s, text-shadow 0.2s; }
+        .nav-links a:hover { color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); }
+
+        /* ── Page header ─────────────────────────────────────── */
+        .page-header {
+            text-align: center;
+            padding: 60px 24px 40px;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+        .page-header h1 {
+            font-family: var(--font-display);
+            font-size: 2.8em;
+            color: var(--neon-green);
+            text-shadow: 0 0 6px rgba(0,255,136,0.6), 0 0 14px rgba(0,204,102,0.3);
+            letter-spacing: 0.06em;
+            margin-bottom: 14px;
+        }
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        /* ── TOC sidebar + content layout ────────────────────── */
+        .docs-layout {
+            display: flex;
+            align-items: flex-start;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+            gap: 40px;
+        }
+
+        /* ── TOC ─────────────────────────────────────────────── */
+        .toc {
+            /* override the global <nav> rule (this is a <nav> too): stack the
+               title above the list, don't stick to the top, and drop the
+               inherited z-index:100 — as a flex item it would otherwise paint
+               on top of the sticky top nav and cover its links */
+            display: block;
+            position: static;
+            z-index: auto;
+            backdrop-filter: none;
+            flex-shrink: 0;
+            width: 260px;
+            border: 1px solid var(--border);
+            padding: 20px 18px;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+            background: var(--card);
+        }
+        .toc-title {
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            letter-spacing: 0.1em;
+            color: var(--copper);
+            margin-bottom: 14px;
+            white-space: nowrap;
+        }
+        .toc ul { list-style: none; }
+        .toc li { margin-bottom: 8px; }
+        .toc a {
+            font-size: 0.82em;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+            display: block;
+            padding-left: 10px;
+            border-left: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .toc a:hover, .toc a.active {
+            color: var(--neon-green);
+            border-left-color: var(--neon-green);
+            text-shadow: none;
+        }
+        .toc li.sub a { padding-left: 22px; font-size: 0.78em; }
+
+        /* ── Doc content ─────────────────────────────────────── */
+        .doc-content { flex: 1; min-width: 0; }
+
+        .doc-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 84px;
+        }
+
+        .doc-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            letter-spacing: 0.08em;
+            color: var(--neon-blue);
+            text-shadow: 0 0 6px rgba(0,212,255,0.4);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .doc-section h3 {
+            font-family: var(--font-mono);
+            font-size: 0.95em;
+            letter-spacing: 0.07em;
+            color: var(--neon-green);
+            text-shadow: 0 0 6px rgba(0,255,136,0.3);
+            margin: 28px 0 10px;
+        }
+
+        .doc-section p {
+            color: var(--text);
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .doc-section ul, .doc-section ol {
+            padding-left: 20px;
+            margin-bottom: 14px;
+        }
+        .doc-section li {
+            font-size: 0.9em;
+            color: var(--text);
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+        .doc-section li::marker { color: var(--copper); }
+
+        /* ── Code blocks ─────────────────────────────────────── */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--neon-green);
+            padding: 16px 18px;
+            margin: 14px 0 18px;
+            overflow-x: auto;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+        }
+        pre code {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            color: var(--neon-green);
+            letter-spacing: 0.04em;
+            line-height: 1.8;
+        }
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            color: var(--copper);
+            background: rgba(200,124,48,0.08);
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        pre code { background: none; padding: 0; color: var(--neon-green); }
+
+        /* ── Info / warning callouts ─────────────────────────── */
+        .callout {
+            padding: 14px 18px;
+            margin: 14px 0 18px;
+            border-left: 3px solid;
+            font-size: 0.88em;
+            line-height: 1.55;
+        }
+        .callout-info {
+            border-color: var(--neon-blue);
+            background: rgba(0,212,255,0.05);
+            color: var(--text);
+        }
+        .callout-warn {
+            border-color: var(--copper);
+            background: rgba(200,124,48,0.07);
+            color: var(--text);
+        }
+        .callout-label {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+        .callout-info .callout-label { color: var(--neon-blue); }
+        .callout-warn .callout-label { color: var(--copper); }
+
+        /* ── Steps ───────────────────────────────────────────── */
+        .steps { counter-reset: step; padding-left: 0; list-style: none; margin-bottom: 14px; }
+        .steps li {
+            counter-increment: step;
+            padding: 10px 14px 10px 44px;
+            position: relative;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+            background: var(--card);
+        }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            color: var(--bg);
+            background: var(--neon-green);
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* ── Gear divider ─────────────────────────────────────── */
+        .gear-divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 24px;
+            color: var(--copper);
+            margin: 0 0 40px;
+        }
+        .gear-divider::before, .gear-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--copper-dim), var(--copper), var(--copper-dim), transparent);
+        }
+        .gear-divider span {
+            font-size: 1.3em;
+            display: inline-block;
+            animation: gear-spin 18s linear infinite;
+            color: var(--copper);
+            filter: drop-shadow(0 0 4px var(--copper));
+        }
+        .gear-divider span:last-child { animation-direction: reverse; animation-duration: 12s; }
+        @keyframes gear-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ── Footer ──────────────────────────────────────────── */
+        footer {
+            border-top: 1px solid var(--border);
+            text-align: center;
+            padding: 30px 24px;
+            color: var(--muted);
+            font-size: 0.85em;
+            letter-spacing: 0.04em;
+        }
+        footer a { color: var(--muted); }
+        footer a:hover { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
+
+        /* ── Language switcher ───────────────────────────────── */
+        .lang-switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .lang-current {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            cursor: default;
+            user-select: none;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switcher:hover .lang-current {
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(3,10,5,0.97);
+            border: 1px solid var(--border);
+            min-width: 130px;
+            z-index: 200;
+            padding: 10px 0 4px;
+            backdrop-filter: blur(10px);
+        }
+        .lang-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 0;
+            right: 0;
+            height: 6px;
+        }
+        .lang-switcher:hover .lang-dropdown { display: block; }
+        .lang-dropdown a {
+            display: block;
+            padding: 7px 14px;
+            font-size: 0.83em;
+            letter-spacing: 0.03em;
+            color: var(--muted);
+            transition: color 0.15s, background 0.15s;
+        }
+        .lang-dropdown a:hover {
+            color: var(--neon-green);
+            background: rgba(0,255,136,0.05);
+            text-shadow: none;
+        }
+
+        /* ── Hamburger ───────────────────────────────────────── */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-left: auto;
+        }
+        .nav-hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--muted);
+            font-size: 1.5em;
+            line-height: 1;
+        }
+        .nav-hamburger:hover { color: var(--neon-blue); }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        @media (max-width: 760px) {
+            nav { padding: 12px 16px; flex-wrap: wrap; }
+            .nav-hamburger { display: block; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                gap: 16px;
+                width: 100%;
+                padding: 16px 0 8px;
+                border-top: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .docs-layout { flex-direction: column; gap: 24px; }
+            .toc { width: 100%; position: static; }
+            .page-header h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+    <a class="nav-brand" href="index.html">
+        <img src="../logo.png" alt="SSHBorg logo">
+        SSHBorg
+    </a>
+    <div class="nav-links">
+        <a href="index.html">Главная</a>
+        <a href="#adding-host">Начало работы</a>
+        <a href="#sftp">SFTP</a>
+        <a href="#ssh-keys">SSH-ключи</a>
+        <a href="#jump-hosts">Jump Hosts</a>
+        <a href="#backup">Резервная копия</a>
+        <a href="https://github.com/payne1982/sshborg/issues">Поддержка</a>
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">Политика конфиденциальности</a>
+    </div>
+    <div class="nav-right">
+        <div class="lang-switcher">
+        <span class="lang-current">RU &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="../docs.html">English</a>
+            <a href="../it/docs.html">Italiano</a>
+            <a href="../de/docs.html">Deutsch</a>
+            <a href="../es/docs.html">Español</a>
+            <a href="../fr/docs.html">Français</a>
+            <a href="../pt/docs.html">Português</a>
+            <a href="../uk/docs.html">Українська</a>
+            <a href="../zh/docs.html">中文</a>
+            <a href="../ja/docs.html">日本語</a>
+        </div>
+    </div>
+        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+    </div>
+</nav>
+
+<!-- Page header -->
+<div class="page-header">
+    <h1>// РУКОВОДСТВО ПОЛЬЗОВАТЕЛЯ</h1>
+    <p>Практическое руководство — что делать шаг за шагом, чтобы получить максимум от SSHBorg.</p>
+</div>
+
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<!-- Docs layout -->
+<div class="docs-layout">
+
+    <!-- TOC -->
+    <nav class="toc" aria-label="Table of contents">
+        <div class="toc-title">// СОДЕРЖАНИЕ</div>
+        <ul>
+            <li><a href="#adding-host">Добавление хоста</a></li>
+            <li><a href="#host-groups">Группы хостов</a></li>
+            <li><a href="#sftp">Файловый менеджер SFTP</a></li>
+            <li class="sub"><a href="#sftp">Навигация</a></li>
+            <li class="sub"><a href="#sftp">Отправка и скачивание</a></li>
+            <li class="sub"><a href="#sftp">Множественный выбор</a></li>
+            <li><a href="#ssh-keys">SSH-ключи</a></li>
+            <li class="sub"><a href="#ssh-keys">Создание ключа</a></li>
+            <li class="sub"><a href="#ssh-keys">Авторизация на сервере</a></li>
+            <li class="sub"><a href="#ssh-keys">Безопасность ключей</a></li>
+            <li><a href="#suggestions">Подсказки команд</a></li>
+            <li class="sub"><a href="#suggestions">Как это работает</a></li>
+            <li class="sub"><a href="#suggestions">Решение проблем</a></li>
+            <li><a href="#terminal">Жесты в терминале</a></li>
+            <li><a href="#terminal-settings">Настройки терминала</a></li>
+            <li><a href="#extra-keys">Панель доп. клавиш</a></li>
+            <li><a href="#agent-forwarding">Проброс агента</a></li>
+            <li><a href="#legacy-ciphers">Устаревшие шифры</a></li>
+            <li><a href="#connection-drops">Обрывы соединения</a></li>
+            <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#jump-hosts">Jump Hosts</a></li>
+            <li class="sub"><a href="#jump-hosts">Многозвенные цепочки</a></li>
+            <li><a href="#sessions">Несколько сессий</a></li>
+            <li><a href="#security">Безопасность приложения</a></li>
+            <li><a href="#backup">Резервная копия настроек</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="doc-content">
+
+        <div class="doc-section" id="adding-host">
+
+            <h2>// ДОБАВЛЕНИЕ ХОСТА</h2>
+            <p>Нажмите кнопку <strong>+</strong> на экране хостов, чтобы добавить новый сервер.</p>
+            <h3>Обязательные поля</h3>
+            <ul>
+                <li><strong>Имя хоста / IP</strong> — адрес сервера или IP. Поддерживаются как IPv4, так и IPv6.</li>
+                <li><strong>Порт</strong> — по умолчанию 22. Измените его, если на вашем сервере SSH работает на другом порту.</li>
+                <li><strong>Имя пользователя</strong> — Unix-пользователь, под которым вы хотите входить (например, <code>ubuntu</code>, <code>root</code>, <code>deploy</code>).</li>
+                <li><strong>Аутентификация</strong> — выберите пароль или SSH-ключ (рекомендуется).</li>
+            </ul>
+            <h3>Проверка отпечатка хоста</h3>
+            <p>При первом подключении SSHBorg показывает отпечаток сервера и просит вас его принять. Это проверка безопасности: она гарантирует, что вы подключаетесь к нужной машине, а не к самозванцу. Прежде чем принимать, убедитесь, что отпечаток совпадает с тем, который сообщил администратор сервера или который вы получили по доверенному каналу.</p>
+            <p>После принятия отпечаток сохраняется локально. Если при следующем подключении он изменится, SSHBorg вас предупредит — это может означать переустановку сервера, смену ключей или атаку «человек посередине».</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// СОВЕТ</div>
+                Проверить отпечаток сервера можно в любой момент командой:
+                <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
+            </div>
+        </div>
+
+        <div class="doc-section" id="host-groups">
+
+            <h2>// ГРУППЫ ХОСТОВ</h2>
+            <p>Когда список серверов разрастается, хосты можно объединять в сворачиваемые группы с цветовой маркировкой — например <em>Продакшн</em>, <em>Домашняя лаборатория</em>, <em>Клиенты</em>.</p>
+            <h3>Создание группы</h3>
+            <ol class="steps">
+                <li>Добавьте или отредактируйте хост и откройте выпадающий список <strong>Группа</strong>.</li>
+                <li>Выберите <strong>Новая группа…</strong>, введите название и выберите один из предустановленных цветов.</li>
+                <li>Сохраните хост — теперь список хостов показывает группу как отдельный раздел.</li>
+            </ol>
+            <h3>Работа с группами</h3>
+            <ul>
+                <li><strong>Свернуть / развернуть</strong> — нажмите на заголовок группы, чтобы свернуть или снова открыть её. Состояние запоминается даже после перезапуска приложения.</li>
+                <li><strong>Цвет</strong> — цвет группы отображается точкой в заголовке и оттенком значков хостов внутри группы.</li>
+                <li><strong>Изменить</strong> — нажмите и удерживайте заголовок группы, затем выберите <em>Изменить</em>, чтобы переименовать группу или сменить её цвет.</li>
+                <li><strong>Удалить</strong> — нажмите и удерживайте заголовок, затем выберите <em>Удалить</em>. Хосты в группе <em>не</em> удаляются — они просто перестают быть сгруппированными.</li>
+            </ul>
+            <p>Цвета можно выбрать из быстрых образцов или свободно подобрать с помощью градиентного выбора цвета. У хоста может быть и <strong>собственный цвет</strong> — он задаётся в редакторе хоста, сразу под группой, — который перекрывает цвет группы и работает также для хостов без группы.</p>
+            <p>Хосты без группы остаются вверху списка, и если вы никогда не создадите ни одной группы, список будет выглядеть и работать точно так же, как раньше.</p>
+        </div>
+
+        <div class="doc-section" id="sftp">
+
+            <h2>// ФАЙЛОВЫЙ МЕНЕДЖЕР SFTP</h2>
+            <p>Файловый менеджер SFTP позволяет просматривать, отправлять, скачивать, переименовывать и удалять файлы на сервере прямо с телефона. Откройте SFTP-сессию с экрана хостов, нажав <strong>SFTP</strong>.</p>
+            <h3>Навигация</h3>
+            <p>Нажмите на папку, чтобы открыть её. Используйте стрелку назад или нажмите на любой сегмент адресной строки, чтобы подняться вверх по дереву каталогов.</p>
+            <p>Символические ссылки отмечены маленьким значком ссылки. Нажатие на симлинк переводит к его цели: если он указывает на каталог, вы входите в него, если на файл — он ведёт себя как обычный файл.</p>
+            <h3>Отправка файлов</h3>
+            <p>Нажмите кнопку <strong>отправки</strong> (↑), чтобы выбрать один или несколько файлов из памяти телефона. Передача начинается сразу, а прогресс отображается вверху экрана.</p>
+            <h3>Скачивание файлов и папок</h3>
+            <p>Нажмите на любой файл, чтобы сразу его скачать. Чтобы скачать папку целиком, нажмите значок <strong>скачивания</strong> рядом с ней — SSHBorg загрузит всё дерево каталогов и сохранит его в папке <strong>Downloads</strong> на вашем телефоне.</p>
+            <p>Если файл уже существует в месте назначения, диалог спросит, нужно ли <strong>перезаписать</strong>, <strong>пропустить</strong> файл или <strong>отменить</strong> всю передачу.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// ПРИМЕЧАНИЕ О СИМЛИНКАХ</div>
+                При скачивании папки символические ссылки, указывающие на каталоги, пропускаются — загружаются только обычные файлы (включая симлинки на файлы). Это предотвращает непреднамеренную рекурсивную загрузку.
+            </div>
+            <h3>Множественный выбор и групповые операции</h3>
+            <p>Нажмите и удерживайте любой элемент, чтобы войти в режим выбора, затем нажимайте на другие элементы, чтобы дополнить выделение. Панель инструментов показывает действия для текущего выбора:</p>
+            <ul>
+                <li><strong>Скачать</strong> — скачивает все выбранные файлы и папки сразу, с диалогом прогресса и возможностью отмены.</li>
+                <li><strong>Удалить</strong> — удаляет все выбранные элементы. Удаление непустой папки рекурсивно уничтожает всё её содержимое. <em>Отмены нет.</em></li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="ssh-keys">
+
+            <h2>// SSH-КЛЮЧИ</h2>
+            <p>Аутентификация по ключу безопаснее паролей и после настройки не требует ничего запоминать или вводить.</p>
+            <h3>Создание ключа</h3>
+            <p>Перейдите в <strong>Настройки → SSH-ключи → Создать новый ключ</strong>. SSHBorg поддерживает:</p>
+            <ul>
+                <li><strong>Ed25519</strong> — рекомендуется. Быстрый, компактный и безопасный.</li>
+                <li><strong>ECDSA (P-256 / P-384)</strong> — хорошая совместимость со старыми серверами.</li>
+                <li><strong>RSA (2048 / 4096 бит)</strong> — максимальная совместимость, но медленнее.</li>
+            </ul>
+            <p>Дайте ключу осмысленное имя (например, <em>my-vps</em> или <em>work-server</em>), чтобы потом его узнать.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ЗАМЕЧАНИЕ О БЕЗОПАСНОСТИ</div>
+                SSHBorg намеренно не позволяет экспортировать закрытые ключи. Ключ никогда не покидает устройство. Если вам нужен такой же доступ с другого устройства, создайте на нём новый ключ и авторизуйте его на серверах отдельно — так безопаснее.
+            </div>
+            <h3>Авторизация ключа на сервере</h3>
+            <p>После создания ключа нажмите на него, чтобы увидеть <strong>открытый ключ</strong>. Скопируйте его и вставьте в файл <code>~/.ssh/authorized_keys</code> на сервере для того пользователя, под которым вы хотите входить.</p>
+            <ol class="steps">
+                <li>На телефоне откройте SSHBorg → Настройки → SSH-ключи → нажмите на ключ → скопируйте открытый ключ.</li>
+                <li>Войдите на сервер (по паролю или другим ключом, который у вас уже есть).</li>
+                <li>Добавьте открытый ключ в файл авторизованных ключей:
+                    <pre><code>mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+echo "ssh-ed25519 AAAA...вашскопированныйключ..." >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys</code></pre>
+                </li>
+                <li>Попробуйте подключиться через SSHBorg — вход должен пройти без запроса пароля.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// ТРЕБОВАНИЕ К СЕРВЕРУ</div>
+                Убедитесь, что на сервере в <code>/etc/ssh/sshd_config</code> указано <code>PubkeyAuthentication yes</code>. В большинстве дистрибутивов это значение по умолчанию, но некоторые усиленные образы его отключают.
+            </div>
+            <h3>Дополнительное шифрование ключа</h3>
+            <p>SSHBorg предлагает необязательную <strong>дополнительную парольную фразу</strong> для ваших ключей (Настройки → SSH-ключи → нажмите на ключ → Включить шифрование). Когда она включена, ключ шифруется парольной фразой, которую SSHBorg не хранит — вводить её придётся при каждом использовании ключа.</p>
+            <p>Это настоятельно рекомендуется, если вы храните на телефоне доступы к важным серверам или если биометрическая блокировка отключена.</p>
+        </div>
+
+        <div class="doc-section" id="suggestions">
+
+            <h2>// ПОДСКАЗКИ КОМАНД</h2>
+            <p>Пока вы печатаете в терминале, SSHBorg показывает панель подсказок над клавиатурой. Подсказки берутся из истории команд того пользователя, под которым вы подключились.</p>
+            <h3>Как это работает</h3>
+            <p>При открытии сессии терминала SSHBorg читает файл истории оболочки с удалённого сервера. Он пробует следующие расположения по порядку:</p>
+            <ol>
+                <li><code>~/.bash_history</code> — по умолчанию для Bash</li>
+                <li><code>~/.zsh_history</code> — по умолчанию для Zsh (также проверяется <code>$HISTFILE</code>, если задан)</li>
+                <li><code>~/.local/share/fish/fish_history</code> — для пользователей Fish</li>
+            </ol>
+            <p>Используется первый существующий и доступный для чтения файл. По мере ввода команды фильтруются в реальном времени и показываются чипами на панели подсказок. Нажмите на чип, чтобы вставить команду.</p>
+            <h3>Решение проблем</h3>
+            <p><strong>Подсказки не появляются</strong></p>
+            <ul>
+                <li>Файл истории может ещё не существовать (первый вход или оболочка не настроена на сохранение истории).</li>
+                <li>Убедитесь, что ваша оболочка настроена на запись истории. Для Bash добавьте в <code>~/.bashrc</code>:
+                    <pre><code>HISTFILE=~/.bash_history
+HISTSIZE=10000
+HISTFILESIZE=20000</code></pre>
+                </li>
+                <li>Для Zsh добавьте в <code>~/.zshrc</code>:
+                    <pre><code>HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
+                </li>
+            </ul>
+            <p><strong>Подсказки от другого пользователя</strong></p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ИЗВЕСТНОЕ ОГРАНИЧЕНИЕ</div>
+                Если вы подключились одним пользователем, а затем выполнили <code>sudo su - root</code> (или переключились на другого пользователя через <code>su</code>), панель подсказок по-прежнему показывает историю <em>исходного пользователя входа</em>, а не <code>root</code>. Это потому, что SSHBorg читает файл истории до запуска оболочки, используя те учётные данные, с которыми вы подключились.
+                <br><br>
+                Чтобы получать подсказки из истории root, добавьте в SSHBorg отдельный хост, настроенный на прямой вход под <code>root</code> (если ваш сервер это допускает).
+            </div>
+        </div>
+
+        <div class="doc-section" id="terminal">
+
+            <h2>// ЖЕСТЫ В ТЕРМИНАЛЕ</h2>
+            <p>Помимо ввода текста терминал реагирует на несколько сенсорных жестов:</p>
+            <ul>
+                <li><strong>Прокрутка истории</strong> — проведите вверх или вниз, чтобы просмотреть буфер прокрутки терминала.</li>
+                <li><strong>Масштаб</strong> — сведите или разведите пальцы, чтобы уменьшить или увеличить размер текста.</li>
+                <li><strong>Копирование текста</strong> — нажмите и удерживайте в любом месте терминала, чтобы войти в режим выделения. Перетаскивайте маркеры, чтобы изменить выделенную область, затем нажмите <em>Копировать выделение</em>, чтобы скопировать только выделенный текст, или <em>Копировать всё</em>, чтобы скопировать весь вывод. Нажмите в любом другом месте для отмены.</li>
+                <li><strong>Вставка</strong> — используйте кнопку <em>Вставить</em> на панели дополнительных клавиш (она видна, когда открыта клавиатура).</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="terminal-settings">
+
+            <h2>// НАСТРОЙКИ ТЕРМИНАЛА</h2>
+            <p>В разделе <strong>Настройки → Терминал</strong> можно подстроить терминал под свои нужды:</p>
+            <ul>
+                <li><strong>Цвета терминала</strong> — классическая <em>тёмная</em> схема (белое на чёрном), <em>светлая</em> схема (чёрное на белом), которую легче читать при ярком дневном свете, или <em>как тема приложения</em> — она переключается автоматически вместе с темой приложения. Изменение применяется сразу, в том числе к уже открытым сессиям.</li>
+                <li><strong>Не выключать экран</strong> — не даёт дисплею гаснуть, пока открыт терминал. Удобно при просмотре логов или длительных команд. По умолчанию выключено.</li>
+                <li><strong>Размер шрифта по умолчанию</strong> — размер текста, с которого начинаются новые сессии терминала; масштаб каждой сессии по-прежнему можно менять жестом.</li>
+                <li><strong>Буфер прокрутки</strong>, <strong>инвертированная прокрутка</strong> и <strong>подсказки команд</strong> — управляют тем, сколько истории вывода сохраняется, направлением прокрутки и панелью подсказок, описанной выше.</li>
+                <li><strong>Действие двойного касания</strong> — по желанию двойное касание терминала отправляет <em>Tab</em> (автодополнение) или <em>Tab</em> дважды (показывает все варианты). По умолчанию выключено.</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="extra-keys">
+
+            <h2>// ПАНЕЛЬ ДОПОЛНИТЕЛЬНЫХ КЛАВИШ</h2>
+            <p>Когда открыта экранная клавиатура, над ней появляется ряд кнопок-ярлыков. Прокручивайте панель вбок, чтобы добраться до всех клавиш.</p>
+            <h3>Клавиши-модификаторы</h3>
+            <p><strong>Ctrl</strong> и <strong>Alt</strong> работают как залипающие переключатели — нажмите одну, затем нажмите букву, чтобы отправить сочетание. Они сбрасываются автоматически после следующего нажатия.</p>
+            <ul>
+                <li><strong>Ctrl+C</strong> — прервать выполняющийся процесс.</li>
+                <li><strong>Ctrl+D</strong> — отправить EOF / закрыть оболочку.</li>
+                <li><strong>Ctrl+Z</strong> — приостановить процесс.</li>
+                <li><strong>Ctrl+L</strong> — очистить экран.</li>
+            </ul>
+            <h3>Режим слов</h3>
+            <p>Значок проверки орфографии переключает клавиатуру между <em>режимом терминала</em> и <em>режимом слов</em>. В режиме терминала (по умолчанию) автозамена и подсказки слов отключены — это идеально для команд и путей к файлам. В режиме слов клавиатура ведёт себя как в обычном текстовом поле, с включёнными подсказками и автозаменой. Полезно, когда вы печатаете обычный текст через SSH, например при работе с Claude Code или другими интерактивными инструментами.</p>
+            <h3>Навигация и редактирование</h3>
+            <ul>
+                <li><strong>ESC</strong> — клавиша Escape.</li>
+                <li><strong>Tab</strong> — автодополнение оболочки.</li>
+                <li><strong>↑ ↓ ← →</strong> — клавиши-стрелки курсора.</li>
+                <li><strong>Home / End</strong> — переход в начало или конец строки.</li>
+                <li><strong>PgUp / PgDn</strong> — страница вверх / страница вниз.</li>
+                <li><strong>Del</strong> — удаление вперёд (символ справа от курсора).</li>
+                <li><strong>Вставить</strong> — вставить содержимое буфера обмена в терминал.</li>
+            </ul>
+            <h3>Функциональные клавиши</h3>
+            <p>Прокрутите панель вправо, чтобы добраться до <strong>F1 — F12</strong>.</p>
+        </div>
+
+        <div class="doc-section" id="agent-forwarding">
+
+            <h2>// ПРОБРОС АГЕНТА</h2>
+            <p>Проброс SSH-агента позволяет использовать ключи, хранящиеся в SSHBorg, для аутентификации дальнейших подключений, выполняемых <em>изнутри</em> удалённого сервера — например, чтобы сделать <code>git clone</code> приватного репозитория или перейти на вторую машину.</p>
+            <h3>Включение проброса в SSHBorg</h3>
+            <p>При добавлении или редактировании хоста включите переключатель <strong>Проброс агента</strong>. SSHBorg будет выступать SSH-агентом для этой сессии.</p>
+            <h3>Настройка на стороне сервера</h3>
+            <p>Сервер должен разрешать проброс агента. Проверьте <code>/etc/ssh/sshd_config</code>:</p>
+            <pre><code>AllowAgentForwarding yes</code></pre>
+            <p>В большинстве систем это значение по умолчанию. После изменения перезапустите демон SSH:</p>
+            <pre><code>sudo systemctl restart sshd</code></pre>
+            <h3>Настройка клиента для конкретного хоста (необязательно)</h3>
+            <p>Если вы подключаетесь к этому серверу ещё и с ноутбука или настольного компьютера, проброс можно настроить постоянно в локальном <code>~/.ssh/config</code>:</p>
+            <pre><code>Host myserver
+    HostName 203.0.113.42
+    User ubuntu
+    ForwardAgent yes</code></pre>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ЗАМЕЧАНИЕ О БЕЗОПАСНОСТИ</div>
+                Проброс агента даёт удалённому серверу временный доступ к сокету вашего SSH-агента. Пользователь root (или скомпрометированный процесс) на этом сервере может воспользоваться вашими ключами, чтобы подключиться куда-то ещё, пока ваша сессия активна. Включайте проброс только на серверах, которым вы доверяете.
+            </div>
+        </div>
+
+        <div class="doc-section" id="legacy-ciphers">
+
+            <h2>// ПОДДЕРЖКА УСТАРЕВШИХ ШИФРОВ</h2>
+            <p>Некоторые старые серверы — сетевые устройства, встраиваемые системы или машины с устаревшими версиями OpenSSH — поддерживают только те алгоритмы шифрования, которые современные SSH-клиенты больше не предлагают по умолчанию.</p>
+            <p>Когда вы включаете переключатель <strong>Разрешить устаревшие шифры</strong> в настройках хоста, SSHBorg добавляет в список согласования следующие дополнительные алгоритмы:</p>
+            <h3>Добавляемые алгоритмы</h3>
+            <ul>
+                <li><strong>Шифры:</strong> <code>aes128-cbc</code>, <code>aes192-cbc</code>, <code>aes256-cbc</code>, <code>3des-cbc</code></li>
+                <li><strong>Обмен ключами:</strong> <code>diffie-hellman-group14-sha1</code>, <code>diffie-hellman-group-exchange-sha1</code>, <code>diffie-hellman-group1-sha1</code></li>
+                <li><strong>Тип ключа хоста:</strong> <code>ssh-dss</code> (DSA 1024 бит)</li>
+            </ul>
+            <p>Сервер всегда согласует самый стойкий алгоритм, поддерживаемый обеими сторонами, поэтому включение этой опции не ослабляет подключения к современным серверам — устаревшие алгоритмы используются только тогда, когда сервер не может предложить ничего лучше.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ЗАМЕЧАНИЕ О БЕЗОПАСНОСТИ</div>
+                Алгоритмы из этого списка считаются криптографически слабыми. Включайте эту опцию только для серверов, которые вы не можете обновить.
+            </div>
+        </div>
+
+        <div class="doc-section" id="connection-drops">
+
+            <h2>// ОБРЫВЫ СОЕДИНЕНИЯ И ТЕРМИНАЛЬНЫЕ МУЛЬТИПЛЕКСОРЫ</h2>
+            <p>SSH — это живое TCP-соединение между вашим телефоном и сервером. Если соединение прервётся — пусть даже на секунду — сессия и всё, что в ней выполняется, будет потеряно.</p>
+            <h3>Почему на мобильных соединения обрываются</h3>
+            <p>Мобильные сети особенно склонны к обрывам по нескольким причинам:</p>
+            <ul>
+                <li><strong>Смена IP-адреса</strong> — в поездке или при переключении между сотовыми вышками оператор может выдать вам новый публичный IP. Поскольку TCP-соединения привязаны к IP-адресу, существующая SSH-сессия сразу становится недействительной.</li>
+                <li><strong>Переход Wi-Fi ↔ мобильная сеть</strong> — переключение между Wi-Fi и мобильными данными (или наоборот) меняет ваш IP и разрывает любое открытое TCP-соединение.</li>
+                <li><strong>Тайм-ауты простоя</strong> — операторы и NAT-маршрутизаторы часто разрывают неактивные соединения через несколько минут. Долгие, но «молчаливые» сессии (просмотр логов, ожидание ввода) особенно уязвимы.</li>
+                <li><strong>Потеря сигнала</strong> — туннели, подземные парковки или просто слабый сигнал могут ненадолго уронить сеть, и этого достаточно, чтобы убить сессию.</li>
+            </ul>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ВАЖНО</div>
+                Если вы выполняете длительную команду (сборку, резервное копирование, миграцию базы данных) прямо в SSH-терминале и соединение обрывается, команда немедленно завершается. Частично выполненная работа может остаться в несогласованном состоянии.
+            </div>
+            <h3>Решение: tmux или screen</h3>
+            <p>Терминальный мультиплексор запускает постоянную сессию <em>на сервере</em>, полностью независимую от вашего SSH-соединения. Если связь оборвётся, сессия и всё, что в ней выполняется, продолжит работать. Переподключившись, вы снова присоединяетесь к ней и находите всё ровно там, где оставили.</p>
+            <p>Это самая полезная привычка для всех, кто управляет серверами с телефона.</p>
+            <h3>Быстрый старт с tmux</h3>
+            <p><code>tmux</code> доступен в большинстве современных дистрибутивов Linux и является рекомендуемым вариантом.</p>
+            <pre><code># Запустить новую именованную сессию
+tmux new -s work
+
+# Отсоединиться от сессии (оставить её работать)
+Ctrl+B, затем D
+
+# Показать список запущенных сессий
+tmux ls
+
+# Снова присоединиться к сессии
+tmux attach -t work
+
+# Присоединиться к самой последней сессии
+tmux attach</code></pre>
+            <h3>Быстрый старт со screen</h3>
+            <p><code>screen</code> старше, но доступен практически в любой Unix-системе, включая минимальные серверные образы, где tmux может быть не установлен.</p>
+            <pre><code># Запустить новую именованную сессию
+screen -S work
+
+# Отсоединиться от сессии
+Ctrl+A, затем D
+
+# Показать список запущенных сессий
+screen -ls
+
+# Снова присоединиться к сессии
+screen -r work</code></pre>
+            <h3>Рекомендуемый порядок работы на телефоне</h3>
+            <ol class="steps">
+                <li>Подключитесь к серверу через SSHBorg.</li>
+                <li>Сразу запустите или присоедините сессию tmux/screen: <code>tmux attach || tmux new -s main</code></li>
+                <li>Выполняйте команды внутри мультиплексора.</li>
+                <li>Если соединение оборвётся, просто переподключитесь — ваша сессия на месте.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// СОВЕТ</div>
+                Можно добавить <code>tmux attach || tmux new -s main</code> в <code>~/.bashrc</code> или <code>~/.zshrc</code> на сервере, чтобы сессия мультиплексора запускалась автоматически при каждом входе через SSHBorg.
+            </div>
+        </div>
+
+        <div class="doc-section" id="jump-hosts">
+
+            <h2>// JUMP HOSTS</h2>
+            <p>Jump host (его также называют бастионом) — это промежуточный сервер, через который нужно пройти, чтобы добраться до целевого сервера, недоступного из интернета напрямую. SSHBorg изначально поддерживает одиночные и многозвенные цепочки переходов.</p>
+            <h3>Настройка jump host в SSHBorg</h3>
+            <ol class="steps">
+                <li>Добавьте сервер-бастион как обычный хост в SSHBorg (например, <em>bastion</em>).</li>
+                <li>Добавьте целевой сервер как ещё один хост.</li>
+                <li>В настройках целевого хоста укажите в поле <strong>Jump host</strong> созданный вами бастион.</li>
+                <li>Включите <strong>Проброс агента</strong> на записи бастиона — это позволит пробросить ваш ключ через бастион для аутентификации на целевом сервере.</li>
+            </ol>
+            <div class="callout callout-info">
+                <div class="callout-label">// КАК ЭТО РАБОТАЕТ</div>
+                SSHBorg сначала устанавливает SSH-соединение с бастионом, а затем открывает через него проброшенный TCP-канал к целевому серверу. Ваш закрытый ключ никогда не покидает телефон — бастион лишь проксирует зашифрованный поток.
+            </div>
+            <h3>Многозвенные цепочки</h3>
+            <p>Если нужно пройти более чем через один промежуточный сервер (например, интернет → bastion → dmz → target), создайте запись для каждого звена и свяжите их:</p>
+            <ul>
+                <li><strong>bastion</strong> — без jump host, проброс агента включён</li>
+                <li><strong>dmz</strong> — jump host = bastion, проброс агента включён</li>
+                <li><strong>target</strong> — jump host = dmz</li>
+            </ul>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ВАЖНО</div>
+                Проброс агента должен быть включён на <em>каждом промежуточном звене</em>, а не только на первом. Без этого цепочка аутентификации разрывается, и подключение к конечному серверу завершится ошибкой «permission denied».
+            </div>
+            <h3>Эквивалентная ручная настройка (для справки)</h3>
+            <p>Аналогичная конфигурация в настольном <code>~/.ssh/config</code> выглядит так:</p>
+            <pre><code>Host bastion
+    HostName bastion.example.com
+    User admin
+    ForwardAgent yes
+
+Host target
+    HostName 10.0.1.50
+    User ubuntu
+    ProxyJump bastion
+    ForwardAgent yes</code></pre>
+            <p>С такой конфигурацией команда <code>ssh target</code> на ноутбуке прозрачно проходит через бастион.</p>
+            <h3>Требования к межсетевому экрану</h3>
+            <ul>
+                <li>Ваш телефон должен иметь доступ к бастиону по его SSH-порту (обычно 22).</li>
+                <li>Бастион должен иметь доступ к целевому серверу по его SSH-порту.</li>
+                <li>Целевой сервер <em>не</em> обязан быть доступен напрямую с вашего телефона.</li>
+            </ul>
+        </div>
+
+        <div class="doc-section" id="sessions">
+
+            <h2>// НЕСКОЛЬКО СЕССИЙ</h2>
+            <p>SSHBorg позволяет держать открытыми одновременно несколько сессий SSH-терминала и файлового менеджера SFTP, даже к разным серверам.</p>
+            <ul>
+                <li>Откройте сессию с экрана хостов, нажав <strong>Терминал</strong> или <strong>SFTP</strong>.</li>
+                <li>Переключайтесь между открытыми сессиями через селектор сессий вверху экрана.</li>
+                <li>Сессии остаются активными в фоне, пока держится сетевое соединение.</li>
+                <li>В списке хостов рядом с каждым хостом показывается небольшой значок с количеством активных SSH- и SFTP-сессий, так что с одного взгляда видно, что открыто.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// СОВЕТ</div>
+                Длительные команды (сборки, резервные копии, просмотр логов) продолжают выполняться, даже когда вы переключаетесь на другую сессию. Используйте на сервере терминальный мультиплексор вроде <code>tmux</code> или <code>screen</code>, если хотите, чтобы они пережили и обрыв SSH-соединения.
+            </div>
+        </div>
+
+        <div class="doc-section" id="security">
+
+            <h2>// БЕЗОПАСНОСТЬ ПРИЛОЖЕНИЯ</h2>
+            <h3>Биометрическая блокировка</h3>
+            <p>Включите биометрическую блокировку в <strong>Настройки → Безопасность → Биометрическая блокировка</strong>. Когда она активна, SSHBorg требует отпечаток пальца или распознавание лица, прежде чем показать любые хосты, учётные данные или данные сессий.</p>
+            <p>Можно задать тайм-аут бездействия — по истечении заданного числа минут в фоне приложение блокируется автоматически.</p>
+            <h3>Защита от скриншотов</h3>
+            <p>По умолчанию SSHBorg блокирует скриншоты и запись экрана, чтобы конфиденциальное содержимое терминала не утекло через экран недавних приложений или инструменты захвата экрана.</p>
+            <p>Если вам нужно сделать скриншот (например, чтобы поделиться выводом терминала), защиту можно временно отключить в <strong>Настройки → Безопасность → Разрешить скриншоты</strong>.</p>
+            <h3>Хранение учётных данных</h3>
+            <p>Все учётные данные (пароли, закрытые ключи, парольные фразы) хранятся в зашифрованном виде с использованием <strong>Android Keystore</strong> — аппаратно защищённого хранилища, доступного на Android 10+. Они никогда не записываются во внешнюю память и никуда не передаются.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ЗАМЕЧАНИЕ О РЕЗЕРВНОМ КОПИРОВАНИИ</div>
+                Поскольку ключи хранятся в Android Keystore, их <strong>нельзя включить в резервную копию</strong> через механизм облачного бэкапа Android, и они не перенесутся на новый телефон автоматически. Перед сменой устройства обязательно авторизуйте на всех своих серверах новый ключ, созданный на новом устройстве.
+            </div>
+        </div>
+
+        <div class="doc-section" id="backup">
+
+            <h2>// РЕЗЕРВНАЯ КОПИЯ НАСТРОЕК</h2>
+            <p>SSHBorg умеет экспортировать и импортировать конфигурации хостов и настройки приложения в виде JSON-файла. Это позволяет перенести список серверов на другое устройство или хранить переносимую копию своей конфигурации.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// ВАЖНО</div>
+                Резервная копия содержит конфигурации хостов и настройки приложения (терминал, оформление, поведение). <strong>Пароли и SSH-ключи никогда не экспортируются</strong> — их придётся настроить заново после импорта на новом устройстве.
+            </div>
+            <h3>Экспорт</h3>
+            <p>Перейдите в <strong>Настройки → Резервная копия → Экспорт копии</strong>. Выберите, куда сохранить файл, с помощью системного диалога. По умолчанию файл называется <code>sshborg_backup.json</code>.</p>
+            <h3>Импорт</h3>
+            <p>Перейдите в <strong>Настройки → Резервная копия → Импорт копии</strong>. Выберите ранее экспортированный (или созданный вручную) файл <code>.json</code>. SSHBorg объединит его с существующим списком хостов:</p>
+            <ul>
+                <li>Хосты, чья <strong>метка</strong> совпадает с существующей записью, <strong>обновляются</strong>.</li>
+                <li>Хосты с новой меткой <strong>добавляются</strong>.</li>
+                <li>Хосты, отсутствующие в файле, <strong>остаются без изменений</strong>.</li>
+                <li>Обновляемый хост сохраняет пароль, ключ и принятый ключ хоста — резервная копия их никогда не содержит.</li>
+</ul>
+            <h3>Формат JSON</h3>
+            <p>Файл экспорта — это обычный объект JSON. Его можно создать и вручную, чтобы массово импортировать список серверов из другого источника.</p>
+            <pre><code>{
+  "version": 3,
+  "exported_at": "2026-05-14T10:00:00Z",
+  "groups": [
+    { "name": "Продакшн", "color": -1754827 }
+  ],
+  "hosts": [
+    {
+      "label":           "Мой VPS",
+      "hostname":        "203.0.113.42",
+      "port":            22,
+      "username":        "ubuntu",
+      "agentForwarding": false,
+      "jumpMode":        "simple",
+      "jumpHosts":       null,
+      "jumpHostIdList":  null,
+      "portForwardings": null,
+      "sftpStartMode":   "last",
+      "sftpStartDir":    null,
+      "allowLegacyCiphers": false,
+      "group":           "Продакшн"
+    }
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
+}</code></pre>
+            <p>Необязательный объект <code>settings</code> содержит настройки приложения и записывается автоматически при экспорте; при создании файла вручную его можно опустить.</p>
+            <h3>Описание полей</h3>
+            <ul>
+                <li><code>label</code> — отображаемое имя в SSHBorg. Используется как уникальный ключ при объединении во время импорта. <strong>Обязательное.</strong></li>
+                <li><code>hostname</code> — адрес сервера или IP (IPv4 или IPv6). <strong>Обязательное.</strong></li>
+                <li><code>port</code> — SSH-порт. По умолчанию <code>22</code>.</li>
+                <li><code>username</code> — пользователь для входа. <strong>Обязательное.</strong></li>
+                <li><code>agentForwarding</code> — <code>true</code>, чтобы включить проброс SSH-агента. По умолчанию <code>false</code>.</li>
+                <li><code>jumpMode</code> — <code>"simple"</code> (использовать текст <code>jumpHosts</code>) или <code>"host_list"</code> (использовать внутренние идентификаторы хостов SSHBorg). При создании файла вручную используйте <code>"simple"</code>.</li>
+                <li><code>jumpHosts</code> — промежуточные хосты через запятую в формате <code>[user@]host[:port]</code>. Используется только когда <code>jumpMode</code> равен <code>"simple"</code>.</li>
+                <li><code>portForwardings</code> — правила локального проброса портов, по одному на строку, в синтаксисе SSH <code>-L</code>, например <code>"8080:localhost:8080"</code>.</li>
+                <li><code>sftpStartMode</code> — начальный каталог SFTP: <code>"last"</code> (запоминать последний посещённый), <code>"fixed"</code> (всегда использовать <code>sftpStartDir</code>), <code>"home"</code> (домашний каталог на сервере). По умолчанию <code>"last"</code>.</li>
+                <li><code>sftpStartDir</code> — путь, используемый когда <code>sftpStartMode</code> равен <code>"fixed"</code>.</li>
+                <li><code>allowLegacyCiphers</code> — <code>true</code>, чтобы включить устаревшие алгоритмы шифрования, описанные выше. По умолчанию <code>false</code>.</li>
+                <li><code>group</code> — имя группы, к которой принадлежит хост. Группы перечисляются в массиве <code>groups</code> верхнего уровня с полями <code>name</code> и <code>color</code> (ARGB как знаковое 32-битное целое). Если хост ссылается на группу, которой нет в массиве, она создаётся автоматически с цветом по умолчанию — поэтому при написании файла вручную массив можно вообще опустить.</li>
+                <li><code>color</code> — необязательный собственный цвет хоста (ARGB как знаковое 32-битное целое). Он перекрывает цвет группы.</li>
+            </ul>
+            <div class="callout callout-info">
+                <div class="callout-label">// НЕОБЯЗАТЕЛЬНЫЕ ПОЛЯ</div>
+                Все поля, кроме <code>label</code>, <code>hostname</code> и <code>username</code>, необязательны. Пропущенные поля принимают значения по умолчанию.
+            </div>
+        </div>
+
+    </div><!-- /doc-content -->
+</div><!-- /docs-layout -->
+
+<div class="gear-divider" style="max-width:1140px; margin: 0 auto 0; padding: 0 24px;"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<!-- Footer -->
+<footer>
+    <p>
+        &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">Политика конфиденциальности</a> &nbsp;&#9135;&nbsp;
+        <a href="https://github.com/payne1982/sshborg/issues">Issues и обратная связь</a> &nbsp;&#9135;&nbsp;
+        <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Исходный код</a> &nbsp;&#9135;&nbsp;
+        <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
+    </p>
+    <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
+        SSH-подключение работает на <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a>
+    </p>
+</footer>
+
+<!-- TOC active link highlight on scroll -->
+<script>
+    const sections = document.querySelectorAll('.doc-section');
+    const tocLinks = document.querySelectorAll('.toc a');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                tocLinks.forEach(l => l.classList.remove('active'));
+                const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+                if (active) active.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

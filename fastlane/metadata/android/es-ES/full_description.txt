@@ -7,7 +7,7 @@ CARACTERÍSTICAS
 • Autenticación por Clave SSH — Genera claves Ed25519, ECDSA y RSA directamente en tu dispositivo. Sin contraseñas.
 • Soporte para Jump Host — Conéctate a través de uno o más bastiones con túnel transparente. Reenvío completo del agente SSH.
 • Bloqueo Biométrico — Protege el acceso a tus servidores con huella dactilar o reconocimiento facial. Tiempo de espera configurable.
-• Multiidioma — Disponible en inglés, italiano, francés, alemán, español, portugués, ucraniano, chino y japonés.
+• Multiidioma — Disponible en inglés, italiano, francés, alemán, español, portugués, ucraniano, ruso, chino y japonés.
 • Tema Oscuro y Claro — Sigue el tema del sistema o déjate elegir. Perfectamente legible en cualquier condición de iluminación.
 • Múltiples Sesiones — Mantén varias sesiones SSH y SFTP abiertas simultáneamente. Cambia entre ellas al instante.
 

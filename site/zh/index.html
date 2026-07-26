@@ -17,6 +17,7 @@
     <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/">
     <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/">
     <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/">
     <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/">
     <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/">
     <link rel="alternate" hreflang="x-default" href="https://sshborg.com/">
@@ -49,10 +50,7 @@
       "inLanguage": "zh-Hans"
     }
     </script>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -70,7 +68,7 @@
             --text:        #a8d4b4;
             --muted:       #4a7058;
             --font-display:'Workbench', sans-serif;
-            --font-mono:   'Bitcount Mono Single', monospace;
+            --font-mono:   'Bitcount Grid Single', monospace;
             --font-body:   'Electrolize', sans-serif;
         }
 
@@ -290,6 +288,29 @@
                 inset 0 0 20px rgba(0,255,136,0.05);
         }
         .cta-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+        /* ── Ko-fi tip button (self-hosted, no third-party widget) ── */
+        .kofi-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            color: var(--copper);
+            font-family: var(--font-display);
+            font-size: 1.1em;
+            letter-spacing: 0.1em;
+            padding: 14px 32px;
+            border: 2px solid var(--copper);
+            clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+            text-decoration: none;
+            transition: background 0.2s, box-shadow 0.2s, text-shadow 0.2s;
+        }
+        .kofi-btn:hover {
+            background: rgba(200,124,48,0.12);
+            text-shadow: 0 0 12px var(--copper);
+            box-shadow: 0 0 20px rgba(200,124,48,0.4), inset 0 0 20px rgba(200,124,48,0.05);
+        }
+        .kofi-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
         @keyframes cta-pulse {
             0%, 100% {
                 box-shadow:
@@ -595,14 +616,14 @@
 
 <!-- Nav -->
 <nav>
-    <a class="nav-brand" href="../index.html">
+    <a class="nav-brand" href="index.html">
         <img src="../logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
         <a href="#features">功能</a>
         <a href="#security">安全</a>
-        <a href="../docs.html">用户指南</a>
+        <a href="docs.html">用户指南</a>
         <a href="https://github.com/payne1982/sshborg/issues">支持</a>
         <a href="../privacy_policy.html" target="_blank" rel="noopener">隐私政策</a>
         <a href="#tip">打赏</a>
@@ -619,6 +640,7 @@
             <a href="../fr/index.html">Français</a>
             <a href="../pt/index.html">Português</a>
             <a href="../uk/index.html">Українська</a>
+            <a href="../ru/index.html">Русский</a>
             <a href="../ja/index.html">日本語</a>
         </div>
     </div>
@@ -685,7 +707,10 @@
             </div>
         </div>
         <div style="margin-top:20px">
-            <script type='text/javascript'>kofiwidget2.init('打赏我', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+            <a class="kofi-btn" href="https://ko-fi.com/R5R21XLAV5" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+                <span>打赏我</span>
+            </a>
         </div>
     </div>
 </div>
@@ -730,7 +755,7 @@
         <div class="feature-card">
             <div class="feature-icon">&#127760;</div>
             <h3>多语言</h3>
-            <p>支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、中文和日语。</p>
+            <p>支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、俄语、中文和日语。</p>
         </div>
 
         <div class="feature-card">
@@ -774,7 +799,10 @@
 <div class="tip-section" id="tip">
     <h2>// 打赏</h2>
     <p>SSHBorg 免费提供，无广告，无跟踪。如果它为您节省了时间，一点打赏可以让它持续下去。</p>
-    <script type='text/javascript'>kofiwidget2.init('在 Ko-fi 上支持我', '#c87a30', 'R5R21XLAV5');kofiwidget2.draw();</script>
+    <a class="kofi-btn" href="https://ko-fi.com/R5R21XLAV5" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+        <span>在 Ko-fi 上支持我</span>
+    </a>
 </div>
 
 <!-- Footer -->

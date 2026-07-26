@@ -16,6 +16,7 @@
     <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html">
     <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html">
     <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/docs.html">
     <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html">
     <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html">
     <link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html">
@@ -45,9 +46,7 @@
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
     }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -65,7 +64,7 @@
             --text:        #a8d4b4;
             --muted:       #4a7058;
             --font-display:'Workbench', sans-serif;
-            --font-mono:   'Bitcount Mono Single', monospace;
+            --font-mono:   'Bitcount Grid Single', monospace;
             --font-body:   'Electrolize', sans-serif;
         }
 
@@ -461,12 +460,12 @@
 
 <!-- Nav -->
 <nav>
-    <a class="nav-brand" href="../index.html">
+    <a class="nav-brand" href="index.html">
         <img src="../logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
-        <a href="../index.html">Inicio</a>
+        <a href="index.html">Inicio</a>
         <a href="#adding-host">Primeros pasos</a>
         <a href="#sftp">SFTP</a>
         <a href="#ssh-keys">Claves SSH</a>
@@ -485,6 +484,7 @@
             <a href="../fr/docs.html">Français</a>
             <a href="../pt/docs.html">Português</a>
             <a href="../uk/docs.html">Українська</a>
+            <a href="../ru/docs.html">Русский</a>
             <a href="../zh/docs.html">中文</a>
             <a href="../ja/docs.html">日本語</a>
         </div>
@@ -701,6 +701,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Mantener la pantalla encendida</strong> — evita que la pantalla se apague mientras un terminal está abierto. Útil al vigilar logs o comandos de larga duración. Desactivado por defecto.</li>
                 <li><strong>Tamaño de letra predeterminado</strong> — el tamaño del texto con el que arrancan las nuevas sesiones; siempre puedes hacer zoom con dos dedos en cada sesión.</li>
                 <li><strong>Scrollback</strong>, <strong>desplazamiento invertido</strong> y <strong>sugerencias de comandos</strong> — controlan cuánto historial de salida se conserva, la dirección del desplazamiento y la barra de sugerencias descrita más arriba.</li>
+                <li><strong>Acción de doble toque</strong> — si quieres, un doble toque en el terminal envía <em>Tab</em> (autocompletado) o <em>Tab</em> dos veces (lista todos los candidatos). Desactivado de forma predeterminada.</li>
             </ul>
         </div>
 
@@ -917,24 +918,25 @@ Host target
         <div class="doc-section" id="backup">
 
             <h2>// COPIA DE SEGURIDAD DE LA CONFIGURACIÓN</h2>
-            <p>SSHBorg puede exportar e importar configuraciones de hosts como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
+            <p>SSHBorg puede exportar e importar configuraciones de hosts y ajustes de la app como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                La copia de seguridad incluye solo las configuraciones de los hosts (dirección, puerto, usuario, ajustes). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
+                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
             </div>
             <h3>Exportar</h3>
-            <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar hosts</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_hosts.json</code> por defecto.</p>
+            <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar copia</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_backup.json</code> por defecto.</p>
             <h3>Importar</h3>
-            <p>Ve a <strong>Ajustes → Copia de seguridad → Importar hosts</strong>. Selecciona el archivo <code>.json</code> exportado previamente (o creado manualmente). SSHBorg lo fusionará con la lista de hosts existente:</p>
+            <p>Ve a <strong>Ajustes → Copia de seguridad → Importar copia</strong>. Selecciona el archivo <code>.json</code> exportado previamente (o creado manualmente). SSHBorg lo fusionará con la lista de hosts existente:</p>
             <ul>
                 <li>Los hosts cuyo <strong>nombre</strong> coincide con una entrada existente se <strong>actualizan</strong>.</li>
                 <li>Los hosts con un nombre nuevo se <strong>añaden</strong>.</li>
                 <li>Los hosts no presentes en el archivo permanecen <strong>sin cambios</strong>.</li>
-            </ul>
+                <li>Un host actualizado conserva su contraseña, clave y clave de host aceptada — la copia nunca las contiene.</li>
+</ul>
             <h3>Formato JSON</h3>
             <p>El archivo exportado es un objeto JSON estándar. También puedes crearlo manualmente para importar en bloque una lista de servidores desde otra fuente.</p>
             <pre><code>{
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Producción", "color": -1754827 }
@@ -955,8 +957,16 @@ Host target
       "allowLegacyCiphers": false,
       "group":           "Producción"
     }
-  ]
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
 }</code></pre>
+            <p>El objeto <code>settings</code> (opcional) contiene los ajustes de la app y se escribe automáticamente al exportar; puedes omitirlo si creas el archivo a mano.</p>
             <h3>Referencia de campos</h3>
             <ul>
                 <li><code>label</code> — nombre mostrado en SSHBorg. Se usa como clave única para la fusión al importar. <strong>Obligatorio.</strong></li>

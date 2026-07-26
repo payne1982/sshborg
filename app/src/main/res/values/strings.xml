@@ -14,7 +14,6 @@
     <string name="action_edit">Edit</string>
     <string name="action_back">Back</string>
     <string name="action_connect">Connect</string>
-    <string name="action_disconnect">Disconnect</string>
     <string name="action_close">Close</string>
     <string name="action_done">Done</string>
     <string name="action_rename">Rename</string>
@@ -25,11 +24,9 @@
     <string name="action_copied">Copied!</string>
     <string name="action_show">Show</string>
     <string name="action_hide">Hide</string>
-    <string name="action_refresh">Refresh</string>
     <string name="action_trust">Trust</string>
     <string name="action_reject">Reject</string>
     <string name="action_go_back">Go back</string>
-    <string name="action_back_to_hosts">Back to hosts</string>
     <string name="action_overwrite">Overwrite</string>
     <string name="action_keep_both">Keep both</string>
     <string name="action_i_understand">I understand</string>
@@ -112,6 +109,9 @@
     <string name="host_start_mode_fixed">Fixed folder</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Starting directory</string>
+    <string name="host_reset_host_keys">Reset accepted host keys</string>
+    <string name="host_reset_host_keys_pending">Host keys will be reset on save</string>
+    <string name="host_reset_host_keys_hint">Forgets the saved host key and cached jump-host keys. The next connection will verify the server again.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH Keys</string>
@@ -162,6 +162,11 @@
 
     <string name="settings_invert_scroll_title">Invert terminal scroll</string>
     <string name="settings_invert_scroll_subtitle">Swipe up to see older output instead of newer</string>
+    <string name="settings_double_tap_title">Double-tap action</string>
+    <string name="settings_double_tap_subtitle">What a double-tap on the terminal sends to the shell</string>
+    <string name="settings_double_tap_none">Nothing</string>
+    <string name="settings_double_tap_tab">Send Tab</string>
+    <string name="settings_double_tap_tab_twice">Send Tab twice</string>
     <string name="settings_keep_screen_on_title">Keep screen on</string>
     <string name="settings_keep_screen_on_subtitle">Prevent the screen from turning off while a terminal is open</string>
     <string name="settings_terminal_colors_title">Terminal colors</string>
@@ -170,7 +175,6 @@
     <string name="settings_font_size_subtitle">Default terminal text size (sp); pinch to zoom in a session</string>
     <string name="settings_scrollback_title">Scrollback lines</string>
     <string name="settings_scrollback_subtitle">Lines of terminal history kept in memory</string>
-    <string name="settings_scrollback_lines">%d lines</string>
     <string name="settings_history_suggestions_title">Command history suggestions</string>
     <string name="settings_history_suggestions_subtitle">Show suggestions from the server shell history while typing in the terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Always-visible suggestion bar</string>
@@ -225,9 +229,7 @@
     <string name="sftp_download_cd">Download</string>
     <string name="sftp_empty_directory">Empty directory</string>
     <string name="sftp_disconnected">Disconnected</string>
-    <string name="sftp_go_back">Go back</string>
 
-    <string name="sftp_downloading">Downloading %1$s</string>
     <string name="sftp_downloading_label">Downloading:</string>
     <string name="sftp_uploading">Uploading %1$s</string>
     <string name="sftp_saved_to_downloads">Saved: %1$s</string>
@@ -330,11 +332,11 @@
     </plurals>
 
     <!-- Backup export/import -->
-    <string name="settings_backup_export_title">Export hosts</string>
-    <string name="settings_backup_export_subtitle">Save host configurations to a JSON file. Passwords and keys are not included.</string>
+    <string name="settings_backup_export_title">Export backup</string>
+    <string name="settings_backup_export_subtitle">Save host configurations and app settings to a JSON file. Passwords and keys are not included.</string>
     <string name="settings_backup_export_action">Export</string>
-    <string name="settings_backup_import_title">Import hosts</string>
-    <string name="settings_backup_import_subtitle">Load host configurations from a JSON file. Existing hosts with the same name will be updated; passwords and keys will not be imported.</string>
+    <string name="settings_backup_import_title">Import backup</string>
+    <string name="settings_backup_import_subtitle">Load host configurations and app settings from a JSON file. Existing hosts with the same name will be updated; passwords and keys will not be imported.</string>
     <string name="settings_backup_import_action">Import</string>
     <string name="backup_export_success">Exported %1$d hosts</string>
     <string name="backup_import_success">Imported %1$d, updated %2$d hosts</string>
@@ -344,7 +346,6 @@
     <string name="error_host_not_found">Host not found</string>
     <string name="error_connection_failed">Connection failed</string>
     <string name="error_cannot_list_directory">Cannot list directory</string>
-    <string name="error_cannot_create_file">Cannot create file in Downloads</string>
     <string name="error_download_failed">Download failed</string>
     <string name="error_upload_failed">Upload failed</string>
     <string name="error_delete_failed">Delete failed</string>

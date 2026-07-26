@@ -15,6 +15,7 @@ const LANGUAGES = [
   { code: 'fr', hreflang: 'fr',      dir: 'fr', root: '../', htmlLang: 'fr',      ogLocale: 'fr_FR' },
   { code: 'pt', hreflang: 'pt',      dir: 'pt', root: '../', htmlLang: 'pt',      ogLocale: 'pt_PT' },
   { code: 'uk', hreflang: 'uk',      dir: 'uk', root: '../', htmlLang: 'uk',      ogLocale: 'uk_UA' },
+  { code: 'ru', hreflang: 'ru',      dir: 'ru', root: '../', htmlLang: 'ru',      ogLocale: 'ru_RU' },
   { code: 'zh', hreflang: 'zh-Hans', dir: 'zh', root: '../', htmlLang: 'zh-Hans', ogLocale: 'zh_CN' },
   { code: 'ja', hreflang: 'ja',      dir: 'ja', root: '../', htmlLang: 'ja',      ogLocale: 'ja_JP' },
 ];
@@ -30,6 +31,7 @@ const ENDONYMS = {
   fr: 'Français',
   pt: 'Português',
   uk: 'Українська',
+  ru: 'Русский',
   zh: '中文',
   ja: '日本語',
 };

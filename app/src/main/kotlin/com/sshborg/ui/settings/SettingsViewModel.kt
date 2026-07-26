@@ -60,6 +60,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
             com.sshborg.data.AppPreferences.TERMINAL_SCHEME_DARK,
         )
 
+    val doubleTapAction: StateFlow<Int> =
+        prefs.doubleTapAction.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.DOUBLE_TAP_NONE,
+        )
+
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -125,6 +131,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setKeepScreenOn(enabled: Boolean) {
         viewModelScope.launch { prefs.setKeepScreenOn(enabled) }
+    }
+
+    fun setDoubleTapAction(action: Int) {
+        viewModelScope.launch { prefs.setDoubleTapAction(action) }
     }
 
     fun setTerminalColorScheme(scheme: Int) {
@@ -195,10 +205,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 2)
+                    put("version", 3)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
+                    put("settings", prefs.exportSettingsJson())
                 }.toString(2)
                 getApplication<Application>().contentResolver.openOutputStream(uri)?.use {
                     it.write(json.toByteArray(Charsets.UTF_8))
@@ -277,9 +288,35 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 var inserted = 0; var updated = 0
                 toImport.forEach { host ->
                     val existing = existingByLabel[host.label]
-                    if (existing != null) { hostDao.upsert(host.copy(id = existing.id)); updated++ }
-                    else { hostDao.upsert(host); inserted++ }
+                    if (existing != null) {
+                        // Preserve the fields the backup never carries so re-importing over
+                        // an existing host doesn't wipe its credentials or saved state:
+                        // auth (key/password) and last-connected time always stay.
+                        //
+                        // Pinned host keys are kept only while the endpoint they were pinned
+                        // to is unchanged, mirroring the edit screen: a stored host key is a
+                        // TOFU anchor bound to a specific target, so if the import repoints
+                        // the host we drop it and re-verify on next connect instead of
+                        // carrying a stale pin (which would prompt forever on the main host,
+                        // or hard-fail a jump host). knownHostsEntry follows hostname+port;
+                        // jumpHostKeys (simple mode) follows the jumpHosts string.
+                        val keepHostKey  = existing.hostname == host.hostname && existing.port == host.port
+                        val keepJumpKeys = host.jumpMode == "simple" && existing.jumpHosts == host.jumpHosts
+                        hostDao.upsert(host.copy(
+                            id                = existing.id,
+                            keyId             = existing.keyId,
+                            password          = existing.password,
+                            encryptedPassword = existing.encryptedPassword,
+                            knownHostsEntry   = if (keepHostKey) existing.knownHostsEntry else null,
+                            jumpHostKeys      = if (keepJumpKeys) existing.jumpHostKeys else null,
+                            lastConnected     = existing.lastConnected,
+                        ))
+                        updated++
+                    } else { hostDao.upsert(host); inserted++ }
                 }
+                // App settings (backup version >= 3): applied reactively via DataStore.
+                root.optJSONObject("settings")?.let { prefs.importSettingsJson(it) }
+
                 _message.tryEmit(
                     getApplication<Application>().getString(R.string.backup_import_success, inserted, updated)
                 )

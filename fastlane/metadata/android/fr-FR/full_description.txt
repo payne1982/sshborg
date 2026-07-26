@@ -7,7 +7,7 @@ FONCTIONNALITÉS
 • Auth par Clé SSH — Générez des clés Ed25519, ECDSA et RSA directement sur votre appareil. Sans mot de passe.
 • Support Jump Host — Connectez-vous via un ou plusieurs hôtes bastions avec tunneling transparent. Transfert complet de l'agent SSH.
 • Verrouillage Biométrique — Protégez l'accès à vos serveurs par empreinte digitale ou reconnaissance faciale. Délai configurable.
-• Multilingue — Disponible en anglais, italien, français, allemand, espagnol, portugais, ukrainien, chinois et japonais.
+• Multilingue — Disponible en anglais, italien, français, allemand, espagnol, portugais, ukrainien, russe, chinois et japonais.
 • Thème Sombre & Clair — Suit le thème système ou vous laisse choisir. Parfaitement lisible dans toutes les conditions d'éclairage.
 • Sessions Multiples — Gardez plusieurs sessions SSH et SFTP ouvertes simultanément. Basculez entre elles instantanément.
 

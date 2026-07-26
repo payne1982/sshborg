@@ -1,0 +1,7 @@
+• Die App ist dank einer Community-Übersetzung jetzt auch auf Russisch verfügbar
+• Speicherleck beim Verlassen einer Terminal-Sitzung behoben
+• Flüssigeres, reaktionsschnelleres Scrollen im Terminal
+• Das Terminal springt beim Tippen wieder ans Ende
+• Optionales Doppeltippen zum Senden von Tab (Autovervollständigung)
+• Sicherungen umfassen jetzt auch die App-Einstellungen
+• Neue Option zum Zurücksetzen des akzeptierten Host-Schlüssels

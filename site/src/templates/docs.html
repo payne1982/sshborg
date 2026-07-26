@@ -35,9 +35,7 @@
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
     }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ROOT}}fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -55,7 +53,7 @@
             --text:        #a8d4b4;
             --muted:       #4a7058;
             --font-display:'Workbench', sans-serif;
-            --font-mono:   'Bitcount Mono Single', monospace;
+            --font-mono:   'Bitcount Grid Single', monospace;
             --font-body:   'Electrolize', sans-serif;
         }
 
@@ -451,12 +449,12 @@
 
 <!-- Nav -->
 <nav>
-    <a class="nav-brand" href="{{ROOT}}index.html">
+    <a class="nav-brand" href="index.html">
         <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
-        <a href="{{ROOT}}index.html">{{nav_home}}</a>
+        <a href="index.html">{{nav_home}}</a>
         <a href="#adding-host">{{nav_getting_started}}</a>
         <a href="#sftp">{{nav_sftp}}</a>
         <a href="#ssh-keys">{{nav_ssh_keys}}</a>

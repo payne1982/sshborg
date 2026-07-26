@@ -12,7 +12,6 @@
     <string name="action_edit">Modifier</string>
     <string name="action_back">Retour</string>
     <string name="action_connect">Connecter</string>
-    <string name="action_disconnect">Déconnecter</string>
     <string name="action_close">Fermer</string>
     <string name="action_done">Terminé</string>
     <string name="action_rename">Renommer</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">Copié !</string>
     <string name="action_show">Afficher</string>
     <string name="action_hide">Masquer</string>
-    <string name="action_refresh">Actualiser</string>
     <string name="action_trust">Faire confiance</string>
     <string name="action_reject">Rejeter</string>
     <string name="action_go_back">Retour</string>
-    <string name="action_back_to_hosts">Retour aux hôtes</string>
     <string name="action_overwrite">Écraser</string>
     <string name="action_keep_both">Conserver les deux</string>
     <string name="action_i_understand">J\'ai compris</string>
@@ -108,6 +105,9 @@
     <string name="host_start_mode_fixed">Dossier fixe</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Répertoire de démarrage</string>
+    <string name="host_reset_host_keys">Réinitialiser les clés d\'hôte acceptées</string>
+    <string name="host_reset_host_keys_pending">Les clés seront réinitialisées à l\'enregistrement</string>
+    <string name="host_reset_host_keys_hint">Oublie la clé d\'hôte enregistrée et les clés de rebond en cache. La prochaine connexion vérifiera à nouveau le serveur.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Clés SSH</string>
@@ -152,6 +152,11 @@
 
     <string name="settings_invert_scroll_title">Inverser le défilement du terminal</string>
     <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus ancienne</string>
+    <string name="settings_double_tap_title">Action du double appui</string>
+    <string name="settings_double_tap_subtitle">Ce qu\'un double appui sur le terminal envoie au shell</string>
+    <string name="settings_double_tap_none">Rien</string>
+    <string name="settings_double_tap_tab">Envoyer Tab</string>
+    <string name="settings_double_tap_tab_twice">Envoyer Tab deux fois</string>
     <string name="settings_keep_screen_on_title">Garder l\'écran allumé</string>
     <string name="settings_keep_screen_on_subtitle">Empêche l\'écran de s\'éteindre tant qu\'un terminal est ouvert</string>
     <string name="settings_terminal_colors_title">Couleurs du terminal</string>
@@ -160,7 +165,6 @@
     <string name="settings_font_size_subtitle">Taille par défaut du texte du terminal (sp) ; pincez pour zoomer dans la session</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
     <string name="settings_scrollback_subtitle">Lignes d\'historique du terminal conservées en mémoire</string>
-    <string name="settings_scrollback_lines">%d lignes</string>
     <string name="settings_history_suggestions_title">Suggestions de l\'historique des commandes</string>
     <string name="settings_history_suggestions_subtitle">Afficher des suggestions tirées de l\'historique shell du serveur lors de la saisie dans le terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>
@@ -210,9 +214,7 @@
     <string name="sftp_download_cd">Télécharger</string>
     <string name="sftp_empty_directory">Dossier vide</string>
     <string name="sftp_disconnected">Déconnecté</string>
-    <string name="sftp_go_back">Retour</string>
 
-    <string name="sftp_downloading">Téléchargement de %1$s</string>
     <string name="sftp_downloading_label">Téléchargement :</string>
     <string name="sftp_uploading">Envoi de %1$s</string>
     <string name="sftp_saved_to_downloads">Enregistré : %1$s</string>
@@ -298,7 +300,6 @@
     <string name="error_host_not_found">Hôte introuvable</string>
     <string name="error_connection_failed">Connexion échouée</string>
     <string name="error_cannot_list_directory">Impossible de lister le dossier</string>
-    <string name="error_cannot_create_file">Impossible de créer le fichier dans les téléchargements</string>
     <string name="error_download_failed">Téléchargement échoué</string>
     <string name="error_upload_failed">Envoi échoué</string>
     <string name="error_delete_failed">Suppression échouée</string>
@@ -307,11 +308,11 @@
     <string name="error_refresh_failed">Actualisation échouée</string>
     <string name="error_encryption_failed">Chiffrement échoué</string>
     <string name="error_decryption_failed">Déchiffrement échoué</string>
-    <string name="settings_backup_export_title">Exporter les hôtes</string>
-    <string name="settings_backup_export_subtitle">Enregistrer les configurations des hôtes dans un fichier JSON. Les mots de passe et les clés ne sont pas inclus.</string>
+    <string name="settings_backup_export_title">Exporter la sauvegarde</string>
+    <string name="settings_backup_export_subtitle">Enregistrer les configurations des hôtes et les réglages de l\'application dans un fichier JSON. Les mots de passe et les clés ne sont pas inclus.</string>
     <string name="settings_backup_export_action">Exporter</string>
-    <string name="settings_backup_import_title">Importer les hôtes</string>
-    <string name="settings_backup_import_subtitle">Charger les configurations depuis un fichier JSON. Les hôtes existants avec le même nom seront mis à jour ; mots de passe et clés ne seront pas importés.</string>
+    <string name="settings_backup_import_title">Importer la sauvegarde</string>
+    <string name="settings_backup_import_subtitle">Charger les configurations des hôtes et les réglages de l\'application depuis un fichier JSON. Les hôtes existants avec le même nom seront mis à jour ; mots de passe et clés ne seront pas importés.</string>
     <string name="settings_backup_import_action">Importer</string>
     <string name="backup_export_success">%1$d hôtes exportés</string>
     <string name="backup_import_success">%1$d importés, %2$d mis à jour</string>

@@ -12,7 +12,6 @@
     <string name="action_edit">Modifica</string>
     <string name="action_back">Indietro</string>
     <string name="action_connect">Connetti</string>
-    <string name="action_disconnect">Disconnetti</string>
     <string name="action_close">Chiudi</string>
     <string name="action_done">Fatto</string>
     <string name="action_rename">Rinomina</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">Copiato!</string>
     <string name="action_show">Mostra</string>
     <string name="action_hide">Nascondi</string>
-    <string name="action_refresh">Aggiorna</string>
     <string name="action_trust">Fidati</string>
     <string name="action_reject">Rifiuta</string>
     <string name="action_go_back">Torna indietro</string>
-    <string name="action_back_to_hosts">Torna agli host</string>
     <string name="action_overwrite">Sovrascrivi</string>
     <string name="action_keep_both">Mantieni entrambi</string>
     <string name="action_i_understand">Ho capito</string>
@@ -108,6 +105,9 @@
     <string name="host_start_mode_fixed">Cartella fissa</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Cartella iniziale</string>
+    <string name="host_reset_host_keys">Azzera chiavi host accettate</string>
+    <string name="host_reset_host_keys_pending">Le chiavi verranno azzerate al salvataggio</string>
+    <string name="host_reset_host_keys_hint">Dimentica la chiave host salvata e le chiavi jump-host in cache. Alla prossima connessione l\'identità del server verrà verificata di nuovo.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Chiavi SSH</string>
@@ -152,6 +152,11 @@
 
     <string name="settings_invert_scroll_title">Inverti scorrimento terminale</string>
     <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più vecchio invece di quello più recente</string>
+    <string name="settings_double_tap_title">Azione doppio tocco</string>
+    <string name="settings_double_tap_subtitle">Cosa invia alla shell un doppio tocco sul terminale</string>
+    <string name="settings_double_tap_none">Niente</string>
+    <string name="settings_double_tap_tab">Invia Tab</string>
+    <string name="settings_double_tap_tab_twice">Invia Tab due volte</string>
     <string name="settings_keep_screen_on_title">Mantieni lo schermo acceso</string>
     <string name="settings_keep_screen_on_subtitle">Impedisce lo spegnimento dello schermo mentre un terminale è aperto</string>
     <string name="settings_terminal_colors_title">Colori del terminale</string>
@@ -160,7 +165,6 @@
     <string name="settings_font_size_subtitle">Dimensione predefinita del testo del terminale (sp); il pinch la cambia nella sessione</string>
     <string name="settings_scrollback_title">Righe di scrollback</string>
     <string name="settings_scrollback_subtitle">Righe di cronologia del terminale mantenute in memoria</string>
-    <string name="settings_scrollback_lines">%d righe</string>
     <string name="settings_history_suggestions_title">Suggerimenti dalla cronologia comandi</string>
     <string name="settings_history_suggestions_subtitle">Mostra suggerimenti dalla cronologia shell del server mentre si digita nel terminale</string>
     <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>
@@ -210,9 +214,7 @@
     <string name="sftp_download_cd">Scarica</string>
     <string name="sftp_empty_directory">Cartella vuota</string>
     <string name="sftp_disconnected">Disconnesso</string>
-    <string name="sftp_go_back">Torna indietro</string>
 
-    <string name="sftp_downloading">Download di %1$s</string>
     <string name="sftp_downloading_label">Download in corso:</string>
     <string name="sftp_uploading">Caricamento di %1$s</string>
     <string name="sftp_saved_to_downloads">Salvato: %1$s</string>
@@ -299,7 +301,6 @@
     <string name="error_host_not_found">Host non trovato</string>
     <string name="error_connection_failed">Connessione fallita</string>
     <string name="error_cannot_list_directory">Impossibile elencare la cartella</string>
-    <string name="error_cannot_create_file">Impossibile creare il file nei Download</string>
     <string name="error_download_failed">Download fallito</string>
     <string name="error_upload_failed">Caricamento fallito</string>
     <string name="error_delete_failed">Eliminazione fallita</string>
@@ -308,11 +309,11 @@
     <string name="error_refresh_failed">Aggiornamento fallito</string>
     <string name="error_encryption_failed">Cifratura fallita</string>
     <string name="error_decryption_failed">Decifratura fallita</string>
-    <string name="settings_backup_export_title">Esporta host</string>
-    <string name="settings_backup_export_subtitle">Salva le configurazioni degli host in un file JSON. Password e chiavi non sono incluse.</string>
+    <string name="settings_backup_export_title">Esporta backup</string>
+    <string name="settings_backup_export_subtitle">Salva le configurazioni degli host e le impostazioni dell\'app in un file JSON. Password e chiavi non sono incluse.</string>
     <string name="settings_backup_export_action">Esporta</string>
-    <string name="settings_backup_import_title">Importa host</string>
-    <string name="settings_backup_import_subtitle">Carica le configurazioni degli host da un file JSON. Gli host esistenti con lo stesso nome verranno aggiornati; password e chiavi non verranno importate.</string>
+    <string name="settings_backup_import_title">Importa backup</string>
+    <string name="settings_backup_import_subtitle">Carica le configurazioni degli host e le impostazioni dell\'app da un file JSON. Gli host esistenti con lo stesso nome verranno aggiornati; password e chiavi non verranno importate.</string>
     <string name="settings_backup_import_action">Importa</string>
     <string name="backup_export_success">Esportati %1$d host</string>
     <string name="backup_import_success">Importati %1$d, aggiornati %2$d host</string>

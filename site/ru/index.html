@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSHBorg – SSH и SFTP клиент для Android</title>
+    <meta name="description" content="SSHBorg — мощный SSH и SFTP клиент для Android. Безопасно управляйте своими серверами с телефона с помощью аутентификации по ключу, зашифрованного хранилища и биометрической блокировки.">
+    <meta name="google-site-verification" content="SZtev8mERq_TIrzE1TF875yUkGgf7diHRQi694RJt-M">
+    <link rel="icon" type="image/x-icon"  href="../favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+        <link rel="alternate" hreflang="en" href="https://sshborg.com/">
+    <link rel="alternate" hreflang="it" href="https://sshborg.com/it/">
+    <link rel="alternate" hreflang="de" href="https://sshborg.com/de/">
+    <link rel="alternate" hreflang="es" href="https://sshborg.com/es/">
+    <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/">
+    <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/">
+    <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/">
+    <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/">
+    <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/">
+    <link rel="alternate" hreflang="x-default" href="https://sshborg.com/">
+    <link rel="canonical" href="https://sshborg.com/ru/">
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:site_name"   content="SSHBorg">
+    <meta property="og:url"         content="https://sshborg.com/ru/">
+    <meta property="og:title"       content="SSHBorg – SSH и SFTP клиент для Android">
+    <meta property="og:description" content="SSHBorg — мощный SSH и SFTP клиент для Android. Безопасно управляйте своими серверами с телефона с помощью аутентификации по ключу, зашифрованного хранилища и биометрической блокировки.">
+    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:locale"      content="ru_RU">
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="SSHBorg – SSH и SFTP клиент для Android">
+    <meta name="twitter:description" content="SSHBorg — мощный SSH и SFTP клиент для Android. Безопасно управляйте своими серверами с телефона с помощью аутентификации по ключу, зашифрованного хранилища и биометрической блокировки.">
+    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SSHBorg",
+      "operatingSystem": "Android",
+      "applicationCategory": "DeveloperApplication",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "description": "SSHBorg — мощный SSH и SFTP клиент для Android. Безопасно управляйте своими серверами с телефона с помощью аутентификации по ключу, зашифрованного хранилища и биометрической блокировки.",
+      "url": "https://sshborg.com/",
+      "downloadUrl": "https://play.google.com/store/apps/details?id=com.sshborg",
+      "inLanguage": "ru"
+    }
+    </script>
+    <link rel="stylesheet" href="../fonts.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:          #030a05;
+            --surface:     #060e08;
+            --card:        #081208;
+            --border:      #1a3a20;
+            --border-hi:   #2a6035;
+            --neon-green:  #00ff88;
+            --neon-blue:   #00d4ff;
+            --deep-green:  #00cc66;
+            --copper:      #c87c30;
+            --copper-dim:  #7a4a1a;
+            --text:        #a8d4b4;
+            --muted:       #4a7058;
+            --font-display:'Workbench', sans-serif;
+            --font-mono:   'Bitcount Grid Single', monospace;
+            --font-body:   'Electrolize', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
+            background-size: 44px 44px;
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.65;
+        }
+
+        /* CRT scanlines overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 3px,
+                rgba(0,0,0,0.07) 3px,
+                rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        a { color: var(--neon-green); text-decoration: none; }
+        a:hover { text-shadow: 0 0 8px var(--neon-green); }
+
+        /* ── Gear divider ─────────────────────────────────────── */
+        .gear-divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 24px;
+            color: var(--copper);
+        }
+        .gear-divider::before, .gear-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--copper-dim), var(--copper), var(--copper-dim), transparent);
+        }
+        .gear-divider span {
+            font-size: 1.3em;
+            display: inline-block;
+            animation: gear-spin 18s linear infinite;
+            color: var(--copper);
+            filter: drop-shadow(0 0 4px var(--copper));
+        }
+        .gear-divider span:last-child { animation-direction: reverse; animation-duration: 12s; }
+        @keyframes gear-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        /* ── Nav ─────────────────────────────────────────────── */
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 14px 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(3,10,5,0.92);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        nav::after { display: none; }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 1.15em;
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green), 0 0 16px var(--deep-green);
+            letter-spacing: 0.08em;
+        }
+        .nav-brand img {
+            width: 30px; height: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 8px rgba(0,255,136,0.4);
+        }
+        .nav-links { display: flex; gap: 28px; font-size: 0.85em; letter-spacing: 0.06em; margin-left: auto; }
+        .nav-links a { color: var(--muted); transition: color 0.2s, text-shadow 0.2s; }
+        .nav-links a:hover { color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); }
+
+        /* ── Hero ────────────────────────────────────────────── */
+        .hero {
+            text-align: center;
+            padding: 80px 24px 64px;
+            max-width: 980px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .hero-logo-wrap {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 36px;
+        }
+        .hero-logo {
+            width: 116px; height: 116px;
+            border-radius: 22px;
+            position: relative;
+            z-index: 1;
+            box-shadow:
+                0 0 0 2px var(--neon-green),
+                0 0 18px rgba(0,255,136,0.55),
+                0 0 44px rgba(0,255,136,0.25),
+                0 0 80px rgba(0,204,102,0.15);
+        }
+        .hero-boot {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            margin-bottom: 18px;
+            line-height: 1.9;
+        }
+        .hero-boot .ok  { color: var(--neon-green); }
+        .hero-boot .prompt { color: var(--copper); }
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 3.8em;
+            color: var(--neon-green);
+            text-shadow:
+                0 0 6px rgba(0,255,136,0.6),
+                0 0 14px rgba(0,204,102,0.3);
+            letter-spacing: 0.06em;
+            margin-bottom: 18px;
+        }
+        .hero-sub {
+            font-size: 1.15em;
+            color: var(--text);
+            max-width: 540px;
+            margin: 0 auto 36px;
+            opacity: 0.85;
+        }
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .badge {
+            font-family: var(--font-mono);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            font-size: 0.78em;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+        }
+        .badge-green {
+            border-color: rgba(0,204,102,0.5);
+            color: var(--deep-green);
+        }
+        .badge-blue {
+            border-color: rgba(0,212,255,0.4);
+            color: var(--neon-blue);
+        }
+
+        /* ── CTA buttons ─────────────────────────────────────── */
+        .cta-wrap { margin-top: 48px; }
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            color: var(--neon-green);
+            font-family: var(--font-display);
+            font-size: 1.3em;
+            letter-spacing: 0.12em;
+            padding: 18px 44px;
+            border: 2px solid var(--neon-green);
+            clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
+            text-decoration: none;
+            position: relative;
+            animation: cta-pulse 2.6s ease-in-out infinite;
+            transition: background 0.2s;
+        }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
+            background: rgba(0,255,136,0.06);
+            z-index: -1;
+        }
+        .cta-btn:hover {
+            background: rgba(0,255,136,0.12);
+            text-shadow: 0 0 12px var(--neon-green);
+            animation: none;
+            box-shadow:
+                0 0 20px var(--neon-green),
+                0 0 40px var(--deep-green),
+                0 0 80px rgba(0,204,102,0.3),
+                inset 0 0 20px rgba(0,255,136,0.05);
+        }
+        .cta-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+        /* ── Ko-fi tip button (self-hosted, no third-party widget) ── */
+        .kofi-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            color: var(--copper);
+            font-family: var(--font-display);
+            font-size: 1.1em;
+            letter-spacing: 0.1em;
+            padding: 14px 32px;
+            border: 2px solid var(--copper);
+            clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+            text-decoration: none;
+            transition: background 0.2s, box-shadow 0.2s, text-shadow 0.2s;
+        }
+        .kofi-btn:hover {
+            background: rgba(200,124,48,0.12);
+            text-shadow: 0 0 12px var(--copper);
+            box-shadow: 0 0 20px rgba(200,124,48,0.4), inset 0 0 20px rgba(200,124,48,0.05);
+        }
+        .kofi-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+        @keyframes cta-pulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 10px var(--neon-green),
+                    0 0 24px var(--deep-green),
+                    0 0 50px rgba(0,204,102,0.3),
+                    inset 0 0 10px rgba(0,255,136,0.04);
+                text-shadow: 0 0 8px var(--neon-green);
+            }
+            50% {
+                box-shadow:
+                    0 0 18px var(--neon-green),
+                    0 0 40px var(--deep-green),
+                    0 0 90px rgba(0,204,102,0.4),
+                    inset 0 0 18px rgba(0,255,136,0.07);
+                text-shadow: 0 0 14px var(--neon-green), 0 0 28px var(--deep-green);
+            }
+        }
+
+        /* ── Download dropdown ───────────────────────────────── */
+        .dl-toggle {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+        }
+        .dl-toggle:focus-visible {
+            outline: 2px solid var(--neon-green);
+            outline-offset: 3px;
+        }
+        .dl-dropdown.open .dl-toggle { animation: none; }
+        .dl-arrow {
+            font-size: 0.7em;
+            display: inline-block;
+            transition: transform 0.22s ease;
+            margin-left: 4px;
+        }
+        .dl-dropdown.open .dl-arrow { transform: rotate(180deg); }
+        .dl-panel {
+            visibility: hidden;
+            pointer-events: none;
+            opacity: 0;
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px);
+            width: 280px;
+            max-width: calc(100vw - 32px);
+            background: rgba(6,14,8,0.98);
+            border: 1px solid var(--border-hi);
+            backdrop-filter: blur(14px);
+            z-index: 50;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+        }
+        .dl-dropdown.open .dl-panel {
+            visibility: visible;
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
+        }
+        .dl-dropdown { display: inline-block; position: relative; }
+        .dl-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .dl-option:last-child { border-bottom: none; }
+        .dl-option svg { flex-shrink: 0; }
+        .dl-play   { color: var(--neon-green); }
+        .dl-ag     { color: var(--neon-blue); }
+        .dl-fdroid { color: var(--copper); }
+        .dl-play:hover   { background: rgba(0,255,136,0.08);  text-shadow: 0 0 8px var(--neon-green); }
+        .dl-ag:hover     { background: rgba(0,212,255,0.08);  text-shadow: 0 0 8px var(--neon-blue); }
+        .dl-fdroid:hover { background: rgba(200,124,48,0.10); text-shadow: 0 0 8px var(--copper); }
+
+        /* ── Section layout ──────────────────────────────────── */
+        section {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 56px 24px;
+        }
+        section h2 {
+            font-family: var(--font-display);
+            text-align: center;
+            font-size: 1.7em;
+            letter-spacing: 0.08em;
+            margin-bottom: 48px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 6px rgba(0,212,255,0.5);
+        }
+
+        /* ── Feature cards ───────────────────────────────────── */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 26px 24px;
+            clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+            position: relative;
+            transition: border-color 0.25s;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--neon-green), var(--neon-blue));
+            opacity: 0.35;
+            transition: opacity 0.25s;
+        }
+        .feature-card:hover { border-color: var(--border-hi); }
+        .feature-card:hover::before { opacity: 0.8; }
+        .feature-icon {
+            font-size: 1.8em;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 6px rgba(0,255,136,0.5));
+        }
+        .feature-card h3 {
+            font-family: var(--font-mono);
+            font-size: 0.95em;
+            letter-spacing: 0.07em;
+            margin-bottom: 10px;
+            color: var(--neon-green);
+            text-shadow: 0 0 6px rgba(0,255,136,0.4);
+        }
+        .feature-card p {
+            font-size: 0.88em;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        /* ── Security block ──────────────────────────────────── */
+        .security-block {
+            border: 1px solid var(--border);
+            padding: 52px 40px;
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto;
+            position: relative;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            background: linear-gradient(135deg, rgba(0,255,136,0.03), rgba(0,212,255,0.03));
+        }
+        .security-block::before, .security-block::after {
+            content: '◈';
+            position: absolute;
+            color: var(--copper);
+            font-size: 0.9em;
+            opacity: 0.6;
+        }
+        .security-block::before { top: 10px; left: 14px; }
+        .security-block::after  { bottom: 10px; right: 14px; }
+        .security-block h2 { margin-bottom: 16px; }
+        .security-block > p { color: var(--muted); max-width: 500px; margin: 0 auto 24px; }
+        .security-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* ── Ko-fi tip section ───────────────────────────────── */
+        .tip-section {
+            text-align: center;
+            padding: 48px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .tip-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+            color: var(--copper);
+            text-shadow: 0 0 6px rgba(200,124,48,0.5);
+        }
+        .tip-section p {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-bottom: 28px;
+        }
+
+        /* ── Footer ──────────────────────────────────────────── */
+        footer {
+            border-top: 1px solid var(--border);
+            text-align: center;
+            padding: 30px 24px;
+            color: var(--muted);
+            font-size: 0.85em;
+            letter-spacing: 0.04em;
+        }
+        footer a { color: var(--muted); }
+        footer a:hover { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
+
+        /* ── Language switcher ───────────────────────────────── */
+        .lang-switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .lang-current {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            cursor: default;
+            user-select: none;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .lang-switcher:hover .lang-current {
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(3,10,5,0.97);
+            border: 1px solid var(--border);
+            min-width: 130px;
+            z-index: 200;
+            padding: 10px 0 4px;
+            backdrop-filter: blur(10px);
+        }
+        .lang-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 0;
+            right: 0;
+            height: 6px;
+        }
+        .lang-switcher:hover .lang-dropdown { display: block; }
+        .lang-dropdown a {
+            display: block;
+            padding: 7px 14px;
+            font-size: 0.83em;
+            letter-spacing: 0.03em;
+            color: var(--muted);
+            transition: color 0.15s, background 0.15s;
+        }
+        .lang-dropdown a:hover {
+            color: var(--neon-green);
+            background: rgba(0,255,136,0.05);
+            text-shadow: none;
+        }
+
+        /* ── Hamburger ───────────────────────────────────────── */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-left: auto;
+        }
+        .nav-hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--muted);
+            font-size: 1.5em;
+            line-height: 1;
+        }
+        .nav-hamburger:hover { color: var(--neon-blue); }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        @media (max-width: 600px) {
+            nav { padding: 12px 16px; flex-wrap: wrap; }
+            .nav-hamburger { display: block; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                gap: 16px;
+                width: 100%;
+                padding: 16px 0 8px;
+                border-top: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+            .hero h1 { font-size: 2.4em; }
+            .cta-btn { font-size: 1.05em; padding: 15px 28px; }
+            .security-block { padding: 32px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+    <a class="nav-brand" href="index.html">
+        <img src="../logo.png" alt="SSHBorg logo">
+        SSHBorg
+    </a>
+    <div class="nav-links">
+        <a href="#features">Возможности</a>
+        <a href="#security">Безопасность</a>
+        <a href="docs.html">Руководство</a>
+        <a href="https://github.com/payne1982/sshborg/issues">Поддержка</a>
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">Политика конфиденциальности</a>
+        <a href="#tip">Поддержать</a>
+        <a href="mailto:massimiliano.playdev AT gmail.com">Контакты</a>
+    </div>
+    <div class="nav-right">
+        <div class="lang-switcher">
+        <span class="lang-current">RU &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="../index.html">English</a>
+            <a href="../it/index.html">Italiano</a>
+            <a href="../de/index.html">Deutsch</a>
+            <a href="../es/index.html">Español</a>
+            <a href="../fr/index.html">Français</a>
+            <a href="../pt/index.html">Português</a>
+            <a href="../uk/index.html">Українська</a>
+            <a href="../zh/index.html">中文</a>
+            <a href="../ja/index.html">日本語</a>
+        </div>
+    </div>
+        <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-logo-wrap">
+        <img class="hero-logo" src="../logo.png" alt="SSHBorg">
+    </div>
+    <div class="hero-boot">
+        <span class="prompt">&gt; </span>INITIALIZING SSHBORG<span class="ok"> [OK]</span><br>
+        <span class="prompt">&gt; </span>LOADING SECURE PROTOCOLS<span class="ok"> [OK]</span><br>
+        <span class="prompt">&gt; </span>TUNNEL READY<span class="ok"> ████████ 100%</span>
+    </div>
+    <h1>SSHBorg</h1>
+    <p class="hero-sub">Мощный SSH и SFTP клиент для Android.<br>Безопасно управляйте своими серверами прямо с телефона.</p>
+    <div class="hero-badges">
+        <span class="badge badge-green">&#10003; Без рекламы</span>
+        <span class="badge badge-green">&#10003; Без слежки</span>
+        <span class="badge badge-green">&#10003; Без облака</span>
+        <span class="badge badge-blue">Бесплатно</span>
+        <span class="badge badge-blue">Android 10+</span>
+    </div>
+    <div class="cta-wrap">
+        <div class="dl-dropdown" id="dlDropdown">
+            <button class="cta-btn dl-toggle"
+                    onclick="toggleDl()"
+                    aria-expanded="false"
+                    aria-controls="dlPanel">
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                СКАЧАТЬ
+                <span class="dl-arrow">&#9660;</span>
+            </button>
+            <div class="dl-panel" id="dlPanel" role="menu" aria-label="СКАЧАТЬ">
+                <a class="dl-option dl-play"
+                   href="https://play.google.com/store/apps/details?id=com.sshborg"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
+                    </svg>
+                    <span>Google Play</span>
+                </a>
+                <a class="dl-option dl-ag"
+                   href="https://appgallery.huawei.com/app/C117647135"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.6c4.634 0 8.4 3.766 8.4 8.4 0 4.634-3.766 8.4-8.4 8.4-4.634 0-8.4-3.766-8.4-8.4 0-4.634 3.766-8.4 8.4-8.4zM8.4 7.1 5.9 11.43 3.4 7.1H1.8l3.2 5.4-3.2 5.4H3.4l2.5-4.33 2.5 4.33h1.6l-3.2-5.4 3.2-5.4H8.4zm7.45.08c-2.42 0-3.85 1.78-3.85 4.04 0 2.74 1.46 4.58 4.1 4.58 1.21 0 2.18-.41 2.92-1.21l-1.05-1.13c-.41.49-.97.74-1.62.74-1.13 0-1.86-.73-2.01-1.86h4.93v-.64c0-2.5-1.37-4.52-3.38-4.52h-.04zm.08 1.46c.97 0 1.62.65 1.7 1.78h-3.47c.08-1.05.73-1.78 1.77-1.78z"/>
+                    </svg>
+                    <span>AppGallery</span>
+                </a>
+                <a class="dl-option dl-fdroid"
+                   href="https://f-droid.org/en/packages/com.sshborg/"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.43-.65-3.05-1.01-4.77-1.01s-3.34.36-4.77 1.01L4.89 5.67c-.19-.29-.54-.37-.83-.22-.3.16-.42.54-.26.85L5.64 9.48A10.78 10.78 0 0 0 1 18h22a10.78 10.78 0 0 0-4.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25S8.25 13.31 8.25 14 7.69 15.25 7 15.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/>
+                    </svg>
+                    <span>F-Droid</span>
+                </a>
+            </div>
+        </div>
+        <div style="margin-top:20px">
+            <a class="kofi-btn" href="https://ko-fi.com/R5R21XLAV5" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+                <span>Оставить чаевые</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<section id="features">
+    <h2>// ВОЗМОЖНОСТИ СИСТЕМЫ</h2>
+    <div class="features">
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128187;</div>
+            <h3>ПОЛНОЦЕННЫЙ SSH-ТЕРМИНАЛ</h3>
+            <p>Интерактивный терминал с эмуляцией VT100/xterm, полной поддержкой UTF-8 и несколькими одновременными сессиями.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128193;</div>
+            <h3>ФАЙЛОВЫЙ МЕНЕДЖЕР SFTP</h3>
+            <p>Просматривайте, отправляйте, скачивайте, переименовывайте и удаляйте файлы на своих серверах с помощью удобного файлового менеджера.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128273;</div>
+            <h3>АУТЕНТИФИКАЦИЯ ПО SSH-КЛЮЧУ</h3>
+            <p>Генерируйте ключи Ed25519, ECDSA и RSA прямо на своём устройстве. Пароли не нужны.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128268;</div>
+            <h3>ПОДДЕРЖКА JUMP HOST</h3>
+            <p>Подключайтесь через один или несколько промежуточных серверов с прозрачным туннелированием. Полная поддержка проброса SSH-агента.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128274;</div>
+            <h3>БИОМЕТРИЧЕСКАЯ БЛОКИРОВКА</h3>
+            <p>Защитите доступ к своим серверам отпечатком пальца или распознаванием лица. Настраиваемый тайм-аут.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#127760;</div>
+            <h3>МНОГОЯЗЫЧНОСТЬ</h3>
+            <p>Доступен на английском, итальянском, французском, немецком, испанском, португальском, украинском, русском, китайском и японском языках.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#127763;</div>
+            <h3>ТЁМНАЯ И СВЕТЛАЯ ТЕМЫ</h3>
+            <p>Следует системной теме или на ваш выбор. Отлично читается при любом освещении.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#9889;</div>
+            <h3>НЕСКОЛЬКО СЕССИЙ</h3>
+            <p>Держите несколько SSH и SFTP сессий открытыми одновременно. Мгновенно переключайтесь между ними.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Security -->
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<section id="security">
+    <div class="security-block">
+        <h2>// КОНФИДЕНЦИАЛЬНОСТЬ ПО УМОЛЧАНИЮ</h2>
+        <p>SSHBorg никогда не собирает ваши данные. Всё остаётся на вашем устройстве — учётные данные, ключи, подключения.</p>
+        <div class="security-list">
+            <span class="badge badge-green">Шифрование Android Keystore</span>
+            <span class="badge badge-green">Без аналитики</span>
+            <span class="badge badge-green">Без сторонних SDK</span>
+            <span class="badge badge-green">Защита от скриншотов</span>
+            <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener"><span class="badge badge-green">Открытый исходный код — GPL v3</span></a>
+        </div>
+        <p style="margin-top:28px;">
+            <a href="../privacy_policy.html" target="_blank" rel="noopener">Читать полную Политику конфиденциальности &rarr;</a>
+        </p>
+    </div>
+</section>
+
+<!-- Tip -->
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<div class="tip-section" id="tip">
+    <h2>// ПОДДЕРЖАТЬ ПРОЕКТ</h2>
+    <p>SSHBorg бесплатен, без рекламы и слежки. Если он экономит вам время, небольшая поддержка поможет ему развиваться.</p>
+    <a class="kofi-btn" href="https://ko-fi.com/R5R21XLAV5" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+        <span>Поддержать меня на Ko-fi</span>
+    </a>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>
+        &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">Политика конфиденциальности</a> &nbsp;&#9135;&nbsp;
+        <a href="https://github.com/payne1982/sshborg/issues">Issues и обратная связь</a> &nbsp;&#9135;&nbsp;
+        <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Исходный код</a> &nbsp;&#9135;&nbsp;
+        <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
+    </p>
+    <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
+        SSH-подключение работает на <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a>
+    </p>
+</footer>
+
+<script>
+function toggleDl() {
+    var dd = document.getElementById('dlDropdown');
+    var btn = dd.querySelector('.dl-toggle');
+    var open = dd.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+document.addEventListener('click', function(e) {
+    var dd = document.getElementById('dlDropdown');
+    if (dd && !dd.contains(e.target) && dd.classList.contains('open')) {
+        dd.classList.remove('open');
+        dd.querySelector('.dl-toggle').setAttribute('aria-expanded', 'false');
+    }
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        var dd = document.getElementById('dlDropdown');
+        if (dd && dd.classList.contains('open')) {
+            dd.classList.remove('open');
+            dd.querySelector('.dl-toggle').setAttribute('aria-expanded', 'false');
+            dd.querySelector('.dl-toggle').focus();
+        }
+    }
+});
+</script>
+</body>
+</html>

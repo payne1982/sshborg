@@ -12,7 +12,6 @@
     <string name="action_edit">Bearbeiten</string>
     <string name="action_back">Zurück</string>
     <string name="action_connect">Verbinden</string>
-    <string name="action_disconnect">Trennen</string>
     <string name="action_close">Schließen</string>
     <string name="action_done">Fertig</string>
     <string name="action_rename">Umbenennen</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">Kopiert!</string>
     <string name="action_show">Anzeigen</string>
     <string name="action_hide">Ausblenden</string>
-    <string name="action_refresh">Aktualisieren</string>
     <string name="action_trust">Vertrauen</string>
     <string name="action_reject">Ablehnen</string>
     <string name="action_go_back">Zurück</string>
-    <string name="action_back_to_hosts">Zurück zu Hosts</string>
     <string name="action_overwrite">Überschreiben</string>
     <string name="action_keep_both">Beide behalten</string>
     <string name="action_i_understand">Ich verstehe</string>
@@ -108,6 +105,9 @@
     <string name="host_start_mode_fixed">Festes Verzeichnis</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Startverzeichnis</string>
+    <string name="host_reset_host_keys">Akzeptierte Hostschlüssel zurücksetzen</string>
+    <string name="host_reset_host_keys_pending">Schlüssel werden beim Speichern zurückgesetzt</string>
+    <string name="host_reset_host_keys_hint">Verwirft den gespeicherten Hostschlüssel und zwischengespeicherte Jump-Host-Schlüssel. Bei der nächsten Verbindung wird der Server erneut überprüft.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-Schlüssel</string>
@@ -152,6 +152,11 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_double_tap_title">Doppeltipp-Aktion</string>
+    <string name="settings_double_tap_subtitle">Was ein Doppeltippen im Terminal an die Shell sendet</string>
+    <string name="settings_double_tap_none">Nichts</string>
+    <string name="settings_double_tap_tab">Tab senden</string>
+    <string name="settings_double_tap_tab_twice">Tab zweimal senden</string>
     <string name="settings_keep_screen_on_title">Bildschirm eingeschaltet lassen</string>
     <string name="settings_keep_screen_on_subtitle">Verhindert das Ausschalten des Bildschirms, solange ein Terminal geöffnet ist</string>
     <string name="settings_terminal_colors_title">Terminalfarben</string>
@@ -160,7 +165,6 @@
     <string name="settings_font_size_subtitle">Standard-Textgröße des Terminals (sp); Zoomen per Fingergeste in der Sitzung</string>
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>
     <string name="settings_scrollback_subtitle">Im Speicher gehaltene Zeilen der Terminal-Historie</string>
-    <string name="settings_scrollback_lines">%d Zeilen</string>
     <string name="settings_history_suggestions_title">Befehlshistorie-Vorschläge</string>
     <string name="settings_history_suggestions_subtitle">Vorschläge aus der Shell-Historie des Servers beim Tippen im Terminal anzeigen</string>
     <string name="settings_suggestions_bar_sticky_title">Vorschlagsleiste immer sichtbar</string>
@@ -210,9 +214,7 @@
     <string name="sftp_download_cd">Herunterladen</string>
     <string name="sftp_empty_directory">Leeres Verzeichnis</string>
     <string name="sftp_disconnected">Getrennt</string>
-    <string name="sftp_go_back">Zurück</string>
 
-    <string name="sftp_downloading">%1$s wird heruntergeladen</string>
     <string name="sftp_downloading_label">Herunterladen:</string>
     <string name="sftp_uploading">%1$s wird hochgeladen</string>
     <string name="sftp_saved_to_downloads">Gespeichert: %1$s</string>
@@ -298,7 +300,6 @@
     <string name="error_host_not_found">Host nicht gefunden</string>
     <string name="error_connection_failed">Verbindung fehlgeschlagen</string>
     <string name="error_cannot_list_directory">Verzeichnis kann nicht aufgelistet werden</string>
-    <string name="error_cannot_create_file">Datei kann nicht in Downloads erstellt werden</string>
     <string name="error_download_failed">Download fehlgeschlagen</string>
     <string name="error_upload_failed">Upload fehlgeschlagen</string>
     <string name="error_delete_failed">Löschen fehlgeschlagen</string>
@@ -307,11 +308,11 @@
     <string name="error_refresh_failed">Aktualisierung fehlgeschlagen</string>
     <string name="error_encryption_failed">Verschlüsselung fehlgeschlagen</string>
     <string name="error_decryption_failed">Entschlüsselung fehlgeschlagen</string>
-    <string name="settings_backup_export_title">Hosts exportieren</string>
-    <string name="settings_backup_export_subtitle">Host-Konfigurationen in eine JSON-Datei speichern. Passwörter und Schlüssel sind nicht enthalten.</string>
+    <string name="settings_backup_export_title">Backup exportieren</string>
+    <string name="settings_backup_export_subtitle">Host-Konfigurationen und App-Einstellungen in eine JSON-Datei speichern. Passwörter und Schlüssel sind nicht enthalten.</string>
     <string name="settings_backup_export_action">Exportieren</string>
-    <string name="settings_backup_import_title">Hosts importieren</string>
-    <string name="settings_backup_import_subtitle">Host-Konfigurationen aus einer JSON-Datei laden. Vorhandene Hosts mit demselben Namen werden aktualisiert; Passwörter und Schlüssel werden nicht importiert.</string>
+    <string name="settings_backup_import_title">Backup importieren</string>
+    <string name="settings_backup_import_subtitle">Host-Konfigurationen und App-Einstellungen aus einer JSON-Datei laden. Vorhandene Hosts mit demselben Namen werden aktualisiert; Passwörter und Schlüssel werden nicht importiert.</string>
     <string name="settings_backup_import_action">Importieren</string>
     <string name="backup_export_success">%1$d Hosts exportiert</string>
     <string name="backup_import_success">%1$d importiert, %2$d aktualisiert</string>

@@ -12,7 +12,6 @@
     <string name="action_edit">Редагувати</string>
     <string name="action_back">Назад</string>
     <string name="action_connect">Підключитися</string>
-    <string name="action_disconnect">Відключитися</string>
     <string name="action_close">Закрити</string>
     <string name="action_done">Готово</string>
     <string name="action_rename">Перейменувати</string>
@@ -23,11 +22,9 @@
     <string name="action_copied">Скопійовано!</string>
     <string name="action_show">Показати</string>
     <string name="action_hide">Приховати</string>
-    <string name="action_refresh">Оновити</string>
     <string name="action_trust">Довіряти</string>
     <string name="action_reject">Відхилити</string>
     <string name="action_go_back">Назад</string>
-    <string name="action_back_to_hosts">Назад до хостів</string>
     <string name="action_overwrite">Перезаписати</string>
     <string name="action_keep_both">Зберегти обидва</string>
     <string name="action_i_understand">Зрозуміло</string>
@@ -89,7 +86,7 @@
     <string name="host_key_change">Змінити</string>
     <string name="host_key_no_keys">Немає ключів – спочатку додайте один</string>
     <string name="host_agent_forwarding">Пересилання агента</string>
-    <string name="host_allow_legacy_ciphers">Застарілі шифри</string>
+    <string name="host_allow_legacy_ciphers">Дозволити застарілі шифри</string>
     <string name="host_section_jump_hosts">Проміжні хости</string>
     <string name="host_field_jump_hosts">Проміжні хости (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
@@ -97,7 +94,7 @@
     <string name="host_jump_mode_simple">Простий</string>
     <string name="host_jump_mode_host_list">Список хостів</string>
     <string name="host_jump_select_placeholder">Оберіть хост…</string>
-    <string name="host_jump_add">Додати jump host</string>
+    <string name="host_jump_add">Додати проміжний хост</string>
     <string name="host_jump_no_password">Пароль не збережено</string>
     <string name="host_section_port_forwarding">Переадресація портів</string>
     <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
@@ -106,8 +103,11 @@
     <string name="host_section_start_directory">SFTP: Початковий каталог</string>
     <string name="host_start_mode_last">Остання відвідана папка</string>
     <string name="host_start_mode_fixed">Фіксована папка</string>
-    <string name="host_start_mode_home">Home</string>
+    <string name="host_start_mode_home">Домашня папка</string>
     <string name="host_field_start_directory">Початковий каталог</string>
+    <string name="host_reset_host_keys">Скинути прийняті ключі хостів</string>
+    <string name="host_reset_host_keys_pending">Ключі буде скинуто під час збереження</string>
+    <string name="host_reset_host_keys_hint">Забуває збережений ключ хоста та кешовані ключі проміжних хостів. Наступне зʼєднання знову перевірить сервер.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-ключі</string>
@@ -152,6 +152,11 @@
 
     <string name="settings_invert_scroll_title">Інвертувати прокручування терміналу</string>
     <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити старіший вивід</string>
+    <string name="settings_double_tap_title">Дія подвійного дотику</string>
+    <string name="settings_double_tap_subtitle">Що подвійний дотик до термінала надсилає в оболонку</string>
+    <string name="settings_double_tap_none">Нічого</string>
+    <string name="settings_double_tap_tab">Надіслати Tab</string>
+    <string name="settings_double_tap_tab_twice">Надіслати Tab двічі</string>
     <string name="settings_keep_screen_on_title">Не вимикати екран</string>
     <string name="settings_keep_screen_on_subtitle">Запобігає вимкненню екрана, поки відкрито термінал</string>
     <string name="settings_terminal_colors_title">Кольори термінала</string>
@@ -160,7 +165,6 @@
     <string name="settings_font_size_subtitle">Типовий розмір тексту термінала (sp); жест масштабування діє в сеансі</string>
     <string name="settings_scrollback_title">Рядки прокрутки</string>
     <string name="settings_scrollback_subtitle">Рядки історії терміналу, що зберігаються в пам\'яті</string>
-    <string name="settings_scrollback_lines">%d рядків</string>
     <string name="settings_history_suggestions_title">Підказки з історії команд</string>
     <string name="settings_history_suggestions_subtitle">Показувати підказки з історії shell сервера під час введення в терміналі</string>
     <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>
@@ -210,9 +214,7 @@
     <string name="sftp_download_cd">Завантажити</string>
     <string name="sftp_empty_directory">Порожня директорія</string>
     <string name="sftp_disconnected">Відключено</string>
-    <string name="sftp_go_back">Назад</string>
 
-    <string name="sftp_downloading">Завантаження %1$s</string>
     <string name="sftp_downloading_label">Завантаження:</string>
     <string name="sftp_uploading">Вивантаження %1$s</string>
     <string name="sftp_saved_to_downloads">Збережено: %1$s</string>
@@ -298,7 +300,6 @@
     <string name="error_host_not_found">Хост не знайдено</string>
     <string name="error_connection_failed">Не вдалося підключитися</string>
     <string name="error_cannot_list_directory">Неможливо відобразити вміст директорії</string>
-    <string name="error_cannot_create_file">Неможливо створити файл у Завантаженнях</string>
     <string name="error_download_failed">Помилка завантаження</string>
     <string name="error_upload_failed">Помилка вивантаження</string>
     <string name="error_delete_failed">Помилка видалення</string>
@@ -307,11 +308,11 @@
     <string name="error_refresh_failed">Помилка оновлення</string>
     <string name="error_encryption_failed">Помилка шифрування</string>
     <string name="error_decryption_failed">Помилка розшифрування</string>
-    <string name="settings_backup_export_title">Експортувати хости</string>
-    <string name="settings_backup_export_subtitle">Зберегти конфігурації хостів у файл JSON. Паролі та ключі не включені.</string>
+    <string name="settings_backup_export_title">Експортувати резервну копію</string>
+    <string name="settings_backup_export_subtitle">Зберегти конфігурації хостів і налаштування застосунку у файл JSON. Паролі та ключі не включені.</string>
     <string name="settings_backup_export_action">Експорт</string>
-    <string name="settings_backup_import_title">Імпортувати хости</string>
-    <string name="settings_backup_import_subtitle">Завантажити конфігурації хостів із файлу JSON. Наявні хости з такою самою назвою будуть оновлені; паролі та ключі не будуть імпортовані.</string>
+    <string name="settings_backup_import_title">Імпортувати резервну копію</string>
+    <string name="settings_backup_import_subtitle">Завантажити конфігурації хостів і налаштування застосунку із файлу JSON. Наявні хости з такою самою назвою будуть оновлені; паролі та ключі не будуть імпортовані.</string>
     <string name="settings_backup_import_action">Імпорт</string>
     <string name="backup_export_success">Експортовано %1$d хостів</string>
     <string name="backup_import_success">Імпортовано %1$d, оновлено %2$d хостів</string>
@@ -337,7 +338,7 @@
         <item quantity="one">%d активна сесія</item>
         <item quantity="few">%d активні сесії</item>
         <item quantity="many">%d активних сесій</item>
-        <item quantity="other">%d активної сесії</item>
+        <item quantity="other">%d активних сесій</item>
     </plurals>
     <plurals name="notification_bg_downloads">
         <item quantity="one">%d файл завантажується</item>

@@ -55,6 +55,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /** Optional per-host ARGB color; overrides the group color. */
     var hostColor = MutableStateFlow<Int?>(null)
 
+    /** When true, the saved host key and cached jump-host keys are cleared on save. */
+    var resetHostKeys = MutableStateFlow(false)
+
+    private val _hasStoredHostKeys = MutableStateFlow(false)
+    /** True when the edited host has a pinned host key or cached jump-host keys to reset. */
+    val hasStoredHostKeys: StateFlow<Boolean> = _hasStoredHostKeys
+
     private val _editingId = MutableStateFlow<Long?>(null)
 
     /** All hosts except the one being edited, annotated with whether they can be used as jump hosts. */
@@ -108,6 +115,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             allowLegacyCiphers.value = h.allowLegacyCiphers
             groupId.value = h.groupId
             hostColor.value = h.color
+            _hasStoredHostKeys.value = h.knownHostsEntry != null || h.jumpHostKeys != null
+            resetHostKeys.value = false
         }
     }
 
@@ -134,11 +143,19 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             jumpHosts.value.trim().takeIf { it.isNotEmpty() }
         } else null
 
-        // Preserve cached jump-host keys only when the jump-hosts string is unchanged (simple mode).
         val existing = editingId?.let { hostDao.getById(it) }
-        val preservedJumpHostKeys = if (currentMode == "simple" && existing?.jumpHosts == newJumpHosts) {
-            existing?.jumpHostKeys
-        } else null
+        val newHostname = hostname.value.trim()
+        val newPort = port.value.toIntOrNull() ?: 22
+        val reset = resetHostKeys.value
+
+        // A pinned host key is a TOFU anchor bound to a specific endpoint. Keep it only
+        // when the endpoint is unchanged (and the user hasn't asked for a reset); if the
+        // host was repointed, drop it so the next connection re-verifies. Cached jump-host
+        // keys follow the same rule against the jump-hosts string (simple mode).
+        val preservedKnownHosts = if (!reset && existing != null &&
+            existing.hostname == newHostname && existing.port == newPort) existing.knownHostsEntry else null
+        val preservedJumpHostKeys = if (!reset && currentMode == "simple" &&
+            existing?.jumpHosts == newJumpHosts) existing?.jumpHostKeys else null
 
         val newSftpStartDir = when (sftpStartMode.value) {
             "home"  -> null
@@ -148,13 +165,14 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
 
         val entity = HostEntity(
             id               = editingId ?: 0,
-            label            = label.value.ifBlank { hostname.value },
-            hostname         = hostname.value.trim(),
-            port             = port.value.toIntOrNull() ?: 22,
+            label            = label.value.ifBlank { newHostname },
+            hostname         = newHostname,
+            port             = newPort,
             username         = username.value.trim(),
             password         = plainPwd,
             encryptedPassword = encryptedPwd,
             keyId            = if (useKey.value) selectedKeyId.value else null,
+            knownHostsEntry  = preservedKnownHosts,
             agentForwarding  = agentForwarding.value,
             jumpHosts        = newJumpHosts,
             jumpHostKeys     = preservedJumpHostKeys,

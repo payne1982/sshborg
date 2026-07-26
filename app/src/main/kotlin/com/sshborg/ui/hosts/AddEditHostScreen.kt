@@ -59,6 +59,8 @@ fun AddEditHostScreen(
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
     val hostColor by vm.hostColor.collectAsState()
+    val hasStoredHostKeys by vm.hasStoredHostKeys.collectAsState()
+    val resetHostKeys by vm.resetHostKeys.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var keyMenuExpanded by remember { mutableStateOf(false) }
@@ -400,6 +402,28 @@ fun AddEditHostScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             )
+
+            if (hasStoredHostKeys) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { vm.resetHostKeys.value = !resetHostKeys },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text(stringResource(
+                        if (resetHostKeys) R.string.host_reset_host_keys_pending
+                        else R.string.host_reset_host_keys,
+                    ))
+                }
+                Text(
+                    stringResource(R.string.host_reset_host_keys_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                )
+            }
 
             Spacer(Modifier.height(8.dp))
 

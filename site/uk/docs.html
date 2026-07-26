@@ -16,6 +16,7 @@
     <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/docs.html">
     <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/docs.html">
     <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/docs.html">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/docs.html">
     <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/docs.html">
     <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/docs.html">
     <link rel="alternate" hreflang="x-default" href="https://sshborg.com/docs.html">
@@ -45,9 +46,7 @@
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
     }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Mono+Single&family=Workbench&family=Electrolize:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -65,7 +64,7 @@
             --text:        #a8d4b4;
             --muted:       #4a7058;
             --font-display:'Workbench', sans-serif;
-            --font-mono:   'Bitcount Mono Single', monospace;
+            --font-mono:   'Bitcount Grid Single', monospace;
             --font-body:   'Electrolize', sans-serif;
         }
 
@@ -461,12 +460,12 @@
 
 <!-- Nav -->
 <nav>
-    <a class="nav-brand" href="../index.html">
+    <a class="nav-brand" href="index.html">
         <img src="../logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
-        <a href="../index.html">Головна</a>
+        <a href="index.html">Головна</a>
         <a href="#adding-host">Початок роботи</a>
         <a href="#sftp">SFTP</a>
         <a href="#ssh-keys">SSH ключі</a>
@@ -485,6 +484,7 @@
             <a href="../es/docs.html">Español</a>
             <a href="../fr/docs.html">Français</a>
             <a href="../pt/docs.html">Português</a>
+            <a href="../ru/docs.html">Русский</a>
             <a href="../zh/docs.html">中文</a>
             <a href="../ja/docs.html">日本語</a>
         </div>
@@ -701,6 +701,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Не вимикати екран</strong> — запобігає вимкненню екрана, поки відкрито термінал. Зручно під час перегляду логів чи тривалих команд. Типово вимкнено.</li>
                 <li><strong>Типовий розмір шрифту</strong> — розмір тексту, з яким починаються нові сеанси; масштабування жестом у кожному сеансі працює як і раніше.</li>
                 <li><strong>Буфер прокручування</strong>, <strong>інвертоване прокручування</strong> та <strong>підказки команд</strong> — визначають, скільки історії виводу зберігається, напрям прокручування та панель підказок, описану вище.</li>
+                <li><strong>Дія подвійного дотику</strong> — за бажанням подвійний дотик до термінала надсилає <em>Tab</em> (автодоповнення) або <em>Tab</em> двічі (перелічує всі варіанти). Типово вимкнено.</li>
             </ul>
         </div>
 
@@ -917,24 +918,25 @@ Host target
         <div class="doc-section" id="backup">
 
             <h2>// РЕЗЕРВНЕ КОПІЮВАННЯ КОНФІГУРАЦІЇ</h2>
-            <p>SSHBorg може експортувати та імпортувати конфігурації хостів у форматі JSON. Це дозволяє перенести список серверів на інший пристрій або зберегти портативну резервну копію налаштувань.</p>
+            <p>SSHBorg може експортувати та імпортувати конфігурації хостів і налаштування застосунку у форматі JSON. Це дозволяє перенести список серверів на інший пристрій або зберегти портативну резервну копію налаштувань.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// ВАЖЛИВО</div>
-                Резервна копія включає лише конфігурації хостів (адреса, порт, ім'я користувача, налаштування). <strong>Паролі та SSH-ключі ніколи не експортуються</strong> — їх необхідно налаштувати заново після імпорту на новому пристрої.
+                Резервна копія включає конфігурації хостів і налаштування застосунку (термінал, вигляд, поведінка). <strong>Паролі та SSH-ключі ніколи не експортуються</strong> — їх необхідно налаштувати заново після імпорту на новому пристрої.
             </div>
             <h3>Експорт</h3>
-            <p>Перейдіть до <strong>Налаштування → Резервна копія → Експортувати хости</strong>. Виберіть місце збереження файлу за допомогою системного вибору файлів. За замовчуванням файл називається <code>sshborg_hosts.json</code>.</p>
+            <p>Перейдіть до <strong>Налаштування → Резервна копія → Експортувати резервну копію</strong>. Виберіть місце збереження файлу за допомогою системного вибору файлів. За замовчуванням файл називається <code>sshborg_backup.json</code>.</p>
             <h3>Імпорт</h3>
-            <p>Перейдіть до <strong>Налаштування → Резервна копія → Імпортувати хости</strong>. Виберіть файл <code>.json</code>, попередньо експортований (або створений вручну). SSHBorg об'єднає його з наявним списком хостів:</p>
+            <p>Перейдіть до <strong>Налаштування → Резервна копія → Імпортувати резервну копію</strong>. Виберіть файл <code>.json</code>, попередньо експортований (або створений вручну). SSHBorg об'єднає його з наявним списком хостів:</p>
             <ul>
                 <li>Хости, <strong>назва</strong> яких збігається з наявним записом, <strong>оновлюються</strong>.</li>
                 <li>Хости з новою назвою <strong>додаються</strong>.</li>
                 <li>Хости, відсутні у файлі, залишаються <strong>без змін</strong>.</li>
-            </ul>
+                <li>Оновлений хост зберігає збережені пароль, ключ і прийнятий ключ хоста — резервна копія їх ніколи не містить.</li>
+</ul>
             <h3>Формат JSON</h3>
             <p>Експортований файл є звичайним об'єктом JSON. Його можна також створити вручну для масового імпорту списку серверів з іншого джерела.</p>
             <pre><code>{
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Продакшн", "color": -1754827 }
@@ -955,8 +957,16 @@ Host target
       "allowLegacyCiphers": false,
       "group":           "Продакшн"
     }
-  ]
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
 }</code></pre>
+            <p>Необов'язковий об'єкт <code>settings</code> містить налаштування застосунку й записується автоматично під час експорту; його можна пропустити, створюючи файл вручну.</p>
             <h3>Довідник полів</h3>
             <ul>
                 <li><code>label</code> — назва, що відображається в SSHBorg. Використовується як унікальний ключ для об'єднання при імпорті. <strong>Обов'язкове.</strong></li>

@@ -37,7 +37,7 @@ module.exports = {
   feat_biometric_title:'BLOQUEO BIOMÉTRICO',
   feat_biometric_desc: 'Protege el acceso a tus servidores con huella dactilar o reconocimiento facial. Tiempo de espera configurable.',
   feat_multilingual_title: 'MULTIIDIOMA',
-  feat_multilingual_desc:  'Disponible en inglés, italiano, francés, alemán, español, portugués, ucraniano, chino y japonés.',
+  feat_multilingual_desc:  'Disponible en inglés, italiano, francés, alemán, español, portugués, ucraniano, ruso, chino y japonés.',
   feat_theme_title:    'TEMA OSCURO Y CLARO',
   feat_theme_desc:     'Sigue el tema del sistema o déjate elegir. Perfectamente legible en cualquier condición de iluminación.',
   feat_sessions_title: 'MÚLTIPLES SESIONES',
@@ -254,6 +254,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Mantener la pantalla encendida</strong> — evita que la pantalla se apague mientras un terminal está abierto. Útil al vigilar logs o comandos de larga duración. Desactivado por defecto.</li>
                 <li><strong>Tamaño de letra predeterminado</strong> — el tamaño del texto con el que arrancan las nuevas sesiones; siempre puedes hacer zoom con dos dedos en cada sesión.</li>
                 <li><strong>Scrollback</strong>, <strong>desplazamiento invertido</strong> y <strong>sugerencias de comandos</strong> — controlan cuánto historial de salida se conserva, la dirección del desplazamiento y la barra de sugerencias descrita más arriba.</li>
+                <li><strong>Acción de doble toque</strong> — si quieres, un doble toque en el terminal envía <em>Tab</em> (autocompletado) o <em>Tab</em> dos veces (lista todos los candidatos). Desactivado de forma predeterminada.</li>
             </ul>`,
 
   doc_extra_keys: `
@@ -454,24 +455,25 @@ Host target
 
   doc_backup: `
             <h2>// COPIA DE SEGURIDAD DE LA CONFIGURACIÓN</h2>
-            <p>SSHBorg puede exportar e importar configuraciones de hosts como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
+            <p>SSHBorg puede exportar e importar configuraciones de hosts y ajustes de la app como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                La copia de seguridad incluye solo las configuraciones de los hosts (dirección, puerto, usuario, ajustes). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
+                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
             </div>
             <h3>Exportar</h3>
-            <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar hosts</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_hosts.json</code> por defecto.</p>
+            <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar copia</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_backup.json</code> por defecto.</p>
             <h3>Importar</h3>
-            <p>Ve a <strong>Ajustes → Copia de seguridad → Importar hosts</strong>. Selecciona el archivo <code>.json</code> exportado previamente (o creado manualmente). SSHBorg lo fusionará con la lista de hosts existente:</p>
+            <p>Ve a <strong>Ajustes → Copia de seguridad → Importar copia</strong>. Selecciona el archivo <code>.json</code> exportado previamente (o creado manualmente). SSHBorg lo fusionará con la lista de hosts existente:</p>
             <ul>
                 <li>Los hosts cuyo <strong>nombre</strong> coincide con una entrada existente se <strong>actualizan</strong>.</li>
                 <li>Los hosts con un nombre nuevo se <strong>añaden</strong>.</li>
                 <li>Los hosts no presentes en el archivo permanecen <strong>sin cambios</strong>.</li>
-            </ul>
+                <li>Un host actualizado conserva su contraseña, clave y clave de host aceptada — la copia nunca las contiene.</li>
+</ul>
             <h3>Formato JSON</h3>
             <p>El archivo exportado es un objeto JSON estándar. También puedes crearlo manualmente para importar en bloque una lista de servidores desde otra fuente.</p>
             <pre><code>{
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Producción", "color": -1754827 }
@@ -492,8 +494,16 @@ Host target
       "allowLegacyCiphers": false,
       "group":           "Producción"
     }
-  ]
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
 }</code></pre>
+            <p>El objeto <code>settings</code> (opcional) contiene los ajustes de la app y se escribe automáticamente al exportar; puedes omitirlo si creas el archivo a mano.</p>
             <h3>Referencia de campos</h3>
             <ul>
                 <li><code>label</code> — nombre mostrado en SSHBorg. Se usa como clave única para la fusión al importar. <strong>Obligatorio.</strong></li>

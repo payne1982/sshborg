@@ -1,0 +1,7 @@
+• L'application est désormais disponible en russe, grâce à une traduction de la communauté
+• Correction d'une fuite mémoire en quittant une session terminal
+• Défilement du terminal plus fluide et réactif
+• Le terminal revient en bas lorsque vous tapez
+• Double appui optionnel pour envoyer Tab (autocomplétion)
+• Les sauvegardes incluent désormais les réglages de l'app
+• Nouvelle option pour réinitialiser la clé acceptée d'un hôte

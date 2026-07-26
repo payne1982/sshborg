@@ -7,7 +7,7 @@ FUNKTIONEN
 • SSH-Schlüssel-Auth — Ed25519-, ECDSA- und RSA-Schlüssel direkt auf deinem Gerät generieren. Kein Passwort erforderlich.
 • Jump-Host-Unterstützung — Verbinde dich über einen oder mehrere Bastion-Hosts mit transparentem Tunneling. Vollständiges SSH-Agent-Forwarding.
 • Biometrische Sperre — Schütze den Zugriff auf deine Server mit Fingerabdruck oder Gesichtserkennung. Konfigurierbares Timeout.
-• Mehrsprachig — Verfügbar in Englisch, Italienisch, Französisch, Deutsch, Spanisch, Portugiesisch, Ukrainisch, Chinesisch und Japanisch.
+• Mehrsprachig — Verfügbar in Englisch, Italienisch, Französisch, Deutsch, Spanisch, Portugiesisch, Ukrainisch, Russisch, Chinesisch und Japanisch.
 • Dunkles & Helles Design — Folgt dem Systemdesign oder lässt dich selbst wählen. In jeder Lichtsituation gut lesbar.
 • Mehrere Sitzungen — Mehrere SSH- und SFTP-Sitzungen gleichzeitig offen halten. Sofort zwischen ihnen wechseln.
 

@@ -9,7 +9,9 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.json.JSONObject
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app_prefs")
 
@@ -28,6 +30,7 @@ class AppPreferences(private val context: Context) {
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
+        val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
@@ -123,6 +126,14 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.TERMINAL_COLOR_SCHEME] = scheme }
     }
 
+    /** What a double-tap on the terminal sends: nothing (default), one Tab, or two Tabs. */
+    val doubleTapAction: Flow<Int> =
+        context.dataStore.data.map { it[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE }
+
+    suspend fun setDoubleTapAction(action: Int) {
+        context.dataStore.edit { it[Keys.DOUBLE_TAP_ACTION] = action }
+    }
+
     companion object {
         const val DEFAULT_TERMINAL_FONT_SIZE = 13
         const val MIN_TERMINAL_FONT_SIZE = 8
@@ -131,6 +142,10 @@ class AppPreferences(private val context: Context) {
         const val TERMINAL_SCHEME_DARK = 0
         const val TERMINAL_SCHEME_LIGHT = 1
         const val TERMINAL_SCHEME_FOLLOW_APP = 2
+
+        const val DOUBLE_TAP_NONE = 0
+        const val DOUBLE_TAP_TAB = 1
+        const val DOUBLE_TAP_TAB_TWICE = 2
     }
 
     /** Whether to show shell history suggestions above the keyboard. Default true. */
@@ -161,5 +176,58 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setPrivacyPolicyAccepted() {
         context.dataStore.edit { it[Keys.PRIVACY_POLICY_ACCEPTED] = true }
+    }
+
+    // ── Settings backup ──────────────────────────────────────────────────────
+    // Only portable UI/terminal preferences are backed up. Deliberately excluded:
+    // biometric_lock and keystore_encryption (security gates tied to this device's
+    // capabilities / actual Keystore crypto state — restoring blindly could lock
+    // the user out or misrepresent whether data is encrypted), and the one-time
+    // acknowledgement flags (root warning, security reminder, privacy consent),
+    // which should re-appear on a fresh install rather than be auto-dismissed.
+
+    /**
+     * Complete snapshot of the backup-eligible preferences as a JSON object.
+     * Every key is always written using the same default the Flow reads fall back
+     * to, so a preference the user never touched (null in DataStore) still lands in
+     * the backup. Otherwise restoring would be non-deterministic — it could only
+     * ever reset the settings the user had already changed. Keep these defaults in
+     * sync with the corresponding Flow getters above.
+     */
+    suspend fun exportSettingsJson(): JSONObject {
+        val p = context.dataStore.data.first()
+        return JSONObject().apply {
+            put("confirm_exit",           p[Keys.CONFIRM_EXIT] ?: false)
+            put("lock_timeout_seconds",   p[Keys.LOCK_TIMEOUT_SECONDS] ?: 60)
+            put("invert_terminal_scroll", p[Keys.INVERT_TERMINAL_SCROLL] ?: false)
+            put("night_mode",             p[Keys.NIGHT_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            put("allow_screenshots",      p[Keys.ALLOW_SCREENSHOTS] ?: false)
+            put("scrollback_lines",       p[Keys.SCROLLBACK_LINES] ?: 2000)
+            put("terminal_font_size",     p[Keys.TERMINAL_FONT_SIZE] ?: DEFAULT_TERMINAL_FONT_SIZE)
+            put("keep_screen_on",         p[Keys.KEEP_SCREEN_ON] ?: false)
+            put("terminal_color_scheme",  p[Keys.TERMINAL_COLOR_SCHEME] ?: TERMINAL_SCHEME_DARK)
+            put("history_suggestions",    p[Keys.HISTORY_SUGGESTIONS] ?: true)
+            put("suggestions_bar_sticky", p[Keys.SUGGESTIONS_BAR_STICKY] ?: false)
+            put("double_tap_action",      p[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE)
+        }
+    }
+
+    /** Applies a settings object produced by [exportSettingsJson]. Missing keys are
+     *  left untouched; bounded values are clamped to guard hand-edited backups. */
+    suspend fun importSettingsJson(obj: JSONObject) {
+        context.dataStore.edit { p ->
+            if (obj.has("confirm_exit"))           p[Keys.CONFIRM_EXIT] = obj.getBoolean("confirm_exit")
+            if (obj.has("lock_timeout_seconds"))   p[Keys.LOCK_TIMEOUT_SECONDS] = obj.getInt("lock_timeout_seconds").coerceAtLeast(0)
+            if (obj.has("invert_terminal_scroll")) p[Keys.INVERT_TERMINAL_SCROLL] = obj.getBoolean("invert_terminal_scroll")
+            if (obj.has("night_mode"))             p[Keys.NIGHT_MODE] = obj.getInt("night_mode")
+            if (obj.has("allow_screenshots"))      p[Keys.ALLOW_SCREENSHOTS] = obj.getBoolean("allow_screenshots")
+            if (obj.has("scrollback_lines"))       p[Keys.SCROLLBACK_LINES] = obj.getInt("scrollback_lines").coerceAtLeast(1)
+            if (obj.has("terminal_font_size"))     p[Keys.TERMINAL_FONT_SIZE] = obj.getInt("terminal_font_size").coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)
+            if (obj.has("keep_screen_on"))         p[Keys.KEEP_SCREEN_ON] = obj.getBoolean("keep_screen_on")
+            if (obj.has("terminal_color_scheme"))  p[Keys.TERMINAL_COLOR_SCHEME] = obj.getInt("terminal_color_scheme").coerceIn(TERMINAL_SCHEME_DARK, TERMINAL_SCHEME_FOLLOW_APP)
+            if (obj.has("history_suggestions"))    p[Keys.HISTORY_SUGGESTIONS] = obj.getBoolean("history_suggestions")
+            if (obj.has("suggestions_bar_sticky")) p[Keys.SUGGESTIONS_BAR_STICKY] = obj.getBoolean("suggestions_bar_sticky")
+            if (obj.has("double_tap_action"))      p[Keys.DOUBLE_TAP_ACTION] = obj.getInt("double_tap_action").coerceIn(DOUBLE_TAP_NONE, DOUBLE_TAP_TAB_TWICE)
+        }
     }
 }

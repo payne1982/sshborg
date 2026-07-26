@@ -1028,10 +1028,14 @@ private fun HostKeyDialog(
         title = { Text(stringResource(R.string.hostkey_title)) },
         text  = { Text(stringResource(R.string.hostkey_sftp_body, hostname, fingerprint)) },
         confirmButton = {
-            TextButton(onClick = onAccept) { Text(stringResource(R.string.action_connect)) }
+            OutlinedButton(onClick = onAccept) { Text(stringResource(R.string.action_trust)) }
         },
         dismissButton = {
-            TextButton(onClick = onReject)  { Text(stringResource(R.string.action_cancel)) }
+            OutlinedButton(
+                onClick = onReject,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)),
+            ) { Text(stringResource(R.string.action_reject)) }
         },
     )
 }
@@ -1080,7 +1084,7 @@ private fun PasswordDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSubmit(pwd) }) { Text(stringResource(R.string.action_connect)) }
+            OutlinedButton(onClick = { onSubmit(pwd) }) { Text(stringResource(R.string.action_connect)) }
         },
         dismissButton = {
             TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
