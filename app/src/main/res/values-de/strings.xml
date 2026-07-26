@@ -105,6 +105,9 @@
     <string name="host_start_mode_fixed">Festes Verzeichnis</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Startverzeichnis</string>
+    <string name="host_reset_host_keys">Akzeptierte Hostschlüssel zurücksetzen</string>
+    <string name="host_reset_host_keys_pending">Schlüssel werden beim Speichern zurückgesetzt</string>
+    <string name="host_reset_host_keys_hint">Verwirft den gespeicherten Hostschlüssel und zwischengespeicherte Jump-Host-Schlüssel. Bei der nächsten Verbindung wird der Server erneut überprüft.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-Schlüssel</string>
@@ -305,11 +308,11 @@
     <string name="error_refresh_failed">Aktualisierung fehlgeschlagen</string>
     <string name="error_encryption_failed">Verschlüsselung fehlgeschlagen</string>
     <string name="error_decryption_failed">Entschlüsselung fehlgeschlagen</string>
-    <string name="settings_backup_export_title">Hosts exportieren</string>
-    <string name="settings_backup_export_subtitle">Host-Konfigurationen in eine JSON-Datei speichern. Passwörter und Schlüssel sind nicht enthalten.</string>
+    <string name="settings_backup_export_title">Backup exportieren</string>
+    <string name="settings_backup_export_subtitle">Host-Konfigurationen und App-Einstellungen in eine JSON-Datei speichern. Passwörter und Schlüssel sind nicht enthalten.</string>
     <string name="settings_backup_export_action">Exportieren</string>
-    <string name="settings_backup_import_title">Hosts importieren</string>
-    <string name="settings_backup_import_subtitle">Host-Konfigurationen aus einer JSON-Datei laden. Vorhandene Hosts mit demselben Namen werden aktualisiert; Passwörter und Schlüssel werden nicht importiert.</string>
+    <string name="settings_backup_import_title">Backup importieren</string>
+    <string name="settings_backup_import_subtitle">Host-Konfigurationen und App-Einstellungen aus einer JSON-Datei laden. Vorhandene Hosts mit demselben Namen werden aktualisiert; Passwörter und Schlüssel werden nicht importiert.</string>
     <string name="settings_backup_import_action">Importieren</string>
     <string name="backup_export_success">%1$d Hosts exportiert</string>
     <string name="backup_import_success">%1$d importiert, %2$d aktualisiert</string>

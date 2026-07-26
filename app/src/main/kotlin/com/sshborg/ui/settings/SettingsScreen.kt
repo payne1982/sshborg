@@ -555,7 +555,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_export_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_export_subtitle)) },
                 trailingContent = {
-                    OutlinedButton(onClick = { exportLauncher.launch("sshborg_hosts.json") }) {
+                    OutlinedButton(onClick = { exportLauncher.launch("sshborg_backup.json") }) {
                         Text(stringResource(R.string.settings_backup_export_action))
                     }
                 },

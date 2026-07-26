@@ -109,6 +109,9 @@
     <string name="host_start_mode_fixed">Fixed folder</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Starting directory</string>
+    <string name="host_reset_host_keys">Reset accepted host keys</string>
+    <string name="host_reset_host_keys_pending">Host keys will be reset on save</string>
+    <string name="host_reset_host_keys_hint">Forgets the saved host key and cached jump-host keys. The next connection will verify the server again.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH Keys</string>
@@ -329,11 +332,11 @@
     </plurals>
 
     <!-- Backup export/import -->
-    <string name="settings_backup_export_title">Export hosts</string>
-    <string name="settings_backup_export_subtitle">Save host configurations to a JSON file. Passwords and keys are not included.</string>
+    <string name="settings_backup_export_title">Export backup</string>
+    <string name="settings_backup_export_subtitle">Save host configurations and app settings to a JSON file. Passwords and keys are not included.</string>
     <string name="settings_backup_export_action">Export</string>
-    <string name="settings_backup_import_title">Import hosts</string>
-    <string name="settings_backup_import_subtitle">Load host configurations from a JSON file. Existing hosts with the same name will be updated; passwords and keys will not be imported.</string>
+    <string name="settings_backup_import_title">Import backup</string>
+    <string name="settings_backup_import_subtitle">Load host configurations and app settings from a JSON file. Existing hosts with the same name will be updated; passwords and keys will not be imported.</string>
     <string name="settings_backup_import_action">Import</string>
     <string name="backup_export_success">Exported %1$d hosts</string>
     <string name="backup_import_success">Imported %1$d, updated %2$d hosts</string>

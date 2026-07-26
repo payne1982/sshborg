@@ -457,15 +457,15 @@ Host target
 
   doc_backup: `
             <h2>// 配置备份</h2>
-            <p>SSHBorg 可以将主机配置导出并导入为 JSON 文件。这样您可以将服务器列表转移到另一台设备，或保留一份可移植的配置备份。</p>
+            <p>SSHBorg 可以将主机配置和应用设置导出并导入为 JSON 文件。这样您可以将服务器列表转移到另一台设备，或保留一份可移植的配置备份。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                备份仅包含主机配置（地址、端口、用户名、设置）。<strong>密码和 SSH 密钥从不导出</strong> — 在新设备上导入后需要重新设置。
+                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 在新设备上导入后需要重新设置。
             </div>
             <h3>导出</h3>
-            <p>前往 <strong>设置 → 备份 → 导出主机</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_hosts.json</code>。</p>
+            <p>前往 <strong>设置 → 备份 → 导出备份</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_backup.json</code>。</p>
             <h3>导入</h3>
-            <p>前往 <strong>设置 → 备份 → 导入主机</strong>。选择之前导出（或手动创建）的 <code>.json</code> 文件。SSHBorg 将其与现有主机列表合并：</p>
+            <p>前往 <strong>设置 → 备份 → 导入备份</strong>。选择之前导出（或手动创建）的 <code>.json</code> 文件。SSHBorg 将其与现有主机列表合并：</p>
             <ul>
                 <li><strong>名称</strong>与现有条目匹配的主机将被<strong>更新</strong>。</li>
                 <li>具有新名称的主机将被<strong>添加</strong>。</li>
@@ -474,7 +474,7 @@ Host target
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "生产", "color": -1754827 }
@@ -495,8 +495,16 @@ Host target
       "allowLegacyCiphers": false,
       "group":           "生产"
     }
-  ]
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
 }</code></pre>
+            <p>可选的 <code>settings</code> 对象包含应用设置，导出时会自动写入；手动创建文件时可以省略。</p>
             <h3>字段说明</h3>
             <ul>
                 <li><code>label</code> — SSHBorg 中显示的名称。导入时用作唯一合并键。<strong>必填。</strong></li>

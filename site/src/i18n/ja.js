@@ -457,15 +457,15 @@ Host target
 
   doc_backup: `
             <h2>// 設定のバックアップ</h2>
-            <p>SSHBorgはホストの設定をJSONファイルとしてエクスポート・インポートできます。これにより、サーバーリストを別のデバイスに移したり、設定のポータブルなバックアップを保管したりできます。</p>
+            <p>SSHBorgはホストの設定とアプリの設定をJSONファイルとしてエクスポート・インポートできます。これにより、サーバーリストを別のデバイスに移したり、設定のポータブルなバックアップを保管したりできます。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                バックアップにはホスト設定（アドレス、ポート、ユーザー名、設定）のみが含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 新しいデバイスにインポートした後、再設定が必要です。
+                バックアップにはホスト設定とアプリ設定（ターミナル、外観、動作）が含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 新しいデバイスにインポートした後、再設定が必要です。
             </div>
             <h3>エクスポート</h3>
-            <p><strong>設定 → バックアップ → ホストをエクスポート</strong> に移動します。システムのファイル選択ツールを使って保存先を選択します。ファイル名はデフォルトで <code>sshborg_hosts.json</code> です。</p>
+            <p><strong>設定 → バックアップ → バックアップをエクスポート</strong> に移動します。システムのファイル選択ツールを使って保存先を選択します。ファイル名はデフォルトで <code>sshborg_backup.json</code> です。</p>
             <h3>インポート</h3>
-            <p><strong>設定 → バックアップ → ホストをインポート</strong> に移動します。以前エクスポートした（または手動で作成した）<code>.json</code> ファイルを選択します。SSHBorgは既存のホストリストと統合します：</p>
+            <p><strong>設定 → バックアップ → バックアップをインポート</strong> に移動します。以前エクスポートした（または手動で作成した）<code>.json</code> ファイルを選択します。SSHBorgは既存のホストリストと統合します：</p>
             <ul>
                 <li><strong>名前</strong>が既存のエントリと一致するホストは<strong>更新</strong>されます。</li>
                 <li>新しい名前を持つホストは<strong>追加</strong>されます。</li>
@@ -474,7 +474,7 @@ Host target
             <h3>JSON形式</h3>
             <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
             <pre><code>{
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "本番", "color": -1754827 }
@@ -495,8 +495,16 @@ Host target
       "allowLegacyCiphers": false,
       "group":           "本番"
     }
-  ]
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
 }</code></pre>
+            <p>任意の <code>settings</code> オブジェクトはアプリの設定を保持し、エクスポート時に自動的に書き込まれます。手動でファイルを作成する場合は省略できます。</p>
             <h3>フィールドリファレンス</h3>
             <ul>
                 <li><code>label</code> — SSHBorgに表示される名前。インポート時の統合に使われる一意のキー。<strong>必須。</strong></li>

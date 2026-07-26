@@ -105,6 +105,9 @@
     <string name="host_start_mode_fixed">Фіксована папка</string>
     <string name="host_start_mode_home">Домашня папка</string>
     <string name="host_field_start_directory">Початковий каталог</string>
+    <string name="host_reset_host_keys">Скинути прийняті ключі хостів</string>
+    <string name="host_reset_host_keys_pending">Ключі буде скинуто під час збереження</string>
+    <string name="host_reset_host_keys_hint">Забуває збережений ключ хоста та кешовані ключі проміжних хостів. Наступне зʼєднання знову перевірить сервер.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-ключі</string>
@@ -305,11 +308,11 @@
     <string name="error_refresh_failed">Помилка оновлення</string>
     <string name="error_encryption_failed">Помилка шифрування</string>
     <string name="error_decryption_failed">Помилка розшифрування</string>
-    <string name="settings_backup_export_title">Експортувати хости</string>
-    <string name="settings_backup_export_subtitle">Зберегти конфігурації хостів у файл JSON. Паролі та ключі не включені.</string>
+    <string name="settings_backup_export_title">Експортувати резервну копію</string>
+    <string name="settings_backup_export_subtitle">Зберегти конфігурації хостів і налаштування застосунку у файл JSON. Паролі та ключі не включені.</string>
     <string name="settings_backup_export_action">Експорт</string>
-    <string name="settings_backup_import_title">Імпортувати хости</string>
-    <string name="settings_backup_import_subtitle">Завантажити конфігурації хостів із файлу JSON. Наявні хости з такою самою назвою будуть оновлені; паролі та ключі не будуть імпортовані.</string>
+    <string name="settings_backup_import_title">Імпортувати резервну копію</string>
+    <string name="settings_backup_import_subtitle">Завантажити конфігурації хостів і налаштування застосунку із файлу JSON. Наявні хости з такою самою назвою будуть оновлені; паролі та ключі не будуть імпортовані.</string>
     <string name="settings_backup_import_action">Імпорт</string>
     <string name="backup_export_success">Експортовано %1$d хостів</string>
     <string name="backup_import_success">Імпортовано %1$d, оновлено %2$d хостів</string>

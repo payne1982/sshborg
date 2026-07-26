@@ -105,6 +105,9 @@
     <string name="host_start_mode_fixed">Dossier fixe</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Répertoire de démarrage</string>
+    <string name="host_reset_host_keys">Réinitialiser les clés d\'hôte acceptées</string>
+    <string name="host_reset_host_keys_pending">Les clés seront réinitialisées à l\'enregistrement</string>
+    <string name="host_reset_host_keys_hint">Oublie la clé d\'hôte enregistrée et les clés de rebond en cache. La prochaine connexion vérifiera à nouveau le serveur.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Clés SSH</string>
@@ -305,11 +308,11 @@
     <string name="error_refresh_failed">Actualisation échouée</string>
     <string name="error_encryption_failed">Chiffrement échoué</string>
     <string name="error_decryption_failed">Déchiffrement échoué</string>
-    <string name="settings_backup_export_title">Exporter les hôtes</string>
-    <string name="settings_backup_export_subtitle">Enregistrer les configurations des hôtes dans un fichier JSON. Les mots de passe et les clés ne sont pas inclus.</string>
+    <string name="settings_backup_export_title">Exporter la sauvegarde</string>
+    <string name="settings_backup_export_subtitle">Enregistrer les configurations des hôtes et les réglages de l\'application dans un fichier JSON. Les mots de passe et les clés ne sont pas inclus.</string>
     <string name="settings_backup_export_action">Exporter</string>
-    <string name="settings_backup_import_title">Importer les hôtes</string>
-    <string name="settings_backup_import_subtitle">Charger les configurations depuis un fichier JSON. Les hôtes existants avec le même nom seront mis à jour ; mots de passe et clés ne seront pas importés.</string>
+    <string name="settings_backup_import_title">Importer la sauvegarde</string>
+    <string name="settings_backup_import_subtitle">Charger les configurations des hôtes et les réglages de l\'application depuis un fichier JSON. Les hôtes existants avec le même nom seront mis à jour ; mots de passe et clés ne seront pas importés.</string>
     <string name="settings_backup_import_action">Importer</string>
     <string name="backup_export_success">%1$d hôtes exportés</string>
     <string name="backup_import_success">%1$d importés, %2$d mis à jour</string>

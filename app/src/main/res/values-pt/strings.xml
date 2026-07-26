@@ -105,6 +105,9 @@
     <string name="host_start_mode_fixed">Pasta fixa</string>
     <string name="host_start_mode_home">Home</string>
     <string name="host_field_start_directory">Diretório inicial</string>
+    <string name="host_reset_host_keys">Repor chaves de host aceites</string>
+    <string name="host_reset_host_keys_pending">As chaves serão repostas ao guardar</string>
+    <string name="host_reset_host_keys_hint">Esquece a chave de host guardada e as chaves de host de salto em cache. A próxima ligação verifica novamente o servidor.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">Chaves SSH</string>
@@ -305,11 +308,11 @@
     <string name="error_refresh_failed">Atualização falhada</string>
     <string name="error_encryption_failed">Cifragem falhada</string>
     <string name="error_decryption_failed">Decifragem falhada</string>
-    <string name="settings_backup_export_title">Exportar hosts</string>
-    <string name="settings_backup_export_subtitle">Salvar as configurações dos hosts em um arquivo JSON. Senhas e chaves não são incluídas.</string>
+    <string name="settings_backup_export_title">Exportar cópia</string>
+    <string name="settings_backup_export_subtitle">Salvar as configurações dos hosts e as configurações do app em um arquivo JSON. Senhas e chaves não são incluídas.</string>
     <string name="settings_backup_export_action">Exportar</string>
-    <string name="settings_backup_import_title">Importar hosts</string>
-    <string name="settings_backup_import_subtitle">Carregar as configurações dos hosts de um arquivo JSON. Hosts existentes com o mesmo nome serão atualizados; senhas e chaves não serão importadas.</string>
+    <string name="settings_backup_import_title">Importar cópia</string>
+    <string name="settings_backup_import_subtitle">Carregar as configurações dos hosts e as configurações do app de um arquivo JSON. Hosts existentes com o mesmo nome serão atualizados; senhas e chaves não serão importadas.</string>
     <string name="settings_backup_import_action">Importar</string>
     <string name="backup_export_success">%1$d hosts exportados</string>
     <string name="backup_import_success">%1$d importados, %2$d atualizados</string>

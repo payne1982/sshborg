@@ -109,6 +109,9 @@
     <string name="host_start_mode_fixed">Фиксированная папка</string>
     <string name="host_start_mode_home">Домашняя папка</string>
     <string name="host_field_start_directory">Стартовая папка</string>
+    <string name="host_reset_host_keys">Сбросить принятые ключи хостов</string>
+    <string name="host_reset_host_keys_pending">Ключи будут сброшены при сохранении</string>
+    <string name="host_reset_host_keys_hint">Забывает сохранённый ключ хоста и кешированные ключи промежуточных хостов. При следующем подключении сервер будет проверен заново.</string>
 
     <!-- ── Keys screen ─────────────────────────────────────────────────── -->
     <string name="keys_title">SSH-ключи</string>
@@ -332,11 +335,11 @@
     </plurals>
 
     <!-- Backup export/import -->
-    <string name="settings_backup_export_title">Экспорт хостов</string>
-    <string name="settings_backup_export_subtitle">Сохранить конфигурации хостов в файл JSON. Пароли и ключи не включаются.</string>
+    <string name="settings_backup_export_title">Экспорт копии</string>
+    <string name="settings_backup_export_subtitle">Сохранить конфигурации хостов и настройки приложения в файл JSON. Пароли и ключи не включаются.</string>
     <string name="settings_backup_export_action">Экспорт</string>
-    <string name="settings_backup_import_title">Импорт хостов</string>
-    <string name="settings_backup_import_subtitle">Загрузить конфигурации хостов из файла JSON. Существующие хосты с тем же именем будут обновлены; пароли и ключи импортированы не будут.</string>
+    <string name="settings_backup_import_title">Импорт копии</string>
+    <string name="settings_backup_import_subtitle">Загрузить конфигурации хостов и настройки приложения из файла JSON. Существующие хосты с тем же именем будут обновлены; пароли и ключи импортированы не будут.</string>
     <string name="settings_backup_import_action">Импорт</string>
     <string name="backup_export_success">Экспортировано хостов: %1$d</string>
     <string name="backup_import_success">Импортировано хостов: %1$d, обновлено: %2$d</string>

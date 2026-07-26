@@ -918,15 +918,15 @@ Host target
         <div class="doc-section" id="backup">
 
             <h2>// COPIA DE SEGURIDAD DE LA CONFIGURACIÓN</h2>
-            <p>SSHBorg puede exportar e importar configuraciones de hosts como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
+            <p>SSHBorg puede exportar e importar configuraciones de hosts y ajustes de la app como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                La copia de seguridad incluye solo las configuraciones de los hosts (dirección, puerto, usuario, ajustes). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
+                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
             </div>
             <h3>Exportar</h3>
-            <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar hosts</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_hosts.json</code> por defecto.</p>
+            <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar copia</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_backup.json</code> por defecto.</p>
             <h3>Importar</h3>
-            <p>Ve a <strong>Ajustes → Copia de seguridad → Importar hosts</strong>. Selecciona el archivo <code>.json</code> exportado previamente (o creado manualmente). SSHBorg lo fusionará con la lista de hosts existente:</p>
+            <p>Ve a <strong>Ajustes → Copia de seguridad → Importar copia</strong>. Selecciona el archivo <code>.json</code> exportado previamente (o creado manualmente). SSHBorg lo fusionará con la lista de hosts existente:</p>
             <ul>
                 <li>Los hosts cuyo <strong>nombre</strong> coincide con una entrada existente se <strong>actualizan</strong>.</li>
                 <li>Los hosts con un nombre nuevo se <strong>añaden</strong>.</li>
@@ -935,7 +935,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>El archivo exportado es un objeto JSON estándar. También puedes crearlo manualmente para importar en bloque una lista de servidores desde otra fuente.</p>
             <pre><code>{
-  "version": 2,
+  "version": 3,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Producción", "color": -1754827 }
@@ -956,8 +956,16 @@ Host target
       "allowLegacyCiphers": false,
       "group":           "Producción"
     }
-  ]
+  ],
+  "settings": {
+    "night_mode":            0,
+    "scrollback_lines":      2000,
+    "terminal_font_size":    13,
+    "terminal_color_scheme": 0,
+    "double_tap_action":     0
+  }
 }</code></pre>
+            <p>El objeto <code>settings</code> (opcional) contiene los ajustes de la app y se escribe automáticamente al exportar; puedes omitirlo si creas el archivo a mano.</p>
             <h3>Referencia de campos</h3>
             <ul>
                 <li><code>label</code> — nombre mostrado en SSHBorg. Se usa como clave única para la fusión al importar. <strong>Obligatorio.</strong></li>
