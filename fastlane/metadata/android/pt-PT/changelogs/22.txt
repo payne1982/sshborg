@@ -1,0 +1,1 @@
+• Corrigido um tipo de letra da interface em falta

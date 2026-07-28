@@ -1,0 +1,30 @@
+<en-US>
+• Fixed a missing interface font
+</en-US>
+<it-IT>
+• Corretto un font dell'interfaccia mancante
+</it-IT>
+<de-DE>
+• Fehlende Schriftart in der Oberfläche behoben
+</de-DE>
+<es-ES>
+• Corregida una fuente de interfaz que faltaba
+</es-ES>
+<fr-FR>
+• Correction d'une police d'interface manquante
+</fr-FR>
+<pt-PT>
+• Corrigido um tipo de letra da interface em falta
+</pt-PT>
+<uk>
+• Виправлено відсутній шрифт інтерфейсу
+</uk>
+<ru-RU>
+• Исправлен отсутствующий шрифт интерфейса
+</ru-RU>
+<zh-CN>
+• 修复了缺失的界面字体
+</zh-CN>
+<ja-JP>
+• 不足していた UI フォントを修正しました
+</ja-JP>
