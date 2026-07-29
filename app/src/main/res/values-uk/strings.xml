@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Публічний ключ (додати до ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Видалити ключ</string>
     <string name="keys_delete_message">Видалити \"%1$s\"? Хости, що використовують цей ключ, перейдуть на автентифікацію за паролем.</string>
+    <string name="keys_delete_warning">Закритий ключ неможливо відновити після видалення.</string>
     <string name="keys_import_cd">Імпортувати ключ</string>
 
     <!-- Import key dialog -->

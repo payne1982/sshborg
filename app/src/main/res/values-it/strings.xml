@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Chiave pubblica (aggiungila a ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Elimina chiave</string>
     <string name="keys_delete_message">Eliminare \"%1$s\"? Gli host che usano questa chiave torneranno all\'autenticazione con password.</string>
+    <string name="keys_delete_warning">La chiave privata non può essere recuperata una volta eliminata.</string>
     <string name="keys_import_cd">Importa chiave</string>
 
     <!-- Import key dialog -->

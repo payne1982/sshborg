@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Öffentlicher Schlüssel (zu ~/.ssh/authorized_keys hinzufügen):</string>
     <string name="keys_delete_title">Schlüssel löschen</string>
     <string name="keys_delete_message">\"%1$s\" löschen? Hosts, die diesen Schlüssel verwenden, fallen auf Passwort-Authentifizierung zurück.</string>
+    <string name="keys_delete_warning">Der private Schlüssel kann nach dem Löschen nicht wiederhergestellt werden.</string>
     <string name="keys_import_cd">Schlüssel importieren</string>
 
     <!-- Import key dialog -->

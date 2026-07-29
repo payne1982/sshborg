@@ -123,6 +123,7 @@
     <string name="keys_public_key_label">公钥（添加到 ~/.ssh/authorized_keys）：</string>
     <string name="keys_delete_title">删除密钥</string>
     <string name="keys_delete_message">删除"%1$s"？使用此密钥的主机将改用密码验证。</string>
+    <string name="keys_delete_warning">删除后私钥将无法恢复。</string>
     <string name="keys_import_cd">导入密钥</string>
 
     <!-- Import key dialog -->

@@ -124,6 +124,7 @@
     <string name="keys_public_key_label">Public key (add to ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Delete key</string>
     <string name="keys_delete_message">Delete \"%1$s\"? Any hosts using this key will fall back to password auth.</string>
+    <string name="keys_delete_warning">The private key cannot be recovered once deleted.</string>
     <string name="keys_import_cd">Import key</string>
 
     <!-- Import key dialog -->

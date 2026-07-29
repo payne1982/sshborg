@@ -123,6 +123,7 @@
     <string name="keys_public_key_label">公開鍵（~/.ssh/authorized_keys に追加）：</string>
     <string name="keys_delete_title">鍵を削除</string>
     <string name="keys_delete_message">"%1$s" を削除しますか？この鍵を使用しているホストはパスワード認証に切り替わります。</string>
+    <string name="keys_delete_warning">秘密鍵は削除すると復元できません。</string>
     <string name="keys_import_cd">鍵をインポート</string>
 
     <!-- Import key dialog -->
