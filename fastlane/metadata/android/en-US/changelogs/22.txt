@@ -1,0 +1,2 @@
+• Fixed a missing interface font
+• Fixed command suggestions not appearing after switching session tabs

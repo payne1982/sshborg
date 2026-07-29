@@ -1,0 +1,2 @@
+• Correction d'une police d'interface manquante
+• Correction des suggestions de commandes qui n'apparaissaient plus après un changement d'onglet de session
