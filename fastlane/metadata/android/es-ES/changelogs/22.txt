@@ -1,1 +1,2 @@
 • Corregida una fuente de interfaz que faltaba
+• Corregidas las sugerencias de comandos que no aparecían tras cambiar de pestaña de sesión

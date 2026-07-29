@@ -1,1 +1,2 @@
 • Corrigido um tipo de letra da interface em falta
+• Corrigidas as sugestões de comandos que não apareciam depois de mudar de separador de sessão

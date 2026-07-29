@@ -104,6 +104,16 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         em.onTitleChanged = { t -> _title.value = t }
         _emulator.value = em
 
+        // Restore suggestion state cached on the session. When switching tabs the
+        // ViewModel is recreated, and attach() (not connect()) runs, so without this
+        // the loaded command history and detected prompt would be lost and the
+        // suggestion bar would stay empty until a full reconnect.
+        _commandHistory.value = session.commandHistory
+        if (session.promptPrefix.isNotEmpty()) {
+            promptPrefix = session.promptPrefix
+            promptDetected = true
+        }
+
         // If already connected, resume reading
         if (session.shellSession != null) {
             shellSession = session.shellSession
@@ -458,11 +468,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }.getOrNull() ?: continue
                     val commands = parseHistory(path, content)
                     if (commands.isNotEmpty()) {
-                        _commandHistory.value = commands
+                        val cmds = commands
                             .reversed()
                             .filter { it.length > 1 }
                             .distinct()
                             .take(100_000)
+                        _commandHistory.value = cmds
+                        // Cache on the session so a tab switch (new ViewModel) keeps it.
+                        sessionId?.let { id -> sessionManager.update(id) { it.copy(commandHistory = cmds) } }
                         break
                     }
                 }
@@ -508,6 +521,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             val m = Regex("""^(.*?[\$#%❯>])\s""").find(lineText) ?: return@launch
             promptPrefix = m.groupValues[1] + " "
             promptDetected = true
+            // Cache on the session so a tab switch (new ViewModel) keeps it.
+            sessionId?.let { id -> sessionManager.update(id) { it.copy(promptPrefix = promptPrefix) } }
         }
     }
 

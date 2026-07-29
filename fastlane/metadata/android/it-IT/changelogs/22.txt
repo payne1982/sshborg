@@ -1,1 +1,2 @@
 • Corretto un font dell'interfaccia mancante
+• Corretti i suggerimenti dei comandi che non comparivano dopo aver cambiato scheda di sessione

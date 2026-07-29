@@ -1,30 +1,40 @@
 <en-US>
 • Fixed a missing interface font
+• Fixed command suggestions not appearing after switching session tabs
 </en-US>
 <it-IT>
 • Corretto un font dell'interfaccia mancante
+• Corretti i suggerimenti dei comandi che non comparivano dopo aver cambiato scheda di sessione
 </it-IT>
 <de-DE>
 • Fehlende Schriftart in der Oberfläche behoben
+• Befehlsvorschläge erscheinen jetzt auch nach dem Wechsel der Sitzungs-Tabs
 </de-DE>
 <es-ES>
 • Corregida una fuente de interfaz que faltaba
+• Corregidas las sugerencias de comandos que no aparecían tras cambiar de pestaña de sesión
 </es-ES>
 <fr-FR>
 • Correction d'une police d'interface manquante
+• Correction des suggestions de commandes qui n'apparaissaient plus après un changement d'onglet de session
 </fr-FR>
 <pt-PT>
 • Corrigido um tipo de letra da interface em falta
+• Corrigidas as sugestões de comandos que não apareciam depois de mudar de separador de sessão
 </pt-PT>
 <uk>
 • Виправлено відсутній шрифт інтерфейсу
+• Виправлено підказки команд, які не з'являлися після переходу між вкладками сеансів
 </uk>
 <ru-RU>
 • Исправлен отсутствующий шрифт интерфейса
+• Исправлены подсказки команд, которые не появлялись после переключения вкладок сессий
 </ru-RU>
 <zh-CN>
 • 修复了缺失的界面字体
+• 修复了切换会话标签页后命令建议不显示的问题
 </zh-CN>
 <ja-JP>
 • 不足していた UI フォントを修正しました
+• セッションのタブを切り替えた後にコマンド候補が表示されない問題を修正しました
 </ja-JP>

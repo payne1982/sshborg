@@ -24,6 +24,10 @@ class SessionManager {
         // Shell-specific
         val shellSession: ShellSession? = null,
         val emulator: TerminalEmulator? = null,
+        // Terminal suggestion state — cached here so it survives the ViewModel
+        // being recreated when switching between sibling tabs.
+        val commandHistory: List<String> = emptyList(),
+        val promptPrefix: String = "",
         // SFTP-specific
         val sftpSession: SftpSession? = null,
         val sftpCurrentPath: String = "/",

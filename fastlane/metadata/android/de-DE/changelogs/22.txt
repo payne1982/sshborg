@@ -1,1 +1,2 @@
 • Fehlende Schriftart in der Oberfläche behoben
+• Befehlsvorschläge erscheinen jetzt auch nach dem Wechsel der Sitzungs-Tabs
