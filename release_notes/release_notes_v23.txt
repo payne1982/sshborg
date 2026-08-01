@@ -1,0 +1,30 @@
+<en-US>
+• The terminal font now includes Nerd Font and Powerline glyphs, so prompts like Starship render correctly
+</en-US>
+<it-IT>
+• Il font del terminale ora include i glifi Nerd Font e Powerline, così i prompt come Starship vengono visualizzati correttamente
+</it-IT>
+<de-DE>
+• Die Terminal-Schriftart enthält jetzt Nerd-Font- und Powerline-Glyphen, sodass Prompts wie Starship korrekt dargestellt werden
+</de-DE>
+<es-ES>
+• La fuente del terminal ahora incluye glifos Nerd Font y Powerline, por lo que los prompts como Starship se muestran correctamente
+</es-ES>
+<fr-FR>
+• La police du terminal inclut désormais les glyphes Nerd Font et Powerline, pour afficher correctement les invites comme Starship
+</fr-FR>
+<pt-PT>
+• O tipo de letra do terminal inclui agora glifos Nerd Font e Powerline, para que prompts como o Starship sejam apresentados corretamente
+</pt-PT>
+<uk>
+• Шрифт термінала тепер містить гліфи Nerd Font і Powerline, тож підказки на кшталт Starship відображаються правильно
+</uk>
+<ru-RU>
+• Шрифт терминала теперь содержит глифы Nerd Font и Powerline, поэтому приглашения вроде Starship отображаются корректно
+</ru-RU>
+<zh-CN>
+• 终端字体现已包含 Nerd Font 和 Powerline 字形，因此 Starship 等提示符能正确显示
+</zh-CN>
+<ja-JP>
+• ターミナルフォントに Nerd Font と Powerline のグリフを追加し、Starship などのプロンプトが正しく表示されるようになりました
+</ja-JP>

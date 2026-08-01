@@ -1,0 +1,1 @@
+• La police du terminal inclut désormais les glyphes Nerd Font et Powerline, pour afficher correctement les invites comme Starship

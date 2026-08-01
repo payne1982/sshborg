@@ -1,0 +1,1 @@
+• The terminal font now includes Nerd Font and Powerline glyphs, so prompts like Starship render correctly

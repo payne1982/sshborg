@@ -1,0 +1,1 @@
+• Die Terminal-Schriftart enthält jetzt Nerd-Font- und Powerline-Glyphen, sodass Prompts wie Starship korrekt dargestellt werden

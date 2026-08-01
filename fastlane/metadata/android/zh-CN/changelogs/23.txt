@@ -1,0 +1,1 @@
+• 终端字体现已包含 Nerd Font 和 Powerline 字形，因此 Starship 等提示符能正确显示

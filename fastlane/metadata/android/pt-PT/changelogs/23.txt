@@ -1,0 +1,1 @@
+• O tipo de letra do terminal inclui agora glifos Nerd Font e Powerline, para que prompts como o Starship sejam apresentados corretamente
