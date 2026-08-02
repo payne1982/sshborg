@@ -124,7 +124,12 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
         AlertDialog(
             onDismissRequest = { keyToDelete = null },
             title = { Text(stringResource(R.string.keys_delete_title)) },
-            text = { Text(stringResource(R.string.keys_delete_message, key.label)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.keys_delete_message, key.label))
+                    Text(stringResource(R.string.keys_delete_warning))
+                }
+            },
             confirmButton = {
                 OutlinedButton(
                     onClick = { vm.deleteKey(key); keyToDelete = null },

@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Chave pública (adicionar a ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Eliminar chave</string>
     <string name="keys_delete_message">Eliminar \"%1$s\"? Os hosts que usam esta chave voltarão a usar autenticação por palavra-passe.</string>
+    <string name="keys_delete_warning">A chave privada não pode ser recuperada depois de eliminada.</string>
     <string name="keys_import_cd">Importar chave</string>
 
     <!-- Import key dialog -->
@@ -170,7 +171,10 @@
     <string name="settings_suggestions_bar_sticky_title">Barra de sugestões sempre visível</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantém a barra de sugestões em altura fixa para evitar o redimensionamento do terminal</string>
 
-    <string name="settings_biometric_lock_title">Bloqueio biométrico</string>
+    <string name="settings_app_lock_title">Bloqueio da app</string>
+    <string name="settings_lock_mode_none">Nenhum</string>
+    <string name="settings_lock_mode_biometric">Apenas biométrico</string>
+    <string name="settings_lock_mode_device">Bloqueio do dispositivo (PIN ou biometria)</string>
     <string name="settings_biometric_available">Exigir autenticação ao regressar à aplicação</string>
     <string name="settings_biometric_unavailable">Nenhum bloqueio biométrico ou de ecrã configurado neste dispositivo</string>
 
@@ -291,7 +295,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Dica de segurança</string>
-    <string name="security_reminder_body">Ative o bloqueio biométrico e a encriptação por hardware nas Definições para manter as suas credenciais seguras.</string>
+    <string name="security_reminder_body">Ative um bloqueio da app e a encriptação por hardware nas Definições para manter as suas credenciais seguras.</string>
     <string name="action_remind_later">Lembrar mais tarde</string>
     <string name="action_dont_show_again">Não mostrar mais</string>
 

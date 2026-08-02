@@ -33,6 +33,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.material3.ripple
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.isActive
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.viewinterop.AndroidView
@@ -263,6 +272,17 @@ fun TerminalScreen(
                 val strCopied    = stringResource(R.string.action_copied)
                 val strSelection = stringResource(R.string.terminal_copy_selection)
                 val strAll       = stringResource(R.string.terminal_copy_all)
+                val strPaste     = stringResource(R.string.terminal_paste_cd)
+                // Reading the clip *description* (mime type), not its contents, so this does
+                // not fire the system clipboard-access notification — only the paste tap,
+                // which reads the actual text, does. Evaluated when the bar appears.
+                val cbCheck = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                        as android.content.ClipboardManager
+                val hasClipText = cbCheck.hasPrimaryClip() &&
+                    cbCheck.primaryClipDescription?.let {
+                        it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN) ||
+                        it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_HTML)
+                    } == true
                 SelectionBar(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
@@ -289,6 +309,16 @@ fun TerminalScreen(
                         }
                         terminalView?.exitSelectionMode()
                     },
+                    labelPaste = if (hasClipText) strPaste else null,
+                    onPaste = if (hasClipText) {
+                        {
+                            val cb = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                                    as android.content.ClipboardManager
+                            val pasteText = cb.primaryClip?.getItemAt(0)?.coerceToText(ctx)?.toString()
+                            if (!pasteText.isNullOrEmpty()) sendInput(pasteText.toByteArray(Charsets.UTF_8))
+                            terminalView?.exitSelectionMode()
+                        }
+                    } else null,
                 )
             }
 
@@ -474,14 +504,14 @@ private fun ExtraKeyRow(
         Spacer(Modifier.width(4.dp))
         ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
         ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
-        ExtraKey("↑", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('A')) })
-        ExtraKey("↓", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('B')) })
-        ExtraKey("←", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('D')) })
-        ExtraKey("→", horizontalPadding = 10.dp, onClick = { onKey(cursorKeys('C')) })
+        ExtraKey("↑", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('A')) })
+        ExtraKey("↓", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('B')) })
+        ExtraKey("←", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('D')) })
+        ExtraKey("→", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('C')) })
         ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
         ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
-        ExtraKey("PgUp", onClick = { onKey("\u001b[5~".toByteArray()) })
-        ExtraKey("PgDn", onClick = { onKey("\u001b[6~".toByteArray()) })
+        ExtraKey("PgUp", repeatOnHold = true, onClick = { onKey("\u001b[5~".toByteArray()) })
+        ExtraKey("PgDn", repeatOnHold = true, onClick = { onKey("\u001b[6~".toByteArray()) })
         ExtraKey("Del",  onClick = { onKey("\u001b[3~".toByteArray()) })
         Box(
             modifier = Modifier
@@ -516,13 +546,52 @@ private fun ExtraKeyRow(
 }
 
 @Composable
-private fun ExtraKey(label: String, active: Boolean = false, horizontalPadding: androidx.compose.ui.unit.Dp = 8.dp, onClick: () -> Unit) {
+private fun ExtraKey(
+    label: String,
+    active: Boolean = false,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 8.dp,
+    // Hold-to-repeat, like the keyboard's own backspace (issue #11): tap = one press,
+    // hold = keep firing until released. Off by default so ordinary keys still tap once.
+    repeatOnHold: Boolean = false,
+    onClick: () -> Unit,
+) {
     val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+    val interaction = remember { MutableInteractionSource() }
+    val scope = rememberCoroutineScope()
+    // For repeat keys we drive the gesture ourselves (fire on down, then auto-repeat),
+    // so clickable is replaced by pointerInput + an explicit ripple to keep the press
+    // feedback. Timings follow the system key-repeat values, matching backspace.
+    val pressModifier = if (repeatOnHold) {
+        Modifier
+            .indication(interaction, ripple())
+            .pointerInput(onClick) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val press = PressInteraction.Press(down.position)
+                    interaction.tryEmit(press)
+                    onClick()  // immediate first press, like backspace on key-down
+                    val repeatJob = scope.launch {
+                        delay(android.view.ViewConfiguration.getKeyRepeatTimeout().toLong())
+                        while (isActive) {
+                            onClick()
+                            delay(android.view.ViewConfiguration.getKeyRepeatDelay().toLong())
+                        }
+                    }
+                    val up = waitForUpOrCancellation()
+                    repeatJob.cancel()
+                    interaction.tryEmit(
+                        if (up != null) PressInteraction.Release(press) else PressInteraction.Cancel(press)
+                    )
+                }
+            }
+    } else {
+        Modifier.clickable(onClick = onClick)
+    }
     Box(
         modifier = Modifier
             .background(bg, MaterialTheme.shapes.extraSmall)
-            .clickable(onClick = onClick)
+            .then(pressModifier)
             .padding(horizontal = horizontalPadding, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -650,6 +719,12 @@ private fun SelectionBar(
     onCopySelection: () -> Unit,
     onCopyAll: () -> Unit,
     modifier: Modifier = Modifier,
+    // Paste is offered here too (issue #9), matching ConnectBot/JuiceSSH. It pastes the
+    // device clipboard at the cursor, not the current selection — a different layer, but
+    // the placement users already expect. Shown only when the caller passes both, i.e.
+    // when the clipboard actually holds text.
+    labelPaste: String? = null,
+    onPaste: (() -> Unit)? = null,
 ) {
     Surface(
         modifier       = modifier,
@@ -665,6 +740,9 @@ private fun SelectionBar(
         ) {
             TextButton(onClick = onCopySelection) { Text(labelCopySelection) }
             TextButton(onClick = onCopyAll)       { Text(labelCopyAll) }
+            if (labelPaste != null && onPaste != null) {
+                TextButton(onClick = onPaste) { Text(labelPaste) }
+            }
         }
     }
 }

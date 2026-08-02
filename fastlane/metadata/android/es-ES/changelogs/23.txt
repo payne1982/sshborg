@@ -1,0 +1,5 @@
+• Nuevas opciones de bloqueo: biométrico, PIN/patrón del dispositivo o ninguno — útil en Android TV
+• El terminal ahora muestra glifos Nerd Font / Powerline (p. ej. prompts de Starship)
+• Las copias recuerdan la clave de cada host por su nombre
+• Añadido Pegar al menú de selección del terminal
+• Las flechas y PgUp/PgDn de la barra de teclas ahora se repiten al mantenerlas

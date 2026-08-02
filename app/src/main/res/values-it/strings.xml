@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Chiave pubblica (aggiungila a ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Elimina chiave</string>
     <string name="keys_delete_message">Eliminare \"%1$s\"? Gli host che usano questa chiave torneranno all\'autenticazione con password.</string>
+    <string name="keys_delete_warning">La chiave privata non può essere recuperata una volta eliminata.</string>
     <string name="keys_import_cd">Importa chiave</string>
 
     <!-- Import key dialog -->
@@ -170,7 +171,10 @@
     <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra dei suggerimenti a dimensione fissa per evitare il ridimensionamento del terminale quando i suggerimenti compaiono o scompaiono</string>
 
-    <string name="settings_biometric_lock_title">Blocco biometrico</string>
+    <string name="settings_app_lock_title">Blocco app</string>
+    <string name="settings_lock_mode_none">Nessuno</string>
+    <string name="settings_lock_mode_biometric">Solo biometrico</string>
+    <string name="settings_lock_mode_device">Blocco del dispositivo (PIN o biometria)</string>
     <string name="settings_biometric_available">Richiedi autenticazione quando torni all\'app</string>
     <string name="settings_biometric_unavailable">Nessun blocco biometrico o schermo configurato sul dispositivo</string>
 
@@ -292,7 +296,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Suggerimento di sicurezza</string>
-    <string name="security_reminder_body">Abilita il blocco biometrico e la cifratura hardware nelle Impostazioni per tenere al sicuro le tue credenziali.</string>
+    <string name="security_reminder_body">Abilita un blocco dell\'app e la cifratura hardware nelle Impostazioni per tenere al sicuro le tue credenziali.</string>
     <string name="action_remind_later">Ricordamelo più tardi</string>
     <string name="action_dont_show_again">Non mostrare più</string>
 

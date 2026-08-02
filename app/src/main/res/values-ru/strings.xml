@@ -124,6 +124,7 @@
     <string name="keys_public_key_label">Публичный ключ (добавьте в ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Удалить ключ</string>
     <string name="keys_delete_message">Удалить «%1$s»? Хосты, использующие этот ключ, перейдут на аутентификацию по паролю.</string>
+    <string name="keys_delete_warning">Закрытый ключ невозможно восстановить после удаления.</string>
     <string name="keys_import_cd">Импортировать ключ</string>
 
     <!-- Import key dialog -->
@@ -180,7 +181,10 @@
     <string name="settings_suggestions_bar_sticky_title">Всегда видимая панель подсказок</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Держать панель подсказок фиксированной высоты, чтобы терминал не менялся в размере при их появлении или исчезновении</string>
 
-    <string name="settings_biometric_lock_title">Биометрическая блокировка</string>
+    <string name="settings_app_lock_title">Блокировка приложения</string>
+    <string name="settings_lock_mode_none">Нет</string>
+    <string name="settings_lock_mode_biometric">Только биометрия</string>
+    <string name="settings_lock_mode_device">Блокировка устройства (PIN или биометрия)</string>
     <string name="settings_biometric_available">Требовать аутентификацию при возврате в приложение</string>
     <string name="settings_biometric_unavailable">На устройстве не настроена биометрия или блокировка экрана</string>
 
@@ -307,7 +311,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Совет по безопасности</string>
-    <string name="security_reminder_body">Включите биометрическую блокировку и аппаратное шифрование в настройках, чтобы защитить свои данные.</string>
+    <string name="security_reminder_body">Включите блокировку приложения и аппаратное шифрование в настройках, чтобы защитить свои данные.</string>
     <string name="action_remind_later">Напомнить позже</string>
     <string name="action_dont_show_again">Больше не показывать</string>
 

@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Clave pública (añadir a ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Eliminar clave</string>
     <string name="keys_delete_message">¿Eliminar \"%1$s\"? Los hosts que usen esta clave usarán autenticación por contraseña.</string>
+    <string name="keys_delete_warning">La clave privada no se puede recuperar una vez eliminada.</string>
     <string name="keys_import_cd">Importar clave</string>
 
     <!-- Import key dialog -->
@@ -170,7 +171,10 @@
     <string name="settings_suggestions_bar_sticky_title">Barra de sugerencias siempre visible</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra de sugerencias a altura fija para evitar el redimensionamiento del terminal</string>
 
-    <string name="settings_biometric_lock_title">Bloqueo biométrico</string>
+    <string name="settings_app_lock_title">Bloqueo de la app</string>
+    <string name="settings_lock_mode_none">Ninguno</string>
+    <string name="settings_lock_mode_biometric">Solo biométrico</string>
+    <string name="settings_lock_mode_device">Bloqueo del dispositivo (PIN o biometría)</string>
     <string name="settings_biometric_available">Requerir autenticación al volver a la app</string>
     <string name="settings_biometric_unavailable">No hay bloqueo biométrico o de pantalla configurado en este dispositivo</string>
 
@@ -291,7 +295,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Consejo de seguridad</string>
-    <string name="security_reminder_body">Activa el bloqueo biométrico y el cifrado por hardware en Ajustes para mantener seguras tus credenciales.</string>
+    <string name="security_reminder_body">Activa un bloqueo de la app y el cifrado por hardware en Ajustes para mantener seguras tus credenciales.</string>
     <string name="action_remind_later">Recordarme más tarde</string>
     <string name="action_dont_show_again">No mostrar más</string>
 

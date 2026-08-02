@@ -640,7 +640,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>密钥额外加密</h3>
             <p>SSHBorg 提供可选的 <strong>额外密码短语</strong>（设置 → SSH 密钥 → 点击密钥 → 启用加密）。启用后，密钥将使用 SSHBorg 不存储的密码短语加密——每次使用密钥时都需要输入。</p>
-            <p>如果您在手机上存储了敏感服务器凭据，或已禁用生物识别锁，强烈建议启用此功能。</p>
+            <p>如果您在手机上存储了敏感服务器凭据，或未启用应用锁，强烈建议启用此功能。</p>
         </div>
 
         <div class="doc-section" id="suggestions">
@@ -901,8 +901,9 @@ Host target
         <div class="doc-section" id="security">
 
             <h2>// 应用安全</h2>
-            <h3>生物识别锁</h3>
-            <p>在 <strong>设置 → 安全 → 生物识别锁</strong> 中启用。启用后，SSHBorg 在显示任何主机、凭据或会话数据前，都需要指纹或人脸解锁。</p>
+            <h3>应用锁</h3>
+            <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁），或 <strong>设备锁</strong>——除生物识别外，还可使用设备的 PIN、图案或密码。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。</p>
+            <p><strong>设备锁</strong> 适用于没有生物识别硬件的设备（如 Android TV），此时可用系统 PIN 解锁。</p>
             <p>您可以设置不活动超时——在后台等待该时长后，应用会自动锁定。</p>
             <h3>截图保护</h3>
             <p>SSHBorg 默认阻止截图和录屏，防止敏感的终端内容通过最近应用界面或截屏工具泄露。</p>
@@ -921,7 +922,7 @@ Host target
             <p>SSHBorg 可以将主机配置和应用设置导出并导入为 JSON 文件。这样您可以将服务器列表转移到另一台设备，或保留一份可移植的配置备份。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 在新设备上导入后需要重新设置。
+                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 密钥材料需要在新设备上重新设置。不过备份会记录每个主机所用密钥的<em>名称</em>：如果在导入前重新创建同名密钥，其主机会自动重新关联。
             </div>
             <h3>导出</h3>
             <p>前往 <strong>设置 → 备份 → 导出备份</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_backup.json</code>。</p>
@@ -932,11 +933,12 @@ Host target
                 <li>具有新名称的主机将被<strong>添加</strong>。</li>
                 <li>文件中不存在的主机保持<strong>不变</strong>。</li>
                 <li>更新已有主机时会保留其已保存的密码、密钥和已接受的主机密钥——备份从不包含这些内容。</li>
+                <li>没有密钥的主机会关联到名称与导出的 <code>keyLabel</code> 匹配的密钥（若存在）；否则忽略该字段。</li>
 </ul>
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "生产", "color": -1754827 }
@@ -955,6 +957,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "我的 VPS 密钥",
       "group":           "生产"
     }
   ],
@@ -980,6 +983,7 @@ Host target
                 <li><code>sftpStartMode</code> — SFTP 起始目录：<code>"last"</code>（记住上次访问的目录）、<code>"fixed"</code>（始终使用 <code>sftpStartDir</code>）、<code>"home"</code>（服务器主目录）。默认值：<code>"last"</code>。</li>
                 <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
                 <li><code>allowLegacyCiphers</code> — 设为 <code>true</code> 可启用上文介绍的旧式加密算法。默认为 <code>false</code>。</li>
+                <li><code>keyLabel</code> — 此主机所用 SSH 密钥的名称。导入时，如果存在同名密钥，则关联到该主机；否则忽略该字段。密钥本身从不包含在备份中。</li>
                 <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
                 <li><code>color</code> — 主机的可选颜色（ARGB，带符号 32 位整数），会覆盖分组颜色。</li>
             </ul>

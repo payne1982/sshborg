@@ -35,8 +35,8 @@ module.exports = {
   feat_keys_desc:      'Generate Ed25519, ECDSA, and RSA keys directly on your device. No passwords needed.',
   feat_jump_title:     'JUMP HOST SUPPORT',
   feat_jump_desc:      'Connect through one or more bastion hosts with transparent tunnelling. Full SSH agent forwarding.',
-  feat_biometric_title:'BIOMETRIC LOCK',
-  feat_biometric_desc: 'Protect access to your servers with fingerprint or face unlock. Configurable timeout.',
+  feat_biometric_title:'APP LOCK',
+  feat_biometric_desc: 'Lock the app with biometrics or your device PIN — works even on Android TV without a fingerprint sensor. Configurable timeout.',
   feat_multilingual_title: 'MULTILINGUAL',
   feat_multilingual_desc:  'Available in English, Italian, French, German, Spanish, Portuguese, Ukrainian, Russian, Chinese, and Japanese.',
   feat_theme_title:    'DARK &amp; LIGHT THEME',
@@ -201,7 +201,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Additional key encryption</h3>
             <p>SSHBorg offers an optional <strong>additional passphrase</strong> for your keys (Settings → SSH Keys → tap a key → Enable encryption). When enabled, the key is encrypted with a passphrase that SSHBorg does not store — you will be asked to enter it each time the key is used.</p>
-            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you have biometric lock disabled.</p>`,
+            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you don't have an app lock enabled.</p>`,
 
   doc_suggestions: `
             <h2>// COMMAND SUGGESTIONS</h2>
@@ -442,8 +442,9 @@ Host target
 
   doc_security: `
             <h2>// APP SECURITY</h2>
-            <h3>Biometric lock</h3>
-            <p>Enable biometric lock in <strong>Settings → Security → Biometric lock</strong>. When active, SSHBorg requires fingerprint or face unlock before showing any host, credential, or session data.</p>
+            <h3>App lock</h3>
+            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), or <strong>Device lock</strong> — the device PIN, pattern, or password, alongside biometrics. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
+            <p>The <strong>Device lock</strong> option is useful on devices without biometric hardware — such as Android TV — where you can unlock with the system PIN instead.</p>
             <p>You can set an inactivity timeout — after that many minutes in the background the app locks automatically.</p>
             <h3>Screenshot protection</h3>
             <p>By default SSHBorg blocks screenshots and screen recording to prevent sensitive terminal content from leaking via the recent-apps screen or screen capture tools.</p>
@@ -460,7 +461,7 @@ Host target
             <p>SSHBorg can export and import host configurations and app settings as a JSON file. This lets you transfer your server list to another device or keep a portable backup of your setup.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANT</div>
-                The backup includes your host configurations and app settings (terminal, appearance, behaviour). <strong>Passwords and SSH keys are never exported</strong> — these must be set up again after importing on a new device.
+                The backup includes your host configurations and app settings (terminal, appearance, behaviour). <strong>Passwords and SSH keys are never exported</strong> — the key material must be set up again on a new device. The backup does record the <em>name</em> of the key each host uses, so if you re-create a key with the same name before importing, its hosts are re-linked to it automatically.
             </div>
             <h3>Exporting</h3>
             <p>Go to <strong>Settings → Backup → Export backup</strong>. Choose where to save the file using the system file picker. The file is named <code>sshborg_backup.json</code> by default.</p>
@@ -471,11 +472,12 @@ Host target
                 <li>Hosts with a new label are <strong>added</strong>.</li>
                 <li>Hosts not present in the file are <strong>left unchanged</strong>.</li>
                 <li>An updated host keeps its saved password, key and accepted host key — the backup never carries them.</li>
+                <li>A host with no key is linked to a key whose name matches the exported <code>keyLabel</code>, if one exists; otherwise the field is ignored.</li>
 </ul>
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827 }
@@ -494,6 +496,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "My VPS key",
       "group":           "Production"
     }
   ],
@@ -519,6 +522,7 @@ Host target
                 <li><code>sftpStartMode</code> — SFTP starting directory: <code>"last"</code> (remember last visited), <code>"fixed"</code> (always use <code>sftpStartDir</code>), <code>"home"</code> (server home). Defaults to <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — path to use when <code>sftpStartMode</code> is <code>"fixed"</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> to enable the legacy cipher algorithms described above. Defaults to <code>false</code>.</li>
+                <li><code>keyLabel</code> — name of the SSH key this host uses. On import, if a key with this name exists it is linked to the host; otherwise the field is ignored. The key itself is never included in the backup.</li>
                 <li><code>group</code> — name of the group the host belongs to. Groups are listed in the top-level <code>groups</code> array with their <code>name</code> and <code>color</code> (ARGB as a signed 32-bit integer). If a host references a group that is not in the array, it is created automatically with a default color — so you can omit the array entirely when writing the file by hand.</li>
                 <li><code>color</code> — optional per-host color (ARGB as a signed 32-bit integer). It overrides the group color.</li>
             </ul>

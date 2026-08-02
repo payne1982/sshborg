@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Публічний ключ (додати до ~/.ssh/authorized_keys):</string>
     <string name="keys_delete_title">Видалити ключ</string>
     <string name="keys_delete_message">Видалити \"%1$s\"? Хости, що використовують цей ключ, перейдуть на автентифікацію за паролем.</string>
+    <string name="keys_delete_warning">Закритий ключ неможливо відновити після видалення.</string>
     <string name="keys_import_cd">Імпортувати ключ</string>
 
     <!-- Import key dialog -->
@@ -170,7 +171,10 @@
     <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Зберігає панель підказок фіксованої висоти, щоб уникнути зміни розміру терміналу</string>
 
-    <string name="settings_biometric_lock_title">Біометричне блокування</string>
+    <string name="settings_app_lock_title">Блокування застосунку</string>
+    <string name="settings_lock_mode_none">Немає</string>
+    <string name="settings_lock_mode_biometric">Лише біометрія</string>
+    <string name="settings_lock_mode_device">Блокування пристрою (PIN або біометрія)</string>
     <string name="settings_biometric_available">Вимагати автентифікацію при поверненні до додатка</string>
     <string name="settings_biometric_unavailable">На цьому пристрої не налаштовано біометричний або екранний замок</string>
 
@@ -291,7 +295,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Порада з безпеки</string>
-    <string name="security_reminder_body">Увімкніть біометричне блокування та апаратне шифрування в Налаштуваннях для захисту ваших облікових даних.</string>
+    <string name="security_reminder_body">Увімкніть блокування застосунку та апаратне шифрування в Налаштуваннях для захисту ваших облікових даних.</string>
     <string name="action_remind_later">Нагадати пізніше</string>
     <string name="action_dont_show_again">Більше не показувати</string>
 

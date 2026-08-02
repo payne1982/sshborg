@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.sshborg.data.AppPreferences
 import com.sshborg.ui.theme.SshBorgTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -85,8 +86,8 @@ class MainActivity : AppCompatActivity() {
         if (isAuthenticating) return
         val app = application as SshBorgApp
         lifecycleScope.launch {
-            val biometricEnabled = app.appPreferences.biometricLock.first()
-            if (!biometricEnabled) {
+            val mode = app.appPreferences.lockMode.first()
+            if (mode == AppPreferences.LOCK_NONE) {
                 setPrivacy(false)
                 return@launch
             }
@@ -97,7 +98,10 @@ class MainActivity : AppCompatActivity() {
                 return@launch
             }
             isAuthenticating = true
-            val ok = BiometricHelper.authenticate(this@MainActivity)
+            val ok = BiometricHelper.authenticate(
+                this@MainActivity,
+                allowDeviceCredential = mode == AppPreferences.LOCK_DEVICE,
+            )
             isAuthenticating = false
             if (ok) {
                 app.lastAuthTime = System.currentTimeMillis()

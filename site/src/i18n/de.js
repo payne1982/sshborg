@@ -34,8 +34,8 @@ module.exports = {
   feat_keys_desc:      'Ed25519-, ECDSA- und RSA-Schlüssel direkt auf deinem Gerät generieren. Kein Passwort erforderlich.',
   feat_jump_title:     'JUMP-HOST-UNTERSTÜTZUNG',
   feat_jump_desc:      'Verbinde dich über einen oder mehrere Bastion-Hosts mit transparentem Tunneling. Vollständiges SSH-Agent-Forwarding.',
-  feat_biometric_title:'BIOMETRISCHE SPERRE',
-  feat_biometric_desc: 'Schütze den Zugriff auf deine Server mit Fingerabdruck oder Gesichtserkennung. Konfigurierbares Timeout.',
+  feat_biometric_title:'APP-SPERRE',
+  feat_biometric_desc: 'Sperre die App mit Biometrie oder der Geräte-PIN — funktioniert auch auf Android TV ohne Fingerabdrucksensor. Konfigurierbares Timeout.',
   feat_multilingual_title: 'MEHRSPRACHIG',
   feat_multilingual_desc:  'Verfügbar in Englisch, Italienisch, Französisch, Deutsch, Spanisch, Portugiesisch, Ukrainisch, Russisch, Chinesisch und Japanisch.',
   feat_theme_title:    'DUNKLES &amp; HELLES DESIGN',
@@ -199,7 +199,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Zusätzliche Schlüsselverschlüsselung</h3>
             <p>SSHBorg bietet eine optionale <strong>zusätzliche Passphrase</strong> für deine Schlüssel (Einstellungen → SSH-Schlüssel → Schlüssel antippen → Verschlüsselung aktivieren). Wenn aktiviert, wird der Schlüssel mit einer Passphrase verschlüsselt, die SSHBorg nicht speichert — du wirst jedes Mal danach gefragt, wenn der Schlüssel verwendet wird.</p>
-            <p>Dies wird dringend empfohlen, wenn du sensible Server-Zugangsdaten auf deinem Smartphone speicherst oder die biometrische Sperre deaktiviert hast.</p>`,
+            <p>Dies wird dringend empfohlen, wenn du sensible Server-Zugangsdaten auf deinem Smartphone speicherst oder keine App-Sperre aktiviert hast.</p>`,
 
   doc_suggestions: `
             <h2>// BEFEHLSVORSCHLÄGE</h2>
@@ -440,8 +440,9 @@ Host target
 
   doc_security: `
             <h2>// APP-SICHERHEIT</h2>
-            <h3>Biometrische Sperre</h3>
-            <p>Aktiviere die biometrische Sperre unter <strong>Einstellungen → Sicherheit → Biometrische Sperre</strong>. Wenn aktiv, erfordert SSHBorg einen Fingerabdruck oder Gesichtserkennung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
+            <h3>App-Sperre</h3>
+            <p>Wähle unter <strong>Einstellungen → Sicherheit → App-Sperre</strong>, wie die App geschützt wird: <strong>Keine</strong> (Standard), <strong>Nur biometrisch</strong> (Fingerabdruck oder Gesichtserkennung) oder <strong>Gerätesperre</strong> — die PIN, das Muster oder das Passwort des Geräts, zusätzlich zur Biometrie. Wenn eine Sperre aktiv ist, erfordert SSHBorg eine Authentifizierung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
+            <p>Die Option <strong>Gerätesperre</strong> ist nützlich auf Geräten ohne biometrische Hardware — etwa Android TV — wo du stattdessen mit der System-PIN entsperren kannst.</p>
             <p>Du kannst ein Inaktivitäts-Timeout festlegen — nach dieser Anzahl von Minuten im Hintergrund sperrt sich die App automatisch.</p>
             <h3>Screenshot-Schutz</h3>
             <p>Standardmäßig blockiert SSHBorg Screenshots und Bildschirmaufnahmen, um zu verhindern, dass sensible Terminal-Inhalte über den Zuletzt-Geöffnet-Bildschirm oder Aufnahme-Tools durchsickern.</p>
@@ -458,7 +459,7 @@ Host target
             <p>SSHBorg kann Host-Konfigurationen und App-Einstellungen als JSON-Datei exportieren und importieren. Das ermöglicht es, die Serverliste auf ein anderes Gerät zu übertragen oder ein portables Backup der eigenen Einrichtung aufzubewahren.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// WICHTIG</div>
-                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — sie müssen nach dem Import auf einem neuen Gerät neu eingerichtet werden.
+                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — das Schlüsselmaterial muss auf einem neuen Gerät neu eingerichtet werden. Das Backup speichert jedoch den <em>Namen</em> des von jedem Host verwendeten Schlüssels: Wenn du vor dem Import einen Schlüssel mit demselben Namen neu erstellst, werden seine Hosts automatisch wieder damit verknüpft.
             </div>
             <h3>Exportieren</h3>
             <p>Gehe zu <strong>Einstellungen → Backup → Backup exportieren</strong>. Wähle über den Systemdatei-Auswähler aus, wo die Datei gespeichert werden soll. Die Datei heißt standardmäßig <code>sshborg_backup.json</code>.</p>
@@ -469,11 +470,12 @@ Host target
                 <li>Hosts mit einem neuen Namen werden <strong>hinzugefügt</strong>.</li>
                 <li>Hosts, die nicht in der Datei vorhanden sind, bleiben <strong>unverändert</strong>.</li>
                 <li>Ein aktualisierter Host behält gespeichertes Passwort, Schlüssel und akzeptierten Hostschlüssel — die Sicherung enthält sie nie.</li>
+                <li>Ein Host ohne Schlüssel wird mit einem Schlüssel verknüpft, dessen Name dem exportierten <code>keyLabel</code> entspricht, sofern vorhanden; andernfalls wird das Feld ignoriert.</li>
 </ul>
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produktion", "color": -1754827 }
@@ -492,6 +494,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "Mein VPS-Schlüssel",
       "group":           "Produktion"
     }
   ],
@@ -517,6 +520,7 @@ Host target
                 <li><code>sftpStartMode</code> — SFTP-Startverzeichnis: <code>"last"</code> (letztes besuchtes merken), <code>"fixed"</code> (immer <code>sftpStartDir</code> verwenden), <code>"home"</code> (Server-Home). Standard: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
+                <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
                 <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>
             </ul>

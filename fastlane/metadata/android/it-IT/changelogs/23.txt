@@ -1,0 +1,5 @@
+• Nuove opzioni di blocco app: biometrico, PIN/sequenza del dispositivo o nessuno — utili su Android TV
+• Il terminale ora mostra i glifi Nerd Font / Powerline (es. prompt Starship)
+• I backup ricordano la chiave di ogni host per nome
+• Aggiunto Incolla al popup di selezione del terminale
+• Frecce e PgUp/PgDn nella barra tasti ora si ripetono se tenute premute

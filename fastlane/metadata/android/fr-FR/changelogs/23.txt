@@ -1,0 +1,5 @@
+• Nouveau verrouillage de l'app : biométrie, PIN/schéma de l'appareil ou aucun — pour Android TV
+• Le terminal affiche les glyphes Nerd Font / Powerline (ex. invites Starship)
+• Les sauvegardes retiennent la clé de chaque hôte par son nom
+• Ajout de Coller au menu de sélection du terminal
+• Les flèches et PgUp/PgDn de la barre de touches se répètent si maintenues

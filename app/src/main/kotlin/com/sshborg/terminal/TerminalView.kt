@@ -21,14 +21,14 @@ class TerminalView @JvmOverloads constructor(
 
     // --- Fonts and metrics ---
     private val regularTypeface: Typeface by lazy {
-        context.assets.open("fonts/JetBrainsMono-Regular.ttf").use { stream ->
+        context.assets.open("fonts/JetBrainsMonoNerdFontMono-Regular.ttf").use { stream ->
             val tmp = java.io.File.createTempFile("jbmono_regular", ".ttf", context.cacheDir)
             tmp.outputStream().use { stream.copyTo(it) }
             Typeface.createFromFile(tmp).also { tmp.delete() }
         }
     }
     private val boldTypeface: Typeface by lazy {
-        context.assets.open("fonts/JetBrainsMono-Bold.ttf").use { stream ->
+        context.assets.open("fonts/JetBrainsMonoNerdFontMono-Bold.ttf").use { stream ->
             val tmp = java.io.File.createTempFile("jbmono_bold", ".ttf", context.cacheDir)
             tmp.outputStream().use { stream.copyTo(it) }
             Typeface.createFromFile(tmp).also { tmp.delete() }

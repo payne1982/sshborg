@@ -120,6 +120,7 @@
     <string name="keys_public_key_label">Clé publique (à ajouter dans ~/.ssh/authorized_keys) :</string>
     <string name="keys_delete_title">Supprimer la clé</string>
     <string name="keys_delete_message">Supprimer \"%1$s\" ? Les hôtes utilisant cette clé reviendront à l\'authentification par mot de passe.</string>
+    <string name="keys_delete_warning">La clé privée ne pourra pas être récupérée une fois supprimée.</string>
     <string name="keys_import_cd">Importer une clé</string>
 
     <!-- Import key dialog -->
@@ -170,7 +171,10 @@
     <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Maintient la barre de suggestions à hauteur fixe pour éviter le redimensionnement du terminal</string>
 
-    <string name="settings_biometric_lock_title">Verrouillage biométrique</string>
+    <string name="settings_app_lock_title">Verrouillage de l\'app</string>
+    <string name="settings_lock_mode_none">Aucun</string>
+    <string name="settings_lock_mode_biometric">Biométrie uniquement</string>
+    <string name="settings_lock_mode_device">Verrouillage de l\'appareil (PIN ou biométrie)</string>
     <string name="settings_biometric_available">Demander l\'authentification au retour dans l\'application</string>
     <string name="settings_biometric_unavailable">Aucun verrou biométrique ou d\'écran configuré sur cet appareil</string>
 
@@ -291,7 +295,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Conseil de sécurité</string>
-    <string name="security_reminder_body">Activez le verrouillage biométrique et le chiffrement matériel dans les Paramètres pour protéger vos identifiants.</string>
+    <string name="security_reminder_body">Activez un verrouillage de l\'app et le chiffrement matériel dans les Paramètres pour protéger vos identifiants.</string>
     <string name="action_remind_later">Me rappeler plus tard</string>
     <string name="action_dont_show_again">Ne plus afficher</string>
 

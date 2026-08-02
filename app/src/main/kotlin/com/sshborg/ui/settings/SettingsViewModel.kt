@@ -24,8 +24,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val hostDao      = sshBorgApp.db.hostDao()
     private val groupDao     = sshBorgApp.db.groupDao()
 
-    val biometricLock: StateFlow<Boolean> =
-        prefs.biometricLock.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val lockMode: StateFlow<Int> =
+        prefs.lockMode.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.LOCK_NONE,
+        )
 
     val keystoreEncryption: StateFlow<Boolean> =
         prefs.keystoreEncryption.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -97,8 +100,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         AppCompatDelegate.setApplicationLocales(localeList)
     }
 
-    fun setBiometricLock(enabled: Boolean) {
-        viewModelScope.launch { prefs.setBiometricLock(enabled) }
+    fun setLockMode(mode: Int) {
+        viewModelScope.launch { prefs.setLockMode(mode) }
     }
 
     fun setConfirmExit(enabled: Boolean) {
@@ -178,6 +181,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 val hosts = hostDao.getAllOnce()
                 val groups = groupDao.getAllOnce()
                 val groupNameById = groups.associate { it.id to it.name }
+                // Export the key by name, not by local row id: the id is meaningless on
+                // another install, but a same-named key can be matched on import.
+                val keyLabelById = keyDao.getAllOnce().associate { it.id to it.label }
                 val groupsArr = JSONArray()
                 groups.forEach { g ->
                     groupsArr.put(JSONObject().apply {
@@ -200,12 +206,13 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         h.jumpHostIdList?.let { put("jumpHostIdList", it) }
                         h.portForwardings?.let { put("portForwardings", it) }
                         h.sftpStartDir?.let { put("sftpStartDir", it) }
+                        h.keyId?.let { id -> keyLabelById[id]?.let { put("keyLabel", it) } }
                         h.groupId?.let { gid -> groupNameById[gid]?.let { put("group", it) } }
                         h.color?.let { put("color", it) }
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 3)
+                    put("version", 4)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
@@ -257,6 +264,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     return id
                 }
 
+                // Match the exported key name to a local key: an id from another install is
+                // meaningless, but a key created with the same name here can be re-linked.
+                // A missing/unknown name resolves to null, so the host simply stays keyless.
+                val keyIdByLabel = keyDao.getAllOnce().associateBy({ it.label }, { it.id })
+
                 val arr = root.getJSONArray("hosts")
                 val toImport = (0 until arr.length()).map { i ->
                     val o = arr.getJSONObject(i)
@@ -266,7 +278,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         hostname = o.getString("hostname"),
                         port = o.optInt("port", 22),
                         username = o.getString("username"),
-                        keyId = null,
+                        keyId = o.optString("keyLabel").takeIf { it.isNotEmpty() }?.let { keyIdByLabel[it] },
                         password = null,
                         encryptedPassword = null,
                         knownHostsEntry = null,
@@ -291,7 +303,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     if (existing != null) {
                         // Preserve the fields the backup never carries so re-importing over
                         // an existing host doesn't wipe its credentials or saved state:
-                        // auth (key/password) and last-connected time always stay.
+                        // the password and last-connected time always stay. The key link is
+                        // kept too, but a host with no key adopts a same-named key resolved
+                        // from the backup (existing.keyId ?: host.keyId) — never overwriting
+                        // one already set, and never clearing it when the backup omits the name.
                         //
                         // Pinned host keys are kept only while the endpoint they were pinned
                         // to is unchanged, mirroring the edit screen: a stored host key is a
@@ -304,7 +319,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         val keepJumpKeys = host.jumpMode == "simple" && existing.jumpHosts == host.jumpHosts
                         hostDao.upsert(host.copy(
                             id                = existing.id,
-                            keyId             = existing.keyId,
+                            keyId             = existing.keyId ?: host.keyId,
                             password          = existing.password,
                             encryptedPassword = existing.encryptedPassword,
                             knownHostsEntry   = if (keepHostKey) existing.knownHostsEntry else null,

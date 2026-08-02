@@ -34,8 +34,8 @@ module.exports = {
   feat_keys_desc:      'Générez des clés Ed25519, ECDSA et RSA directement sur votre appareil. Sans mot de passe.',
   feat_jump_title:     'SUPPORT JUMP HOST',
   feat_jump_desc:      'Connectez-vous via un ou plusieurs hôtes bastions avec tunneling transparent. Transfert complet de l\'agent SSH.',
-  feat_biometric_title:'VERROUILLAGE BIOMÉTRIQUE',
-  feat_biometric_desc: 'Protégez l\'accès à vos serveurs par empreinte digitale ou reconnaissance faciale. Délai configurable.',
+  feat_biometric_title:'VERROUILLAGE DE L\'APP',
+  feat_biometric_desc: 'Verrouillez l\'app par biométrie ou par le code PIN de l\'appareil — fonctionne même sur Android TV sans capteur d\'empreinte. Délai configurable.',
   feat_multilingual_title: 'MULTILINGUE',
   feat_multilingual_desc:  'Disponible en anglais, italien, français, allemand, espagnol, portugais, ukrainien, russe, chinois et japonais.',
   feat_theme_title:    'THÈME SOMBRE &amp; CLAIR',
@@ -199,7 +199,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Chiffrement supplémentaire de la clé</h3>
             <p>SSHBorg propose une <strong>phrase secrète supplémentaire</strong> optionnelle pour vos clés (Paramètres → Clés SSH → appuyez sur une clé → Activer le chiffrement). Quand elle est activée, la clé est chiffrée avec une phrase que SSHBorg ne stocke pas — elle vous sera demandée à chaque utilisation.</p>
-            <p>Fortement recommandé si vous stockez des identifiants sensibles sur votre téléphone ou si le verrouillage biométrique est désactivé.</p>`,
+            <p>Fortement recommandé si vous stockez des identifiants sensibles sur votre téléphone ou si aucun verrouillage de l'app n'est activé.</p>`,
 
   doc_suggestions: `
             <h2>// SUGGESTIONS DE COMMANDES</h2>
@@ -440,8 +440,9 @@ Host target
 
   doc_security: `
             <h2>// SÉCURITÉ DE L'APP</h2>
-            <h3>Verrouillage biométrique</h3>
-            <p>Activez le verrouillage biométrique dans <strong>Paramètres → Sécurité → Verrouillage biométrique</strong>. Quand il est actif, SSHBorg exige une empreinte digitale ou une reconnaissance faciale avant d'afficher des hôtes, des identifiants ou des données de session.</p>
+            <h3>Verrouillage de l'app</h3>
+            <p>Choisissez comment l'app est protégée dans <strong>Paramètres → Sécurité → Verrouillage de l'app</strong> : <strong>Aucun</strong> (par défaut), <strong>Biométrie uniquement</strong> (empreinte digitale ou reconnaissance faciale) ou <strong>Verrouillage de l'appareil</strong> — le code PIN, le schéma ou le mot de passe de l'appareil, en plus de la biométrie. Quand un verrouillage est actif, SSHBorg exige une authentification avant d'afficher des hôtes, des identifiants ou des données de session.</p>
+            <p>L'option <strong>Verrouillage de l'appareil</strong> est utile sur les appareils sans matériel biométrique — comme Android TV — où vous pouvez déverrouiller avec le code PIN du système.</p>
             <p>Vous pouvez définir un délai d'inactivité — après ce nombre de minutes en arrière-plan, l'app se verrouille automatiquement.</p>
             <h3>Protection des captures d'écran</h3>
             <p>Par défaut, SSHBorg bloque les captures d'écran et l'enregistrement d'écran pour empêcher le contenu sensible du terminal de fuiter via l'écran des apps récentes ou des outils de capture.</p>
@@ -458,7 +459,7 @@ Host target
             <p>SSHBorg peut exporter et importer les configurations des hôtes et les réglages de l'application sous forme de fichier JSON. Cela permet de transférer la liste des serveurs vers un autre appareil ou de conserver une sauvegarde portable de sa configuration.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANT</div>
-                La sauvegarde inclut les configurations des hôtes et les réglages de l'application (terminal, apparence, comportement). <strong>Les mots de passe et les clés SSH ne sont jamais exportés</strong> — ils doivent être reconfigurés après l'importation sur un nouvel appareil.
+                La sauvegarde inclut les configurations des hôtes et les réglages de l'application (terminal, apparence, comportement). <strong>Les mots de passe et les clés SSH ne sont jamais exportés</strong> — le contenu de la clé doit être reconfiguré sur un nouvel appareil. La sauvegarde enregistre toutefois le <em>nom</em> de la clé utilisée par chaque hôte : si vous recréez une clé du même nom avant l'importation, ses hôtes y sont automatiquement reliés.
             </div>
             <h3>Exporter</h3>
             <p>Allez dans <strong>Paramètres → Sauvegarde → Exporter la sauvegarde</strong>. Choisissez où enregistrer le fichier via le sélecteur de fichiers système. Le fichier s'appelle <code>sshborg_backup.json</code> par défaut.</p>
@@ -469,11 +470,12 @@ Host target
                 <li>Les hôtes avec un nouveau nom sont <strong>ajoutés</strong>.</li>
                 <li>Les hôtes absents du fichier restent <strong>inchangés</strong>.</li>
                 <li>Un hôte mis à jour conserve son mot de passe, sa clé et sa clé d'hôte acceptée — la sauvegarde ne les contient jamais.</li>
+                <li>Un hôte sans clé est relié à une clé dont le nom correspond au <code>keyLabel</code> exporté, s'il en existe une ; sinon le champ est ignoré.</li>
 </ul>
             <h3>Format JSON</h3>
             <p>Le fichier exporté est un objet JSON standard. Vous pouvez également le créer manuellement pour importer en masse une liste de serveurs depuis une autre source.</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827 }
@@ -492,6 +494,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "Clé de mon VPS",
       "group":           "Production"
     }
   ],
@@ -517,6 +520,7 @@ Host target
                 <li><code>sftpStartMode</code> — répertoire de départ SFTP : <code>"last"</code> (mémoriser le dernier visité), <code>"fixed"</code> (toujours utiliser <code>sftpStartDir</code>), <code>"home"</code> (dossier personnel du serveur). Par défaut : <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — chemin à utiliser quand <code>sftpStartMode</code> est <code>"fixed"</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> pour activer les algorithmes hérités décrits plus haut. Par défaut : <code>false</code>.</li>
+                <li><code>keyLabel</code> — nom de la clé SSH utilisée par cet hôte. À l'import, si une clé de ce nom existe, l'hôte y est relié ; sinon le champ est ignoré. La clé elle-même n'est jamais incluse dans la sauvegarde.</li>
                 <li><code>group</code> — nom du groupe auquel appartient l'hôte. Les groupes figurent dans le tableau <code>groups</code> au niveau racine, avec <code>name</code> et <code>color</code> (ARGB en entier 32 bits signé). Si un hôte référence un groupe absent du tableau, celui-ci est créé automatiquement avec une couleur par défaut — vous pouvez donc omettre le tableau en écrivant le fichier à la main.</li>
                 <li><code>color</code> — couleur facultative de l'hôte (ARGB en entier 32 bits signé). Elle prime sur la couleur du groupe.</li>
             </ul>

@@ -1,0 +1,5 @@
+• New app-lock options: biometric, device PIN/pattern, or none — usable on Android TV
+• Terminal now renders Nerd Font / Powerline glyphs (e.g. Starship prompts)
+• Backups remember each host's key by name
+• Paste added to the terminal selection popup
+• Arrow keys and PgUp/PgDn in the key bar now auto-repeat when held

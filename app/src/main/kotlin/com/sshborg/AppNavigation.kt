@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import com.sshborg.R
+import com.sshborg.data.AppPreferences
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -106,7 +107,7 @@ fun AppNavigation() {
         )
     }
 
-    // Delayed security reminder (shown if biometric or keystore encryption is not enabled)
+    // Delayed security reminder (shown if the app lock or keystore encryption is not enabled)
     // Key on showPrivacyDialog so the reminder waits until privacy policy is accepted
     var showSecurityReminder by remember { mutableStateOf(false) }
     LaunchedEffect(showPrivacyDialog) {
@@ -114,9 +115,9 @@ fun AppNavigation() {
         delay(1500L)
         val dismissed  = app.appPreferences.securityReminderDismissed.first()
         if (!dismissed) {
-            val biometric = app.appPreferences.biometricLock.first()
-            val keystore  = app.appPreferences.keystoreEncryption.first()
-            if (!biometric || !keystore) showSecurityReminder = true
+            val locked   = app.appPreferences.lockMode.first() != AppPreferences.LOCK_NONE
+            val keystore = app.appPreferences.keystoreEncryption.first()
+            if (!locked || !keystore) showSecurityReminder = true
         }
     }
     if (showSecurityReminder) {
