@@ -34,8 +34,8 @@ module.exports = {
   feat_keys_desc:      'Gere chaves Ed25519, ECDSA e RSA diretamente no seu dispositivo. Sem palavras-passe.',
   feat_jump_title:     'SUPORTE JUMP HOST',
   feat_jump_desc:      'Ligue-se através de um ou mais hosts de bastião com tunelamento transparente. Reencaminhamento completo do agente SSH.',
-  feat_biometric_title:'BLOQUEIO BIOMÉTRICO',
-  feat_biometric_desc: 'Proteja o acesso aos seus servidores com impressão digital ou reconhecimento facial. Tempo limite configurável.',
+  feat_biometric_title:'BLOQUEIO DA APP',
+  feat_biometric_desc: 'Bloqueie a app com biometria ou o PIN do dispositivo — funciona mesmo na Android TV sem sensor de impressões. Tempo limite configurável.',
   feat_multilingual_title: 'MULTILINGUE',
   feat_multilingual_desc:  'Disponível em inglês, italiano, francês, alemão, espanhol, português, ucraniano, russo, chinês e japonês.',
   feat_theme_title:    'TEMA ESCURO E CLARO',
@@ -199,7 +199,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Cifração adicional da chave</h3>
             <p>O SSHBorg oferece uma <strong>frase-passe adicional</strong> opcional para as suas chaves (Definições → Chaves SSH → toque numa chave → Ativar cifração). Quando ativa, a chave é cifrada com uma frase que o SSHBorg não guarda — será pedida sempre que a chave for usada.</p>
-            <p>Fortemente recomendado se guarda credenciais sensíveis no telemóvel ou se tem o bloqueio biométrico desativado.</p>`,
+            <p>Fortemente recomendado se guarda credenciais sensíveis no telemóvel ou se não tem um bloqueio da app ativado.</p>`,
 
   doc_suggestions: `
             <h2>// SUGESTÕES DE COMANDOS</h2>
@@ -440,8 +440,9 @@ Host target
 
   doc_security: `
             <h2>// SEGURANÇA DA APP</h2>
-            <h3>Bloqueio biométrico</h3>
-            <p>Ative o bloqueio biométrico em <strong>Definições → Segurança → Bloqueio biométrico</strong>. Quando ativo, o SSHBorg exige impressão digital ou reconhecimento facial antes de mostrar qualquer host, credencial ou dados de sessão.</p>
+            <h3>Bloqueio da app</h3>
+            <p>Escolha como a app é protegida em <strong>Definições → Segurança → Bloqueio da app</strong>: <strong>Nenhum</strong> (predefinido), <strong>Apenas biométrico</strong> (impressão digital ou reconhecimento facial) ou <strong>Bloqueio do dispositivo</strong> — o PIN, o padrão ou a palavra-passe do dispositivo, além da biometria. Quando um bloqueio está ativo, o SSHBorg exige autenticação antes de mostrar qualquer host, credencial ou dados de sessão.</p>
+            <p>A opção <strong>Bloqueio do dispositivo</strong> é útil em dispositivos sem hardware biométrico — como a Android TV — onde pode desbloquear com o PIN do sistema.</p>
             <p>Pode definir um tempo limite de inatividade — após esse número de minutos em segundo plano, a app bloqueia automaticamente.</p>
             <h3>Proteção de capturas de ecrã</h3>
             <p>Por predefinição, o SSHBorg bloqueia capturas de ecrã e gravação de ecrã para evitar que conteúdo sensível do terminal vaze através do ecrã de apps recentes ou ferramentas de captura.</p>

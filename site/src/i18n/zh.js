@@ -35,8 +35,8 @@ module.exports = {
   feat_keys_desc:      '直接在设备上生成 Ed25519、ECDSA 和 RSA 密钥，无需密码。',
   feat_jump_title:     '跳板机支持',
   feat_jump_desc:      '通过一台或多台堡垒主机进行透明隧道连接，完整支持 SSH 代理转发。',
-  feat_biometric_title:'生物识别锁',
-  feat_biometric_desc: '通过指纹或人脸解锁保护服务器访问权限，超时时间可自定义。',
+  feat_biometric_title:'应用锁',
+  feat_biometric_desc: '用生物识别或设备 PIN 锁定应用——即使在没有指纹传感器的 Android TV 上也能使用。超时时间可自定义。',
   feat_multilingual_title: '多语言',
   feat_multilingual_desc:  '支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、俄语、中文和日语。',
   feat_theme_title:    '深色与浅色主题',
@@ -201,7 +201,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>密钥额外加密</h3>
             <p>SSHBorg 提供可选的 <strong>额外密码短语</strong>（设置 → SSH 密钥 → 点击密钥 → 启用加密）。启用后，密钥将使用 SSHBorg 不存储的密码短语加密——每次使用密钥时都需要输入。</p>
-            <p>如果您在手机上存储了敏感服务器凭据，或已禁用生物识别锁，强烈建议启用此功能。</p>`,
+            <p>如果您在手机上存储了敏感服务器凭据，或未启用应用锁，强烈建议启用此功能。</p>`,
 
   doc_suggestions: `
             <h2>// 命令建议</h2>
@@ -442,8 +442,9 @@ Host target
 
   doc_security: `
             <h2>// 应用安全</h2>
-            <h3>生物识别锁</h3>
-            <p>在 <strong>设置 → 安全 → 生物识别锁</strong> 中启用。启用后，SSHBorg 在显示任何主机、凭据或会话数据前，都需要指纹或人脸解锁。</p>
+            <h3>应用锁</h3>
+            <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁），或 <strong>设备锁</strong>——除生物识别外，还可使用设备的 PIN、图案或密码。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。</p>
+            <p><strong>设备锁</strong> 适用于没有生物识别硬件的设备（如 Android TV），此时可用系统 PIN 解锁。</p>
             <p>您可以设置不活动超时——在后台等待该时长后，应用会自动锁定。</p>
             <h3>截图保护</h3>
             <p>SSHBorg 默认阻止截图和录屏，防止敏感的终端内容通过最近应用界面或截屏工具泄露。</p>

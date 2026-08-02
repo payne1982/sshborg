@@ -171,7 +171,10 @@
     <string name="settings_suggestions_bar_sticky_title">Vorschlagsleiste immer sichtbar</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Hält die Vorschlagsleiste auf fester Höhe, um Größenänderungen des Terminals zu vermeiden</string>
 
-    <string name="settings_biometric_lock_title">Biometrische Sperre</string>
+    <string name="settings_app_lock_title">App-Sperre</string>
+    <string name="settings_lock_mode_none">Keine</string>
+    <string name="settings_lock_mode_biometric">Nur biometrisch</string>
+    <string name="settings_lock_mode_device">Gerätesperre (PIN oder Biometrie)</string>
     <string name="settings_biometric_available">Authentifizierung beim Zurückkehren zur App verlangen</string>
     <string name="settings_biometric_unavailable">Keine biometrische Sperre oder Bildschirmsperre auf diesem Gerät eingerichtet</string>
 
@@ -292,7 +295,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Sicherheitshinweis</string>
-    <string name="security_reminder_body">Aktiviere biometrische Sperre und Hardware-Verschlüsselung in den Einstellungen, um deine Zugangsdaten zu schützen.</string>
+    <string name="security_reminder_body">Aktiviere eine App-Sperre und Hardware-Verschlüsselung in den Einstellungen, um deine Zugangsdaten zu schützen.</string>
     <string name="action_remind_later">Später erinnern</string>
     <string name="action_dont_show_again">Nicht mehr anzeigen</string>
 

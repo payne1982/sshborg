@@ -34,8 +34,8 @@ module.exports = {
   feat_keys_desc:      'Générez des clés Ed25519, ECDSA et RSA directement sur votre appareil. Sans mot de passe.',
   feat_jump_title:     'SUPPORT JUMP HOST',
   feat_jump_desc:      'Connectez-vous via un ou plusieurs hôtes bastions avec tunneling transparent. Transfert complet de l\'agent SSH.',
-  feat_biometric_title:'VERROUILLAGE BIOMÉTRIQUE',
-  feat_biometric_desc: 'Protégez l\'accès à vos serveurs par empreinte digitale ou reconnaissance faciale. Délai configurable.',
+  feat_biometric_title:'VERROUILLAGE DE L\'APP',
+  feat_biometric_desc: 'Verrouillez l\'app par biométrie ou par le code PIN de l\'appareil — fonctionne même sur Android TV sans capteur d\'empreinte. Délai configurable.',
   feat_multilingual_title: 'MULTILINGUE',
   feat_multilingual_desc:  'Disponible en anglais, italien, français, allemand, espagnol, portugais, ukrainien, russe, chinois et japonais.',
   feat_theme_title:    'THÈME SOMBRE &amp; CLAIR',
@@ -199,7 +199,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Chiffrement supplémentaire de la clé</h3>
             <p>SSHBorg propose une <strong>phrase secrète supplémentaire</strong> optionnelle pour vos clés (Paramètres → Clés SSH → appuyez sur une clé → Activer le chiffrement). Quand elle est activée, la clé est chiffrée avec une phrase que SSHBorg ne stocke pas — elle vous sera demandée à chaque utilisation.</p>
-            <p>Fortement recommandé si vous stockez des identifiants sensibles sur votre téléphone ou si le verrouillage biométrique est désactivé.</p>`,
+            <p>Fortement recommandé si vous stockez des identifiants sensibles sur votre téléphone ou si aucun verrouillage de l'app n'est activé.</p>`,
 
   doc_suggestions: `
             <h2>// SUGGESTIONS DE COMMANDES</h2>
@@ -440,8 +440,9 @@ Host target
 
   doc_security: `
             <h2>// SÉCURITÉ DE L'APP</h2>
-            <h3>Verrouillage biométrique</h3>
-            <p>Activez le verrouillage biométrique dans <strong>Paramètres → Sécurité → Verrouillage biométrique</strong>. Quand il est actif, SSHBorg exige une empreinte digitale ou une reconnaissance faciale avant d'afficher des hôtes, des identifiants ou des données de session.</p>
+            <h3>Verrouillage de l'app</h3>
+            <p>Choisissez comment l'app est protégée dans <strong>Paramètres → Sécurité → Verrouillage de l'app</strong> : <strong>Aucun</strong> (par défaut), <strong>Biométrie uniquement</strong> (empreinte digitale ou reconnaissance faciale) ou <strong>Verrouillage de l'appareil</strong> — le code PIN, le schéma ou le mot de passe de l'appareil, en plus de la biométrie. Quand un verrouillage est actif, SSHBorg exige une authentification avant d'afficher des hôtes, des identifiants ou des données de session.</p>
+            <p>L'option <strong>Verrouillage de l'appareil</strong> est utile sur les appareils sans matériel biométrique — comme Android TV — où vous pouvez déverrouiller avec le code PIN du système.</p>
             <p>Vous pouvez définir un délai d'inactivité — après ce nombre de minutes en arrière-plan, l'app se verrouille automatiquement.</p>
             <h3>Protection des captures d'écran</h3>
             <p>Par défaut, SSHBorg bloque les captures d'écran et l'enregistrement d'écran pour empêcher le contenu sensible du terminal de fuiter via l'écran des apps récentes ou des outils de capture.</p>

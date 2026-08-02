@@ -35,8 +35,8 @@ module.exports = {
   feat_keys_desc:      'Generate Ed25519, ECDSA, and RSA keys directly on your device. No passwords needed.',
   feat_jump_title:     'JUMP HOST SUPPORT',
   feat_jump_desc:      'Connect through one or more bastion hosts with transparent tunnelling. Full SSH agent forwarding.',
-  feat_biometric_title:'BIOMETRIC LOCK',
-  feat_biometric_desc: 'Protect access to your servers with fingerprint or face unlock. Configurable timeout.',
+  feat_biometric_title:'APP LOCK',
+  feat_biometric_desc: 'Lock the app with biometrics or your device PIN — works even on Android TV without a fingerprint sensor. Configurable timeout.',
   feat_multilingual_title: 'MULTILINGUAL',
   feat_multilingual_desc:  'Available in English, Italian, French, German, Spanish, Portuguese, Ukrainian, Russian, Chinese, and Japanese.',
   feat_theme_title:    'DARK &amp; LIGHT THEME',
@@ -201,7 +201,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Additional key encryption</h3>
             <p>SSHBorg offers an optional <strong>additional passphrase</strong> for your keys (Settings → SSH Keys → tap a key → Enable encryption). When enabled, the key is encrypted with a passphrase that SSHBorg does not store — you will be asked to enter it each time the key is used.</p>
-            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you have biometric lock disabled.</p>`,
+            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you don't have an app lock enabled.</p>`,
 
   doc_suggestions: `
             <h2>// COMMAND SUGGESTIONS</h2>
@@ -442,8 +442,9 @@ Host target
 
   doc_security: `
             <h2>// APP SECURITY</h2>
-            <h3>Biometric lock</h3>
-            <p>Enable biometric lock in <strong>Settings → Security → Biometric lock</strong>. When active, SSHBorg requires fingerprint or face unlock before showing any host, credential, or session data.</p>
+            <h3>App lock</h3>
+            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), or <strong>Device lock</strong> — the device PIN, pattern, or password, alongside biometrics. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
+            <p>The <strong>Device lock</strong> option is useful on devices without biometric hardware — such as Android TV — where you can unlock with the system PIN instead.</p>
             <p>You can set an inactivity timeout — after that many minutes in the background the app locks automatically.</p>
             <h3>Screenshot protection</h3>
             <p>By default SSHBorg blocks screenshots and screen recording to prevent sensitive terminal content from leaking via the recent-apps screen or screen capture tools.</p>

@@ -19,6 +19,7 @@ class AppPreferences(private val context: Context) {
 
     private object Keys {
         val BIOMETRIC_LOCK           = booleanPreferencesKey("biometric_lock")
+        val LOCK_MODE                = intPreferencesKey("lock_mode")
         val KEYSTORE_ENCRYPTION      = booleanPreferencesKey("keystore_encryption")
         val CONFIRM_EXIT             = booleanPreferencesKey("confirm_exit")
         val LOCK_TIMEOUT_SECONDS      = intPreferencesKey("lock_timeout_seconds")
@@ -37,8 +38,16 @@ class AppPreferences(private val context: Context) {
         val PRIVACY_POLICY_ACCEPTED      = booleanPreferencesKey("privacy_policy_accepted")
     }
 
-    val biometricLock: Flow<Boolean> =
-        context.dataStore.data.map { it[Keys.BIOMETRIC_LOCK] ?: false }
+    /**
+     * App-lock mode. Backward compatible with the old boolean [Keys.BIOMETRIC_LOCK]:
+     * if the new int key was never written, an old `biometric_lock = true` maps to
+     * [LOCK_BIOMETRIC], everything else to [LOCK_NONE]. So users who had the biometric
+     * lock on keep it, and nobody who had it off is suddenly locked.
+     */
+    val lockMode: Flow<Int> =
+        context.dataStore.data.map { p ->
+            p[Keys.LOCK_MODE] ?: if (p[Keys.BIOMETRIC_LOCK] == true) LOCK_BIOMETRIC else LOCK_NONE
+        }
 
     val keystoreEncryption: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.KEYSTORE_ENCRYPTION] ?: false }
@@ -59,8 +68,8 @@ class AppPreferences(private val context: Context) {
     val nightMode: Flow<Int> =
         context.dataStore.data.map { it[Keys.NIGHT_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM }
 
-    suspend fun setBiometricLock(enabled: Boolean) {
-        context.dataStore.edit { it[Keys.BIOMETRIC_LOCK] = enabled }
+    suspend fun setLockMode(mode: Int) {
+        context.dataStore.edit { it[Keys.LOCK_MODE] = mode }
     }
 
     suspend fun setKeystoreEncryption(enabled: Boolean) {
@@ -146,6 +155,11 @@ class AppPreferences(private val context: Context) {
         const val DOUBLE_TAP_NONE = 0
         const val DOUBLE_TAP_TAB = 1
         const val DOUBLE_TAP_TAB_TWICE = 2
+
+        // App-lock modes (see [lockMode]).
+        const val LOCK_NONE = 0       // no lock (default)
+        const val LOCK_BIOMETRIC = 1  // biometric only, device credential only if no biometric enrolled
+        const val LOCK_DEVICE = 2     // any device screen lock: biometric, PIN, pattern, or password
     }
 
     /** Whether to show shell history suggestions above the keyboard. Default true. */
@@ -180,7 +194,7 @@ class AppPreferences(private val context: Context) {
 
     // ── Settings backup ──────────────────────────────────────────────────────
     // Only portable UI/terminal preferences are backed up. Deliberately excluded:
-    // biometric_lock and keystore_encryption (security gates tied to this device's
+    // lock_mode and keystore_encryption (security gates tied to this device's
     // capabilities / actual Keystore crypto state — restoring blindly could lock
     // the user out or misrepresent whether data is encrypted), and the one-time
     // acknowledgement flags (root warning, security reminder, privacy consent),

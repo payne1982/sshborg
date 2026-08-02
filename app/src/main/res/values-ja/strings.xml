@@ -180,7 +180,10 @@
     <string name="settings_suggestions_bar_sticky_title">候補バーを常に表示</string>
     <string name="settings_suggestions_bar_sticky_subtitle">候補の表示・非表示でターミナルのサイズが変わらないよう、候補バーの高さを固定する</string>
 
-    <string name="settings_biometric_lock_title">生体認証ロック</string>
+    <string name="settings_app_lock_title">アプリのロック</string>
+    <string name="settings_lock_mode_none">なし</string>
+    <string name="settings_lock_mode_biometric">生体認証のみ</string>
+    <string name="settings_lock_mode_device">デバイスのロック（PIN・生体認証）</string>
     <string name="settings_biometric_available">アプリに戻るときに認証を要求する</string>
     <string name="settings_biometric_unavailable">このデバイスに生体認証または画面ロックが設定されていません</string>
 
@@ -307,7 +310,7 @@
 
     <!-- ── Security reminder dialog ── -->
     <string name="security_reminder_title">セキュリティのヒント</string>
-    <string name="security_reminder_body">認証情報を安全に保つため、設定で生体認証ロックとハードウェア暗号化を有効にしてください。</string>
+    <string name="security_reminder_body">認証情報を安全に保つため、設定でアプリのロックとハードウェア暗号化を有効にしてください。</string>
     <string name="action_remind_later">後で通知する</string>
     <string name="action_dont_show_again">今後表示しない</string>
 

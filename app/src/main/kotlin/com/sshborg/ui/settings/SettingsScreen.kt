@@ -38,6 +38,14 @@ private val TIMEOUT_OPTIONS = listOf(
     14400 to R.string.timeout_4_hours,
 )
 
+// App-lock modes offered in the dropdown, in display order. "None" is always
+// available; the two authentication modes need a device secure lock present.
+private val LOCK_MODE_OPTIONS = listOf(
+    AppPreferences.LOCK_NONE      to R.string.settings_lock_mode_none,
+    AppPreferences.LOCK_BIOMETRIC to R.string.settings_lock_mode_biometric,
+    AppPreferences.LOCK_DEVICE    to R.string.settings_lock_mode_device,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -46,7 +54,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    val biometricLock         by vm.biometricLock.collectAsState()
+    val lockMode              by vm.lockMode.collectAsState()
     val lockTimeoutSeconds    by vm.lockTimeoutSeconds.collectAsState()
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
     val confirmExit           by vm.confirmExit.collectAsState()
@@ -76,6 +84,7 @@ fun SettingsScreen(
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
+    var lockModeMenuExpanded by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
@@ -445,9 +454,13 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
 
-            // Biometric lock
+            // App lock
+            val currentLockLabel = stringResource(
+                LOCK_MODE_OPTIONS.find { it.first == lockMode }?.second
+                    ?: R.string.settings_lock_mode_none
+            )
             ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_biometric_lock_title)) },
+                headlineContent = { Text(stringResource(R.string.settings_app_lock_title)) },
                 supportingContent = {
                     Text(
                         if (biometricAvailable)
@@ -457,16 +470,45 @@ fun SettingsScreen(
                     )
                 },
                 trailingContent = {
-                    Switch(
-                        checked = biometricLock,
-                        onCheckedChange = { vm.setBiometricLock(it) },
-                        enabled = biometricAvailable,
-                    )
+                    ExposedDropdownMenuBox(
+                        expanded = lockModeMenuExpanded,
+                        onExpandedChange = { lockModeMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = currentLockLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(lockModeMenuExpanded) },
+                            modifier = Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .width(160.dp),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            singleLine = true,
+                        )
+                        ExposedDropdownMenu(
+                            expanded = lockModeMenuExpanded,
+                            onDismissRequest = { lockModeMenuExpanded = false },
+                        ) {
+                            LOCK_MODE_OPTIONS.forEach { (mode, labelResId) ->
+                                // The two authentication modes need a device secure lock;
+                                // "None" is always selectable so the user can turn the lock off.
+                                val enabled = mode == AppPreferences.LOCK_NONE || biometricAvailable
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(labelResId)) },
+                                    enabled = enabled,
+                                    onClick = {
+                                        vm.setLockMode(mode)
+                                        lockModeMenuExpanded = false
+                                    },
+                                )
+                            }
+                        }
+                    }
                 },
             )
 
-            // Lock timeout — only shown when biometric is enabled
-            if (biometricLock) {
+            // Lock timeout — only shown when a lock is enabled
+            if (lockMode != AppPreferences.LOCK_NONE) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_lock_after_title)) },
                     supportingContent = { Text(stringResource(R.string.settings_lock_after_subtitle)) },

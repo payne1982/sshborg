@@ -1,3 +1,4 @@
+• Neue App-Sperre: biometrisch, Geräte-PIN/-Muster oder keine — auch für Android TV
 • Terminal zeigt jetzt Nerd-Font-/Powerline-Glyphen (z. B. Starship-Prompts)
 • Backups merken sich den Schlüssel jedes Hosts per Name
 • Einfügen zum Auswahl-Popup des Terminals hinzugefügt

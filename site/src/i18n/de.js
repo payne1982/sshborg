@@ -34,8 +34,8 @@ module.exports = {
   feat_keys_desc:      'Ed25519-, ECDSA- und RSA-Schlüssel direkt auf deinem Gerät generieren. Kein Passwort erforderlich.',
   feat_jump_title:     'JUMP-HOST-UNTERSTÜTZUNG',
   feat_jump_desc:      'Verbinde dich über einen oder mehrere Bastion-Hosts mit transparentem Tunneling. Vollständiges SSH-Agent-Forwarding.',
-  feat_biometric_title:'BIOMETRISCHE SPERRE',
-  feat_biometric_desc: 'Schütze den Zugriff auf deine Server mit Fingerabdruck oder Gesichtserkennung. Konfigurierbares Timeout.',
+  feat_biometric_title:'APP-SPERRE',
+  feat_biometric_desc: 'Sperre die App mit Biometrie oder der Geräte-PIN — funktioniert auch auf Android TV ohne Fingerabdrucksensor. Konfigurierbares Timeout.',
   feat_multilingual_title: 'MEHRSPRACHIG',
   feat_multilingual_desc:  'Verfügbar in Englisch, Italienisch, Französisch, Deutsch, Spanisch, Portugiesisch, Ukrainisch, Russisch, Chinesisch und Japanisch.',
   feat_theme_title:    'DUNKLES &amp; HELLES DESIGN',
@@ -199,7 +199,7 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             </div>
             <h3>Zusätzliche Schlüsselverschlüsselung</h3>
             <p>SSHBorg bietet eine optionale <strong>zusätzliche Passphrase</strong> für deine Schlüssel (Einstellungen → SSH-Schlüssel → Schlüssel antippen → Verschlüsselung aktivieren). Wenn aktiviert, wird der Schlüssel mit einer Passphrase verschlüsselt, die SSHBorg nicht speichert — du wirst jedes Mal danach gefragt, wenn der Schlüssel verwendet wird.</p>
-            <p>Dies wird dringend empfohlen, wenn du sensible Server-Zugangsdaten auf deinem Smartphone speicherst oder die biometrische Sperre deaktiviert hast.</p>`,
+            <p>Dies wird dringend empfohlen, wenn du sensible Server-Zugangsdaten auf deinem Smartphone speicherst oder keine App-Sperre aktiviert hast.</p>`,
 
   doc_suggestions: `
             <h2>// BEFEHLSVORSCHLÄGE</h2>
@@ -440,8 +440,9 @@ Host target
 
   doc_security: `
             <h2>// APP-SICHERHEIT</h2>
-            <h3>Biometrische Sperre</h3>
-            <p>Aktiviere die biometrische Sperre unter <strong>Einstellungen → Sicherheit → Biometrische Sperre</strong>. Wenn aktiv, erfordert SSHBorg einen Fingerabdruck oder Gesichtserkennung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
+            <h3>App-Sperre</h3>
+            <p>Wähle unter <strong>Einstellungen → Sicherheit → App-Sperre</strong>, wie die App geschützt wird: <strong>Keine</strong> (Standard), <strong>Nur biometrisch</strong> (Fingerabdruck oder Gesichtserkennung) oder <strong>Gerätesperre</strong> — die PIN, das Muster oder das Passwort des Geräts, zusätzlich zur Biometrie. Wenn eine Sperre aktiv ist, erfordert SSHBorg eine Authentifizierung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
+            <p>Die Option <strong>Gerätesperre</strong> ist nützlich auf Geräten ohne biometrische Hardware — etwa Android TV — wo du stattdessen mit der System-PIN entsperren kannst.</p>
             <p>Du kannst ein Inaktivitäts-Timeout festlegen — nach dieser Anzahl von Minuten im Hintergrund sperrt sich die App automatisch.</p>
             <h3>Screenshot-Schutz</h3>
             <p>Standardmäßig blockiert SSHBorg Screenshots und Bildschirmaufnahmen, um zu verhindern, dass sensible Terminal-Inhalte über den Zuletzt-Geöffnet-Bildschirm oder Aufnahme-Tools durchsickern.</p>

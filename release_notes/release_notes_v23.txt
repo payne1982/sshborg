@@ -1,58 +1,68 @@
 <en-US>
+• New app-lock options: biometric, device PIN/pattern, or none — usable on Android TV
 • Terminal now renders Nerd Font / Powerline glyphs (e.g. Starship prompts)
 • Backups remember each host's key by name
 • Paste added to the terminal selection popup
 • Arrow keys and PgUp/PgDn in the key bar now auto-repeat when held
 </en-US>
 <it-IT>
+• Nuove opzioni di blocco app: biometrico, PIN/sequenza del dispositivo o nessuno — utili su Android TV
 • Il terminale ora mostra i glifi Nerd Font / Powerline (es. prompt Starship)
 • I backup ricordano la chiave di ogni host per nome
 • Aggiunto Incolla al popup di selezione del terminale
 • Frecce e PgUp/PgDn nella barra tasti ora si ripetono se tenute premute
 </it-IT>
 <de-DE>
+• Neue App-Sperre: biometrisch, Geräte-PIN/-Muster oder keine — auch für Android TV
 • Terminal zeigt jetzt Nerd-Font-/Powerline-Glyphen (z. B. Starship-Prompts)
 • Backups merken sich den Schlüssel jedes Hosts per Name
 • Einfügen zum Auswahl-Popup des Terminals hinzugefügt
 • Pfeiltasten und PgUp/PgDn in der Tastenleiste wiederholen sich beim Halten
 </de-DE>
 <es-ES>
+• Nuevas opciones de bloqueo: biométrico, PIN/patrón del dispositivo o ninguno — útil en Android TV
 • El terminal ahora muestra glifos Nerd Font / Powerline (p. ej. prompts de Starship)
 • Las copias recuerdan la clave de cada host por su nombre
 • Añadido Pegar al menú de selección del terminal
 • Las flechas y PgUp/PgDn de la barra de teclas ahora se repiten al mantenerlas
 </es-ES>
 <fr-FR>
+• Nouveau verrouillage de l'app : biométrie, PIN/schéma de l'appareil ou aucun — pour Android TV
 • Le terminal affiche les glyphes Nerd Font / Powerline (ex. invites Starship)
 • Les sauvegardes retiennent la clé de chaque hôte par son nom
 • Ajout de Coller au menu de sélection du terminal
 • Les flèches et PgUp/PgDn de la barre de touches se répètent si maintenues
 </fr-FR>
 <pt-PT>
+• Novas opções de bloqueio: biométrico, PIN/padrão do dispositivo ou nenhum — útil na Android TV
 • O terminal mostra agora glifos Nerd Font / Powerline (ex. prompts do Starship)
 • As cópias recordam a chave de cada host pelo nome
 • Adicionado Colar ao menu de seleção do terminal
 • As setas e PgUp/PgDn da barra de teclas repetem-se ao manter premido
 </pt-PT>
 <uk>
+• Нові варіанти блокування: біометрія, PIN/ключ пристрою або жоден — зручно на Android TV
 • Термінал показує гліфи Nerd Font / Powerline (напр., підказки Starship)
 • Резервні копії запам'ятовують ключ кожного хоста за назвою
 • Додано вставку до меню виділення термінала
 • Стрілки та PgUp/PgDn на панелі клавіш тепер повторюються при утриманні
 </uk>
 <ru-RU>
+• Новые варианты блокировки: биометрия, PIN/ключ устройства или без — удобно на Android TV
 • Терминал показывает глифы Nerd Font / Powerline (напр., приглашения Starship)
 • Резервные копии запоминают ключ каждого хоста по имени
 • Добавлена вставка в меню выделения терминала
 • Стрелки и PgUp/PgDn на панели клавиш теперь повторяются при удержании
 </ru-RU>
 <zh-CN>
+• 新增应用锁方式：生物识别、设备 PIN/图案或无——适用于 Android TV
 • 终端现可显示 Nerd Font / Powerline 字形（如 Starship 提示符）
 • 备份按名称记住每个主机的密钥
 • 终端选择菜单中新增“粘贴”
 • 按键栏中的方向键和 PgUp/PgDn 现在长按可连续触发
 </zh-CN>
 <ja-JP>
+• アプリのロックを追加：生体認証、端末のPIN/パターン、なし — Android TVにも対応
 • ターミナルが Nerd Font / Powerline グリフを表示（Starship プロンプトなど）
 • バックアップが各ホストの鍵を名前で記憶
 • ターミナルの選択メニューに「貼り付け」を追加

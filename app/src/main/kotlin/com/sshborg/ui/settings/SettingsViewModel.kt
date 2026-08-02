@@ -24,8 +24,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val hostDao      = sshBorgApp.db.hostDao()
     private val groupDao     = sshBorgApp.db.groupDao()
 
-    val biometricLock: StateFlow<Boolean> =
-        prefs.biometricLock.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val lockMode: StateFlow<Int> =
+        prefs.lockMode.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.LOCK_NONE,
+        )
 
     val keystoreEncryption: StateFlow<Boolean> =
         prefs.keystoreEncryption.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -97,8 +100,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         AppCompatDelegate.setApplicationLocales(localeList)
     }
 
-    fun setBiometricLock(enabled: Boolean) {
-        viewModelScope.launch { prefs.setBiometricLock(enabled) }
+    fun setLockMode(mode: Int) {
+        viewModelScope.launch { prefs.setLockMode(mode) }
     }
 
     fun setConfirmExit(enabled: Boolean) {

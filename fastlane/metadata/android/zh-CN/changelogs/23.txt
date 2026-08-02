@@ -1,3 +1,4 @@
+• 新增应用锁方式：生物识别、设备 PIN/图案或无——适用于 Android TV
 • 终端现可显示 Nerd Font / Powerline 字形（如 Starship 提示符）
 • 备份按名称记住每个主机的密钥
 • 终端选择菜单中新增“粘贴”

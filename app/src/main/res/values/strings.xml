@@ -181,9 +181,12 @@
     <string name="settings_suggestions_bar_sticky_title">Always-visible suggestion bar</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Keep the suggestion bar at a fixed height to prevent the terminal from resizing when suggestions appear or disappear</string>
 
-    <string name="settings_biometric_lock_title">Biometric lock</string>
+    <string name="settings_app_lock_title">App lock</string>
     <string name="settings_biometric_available">Require authentication when returning to the app</string>
     <string name="settings_biometric_unavailable">No biometric or screen lock set up on this device</string>
+    <string name="settings_lock_mode_none">None</string>
+    <string name="settings_lock_mode_biometric">Biometric only</string>
+    <string name="settings_lock_mode_device">Device lock (PIN or biometric)</string>
 
     <string name="settings_lock_after_title">Lock after</string>
     <string name="settings_lock_after_subtitle">Time before requiring authentication again</string>
@@ -308,7 +311,7 @@
 
     <!-- ── Security reminder dialog ──────────────────────────────────────── -->
     <string name="security_reminder_title">Security tip</string>
-    <string name="security_reminder_body">Enable biometric lock and hardware encryption in Settings to keep your credentials safe.</string>
+    <string name="security_reminder_body">Enable an app lock and hardware encryption in Settings to keep your credentials safe.</string>
     <string name="action_remind_later">Remind me later</string>
     <string name="action_dont_show_again">Don\'t show again</string>
 
