@@ -1,1 +1,2 @@
 • Die Terminal-Schriftart enthält jetzt Nerd-Font- und Powerline-Glyphen, sodass Prompts wie Starship korrekt dargestellt werden
+• Backups merken sich jetzt, welchen Schlüssel jeder Host verwendet, und verknüpfen ihn beim Import erneut, wenn ein Schlüssel mit demselben Namen vorhanden ist

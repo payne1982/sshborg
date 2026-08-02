@@ -460,7 +460,7 @@ Host target
             <p>SSHBorgはホストの設定とアプリの設定をJSONファイルとしてエクスポート・インポートできます。これにより、サーバーリストを別のデバイスに移したり、設定のポータブルなバックアップを保管したりできます。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                バックアップにはホスト設定とアプリ設定（ターミナル、外観、動作）が含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 新しいデバイスにインポートした後、再設定が必要です。
+                バックアップにはホスト設定とアプリ設定（ターミナル、外観、動作）が含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 鍵そのものは新しいデバイスで再設定が必要です。ただしバックアップには各ホストが使用する鍵の<em>名前</em>が記録されるため、インポート前に同じ名前の鍵を作成しておくと、そのホストは自動的に再リンクされます。
             </div>
             <h3>エクスポート</h3>
             <p><strong>設定 → バックアップ → バックアップをエクスポート</strong> に移動します。システムのファイル選択ツールを使って保存先を選択します。ファイル名はデフォルトで <code>sshborg_backup.json</code> です。</p>
@@ -471,11 +471,12 @@ Host target
                 <li>新しい名前を持つホストは<strong>追加</strong>されます。</li>
                 <li>ファイルにないホストは<strong>変更されません</strong>。</li>
                 <li>更新されるホストは保存済みのパスワード・鍵・承認済みホスト鍵を保持します（バックアップには含まれません）。</li>
+                <li>鍵のないホストは、エクスポートされた <code>keyLabel</code> と名前が一致する鍵があればそれにリンクされます。なければこのフィールドは無視されます。</li>
 </ul>
             <h3>JSON形式</h3>
             <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "本番", "color": -1754827 }
@@ -494,6 +495,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "私の VPS 鍵",
       "group":           "本番"
     }
   ],
@@ -519,6 +521,7 @@ Host target
                 <li><code>sftpStartMode</code> — SFTPの開始ディレクトリ：<code>"last"</code>（最後に訪問したディレクトリを記憶）、<code>"fixed"</code>（常に <code>sftpStartDir</code> を使用）、<code>"home"</code>（サーバーのホームディレクトリ）。デフォルト：<code>"last"</code>。</li>
                 <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> にすると、前述のレガシー暗号アルゴリズムが有効になります。既定は <code>false</code> です。</li>
+                <li><code>keyLabel</code> — このホストが使用するSSH鍵の名前。インポート時に同じ名前の鍵があればホストにリンクされ、なければ無視されます。鍵そのものはバックアップに含まれません。</li>
                 <li><code>group</code> — ホストが属するグループ名。グループはトップレベルの <code>groups</code> 配列に <code>name</code> と <code>color</code>（符号付き 32 ビット整数の ARGB）で記載します。配列にないグループをホストが参照している場合は既定の色で自動作成されるため、手書きの場合は配列を丸ごと省略してもかまいません。</li>
                 <li><code>color</code> — ホストごとの任意の色（符号付き 32 ビット整数の ARGB）。グループの色より優先されます。</li>
             </ul>

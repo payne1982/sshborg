@@ -459,7 +459,7 @@ Host target
             <p>SSHBorg può esportare e importare le configurazioni degli host e le impostazioni dell'app come file JSON. Questo permette di trasferire la lista dei server su un altro dispositivo o di conservare un backup portabile della propria configurazione.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                Il backup include le configurazioni degli host e le impostazioni dell'app (terminale, aspetto, comportamento). <strong>Password e chiavi SSH non vengono mai esportate</strong> — devono essere riconfigurate dopo l'importazione su un nuovo dispositivo.
+                Il backup include le configurazioni degli host e le impostazioni dell'app (terminale, aspetto, comportamento). <strong>Password e chiavi SSH non vengono mai esportate</strong> — il materiale della chiave va riconfigurato su un nuovo dispositivo. Il backup registra però il <em>nome</em> della chiave usata da ogni host: se ricrei una chiave con lo stesso nome prima di importare, i suoi host vengono ricollegati automaticamente.
             </div>
             <h3>Esportare</h3>
             <p>Vai in <strong>Impostazioni → Backup → Esporta backup</strong>. Scegli dove salvare il file tramite il selettore file di sistema. Il file si chiama <code>sshborg_backup.json</code> per impostazione predefinita.</p>
@@ -470,11 +470,12 @@ Host target
                 <li>Gli host con un nome nuovo vengono <strong>aggiunti</strong>.</li>
                 <li>Gli host non presenti nel file rimangono <strong>invariati</strong>.</li>
                 <li>Un host aggiornato mantiene password, chiave e chiave host accettata già salvate — il backup non le contiene.</li>
+                <li>Un host senza chiave viene collegato a una chiave il cui nome corrisponde al <code>keyLabel</code> esportato, se esiste; altrimenti il campo viene ignorato.</li>
 </ul>
             <h3>Formato JSON</h3>
             <p>Il file esportato è un normale oggetto JSON. È possibile crearlo manualmente per importare in blocco una lista di server da un'altra fonte.</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produzione", "color": -1754827 }
@@ -493,6 +494,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "Chiave VPS",
       "group":           "Produzione"
     }
   ],
@@ -518,6 +520,7 @@ Host target
                 <li><code>sftpStartMode</code> — cartella iniziale SFTP: <code>"last"</code> (ricorda l'ultima visitata), <code>"fixed"</code> (usa sempre <code>sftpStartDir</code>), <code>"home"</code> (home del server). Valore predefinito: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — percorso da usare quando <code>sftpStartMode</code> è <code>"fixed"</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> per abilitare gli algoritmi legacy descritti sopra. Predefinito: <code>false</code>.</li>
+                <li><code>keyLabel</code> — nome della chiave SSH usata da questo host. All'importazione, se esiste una chiave con questo nome viene collegata all'host; altrimenti il campo viene ignorato. La chiave stessa non è mai inclusa nel backup.</li>
                 <li><code>group</code> — nome del gruppo a cui appartiene l'host. I gruppi sono elencati nell'array <code>groups</code> in cima al file, con <code>name</code> e <code>color</code> (ARGB come intero a 32 bit con segno). Se un host fa riferimento a un gruppo assente dall'array, il gruppo viene creato automaticamente con un colore predefinito: scrivendo il file a mano puoi quindi omettere l'array.</li>
                 <li><code>color</code> — colore opzionale del singolo host (ARGB come intero a 32 bit con segno). Prevale sul colore del gruppo.</li>
             </ul>

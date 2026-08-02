@@ -1,30 +1,40 @@
 <en-US>
 • The terminal font now includes Nerd Font and Powerline glyphs, so prompts like Starship render correctly
+• Backups now remember which key each host uses, re-linking it on import if a key with the same name exists
 </en-US>
 <it-IT>
 • Il font del terminale ora include i glifi Nerd Font e Powerline, così i prompt come Starship vengono visualizzati correttamente
+• I backup ora ricordano quale chiave usa ogni host e la ricollegano all'importazione se esiste una chiave con lo stesso nome
 </it-IT>
 <de-DE>
 • Die Terminal-Schriftart enthält jetzt Nerd-Font- und Powerline-Glyphen, sodass Prompts wie Starship korrekt dargestellt werden
+• Backups merken sich jetzt, welchen Schlüssel jeder Host verwendet, und verknüpfen ihn beim Import erneut, wenn ein Schlüssel mit demselben Namen vorhanden ist
 </de-DE>
 <es-ES>
 • La fuente del terminal ahora incluye glifos Nerd Font y Powerline, por lo que los prompts como Starship se muestran correctamente
+• Las copias de seguridad ahora recuerdan qué clave usa cada host y la vuelven a vincular al importar si existe una clave con el mismo nombre
 </es-ES>
 <fr-FR>
 • La police du terminal inclut désormais les glyphes Nerd Font et Powerline, pour afficher correctement les invites comme Starship
+• Les sauvegardes retiennent désormais la clé utilisée par chaque hôte et la relient à l'import si une clé du même nom existe
 </fr-FR>
 <pt-PT>
 • O tipo de letra do terminal inclui agora glifos Nerd Font e Powerline, para que prompts como o Starship sejam apresentados corretamente
+• As cópias de segurança passam a lembrar-se da chave que cada anfitrião usa e voltam a associá-la na importação se existir uma chave com o mesmo nome
 </pt-PT>
 <uk>
 • Шрифт термінала тепер містить гліфи Nerd Font і Powerline, тож підказки на кшталт Starship відображаються правильно
+• Резервні копії тепер запам'ятовують, який ключ використовує кожен хост, і знову прив'язують його під час імпорту, якщо існує ключ із такою ж назвою
 </uk>
 <ru-RU>
 • Шрифт терминала теперь содержит глифы Nerd Font и Powerline, поэтому приглашения вроде Starship отображаются корректно
+• Резервные копии теперь запоминают, какой ключ использует каждый хост, и повторно связывают его при импорте, если есть ключ с таким же именем
 </ru-RU>
 <zh-CN>
 • 终端字体现已包含 Nerd Font 和 Powerline 字形，因此 Starship 等提示符能正确显示
+• 备份现在会记住每个主机使用的密钥，导入时若存在同名密钥会自动重新关联
 </zh-CN>
 <ja-JP>
 • ターミナルフォントに Nerd Font と Powerline のグリフを追加し、Starship などのプロンプトが正しく表示されるようになりました
+• バックアップが各ホストの使用するキーを記憶し、同名のキーがあればインポート時に再びリンクするようになりました
 </ja-JP>

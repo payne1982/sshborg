@@ -1,1 +1,2 @@
 • O tipo de letra do terminal inclui agora glifos Nerd Font e Powerline, para que prompts como o Starship sejam apresentados corretamente
+• As cópias de segurança passam a lembrar-se da chave que cada anfitrião usa e voltam a associá-la na importação se existir uma chave com o mesmo nome

@@ -1,1 +1,2 @@
 • La fuente del terminal ahora incluye glifos Nerd Font y Powerline, por lo que los prompts como Starship se muestran correctamente
+• Las copias de seguridad ahora recuerdan qué clave usa cada host y la vuelven a vincular al importar si existe una clave con el mismo nombre

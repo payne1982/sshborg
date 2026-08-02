@@ -921,7 +921,7 @@ Host target
             <p>SSHBorg puede exportar e importar configuraciones de hosts y ajustes de la app como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — deben configurarse de nuevo tras importar en un dispositivo nuevo.
+                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — el material de la clave debe configurarse de nuevo en un dispositivo nuevo. No obstante, la copia registra el <em>nombre</em> de la clave que usa cada host: si vuelves a crear una clave con el mismo nombre antes de importar, sus hosts se vuelven a vincular automáticamente.
             </div>
             <h3>Exportar</h3>
             <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar copia</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_backup.json</code> por defecto.</p>
@@ -932,11 +932,12 @@ Host target
                 <li>Los hosts con un nombre nuevo se <strong>añaden</strong>.</li>
                 <li>Los hosts no presentes en el archivo permanecen <strong>sin cambios</strong>.</li>
                 <li>Un host actualizado conserva su contraseña, clave y clave de host aceptada — la copia nunca las contiene.</li>
+                <li>Un host sin clave se vincula a una clave cuyo nombre coincide con el <code>keyLabel</code> exportado, si existe; de lo contrario, el campo se ignora.</li>
 </ul>
             <h3>Formato JSON</h3>
             <p>El archivo exportado es un objeto JSON estándar. También puedes crearlo manualmente para importar en bloque una lista de servidores desde otra fuente.</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Producción", "color": -1754827 }
@@ -955,6 +956,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "Clave de mi VPS",
       "group":           "Producción"
     }
   ],
@@ -980,6 +982,7 @@ Host target
                 <li><code>sftpStartMode</code> — directorio de inicio SFTP: <code>"last"</code> (recordar el último visitado), <code>"fixed"</code> (usar siempre <code>sftpStartDir</code>), <code>"home"</code> (directorio principal del servidor). Por defecto: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — ruta a usar cuando <code>sftpStartMode</code> es <code>"fixed"</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> para habilitar los algoritmos heredados descritos más arriba. Por defecto <code>false</code>.</li>
+                <li><code>keyLabel</code> — nombre de la clave SSH que usa este host. Al importar, si existe una clave con este nombre se vincula al host; de lo contrario, el campo se ignora. La clave en sí nunca se incluye en la copia.</li>
                 <li><code>group</code> — nombre del grupo al que pertenece el host. Los grupos se listan en el array <code>groups</code> del nivel superior, con <code>name</code> y <code>color</code> (ARGB como entero de 32 bits con signo). Si un host hace referencia a un grupo que no está en el array, se crea automáticamente con un color por defecto — al escribir el archivo a mano puedes omitir el array.</li>
                 <li><code>color</code> — color opcional del host (ARGB como entero de 32 bits con signo). Prevalece sobre el color del grupo.</li>
             </ul>

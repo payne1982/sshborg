@@ -1,1 +1,2 @@
 • The terminal font now includes Nerd Font and Powerline glyphs, so prompts like Starship render correctly
+• Backups now remember which key each host uses, re-linking it on import if a key with the same name exists

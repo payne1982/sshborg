@@ -1,1 +1,2 @@
 • La police du terminal inclut désormais les glyphes Nerd Font et Powerline, pour afficher correctement les invites comme Starship
+• Les sauvegardes retiennent désormais la clé utilisée par chaque hôte et la relient à l'import si une clé du même nom existe

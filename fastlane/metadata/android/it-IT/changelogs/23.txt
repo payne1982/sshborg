@@ -1,1 +1,2 @@
 • Il font del terminale ora include i glifi Nerd Font e Powerline, così i prompt come Starship vengono visualizzati correttamente
+• I backup ora ricordano quale chiave usa ogni host e la ricollegano all'importazione se esiste una chiave con lo stesso nome

@@ -458,7 +458,7 @@ Host target
             <p>SSHBorg kann Host-Konfigurationen und App-Einstellungen als JSON-Datei exportieren und importieren. Das ermöglicht es, die Serverliste auf ein anderes Gerät zu übertragen oder ein portables Backup der eigenen Einrichtung aufzubewahren.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// WICHTIG</div>
-                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — sie müssen nach dem Import auf einem neuen Gerät neu eingerichtet werden.
+                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — das Schlüsselmaterial muss auf einem neuen Gerät neu eingerichtet werden. Das Backup speichert jedoch den <em>Namen</em> des von jedem Host verwendeten Schlüssels: Wenn du vor dem Import einen Schlüssel mit demselben Namen neu erstellst, werden seine Hosts automatisch wieder damit verknüpft.
             </div>
             <h3>Exportieren</h3>
             <p>Gehe zu <strong>Einstellungen → Backup → Backup exportieren</strong>. Wähle über den Systemdatei-Auswähler aus, wo die Datei gespeichert werden soll. Die Datei heißt standardmäßig <code>sshborg_backup.json</code>.</p>
@@ -469,11 +469,12 @@ Host target
                 <li>Hosts mit einem neuen Namen werden <strong>hinzugefügt</strong>.</li>
                 <li>Hosts, die nicht in der Datei vorhanden sind, bleiben <strong>unverändert</strong>.</li>
                 <li>Ein aktualisierter Host behält gespeichertes Passwort, Schlüssel und akzeptierten Hostschlüssel — die Sicherung enthält sie nie.</li>
+                <li>Ein Host ohne Schlüssel wird mit einem Schlüssel verknüpft, dessen Name dem exportierten <code>keyLabel</code> entspricht, sofern vorhanden; andernfalls wird das Feld ignoriert.</li>
 </ul>
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 3,
+  "version": 4,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produktion", "color": -1754827 }
@@ -492,6 +493,7 @@ Host target
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
       "allowLegacyCiphers": false,
+      "keyLabel":         "Mein VPS-Schlüssel",
       "group":           "Produktion"
     }
   ],
@@ -517,6 +519,7 @@ Host target
                 <li><code>sftpStartMode</code> — SFTP-Startverzeichnis: <code>"last"</code> (letztes besuchtes merken), <code>"fixed"</code> (immer <code>sftpStartDir</code> verwenden), <code>"home"</code> (Server-Home). Standard: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
+                <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
                 <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>
             </ul>
