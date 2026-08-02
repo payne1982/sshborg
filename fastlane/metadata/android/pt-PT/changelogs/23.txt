@@ -1,2 +1,4 @@
-• O tipo de letra do terminal inclui agora glifos Nerd Font e Powerline, para que prompts como o Starship sejam apresentados corretamente
-• As cópias de segurança passam a lembrar-se da chave que cada anfitrião usa e voltam a associá-la na importação se existir uma chave com o mesmo nome
+• O terminal mostra agora glifos Nerd Font / Powerline (ex. prompts do Starship)
+• As cópias recordam a chave de cada host pelo nome
+• Adicionado Colar ao menu de seleção do terminal
+• As setas e PgUp/PgDn da barra de teclas repetem-se ao manter premido

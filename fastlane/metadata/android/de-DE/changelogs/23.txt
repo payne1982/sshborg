@@ -1,2 +1,4 @@
-• Die Terminal-Schriftart enthält jetzt Nerd-Font- und Powerline-Glyphen, sodass Prompts wie Starship korrekt dargestellt werden
-• Backups merken sich jetzt, welchen Schlüssel jeder Host verwendet, und verknüpfen ihn beim Import erneut, wenn ein Schlüssel mit demselben Namen vorhanden ist
+• Terminal zeigt jetzt Nerd-Font-/Powerline-Glyphen (z. B. Starship-Prompts)
+• Backups merken sich den Schlüssel jedes Hosts per Name
+• Einfügen zum Auswahl-Popup des Terminals hinzugefügt
+• Pfeiltasten und PgUp/PgDn in der Tastenleiste wiederholen sich beim Halten

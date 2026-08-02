@@ -1,2 +1,4 @@
-• The terminal font now includes Nerd Font and Powerline glyphs, so prompts like Starship render correctly
-• Backups now remember which key each host uses, re-linking it on import if a key with the same name exists
+• Terminal now renders Nerd Font / Powerline glyphs (e.g. Starship prompts)
+• Backups remember each host's key by name
+• Paste added to the terminal selection popup
+• Arrow keys and PgUp/PgDn in the key bar now auto-repeat when held
