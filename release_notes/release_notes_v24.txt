@@ -1,30 +1,40 @@
 <en-US>
 • Improved text selection near the terminal edges
+• Fixed a grey screen that could get stuck in some situations
 </en-US>
 <it-IT>
 • Migliorata la selezione del testo vicino ai bordi del terminale
+• Corretto uno schermo grigio che poteva bloccarsi in alcune situazioni
 </it-IT>
 <de-DE>
 • Textauswahl an den Terminalrändern verbessert
+• Grauer Bildschirm behoben, der in manchen Situationen hängen bleiben konnte
 </de-DE>
 <es-ES>
 • Mejorada la selección de texto cerca de los bordes del terminal
+• Corregida una pantalla gris que podía quedarse bloqueada en algunas situaciones
 </es-ES>
 <fr-FR>
 • Sélection de texte améliorée près des bords du terminal
+• Correction d'un écran gris qui pouvait rester bloqué dans certaines situations
 </fr-FR>
 <pt-PT>
 • Seleção de texto melhorada junto às margens do terminal
+• Corrigido um ecrã cinzento que podia ficar bloqueado em algumas situações
 </pt-PT>
 <uk>
 • Покращено виділення тексту біля країв термінала
+• Виправлено сірий екран, який міг зависати в деяких ситуаціях
 </uk>
 <ru-RU>
 • Улучшено выделение текста у краёв терминала
+• Исправлен серый экран, который иногда мог зависать
 </ru-RU>
 <zh-CN>
 • 改进了终端边缘附近的文本选择
+• 修复了某些情况下可能卡住的灰色屏幕
 </zh-CN>
 <ja-JP>
 • ターミナルの端付近でのテキスト選択を改善
+• 一部の状況で灰色の画面が固まる問題を修正
 </ja-JP>

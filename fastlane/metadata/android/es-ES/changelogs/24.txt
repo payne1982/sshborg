@@ -1,1 +1,2 @@
 • Mejorada la selección de texto cerca de los bordes del terminal
+• Corregida una pantalla gris que podía quedarse bloqueada en algunas situaciones

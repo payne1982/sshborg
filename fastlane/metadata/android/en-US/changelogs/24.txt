@@ -1,1 +1,2 @@
 • Improved text selection near the terminal edges
+• Fixed a grey screen that could get stuck in some situations

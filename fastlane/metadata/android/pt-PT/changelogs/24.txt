@@ -1,1 +1,2 @@
 • Seleção de texto melhorada junto às margens do terminal
+• Corrigido um ecrã cinzento que podia ficar bloqueado em algumas situações
