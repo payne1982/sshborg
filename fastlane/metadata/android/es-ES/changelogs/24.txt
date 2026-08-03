@@ -1,0 +1,1 @@
+• Mejorada la selección de texto cerca de los bordes del terminal

@@ -1,0 +1,30 @@
+<en-US>
+• Improved text selection near the terminal edges
+</en-US>
+<it-IT>
+• Migliorata la selezione del testo vicino ai bordi del terminale
+</it-IT>
+<de-DE>
+• Textauswahl an den Terminalrändern verbessert
+</de-DE>
+<es-ES>
+• Mejorada la selección de texto cerca de los bordes del terminal
+</es-ES>
+<fr-FR>
+• Sélection de texte améliorée près des bords du terminal
+</fr-FR>
+<pt-PT>
+• Seleção de texto melhorada junto às margens do terminal
+</pt-PT>
+<uk>
+• Покращено виділення тексту біля країв термінала
+</uk>
+<ru-RU>
+• Улучшено выделение текста у краёв терминала
+</ru-RU>
+<zh-CN>
+• 改进了终端边缘附近的文本选择
+</zh-CN>
+<ja-JP>
+• ターミナルの端付近でのテキスト選択を改善
+</ja-JP>
