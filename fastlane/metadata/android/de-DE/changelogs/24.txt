@@ -1,2 +1,3 @@
 • Textauswahl an den Terminalrändern verbessert
 • Grauer Bildschirm behoben, der in manchen Situationen hängen bleiben konnte
+• SFTP-Navigation verbessert, um Verbindungsabbrüche zu vermeiden

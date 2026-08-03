@@ -1,40 +1,50 @@
 <en-US>
 • Improved text selection near the terminal edges
 • Fixed a grey screen that could get stuck in some situations
+• Improved SFTP navigation to prevent connection drops
 </en-US>
 <it-IT>
 • Migliorata la selezione del testo vicino ai bordi del terminale
 • Corretto uno schermo grigio che poteva bloccarsi in alcune situazioni
+• Migliorata la navigazione SFTP per prevenire interruzioni nella connessione
 </it-IT>
 <de-DE>
 • Textauswahl an den Terminalrändern verbessert
 • Grauer Bildschirm behoben, der in manchen Situationen hängen bleiben konnte
+• SFTP-Navigation verbessert, um Verbindungsabbrüche zu vermeiden
 </de-DE>
 <es-ES>
 • Mejorada la selección de texto cerca de los bordes del terminal
 • Corregida una pantalla gris que podía quedarse bloqueada en algunas situaciones
+• Mejorada la navegación SFTP para evitar cortes de conexión
 </es-ES>
 <fr-FR>
 • Sélection de texte améliorée près des bords du terminal
 • Correction d'un écran gris qui pouvait rester bloqué dans certaines situations
+• Navigation SFTP améliorée pour éviter les coupures de connexion
 </fr-FR>
 <pt-PT>
 • Seleção de texto melhorada junto às margens do terminal
 • Corrigido um ecrã cinzento que podia ficar bloqueado em algumas situações
+• Navegação SFTP melhorada para evitar quedas de ligação
 </pt-PT>
 <uk>
 • Покращено виділення тексту біля країв термінала
 • Виправлено сірий екран, який міг зависати в деяких ситуаціях
+• Покращено навігацію SFTP, щоб запобігти розривам з'єднання
 </uk>
 <ru-RU>
 • Улучшено выделение текста у краёв терминала
 • Исправлен серый экран, который иногда мог зависать
+• Улучшена навигация SFTP для предотвращения обрывов соединения
 </ru-RU>
 <zh-CN>
 • 改进了终端边缘附近的文本选择
 • 修复了某些情况下可能卡住的灰色屏幕
+• 改进了 SFTP 导航，防止连接中断
 </zh-CN>
 <ja-JP>
 • ターミナルの端付近でのテキスト選択を改善
 • 一部の状況で灰色の画面が固まる問題を修正
+• SFTPナビゲーションを改善し、接続の切断を防止
 </ja-JP>

@@ -1,2 +1,3 @@
 • Sélection de texte améliorée près des bords du terminal
 • Correction d'un écran gris qui pouvait rester bloqué dans certaines situations
+• Navigation SFTP améliorée pour éviter les coupures de connexion
