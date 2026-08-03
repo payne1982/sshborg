@@ -91,6 +91,7 @@ class TerminalView @JvmOverloads constructor(
     private var draggingHandle = 0  // 0=none, 1=start, 2=end
     private var cachedViewStart = 0 // set each onDraw; safe to read on main thread in touch handlers
     private var dragLastX = 0f
+    private var dragLastY = 0f
     // Finger-to-anchor offset captured at grab time, so the handle can be dragged by its
     // round knob (above/below the row) without the selection jumping to the finger's row.
     private var dragOffsetX = 0f
@@ -392,12 +393,21 @@ class TerminalView @JvmOverloads constructor(
                 MotionEvent.ACTION_MOVE -> {
                     if (draggingHandle != 0) {
                         dragLastX = event.x + dragOffsetX
-                        val triggerZone = cellH * 2f
-                        when {
-                            event.y < triggerZone          -> scheduleAutoScroll(+1)
-                            event.y > height - triggerZone -> scheduleAutoScroll(-1)
-                            else -> { cancelAutoScroll(); updateDraggedHandle(event.x + dragOffsetX, event.y + dragOffsetY) }
+                        dragLastY = event.y + dragOffsetY
+                        // Always track the finger's real row/col — never snap the handle to
+                        // the edge row. That snap was the "magnetic jump" to the last/first
+                        // line when the finger neared the top/bottom edge.
+                        updateDraggedHandle(dragLastX, dragLastY)
+                        // Auto-scroll only inside the edge band AND only when there is
+                        // actually more scrollback to reveal in that direction; otherwise the
+                        // handle simply follows the finger to the last visible row.
+                        val triggerZone = cellH * 1.5f
+                        val dir = when {
+                            event.y < triggerZone          -> +1
+                            event.y > height - triggerZone -> -1
+                            else -> 0
                         }
+                        if (dir != 0 && canAutoScroll(dir)) scheduleAutoScroll(dir) else cancelAutoScroll()
                         return true
                     }
                 }
@@ -481,6 +491,14 @@ class TerminalView @JvmOverloads constructor(
         }
     }
 
+    /** True if there is scrollback left to reveal in [dir] (+1 = older/up, -1 = newer/down). */
+    private fun canAutoScroll(dir: Int): Boolean {
+        val emu = emulator ?: return false
+        val maxScrollback: Int
+        synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
+        return if (dir > 0) scrollbackOffset < maxScrollback else scrollbackOffset > 0
+    }
+
     private fun scheduleAutoScroll(dir: Int) {
         if (autoScrollDir == dir) return
         cancelAutoScroll()
@@ -491,11 +509,14 @@ class TerminalView @JvmOverloads constructor(
                 val emu = emulator ?: return
                 val maxScrollback: Int
                 synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
-                scrollbackOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollback)
+                val newOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollback)
+                if (newOffset == scrollbackOffset) { cancelAutoScroll(); return }  // nothing left to reveal
+                scrollbackOffset = newOffset
                 val viewStart = maxScrollback - scrollbackOffset
-                val edgeRow = if (autoScrollDir > 0) 0 else termRows - 1
+                // Extend from the finger's actual row, not a forced edge row.
+                val row = (dragLastY / cellH).toInt().coerceIn(0, termRows - 1)
                 val col = (dragLastX / cellW).toInt().coerceIn(0, termColumns - 1)
-                applyDraggedAnchor((viewStart + edgeRow) to col)
+                applyDraggedAnchor((viewStart + row) to col)
                 invalidate()
                 autoScrollHandler.postDelayed(this, 80)
             }
