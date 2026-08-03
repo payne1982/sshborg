@@ -72,10 +72,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        // Cover content whenever the app leaves the foreground (including when the biometric/
-        // credential screen appears), so the user never sees app content on return.
+    override fun onStop() {
+        super.onStop()
+        // Cover content when the app is actually stopped (backgrounded, recents, another
+        // full-screen app, or the device-credential auth Activity) so it isn't shown on
+        // return until onStart clears it. Deliberately NOT in onPause: a mere pause that
+        // never reaches onStop — e.g. Gboard's voice-input panel or a transient dialog —
+        // is not followed by onStart, so an onPause cover would get stuck grey until the
+        // user fully backgrounds and reopens the app. onStop <-> onStart is symmetric.
+        // The recents thumbnail is protected independently by FLAG_SECURE (see onResume).
         setPrivacy(true)
     }
 
