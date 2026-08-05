@@ -2,49 +2,59 @@
 • Improved text selection near the terminal edges
 • Fixed a grey screen that could get stuck in some situations
 • Improved SFTP navigation to prevent connection drops
+• Tap a download notification to open the file, and see the destination path
 </en-US>
 <it-IT>
 • Migliorata la selezione del testo vicino ai bordi del terminale
 • Corretto uno schermo grigio che poteva bloccarsi in alcune situazioni
 • Migliorata la navigazione SFTP per prevenire interruzioni nella connessione
+• Tocca la notifica di download per aprire il file e vedere il percorso di destinazione
 </it-IT>
 <de-DE>
 • Textauswahl an den Terminalrändern verbessert
 • Grauer Bildschirm behoben, der in manchen Situationen hängen bleiben konnte
 • SFTP-Navigation verbessert, um Verbindungsabbrüche zu vermeiden
+• Tippe auf die Download-Benachrichtigung, um die Datei zu öffnen und den Zielpfad zu sehen
 </de-DE>
 <es-ES>
 • Mejorada la selección de texto cerca de los bordes del terminal
 • Corregida una pantalla gris que podía quedarse bloqueada en algunas situaciones
 • Mejorada la navegación SFTP para evitar cortes de conexión
+• Toca la notificación de descarga para abrir el archivo y ver la ruta de destino
 </es-ES>
 <fr-FR>
 • Sélection de texte améliorée près des bords du terminal
 • Correction d'un écran gris qui pouvait rester bloqué dans certaines situations
 • Navigation SFTP améliorée pour éviter les coupures de connexion
+• Touchez la notification de téléchargement pour ouvrir le fichier et voir le chemin de destination
 </fr-FR>
 <pt-PT>
 • Seleção de texto melhorada junto às margens do terminal
 • Corrigido um ecrã cinzento que podia ficar bloqueado em algumas situações
 • Navegação SFTP melhorada para evitar quedas de ligação
+• Toque na notificação de transferência para abrir o ficheiro e ver o caminho de destino
 </pt-PT>
 <uk>
 • Покращено виділення тексту біля країв термінала
 • Виправлено сірий екран, який міг зависати в деяких ситуаціях
 • Покращено навігацію SFTP, щоб запобігти розривам з'єднання
+• Торкніться сповіщення про завантаження, щоб відкрити файл і побачити шлях призначення
 </uk>
 <ru-RU>
 • Улучшено выделение текста у краёв терминала
 • Исправлен серый экран, который иногда мог зависать
 • Улучшена навигация SFTP для предотвращения обрывов соединения
+• Нажмите на уведомление о загрузке, чтобы открыть файл и увидеть путь сохранения
 </ru-RU>
 <zh-CN>
 • 改进了终端边缘附近的文本选择
 • 修复了某些情况下可能卡住的灰色屏幕
 • 改进了 SFTP 导航，防止连接中断
+• 点按下载通知即可打开文件并查看保存路径
 </zh-CN>
 <ja-JP>
 • ターミナルの端付近でのテキスト選択を改善
 • 一部の状況で灰色の画面が固まる問題を修正
 • SFTPナビゲーションを改善し、接続の切断を防止
+• ダウンロード通知をタップしてファイルを開き、保存先パスを確認できます
 </ja-JP>

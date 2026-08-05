@@ -1,3 +1,4 @@
 • Textauswahl an den Terminalrändern verbessert
 • Grauer Bildschirm behoben, der in manchen Situationen hängen bleiben konnte
 • SFTP-Navigation verbessert, um Verbindungsabbrüche zu vermeiden
+• Tippe auf die Download-Benachrichtigung, um die Datei zu öffnen und den Zielpfad zu sehen
