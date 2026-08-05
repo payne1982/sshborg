@@ -23,6 +23,7 @@ data class BackgroundTransfer(
     val id: String,
     val sessionId: String,
     val filename: String,
+    val localDir: String = "",
     val fileIndex: Int = 1,
     val totalFiles: Int = 1,
     val bytesReceived: Long = 0L,
@@ -61,7 +62,7 @@ class TransferManager(private val app: Application) {
     ): String {
         require(tasks.isNotEmpty())
         val id = UUID.randomUUID().toString()
-        _transfers.update { it + BackgroundTransfer(id, sessionId, tasks.first().filename, 1, tasks.size) }
+        _transfers.update { it + BackgroundTransfer(id, sessionId, tasks.first().filename, tasks.first().localDir, 1, tasks.size) }
 
         val job = scope.launch {
             val thisJob = coroutineContext[Job]!!
@@ -75,7 +76,7 @@ class TransferManager(private val app: Application) {
 
                 for ((index, task) in tasks.withIndex()) {
                     if (!thisJob.isActive) break
-                    update(id) { it.copy(filename = task.filename, fileIndex = index + 1, bytesReceived = 0L) }
+                    update(id) { it.copy(filename = task.filename, localDir = task.localDir, fileIndex = index + 1, bytesReceived = 0L) }
 
                     val ext  = task.filename.substringAfterLast('.', "").lowercase()
                     val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
