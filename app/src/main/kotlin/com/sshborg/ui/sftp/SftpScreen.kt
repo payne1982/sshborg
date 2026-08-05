@@ -330,6 +330,7 @@ fun SftpScreen(
                             if (s.totalFiles > 1) append(" (${s.fileIndex}/${s.totalFiles})")
                         },
                         sublabel     = s.filename,
+                        location     = s.location,
                         bytes        = s.bytesReceived,
                         icon         = Icons.Default.Download,
                         startedAt    = s.startedAt,
@@ -341,6 +342,7 @@ fun SftpScreen(
                 is SftpViewModel.State.Downloaded -> {
                     DownloadComplete(
                         filename     = s.filename,
+                        location     = s.location,
                         totalFiles   = s.totalFiles,
                         skippedFiles = s.skippedFiles,
                         startedAt    = s.startedAt,
@@ -609,6 +611,7 @@ fun SftpScreen(
 private fun BoxScope.TransferProgress(
     label: String,
     sublabel: String = "",
+    location: String = "",
     bytes: Long,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     startedAt: Long = 0L,
@@ -634,6 +637,17 @@ private fun BoxScope.TransferProgress(
         if (sublabel.isNotEmpty()) {
             Text(
                 sublabel,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (location.isNotEmpty()) {
+            Text(
+                location,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
@@ -972,6 +986,7 @@ private fun TransferTimestamps(startedAt: Long, completedAt: Long?, cancelled: B
 @Composable
 private fun BoxScope.DownloadComplete(
     filename: String,
+    location: String,
     totalFiles: Int,
     skippedFiles: Int,
     startedAt: Long,
@@ -1009,6 +1024,16 @@ private fun BoxScope.DownloadComplete(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        if (location.isNotEmpty()) {
+            Text(
+                text = location,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             TransferTimestamps(startedAt = startedAt, completedAt = completedAt)
         }

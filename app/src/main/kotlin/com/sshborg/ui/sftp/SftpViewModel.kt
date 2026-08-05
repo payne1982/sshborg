@@ -29,9 +29,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         data class HostKeyPrompt(val hostname: String, val fingerprint: String) : State
         data class PasswordPrompt(val hostname: String, val wrongPassword: Boolean = false) : State
         data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
-        data class Downloading(val filename: String, val bytesReceived: Long, val fileIndex: Int = 1, val totalFiles: Int = 1, val startedAt: Long = 0L) : State
+        data class Downloading(val filename: String, val location: String, val bytesReceived: Long, val fileIndex: Int = 1, val totalFiles: Int = 1, val startedAt: Long = 0L) : State
         data class Downloaded(
             val filename: String,
+            val location: String,
             val totalFiles: Int = 1,
             val skippedFiles: Int = 0,
             val startedAt: Long = 0L,
@@ -73,6 +74,12 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     private var sftpSession: SftpSession? = null
     private val pathStack = mutableListOf<String>()
+
+    // Guards directory navigation. A single SFTP channel is not thread-safe, so two
+    // overlapping listDir() calls corrupt the stream ("pipe closed"). Taps arriving
+    // while a navigation is in flight are dropped, not queued — matching what the user
+    // expects (a fast double-tap on a folder or on ".." should not walk several levels).
+    private val navigating = java.util.concurrent.atomic.AtomicBoolean(false)
 
     private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -267,19 +274,28 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     // ── Navigation ────────────────────────────────────────────────────────────
 
     fun navigateTo(path: String) {
+        // Drop the tap if a navigation is already running (see [navigating]).
+        if (!navigating.compareAndSet(false, true)) return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val entries = sftpSession!!.listDir(path)
-                pathStack.add(path)
-                sessionManager.update(sessionId ?: return@launch) { it.copy(sftpCurrentPath = path) }
-                _state.value = State.Listing(path, entries)
-            }.onFailure {
-                _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_cannot_list_directory))
+            try {
+                runCatching {
+                    val entries = sftpSession!!.listDir(path)
+                    pathStack.add(path)
+                    sessionManager.update(sessionId ?: return@launch) { it.copy(sftpCurrentPath = path) }
+                    _state.value = State.Listing(path, entries)
+                }.onFailure {
+                    _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_cannot_list_directory))
+                }
+            } finally {
+                navigating.set(false)
             }
         }
     }
 
     fun navigateUp(): Boolean {
+        // Busy: swallow the request (return "handled") so a hardware-back during a
+        // navigation neither pops the stack nor falls through to disconnect().
+        if (navigating.get()) return true
         val current = (state.value as? State.Listing)?.path ?: return false
         if (current == "/" || current.isEmpty()) return false
         val parent = current.substringBeforeLast("/").ifEmpty { "/" }
@@ -413,11 +429,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 .collect { t ->
                     when (t.status) {
                         BackgroundTransfer.Status.Running ->
-                            _state.value = State.Downloading(t.filename, t.bytesReceived, t.fileIndex, t.totalFiles, t.startedAt)
+                            _state.value = State.Downloading(t.filename, t.localDir, t.bytesReceived, t.fileIndex, t.totalFiles, t.startedAt)
                         BackgroundTransfer.Status.Done -> {
                             transferManager.dismiss(transferId)
                             _state.value = State.Downloaded(
-                                t.filename, t.totalFiles, t.skippedFiles,
+                                t.filename, t.localDir, t.totalFiles, t.skippedFiles,
                                 t.startedAt, t.completedAt ?: System.currentTimeMillis(),
                             )
                             foregroundTransferId = null

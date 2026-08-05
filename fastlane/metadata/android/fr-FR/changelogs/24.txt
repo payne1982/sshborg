@@ -1,0 +1,4 @@
+• Sélection de texte améliorée près des bords du terminal
+• Correction d'un écran gris qui pouvait rester bloqué dans certaines situations
+• Navigation SFTP améliorée pour éviter les coupures de connexion
+• Touchez la notification de téléchargement pour ouvrir le fichier et voir le chemin de destination

@@ -1,0 +1,4 @@
+• Migliorata la selezione del testo vicino ai bordi del terminale
+• Corretto uno schermo grigio che poteva bloccarsi in alcune situazioni
+• Migliorata la navigazione SFTP per prevenire interruzioni nella connessione
+• Tocca la notifica di download per aprire il file e vedere il percorso di destinazione
