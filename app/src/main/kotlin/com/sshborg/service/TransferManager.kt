@@ -67,6 +67,8 @@ class TransferManager(private val app: Application) {
             val thisJob = coroutineContext[Job]!!
             var channel: com.jcraft.jsch.ChannelSftp? = null
             var skipped = 0
+            var lastUri: android.net.Uri? = null   // set on a successful single-file save, for the tap-to-open intent
+            var lastMime: String? = null
             try {
                 channel = sftpSession.openBackgroundChannel()
                 channelMap[id] = channel
@@ -99,6 +101,7 @@ class TransferManager(private val app: Application) {
                                 override fun end() {}
                             })
                         }
+                        lastUri = uri; lastMime = mime
                     } catch (e: Exception) {
                         app.contentResolver.delete(uri, null, null)
                         if (!thisJob.isActive || e is CancellationException) break
@@ -110,12 +113,20 @@ class TransferManager(private val app: Application) {
                     jobMap.remove(id)
                     update(id) { it.copy(status = BackgroundTransfer.Status.Done, skippedFiles = skipped, completedAt = System.currentTimeMillis()) }
                     val last = tasks.last()
+                    val single = tasks.size == 1
                     val msg = when {
-                        tasks.size == 1 -> app.getString(R.string.sftp_saved_to_downloads, "${last.localDir}${last.filename}")
-                        skipped > 0     -> app.getString(R.string.sftp_downloaded_n_files_skipped, tasks.size - skipped, skipped)
-                        else            -> app.getString(R.string.sftp_downloaded_n_files, tasks.size)
+                        single      -> app.getString(R.string.sftp_saved_to_downloads, "${last.localDir}${last.filename}")
+                        skipped > 0 -> app.getString(R.string.sftp_downloaded_n_files_skipped, tasks.size - skipped, skipped)
+                        else        -> app.getString(R.string.sftp_downloaded_n_files, tasks.size)
                     }
-                    SshForegroundService.notifyDownloadComplete(app, msg)
+                    // Single file already carries its full path; for a multi-file batch, append the
+                    // (dynamic) destination folder on a second line so the notification shows where it went.
+                    val body = if (single) msg else "$msg\n$downloadFolder"
+                    SshForegroundService.notifyDownloadComplete(
+                        app, body,
+                        openUri = if (single) lastUri else null,   // tap: single -> open the file, multi -> open Downloads
+                        mime = if (single) lastMime else null,
+                    )
                 } else if (jobMap.remove(id) != null) {
                     update(id) { it.copy(status = BackgroundTransfer.Status.Cancelled, completedAt = System.currentTimeMillis()) }
                 }

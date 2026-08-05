@@ -1,5 +1,6 @@
 package com.sshborg.service
 
+import android.app.DownloadManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,6 +8,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationCompat
@@ -157,8 +159,25 @@ class SshForegroundService : Service() {
             context.stopService(Intent(context, SshForegroundService::class.java))
         }
 
-        fun notifyDownloadComplete(context: Context, message: String) =
-            postTransferNotification(context, context.getString(R.string.sftp_download_complete), message, NOTIFICATION_ID_DOWNLOAD)
+        fun notifyDownloadComplete(context: Context, message: String, openUri: Uri? = null, mime: String? = null) {
+            // Tap target: a single downloaded file opens in a viewer (ACTION_VIEW on its MediaStore
+            // uri — a public content:// uri, no FileProvider needed); a multi-file batch (openUri null)
+            // opens the system Downloads screen. If nothing can handle the file's type, Android shows
+            // the usual "no app" message — acceptable, same as any download.
+            val intent = if (openUri != null) {
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(openUri, mime ?: "*/*")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            } else {
+                Intent(DownloadManager.ACTION_VIEW_DOWNLOADS).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+            }
+            val contentIntent = PendingIntent.getActivity(
+                context, NOTIFICATION_ID_DOWNLOAD, intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            postTransferNotification(context, context.getString(R.string.sftp_download_complete), message, NOTIFICATION_ID_DOWNLOAD, contentIntent)
+        }
 
         fun notifyDownloadError(context: Context, filename: String) =
             postTransferNotification(
@@ -171,7 +190,7 @@ class SshForegroundService : Service() {
         fun notifyUploadComplete(context: Context, message: String) =
             postTransferNotification(context, context.getString(R.string.sftp_upload_complete), message, NOTIFICATION_ID_UPLOAD)
 
-        private fun postTransferNotification(context: Context, title: String, text: String, notifId: Int) {
+        private fun postTransferNotification(context: Context, title: String, text: String, notifId: Int, contentIntent: PendingIntent? = null) {
             val nm = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             nm.createNotificationChannel(
                 NotificationChannel(CHANNEL_ID_TRANSFERS, context.getString(R.string.notification_channel_transfers_name), NotificationManager.IMPORTANCE_DEFAULT)
@@ -181,8 +200,10 @@ class SshForegroundService : Service() {
             NotificationCompat.Builder(context, CHANNEL_ID_TRANSFERS)
                 .setContentTitle(title)
                 .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))   // wrap long destination paths
                 .setSmallIcon(R.drawable.ic_notification)
                 .setAutoCancel(true)
+                .apply { contentIntent?.let { setContentIntent(it) } }
                 .build()
                 .also { nm.notify(notifId, it) }
         }
