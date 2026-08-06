@@ -1,0 +1,1 @@
+• Cambia entre sesiones de distintos hosts directamente desde la barra de pestañas del terminal

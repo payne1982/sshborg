@@ -1,0 +1,1 @@
+• Switch between sessions on different hosts right from the terminal tab bar

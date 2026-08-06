@@ -1,0 +1,1 @@
+• Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal

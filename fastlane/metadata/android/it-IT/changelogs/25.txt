@@ -1,0 +1,1 @@
+• Passa tra sessioni su host diversi direttamente dalla barra delle schede del terminale

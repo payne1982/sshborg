@@ -1,0 +1,1 @@
+• Passez d'une session à l'autre sur différents hôtes directement depuis la barre d'onglets du terminal
