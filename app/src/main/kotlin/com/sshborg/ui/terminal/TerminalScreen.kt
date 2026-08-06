@@ -111,11 +111,11 @@ fun TerminalScreen(
     }
     val suggestions   by vm.suggestions.collectAsState()
 
-    // Siblings: other Shell sessions for the same host (for the tab bar)
+    // Tab bar data. All open Shell sessions, grouped by host (order preserved).
+    // One host  -> per-session tabs (#1 #2 …); many hosts -> one tab per host.
     val currentSession = sessions.find { it.id == sessionId }
-    val siblingShellSessions = if (currentSession != null)
-        sessions.filter { it.hostId == currentSession.hostId && it.type == SessionManager.SessionType.Shell }
-    else emptyList()
+    val allShellSessions = sessions.filter { it.type == SessionManager.SessionType.Shell }
+    val shellHostGroups = allShellSessions.groupBy { it.hostId }.values.toList()
 
     var ctrlActive by remember { mutableStateOf(false) }
     var altActive  by remember { mutableStateOf(false) }
@@ -222,10 +222,17 @@ fun TerminalScreen(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 )
 
-                // Tab chips — only when there are multiple sessions for this host
-                if (siblingShellSessions.size > 1) {
+                // Tab chips. Many hosts -> one tab per host (tap a multi-session host
+                // for a numbered popup); a single host with siblings -> per-session tabs.
+                if (shellHostGroups.size > 1) {
+                    HostTabRow(
+                        hostGroups = shellHostGroups,
+                        currentId  = sessionId,
+                        onSwitch   = onSwitchSession,
+                    )
+                } else if (allShellSessions.size > 1) {
                     SessionTabRow(
-                        sessions       = siblingShellSessions,
+                        sessions       = allShellSessions,
                         currentId      = sessionId,
                         onSwitch       = onSwitchSession,
                     )
@@ -421,6 +428,126 @@ private fun SessionTabRow(
                     color      = if (selected) MaterialTheme.colorScheme.primary
                                  else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Cross-host tab bar: one tab per host. Tapping a host with a single session jumps
+ * straight to it; a host with several sessions expands an in-layout numbered picker
+ * ABOVE the tabs (an inline row, not a focus-stealing popup — so the soft keyboard
+ * stays up and nothing shifts) to choose which session to open.
+ */
+@Composable
+private fun HostTabRow(
+    hostGroups: List<List<SessionManager.ActiveSession>>,
+    currentId: String,
+    onSwitch: (String) -> Unit,
+) {
+    val tabShape  = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+    val pillShape = RoundedCornerShape(8.dp)
+    var expandedHostId by remember { mutableStateOf<Long?>(null) }
+    val expandedGroup = hostGroups.find { it.first().hostId == expandedHostId }
+
+    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant)) {
+        // Numbered session picker for the expanded multi-session host, drawn above the
+        // tabs so it reads as opening "upward" from the host tab that spawned it.
+        if (expandedGroup != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                expandedGroup.forEachIndexed { index, session ->
+                    val here = session.id == currentId
+                    Box(
+                        modifier = Modifier
+                            .clip(pillShape)
+                            .background(
+                                if (here) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                else MaterialTheme.colorScheme.surface
+                            )
+                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, pillShape)
+                            .clickable {
+                                expandedHostId = null
+                                if (!here) onSwitch(session.id)
+                            }
+                            .padding(horizontal = 14.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            text       = "#${index + 1}",
+                            fontSize   = 12.sp,
+                            fontWeight = if (here) FontWeight.Bold else FontWeight.Normal,
+                            color      = if (here) MaterialTheme.colorScheme.primary
+                                         else MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 4.dp)
+                .padding(top = 3.dp),
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            hostGroups.forEach { group ->
+                val selected = group.any { it.id == currentId }
+                val expanded = group.first().hostId == expandedHostId
+                val label    = group.first().hostLabel
+                val color    = if (selected) MaterialTheme.colorScheme.primary
+                               else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                Box(
+                    modifier = Modifier
+                        .clip(tabShape)
+                        .background(
+                            if (selected) MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        .then(
+                            if (selected) Modifier
+                            else Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, tabShape)
+                        )
+                        .clickable {
+                            if (group.size == 1) {
+                                expandedHostId = null
+                                if (group[0].id != currentId) onSwitch(group[0].id)
+                            } else {
+                                // toggle the picker for this host
+                                expandedHostId = if (expanded) null else group.first().hostId
+                            }
+                        }
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text       = label,
+                            fontSize   = 12.sp,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            color      = color,
+                            maxLines   = 1,
+                            overflow   = TextOverflow.Ellipsis,
+                            modifier   = Modifier.widthIn(max = 120.dp),
+                        )
+                        if (group.size > 1) {
+                            Text(
+                                text       = " (${group.size})",
+                                fontSize   = 12.sp,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                color      = color,
+                            )
+                        }
+                    }
+                }
             }
         }
     }
