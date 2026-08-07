@@ -125,7 +125,40 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 sessionManager.update(id) { it.copy(status = SessionManager.Status.Disconnected) }
             }
         }
-        // else: new session, connect() will be called next
+        // else: fresh session — maybeConnect() will start it once a real size is known.
+        attached = true
+        maybeConnect()
+    }
+
+    /** Set once [attach] has run, so a size callback that races ahead of it doesn't try to connect early. */
+    private var attached = false
+    /** Last real geometry reported by the view (0 until the first measurement). */
+    private var lastCols = 0
+    private var lastRows = 0
+
+    /**
+     * Called by the view every time it measures its size. For a fresh session this drives the
+     * initial connection: we connect only once we have BOTH an attached session and a real
+     * measurement, at that measurement, so the login banner is generated and rendered at the
+     * correct width from the start instead of being printed at a default 80 cols and then
+     * truncated by the later shrink. Later measurements are plain resizes.
+     */
+    fun onTerminalSize(cols: Int, rows: Int) {
+        lastCols = cols; lastRows = rows
+        if (shellSession != null) resize(cols, rows) else maybeConnect()
+    }
+
+    /** Connects a fresh session as soon as it is both attached and has a real measured size. */
+    private fun maybeConnect() {
+        if (shellSession != null || connectJob != null || !attached) return
+        if (lastCols > 0 && lastRows > 0) connect(lastCols, lastRows)
+        // else: no measurement yet — wait for the first onTerminalSize (connectWithDefaultsIfPending covers the never-measured case)
+    }
+
+    /** Fallback: if a fresh session is still unconnected (e.g. no measurement arrived), connect it. */
+    fun connectWithDefaultsIfPending() {
+        if (shellSession != null || connectJob != null || !attached) return
+        if (lastCols > 0 && lastRows > 0) connect(lastCols, lastRows) else connect()
     }
 
     /** Starts the SSH connection for a newly created session. */
@@ -133,6 +166,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         val id     = sessionId ?: return
         val hostId = sessionManager.get(id)?.hostId ?: return
         if (connectJob?.isActive == true) return
+
+        // Size the emulator to the real terminal geometry before any bytes arrive, so the
+        // login banner is laid out at the right width from the start. This avoids the
+        // shrink-and-truncate that happened when we opened at a default 80x24 and only
+        // resized after the banner had already been printed.
+        synchronized(_emulator.value) { _emulator.value.resize(columns, rows) }
 
         connectJob = viewModelScope.launch(Dispatchers.IO) {
             val host = hostDao.getById(hostId) ?: run {

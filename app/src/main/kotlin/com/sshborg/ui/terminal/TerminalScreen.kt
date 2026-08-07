@@ -193,7 +193,7 @@ fun TerminalScreen(
                             view.keepScreenOn          = keepScreenOn
                             view.lightScheme           = terminalLight
                             view.onInput              = sendInput
-                            view.onResize             = { cols, rows -> vm.resize(cols, rows) }
+                            view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
                             vm.onNeedsRedraw           = { view.postInvalidate() }
                             terminalView               = view
@@ -207,7 +207,7 @@ fun TerminalScreen(
                         view.keepScreenOn          = keepScreenOn
                         view.lightScheme           = terminalLight
                         view.onInput              = sendInput
-                        view.onResize             = { cols, rows -> vm.resize(cols, rows) }
+                        view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         terminalView               = view
@@ -354,12 +354,13 @@ fun TerminalScreen(
         }
     }
 
-    // Attach + connect on first composition
+    // Attach on first composition. The connection itself is started by the first
+    // terminal-size measurement (vm.onTerminalSize) so the PTY opens at the real
+    // width; this only arms a fallback in case that measurement is slow to arrive.
     LaunchedEffect(sessionId) {
         vm.attach(sessionId)
-        if (vm.state.value == ConnectionState.Connecting) {
-            vm.connect()
-        }
+        delay(400)
+        vm.connectWithDefaultsIfPending()
     }
 
     // Auto-navigate back when the remote shell exits cleanly
