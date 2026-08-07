@@ -347,6 +347,7 @@ fun SftpScreen(
                         skippedFiles = s.skippedFiles,
                         startedAt    = s.startedAt,
                         completedAt  = s.completedAt,
+                        onOpen       = { vm.openDownloadedFile(s.filename, s.location) },
                         onDone       = vm::dismissDownloaded,
                     )
                 }
@@ -393,6 +394,7 @@ fun SftpScreen(
                     transfers  = backgroundTransfers,
                     onCancel   = vm::cancelBackgroundTransfer,
                     onDismiss  = vm::dismissBackgroundTransfer,
+                    onOpen     = { vm.openDownloadedFile(it.filename, it.localDir) },
                     modifier   = Modifier.align(Alignment.BottomCenter),
                     endPadding = if (isListing && !selectionMode) 80.dp else 12.dp,
                 )
@@ -809,6 +811,7 @@ private fun BackgroundTransfersPanel(
     transfers: List<BackgroundTransfer>,
     onCancel: (String) -> Unit,
     onDismiss: (String) -> Unit,
+    onOpen: (BackgroundTransfer) -> Unit,
     modifier: Modifier = Modifier,
     endPadding: Dp = 12.dp,
 ) {
@@ -857,13 +860,39 @@ private fun BackgroundTransfersPanel(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Text(
-                                text = t.filename,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.weight(1f),
-                            )
+                            // A completed single-file download's name is tappable (primary
+                            // colour + an "open" icon) and opens the file; anything else is plain.
+                            val openable = t.status == BackgroundTransfer.Status.Done && t.totalFiles == 1
+                            if (openable) {
+                                Row(
+                                    modifier = Modifier.weight(1f).clickable { onOpen(t) },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Text(
+                                        text = t.filename,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.weight(1f, fill = false),
+                                    )
+                                    Icon(
+                                        Icons.Default.FileOpen,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(14.dp),
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    text = t.filename,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
                             if (t.bytesReceived > 0) {
                                 Text(
                                     text = formatSize(t.bytesReceived),
@@ -991,6 +1020,7 @@ private fun BoxScope.DownloadComplete(
     skippedFiles: Int,
     startedAt: Long,
     completedAt: Long,
+    onOpen: () -> Unit,
     onDone: () -> Unit,
 ) {
     Column(
@@ -1010,20 +1040,47 @@ private fun BoxScope.DownloadComplete(
             stringResource(R.string.sftp_download_complete),
             style = MaterialTheme.typography.titleMedium,
         )
+        val singleFile = totalFiles == 1 && skippedFiles == 0
         val summary = when {
-            totalFiles == 1 && skippedFiles == 0 -> filename
+            singleFile -> filename
             skippedFiles > 0 ->
                 stringResource(R.string.sftp_downloaded_n_files_skipped, totalFiles - skippedFiles, skippedFiles)
             else ->
                 stringResource(R.string.sftp_downloaded_n_files, totalFiles)
         }
-        Text(
-            text = summary,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+        // A single file's name is tappable (primary colour + an "open" icon) and opens the
+        // file; a multi-file summary is just a count, so it stays plain text.
+        if (singleFile) {
+            Row(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Icon(
+                    Icons.Default.FileOpen,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 6.dp).size(16.dp),
+                )
+            }
+        } else {
+            Text(
+                text = summary,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         if (location.isNotEmpty()) {
             Text(
                 text = location,
