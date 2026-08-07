@@ -56,10 +56,6 @@ object SshManager {
         val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, onHostKeyVerify)
 
         val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
-        // Allow multiple SFTP requests in-flight simultaneously (default is 1).
-        // Without pipelining, throughput = blockSize / RTT regardless of bandwidth.
-        // 16 concurrent requests scales throughput ~16x on high-latency connections.
-        channel.setBulkRequests(16)
         channel.connect(10_000)
 
         val homePath = withTimeoutOrNull(5_000) {
