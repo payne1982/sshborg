@@ -1,2 +1,3 @@
 • Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal
+• Toque no nome de um ficheiro transferido para o abrir, no ecrã de transferência ou no painel de transferências
 • Corrigido o texto cortado no início da primeira sessão do terminal

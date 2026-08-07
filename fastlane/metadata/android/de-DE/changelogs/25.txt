@@ -1,2 +1,3 @@
 • Wechsle direkt über die Tab-Leiste des Terminals zwischen Sitzungen auf verschiedenen Hosts
+• Tippe auf den Namen einer heruntergeladenen Datei, um sie zu öffnen – im Download-Bildschirm oder im Übertragungen-Panel
 • Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
