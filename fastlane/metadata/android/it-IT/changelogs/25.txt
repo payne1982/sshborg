@@ -1,1 +1,2 @@
 • Passa tra sessioni su host diversi direttamente dalla barra delle schede del terminale
+• Corretto il testo tagliato in cima alla prima sessione del terminale

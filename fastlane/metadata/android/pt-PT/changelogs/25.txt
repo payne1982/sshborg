@@ -1,1 +1,2 @@
 • Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal
+• Corrigido o texto cortado no início da primeira sessão do terminal

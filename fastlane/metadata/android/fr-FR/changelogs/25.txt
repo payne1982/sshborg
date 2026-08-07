@@ -1,1 +1,2 @@
 • Passez d'une session à l'autre sur différents hôtes directement depuis la barre d'onglets du terminal
+• Correction du texte tronqué en haut de la première session du terminal

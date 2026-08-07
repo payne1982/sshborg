@@ -1,1 +1,2 @@
 • Cambia entre sesiones de distintos hosts directamente desde la barra de pestañas del terminal
+• Corregido el texto cortado al inicio de la primera sesión del terminal

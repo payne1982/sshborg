@@ -1,30 +1,40 @@
 <en-US>
 • Switch between sessions on different hosts right from the terminal tab bar
+• Fixed cut-off text at the top of the first terminal session
 </en-US>
 <it-IT>
 • Passa tra sessioni su host diversi direttamente dalla barra delle schede del terminale
+• Corretto il testo tagliato in cima alla prima sessione del terminale
 </it-IT>
 <de-DE>
 • Wechsle direkt über die Tab-Leiste des Terminals zwischen Sitzungen auf verschiedenen Hosts
+• Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
 </de-DE>
 <es-ES>
 • Cambia entre sesiones de distintos hosts directamente desde la barra de pestañas del terminal
+• Corregido el texto cortado al inicio de la primera sesión del terminal
 </es-ES>
 <fr-FR>
 • Passez d'une session à l'autre sur différents hôtes directement depuis la barre d'onglets du terminal
+• Correction du texte tronqué en haut de la première session du terminal
 </fr-FR>
 <pt-PT>
 • Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal
+• Corrigido o texto cortado no início da primeira sessão do terminal
 </pt-PT>
 <uk>
 • Перемикайтеся між сеансами на різних хостах прямо з панелі вкладок термінала
+• Виправлено обрізаний текст на початку першого сеансу термінала
 </uk>
 <ru-RU>
 • Переключайтесь между сессиями на разных хостах прямо из панели вкладок терминала
+• Исправлен обрезанный текст в начале первой сессии терминала
 </ru-RU>
 <zh-CN>
 • 直接从终端标签栏在不同主机的会话之间切换
+• 修复了首个终端会话顶部文本被截断的问题
 </zh-CN>
 <ja-JP>
 • ターミナルのタブバーから、異なるホストのセッションをすばやく切り替え
+• 最初のターミナルセッションの先頭でテキストが途切れる問題を修正
 </ja-JP>

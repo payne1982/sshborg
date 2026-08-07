@@ -1,1 +1,2 @@
 • Switch between sessions on different hosts right from the terminal tab bar
+• Fixed cut-off text at the top of the first terminal session

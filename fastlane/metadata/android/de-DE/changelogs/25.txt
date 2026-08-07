@@ -1,1 +1,2 @@
 • Wechsle direkt über die Tab-Leiste des Terminals zwischen Sitzungen auf verschiedenen Hosts
+• Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
