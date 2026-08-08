@@ -45,6 +45,20 @@ class SessionManager {
     @Volatile
     var switchingTab: Boolean = false
 
+    /**
+     * Cluster-scoped override for the extra-keys bar "pin". Null = untouched, so the
+     * UI falls back to the settings default. Set to a concrete value when the user taps
+     * the on-bar pin; it holds for as long as at least one session is open and resets to
+     * null when the last one closes, so a fresh cluster starts from the settings default.
+     * Not part of session state on purpose.
+     */
+    private val _extraBarPinned = MutableStateFlow<Boolean?>(null)
+    val extraBarPinned: StateFlow<Boolean?> = _extraBarPinned.asStateFlow()
+
+    fun setExtraBarPinned(pinned: Boolean) {
+        _extraBarPinned.value = pinned
+    }
+
     fun create(hostId: Long, hostLabel: String, type: SessionType): String {
         val id = UUID.randomUUID().toString()
         _sessions.update { it + ActiveSession(id, hostId, hostLabel, type) }
@@ -60,6 +74,7 @@ class SessionManager {
         runCatching { session?.shellSession?.disconnect() }
         runCatching { session?.sftpSession?.disconnect() }
         _sessions.update { list -> list.filter { it.id != id } }
+        if (_sessions.value.isEmpty()) _extraBarPinned.value = null
     }
 
     fun removeAll() {
@@ -70,6 +85,7 @@ class SessionManager {
             }
             emptyList()
         }
+        _extraBarPinned.value = null
     }
 
     fun get(id: String): ActiveSession? = _sessions.value.find { it.id == id }

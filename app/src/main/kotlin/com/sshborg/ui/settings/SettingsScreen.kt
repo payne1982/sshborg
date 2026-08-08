@@ -64,6 +64,7 @@ fun SettingsScreen(
     val doubleTapAction       by vm.doubleTapAction.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
+    val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -443,6 +444,17 @@ fun SettingsScreen(
                     },
                 )
             }
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_extra_keys_bar_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_extra_keys_bar_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = extraKeysBarPinned,
+                        onCheckedChange = { vm.setExtraKeysBarPinned(it) },
+                    )
+                },
+            )
 
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 

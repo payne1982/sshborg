@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -110,6 +112,7 @@ fun TerminalScreen(
         else                                      -> false
     }
     val suggestions   by vm.suggestions.collectAsState()
+    val extraBarPinned by vm.extraBarPinned.collectAsState()
 
     // Tab bar data. All open Shell sessions, grouped by host (order preserved).
     // One host  -> per-session tabs (#1 #2 …); many hosts -> one tab per host.
@@ -181,7 +184,17 @@ fun TerminalScreen(
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            Column(Modifier.fillMaxSize().imePadding()) {
+            // Bottom padding = max(IME, navigation bar): with the keyboard up the IME
+            // inset wins (as before); when the extra-key bar is pinned with the keyboard
+            // closed, the navigation-bar inset keeps that bar clear of the system bar.
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(
+                        WindowInsets.ime.union(WindowInsets.navigationBars)
+                            .only(WindowInsetsSides.Bottom)
+                    )
+            ) {
                 // Terminal view
                 AndroidView(
                     factory = { factoryCtx ->
@@ -259,15 +272,17 @@ fun TerminalScreen(
                     )
                 }
 
-                // Extra key bar — only when soft keyboard is open
-                if (imeVisible) {
+                // Extra key bar — when the soft keyboard is open, or pinned to stay put
+                if (imeVisible || extraBarPinned) {
                     ExtraKeyRow(
                         ctrlActive       = ctrlActive,
                         altActive        = altActive,
                         wordMode         = wordMode,
+                        pinned           = extraBarPinned,
                         onCtrlToggle     = { ctrlActive = !ctrlActive },
                         onAltToggle      = { altActive  = !altActive  },
                         onWordModeToggle = { wordMode   = !wordMode   },
+                        onPinToggle      = { vm.toggleExtraBarPinned() },
                         onKey            = { bytes -> sendInput(bytes) },
                         cursorKeys       = { vm.cursorKeyBytes(it) },
                     )
@@ -590,15 +605,18 @@ private fun ExtraKeyRow(
     ctrlActive: Boolean,
     altActive: Boolean,
     wordMode: Boolean,
+    pinned: Boolean,
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit,
     onWordModeToggle: () -> Unit,
+    onPinToggle: () -> Unit,
     onKey: (ByteArray) -> Unit,
     cursorKeys: (Char) -> ByteArray,
 ) {
     val clipboardManager = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
+    val pinContentDesc = stringResource(R.string.terminal_pin_keys_cd)
 
     Row(
         modifier = Modifier
@@ -656,6 +674,26 @@ private fun ExtraKeyRow(
         ) {
             Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
                 modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
+        }
+        // Pin: keep this bar visible even with the keyboard closed. Filled = pinned.
+        Box(
+            modifier = Modifier
+                .background(
+                    if (pinned) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surface,
+                    MaterialTheme.shapes.extraSmall,
+                )
+                .clickable(onClick = onPinToggle)
+                .padding(horizontal = 8.dp, vertical = 7.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                if (pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                contentDescription = pinContentDesc,
+                modifier = Modifier.size(18.dp),
+                tint = if (pinned) MaterialTheme.colorScheme.onPrimaryContainer
+                       else MaterialTheme.colorScheme.onSurface,
+            )
         }
         Spacer(Modifier.width(4.dp))
         ExtraKey("F1",  onClick = { onKey("\u001bOP".toByteArray()) })

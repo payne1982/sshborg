@@ -180,6 +180,8 @@
     <string name="settings_history_suggestions_subtitle">Показывать подсказки из истории команд сервера при вводе в терминале</string>
     <string name="settings_suggestions_bar_sticky_title">Всегда видимая панель подсказок</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Держать панель подсказок фиксированной высоты, чтобы терминал не менялся в размере при их появлении или исчезновении</string>
+    <string name="settings_extra_keys_bar_title">Дополнительные клавиши всегда видимы</string>
+    <string name="settings_extra_keys_bar_subtitle">Держать панель дополнительных клавиш (Ctrl, стрелки, F-клавиши…) видимой даже при закрытой клавиатуре. Переключается также булавкой на панели.</string>
 
     <string name="settings_app_lock_title">Блокировка приложения</string>
     <string name="settings_lock_mode_none">Нет</string>
@@ -217,6 +219,7 @@
     <string name="terminal_title_default">Терминал</string>
     <string name="terminal_disconnect_cd">Отключить</string>
     <string name="terminal_paste_cd">Вставить</string>
+    <string name="terminal_pin_keys_cd">Держать панель клавиш видимой</string>
     <string name="terminal_copy_selection">Копировать выделенное</string>
     <string name="terminal_copy_all">Копировать всё</string>
     <string name="terminal_connecting">Подключение…</string>

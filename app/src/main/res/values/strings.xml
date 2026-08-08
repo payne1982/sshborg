@@ -180,6 +180,8 @@
     <string name="settings_history_suggestions_subtitle">Show suggestions from the server shell history while typing in the terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Always-visible suggestion bar</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Keep the suggestion bar at a fixed height to prevent the terminal from resizing when suggestions appear or disappear</string>
+    <string name="settings_extra_keys_bar_title">Always-visible extra keys</string>
+    <string name="settings_extra_keys_bar_subtitle">Keep the extra key bar (Ctrl, arrows, F-keys…) visible even when the keyboard is closed. You can also toggle this with the pin on the bar.</string>
 
     <string name="settings_app_lock_title">App lock</string>
     <string name="settings_biometric_available">Require authentication when returning to the app</string>
@@ -217,6 +219,7 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Disconnect</string>
     <string name="terminal_paste_cd">Paste</string>
+    <string name="terminal_pin_keys_cd">Keep key bar visible</string>
     <string name="terminal_copy_selection">Copy selection</string>
     <string name="terminal_copy_all">Copy all</string>
     <string name="terminal_connecting">Connecting…</string>

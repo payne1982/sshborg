@@ -73,6 +73,21 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     val suggestionsBarSticky: StateFlow<Boolean> =
         prefs.suggestionsBarSticky.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    /**
+     * Effective "pinned" state of the extra-keys bar: the cluster-scoped override from
+     * [SessionManager] if the user has toggled the on-bar pin, otherwise the settings
+     * default. When true the bar stays visible with the keyboard closed.
+     */
+    val extraBarPinned: StateFlow<Boolean> =
+        combine(sessionManager.extraBarPinned, prefs.extraKeysBarPinned) { override, default ->
+            override ?: default
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    /** Flips the pin, storing a concrete override for the current terminal cluster. */
+    fun toggleExtraBarPinned() {
+        sessionManager.setExtraBarPinned(!extraBarPinned.value)
+    }
+
     /** Prompt string detected from first terminal render, used to strip it from the input line. */
     private var promptPrefix = ""
     private var promptDetected = false

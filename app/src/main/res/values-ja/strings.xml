@@ -179,6 +179,8 @@
     <string name="settings_history_suggestions_subtitle">ターミナル入力中にサーバーのシェル履歴から候補を表示</string>
     <string name="settings_suggestions_bar_sticky_title">候補バーを常に表示</string>
     <string name="settings_suggestions_bar_sticky_subtitle">候補の表示・非表示でターミナルのサイズが変わらないよう、候補バーの高さを固定する</string>
+    <string name="settings_extra_keys_bar_title">追加キーを常に表示</string>
+    <string name="settings_extra_keys_bar_subtitle">キーボードを閉じていても追加キーバー（Ctrl、矢印、Fキーなど）を表示したままにします。バー上のピンでも切り替えられます。</string>
 
     <string name="settings_app_lock_title">アプリのロック</string>
     <string name="settings_lock_mode_none">なし</string>
@@ -216,6 +218,7 @@
     <string name="terminal_title_default">ターミナル</string>
     <string name="terminal_disconnect_cd">切断</string>
     <string name="terminal_paste_cd">貼り付け</string>
+    <string name="terminal_pin_keys_cd">キーバーを表示したままにする</string>
     <string name="terminal_copy_selection">選択範囲をコピー</string>
     <string name="terminal_copy_all">すべてコピー</string>
     <string name="terminal_connecting">接続中…</string>

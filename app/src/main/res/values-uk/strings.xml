@@ -170,6 +170,8 @@
     <string name="settings_history_suggestions_subtitle">Показувати підказки з історії shell сервера під час введення в терміналі</string>
     <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Зберігає панель підказок фіксованої висоти, щоб уникнути зміни розміру терміналу</string>
+    <string name="settings_extra_keys_bar_title">Додаткові клавіші завжди видимі</string>
+    <string name="settings_extra_keys_bar_subtitle">Тримає панель додаткових клавіш (Ctrl, стрілки, клавіші F…) видимою навіть із закритою клавіатурою. Це також можна перемкнути шпилькою на панелі.</string>
 
     <string name="settings_app_lock_title">Блокування застосунку</string>
     <string name="settings_lock_mode_none">Немає</string>
@@ -202,6 +204,7 @@
     <string name="terminal_title_default">Термінал</string>
     <string name="terminal_disconnect_cd">Відключитися</string>
     <string name="terminal_paste_cd">Вставити</string>
+    <string name="terminal_pin_keys_cd">Тримати панель клавіш видимою</string>
     <string name="terminal_copy_selection">Копіювати вибране</string>
     <string name="terminal_copy_all">Копіювати все</string>
     <string name="terminal_connecting">Підключення…</string>
