@@ -31,18 +31,23 @@ object SshManager {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
         channel.setAgentForwarding(params.agentForwarding)
 
-        // Stdin: use setInputStream so JSch reads from our pipe and forwards to server.
-        val stdinIn  = java.io.PipedInputStream(4096)
-        val stdinOut = java.io.PipedOutputStream(stdinIn)
-        channel.setInputStream(stdinIn)
-
         // Stdout: initialise JSch's internal pipe BEFORE connecting so no bytes are lost.
         val channelInput = channel.inputStream
+
+        // Stdin: write straight to the channel's output stream. We deliberately do NOT use
+        // channel.setInputStream(PipedInputStream): that spawns a JSch helper thread that
+        // reads our pipe, and PipedInputStream tracks the *writer* thread. Since each
+        // sendInput() writes from a fresh Dispatchers.IO coroutine, once such a transient
+        // thread is reclaimed by the pool the JSch stdin thread (blocked in read()) throws
+        // "Pipe broken" and dies — silently killing input on a backgrounded session after it
+        // is resumed, while the channel still reports connected. Writing directly avoids the
+        // helper thread and the writer-thread tracking entirely.
+        val channelOutput = channel.outputStream
 
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
+        ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
     }
 
     /**
