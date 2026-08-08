@@ -3,3 +3,4 @@
 • Mejor visualización de emojis y caracteres anchos (CJK) en el terminal
 • Corregido el texto cortado al inicio de la primera sesión del terminal
 • Corregidas las sesiones en segundo plano que podían dejar de aceptar entradas
+• Mantén la barra de teclas extra visible sin el teclado

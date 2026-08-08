@@ -4,6 +4,7 @@
 • Better display of emoji and wide (CJK) characters in the terminal
 • Fixed cut-off text at the top of the first terminal session
 • Fixed background sessions that could stop accepting input
+• Keep the extra key bar visible with the keyboard closed
 </en-US>
 <it-IT>
 • Passa tra sessioni su host diversi direttamente dalla barra delle schede del terminale
@@ -11,6 +12,7 @@
 • Migliore visualizzazione di emoji e caratteri larghi (CJK) nel terminale
 • Corretto il testo tagliato in cima alla prima sessione del terminale
 • Corrette le sessioni in background che potevano smettere di accettare input
+• Mantieni la barra dei tasti extra visibile senza tastiera
 </it-IT>
 <de-DE>
 • Wechsle direkt über die Tab-Leiste des Terminals zwischen Sitzungen auf verschiedenen Hosts
@@ -18,6 +20,7 @@
 • Bessere Darstellung von Emoji und breiten (CJK-)Zeichen im Terminal
 • Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
 • Hintergrundsitzungen behoben, die keine Eingaben mehr annehmen konnten
+• Zusatztastenleiste auch ohne Tastatur sichtbar halten
 </de-DE>
 <es-ES>
 • Cambia entre sesiones de distintos hosts directamente desde la barra de pestañas del terminal
@@ -25,6 +28,7 @@
 • Mejor visualización de emojis y caracteres anchos (CJK) en el terminal
 • Corregido el texto cortado al inicio de la primera sesión del terminal
 • Corregidas las sesiones en segundo plano que podían dejar de aceptar entradas
+• Mantén la barra de teclas extra visible sin el teclado
 </es-ES>
 <fr-FR>
 • Passez d'une session à l'autre sur différents hôtes directement depuis la barre d'onglets du terminal
@@ -32,6 +36,7 @@
 • Meilleur affichage des emoji et des caractères larges (CJK) dans le terminal
 • Correction du texte tronqué en haut de la première session du terminal
 • Correction des sessions en arrière-plan qui pouvaient cesser d'accepter la saisie
+• Barre de touches visible sans clavier
 </fr-FR>
 <pt-PT>
 • Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal
@@ -39,6 +44,7 @@
 • Melhor apresentação de emoji e carateres largos (CJK) no terminal
 • Corrigido o texto cortado no início da primeira sessão do terminal
 • Corrigidas as sessões em segundo plano que podiam deixar de aceitar entrada
+• Mantenha a barra de teclas extra visível sem o teclado
 </pt-PT>
 <uk>
 • Перемикайтеся між сеансами на різних хостах прямо з панелі вкладок термінала
@@ -46,6 +52,7 @@
 • Краще відображення емодзі та широких символів (CJK) у терміналі
 • Виправлено обрізаний текст на початку першого сеансу термінала
 • Виправлено фонові сеанси, які могли перестати приймати введення
+• Тримайте панель додаткових клавіш видимою без клавіатури
 </uk>
 <ru-RU>
 • Переключайтесь между сессиями на разных хостах прямо из панели вкладок терминала
@@ -53,6 +60,7 @@
 • Улучшено отображение эмодзи и широких символов (CJK) в терминале
 • Исправлен обрезанный текст в начале первой сессии терминала
 • Исправлены фоновые сессии, которые могли перестать принимать ввод
+• Панель дополнительных клавиш видима без клавиатуры
 </ru-RU>
 <zh-CN>
 • 直接从终端标签栏在不同主机的会话之间切换
@@ -60,6 +68,7 @@
 • 改进终端中表情符号和宽字符（中日韩）的显示
 • 修复了首个终端会话顶部文本被截断的问题
 • 修复了后台会话可能停止接受输入的问题
+• 键盘关闭时也保持额外按键栏可见
 </zh-CN>
 <ja-JP>
 • ターミナルのタブバーから、異なるホストのセッションをすばやく切り替え
@@ -67,4 +76,5 @@
 • 端末での絵文字や全角（CJK）文字の表示を改善
 • 最初のターミナルセッションの先頭でテキストが途切れる問題を修正
 • バックグラウンドのセッションが入力を受け付けなくなる問題を修正
+• キーボードを閉じても追加キーバーを表示
 </ja-JP>

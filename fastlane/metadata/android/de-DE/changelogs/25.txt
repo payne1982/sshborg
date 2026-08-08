@@ -3,3 +3,4 @@
 • Bessere Darstellung von Emoji und breiten (CJK-)Zeichen im Terminal
 • Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
 • Hintergrundsitzungen behoben, die keine Eingaben mehr annehmen konnten
+• Zusatztastenleiste auch ohne Tastatur sichtbar halten

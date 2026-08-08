@@ -3,3 +3,4 @@
 • Migliore visualizzazione di emoji e caratteri larghi (CJK) nel terminale
 • Corretto il testo tagliato in cima alla prima sessione del terminale
 • Corrette le sessioni in background che potevano smettere di accettare input
+• Mantieni la barra dei tasti extra visibile senza tastiera
