@@ -216,8 +216,8 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             'd' -> buffer.cursorRow = (param(0, 1) - 1).coerceIn(0, buffer.rows - 1)
             // Repeat
             'b' -> {
-                val ch = lastPrintedChar
-                if (ch != '\u0000') repeat(param(0, 1)) { printChar(ch.code) }
+                val cp = lastPrintedCodePoint
+                if (cp >= 0) repeat(param(0, 1)) { printChar(cp) }
             }
             else -> {} // unhandled
         }
@@ -318,24 +318,35 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     // --- Helpers ---
 
-    private var lastPrintedChar = '\u0000'
+    private var lastPrintedCodePoint = -1
 
     private fun printChar(codepoint: Int) {
-        // BMP codepoint (U+0000..U+FFFF) fits in a single Char.
-        // Supplementary codepoints (emoji, etc.) are stored as two surrogate Chars.
-        val chars = Character.toChars(codepoint)
-        for (ch in chars) {
-            lastPrintedChar = ch
-            if (buffer.cursorCol >= buffer.columns) {
-                // Auto-wrap: mark the full line as continuing onto the next one,
-                // so copy/paste can join the two without inserting a fake newline
-                buffer.setLineWrapped(buffer.cursorRow, true)
-                buffer.cursorCol = 0
-                lineFeed()
-            }
-            buffer.setChar(buffer.cursorRow, buffer.cursorCol, ch)
-            buffer.cursorCol++
+        val w = CharWidth.of(codepoint)
+        // Zero-width (combining marks, variation selectors, ZWJ): drop it so our column
+        // count stays aligned with the host, which also counts it as 0. (Applying it to the
+        // previous glyph is a later refinement.)
+        if (w == 0) return
+        lastPrintedCodePoint = codepoint
+        // A wide character needs 2 columns; if it doesn't fit, wrap first (it can't straddle
+        // the right margin). A narrow char defers the wrap until the next char, as before.
+        if (buffer.cursorCol + w > buffer.columns) {
+            // Auto-wrap: mark the full line as continuing onto the next one,
+            // so copy/paste can join the two without inserting a fake newline
+            buffer.setLineWrapped(buffer.cursorRow, true)
+            buffer.cursorCol = 0
+            lineFeed()
         }
+        val row = buffer.cursorRow
+        val col = buffer.cursorCol
+        // Overwriting half of an existing wide char: clear its orphaned partner first.
+        buffer.clearWidePairAt(row, col)
+        if (w == 2) {
+            buffer.clearWidePairAt(row, col + 1)
+            buffer.setWide(row, col, codepoint)
+        } else {
+            buffer.setCodePoint(row, col, codepoint)
+        }
+        buffer.cursorCol += w
     }
 
     private fun lineFeed() {

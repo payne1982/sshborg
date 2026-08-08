@@ -6,7 +6,23 @@ package com.sshborg.terminal
  */
 class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2000) {
 
-    data class Cell(val char: Char = ' ', val style: TextStyle = TextStyle.DEFAULT)
+    /**
+     * A single screen cell. [code] is a full Unicode codepoint (Int), so supplementary
+     * characters (emoji) fit in one cell instead of being split across two surrogate cells.
+     *
+     * A wide character (CJK, emoji: [CharWidth] == 2) occupies two cells: the left "lead"
+     * cell carries the codepoint with [wide] = true, and the right cell is a [trailing]
+     * placeholder (code 0) that is never drawn and is skipped when reading text out.
+     */
+    data class Cell(
+        val code: Int = ' '.code,
+        val style: TextStyle = TextStyle.DEFAULT,
+        val wide: Boolean = false,
+        val trailing: Boolean = false,
+    ) {
+        /** BMP convenience view; supplementary codepoints (emoji) read back as a space. */
+        val char: Char get() = if (Character.isBmpCodePoint(code)) code.toChar() else ' '
+    }
 
     // Scrollback: index 0 = oldest line
     private val scrollback = ArrayDeque<Array<Cell>>(maxScrollback)
@@ -44,7 +60,12 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     fun getRowText(row: Int, upToCol: Int = -1): String {
         if (row < 0 || row >= rows) return ""
         val end = if (upToCol < 0) columns else upToCol.coerceIn(0, columns)
-        return buildString { for (c in 0 until end) append(screen[row][c].char) }.trimEnd()
+        return buildString {
+            for (c in 0 until end) {
+                val cell = screen[row][c]
+                if (!cell.trailing) appendCodePoint(cell.code)
+            }
+        }.trimEnd()
     }
 
     fun getCell(row: Int, col: Int): Cell {
@@ -67,9 +88,40 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     // --- Write access ---
 
-    fun setChar(row: Int, col: Int, char: Char, style: TextStyle = currentStyle) {
+    fun setCodePoint(row: Int, col: Int, code: Int, style: TextStyle = currentStyle) {
         if (row < 0 || row >= rows || col < 0 || col >= columns) return
-        screen[row][col] = Cell(char, style)
+        screen[row][col] = Cell(code, style)
+    }
+
+    /** Writes a wide (2-cell) character: lead at [col], trailing placeholder at [col]+1. */
+    fun setWide(row: Int, col: Int, code: Int, style: TextStyle = currentStyle) {
+        if (row < 0 || row >= rows || col < 0 || col + 1 >= columns) return
+        screen[row][col] = Cell(code, style, wide = true)
+        screen[row][col + 1] = Cell(0, style, trailing = true)
+    }
+
+    /**
+     * If ([row],[col]) is half of a wide character, blanks both of its cells so no orphaned
+     * lead or trailing placeholder is left behind when a character is overwritten.
+     */
+    fun clearWidePairAt(row: Int, col: Int) {
+        if (row < 0 || row >= rows || col < 0 || col >= columns) return
+        val cell = screen[row][col]
+        when {
+            cell.trailing && col > 0 -> { screen[row][col - 1] = Cell(); screen[row][col] = Cell() }
+            cell.wide && col + 1 < columns -> { screen[row][col] = Cell(); screen[row][col + 1] = Cell() }
+        }
+    }
+
+    /** Blanks any orphaned wide lead / trailing placeholder in [row] (after shift/erase edits). */
+    fun sanitizeWide(row: Int) {
+        if (row < 0 || row >= rows) return
+        val line = screen[row]
+        for (c in 0 until columns) {
+            val cell = line[c]
+            if (cell.wide && (c + 1 >= columns || !line[c + 1].trailing)) line[c] = Cell()
+            if (cell.trailing && (c == 0 || !line[c - 1].wide)) line[c] = Cell()
+        }
     }
 
     fun saveCursor() {
@@ -185,8 +237,9 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
             0 -> {
                 for (c in cursorCol until columns) screen[cursorRow][c] = Cell()
                 screenWrapped[cursorRow] = false
+                sanitizeWide(cursorRow)
             }
-            1 -> for (c in 0..cursorCol) screen[cursorRow][c] = Cell()
+            1 -> { for (c in 0..cursorCol) screen[cursorRow][c] = Cell(); sanitizeWide(cursorRow) }
             2 -> {
                 screen[cursorRow] = Array(columns) { Cell() }
                 screenWrapped[cursorRow] = false
@@ -199,6 +252,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
             screen[cursorRow][c] = Cell()
         }
         if (cursorCol + count >= columns) screenWrapped[cursorRow] = false
+        sanitizeWide(cursorRow)
     }
 
     fun insertChars(count: Int) {
@@ -210,6 +264,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (c in cursorCol until cursorCol + n) row[c] = Cell()
         // The tail of the line changed, so any auto-wrap continuation is broken
         screenWrapped[cursorRow] = false
+        sanitizeWide(cursorRow)
     }
 
     fun deleteChars(count: Int) {
@@ -218,6 +273,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (c in cursorCol until columns - n) row[c] = row[c + n]
         for (c in columns - n until columns) row[c] = Cell()
         screenWrapped[cursorRow] = false
+        sanitizeWide(cursorRow)
     }
 
     /** Resizes the buffer, preserving content as much as possible.
@@ -264,5 +320,6 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         scrollBottom = newRows - 1
         cursorRow = cursorRow.coerceIn(0, newRows - 1)
         cursorCol = cursorCol.coerceAtMost(newCols - 1)
+        for (r in 0 until rows) sanitizeWide(r)
     }
 }
