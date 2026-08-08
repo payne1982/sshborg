@@ -1,0 +1,6 @@
+• Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal
+• Toque no nome de um ficheiro transferido para o abrir, no ecrã de transferência ou no painel de transferências
+• Melhor apresentação de emoji e carateres largos (CJK) no terminal
+• Corrigido o texto cortado no início da primeira sessão do terminal
+• Corrigidas as sessões em segundo plano que podiam deixar de aceitar entrada
+• Mantenha a barra de teclas extra visível sem o teclado

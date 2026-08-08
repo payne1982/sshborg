@@ -1,6 +1,5 @@
 package com.sshborg.service
 
-import android.app.DownloadManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -160,18 +159,10 @@ class SshForegroundService : Service() {
         }
 
         fun notifyDownloadComplete(context: Context, message: String, openUri: Uri? = null, mime: String? = null) {
-            // Tap target: a single downloaded file opens in a viewer (ACTION_VIEW on its MediaStore
-            // uri — a public content:// uri, no FileProvider needed); a multi-file batch (openUri null)
-            // opens the system Downloads screen. If nothing can handle the file's type, Android shows
-            // the usual "no app" message — acceptable, same as any download.
-            val intent = if (openUri != null) {
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(openUri, mime ?: "*/*")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-            } else {
-                Intent(DownloadManager.ACTION_VIEW_DOWNLOADS).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
-            }
+            // Tap target follows the shared DownloadIntents rule: a single file opens in a viewer,
+            // an APK or a multi-file batch opens the system Downloads screen. If nothing can handle
+            // the file's type, Android shows the usual "no app" message — acceptable, same as any download.
+            val intent = DownloadIntents.open(openUri, mime)
             val contentIntent = PendingIntent.getActivity(
                 context, NOTIFICATION_ID_DOWNLOAD, intent,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,

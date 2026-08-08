@@ -31,18 +31,23 @@ object SshManager {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
         channel.setAgentForwarding(params.agentForwarding)
 
-        // Stdin: use setInputStream so JSch reads from our pipe and forwards to server.
-        val stdinIn  = java.io.PipedInputStream(4096)
-        val stdinOut = java.io.PipedOutputStream(stdinIn)
-        channel.setInputStream(stdinIn)
-
         // Stdout: initialise JSch's internal pipe BEFORE connecting so no bytes are lost.
         val channelInput = channel.inputStream
+
+        // Stdin: write straight to the channel's output stream. We deliberately do NOT use
+        // channel.setInputStream(PipedInputStream): that spawns a JSch helper thread that
+        // reads our pipe, and PipedInputStream tracks the *writer* thread. Since each
+        // sendInput() writes from a fresh Dispatchers.IO coroutine, once such a transient
+        // thread is reclaimed by the pool the JSch stdin thread (blocked in read()) throws
+        // "Pipe broken" and dies — silently killing input on a backgrounded session after it
+        // is resumed, while the channel still reports connected. Writing directly avoids the
+        // helper thread and the writer-thread tracking entirely.
+        val channelOutput = channel.outputStream
 
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        ShellSession(session, channel, channelInput, stdinOut, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
+        ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
     }
 
     /**
@@ -56,10 +61,6 @@ object SshManager {
         val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, onHostKeyVerify)
 
         val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
-        // Allow multiple SFTP requests in-flight simultaneously (default is 1).
-        // Without pipelining, throughput = blockSize / RTT regardless of bandwidth.
-        // 16 concurrent requests scales throughput ~16x on high-latency connections.
-        channel.setBulkRequests(16)
         channel.connect(10_000)
 
         val homePath = withTimeoutOrNull(5_000) {
@@ -395,9 +396,23 @@ class ShellSession(
     val newJumpHostKeyUpdates: List<Pair<Long, String>> = emptyList(),
 ) {
     val inputStream: java.io.InputStream get() = channelInput
-    val outputStream: java.io.OutputStream get() = stdinOutput
     val isConnected get() = channel.isConnected && session.isConnected
     val exitStatus get() = channel.exitStatus
+
+    // JSch's channel OutputStream (channel.outputStream) is NOT thread-safe: its write/flush
+    // are unsynchronized and accumulate into a shared packet buffer. We write to it from
+    // several threads (each sendInput coroutine, plus the reader thread's terminal-response
+    // callback), so concurrent writes could interleave into one corrupt packet and drop the
+    // connection. Serialize every write through this lock.
+    private val writeLock = Any()
+
+    /** Writes [data] to the remote shell's stdin and flushes, serialized against other writers. */
+    fun write(data: ByteArray) {
+        synchronized(writeLock) {
+            stdinOutput.write(data)
+            stdinOutput.flush()
+        }
+    }
 
     fun resize(columns: Int, rows: Int) {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)

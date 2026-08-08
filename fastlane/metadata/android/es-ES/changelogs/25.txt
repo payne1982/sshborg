@@ -1,0 +1,6 @@
+• Cambia entre sesiones de distintos hosts directamente desde la barra de pestañas del terminal
+• Toca el nombre de un archivo descargado para abrirlo, desde la pantalla de descarga o el panel de transferencias
+• Mejor visualización de emojis y caracteres anchos (CJK) en el terminal
+• Corregido el texto cortado al inicio de la primera sesión del terminal
+• Corregidas las sesiones en segundo plano que podían dejar de aceptar entradas
+• Mantén la barra de teclas extra visible sin el teclado

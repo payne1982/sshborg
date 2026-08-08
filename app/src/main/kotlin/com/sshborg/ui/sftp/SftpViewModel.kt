@@ -14,7 +14,9 @@ import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
+import android.webkit.MimeTypeMap
 import com.sshborg.service.BackgroundTransfer
+import com.sshborg.service.DownloadIntents
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.service.TransferTask
@@ -503,6 +505,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }
         } // swallow per-subtree errors — remaining tasks continue
+    }
+
+    /**
+     * Opens a completed download: resolves its MediaStore uri from name + folder and fires the
+     * shared [DownloadIntents] intent (view the file, or the Downloads screen for an APK). Fails
+     * silently if the file is gone or nothing can open it.
+     */
+    fun openDownloadedFile(filename: String, localDir: String) {
+        val uri = findExistingDownload(filename, localDir) ?: return
+        val mime = MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension(filename.substringAfterLast('.', "").lowercase())
+        runCatching {
+            getApplication<Application>().startActivity(DownloadIntents.open(uri, mime, filename))
+        }
     }
 
     private fun findExistingDownload(filename: String, localDir: String): Uri? {

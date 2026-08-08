@@ -170,6 +170,8 @@
     <string name="settings_history_suggestions_subtitle">Vorschläge aus der Shell-Historie des Servers beim Tippen im Terminal anzeigen</string>
     <string name="settings_suggestions_bar_sticky_title">Vorschlagsleiste immer sichtbar</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Hält die Vorschlagsleiste auf fester Höhe, um Größenänderungen des Terminals zu vermeiden</string>
+    <string name="settings_extra_keys_bar_title">Zusatztasten immer sichtbar</string>
+    <string name="settings_extra_keys_bar_subtitle">Hält die Zusatztastenleiste (Strg, Pfeile, F-Tasten…) auch bei geschlossener Tastatur sichtbar. Auch über die Pinnadel auf der Leiste umschaltbar.</string>
 
     <string name="settings_app_lock_title">App-Sperre</string>
     <string name="settings_lock_mode_none">Keine</string>
@@ -202,6 +204,7 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Trennen</string>
     <string name="terminal_paste_cd">Einfügen</string>
+    <string name="terminal_pin_keys_cd">Tastenleiste sichtbar halten</string>
     <string name="terminal_copy_selection">Auswahl kopieren</string>
     <string name="terminal_copy_all">Alles kopieren</string>
     <string name="terminal_connecting">Wird verbunden…</string>

@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -110,12 +112,13 @@ fun TerminalScreen(
         else                                      -> false
     }
     val suggestions   by vm.suggestions.collectAsState()
+    val extraBarPinned by vm.extraBarPinned.collectAsState()
 
-    // Siblings: other Shell sessions for the same host (for the tab bar)
+    // Tab bar data. All open Shell sessions, grouped by host (order preserved).
+    // One host  -> per-session tabs (#1 #2 …); many hosts -> one tab per host.
     val currentSession = sessions.find { it.id == sessionId }
-    val siblingShellSessions = if (currentSession != null)
-        sessions.filter { it.hostId == currentSession.hostId && it.type == SessionManager.SessionType.Shell }
-    else emptyList()
+    val allShellSessions = sessions.filter { it.type == SessionManager.SessionType.Shell }
+    val shellHostGroups = allShellSessions.groupBy { it.hostId }.values.toList()
 
     var ctrlActive by remember { mutableStateOf(false) }
     var altActive  by remember { mutableStateOf(false) }
@@ -181,7 +184,17 @@ fun TerminalScreen(
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            Column(Modifier.fillMaxSize().imePadding()) {
+            // Bottom padding = max(IME, navigation bar): with the keyboard up the IME
+            // inset wins (as before); when the extra-key bar is pinned with the keyboard
+            // closed, the navigation-bar inset keeps that bar clear of the system bar.
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(
+                        WindowInsets.ime.union(WindowInsets.navigationBars)
+                            .only(WindowInsetsSides.Bottom)
+                    )
+            ) {
                 // Terminal view
                 AndroidView(
                     factory = { factoryCtx ->
@@ -193,7 +206,7 @@ fun TerminalScreen(
                             view.keepScreenOn          = keepScreenOn
                             view.lightScheme           = terminalLight
                             view.onInput              = sendInput
-                            view.onResize             = { cols, rows -> vm.resize(cols, rows) }
+                            view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
                             vm.onNeedsRedraw           = { view.postInvalidate() }
                             terminalView               = view
@@ -207,7 +220,7 @@ fun TerminalScreen(
                         view.keepScreenOn          = keepScreenOn
                         view.lightScheme           = terminalLight
                         view.onInput              = sendInput
-                        view.onResize             = { cols, rows -> vm.resize(cols, rows) }
+                        view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         terminalView               = view
@@ -222,10 +235,17 @@ fun TerminalScreen(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 )
 
-                // Tab chips — only when there are multiple sessions for this host
-                if (siblingShellSessions.size > 1) {
+                // Tab chips. Many hosts -> one tab per host (tap a multi-session host
+                // for a numbered popup); a single host with siblings -> per-session tabs.
+                if (shellHostGroups.size > 1) {
+                    HostTabRow(
+                        hostGroups = shellHostGroups,
+                        currentId  = sessionId,
+                        onSwitch   = onSwitchSession,
+                    )
+                } else if (allShellSessions.size > 1) {
                     SessionTabRow(
-                        sessions       = siblingShellSessions,
+                        sessions       = allShellSessions,
                         currentId      = sessionId,
                         onSwitch       = onSwitchSession,
                     )
@@ -252,15 +272,17 @@ fun TerminalScreen(
                     )
                 }
 
-                // Extra key bar — only when soft keyboard is open
-                if (imeVisible) {
+                // Extra key bar — when the soft keyboard is open, or pinned to stay put
+                if (imeVisible || extraBarPinned) {
                     ExtraKeyRow(
                         ctrlActive       = ctrlActive,
                         altActive        = altActive,
                         wordMode         = wordMode,
+                        pinned           = extraBarPinned,
                         onCtrlToggle     = { ctrlActive = !ctrlActive },
                         onAltToggle      = { altActive  = !altActive  },
                         onWordModeToggle = { wordMode   = !wordMode   },
+                        onPinToggle      = { vm.toggleExtraBarPinned() },
                         onKey            = { bytes -> sendInput(bytes) },
                         cursorKeys       = { vm.cursorKeyBytes(it) },
                     )
@@ -347,12 +369,13 @@ fun TerminalScreen(
         }
     }
 
-    // Attach + connect on first composition
+    // Attach on first composition. The connection itself is started by the first
+    // terminal-size measurement (vm.onTerminalSize) so the PTY opens at the real
+    // width; this only arms a fallback in case that measurement is slow to arrive.
     LaunchedEffect(sessionId) {
         vm.attach(sessionId)
-        if (vm.state.value == ConnectionState.Connecting) {
-            vm.connect()
-        }
+        delay(400)
+        vm.connectWithDefaultsIfPending()
     }
 
     // Auto-navigate back when the remote shell exits cleanly
@@ -426,6 +449,126 @@ private fun SessionTabRow(
     }
 }
 
+/**
+ * Cross-host tab bar: one tab per host. Tapping a host with a single session jumps
+ * straight to it; a host with several sessions expands an in-layout numbered picker
+ * ABOVE the tabs (an inline row, not a focus-stealing popup — so the soft keyboard
+ * stays up and nothing shifts) to choose which session to open.
+ */
+@Composable
+private fun HostTabRow(
+    hostGroups: List<List<SessionManager.ActiveSession>>,
+    currentId: String,
+    onSwitch: (String) -> Unit,
+) {
+    val tabShape  = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+    val pillShape = RoundedCornerShape(8.dp)
+    var expandedHostId by remember { mutableStateOf<Long?>(null) }
+    val expandedGroup = hostGroups.find { it.first().hostId == expandedHostId }
+
+    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant)) {
+        // Numbered session picker for the expanded multi-session host, drawn above the
+        // tabs so it reads as opening "upward" from the host tab that spawned it.
+        if (expandedGroup != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                expandedGroup.forEachIndexed { index, session ->
+                    val here = session.id == currentId
+                    Box(
+                        modifier = Modifier
+                            .clip(pillShape)
+                            .background(
+                                if (here) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                else MaterialTheme.colorScheme.surface
+                            )
+                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, pillShape)
+                            .clickable {
+                                expandedHostId = null
+                                if (!here) onSwitch(session.id)
+                            }
+                            .padding(horizontal = 14.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            text       = "#${index + 1}",
+                            fontSize   = 12.sp,
+                            fontWeight = if (here) FontWeight.Bold else FontWeight.Normal,
+                            color      = if (here) MaterialTheme.colorScheme.primary
+                                         else MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 4.dp)
+                .padding(top = 3.dp),
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            hostGroups.forEach { group ->
+                val selected = group.any { it.id == currentId }
+                val expanded = group.first().hostId == expandedHostId
+                val label    = group.first().hostLabel
+                val color    = if (selected) MaterialTheme.colorScheme.primary
+                               else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                Box(
+                    modifier = Modifier
+                        .clip(tabShape)
+                        .background(
+                            if (selected) MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        .then(
+                            if (selected) Modifier
+                            else Modifier.border(1.dp, MaterialTheme.colorScheme.outlineVariant, tabShape)
+                        )
+                        .clickable {
+                            if (group.size == 1) {
+                                expandedHostId = null
+                                if (group[0].id != currentId) onSwitch(group[0].id)
+                            } else {
+                                // toggle the picker for this host
+                                expandedHostId = if (expanded) null else group.first().hostId
+                            }
+                        }
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text       = label,
+                            fontSize   = 12.sp,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            color      = color,
+                            maxLines   = 1,
+                            overflow   = TextOverflow.Ellipsis,
+                            modifier   = Modifier.widthIn(max = 120.dp),
+                        )
+                        if (group.size > 1) {
+                            Text(
+                                text       = " (${group.size})",
+                                fontSize   = 12.sp,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                color      = color,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun SuggestionRow(suggestions: List<String>, sticky: Boolean, onSelect: (String) -> Unit) {
     LazyRow(
@@ -462,15 +605,18 @@ private fun ExtraKeyRow(
     ctrlActive: Boolean,
     altActive: Boolean,
     wordMode: Boolean,
+    pinned: Boolean,
     onCtrlToggle: () -> Unit,
     onAltToggle: () -> Unit,
     onWordModeToggle: () -> Unit,
+    onPinToggle: () -> Unit,
     onKey: (ByteArray) -> Unit,
     cursorKeys: (Char) -> ByteArray,
 ) {
     val clipboardManager = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
+    val pinContentDesc = stringResource(R.string.terminal_pin_keys_cd)
 
     Row(
         modifier = Modifier
@@ -528,6 +674,26 @@ private fun ExtraKeyRow(
         ) {
             Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
                 modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
+        }
+        // Pin: keep this bar visible even with the keyboard closed. Filled = pinned.
+        Box(
+            modifier = Modifier
+                .background(
+                    if (pinned) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surface,
+                    MaterialTheme.shapes.extraSmall,
+                )
+                .clickable(onClick = onPinToggle)
+                .padding(horizontal = 8.dp, vertical = 7.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                if (pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                contentDescription = pinContentDesc,
+                modifier = Modifier.size(18.dp),
+                tint = if (pinned) MaterialTheme.colorScheme.onPrimaryContainer
+                       else MaterialTheme.colorScheme.onSurface,
+            )
         }
         Spacer(Modifier.width(4.dp))
         ExtraKey("F1",  onClick = { onKey("\u001bOP".toByteArray()) })

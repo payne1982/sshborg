@@ -1,0 +1,6 @@
+• Switch between sessions on different hosts right from the terminal tab bar
+• Tap a downloaded file's name to open it, from the download screen or the transfers panel
+• Better display of emoji and wide (CJK) characters in the terminal
+• Fixed cut-off text at the top of the first terminal session
+• Fixed background sessions that could stop accepting input
+• Keep the extra key bar visible with the keyboard closed

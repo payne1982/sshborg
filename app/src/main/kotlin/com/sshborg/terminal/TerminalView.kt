@@ -42,10 +42,9 @@ class TerminalView @JvmOverloads constructor(
     private var cellH = 0f
     private var cellBaseline = 0f
 
-    // Reused single-char buffer for drawText, so each drawn cell no longer allocates a
-    // String (cell.char.toString()) every frame. Positioning is unchanged: still one
-    // glyph per cell at its grid x, so the rendered pixels are identical.
-    private val charBuf = CharArray(1)
+    // Reused char buffer for drawText, so each drawn cell no longer allocates a String
+    // every frame. Sized 2 to hold a supplementary codepoint's surrogate pair (emoji).
+    private val charBuf = CharArray(2)
 
     // Scroll offset (in lines) for viewing scrollback
     private var scrollbackOffset = 0
@@ -273,30 +272,34 @@ class TerminalView @JvmOverloads constructor(
 
                 for (c in 0 until visibleCols.coerceAtMost(cells.size)) {
                     val cell = cells[c]
+                    // Trailing half of a wide char: covered by the lead's 2-cell span, skip it.
+                    if (cell.trailing) continue
                     val style = cell.style
                     val left = c * cellW
+                    // A wide char (emoji/CJK) spans two cells so it isn't clipped mid-glyph.
+                    val span = if (cell.wide) cellW * 2 else cellW
 
                     val (fg, bg) = resolveColors(style)
 
                     if (bg != defaultBg) {
                         textPaint.color = bg
-                        canvas.drawRect(left, top, left + cellW, bottom, textPaint)
+                        canvas.drawRect(left, top, left + span, bottom, textPaint)
                     }
 
-                    if (cell.char != ' ' && !style.invisible) {
+                    if (cell.code != ' '.code && !style.invisible) {
                         val paint = if (style.bold) boldPaint else textPaint
                         paint.color = if (style.bold && style.fg in 0..7) colorPalette[style.fg + 8] else fg
-                        charBuf[0] = cell.char
-                        canvas.drawText(charBuf, 0, 1, left, top + cellBaseline, paint)
+                        val n = Character.toChars(cell.code, charBuf, 0)
+                        canvas.drawText(charBuf, 0, n, left, top + cellBaseline, paint)
 
                         if (style.underline) {
                             paint.color = fg
-                            canvas.drawLine(left, bottom - 2, left + cellW, bottom - 2, paint)
+                            canvas.drawLine(left, bottom - 2, left + span, bottom - 2, paint)
                         }
                         if (style.strikethrough) {
                             val mid = top + cellH / 2
                             paint.color = fg
-                            canvas.drawLine(left, mid, left + cellW, mid, paint)
+                            canvas.drawLine(left, mid, left + span, mid, paint)
                         }
                     }
                 }
@@ -304,9 +307,10 @@ class TerminalView @JvmOverloads constructor(
                 // Cursor (only on screen portion, not scrollback)
                 if (scrollbackOffset == 0 && absLine == totalScrollback + buf.cursorRow && buf.cursorVisible) {
                     val cursorLeft = buf.cursorCol * cellW
+                    val cursorSpan = if (buf.getCell(buf.cursorRow, buf.cursorCol).wide) cellW * 2 else cellW
                     textPaint.color = defaultFg
                     textPaint.alpha = 180
-                    canvas.drawRect(cursorLeft, top, cursorLeft + cellW, bottom, textPaint)
+                    canvas.drawRect(cursorLeft, top, cursorLeft + cursorSpan, bottom, textPaint)
                     textPaint.alpha = 255
                 }
             }
@@ -587,7 +591,7 @@ class TerminalView @JvmOverloads constructor(
                 val from  = if (absLine == s.first) s.second else 0
                 val to    = (if (absLine == e.first) e.second else cells.lastIndex).coerceAtMost(cells.lastIndex)
                 val row   = StringBuilder()
-                for (col in from..to) row.append(cells[col].char)
+                for (col in from..to) { val cell = cells[col]; if (!cell.trailing) row.appendCodePoint(cell.code) }
                 when {
                     absLine == e.first -> sb.append(row.trimEnd())
                     // Auto-wrapped line: it continues on the next one, so no newline
@@ -608,12 +612,12 @@ class TerminalView @JvmOverloads constructor(
             for (i in 0 until buf.scrollbackSize) {
                 val line = buf.getScrollbackLine(i) ?: continue
                 val row = StringBuilder()
-                for (cell in line) row.append(cell.char)
+                for (cell in line) if (!cell.trailing) row.appendCodePoint(cell.code)
                 if (buf.isScrollbackLineWrapped(i)) sb.append(row) else sb.appendLine(row.trimEnd())
             }
             for (row in 0 until buf.rows) {
                 val line = StringBuilder()
-                for (col in 0 until buf.columns) line.append(buf.getCell(row, col).char)
+                for (col in 0 until buf.columns) { val cell = buf.getCell(row, col); if (!cell.trailing) line.appendCodePoint(cell.code) }
                 if (buf.isLineWrapped(row)) sb.append(line) else sb.appendLine(line.trimEnd())
             }
         }

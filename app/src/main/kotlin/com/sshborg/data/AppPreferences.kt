@@ -34,6 +34,7 @@ class AppPreferences(private val context: Context) {
         val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
+        val EXTRA_KEYS_BAR_PINNED        = booleanPreferencesKey("extra_keys_bar_pinned")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
         val PRIVACY_POLICY_ACCEPTED      = booleanPreferencesKey("privacy_policy_accepted")
     }
@@ -178,6 +179,18 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.SUGGESTIONS_BAR_STICKY] = enabled }
     }
 
+    /**
+     * Default "pinned" state of the extra-keys bar: when true the bar stays visible
+     * even with the soft keyboard closed. This is only the starting value; the on-bar
+     * pin overrides it for the lifetime of a terminal cluster. Default false.
+     */
+    val extraKeysBarPinned: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.EXTRA_KEYS_BAR_PINNED] ?: false }
+
+    suspend fun setExtraKeysBarPinned(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.EXTRA_KEYS_BAR_PINNED] = enabled }
+    }
+
     val securityReminderDismissed: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.SECURITY_REMINDER_DISMISSED] ?: false }
 
@@ -222,6 +235,7 @@ class AppPreferences(private val context: Context) {
             put("terminal_color_scheme",  p[Keys.TERMINAL_COLOR_SCHEME] ?: TERMINAL_SCHEME_DARK)
             put("history_suggestions",    p[Keys.HISTORY_SUGGESTIONS] ?: true)
             put("suggestions_bar_sticky", p[Keys.SUGGESTIONS_BAR_STICKY] ?: false)
+            put("extra_keys_bar_pinned",  p[Keys.EXTRA_KEYS_BAR_PINNED] ?: false)
             put("double_tap_action",      p[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE)
         }
     }
@@ -241,6 +255,7 @@ class AppPreferences(private val context: Context) {
             if (obj.has("terminal_color_scheme"))  p[Keys.TERMINAL_COLOR_SCHEME] = obj.getInt("terminal_color_scheme").coerceIn(TERMINAL_SCHEME_DARK, TERMINAL_SCHEME_FOLLOW_APP)
             if (obj.has("history_suggestions"))    p[Keys.HISTORY_SUGGESTIONS] = obj.getBoolean("history_suggestions")
             if (obj.has("suggestions_bar_sticky")) p[Keys.SUGGESTIONS_BAR_STICKY] = obj.getBoolean("suggestions_bar_sticky")
+            if (obj.has("extra_keys_bar_pinned"))  p[Keys.EXTRA_KEYS_BAR_PINNED] = obj.getBoolean("extra_keys_bar_pinned")
             if (obj.has("double_tap_action"))      p[Keys.DOUBLE_TAP_ACTION] = obj.getInt("double_tap_action").coerceIn(DOUBLE_TAP_NONE, DOUBLE_TAP_TAB_TWICE)
         }
     }

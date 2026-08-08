@@ -170,6 +170,8 @@
     <string name="settings_history_suggestions_subtitle">Mostra suggerimenti dalla cronologia shell del server mentre si digita nel terminale</string>
     <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra dei suggerimenti a dimensione fissa per evitare il ridimensionamento del terminale quando i suggerimenti compaiono o scompaiono</string>
+    <string name="settings_extra_keys_bar_title">Tasti extra sempre visibili</string>
+    <string name="settings_extra_keys_bar_subtitle">Mantiene visibile la barra dei tasti extra (Ctrl, frecce, tasti F…) anche a tastiera chiusa. Puoi cambiarlo anche con il pin sulla barra.</string>
 
     <string name="settings_app_lock_title">Blocco app</string>
     <string name="settings_lock_mode_none">Nessuno</string>
@@ -202,6 +204,7 @@
     <string name="terminal_title_default">Terminale</string>
     <string name="terminal_disconnect_cd">Disconnetti</string>
     <string name="terminal_paste_cd">Incolla</string>
+    <string name="terminal_pin_keys_cd">Mantieni visibile la barra dei tasti</string>
     <string name="terminal_copy_selection">Copia selezione</string>
     <string name="terminal_copy_all">Copia tutto</string>
     <string name="terminal_connecting">Connessione in corso…</string>

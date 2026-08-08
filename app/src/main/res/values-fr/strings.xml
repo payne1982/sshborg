@@ -170,6 +170,8 @@
     <string name="settings_history_suggestions_subtitle">Afficher des suggestions tirées de l\'historique shell du serveur lors de la saisie dans le terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Maintient la barre de suggestions à hauteur fixe pour éviter le redimensionnement du terminal</string>
+    <string name="settings_extra_keys_bar_title">Touches supplémentaires toujours visibles</string>
+    <string name="settings_extra_keys_bar_subtitle">Garde la barre de touches supplémentaires (Ctrl, flèches, touches F…) visible même clavier fermé. Réglable aussi avec l\'épingle sur la barre.</string>
 
     <string name="settings_app_lock_title">Verrouillage de l\'app</string>
     <string name="settings_lock_mode_none">Aucun</string>
@@ -202,6 +204,7 @@
     <string name="terminal_title_default">Terminal</string>
     <string name="terminal_disconnect_cd">Déconnecter</string>
     <string name="terminal_paste_cd">Coller</string>
+    <string name="terminal_pin_keys_cd">Garder la barre de touches visible</string>
     <string name="terminal_copy_selection">Copier la sélection</string>
     <string name="terminal_copy_all">Tout copier</string>
     <string name="terminal_connecting">Connexion en cours…</string>

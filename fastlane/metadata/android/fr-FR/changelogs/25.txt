@@ -1,0 +1,6 @@
+• Passez d'une session à l'autre sur différents hôtes directement depuis la barre d'onglets du terminal
+• Touchez le nom d'un fichier téléchargé pour l'ouvrir, depuis l'écran de téléchargement ou le panneau des transferts
+• Meilleur affichage des emoji et des caractères larges (CJK) dans le terminal
+• Correction du texte tronqué en haut de la première session du terminal
+• Correction des sessions en arrière-plan qui pouvaient cesser d'accepter la saisie
+• Barre de touches visible sans clavier
