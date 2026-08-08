@@ -2,3 +2,4 @@
 • Tippe auf den Namen einer heruntergeladenen Datei, um sie zu öffnen – im Download-Bildschirm oder im Übertragungen-Panel
 • Bessere Darstellung von Emoji und breiten (CJK-)Zeichen im Terminal
 • Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
+• Hintergrundsitzungen behoben, die keine Eingaben mehr annehmen konnten
