@@ -1,50 +1,60 @@
 <en-US>
 • Switch between sessions on different hosts right from the terminal tab bar
 • Tap a downloaded file's name to open it, from the download screen or the transfers panel
+• Better display of emoji and wide (CJK) characters in the terminal
 • Fixed cut-off text at the top of the first terminal session
 </en-US>
 <it-IT>
 • Passa tra sessioni su host diversi direttamente dalla barra delle schede del terminale
 • Tocca il nome di un file scaricato per aprirlo, dalla schermata di download o dal pannello dei trasferimenti
+• Migliore visualizzazione di emoji e caratteri larghi (CJK) nel terminale
 • Corretto il testo tagliato in cima alla prima sessione del terminale
 </it-IT>
 <de-DE>
 • Wechsle direkt über die Tab-Leiste des Terminals zwischen Sitzungen auf verschiedenen Hosts
 • Tippe auf den Namen einer heruntergeladenen Datei, um sie zu öffnen – im Download-Bildschirm oder im Übertragungen-Panel
+• Bessere Darstellung von Emoji und breiten (CJK-)Zeichen im Terminal
 • Abgeschnittenen Text am Anfang der ersten Terminal-Sitzung behoben
 </de-DE>
 <es-ES>
 • Cambia entre sesiones de distintos hosts directamente desde la barra de pestañas del terminal
 • Toca el nombre de un archivo descargado para abrirlo, desde la pantalla de descarga o el panel de transferencias
+• Mejor visualización de emojis y caracteres anchos (CJK) en el terminal
 • Corregido el texto cortado al inicio de la primera sesión del terminal
 </es-ES>
 <fr-FR>
 • Passez d'une session à l'autre sur différents hôtes directement depuis la barre d'onglets du terminal
 • Touchez le nom d'un fichier téléchargé pour l'ouvrir, depuis l'écran de téléchargement ou le panneau des transferts
+• Meilleur affichage des emoji et des caractères larges (CJK) dans le terminal
 • Correction du texte tronqué en haut de la première session du terminal
 </fr-FR>
 <pt-PT>
 • Alterne entre sessões em anfitriões diferentes diretamente na barra de separadores do terminal
 • Toque no nome de um ficheiro transferido para o abrir, no ecrã de transferência ou no painel de transferências
+• Melhor apresentação de emoji e carateres largos (CJK) no terminal
 • Corrigido o texto cortado no início da primeira sessão do terminal
 </pt-PT>
 <uk>
 • Перемикайтеся між сеансами на різних хостах прямо з панелі вкладок термінала
 • Торкніться назви завантаженого файлу, щоб відкрити його, — з екрана завантаження або панелі передач
+• Краще відображення емодзі та широких символів (CJK) у терміналі
 • Виправлено обрізаний текст на початку першого сеансу термінала
 </uk>
 <ru-RU>
 • Переключайтесь между сессиями на разных хостах прямо из панели вкладок терминала
 • Нажмите на имя загруженного файла, чтобы открыть его, — с экрана загрузки или панели передач
+• Улучшено отображение эмодзи и широких символов (CJK) в терминале
 • Исправлен обрезанный текст в начале первой сессии терминала
 </ru-RU>
 <zh-CN>
 • 直接从终端标签栏在不同主机的会话之间切换
 • 点按已下载文件的名称即可打开它，可在下载界面或传输面板中操作
+• 改进终端中表情符号和宽字符（中日韩）的显示
 • 修复了首个终端会话顶部文本被截断的问题
 </zh-CN>
 <ja-JP>
 • ターミナルのタブバーから、異なるホストのセッションをすばやく切り替え
 • ダウンロードしたファイル名をタップして開けます（ダウンロード画面や転送パネルから）
+• 端末での絵文字や全角（CJK）文字の表示を改善
 • 最初のターミナルセッションの先頭でテキストが途切れる問題を修正
 </ja-JP>

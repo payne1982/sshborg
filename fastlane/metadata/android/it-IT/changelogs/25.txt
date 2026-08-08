@@ -1,3 +1,4 @@
 • Passa tra sessioni su host diversi direttamente dalla barra delle schede del terminale
 • Tocca il nome di un file scaricato per aprirlo, dalla schermata di download o dal pannello dei trasferimenti
+• Migliore visualizzazione di emoji e caratteri larghi (CJK) nel terminale
 • Corretto il testo tagliato in cima alla prima sessione del terminale
