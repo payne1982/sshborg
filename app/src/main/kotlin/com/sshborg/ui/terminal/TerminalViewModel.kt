@@ -361,7 +361,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private fun startReading(session: ShellSession) {
         val em = _emulator.value
         em.onSendResponse = { bytes ->
-            runCatching { session.outputStream.write(bytes); session.outputStream.flush() }
+            runCatching { session.write(bytes) }
         }
         readerJob?.cancel()
         readerJob = viewModelScope.launch(Dispatchers.IO) {
@@ -434,10 +434,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             _suggestions.value = emptyList()
         }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                shellSession?.outputStream?.write(data)
-                shellSession?.outputStream?.flush()
-            }
+            runCatching { shellSession?.write(data) }
         }
     }
 

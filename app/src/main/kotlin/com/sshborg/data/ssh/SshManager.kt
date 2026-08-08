@@ -396,9 +396,23 @@ class ShellSession(
     val newJumpHostKeyUpdates: List<Pair<Long, String>> = emptyList(),
 ) {
     val inputStream: java.io.InputStream get() = channelInput
-    val outputStream: java.io.OutputStream get() = stdinOutput
     val isConnected get() = channel.isConnected && session.isConnected
     val exitStatus get() = channel.exitStatus
+
+    // JSch's channel OutputStream (channel.outputStream) is NOT thread-safe: its write/flush
+    // are unsynchronized and accumulate into a shared packet buffer. We write to it from
+    // several threads (each sendInput coroutine, plus the reader thread's terminal-response
+    // callback), so concurrent writes could interleave into one corrupt packet and drop the
+    // connection. Serialize every write through this lock.
+    private val writeLock = Any()
+
+    /** Writes [data] to the remote shell's stdin and flushes, serialized against other writers. */
+    fun write(data: ByteArray) {
+        synchronized(writeLock) {
+            stdinOutput.write(data)
+            stdinOutput.flush()
+        }
+    }
 
     fun resize(columns: Int, rows: Int) {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
