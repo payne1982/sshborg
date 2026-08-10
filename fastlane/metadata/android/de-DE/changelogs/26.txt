@@ -1,1 +1,2 @@
 • Neu gestaltete Fehler- und Trennungsbildschirme: klare Zusammenfassung plus ausklappbare Details zum Scrollen und Kopieren
+• Stabilere Verbindungen: hält das WLAN während aktiver Sitzungen wach und prüft die Verbindung häufiger

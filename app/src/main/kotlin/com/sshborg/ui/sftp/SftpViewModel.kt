@@ -257,15 +257,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     auth = SshAuth.Password(pwd)
                 } else {
-                    val detail = err?.let {
-                        buildString {
-                            append(it.toString())
-                            com.sshborg.data.ssh.SshDiagnostics.recentTail()?.let { t -> append("\n\n").append(t) }
-                        }
-                    }
                     _state.value = State.Error(
                         err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed),
-                        detail,
+                        err?.stackTraceToString(),
                     )
                     sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
                     return@launch
@@ -690,10 +684,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 if (sftpSession?.isConnected != true) {
                     _state.value = State.Error(
                         getApplication<Application>().getString(R.string.terminal_connection_lost),
-                        buildString {
-                            append(it.toString())
-                            com.sshborg.data.ssh.SshDiagnostics.recentTail()?.let { t -> append("\n\n").append(t) }
-                        },
+                        it.stackTraceToString(),
                     )
                     sessionId?.let { id -> sessionManager.update(id) { s -> s.copy(status = SessionManager.Status.Error) } }
                 } else {

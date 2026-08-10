@@ -1,1 +1,2 @@
 • Schermate di errore e disconnessione ridisegnate: un riepilogo chiaro più dettagli espandibili che puoi scorrere e copiare
+• Connessioni più stabili: mantiene il Wi-Fi attivo durante le sessioni e controlla il collegamento più spesso

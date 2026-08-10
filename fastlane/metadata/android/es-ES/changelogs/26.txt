@@ -1,1 +1,2 @@
 • Pantallas de error y desconexión rediseñadas: un resumen claro más detalles desplegables que puedes desplazar y copiar
+• Conexiones más estables: mantiene el Wi-Fi activo durante las sesiones y comprueba el enlace más a menudo

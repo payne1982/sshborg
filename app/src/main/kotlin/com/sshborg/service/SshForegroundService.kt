@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationCompat
@@ -25,12 +26,30 @@ class SshForegroundService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.Main)
     private var observeJob: Job? = null
+    private var wifiLock: WifiManager.WifiLock? = null
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification(0))
+        acquireWifiLock()
         observeSessionCount()
+    }
+
+    /**
+     * Keeps the Wi-Fi radio in full-power mode while sessions are active. Android's Wi-Fi power
+     * management can park the radio on an idle connection and locally abort the TCP socket
+     * (SocketException "Software caused connection abort"), dropping an otherwise healthy SSH
+     * session after ~30-40s of inactivity — foreground or background. The service already lives
+     * exactly as long as there is ≥1 session, so the lock's lifetime matches. WifiLock needs no
+     * manifest permission.
+     */
+    private fun acquireWifiLock() {
+        val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        wifiLock = wifi.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "sshborg:sessions").apply {
+            setReferenceCounted(false)
+            runCatching { acquire() }
+        }
     }
 
     private fun observeSessionCount() {
@@ -76,6 +95,8 @@ class SshForegroundService : Service() {
 
     override fun onDestroy() {
         scope.cancel()
+        wifiLock?.takeIf { it.isHeld }?.let { runCatching { it.release() } }
+        wifiLock = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }

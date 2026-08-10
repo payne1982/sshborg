@@ -150,8 +150,8 @@ object SshManager {
                 if (params.allowLegacyCiphers) applyLegacyCiphers(this)
             }
             jumpSession.setConfig(jumpConfig)
-            jumpSession.setServerAliveInterval(30_000)
-            jumpSession.setServerAliveCountMax(3)
+            jumpSession.setServerAliveInterval(15_000)
+            jumpSession.setServerAliveCountMax(6)
 
             jumpSession.connect(20_000)
             jumpSession.setTimeout(0)
@@ -224,8 +224,10 @@ object SshManager {
             if (params.allowLegacyCiphers) applyLegacyCiphers(this)
         }
         session.setConfig(config)
-        session.setServerAliveInterval(30_000)
-        session.setServerAliveCountMax(3)
+        // Keepalive every 15s, give up after 6 missed (~90s). Frequent probes keep the WiFi
+        // path warm (see the WifiLock in SshForegroundService) and detect a real death sooner.
+        session.setServerAliveInterval(15_000)
+        session.setServerAliveCountMax(6)
 
         // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
         // channel-level flag but never sets Session.agent_forwarding. Fix via reflection.

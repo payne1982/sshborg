@@ -1,1 +1,2 @@
 • Écrans d'erreur et de déconnexion repensés : un résumé clair et des détails dépliables à faire défiler et à copier
+• Connexions plus stables : garde le Wi-Fi actif pendant les sessions et vérifie le lien plus souvent
