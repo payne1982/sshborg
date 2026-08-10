@@ -1,0 +1,1 @@
+• Redesigned connection error and disconnect screens: a clear summary plus expandable details you can scroll and copy

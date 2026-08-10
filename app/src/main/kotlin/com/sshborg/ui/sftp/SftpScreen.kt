@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
+import com.sshborg.ui.common.ProblemContent
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -369,17 +370,16 @@ fun SftpScreen(
                 }
 
                 is SftpViewModel.State.Error -> {
-                    Column(
-                        Modifier.align(Alignment.Center).padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Icon(Icons.Default.ErrorOutline, null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(48.dp))
-                        Text(s.message, style = MaterialTheme.typography.bodyMedium)
-                        Button(onClick = onBack) { Text(stringResource(R.string.action_go_back)) }
-                    }
+                    ProblemContent(
+                        title        = s.message,
+                        summary      = null,
+                        detail       = s.detail,
+                        primaryLabel = stringResource(R.string.action_go_back),
+                        onPrimary    = onBack,
+                        modifier     = Modifier.align(Alignment.Center).padding(24.dp),
+                        icon         = Icons.Default.ErrorOutline,
+                        iconTint     = MaterialTheme.colorScheme.error,
+                    )
                 }
 
                 SftpViewModel.State.Disconnected -> {

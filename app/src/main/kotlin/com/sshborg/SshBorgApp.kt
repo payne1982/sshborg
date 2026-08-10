@@ -1,7 +1,9 @@
 package com.sshborg
 
 import android.app.Application
+import com.jcraft.jsch.JSch
 import com.sshborg.data.AppPreferences
+import com.sshborg.data.ssh.SshDiagnostics
 import com.sshborg.data.db.AppDatabase
 import com.sshborg.service.SessionManager
 import com.sshborg.service.TransferManager
@@ -25,5 +27,9 @@ class SshBorgApp : Application() {
         // on all API levels (Ed25519 is only in Android's JCE from API 33+).
         Security.removeProvider("BC")
         Security.addProvider(BouncyCastleProvider())
+
+        // Capture JSch's own diagnostics: an in-memory ring buffer (always) so a dropped
+        // connection can show a real cause, plus Logcat output in debug builds only.
+        JSch.setLogger(SshDiagnostics)
     }
 }

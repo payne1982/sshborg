@@ -211,6 +211,8 @@
     <string name="terminal_connection_failed">Connessione fallita</string>
     <string name="terminal_connection_lost">Connessione persa</string>
     <string name="terminal_disconnected">Disconnesso</string>
+    <string name="terminal_error_details">Dettagli</string>
+    <string name="terminal_copy_error">Copia errore</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Torna agli host</string>

@@ -225,6 +225,8 @@
     <string name="terminal_connection_failed">连接失败</string>
     <string name="terminal_connection_lost">连接已断开</string>
     <string name="terminal_disconnected">已断开连接</string>
+    <string name="terminal_error_details">详情</string>
+    <string name="terminal_copy_error">复制错误</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">返回主机列表</string>

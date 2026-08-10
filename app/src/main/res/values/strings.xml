@@ -226,6 +226,8 @@
     <string name="terminal_connection_failed">Connection failed</string>
     <string name="terminal_connection_lost">Connection lost</string>
     <string name="terminal_disconnected">Disconnected</string>
+    <string name="terminal_error_details">Details</string>
+    <string name="terminal_copy_error">Copy error</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Back to hosts</string>

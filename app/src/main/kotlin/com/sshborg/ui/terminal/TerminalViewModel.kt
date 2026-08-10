@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
-import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.KeystoreManager
@@ -21,8 +20,13 @@ sealed interface ConnectionState {
     object Connected : ConnectionState
     data class HostKeyPrompt(val hostname: String, val fingerprint: String) : ConnectionState
     data class PasswordPrompt(val hostname: String, val wrongPassword: Boolean = false) : ConnectionState
-    data class Error(val message: String) : ConnectionState
-    data class Disconnected(val cause: String? = null) : ConnectionState
+    data class Error(val message: String, val detail: String? = null) : ConnectionState
+    /**
+     * @param summary short, human-readable line shown under the title (all non-clean cases).
+     * @param detail  full technical cause (exception text + recent JSch log tail), shown
+     *                in the expandable, scrollable, copyable section. Null → no details section.
+     */
+    data class Disconnected(val summary: String? = null, val detail: String? = null) : ConnectionState
 }
 
 class TerminalViewModel(app: Application) : AndroidViewModel(app) {
@@ -136,7 +140,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 _state.value = ConnectionState.Connected
                 startReading(session.shellSession)
             } else {
-                _state.value = ConnectionState.Disconnected()
+                // Session dropped while backgrounded: the reader loop wasn't running to catch
+                // the exception, so pull the reason from JSch's own log tail.
+                _state.value = ConnectionState.Disconnected(
+                    summary = getApplication<Application>().getString(R.string.terminal_connection_lost),
+                    detail  = com.sshborg.data.ssh.SshDiagnostics.recentTail(),
+                )
                 sessionManager.update(id) { it.copy(status = SessionManager.Status.Disconnected) }
             }
         }
@@ -322,7 +331,15 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     auth = SshAuth.Password(pwd)
                 } else {
-                    _state.value = ConnectionState.Error(err?.message?.takeIf { it.isNotBlank() } ?: getApplication<Application>().getString(R.string.error_connection_failed))
+                    val summary = err?.message?.takeIf { it.isNotBlank() }
+                        ?: getApplication<Application>().getString(R.string.error_connection_failed)
+                    val detail = err?.let {
+                        buildString {
+                            append(it.toString())
+                            com.sshborg.data.ssh.SshDiagnostics.recentTail()?.let { t -> append("\n\n").append(t) }
+                        }
+                    }
+                    _state.value = ConnectionState.Error(summary, detail)
                     sessionManager.remove(id)
                     if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
                     return@launch
@@ -382,7 +399,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val buf = ByteArray(4096)
             var cleanExit = false
-            var disconnectCause: String? = null
+            // summary = short line under the title; detail = full technical cause (expandable).
+            var causeSummary: String? = null
+            var causeDetail: String? = null
+            val connectionLost = { getApplication<Application>().getString(R.string.terminal_connection_lost) }
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
@@ -395,7 +415,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         if (session.exitStatus != -1) {
                             cleanExit = true
                         } else {
-                            disconnectCause = getApplication<Application>().getString(R.string.terminal_connection_lost)
+                            causeSummary = connectionLost()
+                            causeDetail  = com.sshborg.data.ssh.SshDiagnostics.recentTail()
                         }
                         break
                     }
@@ -405,11 +426,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     scheduleUpdateSuggestions()
                 }
                 // Loop exited because session.isConnected flipped without EOF — unexpected disconnect.
-                if (isActive && !cleanExit && disconnectCause == null) {
+                if (isActive && !cleanExit && causeSummary == null) {
                     if (session.exitStatus != -1) {
                         cleanExit = true
                     } else {
-                        disconnectCause = getApplication<Application>().getString(R.string.terminal_connection_lost)
+                        causeSummary = connectionLost()
+                        causeDetail  = com.sshborg.data.ssh.SshDiagnostics.recentTail()
                     }
                 }
             } catch (e: Exception) {
@@ -419,8 +441,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 if (session.exitStatus != -1) {
                     cleanExit = true
                 } else {
-                    disconnectCause = if (BuildConfig.DEBUG) e.toString()
-                                      else "${e.javaClass.simpleName}${e.message?.let { ": $it" } ?: ""}"
+                    // Short summary from the exception; full detail = exception text plus the
+                    // recent JSch log tail (the real protocol-level reason lives there).
+                    causeSummary = e.message?.takeIf { it.isNotBlank() } ?: e.javaClass.simpleName
+                    causeDetail = buildString {
+                        append(e.toString())
+                        com.sshborg.data.ssh.SshDiagnostics.recentTail()?.let { append("\n\n").append(it) }
+                    }
                 }
             }
 
@@ -437,7 +464,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 if (cleanExit) {
                     _navBack.tryEmit(Unit)
                 } else {
-                    _state.value = ConnectionState.Disconnected(disconnectCause)
+                    _state.value = ConnectionState.Disconnected(causeSummary, causeDetail)
                 }
             }
         }

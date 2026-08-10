@@ -1,0 +1,30 @@
+<en-US>
+• Redesigned connection error and disconnect screens: a clear summary plus expandable details you can scroll and copy
+</en-US>
+<it-IT>
+• Schermate di errore e disconnessione ridisegnate: un riepilogo chiaro più dettagli espandibili che puoi scorrere e copiare
+</it-IT>
+<de-DE>
+• Neu gestaltete Fehler- und Trennungsbildschirme: klare Zusammenfassung plus ausklappbare Details zum Scrollen und Kopieren
+</de-DE>
+<es-ES>
+• Pantallas de error y desconexión rediseñadas: un resumen claro más detalles desplegables que puedes desplazar y copiar
+</es-ES>
+<fr-FR>
+• Écrans d'erreur et de déconnexion repensés : un résumé clair et des détails dépliables à faire défiler et à copier
+</fr-FR>
+<pt-PT>
+• Ecrãs de erro e desconexão redesenhados: um resumo claro e detalhes expansíveis que pode percorrer e copiar
+</pt-PT>
+<uk>
+• Оновлені екрани помилок і відключення: чіткий підсумок і розгортані деталі, які можна гортати та копіювати
+</uk>
+<ru-RU>
+• Переработаны экраны ошибок и отключения: понятная сводка и разворачиваемые детали, которые можно прокрутить и скопировать
+</ru-RU>
+<zh-CN>
+• 重新设计的连接错误和断开界面：清晰的摘要，以及可展开、可滚动、可复制的详情
+</zh-CN>
+<ja-JP>
+• 接続エラーと切断の画面を刷新：分かりやすい要約と、スクロール・コピーできる展開可能な詳細
+</ja-JP>

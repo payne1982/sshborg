@@ -225,6 +225,8 @@
     <string name="terminal_connection_failed">接続に失敗しました</string>
     <string name="terminal_connection_lost">接続が切れました</string>
     <string name="terminal_disconnected">切断されました</string>
+    <string name="terminal_error_details">詳細</string>
+    <string name="terminal_copy_error">エラーをコピー</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">ホスト一覧に戻る</string>

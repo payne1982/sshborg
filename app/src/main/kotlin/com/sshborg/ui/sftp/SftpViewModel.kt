@@ -43,7 +43,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         data class Deleting(val name: String, val index: Int = 1, val total: Int = 1) : State
         data class Uploading(val filename: String, val bytesSent: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
         data class Uploaded(val filename: String, val totalFiles: Int = 1) : State
-        data class Error(val message: String) : State
+        data class Error(val message: String, val detail: String? = null) : State
         object Disconnected : State
     }
 
@@ -257,7 +257,16 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     auth = SshAuth.Password(pwd)
                 } else {
-                    _state.value = State.Error(err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed))
+                    val detail = err?.let {
+                        buildString {
+                            append(it.toString())
+                            com.sshborg.data.ssh.SshDiagnostics.recentTail()?.let { t -> append("\n\n").append(t) }
+                        }
+                    }
+                    _state.value = State.Error(
+                        err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed),
+                        detail,
+                    )
                     sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
                     return@launch
                 }
@@ -679,7 +688,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 // If the session is gone, a snackbar alone would leave the current state
                 // (e.g. the Downloading overlay) on screen with no way out.
                 if (sftpSession?.isConnected != true) {
-                    _state.value = State.Error(getApplication<Application>().getString(R.string.terminal_connection_lost))
+                    _state.value = State.Error(
+                        getApplication<Application>().getString(R.string.terminal_connection_lost),
+                        buildString {
+                            append(it.toString())
+                            com.sshborg.data.ssh.SshDiagnostics.recentTail()?.let { t -> append("\n\n").append(t) }
+                        },
+                    )
                     sessionId?.let { id -> sessionManager.update(id) { s -> s.copy(status = SessionManager.Status.Error) } }
                 } else {
                     _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_refresh_failed))

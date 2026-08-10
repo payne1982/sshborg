@@ -226,6 +226,8 @@
     <string name="terminal_connection_failed">Не удалось подключиться</string>
     <string name="terminal_connection_lost">Соединение потеряно</string>
     <string name="terminal_disconnected">Отключено</string>
+    <string name="terminal_error_details">Подробности</string>
+    <string name="terminal_copy_error">Копировать ошибку</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">К списку хостов</string>
