@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -867,7 +868,9 @@ private fun HostKeyDialog(hostname: String, fingerprint: String, onAccept: () ->
 
 @Composable
 private fun ErrorOverlay(message: String, detail: String?, onBack: () -> Unit) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    // Sit high (≈¼ from the top), not centred: on some devices the terminal keyboard stays up
+    // and would hide the expanded Details if the box were centred.
+    Box(Modifier.fillMaxSize(), contentAlignment = BiasAlignment(0f, -0.5f)) {
         Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
             ProblemContent(
                 title        = stringResource(R.string.terminal_connection_failed),
@@ -918,7 +921,8 @@ private fun SelectionBar(
 
 @Composable
 private fun DisconnectedOverlay(summary: String?, detail: String?, onClose: () -> Unit) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    // See ErrorOverlay: high, not centred, so expanded Details clear a still-open keyboard.
+    Box(Modifier.fillMaxSize(), contentAlignment = BiasAlignment(0f, -0.5f)) {
         Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), shape = MaterialTheme.shapes.medium) {
             ProblemContent(
                 title        = stringResource(R.string.terminal_disconnected),

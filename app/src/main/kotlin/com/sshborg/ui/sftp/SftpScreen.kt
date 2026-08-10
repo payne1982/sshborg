@@ -20,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
@@ -376,7 +377,7 @@ fun SftpScreen(
                         detail       = s.detail,
                         primaryLabel = stringResource(R.string.action_go_back),
                         onPrimary    = onBack,
-                        modifier     = Modifier.align(Alignment.Center).padding(24.dp),
+                        modifier     = Modifier.align(BiasAlignment(0f, -0.5f)).padding(24.dp),
                         icon         = Icons.Default.ErrorOutline,
                         iconTint     = MaterialTheme.colorScheme.error,
                     )
