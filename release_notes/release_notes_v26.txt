@@ -1,40 +1,50 @@
 <en-US>
 • Redesigned connection error and disconnect screens: a clear summary plus expandable details you can scroll and copy
 • More stable connections: keeps Wi-Fi awake during active sessions and checks the link more often
+• Fixed a rare crash and now notifies you when Android's background time limit stops your sessions
 </en-US>
 <it-IT>
 • Schermate di errore e disconnessione ridisegnate: un riepilogo chiaro più dettagli espandibili che puoi scorrere e copiare
 • Connessioni più stabili: mantiene il Wi-Fi attivo durante le sessioni e controlla il collegamento più spesso
+• Corretto un raro arresto anomalo e ora ti avvisa quando il limite di tempo in background di Android interrompe le sessioni
 </it-IT>
 <de-DE>
 • Neu gestaltete Fehler- und Trennungsbildschirme: klare Zusammenfassung plus ausklappbare Details zum Scrollen und Kopieren
 • Stabilere Verbindungen: hält das WLAN während aktiver Sitzungen wach und prüft die Verbindung häufiger
+• Seltenen Absturz behoben und informiert dich jetzt, wenn Androids Hintergrund-Zeitlimit deine Sitzungen beendet
 </de-DE>
 <es-ES>
 • Pantallas de error y desconexión rediseñadas: un resumen claro más detalles desplegables que puedes desplazar y copiar
 • Conexiones más estables: mantiene el Wi-Fi activo durante las sesiones y comprueba el enlace más a menudo
+• Corregido un fallo poco frecuente y ahora te avisa cuando el límite de tiempo en segundo plano de Android detiene las sesiones
 </es-ES>
 <fr-FR>
 • Écrans d'erreur et de déconnexion repensés : un résumé clair et des détails dépliables à faire défiler et à copier
 • Connexions plus stables : garde le Wi-Fi actif pendant les sessions et vérifie le lien plus souvent
+• Correction d'un plantage rare et vous avertit désormais quand la limite de temps en arrière-plan d'Android arrête vos sessions
 </fr-FR>
 <pt-PT>
 • Ecrãs de erro e desconexão redesenhados: um resumo claro e detalhes expansíveis que pode percorrer e copiar
 • Ligações mais estáveis: mantém o Wi-Fi ativo durante as sessões e verifica a ligação com mais frequência
+• Corrigida uma falha rara e agora avisa quando o limite de tempo em segundo plano do Android interrompe as sessões
 </pt-PT>
 <uk>
 • Оновлені екрани помилок і відключення: чіткий підсумок і розгортані деталі, які можна гортати та копіювати
 • Стабільніші з'єднання: тримає Wi-Fi активним під час сеансів і частіше перевіряє зв'язок
+• Виправлено рідкісний збій, і тепер застосунок сповіщає, коли обмеження часу Android у фоні зупиняє сеанси
 </uk>
 <ru-RU>
 • Переработаны экраны ошибок и отключения: понятная сводка и разворачиваемые детали, которые можно прокрутить и скопировать
 • Более стабильные соединения: держит Wi-Fi активным во время сессий и чаще проверяет связь
+• Исправлен редкий сбой, и теперь приложение уведомляет, когда ограничение времени Android в фоне останавливает сессии
 </ru-RU>
 <zh-CN>
 • 重新设计的连接错误和断开界面：清晰的摘要，以及可展开、可滚动、可复制的详情
 • 更稳定的连接：会话期间保持 Wi-Fi 唤醒，并更频繁地检查链路
+• 修复了一个罕见的崩溃，现在当 Android 的后台时间限制停止会话时会通知你
 </zh-CN>
 <ja-JP>
 • 接続エラーと切断の画面を刷新：分かりやすい要約と、スクロール・コピーできる展開可能な詳細
 • より安定した接続：セッション中は Wi-Fi をスリープさせず、接続をより頻繁に確認
+• まれなクラッシュを修正し、Android のバックグラウンド時間制限でセッションが停止した際に通知するようになりました
 </ja-JP>

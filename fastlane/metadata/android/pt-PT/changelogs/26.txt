@@ -1,2 +1,3 @@
 • Ecrãs de erro e desconexão redesenhados: um resumo claro e detalhes expansíveis que pode percorrer e copiar
 • Ligações mais estáveis: mantém o Wi-Fi ativo durante as sessões e verifica a ligação com mais frequência
+• Corrigida uma falha rara e agora avisa quando o limite de tempo em segundo plano do Android interrompe as sessões

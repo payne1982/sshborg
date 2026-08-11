@@ -342,6 +342,8 @@
     <string name="notification_channel_transfers_name">Transferts de fichiers</string>
     <string name="notification_channel_transfers_description">Notifications à la fin des transferts</string>
     <string name="notification_no_sessions">Aucune session active</string>
+    <string name="notification_bg_timeout_title">Sessions arrêtées</string>
+    <string name="notification_bg_timeout_text">Android a atteint la limite de durée d\'exécution de l\'app en arrière-plan, donc les sessions ont été arrêtées. Touchez pour rouvrir et vous reconnecter.</string>
     <string name="notification_disconnect_all">Tout déconnecter</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">%d session active</item>

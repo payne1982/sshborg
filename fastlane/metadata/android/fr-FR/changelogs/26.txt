@@ -1,2 +1,3 @@
 • Écrans d'erreur et de déconnexion repensés : un résumé clair et des détails dépliables à faire défiler et à copier
 • Connexions plus stables : garde le Wi-Fi actif pendant les sessions et vérifie le lien plus souvent
+• Correction d'un plantage rare et vous avertit désormais quand la limite de temps en arrière-plan d'Android arrête vos sessions

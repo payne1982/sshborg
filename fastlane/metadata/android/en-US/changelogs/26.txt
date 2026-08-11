@@ -1,2 +1,3 @@
 • Redesigned connection error and disconnect screens: a clear summary plus expandable details you can scroll and copy
 • More stable connections: keeps Wi-Fi awake during active sessions and checks the link more often
+• Fixed a rare crash and now notifies you when Android's background time limit stops your sessions

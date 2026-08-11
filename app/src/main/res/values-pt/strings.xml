@@ -342,6 +342,8 @@
     <string name="notification_channel_transfers_name">Transferências de ficheiros</string>
     <string name="notification_channel_transfers_description">Notificações ao fim das transferências</string>
     <string name="notification_no_sessions">Sem sessões ativas</string>
+    <string name="notification_bg_timeout_title">Sessões interrompidas</string>
+    <string name="notification_bg_timeout_text">O Android atingiu o limite de tempo da app em segundo plano, por isso as sessões foram interrompidas. Toque para reabrir e ligar de novo.</string>
     <string name="notification_disconnect_all">Desligar tudo</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">%d sessão ativa</item>

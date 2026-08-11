@@ -329,6 +329,8 @@
     <string name="notification_channel_transfers_name">Передача файлов</string>
     <string name="notification_channel_transfers_description">Уведомления о завершении передачи файлов</string>
     <string name="notification_no_sessions">Нет активных сессий</string>
+    <string name="notification_bg_timeout_title">Сессии остановлены</string>
+    <string name="notification_bg_timeout_text">Android достиг ограничения времени работы приложения в фоне, поэтому сессии были остановлены. Нажмите, чтобы открыть снова и переподключиться.</string>
     <string name="notification_disconnect_all">Отключить все</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">%d активная сессия</item>
