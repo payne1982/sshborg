@@ -332,6 +332,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Wi-Fi ↔ 移动数据切换</strong> — 在 Wi-Fi 和移动数据之间切换会改变 IP 并中断所有开放的 TCP 连接。</li>
                 <li><strong>空闲超时</strong> — 运营商和 NAT 路由器通常在几分钟后断开空闲连接。长时间运行但静默的会话（查看日志、等待输入）容易受此影响。</li>
                 <li><strong>信号丢失</strong> — 隧道、地下车库或信号弱区域都可能短暂断网，足以终止会话。</li>
+                <li><strong>Android 后台限制</strong> — 为了省电，Android 会限制应用在后台持续运行的时长。在后台累计约六小时后，系统会停止 SSHBorg 的会话；你会收到通知，重新打开应用即可重新连接。将应用切回前台会重置此限制。</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>

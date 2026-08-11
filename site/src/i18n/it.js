@@ -331,6 +331,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Cambio Wi-Fi ↔ dati mobili</strong> — passare da una rete Wi-Fi ai dati mobili (o viceversa) cambia il tuo IP e interrompe qualsiasi connessione TCP aperta.</li>
                 <li><strong>Timeout di inattività</strong> — operatori e router NAT spesso chiudono le connessioni inattive dopo pochi minuti. Le sessioni attive ma silenziose (guardare log, aspettare input) sono vulnerabili a questo.</li>
                 <li><strong>Perdita di segnale</strong> — tunnel, parcheggi sotterranei o semplicemente un segnale debole possono interrompere brevemente la rete, il che è sufficiente per uccidere una sessione.</li>
+                <li><strong>Limiti di Android in background</strong> — per risparmiare batteria, Android limita quanto a lungo un'app può restare attiva in background. Dopo circa sei ore cumulative in background, il sistema interrompe le sessioni di SSHBorg; ricevi una notifica e puoi riconnetterti riaprendo l'app. Riportare l'app in primo piano azzera questo limite.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>

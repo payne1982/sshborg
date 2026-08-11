@@ -785,6 +785,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Wi-Fi ↔ モバイルデータの切り替え</strong> — Wi-FiとモバイルデータネットワークのIPが変わり、開いているTCP接続がすべて切断されます。</li>
                 <li><strong>アイドルタイムアウト</strong> — キャリアやNATルーターは数分後にアイドル接続を切断することがよくあります。長時間実行されているが無音のセッション（ログ監視、入力待ち）がこれに脆弱です。</li>
                 <li><strong>電波の喪失</strong> — トンネル、地下駐車場、または単に弱い電波でも一時的にネットワークが切断され、セッションが終了するのに十分です。</li>
+                <li><strong>Android のバックグラウンド制限</strong> — バッテリーを節約するため、Android はアプリがバックグラウンドで動作し続けられる時間を制限します。バックグラウンドで累計約6時間が経過すると、システムは SSHBorg のセッションを停止します。通知が届き、アプリを開き直せば再接続できます。アプリを前面に戻すとこの制限はリセットされます。</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>

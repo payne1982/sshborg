@@ -330,6 +330,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Basculement Wi-Fi ↔ données mobiles</strong> — passer d'un réseau Wi-Fi aux données mobiles (ou inversement) change votre IP et rompt toute connexion TCP ouverte.</li>
                 <li><strong>Délais d'inactivité</strong> — les opérateurs et routeurs NAT ferment souvent les connexions inactives après quelques minutes. Les sessions actives mais silencieuses (surveillance de logs, attente de saisie) sont vulnérables.</li>
                 <li><strong>Perte de signal</strong> — tunnels, parkings souterrains ou simplement un signal faible peuvent brièvement interrompre le réseau, ce qui suffit à tuer une session.</li>
+                <li><strong>Limites d'arrière-plan d'Android</strong> — pour économiser la batterie, Android limite la durée pendant laquelle une app peut continuer à travailler en arrière-plan. Après environ six heures cumulées en arrière-plan, le système arrête les sessions de SSHBorg ; vous recevez une notification et pouvez vous reconnecter en rouvrant l'app. Ramener l'app au premier plan réinitialise cette limite.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANT</div>
