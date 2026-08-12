@@ -225,6 +225,8 @@
     <string name="terminal_connection_failed">接続に失敗しました</string>
     <string name="terminal_connection_lost">接続が切れました</string>
     <string name="terminal_disconnected">切断されました</string>
+    <string name="terminal_error_details">詳細</string>
+    <string name="terminal_copy_error">エラーをコピー</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">ホスト一覧に戻る</string>
@@ -326,6 +328,8 @@
     <string name="notification_channel_transfers_name">ファイル転送</string>
     <string name="notification_channel_transfers_description">ファイル転送完了時に通知</string>
     <string name="notification_no_sessions">アクティブなセッションなし</string>
+    <string name="notification_bg_timeout_title">セッションを停止しました</string>
+    <string name="notification_bg_timeout_text">アプリのバックグラウンド実行時間の上限に達したため、セッションを停止しました。タップして再度開き、接続し直してください。</string>
     <string name="notification_disconnect_all">すべて切断</string>
     <plurals name="notification_active_sessions">
         <item quantity="other">%d 件のアクティブなセッション</item>

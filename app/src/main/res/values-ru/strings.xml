@@ -226,6 +226,8 @@
     <string name="terminal_connection_failed">Не удалось подключиться</string>
     <string name="terminal_connection_lost">Соединение потеряно</string>
     <string name="terminal_disconnected">Отключено</string>
+    <string name="terminal_error_details">Подробности</string>
+    <string name="terminal_copy_error">Копировать ошибку</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">К списку хостов</string>
@@ -327,6 +329,8 @@
     <string name="notification_channel_transfers_name">Передача файлов</string>
     <string name="notification_channel_transfers_description">Уведомления о завершении передачи файлов</string>
     <string name="notification_no_sessions">Нет активных сессий</string>
+    <string name="notification_bg_timeout_title">Сессии остановлены</string>
+    <string name="notification_bg_timeout_text">Android достиг ограничения времени работы приложения в фоне, поэтому сессии были остановлены. Нажмите, чтобы открыть снова и переподключиться.</string>
     <string name="notification_disconnect_all">Отключить все</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">%d активная сессия</item>

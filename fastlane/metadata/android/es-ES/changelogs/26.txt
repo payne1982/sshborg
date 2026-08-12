@@ -1,0 +1,3 @@
+• Pantallas de error y desconexión rediseñadas: un resumen claro más detalles desplegables que puedes desplazar y copiar
+• Conexiones más estables: mantiene el Wi-Fi activo durante las sesiones y comprueba el enlace más a menudo
+• Corregido un fallo poco frecuente y ahora te avisa cuando el límite de tiempo en segundo plano de Android detiene las sesiones

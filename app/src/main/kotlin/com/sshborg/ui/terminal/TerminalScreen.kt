@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +56,7 @@ import com.sshborg.SshBorgApp
 import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
+import com.sshborg.ui.common.ProblemContent
 import kotlinx.coroutines.delay
 
 private val ExtraKeyFont = FontFamily(
@@ -359,9 +361,10 @@ fun TerminalScreen(
                     onAccept    = { vm.acceptHostKey() },
                     onReject    = { vm.rejectHostKey() },
                 )
-                is ConnectionState.Error           -> ErrorOverlay(message = s.message, onBack = onBack)
+                is ConnectionState.Error           -> ErrorOverlay(message = s.message, detail = s.detail, onBack = onBack)
                 is ConnectionState.Disconnected    -> DisconnectedOverlay(
-                    cause   = s.cause,
+                    summary = s.summary,
+                    detail  = s.detail,
                     onClose = { vm.disconnect(); onBack() },
                 )
                 is ConnectionState.Connected       -> { /* normal */ }
@@ -864,16 +867,19 @@ private fun HostKeyDialog(hostname: String, fingerprint: String, onAccept: () ->
 }
 
 @Composable
-private fun ErrorOverlay(message: String, onBack: () -> Unit) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+private fun ErrorOverlay(message: String, detail: String?, onBack: () -> Unit) {
+    // Sit high (≈¼ from the top), not centred: on some devices the terminal keyboard stays up
+    // and would hide the expanded Details if the box were centred.
+    Box(Modifier.fillMaxSize(), contentAlignment = BiasAlignment(0f, -0.5f)) {
         Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
-            Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.terminal_connection_failed), style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
-                Text(message, style = MaterialTheme.typography.bodySmall)
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = onBack) { Text(stringResource(R.string.action_go_back)) }
-            }
+            ProblemContent(
+                title        = stringResource(R.string.terminal_connection_failed),
+                summary      = message,
+                detail       = detail,
+                primaryLabel = stringResource(R.string.action_go_back),
+                onPrimary    = onBack,
+                modifier     = Modifier.padding(24.dp),
+            )
         }
     }
 }
@@ -885,7 +891,7 @@ private fun SelectionBar(
     onCopySelection: () -> Unit,
     onCopyAll: () -> Unit,
     modifier: Modifier = Modifier,
-    // Paste is offered here too (issue #9), matching ConnectBot/JuiceSSH. It pastes the
+    // Paste is offered here too (issue #9), a placement common in terminal apps. It pastes the
     // device clipboard at the cursor, not the current selection — a different layer, but
     // the placement users already expect. Shown only when the caller passes both, i.e.
     // when the clipboard actually holds text.
@@ -914,18 +920,18 @@ private fun SelectionBar(
 }
 
 @Composable
-private fun DisconnectedOverlay(cause: String?, onClose: () -> Unit) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), shape = MaterialTheme.shapes.medium) {
-            Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.terminal_disconnected), style = MaterialTheme.typography.titleMedium)
-                if (cause != null) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(cause, style = MaterialTheme.typography.bodySmall)
-                }
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = onClose) { Text(stringResource(R.string.action_close)) }
-            }
+private fun DisconnectedOverlay(summary: String?, detail: String?, onClose: () -> Unit) {
+    // See ErrorOverlay: high, not centred, so expanded Details clear a still-open keyboard.
+    Box(Modifier.fillMaxSize(), contentAlignment = BiasAlignment(0f, -0.5f)) {
+        Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), shape = MaterialTheme.shapes.medium) {
+            ProblemContent(
+                title        = stringResource(R.string.terminal_disconnected),
+                summary      = summary,
+                detail       = detail,
+                primaryLabel = stringResource(R.string.action_close),
+                onPrimary    = onClose,
+                modifier     = Modifier.padding(24.dp),
+            )
         }
     }
 }

@@ -785,6 +785,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Wi-Fi ↔ mobile handover</strong> — switching between a Wi-Fi network and mobile data (or vice versa) changes your IP and breaks any open TCP connection.</li>
                 <li><strong>Idle timeouts</strong> — carriers and NAT routers often drop idle connections after a few minutes. Long-running but silent sessions (watching logs, waiting for input) are vulnerable to this.</li>
                 <li><strong>Signal loss</strong> — tunnels, underground car parks, or simply a weak signal can briefly drop the network, which is enough to kill a session.</li>
+                <li><strong>Android background limits</strong> — to save battery, Android limits how long an app may keep working in the background. After about six cumulative hours in the background, the system stops SSHBorg's sessions; you get a notification and can reconnect by reopening the app. Bringing the app to the foreground resets this limit.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANT</div>

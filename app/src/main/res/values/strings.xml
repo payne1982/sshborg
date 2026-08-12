@@ -226,6 +226,8 @@
     <string name="terminal_connection_failed">Connection failed</string>
     <string name="terminal_connection_lost">Connection lost</string>
     <string name="terminal_disconnected">Disconnected</string>
+    <string name="terminal_error_details">Details</string>
+    <string name="terminal_copy_error">Copy error</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Back to hosts</string>
@@ -328,6 +330,8 @@
     <string name="notification_channel_transfers_name">File transfers</string>
     <string name="notification_channel_transfers_description">Notifications when file transfers complete</string>
     <string name="notification_no_sessions">No active sessions</string>
+    <string name="notification_bg_timeout_title">Sessions stopped</string>
+    <string name="notification_bg_timeout_text">Android reached its limit on how long the app can run in the background, so your sessions were stopped. Tap to reopen and reconnect.</string>
     <string name="notification_disconnect_all">Disconnect all</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">1 active session</item>

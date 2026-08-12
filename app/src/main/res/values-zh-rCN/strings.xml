@@ -225,6 +225,8 @@
     <string name="terminal_connection_failed">连接失败</string>
     <string name="terminal_connection_lost">连接已断开</string>
     <string name="terminal_disconnected">已断开连接</string>
+    <string name="terminal_error_details">详情</string>
+    <string name="terminal_copy_error">复制错误</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">返回主机列表</string>
@@ -326,6 +328,8 @@
     <string name="notification_channel_transfers_name">文件传输</string>
     <string name="notification_channel_transfers_description">文件传输完成时发送通知</string>
     <string name="notification_no_sessions">无活跃会话</string>
+    <string name="notification_bg_timeout_title">会话已停止</string>
+    <string name="notification_bg_timeout_text">Android 已达到应用在后台的运行时间上限，因此会话已停止。点按可重新打开并连接。</string>
     <string name="notification_disconnect_all">断开所有连接</string>
     <plurals name="notification_active_sessions">
         <item quantity="other">%d 个活跃会话</item>

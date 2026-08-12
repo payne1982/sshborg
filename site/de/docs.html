@@ -785,6 +785,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>WLAN ↔ Mobilfunk-Wechsel</strong> — das Wechseln zwischen WLAN und Mobilfunkdaten (oder umgekehrt) ändert deine IP und unterbricht alle offenen TCP-Verbindungen.</li>
                 <li><strong>Inaktivitäts-Timeouts</strong> — Mobilfunkanbieter und NAT-Router beenden oft inaktive Verbindungen nach wenigen Minuten. Lang laufende, aber stille Sitzungen (Log-Beobachtung, auf Eingabe warten) sind gefährdet.</li>
                 <li><strong>Signalverlust</strong> — Tunnel, Tiefgaragen oder einfach ein schwaches Signal können kurz die Netzwerkverbindung unterbrechen, was ausreicht, um eine Sitzung zu beenden.</li>
+                <li><strong>Android-Hintergrundgrenzen</strong> — um Akku zu sparen, begrenzt Android, wie lange eine App im Hintergrund weiterarbeiten darf. Nach etwa sechs kumulativen Stunden im Hintergrund beendet das System die Sitzungen von SSHBorg; du erhältst eine Benachrichtigung und kannst dich durch erneutes Öffnen der App wieder verbinden. Wird die App in den Vordergrund geholt, wird dieses Limit zurückgesetzt.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// WICHTIG</div>

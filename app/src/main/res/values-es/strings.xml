@@ -211,6 +211,8 @@
     <string name="terminal_connection_failed">Conexión fallida</string>
     <string name="terminal_connection_lost">Conexión perdida</string>
     <string name="terminal_disconnected">Desconectado</string>
+    <string name="terminal_error_details">Detalles</string>
+    <string name="terminal_copy_error">Copiar error</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Volver a hosts</string>
@@ -340,6 +342,8 @@
     <string name="notification_channel_transfers_name">Transferencias de archivos</string>
     <string name="notification_channel_transfers_description">Notificaciones al finalizar transferencias</string>
     <string name="notification_no_sessions">No hay sesiones activas</string>
+    <string name="notification_bg_timeout_title">Sesiones detenidas</string>
+    <string name="notification_bg_timeout_text">Android alcanzó el límite de tiempo de la app en segundo plano, por lo que las sesiones se detuvieron. Toca para volver a abrir y reconectar.</string>
     <string name="notification_disconnect_all">Desconectar todo</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">1 sesión activa</item>

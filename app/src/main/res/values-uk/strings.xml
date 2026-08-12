@@ -211,6 +211,8 @@
     <string name="terminal_connection_failed">Не вдалося підключитися</string>
     <string name="terminal_connection_lost">З\'єднання втрачено</string>
     <string name="terminal_disconnected">Відключено</string>
+    <string name="terminal_error_details">Подробиці</string>
+    <string name="terminal_copy_error">Копіювати помилку</string>
 
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Назад до хостів</string>
@@ -340,6 +342,8 @@
     <string name="notification_channel_transfers_name">Передача файлів</string>
     <string name="notification_channel_transfers_description">Сповіщення після завершення передачі файлів</string>
     <string name="notification_no_sessions">Немає активних сесій</string>
+    <string name="notification_bg_timeout_title">Сесії зупинено</string>
+    <string name="notification_bg_timeout_text">Android досяг межі часу роботи застосунку у фоні, тому сесії було зупинено. Торкніться, щоб відкрити знову та перепідключитися.</string>
     <string name="notification_disconnect_all">Від\'єднати все</string>
     <plurals name="notification_active_sessions">
         <item quantity="one">%d активна сесія</item>

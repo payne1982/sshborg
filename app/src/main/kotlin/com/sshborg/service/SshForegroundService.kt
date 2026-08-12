@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationCompat
@@ -25,12 +26,30 @@ class SshForegroundService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.Main)
     private var observeJob: Job? = null
+    private var wifiLock: WifiManager.WifiLock? = null
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification(0))
+        acquireWifiLock()
         observeSessionCount()
+    }
+
+    /**
+     * Keeps the Wi-Fi radio in full-power mode while sessions are active. Android's Wi-Fi power
+     * management can park the radio on an idle connection and locally abort the TCP socket
+     * (SocketException "Software caused connection abort"), dropping an otherwise healthy SSH
+     * session after ~30-40s of inactivity — foreground or background. The service already lives
+     * exactly as long as there is ≥1 session, so the lock's lifetime matches. WifiLock needs no
+     * manifest permission.
+     */
+    private fun acquireWifiLock() {
+        val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        wifiLock = wifi.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "sshborg:sessions").apply {
+            setReferenceCounted(false)
+            runCatching { acquire() }
+        }
     }
 
     private fun observeSessionCount() {
@@ -74,8 +93,53 @@ class SshForegroundService : Service() {
         }
     }
 
+    /**
+     * Android 15+ caps a `dataSync` foreground service at ~6 cumulative hours per 24h. When the
+     * budget is spent the system calls onTimeout() and gives us a few seconds to stop; if we don't,
+     * it force-kills the process with ForegroundServiceDidNotStopInTimeException. A long-lived SSH
+     * session is exactly the case that reaches the cap, so we stop the foreground state cleanly here
+     * instead of crashing. The 6h ceiling itself is OS policy for this service type and can't be
+     * lifted from the app side. Android 16 (API 36) calls the 2-arg overload; API 35 the 1-arg one.
+     */
+    override fun onTimeout(startId: Int) = handleForegroundTimeout()
+
+    override fun onTimeout(startId: Int, fgsType: Int) = handleForegroundTimeout()
+
+    private fun handleForegroundTimeout() {
+        postTimeoutNotification()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
+    /** Tells the user why the sessions stopped — the app is in the background here, so a notification
+     *  (not an in-app overlay) is the only thing they'll actually see. Tapping reopens the app. */
+    private fun postTimeoutNotification() {
+        val ctx = localizedContext()
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (!nm.areNotificationsEnabled()) return
+        val tapIntent = PendingIntent.getActivity(
+            this, NOTIFICATION_ID_TIMEOUT,
+            Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+        val text = ctx.getString(R.string.notification_bg_timeout_text)
+        nm.notify(
+            NOTIFICATION_ID_TIMEOUT,
+            NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(ctx.getString(R.string.notification_bg_timeout_title))
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentIntent(tapIntent)
+                .setAutoCancel(true)
+                .build()
+        )
+    }
+
     override fun onDestroy() {
         scope.cancel()
+        wifiLock?.takeIf { it.isHeld }?.let { runCatching { it.release() } }
+        wifiLock = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
@@ -148,6 +212,7 @@ class SshForegroundService : Service() {
         private const val NOTIFICATION_ID_DOWNLOAD = 2
         private const val NOTIFICATION_ID_UPLOAD = 3
         private const val NOTIFICATION_ID_DOWNLOAD_ERROR = 4
+        private const val NOTIFICATION_ID_TIMEOUT = 5
         private const val ACTION_DISCONNECT_ALL = "com.sshborg.DISCONNECT_ALL"
 
         fun start(context: Context) {

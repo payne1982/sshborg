@@ -330,6 +330,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Mudança Wi-Fi ↔ dados móveis</strong> — mudar entre uma rede Wi-Fi e dados móveis (ou vice-versa) altera o seu IP e quebra qualquer ligação TCP aberta.</li>
                 <li><strong>Tempos limite de inatividade</strong> — operadores e routers NAT encerram frequentemente ligações inativas após alguns minutos. As sessões ativas mas silenciosas (observar logs, aguardar entrada) são vulneráveis.</li>
                 <li><strong>Perda de sinal</strong> — túneis, parques de estacionamento subterrâneos ou simplesmente um sinal fraco podem interromper brevemente a rede, o que é suficiente para terminar uma sessão.</li>
+                <li><strong>Limites do Android em segundo plano</strong> — para poupar bateria, o Android limita quanto tempo uma app pode continuar a funcionar em segundo plano. Após cerca de seis horas cumulativas em segundo plano, o sistema interrompe as sessões do SSHBorg; recebe uma notificação e pode voltar a ligar reabrindo a app. Trazer a app para primeiro plano repõe este limite.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
