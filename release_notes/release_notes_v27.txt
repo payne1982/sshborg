@@ -1,30 +1,40 @@
 <en-US>
 • Duplicate a host from its menu to reuse its settings for a new connection — handy for reaching the same server on a different port or jump host
+• Updated the app's libraries and build tools to their latest stable versions
 </en-US>
 <it-IT>
 • Duplica un host dal suo menù per riusarne le impostazioni in una nuova connessione — comodo per raggiungere lo stesso server su porta o jump host diversi
+• Aggiornate le librerie e gli strumenti di build dell'app alle ultime versioni stabili
 </it-IT>
 <de-DE>
 • Host über sein Menü duplizieren, um seine Einstellungen für eine neue Verbindung wiederzuverwenden – praktisch für denselben Server über einen anderen Port oder Jump-Host
+• Bibliotheken und Build-Tools der App auf die neuesten stabilen Versionen aktualisiert
 </de-DE>
 <es-ES>
 • Duplica un host desde su menú para reutilizar su configuración en una nueva conexión, ideal para llegar al mismo servidor por un puerto o salto distinto
+• Bibliotecas y herramientas de compilación de la app actualizadas a las últimas versiones estables
 </es-ES>
 <fr-FR>
 • Dupliquez un hôte depuis son menu pour réutiliser ses réglages sur une nouvelle connexion — pratique pour joindre le même serveur via un autre port ou rebond
+• Bibliothèques et outils de compilation de l'app mis à jour vers les dernières versions stables
 </fr-FR>
 <pt-PT>
 • Duplique um anfitrião a partir do menu para reutilizar as definições numa nova ligação — útil para chegar ao mesmo servidor por outra porta ou salto
+• Bibliotecas e ferramentas de compilação da app atualizadas para as versões estáveis mais recentes
 </pt-PT>
 <uk>
 • Дублюйте хост із його меню, щоб повторно використати налаштування для нового з'єднання — зручно для того самого сервера на іншому порту чи через інший проміжний вузол
+• Бібліотеки та інструменти збірки застосунку оновлено до останніх стабільних версій
 </uk>
 <ru-RU>
 • Дублируйте хост из его меню, чтобы повторно использовать настройки для нового подключения — удобно для того же сервера на другом порту или через другой промежуточный узел
+• Библиотеки и инструменты сборки приложения обновлены до последних стабильных версий
 </ru-RU>
 <zh-CN>
 • 从主机菜单复制主机，以便在新连接中重用其设置——适合以不同端口或跳板机连接同一服务器
+• 已将应用的库和构建工具更新到最新稳定版本
 </zh-CN>
 <ja-JP>
 • ホストのメニューから複製して、その設定を新しい接続に再利用できます。同じサーバーへ別のポートやジャンプホストで接続したいときに便利です
+• アプリのライブラリとビルドツールを最新の安定版に更新しました
 </ja-JP>

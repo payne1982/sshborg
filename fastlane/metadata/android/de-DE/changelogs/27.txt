@@ -1,1 +1,2 @@
 • Host über sein Menü duplizieren, um seine Einstellungen für eine neue Verbindung wiederzuverwenden – praktisch für denselben Server über einen anderen Port oder Jump-Host
+• Bibliotheken und Build-Tools der App auf die neuesten stabilen Versionen aktualisiert

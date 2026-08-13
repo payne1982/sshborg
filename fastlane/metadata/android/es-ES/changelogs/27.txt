@@ -1,1 +1,2 @@
 • Duplica un host desde su menú para reutilizar su configuración en una nueva conexión, ideal para llegar al mismo servidor por un puerto o salto distinto
+• Bibliotecas y herramientas de compilación de la app actualizadas a las últimas versiones estables
