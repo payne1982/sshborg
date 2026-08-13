@@ -1,0 +1,1 @@
+• Dupliquez un hôte depuis son menu pour réutiliser ses réglages sur une nouvelle connexion — pratique pour joindre le même serveur via un autre port ou rebond

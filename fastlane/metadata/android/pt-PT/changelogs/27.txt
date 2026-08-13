@@ -1,0 +1,1 @@
+• Duplique um anfitrião a partir do menu para reutilizar as definições numa nova ligação — útil para chegar ao mesmo servidor por outra porta ou salto

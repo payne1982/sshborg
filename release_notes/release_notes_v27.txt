@@ -1,0 +1,30 @@
+<en-US>
+• Duplicate a host from its menu to reuse its settings for a new connection — handy for reaching the same server on a different port or jump host
+</en-US>
+<it-IT>
+• Duplica un host dal suo menù per riusarne le impostazioni in una nuova connessione — comodo per raggiungere lo stesso server su porta o jump host diversi
+</it-IT>
+<de-DE>
+• Host über sein Menü duplizieren, um seine Einstellungen für eine neue Verbindung wiederzuverwenden – praktisch für denselben Server über einen anderen Port oder Jump-Host
+</de-DE>
+<es-ES>
+• Duplica un host desde su menú para reutilizar su configuración en una nueva conexión, ideal para llegar al mismo servidor por un puerto o salto distinto
+</es-ES>
+<fr-FR>
+• Dupliquez un hôte depuis son menu pour réutiliser ses réglages sur une nouvelle connexion — pratique pour joindre le même serveur via un autre port ou rebond
+</fr-FR>
+<pt-PT>
+• Duplique um anfitrião a partir do menu para reutilizar as definições numa nova ligação — útil para chegar ao mesmo servidor por outra porta ou salto
+</pt-PT>
+<uk>
+• Дублюйте хост із його меню, щоб повторно використати налаштування для нового з'єднання — зручно для того самого сервера на іншому порту чи через інший проміжний вузол
+</uk>
+<ru-RU>
+• Дублируйте хост из его меню, чтобы повторно использовать настройки для нового подключения — удобно для того же сервера на другом порту или через другой промежуточный узел
+</ru-RU>
+<zh-CN>
+• 从主机菜单复制主机，以便在新连接中重用其设置——适合以不同端口或跳板机连接同一服务器
+</zh-CN>
+<ja-JP>
+• ホストのメニューから複製して、その設定を新しい接続に再利用できます。同じサーバーへ別のポートやジャンプホストで接続したいときに便利です
+</ja-JP>

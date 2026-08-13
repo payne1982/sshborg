@@ -1,0 +1,1 @@
+• Duplica un host dal suo menù per riusarne le impostazioni in una nuova connessione — comodo per raggiungere lo stesso server su porta o jump host diversi
