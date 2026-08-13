@@ -12,6 +12,8 @@
     <string name="action_delete">Delete</string>
     <string name="action_save">Save</string>
     <string name="action_edit">Edit</string>
+    <string name="action_duplicate">Duplicate</string>
+    <string name="host_clone_label">%1$s (copy)</string>
     <string name="action_back">Back</string>
     <string name="action_connect">Connect</string>
     <string name="action_close">Close</string>

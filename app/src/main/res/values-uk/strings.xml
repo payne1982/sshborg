@@ -10,6 +10,8 @@
     <string name="action_delete">Видалити</string>
     <string name="action_save">Зберегти</string>
     <string name="action_edit">Редагувати</string>
+    <string name="action_duplicate">Дублювати</string>
+    <string name="host_clone_label">%1$s (копія)</string>
     <string name="action_back">Назад</string>
     <string name="action_connect">Підключитися</string>
     <string name="action_close">Закрити</string>

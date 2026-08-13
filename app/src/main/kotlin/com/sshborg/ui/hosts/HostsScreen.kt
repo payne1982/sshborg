@@ -133,6 +133,7 @@ fun HostsScreen(
                         }
                     },
                     onEdit        = { onEditHost(host.id) },
+                    onClone       = { vm.cloneHost(host) { newId -> onEditHost(newId) } },
                     onDelete      = { hostToDelete = host },
                     onNewTerminal = { onNewTerminal(host.id, host.label) },
                     onNewSftp     = { onNewSftp(host.id, host.label) },
@@ -370,6 +371,7 @@ private fun HostItem(
     onClick: () -> Unit,
     onSftp: () -> Unit,
     onEdit: () -> Unit,
+    onClone: () -> Unit,
     onDelete: () -> Unit,
     onNewTerminal: () -> Unit,
     onNewSftp: () -> Unit,
@@ -481,6 +483,11 @@ private fun HostItem(
                         text = { Text(stringResource(R.string.action_edit)) },
                         leadingIcon = { Icon(Icons.Default.Edit, null) },
                         onClick = { menuExpanded = false; onEdit() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_duplicate)) },
+                        leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
+                        onClick = { menuExpanded = false; onClone() },
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_delete)) },

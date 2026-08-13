@@ -11,6 +11,8 @@
     <string name="action_delete">削除</string>
     <string name="action_save">保存</string>
     <string name="action_edit">編集</string>
+    <string name="action_duplicate">複製</string>
+    <string name="host_clone_label">%1$s（コピー）</string>
     <string name="action_back">戻る</string>
     <string name="action_connect">接続</string>
     <string name="action_close">閉じる</string>

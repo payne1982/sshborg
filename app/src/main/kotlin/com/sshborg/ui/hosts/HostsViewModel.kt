@@ -3,6 +3,7 @@ package com.sshborg.ui.hosts
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.sshborg.R
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
@@ -32,6 +33,21 @@ class HostsViewModel(app: Application) : AndroidViewModel(app) {
         sshBorgApp.appPreferences.confirmExit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     fun deleteHost(host: HostEntity) = viewModelScope.launch { dao.delete(host) }
+
+    /**
+     * Duplicates a host into a new row (fresh id, "(copy)" label, no last-connected timestamp) and
+     * hands the new id back so the caller can open it in the editor. Everything else — credentials,
+     * key, jump chain, port-forwards — is copied verbatim, since the point (issue #15) is to reuse a
+     * host's settings and only tweak a detail like the port or jump host.
+     */
+    fun cloneHost(host: HostEntity, onCloned: (Long) -> Unit) = viewModelScope.launch {
+        val copy = host.copy(
+            id = 0,
+            label = getApplication<Application>().getString(R.string.host_clone_label, host.label),
+            lastConnected = null,
+        )
+        onCloned(dao.upsert(copy))
+    }
 
     fun toggleGroupCollapsed(group: GroupEntity) =
         viewModelScope.launch { groupDao.setCollapsed(group.id, !group.collapsed) }

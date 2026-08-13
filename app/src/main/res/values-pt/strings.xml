@@ -10,6 +10,8 @@
     <string name="action_delete">Eliminar</string>
     <string name="action_save">Guardar</string>
     <string name="action_edit">Editar</string>
+    <string name="action_duplicate">Duplicar</string>
+    <string name="host_clone_label">%1$s (cópia)</string>
     <string name="action_back">Voltar</string>
     <string name="action_connect">Ligar</string>
     <string name="action_close">Fechar</string>
