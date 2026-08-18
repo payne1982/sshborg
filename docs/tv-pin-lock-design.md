@@ -125,6 +125,19 @@ nudge title/body/buttons; keypad key content descriptions.
 - `TvUtils.kt` — `isTelevision`.
 - strings ×10.
 
+## Refinements from hands-on testing
+
+- **Reveal toggle** on every secret field (set/change dialog and confirm-current)
+  and on the PIN unlock screen — because a forgotten secret can't be recovered,
+  the user must be able to check what they typed.
+- **PIN dots grow** with the entered digits rather than showing a fixed row that
+  exposes the maximum; the max is 12.
+- **Change or disable requires the current secret**, mirroring the OS screen
+  lock: while active, re-selecting the same mode is a no-op, and switching to
+  None/Biometric/Device prompts for the current secret first (ConfirmSecretDialog).
+- The unlock button uses an **open padlock**; the header keeps a closed one as
+  the "locked" indicator.
+
 ## Implementation order (small, independently testable steps)
 
 1. `AppLockManager` + `AppPreferences` keys — hash/verify/throttle, no UI. Unit-

@@ -20,11 +20,15 @@ Work happens on the `V1_DEV_TV` branch and is merged back in small steps.
 
 The store's TV review, and basic safety, gate on these. They must land first.
 
-**Status: implemented on `V1_DEV_TV`** — AppLockManager (PBKDF2 + throttling),
-the adaptive AppLockScreen, MainActivity integration, the Settings option with
-set/change flow and TV filtering, and the first-run TV nudge are all in. See
-`tv-pin-lock-design.md`. Still to do here: a hands-on pass, ideally on a TV
-emulator with D-pad navigation.
+**Status: implemented on `V1_DEV_TV`, verified on a phone.** AppLockManager
+(PBKDF2 + throttling), the adaptive AppLockScreen, MainActivity integration, the
+Settings option with set/change flow and TV filtering, and the first-run TV
+nudge are all in and working. Refinements from hands-on testing: a show/hide
+reveal toggle on entry, PIN dots that grow instead of exposing the max (now 12),
+a button-styled "Change" action, a no-recovery disclaimer before enabling, the
+current secret required to change **or** disable the lock, and an open-padlock
+unlock button. See `tv-pin-lock-design.md`. **Remaining here:** a D-pad pass on a
+TV emulator (the lock UI was built D-pad-friendly but not yet exercised on a TV).
 
 ### 1a. In-app PIN / passphrase lock (app-lock phase 2)
 
@@ -89,8 +93,8 @@ instead of the system biometric prompt.
 
 ## Suggested order
 
-1. 1a — in-app PIN lock (the bulk of the work).
-2. 1b — TV detection and first-run steering.
-3. 2 — D-pad focus pass on the emulator.
-4. 3 — minor SFTP improvements.
+1. ~~1a — in-app PIN lock (the bulk of the work).~~ **Done.**
+2. ~~1b — TV detection and first-run steering.~~ **Done.**
+3. 2 — D-pad focus pass on the emulator. ← next
+4. 3 — the remaining minor SFTP improvement (optional folder/file sort).
 5. 4 — Play Console assets + opt-in + review.
