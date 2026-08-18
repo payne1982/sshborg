@@ -14,6 +14,15 @@ passwords keep their own Keystore encryption (`encryptedPassword`); the local DB
 is not re-encrypted by the secret. This keeps parity with the biometric mode and
 avoids a false promise.
 
+## Availability
+
+The PIN/passphrase lock is a **general, device-agnostic mode** (`LOCK_SECRET`),
+offered on every device type, not just TVs — on a phone it is simply an extra
+choice next to Biometric and Device credential, useful for anyone who prefers an
+app-specific PIN or has no enrolled biometric. The TV-specific behaviour is only
+additive: on a TV the unusable Biometric/Device options are hidden and a
+first-run nudge is shown. Phones keep all options, PIN/passphrase included.
+
 ## Secret kinds
 
 The user picks one when enabling the lock:
