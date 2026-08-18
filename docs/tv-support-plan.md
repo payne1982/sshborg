@@ -20,6 +20,12 @@ Work happens on the `V1_DEV_TV` branch and is merged back in small steps.
 
 The store's TV review, and basic safety, gate on these. They must land first.
 
+**Status: implemented on `V1_DEV_TV`** — AppLockManager (PBKDF2 + throttling),
+the adaptive AppLockScreen, MainActivity integration, the Settings option with
+set/change flow and TV filtering, and the first-run TV nudge are all in. See
+`tv-pin-lock-design.md`. Still to do here: a hands-on pass, ideally on a TV
+emulator with D-pad navigation.
+
 ### 1a. In-app PIN / passphrase lock (app-lock phase 2)
 
 On a TV none of the current lock modes is usable *and* secure:
