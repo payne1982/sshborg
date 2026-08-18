@@ -62,8 +62,8 @@ instead of the system biometric prompt.
 
 ## 3. Minor listing improvements (from #3, non-blocking)
 
-- **SFTP**: surface *where* a downloaded file was saved (destination path is not
-  obvious today).
+- **SFTP**: surface *where* a downloaded file was saved — **done** (the download
+  result shows "Saved: <path>").
 - **SFTP**: optional setting to not sort folders before files (`listDir`
   currently forces dirs-first).
 - **SFTP**: hide dotfiles — **done** (versionCode 27).
