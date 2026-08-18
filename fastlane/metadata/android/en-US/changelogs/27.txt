@@ -1,2 +1,3 @@
 • Duplicate a host from its menu to reuse its settings for a new connection — handy for reaching the same server on a different port or jump host
+• Show or hide hidden files (dotfiles) in the SFTP browser — saved per host
 • Updated the app's libraries and build tools to their latest stable versions

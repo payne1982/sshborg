@@ -1,2 +1,3 @@
 • Host über sein Menü duplizieren, um seine Einstellungen für eine neue Verbindung wiederzuverwenden – praktisch für denselben Server über einen anderen Port oder Jump-Host
+• Versteckte Dateien (Dotfiles) im SFTP-Browser ein- oder ausblenden – pro Host gespeichert
 • Bibliotheken und Build-Tools der App auf die neuesten stabilen Versionen aktualisiert

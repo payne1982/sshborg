@@ -1,2 +1,3 @@
 • Dupliquez un hôte depuis son menu pour réutiliser ses réglages sur une nouvelle connexion — pratique pour joindre le même serveur via un autre port ou rebond
+• Afficher ou masquer les fichiers cachés (dotfiles) dans l'explorateur SFTP — enregistré par hôte
 • Bibliothèques et outils de compilation de l'app mis à jour vers les dernières versions stables
