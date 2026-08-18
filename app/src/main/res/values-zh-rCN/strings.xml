@@ -373,4 +373,12 @@
     <string name="lock_delete_cd">删除</string>
     <string name="lock_reveal_cd">显示或隐藏密码短语</string>
     <string name="lock_submit_cd">解锁</string>
+    <string name="settings_lock_mode_pin">PIN 或密码短语</string>
+    <string name="settings_change_secret">更改 PIN 或密码短语</string>
+    <string name="lock_set_title">设置 PIN 或密码短语</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">密码短语</string>
+    <string name="lock_confirm">确认</string>
+    <string name="lock_mismatch">不匹配</string>
+    <string name="lock_too_short">太短</string>
 </resources>

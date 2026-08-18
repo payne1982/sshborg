@@ -373,4 +373,12 @@
     <string name="lock_delete_cd">削除</string>
     <string name="lock_reveal_cd">パスフレーズの表示・非表示</string>
     <string name="lock_submit_cd">ロック解除</string>
+    <string name="settings_lock_mode_pin">PIN またはパスフレーズ</string>
+    <string name="settings_change_secret">PIN またはパスフレーズを変更</string>
+    <string name="lock_set_title">PIN またはパスフレーズを設定</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">パスフレーズ</string>
+    <string name="lock_confirm">確認</string>
+    <string name="lock_mismatch">一致しません</string>
+    <string name="lock_too_short">短すぎます</string>
 </resources>

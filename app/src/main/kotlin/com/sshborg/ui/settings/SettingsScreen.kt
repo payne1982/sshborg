@@ -3,6 +3,7 @@ package com.sshborg.ui.settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,6 +26,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
+import com.sshborg.isTelevision
+import com.sshborg.ui.lock.LockSecretDialog
 
 private val TIMEOUT_OPTIONS = listOf(
     0     to R.string.timeout_immediately,
@@ -44,6 +47,7 @@ private val LOCK_MODE_OPTIONS = listOf(
     AppPreferences.LOCK_NONE      to R.string.settings_lock_mode_none,
     AppPreferences.LOCK_BIOMETRIC to R.string.settings_lock_mode_biometric,
     AppPreferences.LOCK_DEVICE    to R.string.settings_lock_mode_device,
+    AppPreferences.LOCK_SECRET    to R.string.settings_lock_mode_pin,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +90,7 @@ fun SettingsScreen(
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var lockModeMenuExpanded by remember { mutableStateOf(false) }
+    var showLockSecretDialog by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
@@ -95,6 +100,7 @@ fun SettingsScreen(
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
+    val isTv = remember { isTelevision(context) }
 
     // Map seconds to string resource id, then resolve the label
     val currentTimeoutResId = TIMEOUT_OPTIONS.find { it.first == lockTimeoutSeconds }?.second
@@ -501,16 +507,28 @@ fun SettingsScreen(
                             expanded = lockModeMenuExpanded,
                             onDismissRequest = { lockModeMenuExpanded = false },
                         ) {
-                            LOCK_MODE_OPTIONS.forEach { (mode, labelResId) ->
-                                // The two authentication modes need a device secure lock;
-                                // "None" is always selectable so the user can turn the lock off.
-                                val enabled = mode == AppPreferences.LOCK_NONE || biometricAvailable
+                            // Biometric/device modes need a device secure lock and are
+                            // filtered out entirely on a TV, where they don't work; None and
+                            // the in-app PIN/passphrase are always offered.
+                            val lockOptions = if (isTv)
+                                LOCK_MODE_OPTIONS.filter {
+                                    it.first == AppPreferences.LOCK_NONE || it.first == AppPreferences.LOCK_SECRET
+                                }
+                            else LOCK_MODE_OPTIONS
+                            lockOptions.forEach { (mode, labelResId) ->
+                                val enabled = mode == AppPreferences.LOCK_NONE ||
+                                    mode == AppPreferences.LOCK_SECRET || biometricAvailable
                                 DropdownMenuItem(
                                     text = { Text(stringResource(labelResId)) },
                                     enabled = enabled,
                                     onClick = {
-                                        vm.setLockMode(mode)
                                         lockModeMenuExpanded = false
+                                        if (mode == AppPreferences.LOCK_SECRET) {
+                                            // Capture a secret before the mode takes effect.
+                                            showLockSecretDialog = true
+                                        } else {
+                                            vm.setLockMode(mode)
+                                        }
                                     },
                                 )
                             }
@@ -518,6 +536,24 @@ fun SettingsScreen(
                     }
                 },
             )
+
+            // Change the stored PIN/passphrase (only while that mode is active).
+            if (lockMode == AppPreferences.LOCK_SECRET) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_change_secret)) },
+                    modifier = Modifier.clickable { showLockSecretDialog = true },
+                )
+            }
+
+            if (showLockSecretDialog) {
+                LockSecretDialog(
+                    onDismiss = { showLockSecretDialog = false },
+                    onConfirm = { kind, secret ->
+                        vm.setAppLockSecret(kind, secret)
+                        showLockSecretDialog = false
+                    },
+                )
+            }
 
             // Lock timeout — only shown when a lock is enabled
             if (lockMode != AppPreferences.LOCK_NONE) {

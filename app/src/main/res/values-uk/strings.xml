@@ -372,4 +372,12 @@
     <string name="lock_delete_cd">Видалити</string>
     <string name="lock_reveal_cd">Показати або сховати парольну фразу</string>
     <string name="lock_submit_cd">Розблокувати</string>
+    <string name="settings_lock_mode_pin">PIN або парольна фраза</string>
+    <string name="settings_change_secret">Змінити PIN або парольну фразу</string>
+    <string name="lock_set_title">Установити PIN або парольну фразу</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Парольна фраза</string>
+    <string name="lock_confirm">Підтвердити</string>
+    <string name="lock_mismatch">Не збігаються</string>
+    <string name="lock_too_short">Надто короткий</string>
 </resources>

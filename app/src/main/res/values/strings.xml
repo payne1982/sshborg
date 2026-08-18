@@ -379,4 +379,12 @@
     <string name="lock_delete_cd">Delete</string>
     <string name="lock_reveal_cd">Show or hide passphrase</string>
     <string name="lock_submit_cd">Unlock</string>
+    <string name="settings_lock_mode_pin">PIN or passphrase</string>
+    <string name="settings_change_secret">Change PIN or passphrase</string>
+    <string name="lock_set_title">Set PIN or passphrase</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Passphrase</string>
+    <string name="lock_confirm">Confirm</string>
+    <string name="lock_mismatch">They don\'t match</string>
+    <string name="lock_too_short">Too short</string>
 </resources>

@@ -368,4 +368,12 @@
     <string name="lock_delete_cd">Eliminar</string>
     <string name="lock_reveal_cd">Mostrar ou ocultar a frase-passe</string>
     <string name="lock_submit_cd">Desbloquear</string>
+    <string name="settings_lock_mode_pin">PIN ou frase-passe</string>
+    <string name="settings_change_secret">Alterar PIN ou frase-passe</string>
+    <string name="lock_set_title">Definir PIN ou frase-passe</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Frase-passe</string>
+    <string name="lock_confirm">Confirmar</string>
+    <string name="lock_mismatch">Não coincidem</string>
+    <string name="lock_too_short">Demasiado curto</string>
 </resources>

@@ -368,4 +368,12 @@
     <string name="lock_delete_cd">Supprimer</string>
     <string name="lock_reveal_cd">Afficher ou masquer la phrase secrète</string>
     <string name="lock_submit_cd">Déverrouiller</string>
+    <string name="settings_lock_mode_pin">PIN ou phrase secrète</string>
+    <string name="settings_change_secret">Modifier le PIN ou la phrase secrète</string>
+    <string name="lock_set_title">Définir un PIN ou une phrase secrète</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Phrase secrète</string>
+    <string name="lock_confirm">Confirmer</string>
+    <string name="lock_mismatch">Ne correspondent pas</string>
+    <string name="lock_too_short">Trop court</string>
 </resources>
