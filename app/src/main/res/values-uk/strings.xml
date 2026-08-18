@@ -389,4 +389,5 @@
     <string name="lock_disclaimer_title">Відновлення неможливе, якщо забудете</string>
     <string name="lock_disclaimer_body">Забутий PIN або парольну фразу неможливо відновити. Тоді доведеться очистити дані застосунку або перевстановити його, втративши збережені сервери й ключі, якщо немає резервної копії.</string>
     <string name="lock_disclaimer_continue">Зрозуміло</string>
+    <string name="lock_confirm_current_title">Введіть поточний PIN або парольну фразу</string>
 </resources>

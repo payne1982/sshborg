@@ -390,4 +390,5 @@
     <string name="lock_disclaimer_title">忘记后无法找回</string>
     <string name="lock_disclaimer_body">忘记的 PIN 或密码短语无法找回。届时你需要清除应用数据或重新安装，若没有备份将丢失已保存的服务器和密钥。</string>
     <string name="lock_disclaimer_continue">我明白了</string>
+    <string name="lock_confirm_current_title">输入当前 PIN 或密码短语</string>
 </resources>

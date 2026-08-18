@@ -385,4 +385,5 @@
     <string name="lock_disclaimer_title">Sin recuperación si se olvida</string>
     <string name="lock_disclaimer_body">No se puede recuperar un PIN o frase de contraseña olvidados. Si lo olvidas, tendrás que borrar los datos de la app o reinstalarla, perdiendo servidores y claves guardados si no tienes copia de seguridad.</string>
     <string name="lock_disclaimer_continue">Entiendo</string>
+    <string name="lock_confirm_current_title">Introduce tu PIN o frase de contraseña actual</string>
 </resources>

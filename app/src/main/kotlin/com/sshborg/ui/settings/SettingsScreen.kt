@@ -26,6 +26,7 @@ import com.sshborg.BiometricHelper
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
 import com.sshborg.isTelevision
+import com.sshborg.ui.lock.ConfirmSecretDialog
 import com.sshborg.ui.lock.LockSecretDialog
 
 private val TIMEOUT_OPTIONS = listOf(
@@ -92,6 +93,8 @@ fun SettingsScreen(
     var showLockDisclaimer by remember { mutableStateOf(false) }
     var showLockSecretDialog by remember { mutableStateOf(false) }
     var lockDialogIsChange by remember { mutableStateOf(false) }
+    var showConfirmCurrent by remember { mutableStateOf(false) }
+    var pendingLockMode by remember { mutableStateOf<Int?>(null) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
@@ -524,11 +527,16 @@ fun SettingsScreen(
                                     enabled = enabled,
                                     onClick = {
                                         lockModeMenuExpanded = false
-                                        if (mode == AppPreferences.LOCK_SECRET) {
-                                            // Warn about no-recovery first, then capture the secret.
-                                            showLockDisclaimer = true
-                                        } else {
-                                            vm.setLockMode(mode)
+                                        when {
+                                            mode == lockMode -> Unit  // already the active mode
+                                            // Leaving the in-app lock needs the current secret.
+                                            lockMode == AppPreferences.LOCK_SECRET -> {
+                                                pendingLockMode = mode
+                                                showConfirmCurrent = true
+                                            }
+                                            // Enabling it: warn about no-recovery, then capture it.
+                                            mode == AppPreferences.LOCK_SECRET -> showLockDisclaimer = true
+                                            else -> vm.setLockMode(mode)
                                         }
                                     },
                                 )
@@ -566,6 +574,18 @@ fun SettingsScreen(
                         TextButton(onClick = { showLockDisclaimer = false }) {
                             Text(stringResource(R.string.action_cancel))
                         }
+                    },
+                )
+            }
+
+            if (showConfirmCurrent) {
+                ConfirmSecretDialog(
+                    onDismiss = { showConfirmCurrent = false; pendingLockMode = null },
+                    verify = { vm.checkAppLockSecret(it) },
+                    onVerified = {
+                        pendingLockMode?.let { vm.setLockMode(it) }
+                        showConfirmCurrent = false
+                        pendingLockMode = null
                     },
                 )
             }

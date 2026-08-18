@@ -385,4 +385,5 @@
     <string name="lock_disclaimer_title">Aucune récupération en cas d\'oubli</string>
     <string name="lock_disclaimer_body">Un PIN ou une phrase secrète oublié ne peut pas être récupéré. Vous devrez alors effacer les données de l\'app ou la réinstaller, perdant vos serveurs et clés enregistrés sans sauvegarde.</string>
     <string name="lock_disclaimer_continue">J\'ai compris</string>
+    <string name="lock_confirm_current_title">Saisissez votre PIN ou phrase secrète actuel</string>
 </resources>

@@ -385,4 +385,5 @@
     <string name="lock_disclaimer_title">Keine Wiederherstellung bei Verlust</string>
     <string name="lock_disclaimer_body">Ein vergessener PIN oder eine vergessene Passphrase lässt sich nicht wiederherstellen. Dann musst du die App-Daten löschen oder die App neu installieren – und verlierst gespeicherte Server und Schlüssel ohne Backup.</string>
     <string name="lock_disclaimer_continue">Verstanden</string>
+    <string name="lock_confirm_current_title">Aktuellen PIN oder aktuelle Passphrase eingeben</string>
 </resources>
