@@ -385,4 +385,8 @@
     <string name="tv_lock_nudge_body">リモコンを持つ人は誰でも保存済みのサーバーや鍵にアクセスできます。PIN またはパスフレーズを設定してアプリをロックしてください。</string>
     <string name="tv_lock_nudge_setup">設定</string>
     <string name="tv_lock_nudge_dismiss">後で</string>
+    <string name="lock_current">現在の PIN またはパスフレーズ</string>
+    <string name="lock_disclaimer_title">忘れると復元できません</string>
+    <string name="lock_disclaimer_body">忘れた PIN やパスフレーズは復元できません。その場合はアプリのデータを消去するか再インストールが必要で、バックアップがなければ保存済みのサーバーや鍵を失います。</string>
+    <string name="lock_disclaimer_continue">了解しました</string>
 </resources>

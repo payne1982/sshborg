@@ -112,6 +112,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Confirms the current PIN/passphrase (no throttling) before allowing a change. */
+    suspend fun checkAppLockSecret(input: CharArray): Boolean = appLock.checkSecret(input)
+
     /** Stores a new PIN/passphrase and switches to the in-app lock mode. */
     fun setAppLockSecret(kind: com.sshborg.data.AppLockManager.Kind, secret: CharArray) {
         viewModelScope.launch {

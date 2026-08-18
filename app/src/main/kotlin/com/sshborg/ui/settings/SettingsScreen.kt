@@ -90,7 +90,9 @@ fun SettingsScreen(
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var lockModeMenuExpanded by remember { mutableStateOf(false) }
+    var showLockDisclaimer by remember { mutableStateOf(false) }
     var showLockSecretDialog by remember { mutableStateOf(false) }
+    var lockDialogIsChange by remember { mutableStateOf(false) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
@@ -524,8 +526,8 @@ fun SettingsScreen(
                                     onClick = {
                                         lockModeMenuExpanded = false
                                         if (mode == AppPreferences.LOCK_SECRET) {
-                                            // Capture a secret before the mode takes effect.
-                                            showLockSecretDialog = true
+                                            // Warn about no-recovery first, then capture the secret.
+                                            showLockDisclaimer = true
                                         } else {
                                             vm.setLockMode(mode)
                                         }
@@ -541,17 +543,39 @@ fun SettingsScreen(
             if (lockMode == AppPreferences.LOCK_SECRET) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_change_secret)) },
-                    modifier = Modifier.clickable { showLockSecretDialog = true },
+                    modifier = Modifier.clickable { lockDialogIsChange = true; showLockSecretDialog = true },
+                )
+            }
+
+            if (showLockDisclaimer) {
+                AlertDialog(
+                    onDismissRequest = { showLockDisclaimer = false },
+                    title = { Text(stringResource(R.string.lock_disclaimer_title)) },
+                    text  = { Text(stringResource(R.string.lock_disclaimer_body)) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showLockDisclaimer = false
+                            lockDialogIsChange = false
+                            showLockSecretDialog = true
+                        }) { Text(stringResource(R.string.lock_disclaimer_continue)) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLockDisclaimer = false }) {
+                            Text(stringResource(R.string.action_cancel))
+                        }
+                    },
                 )
             }
 
             if (showLockSecretDialog) {
                 LockSecretDialog(
-                    onDismiss = { showLockSecretDialog = false },
+                    onDismiss = { showLockSecretDialog = false; lockDialogIsChange = false },
                     onConfirm = { kind, secret ->
                         vm.setAppLockSecret(kind, secret)
                         showLockSecretDialog = false
+                        lockDialogIsChange = false
                     },
+                    verifyCurrent = if (lockDialogIsChange) ({ vm.checkAppLockSecret(it) }) else null,
                 )
             }
 

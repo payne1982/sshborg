@@ -391,4 +391,8 @@
     <string name="tv_lock_nudge_body">Anyone with the remote can reach your saved servers and keys. Set a PIN or passphrase to lock the app.</string>
     <string name="tv_lock_nudge_setup">Set up</string>
     <string name="tv_lock_nudge_dismiss">Not now</string>
+    <string name="lock_current">Current PIN or passphrase</string>
+    <string name="lock_disclaimer_title">No recovery if forgotten</string>
+    <string name="lock_disclaimer_body">There\'s no way to recover a forgotten PIN or passphrase. If you forget it, you\'ll have to clear the app\'s data or reinstall — losing your saved servers and keys unless you have a backup.</string>
+    <string name="lock_disclaimer_continue">I understand</string>
 </resources>

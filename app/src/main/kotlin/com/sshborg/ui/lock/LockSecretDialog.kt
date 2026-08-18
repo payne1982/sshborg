@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import com.sshborg.data.AppLockManager
+import kotlinx.coroutines.launch
 
 private const val PIN_MIN = 4
 private const val PIN_MAX = 8
@@ -21,28 +22,35 @@ private const val PASSPHRASE_MIN = 4
 /**
  * Dialog to set or change the in-app lock secret. The user picks a kind (PIN or
  * passphrase), enters it twice, and [onConfirm] receives the chosen kind and the
- * secret. Validation enforces a numeric 4–8 digit PIN or a passphrase of at least
- * four characters, and that both entries match.
+ * secret. When [verifyCurrent] is non-null (changing an existing secret), the current
+ * secret must be entered and verified first, so a change can't quietly replace it with
+ * something the user picked by mistake.
  */
 @Composable
 fun LockSecretDialog(
     onDismiss: () -> Unit,
     onConfirm: (AppLockManager.Kind, CharArray) -> Unit,
+    verifyCurrent: (suspend (CharArray) -> Boolean)? = null,
 ) {
+    val scope = rememberCoroutineScope()
+    var current by remember { mutableStateOf("") }
+    var currentWrong by remember { mutableStateOf(false) }
     var kind by remember { mutableStateOf(AppLockManager.Kind.PIN) }
     var secret by remember { mutableStateOf("") }
     var confirm by remember { mutableStateOf("") }
 
-    // Switching kind clears the fields so a PIN can't leak into passphrase rules.
+    // Switching kind clears the new fields so a PIN can't leak into passphrase rules.
     fun selectKind(k: AppLockManager.Kind) { if (k != kind) { kind = k; secret = ""; confirm = "" } }
 
     val isPin = kind == AppLockManager.Kind.PIN
     val longEnough = if (isPin) secret.length in PIN_MIN..PIN_MAX && secret.all { it.isDigit() }
                      else secret.length >= PASSPHRASE_MIN
     val matches = secret == confirm
-    val valid = longEnough && matches
+    val needsCurrent = verifyCurrent != null
+    val canSave = longEnough && matches && (!needsCurrent || current.isNotEmpty())
 
     val error = when {
+        currentWrong                       -> stringResource(R.string.lock_incorrect)
         secret.isNotEmpty() && !longEnough -> stringResource(R.string.lock_too_short)
         confirm.isNotEmpty() && !matches   -> stringResource(R.string.lock_mismatch)
         else -> null
@@ -54,11 +62,34 @@ fun LockSecretDialog(
     val filterInput: (String) -> String =
         { if (isPin) it.filter(Char::isDigit).take(PIN_MAX) else it }
 
+    val onSave = {
+        if (needsCurrent) {
+            scope.launch {
+                if (verifyCurrent!!(current.toCharArray())) onConfirm(kind, secret.toCharArray())
+                else currentWrong = true
+            }
+            Unit
+        } else onConfirm(kind, secret.toCharArray())
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.lock_set_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (needsCurrent) {
+                    OutlinedTextField(
+                        value = current,
+                        onValueChange = { current = it; currentWrong = false },
+                        label = { Text(stringResource(R.string.lock_current)) },
+                        singleLine = true,
+                        isError = currentWrong,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    HorizontalDivider()
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     KindOption(stringResource(R.string.lock_kind_pin), isPin) { selectKind(AppLockManager.Kind.PIN) }
                     KindOption(stringResource(R.string.lock_kind_passphrase), !isPin) { selectKind(AppLockManager.Kind.PASSPHRASE) }
@@ -88,7 +119,7 @@ fun LockSecretDialog(
             }
         },
         confirmButton = {
-            TextButton(enabled = valid, onClick = { onConfirm(kind, secret.toCharArray()) }) {
+            TextButton(enabled = canSave, onClick = onSave) {
                 Text(stringResource(R.string.action_save))
             }
         },

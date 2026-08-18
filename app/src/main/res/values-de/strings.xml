@@ -380,4 +380,8 @@
     <string name="tv_lock_nudge_body">Jeder mit der Fernbedienung kann auf deine gespeicherten Server und Schlüssel zugreifen. Lege einen PIN oder eine Passphrase fest, um die App zu sperren.</string>
     <string name="tv_lock_nudge_setup">Einrichten</string>
     <string name="tv_lock_nudge_dismiss">Nicht jetzt</string>
+    <string name="lock_current">Aktueller PIN oder Passphrase</string>
+    <string name="lock_disclaimer_title">Keine Wiederherstellung bei Verlust</string>
+    <string name="lock_disclaimer_body">Ein vergessener PIN oder eine vergessene Passphrase lässt sich nicht wiederherstellen. Dann musst du die App-Daten löschen oder die App neu installieren – und verlierst gespeicherte Server und Schlüssel ohne Backup.</string>
+    <string name="lock_disclaimer_continue">Verstanden</string>
 </resources>

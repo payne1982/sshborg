@@ -86,6 +86,17 @@ class AppLockManager(private val prefs: AppPreferences) {
         }
     }
 
+    /**
+     * Plain match against the stored secret, with no throttling side effects. Used to confirm the
+     * current secret before changing it — the app is already unlocked there, so it must not touch
+     * the failed-attempt counters that guard the unlock screen.
+     */
+    suspend fun checkSecret(input: CharArray): Boolean {
+        val record = prefs.readLockSecret() ?: return false
+        val actual = pbkdf2(input, unb64(record.saltB64), record.iterations)
+        return MessageDigest.isEqual(actual, unb64(record.hashB64))
+    }
+
     private fun pbkdf2(secret: CharArray, salt: ByteArray, iterations: Int): ByteArray {
         val spec = PBEKeySpec(secret, salt, iterations, KEY_BITS)
         try {

@@ -381,4 +381,8 @@
     <string name="tv_lock_nudge_body">Chiunque abbia il telecomando può accedere ai server e alle chiavi salvate. Imposta un PIN o una passphrase per bloccare l\'app.</string>
     <string name="tv_lock_nudge_setup">Configura</string>
     <string name="tv_lock_nudge_dismiss">Non ora</string>
+    <string name="lock_current">PIN o passphrase attuale</string>
+    <string name="lock_disclaimer_title">Nessun recupero se dimenticato</string>
+    <string name="lock_disclaimer_body">Non è possibile recuperare un PIN o una passphrase dimenticati. Se lo dimentichi, dovrai cancellare i dati dell\'app o reinstallarla, perdendo host e chiavi salvate se non hai un backup.</string>
+    <string name="lock_disclaimer_continue">Ho capito</string>
 </resources>

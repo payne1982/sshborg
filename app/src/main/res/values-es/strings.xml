@@ -380,4 +380,8 @@
     <string name="tv_lock_nudge_body">Cualquiera con el mando puede acceder a tus servidores y claves guardados. Establece un PIN o frase de contraseña para bloquear la app.</string>
     <string name="tv_lock_nudge_setup">Configurar</string>
     <string name="tv_lock_nudge_dismiss">Ahora no</string>
+    <string name="lock_current">PIN o frase de contraseña actual</string>
+    <string name="lock_disclaimer_title">Sin recuperación si se olvida</string>
+    <string name="lock_disclaimer_body">No se puede recuperar un PIN o frase de contraseña olvidados. Si lo olvidas, tendrás que borrar los datos de la app o reinstalarla, perdiendo servidores y claves guardados si no tienes copia de seguridad.</string>
+    <string name="lock_disclaimer_continue">Entiendo</string>
 </resources>

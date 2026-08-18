@@ -380,4 +380,8 @@
     <string name="tv_lock_nudge_body">Qualquer pessoa com o comando pode aceder aos seus servidores e chaves guardados. Defina um PIN ou frase-passe para bloquear a app.</string>
     <string name="tv_lock_nudge_setup">Configurar</string>
     <string name="tv_lock_nudge_dismiss">Agora não</string>
+    <string name="lock_current">PIN ou frase-passe atual</string>
+    <string name="lock_disclaimer_title">Sem recuperação se esquecer</string>
+    <string name="lock_disclaimer_body">Não é possível recuperar um PIN ou frase-passe esquecidos. Se o esquecer, terá de limpar os dados da app ou reinstalá-la, perdendo servidores e chaves guardados se não tiver uma cópia de segurança.</string>
+    <string name="lock_disclaimer_continue">Compreendo</string>
 </resources>

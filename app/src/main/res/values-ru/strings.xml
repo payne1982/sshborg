@@ -394,4 +394,8 @@
     <string name="tv_lock_nudge_body">Любой, у кого есть пульт, может получить доступ к сохранённым серверам и ключам. Задайте PIN или парольную фразу, чтобы заблокировать приложение.</string>
     <string name="tv_lock_nudge_setup">Настроить</string>
     <string name="tv_lock_nudge_dismiss">Не сейчас</string>
+    <string name="lock_current">Текущий PIN или парольная фраза</string>
+    <string name="lock_disclaimer_title">Восстановление невозможно</string>
+    <string name="lock_disclaimer_body">Забытый PIN или парольную фразу нельзя восстановить. Тогда придётся очистить данные приложения или переустановить его, потеряв сохранённые серверы и ключи, если нет резервной копии.</string>
+    <string name="lock_disclaimer_continue">Понятно</string>
 </resources>
