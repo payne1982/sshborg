@@ -360,4 +360,12 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Autoriser les captures d\'écran</string>
     <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Laisser désactivé pour protéger les contenus sensibles.</string>
+    <string name="lock_title">Déverrouiller SSHBorg</string>
+    <string name="lock_enter_pin">Saisissez votre code PIN</string>
+    <string name="lock_enter_passphrase">Saisissez votre phrase secrète</string>
+    <string name="lock_incorrect">Incorrect — réessayez</string>
+    <string name="lock_locked_out">Trop de tentatives. Réessayez dans %1$d s</string>
+    <string name="lock_delete_cd">Supprimer</string>
+    <string name="lock_reveal_cd">Afficher ou masquer la phrase secrète</string>
+    <string name="lock_submit_cd">Déverrouiller</string>
 </resources>

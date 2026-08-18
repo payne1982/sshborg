@@ -361,4 +361,12 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Consenti screenshot</string>
     <string name="settings_allow_screenshots_subtitle">Permetti screenshot e registrazione dello schermo. Lascia disattivato per proteggere i contenuti sensibili.</string>
+    <string name="lock_title">Sblocca SSHBorg</string>
+    <string name="lock_enter_pin">Inserisci il PIN</string>
+    <string name="lock_enter_passphrase">Inserisci la passphrase</string>
+    <string name="lock_incorrect">Errato — riprova</string>
+    <string name="lock_locked_out">Troppi tentativi. Riprova tra %1$d s</string>
+    <string name="lock_delete_cd">Cancella</string>
+    <string name="lock_reveal_cd">Mostra o nascondi la passphrase</string>
+    <string name="lock_submit_cd">Sblocca</string>
 </resources>

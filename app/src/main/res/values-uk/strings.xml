@@ -364,4 +364,12 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
     <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Залиште вимкненим для захисту конфіденційного вмісту.</string>
+    <string name="lock_title">Розблокувати SSHBorg</string>
+    <string name="lock_enter_pin">Введіть PIN-код</string>
+    <string name="lock_enter_passphrase">Введіть парольну фразу</string>
+    <string name="lock_incorrect">Неправильно — спробуйте ще раз</string>
+    <string name="lock_locked_out">Забагато спроб. Повторіть через %1$d с</string>
+    <string name="lock_delete_cd">Видалити</string>
+    <string name="lock_reveal_cd">Показати або сховати парольну фразу</string>
+    <string name="lock_submit_cd">Розблокувати</string>
 </resources>

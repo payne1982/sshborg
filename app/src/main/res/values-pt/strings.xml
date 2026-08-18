@@ -360,4 +360,12 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de ecrã e gravação de ecrã. Manter desativado para proteger conteúdo sensível.</string>
+    <string name="lock_title">Desbloquear o SSHBorg</string>
+    <string name="lock_enter_pin">Introduza o PIN</string>
+    <string name="lock_enter_passphrase">Introduza a frase-passe</string>
+    <string name="lock_incorrect">Incorreto — tente novamente</string>
+    <string name="lock_locked_out">Demasiadas tentativas. Tente novamente em %1$d s</string>
+    <string name="lock_delete_cd">Eliminar</string>
+    <string name="lock_reveal_cd">Mostrar ou ocultar a frase-passe</string>
+    <string name="lock_submit_cd">Desbloquear</string>
 </resources>

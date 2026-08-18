@@ -374,4 +374,12 @@
     <string name="error_encryption_failed">Ошибка шифрования</string>
     <string name="error_decryption_failed">Ошибка расшифровки</string>
     <string name="error_unknown">Что-то пошло не так</string>
+    <string name="lock_title">Разблокировать SSHBorg</string>
+    <string name="lock_enter_pin">Введите PIN-код</string>
+    <string name="lock_enter_passphrase">Введите парольную фразу</string>
+    <string name="lock_incorrect">Неверно — попробуйте снова</string>
+    <string name="lock_locked_out">Слишком много попыток. Повторите через %1$d с</string>
+    <string name="lock_delete_cd">Удалить</string>
+    <string name="lock_reveal_cd">Показать или скрыть парольную фразу</string>
+    <string name="lock_submit_cd">Разблокировать</string>
 </resources>

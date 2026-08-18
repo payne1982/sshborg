@@ -365,4 +365,12 @@
     <string name="backup_export_success">已导出 %1$d 个主机</string>
     <string name="backup_import_success">已导入 %1$d 个，已更新 %2$d 个主机</string>
     <string name="error_unknown">出现错误</string>
+    <string name="lock_title">解锁 SSHBorg</string>
+    <string name="lock_enter_pin">输入 PIN 码</string>
+    <string name="lock_enter_passphrase">输入密码短语</string>
+    <string name="lock_incorrect">不正确 — 请重试</string>
+    <string name="lock_locked_out">尝试次数过多。请在 %1$d 秒后重试</string>
+    <string name="lock_delete_cd">删除</string>
+    <string name="lock_reveal_cd">显示或隐藏密码短语</string>
+    <string name="lock_submit_cd">解锁</string>
 </resources>
