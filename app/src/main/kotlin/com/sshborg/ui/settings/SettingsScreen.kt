@@ -3,7 +3,6 @@ package com.sshborg.ui.settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -543,7 +542,11 @@ fun SettingsScreen(
             if (lockMode == AppPreferences.LOCK_SECRET) {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_change_secret)) },
-                    modifier = Modifier.clickable { lockDialogIsChange = true; showLockSecretDialog = true },
+                    trailingContent = {
+                        OutlinedButton(onClick = { lockDialogIsChange = true; showLockSecretDialog = true }) {
+                            Text(stringResource(R.string.action_change))
+                        }
+                    },
                 )
             }
 

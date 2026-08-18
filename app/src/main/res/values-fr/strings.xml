@@ -366,7 +366,8 @@
     <string name="lock_incorrect">Incorrect — réessayez</string>
     <string name="lock_locked_out">Trop de tentatives. Réessayez dans %1$d s</string>
     <string name="lock_delete_cd">Supprimer</string>
-    <string name="lock_reveal_cd">Afficher ou masquer la phrase secrète</string>
+    <string name="lock_reveal_cd">Afficher ou masquer</string>
+    <string name="action_change">Modifier</string>
     <string name="lock_submit_cd">Déverrouiller</string>
     <string name="settings_lock_mode_pin">PIN ou phrase secrète</string>
     <string name="settings_change_secret">Modifier le PIN ou la phrase secrète</string>

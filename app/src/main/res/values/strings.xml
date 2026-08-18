@@ -377,7 +377,8 @@
     <string name="lock_incorrect">Incorrect — try again</string>
     <string name="lock_locked_out">Too many attempts. Try again in %1$d s</string>
     <string name="lock_delete_cd">Delete</string>
-    <string name="lock_reveal_cd">Show or hide passphrase</string>
+    <string name="lock_reveal_cd">Show or hide</string>
+    <string name="action_change">Change</string>
     <string name="lock_submit_cd">Unlock</string>
     <string name="settings_lock_mode_pin">PIN or passphrase</string>
     <string name="settings_change_secret">Change PIN or passphrase</string>

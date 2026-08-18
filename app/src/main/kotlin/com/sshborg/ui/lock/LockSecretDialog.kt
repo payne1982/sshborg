@@ -3,6 +3,9 @@ package com.sshborg.ui.lock
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,13 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import com.sshborg.data.AppLockManager
 import kotlinx.coroutines.launch
 
 private const val PIN_MIN = 4
-private const val PIN_MAX = 8
+private const val PIN_MAX = 12
 private const val PASSPHRASE_MIN = 4
 
 /**
@@ -38,6 +42,7 @@ fun LockSecretDialog(
     var kind by remember { mutableStateOf(AppLockManager.Kind.PIN) }
     var secret by remember { mutableStateOf("") }
     var confirm by remember { mutableStateOf("") }
+    var reveal by remember { mutableStateOf(false) }
 
     // Switching kind clears the new fields so a PIN can't leak into passphrase rules.
     fun selectKind(k: AppLockManager.Kind) { if (k != kind) { kind = k; secret = ""; confirm = "" } }
@@ -62,6 +67,16 @@ fun LockSecretDialog(
     val filterInput: (String) -> String =
         { if (isPin) it.filter(Char::isDigit).take(PIN_MAX) else it }
 
+    val revealVisual = if (reveal) VisualTransformation.None else PasswordVisualTransformation()
+    val revealIcon: @Composable () -> Unit = {
+        IconButton(onClick = { reveal = !reveal }) {
+            Icon(
+                if (reveal) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                stringResource(R.string.lock_reveal_cd),
+            )
+        }
+    }
+
     val onSave = {
         if (needsCurrent) {
             scope.launch {
@@ -84,7 +99,8 @@ fun LockSecretDialog(
                         label = { Text(stringResource(R.string.lock_current)) },
                         singleLine = true,
                         isError = currentWrong,
-                        visualTransformation = PasswordVisualTransformation(),
+                        visualTransformation = revealVisual,
+                        trailingIcon = revealIcon,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -99,7 +115,8 @@ fun LockSecretDialog(
                     onValueChange = { secret = filterInput(it) },
                     label = { Text(stringResource(if (isPin) R.string.lock_enter_pin else R.string.lock_enter_passphrase)) },
                     singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = revealVisual,
+                    trailingIcon = revealIcon,
                     keyboardOptions = keyboard,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -109,7 +126,8 @@ fun LockSecretDialog(
                     label = { Text(stringResource(R.string.lock_confirm)) },
                     singleLine = true,
                     isError = confirm.isNotEmpty() && !matches,
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = revealVisual,
+                    trailingIcon = revealIcon,
                     keyboardOptions = keyboard,
                     modifier = Modifier.fillMaxWidth(),
                 )

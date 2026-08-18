@@ -366,7 +366,8 @@
     <string name="lock_incorrect">Incorrecto: inténtalo de nuevo</string>
     <string name="lock_locked_out">Demasiados intentos. Reintenta en %1$d s</string>
     <string name="lock_delete_cd">Borrar</string>
-    <string name="lock_reveal_cd">Mostrar u ocultar la frase de contraseña</string>
+    <string name="lock_reveal_cd">Mostrar u ocultar</string>
+    <string name="action_change">Cambiar</string>
     <string name="lock_submit_cd">Desbloquear</string>
     <string name="settings_lock_mode_pin">PIN o frase de contraseña</string>
     <string name="settings_change_secret">Cambiar PIN o frase de contraseña</string>

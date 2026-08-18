@@ -370,7 +370,8 @@
     <string name="lock_incorrect">Неправильно — спробуйте ще раз</string>
     <string name="lock_locked_out">Забагато спроб. Повторіть через %1$d с</string>
     <string name="lock_delete_cd">Видалити</string>
-    <string name="lock_reveal_cd">Показати або сховати парольну фразу</string>
+    <string name="lock_reveal_cd">Показати або сховати</string>
+    <string name="action_change">Змінити</string>
     <string name="lock_submit_cd">Розблокувати</string>
     <string name="settings_lock_mode_pin">PIN або парольна фраза</string>
     <string name="settings_change_secret">Змінити PIN або парольну фразу</string>

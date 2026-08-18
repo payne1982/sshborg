@@ -367,7 +367,8 @@
     <string name="lock_incorrect">Errato — riprova</string>
     <string name="lock_locked_out">Troppi tentativi. Riprova tra %1$d s</string>
     <string name="lock_delete_cd">Cancella</string>
-    <string name="lock_reveal_cd">Mostra o nascondi la passphrase</string>
+    <string name="lock_reveal_cd">Mostra o nascondi</string>
+    <string name="action_change">Cambia</string>
     <string name="lock_submit_cd">Sblocca</string>
     <string name="settings_lock_mode_pin">PIN o passphrase</string>
     <string name="settings_change_secret">Cambia PIN o passphrase</string>

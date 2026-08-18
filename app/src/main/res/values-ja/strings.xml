@@ -371,7 +371,8 @@
     <string name="lock_incorrect">正しくありません — 再試行してください</string>
     <string name="lock_locked_out">試行回数が多すぎます。%1$d 秒後に再試行してください</string>
     <string name="lock_delete_cd">削除</string>
-    <string name="lock_reveal_cd">パスフレーズの表示・非表示</string>
+    <string name="lock_reveal_cd">表示・非表示</string>
+    <string name="action_change">変更</string>
     <string name="lock_submit_cd">ロック解除</string>
     <string name="settings_lock_mode_pin">PIN またはパスフレーズ</string>
     <string name="settings_change_secret">PIN またはパスフレーズを変更</string>
