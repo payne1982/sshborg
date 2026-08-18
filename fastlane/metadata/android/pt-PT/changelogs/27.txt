@@ -1,3 +1,4 @@
 • Duplique um anfitrião a partir do menu para reutilizar as definições numa nova ligação — útil para chegar ao mesmo servidor por outra porta ou salto
 • Mostrar ou ocultar ficheiros ocultos (dotfiles) no explorador SFTP — guardado por anfitrião
+• Novo bloqueio da app: proteja-a com um PIN ou frase-passe na app
 • Bibliotecas e ferramentas de compilação da app atualizadas para as versões estáveis mais recentes

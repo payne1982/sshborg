@@ -1,3 +1,4 @@
 • Dupliquez un hôte depuis son menu pour réutiliser ses réglages sur une nouvelle connexion — pratique pour joindre le même serveur via un autre port ou rebond
 • Afficher ou masquer les fichiers cachés (dotfiles) dans l'explorateur SFTP — enregistré par hôte
+• Nouveau verrouillage de l'app : protégez-la avec un PIN ou une phrase secrète intégrés
 • Bibliothèques et outils de compilation de l'app mis à jour vers les dernières versions stables
