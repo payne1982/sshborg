@@ -376,4 +376,8 @@
     <string name="lock_confirm">Confirmar</string>
     <string name="lock_mismatch">No coinciden</string>
     <string name="lock_too_short">Demasiado corto</string>
+    <string name="tv_lock_nudge_title">Protege la app en el televisor</string>
+    <string name="tv_lock_nudge_body">Cualquiera con el mando puede acceder a tus servidores y claves guardados. Establece un PIN o frase de contraseña para bloquear la app.</string>
+    <string name="tv_lock_nudge_setup">Configurar</string>
+    <string name="tv_lock_nudge_dismiss">Ahora no</string>
 </resources>

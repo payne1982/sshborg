@@ -381,4 +381,8 @@
     <string name="lock_confirm">確認</string>
     <string name="lock_mismatch">一致しません</string>
     <string name="lock_too_short">短すぎます</string>
+    <string name="tv_lock_nudge_title">テレビでアプリを保護</string>
+    <string name="tv_lock_nudge_body">リモコンを持つ人は誰でも保存済みのサーバーや鍵にアクセスできます。PIN またはパスフレーズを設定してアプリをロックしてください。</string>
+    <string name="tv_lock_nudge_setup">設定</string>
+    <string name="tv_lock_nudge_dismiss">後で</string>
 </resources>

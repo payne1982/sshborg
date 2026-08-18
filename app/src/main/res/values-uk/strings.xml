@@ -380,4 +380,8 @@
     <string name="lock_confirm">Підтвердити</string>
     <string name="lock_mismatch">Не збігаються</string>
     <string name="lock_too_short">Надто короткий</string>
+    <string name="tv_lock_nudge_title">Захистіть застосунок на телевізорі</string>
+    <string name="tv_lock_nudge_body">Будь-хто з пультом може отримати доступ до збережених серверів і ключів. Установіть PIN або парольну фразу, щоб заблокувати застосунок.</string>
+    <string name="tv_lock_nudge_setup">Налаштувати</string>
+    <string name="tv_lock_nudge_dismiss">Не зараз</string>
 </resources>

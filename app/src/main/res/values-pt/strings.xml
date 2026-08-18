@@ -376,4 +376,8 @@
     <string name="lock_confirm">Confirmar</string>
     <string name="lock_mismatch">Não coincidem</string>
     <string name="lock_too_short">Demasiado curto</string>
+    <string name="tv_lock_nudge_title">Proteja a app na TV</string>
+    <string name="tv_lock_nudge_body">Qualquer pessoa com o comando pode aceder aos seus servidores e chaves guardados. Defina um PIN ou frase-passe para bloquear a app.</string>
+    <string name="tv_lock_nudge_setup">Configurar</string>
+    <string name="tv_lock_nudge_dismiss">Agora não</string>
 </resources>

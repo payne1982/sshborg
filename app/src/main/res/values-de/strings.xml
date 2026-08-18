@@ -376,4 +376,8 @@
     <string name="lock_confirm">Bestätigen</string>
     <string name="lock_mismatch">Stimmen nicht überein</string>
     <string name="lock_too_short">Zu kurz</string>
+    <string name="tv_lock_nudge_title">App auf dem TV schützen</string>
+    <string name="tv_lock_nudge_body">Jeder mit der Fernbedienung kann auf deine gespeicherten Server und Schlüssel zugreifen. Lege einen PIN oder eine Passphrase fest, um die App zu sperren.</string>
+    <string name="tv_lock_nudge_setup">Einrichten</string>
+    <string name="tv_lock_nudge_dismiss">Nicht jetzt</string>
 </resources>

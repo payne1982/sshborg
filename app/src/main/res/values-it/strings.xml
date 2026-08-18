@@ -377,4 +377,8 @@
     <string name="lock_confirm">Conferma</string>
     <string name="lock_mismatch">Non corrispondono</string>
     <string name="lock_too_short">Troppo corto</string>
+    <string name="tv_lock_nudge_title">Proteggi l\'app sulla TV</string>
+    <string name="tv_lock_nudge_body">Chiunque abbia il telecomando può accedere ai server e alle chiavi salvate. Imposta un PIN o una passphrase per bloccare l\'app.</string>
+    <string name="tv_lock_nudge_setup">Configura</string>
+    <string name="tv_lock_nudge_dismiss">Non ora</string>
 </resources>
