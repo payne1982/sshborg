@@ -32,6 +32,18 @@ class HostsViewModel(app: Application) : AndroidViewModel(app) {
     val confirmExit: StateFlow<Boolean> =
         sshBorgApp.appPreferences.confirmExit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    // Drive the one-time "set a lock" nudge shown on a TV (see HostsScreen).
+    val lockMode: StateFlow<Int> =
+        sshBorgApp.appPreferences.lockMode.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.LOCK_NONE,
+        )
+
+    val tvLockNudgeShown: StateFlow<Boolean> =
+        sshBorgApp.appPreferences.tvLockNudgeShown.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    fun markTvLockNudgeShown() = viewModelScope.launch { sshBorgApp.appPreferences.setTvLockNudgeShown() }
+
     fun deleteHost(host: HostEntity) = viewModelScope.launch { dao.delete(host) }
 
     /**

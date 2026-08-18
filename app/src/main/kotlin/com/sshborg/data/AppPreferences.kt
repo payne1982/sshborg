@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +39,14 @@ class AppPreferences(private val context: Context) {
         val EXTRA_KEYS_BAR_PINNED        = booleanPreferencesKey("extra_keys_bar_pinned")
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
         val PRIVACY_POLICY_ACCEPTED      = booleanPreferencesKey("privacy_policy_accepted")
+        // In-app lock secret (mode LOCK_SECRET): a salted PBKDF2 hash, never the secret itself.
+        val LOCK_SECRET_KIND     = stringPreferencesKey("lock_secret_kind")   // "pin" | "passphrase"
+        val LOCK_SECRET_SALT     = stringPreferencesKey("lock_secret_salt")   // base64
+        val LOCK_SECRET_HASH     = stringPreferencesKey("lock_secret_hash")   // base64
+        val LOCK_SECRET_ITER     = intPreferencesKey("lock_secret_iterations")
+        val LOCK_FAILED_ATTEMPTS = intPreferencesKey("lock_failed_attempts")
+        val LOCK_LOCKOUT_UNTIL   = longPreferencesKey("lock_lockout_until")   // epoch millis
+        val TV_LOCK_NUDGE_SHOWN  = booleanPreferencesKey("tv_lock_nudge_shown")
     }
 
     /**
@@ -161,6 +171,7 @@ class AppPreferences(private val context: Context) {
         const val LOCK_NONE = 0       // no lock (default)
         const val LOCK_BIOMETRIC = 1  // biometric only, device credential only if no biometric enrolled
         const val LOCK_DEVICE = 2     // any device screen lock: biometric, PIN, pattern, or password
+        const val LOCK_SECRET = 3     // in-app PIN or passphrase (works without device hardware; see AppLockManager)
     }
 
     /** Whether to show shell history suggestions above the keyboard. Default true. */
@@ -203,6 +214,62 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setPrivacyPolicyAccepted() {
         context.dataStore.edit { it[Keys.PRIVACY_POLICY_ACCEPTED] = true }
+    }
+
+    // ── In-app lock secret (PIN / passphrase) ─────────────────────────────────
+    // Persisted only as a salted PBKDF2 hash (see AppLockManager). Deliberately NOT
+    // part of the settings backup, like lock_mode — a security gate tied to this
+    // install, never carried to another device.
+
+    /** A stored lock secret: the hash and the parameters needed to re-derive it. */
+    data class LockSecret(val kind: String, val saltB64: String, val hashB64: String, val iterations: Int)
+
+    suspend fun readLockSecret(): LockSecret? {
+        val p = context.dataStore.data.first()
+        val kind = p[Keys.LOCK_SECRET_KIND] ?: return null
+        val salt = p[Keys.LOCK_SECRET_SALT] ?: return null
+        val hash = p[Keys.LOCK_SECRET_HASH] ?: return null
+        val iter = p[Keys.LOCK_SECRET_ITER] ?: return null
+        return LockSecret(kind, salt, hash, iter)
+    }
+
+    suspend fun writeLockSecret(secret: LockSecret) {
+        context.dataStore.edit {
+            it[Keys.LOCK_SECRET_KIND] = secret.kind
+            it[Keys.LOCK_SECRET_SALT] = secret.saltB64
+            it[Keys.LOCK_SECRET_HASH] = secret.hashB64
+            it[Keys.LOCK_SECRET_ITER] = secret.iterations
+        }
+    }
+
+    /** Removes the stored secret and resets the throttling counters. */
+    suspend fun clearLockSecret() {
+        context.dataStore.edit {
+            it.remove(Keys.LOCK_SECRET_KIND); it.remove(Keys.LOCK_SECRET_SALT)
+            it.remove(Keys.LOCK_SECRET_HASH); it.remove(Keys.LOCK_SECRET_ITER)
+            it.remove(Keys.LOCK_FAILED_ATTEMPTS); it.remove(Keys.LOCK_LOCKOUT_UNTIL)
+        }
+    }
+
+    /** (failedAttempts, lockoutUntilEpochMillis). */
+    suspend fun readLockAttempts(): Pair<Int, Long> {
+        val p = context.dataStore.data.first()
+        return (p[Keys.LOCK_FAILED_ATTEMPTS] ?: 0) to (p[Keys.LOCK_LOCKOUT_UNTIL] ?: 0L)
+    }
+
+    suspend fun writeLockAttempts(failedAttempts: Int, lockoutUntil: Long) {
+        context.dataStore.edit {
+            it[Keys.LOCK_FAILED_ATTEMPTS] = failedAttempts
+            it[Keys.LOCK_LOCKOUT_UNTIL] = lockoutUntil
+        }
+    }
+
+    /** Whether the one-time "set a PIN" nudge has been shown on a TV. */
+    val tvLockNudgeShown: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.TV_LOCK_NUDGE_SHOWN] ?: false }
+
+    suspend fun setTvLockNudgeShown() {
+        context.dataStore.edit { it[Keys.TV_LOCK_NUDGE_SHOWN] = true }
     }
 
     // ── Settings backup ──────────────────────────────────────────────────────

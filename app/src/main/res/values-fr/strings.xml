@@ -360,4 +360,30 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Autoriser les captures d\'écran</string>
     <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Laisser désactivé pour protéger les contenus sensibles.</string>
+    <string name="lock_title">Déverrouiller SSHBorg</string>
+    <string name="lock_enter_pin">Saisissez votre code PIN</string>
+    <string name="lock_enter_passphrase">Saisissez votre phrase secrète</string>
+    <string name="lock_incorrect">Incorrect — réessayez</string>
+    <string name="lock_locked_out">Trop de tentatives. Réessayez dans %1$d s</string>
+    <string name="lock_delete_cd">Supprimer</string>
+    <string name="lock_reveal_cd">Afficher ou masquer</string>
+    <string name="action_change">Modifier</string>
+    <string name="lock_submit_cd">Déverrouiller</string>
+    <string name="settings_lock_mode_pin">PIN ou phrase secrète</string>
+    <string name="settings_change_secret">Modifier le PIN ou la phrase secrète</string>
+    <string name="lock_set_title">Définir un PIN ou une phrase secrète</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Phrase secrète</string>
+    <string name="lock_confirm">Confirmer</string>
+    <string name="lock_mismatch">Ne correspondent pas</string>
+    <string name="lock_too_short">Trop court</string>
+    <string name="tv_lock_nudge_title">Protégez l\'app sur votre TV</string>
+    <string name="tv_lock_nudge_body">Toute personne ayant la télécommande peut accéder à vos serveurs et clés enregistrés. Définissez un PIN ou une phrase secrète pour verrouiller l\'app.</string>
+    <string name="tv_lock_nudge_setup">Configurer</string>
+    <string name="tv_lock_nudge_dismiss">Plus tard</string>
+    <string name="lock_current">PIN ou phrase secrète actuel</string>
+    <string name="lock_disclaimer_title">Aucune récupération en cas d\'oubli</string>
+    <string name="lock_disclaimer_body">Un PIN ou une phrase secrète oublié ne peut pas être récupéré. Vous devrez alors effacer les données de l\'app ou la réinstaller, perdant vos serveurs et clés enregistrés sans sauvegarde.</string>
+    <string name="lock_disclaimer_continue">J\'ai compris</string>
+    <string name="lock_confirm_current_title">Saisissez votre PIN ou phrase secrète actuel</string>
 </resources>

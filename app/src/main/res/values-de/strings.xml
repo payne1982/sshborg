@@ -360,4 +360,30 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Screenshots erlauben</string>
     <string name="settings_allow_screenshots_subtitle">Screenshots und Bildschirmaufnahmen erlauben. Deaktiviert lassen, um sensible Inhalte zu schützen.</string>
+    <string name="lock_title">SSHBorg entsperren</string>
+    <string name="lock_enter_pin">PIN eingeben</string>
+    <string name="lock_enter_passphrase">Passphrase eingeben</string>
+    <string name="lock_incorrect">Falsch – erneut versuchen</string>
+    <string name="lock_locked_out">Zu viele Versuche. Erneut versuchen in %1$d s</string>
+    <string name="lock_delete_cd">Löschen</string>
+    <string name="lock_reveal_cd">Ein- oder ausblenden</string>
+    <string name="action_change">Ändern</string>
+    <string name="lock_submit_cd">Entsperren</string>
+    <string name="settings_lock_mode_pin">PIN oder Passphrase</string>
+    <string name="settings_change_secret">PIN oder Passphrase ändern</string>
+    <string name="lock_set_title">PIN oder Passphrase festlegen</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Passphrase</string>
+    <string name="lock_confirm">Bestätigen</string>
+    <string name="lock_mismatch">Stimmen nicht überein</string>
+    <string name="lock_too_short">Zu kurz</string>
+    <string name="tv_lock_nudge_title">App auf dem TV schützen</string>
+    <string name="tv_lock_nudge_body">Jeder mit der Fernbedienung kann auf deine gespeicherten Server und Schlüssel zugreifen. Lege einen PIN oder eine Passphrase fest, um die App zu sperren.</string>
+    <string name="tv_lock_nudge_setup">Einrichten</string>
+    <string name="tv_lock_nudge_dismiss">Nicht jetzt</string>
+    <string name="lock_current">Aktueller PIN oder Passphrase</string>
+    <string name="lock_disclaimer_title">Keine Wiederherstellung bei Verlust</string>
+    <string name="lock_disclaimer_body">Ein vergessener PIN oder eine vergessene Passphrase lässt sich nicht wiederherstellen. Dann musst du die App-Daten löschen oder die App neu installieren – und verlierst gespeicherte Server und Schlüssel ohne Backup.</string>
+    <string name="lock_disclaimer_continue">Verstanden</string>
+    <string name="lock_confirm_current_title">Aktuellen PIN oder aktuelle Passphrase eingeben</string>
 </resources>

@@ -2,6 +2,7 @@ package com.sshborg
 
 import android.app.Application
 import com.jcraft.jsch.JSch
+import com.sshborg.data.AppLockManager
 import com.sshborg.data.AppPreferences
 import com.sshborg.data.ssh.SshDiagnostics
 import com.sshborg.data.db.AppDatabase
@@ -16,6 +17,7 @@ class SshBorgApp : Application() {
     val sessionManager = SessionManager()
     val transferManager by lazy { TransferManager(this) }
     val appPreferences by lazy { AppPreferences(this) }
+    val appLockManager by lazy { AppLockManager(appPreferences) }
 
     /** Timestamp of the last successful biometric authentication (in-memory only). */
     var lastAuthTime: Long = 0L

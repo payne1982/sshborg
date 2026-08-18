@@ -20,6 +20,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private val sshBorgApp   = app as SshBorgApp
     private val prefs        = sshBorgApp.appPreferences
+    private val appLock      = sshBorgApp.appLockManager
     private val keyDao       = sshBorgApp.db.sshKeyDao()
     private val hostDao      = sshBorgApp.db.hostDao()
     private val groupDao     = sshBorgApp.db.groupDao()
@@ -104,7 +105,23 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setLockMode(mode: Int) {
-        viewModelScope.launch { prefs.setLockMode(mode) }
+        viewModelScope.launch {
+            // Leaving the in-app lock discards its stored secret.
+            if (mode != com.sshborg.data.AppPreferences.LOCK_SECRET) appLock.clear()
+            prefs.setLockMode(mode)
+        }
+    }
+
+    /** Confirms the current PIN/passphrase (no throttling) before allowing a change. */
+    suspend fun checkAppLockSecret(input: CharArray): Boolean = appLock.checkSecret(input)
+
+    /** Stores a new PIN/passphrase and switches to the in-app lock mode. */
+    fun setAppLockSecret(kind: com.sshborg.data.AppLockManager.Kind, secret: CharArray) {
+        viewModelScope.launch {
+            appLock.setSecret(kind, secret)
+            secret.fill(' ')
+            prefs.setLockMode(com.sshborg.data.AppPreferences.LOCK_SECRET)
+        }
     }
 
     fun setConfirmExit(enabled: Boolean) {

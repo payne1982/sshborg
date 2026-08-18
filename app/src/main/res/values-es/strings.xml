@@ -360,4 +360,30 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Permitir capturas de pantalla</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de pantalla y grabación de pantalla. Déjalo desactivado para proteger el contenido sensible.</string>
+    <string name="lock_title">Desbloquear SSHBorg</string>
+    <string name="lock_enter_pin">Introduce el PIN</string>
+    <string name="lock_enter_passphrase">Introduce la frase de contraseña</string>
+    <string name="lock_incorrect">Incorrecto: inténtalo de nuevo</string>
+    <string name="lock_locked_out">Demasiados intentos. Reintenta en %1$d s</string>
+    <string name="lock_delete_cd">Borrar</string>
+    <string name="lock_reveal_cd">Mostrar u ocultar</string>
+    <string name="action_change">Cambiar</string>
+    <string name="lock_submit_cd">Desbloquear</string>
+    <string name="settings_lock_mode_pin">PIN o frase de contraseña</string>
+    <string name="settings_change_secret">Cambiar PIN o frase de contraseña</string>
+    <string name="lock_set_title">Establecer PIN o frase de contraseña</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Frase de contraseña</string>
+    <string name="lock_confirm">Confirmar</string>
+    <string name="lock_mismatch">No coinciden</string>
+    <string name="lock_too_short">Demasiado corto</string>
+    <string name="tv_lock_nudge_title">Protege la app en el televisor</string>
+    <string name="tv_lock_nudge_body">Cualquiera con el mando puede acceder a tus servidores y claves guardados. Establece un PIN o frase de contraseña para bloquear la app.</string>
+    <string name="tv_lock_nudge_setup">Configurar</string>
+    <string name="tv_lock_nudge_dismiss">Ahora no</string>
+    <string name="lock_current">PIN o frase de contraseña actual</string>
+    <string name="lock_disclaimer_title">Sin recuperación si se olvida</string>
+    <string name="lock_disclaimer_body">No se puede recuperar un PIN o frase de contraseña olvidados. Si lo olvidas, tendrás que borrar los datos de la app o reinstalarla, perdiendo servidores y claves guardados si no tienes copia de seguridad.</string>
+    <string name="lock_disclaimer_continue">Entiendo</string>
+    <string name="lock_confirm_current_title">Introduce tu PIN o frase de contraseña actual</string>
 </resources>
