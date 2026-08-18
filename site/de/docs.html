@@ -903,8 +903,8 @@ Host target
 
             <h2>// APP-SICHERHEIT</h2>
             <h3>App-Sperre</h3>
-            <p>Wähle unter <strong>Einstellungen → Sicherheit → App-Sperre</strong>, wie die App geschützt wird: <strong>Keine</strong> (Standard), <strong>Nur biometrisch</strong> (Fingerabdruck oder Gesichtserkennung) oder <strong>Gerätesperre</strong> — die PIN, das Muster oder das Passwort des Geräts, zusätzlich zur Biometrie. Wenn eine Sperre aktiv ist, erfordert SSHBorg eine Authentifizierung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
-            <p>Die Option <strong>Gerätesperre</strong> ist nützlich auf Geräten ohne biometrische Hardware — etwa Android TV — wo du stattdessen mit der System-PIN entsperren kannst.</p>
+            <p>Wähle unter <strong>Einstellungen → Sicherheit → App-Sperre</strong>, wie die App geschützt wird: <strong>Keine</strong> (Standard), <strong>Nur biometrisch</strong> (Fingerabdruck oder Gesichtserkennung), <strong>Gerätesperre</strong> (die PIN, das Muster oder das Passwort des Geräts, zusätzlich zur Biometrie) oder ein <strong>In-App-PIN oder eine Passphrase</strong>. Wenn eine Sperre aktiv ist, erfordert SSHBorg eine Authentifizierung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
+            <p>Der <strong>In-App-PIN bzw. die Passphrase</strong> funktioniert auf jedem Gerät, auch ohne biometrische Hardware oder eine System-Bildschirmsperre — das macht ihn zur richtigen Wahl auf einem Android TV. Zum Ändern oder Entfernen wird zuerst der aktuelle abgefragt. Bei Verlust gibt es keine Wiederherstellung: Du müsstest die App-Daten löschen oder die App neu installieren — halte also ein Backup deiner Hosts bereit.</p>
             <p>Du kannst ein Inaktivitäts-Timeout festlegen — nach dieser Anzahl von Minuten im Hintergrund sperrt sich die App automatisch.</p>
             <h3>Screenshot-Schutz</h3>
             <p>Standardmäßig blockiert SSHBorg Screenshots und Bildschirmaufnahmen, um zu verhindern, dass sensible Terminal-Inhalte über den Zuletzt-Geöffnet-Bildschirm oder Aufnahme-Tools durchsickern.</p>
@@ -939,7 +939,7 @@ Host target
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produktion", "color": -1754827 }
@@ -957,6 +957,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "Mein VPS-Schlüssel",
       "group":           "Produktion"
@@ -983,6 +984,7 @@ Host target
                 <li><code>portForwardings</code> — zeilengetrennte lokale Port-Weiterleitungsregeln in SSH-<code>-L</code>-Syntax, z.B. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — SFTP-Startverzeichnis: <code>"last"</code> (letztes besuchtes merken), <code>"fixed"</code> (immer <code>sftpStartDir</code> verwenden), <code>"home"</code> (Server-Home). Standard: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
+                <li><code>sftpShowHidden</code> — <code>true</code>, um versteckte Dateien (Dotfiles, Namen mit "." am Anfang) im SFTP-Browser dieses Hosts anzuzeigen. Standard <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
                 <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>

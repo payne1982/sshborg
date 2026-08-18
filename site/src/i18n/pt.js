@@ -35,7 +35,7 @@ module.exports = {
   feat_jump_title:     'SUPORTE JUMP HOST',
   feat_jump_desc:      'Ligue-se através de um ou mais hosts de bastião com tunelamento transparente. Reencaminhamento completo do agente SSH.',
   feat_biometric_title:'BLOQUEIO DA APP',
-  feat_biometric_desc: 'Bloqueie a app com biometria ou o PIN do dispositivo — funciona mesmo na Android TV sem sensor de impressões. Tempo limite configurável.',
+  feat_biometric_desc: 'Bloqueie a app com biometria, o PIN do dispositivo ou um PIN ou frase-passe na app — funciona mesmo na Android TV sem sensor de impressões. Tempo limite configurável.',
   feat_multilingual_title: 'MULTILINGUE',
   feat_multilingual_desc:  'Disponível em inglês, italiano, francês, alemão, espanhol, português, ucraniano, russo, chinês e japonês.',
   feat_theme_title:    'TEMA ESCURO E CLARO',
@@ -442,8 +442,8 @@ Host target
   doc_security: `
             <h2>// SEGURANÇA DA APP</h2>
             <h3>Bloqueio da app</h3>
-            <p>Escolha como a app é protegida em <strong>Definições → Segurança → Bloqueio da app</strong>: <strong>Nenhum</strong> (predefinido), <strong>Apenas biométrico</strong> (impressão digital ou reconhecimento facial) ou <strong>Bloqueio do dispositivo</strong> — o PIN, o padrão ou a palavra-passe do dispositivo, além da biometria. Quando um bloqueio está ativo, o SSHBorg exige autenticação antes de mostrar qualquer host, credencial ou dados de sessão.</p>
-            <p>A opção <strong>Bloqueio do dispositivo</strong> é útil em dispositivos sem hardware biométrico — como a Android TV — onde pode desbloquear com o PIN do sistema.</p>
+            <p>Escolha como a app é protegida em <strong>Definições → Segurança → Bloqueio da app</strong>: <strong>Nenhum</strong> (predefinido), <strong>Apenas biométrico</strong> (impressão digital ou reconhecimento facial), <strong>Bloqueio do dispositivo</strong> (o PIN, o padrão ou a palavra-passe do dispositivo, além da biometria) ou um <strong>PIN ou frase-passe</strong> na app. Quando um bloqueio está ativo, o SSHBorg exige autenticação antes de mostrar qualquer host, credencial ou dados de sessão.</p>
+            <p>O <strong>PIN ou frase-passe</strong> na app funciona em qualquer dispositivo, mesmo sem hardware biométrico ou um bloqueio de ecrã do sistema — o que o torna a escolha certa numa Android TV. Alterá-lo ou removê-lo pede primeiro o atual. Não é recuperável se for esquecido: teria de limpar os dados da app ou reinstalá-la, por isso mantenha uma cópia de segurança dos seus hosts.</p>
             <p>Pode definir um tempo limite de inatividade — após esse número de minutos em segundo plano, a app bloqueia automaticamente.</p>
             <h3>Proteção de capturas de ecrã</h3>
             <p>Por predefinição, o SSHBorg bloqueia capturas de ecrã e gravação de ecrã para evitar que conteúdo sensível do terminal vaze através do ecrã de apps recentes ou ferramentas de captura.</p>
@@ -476,7 +476,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>O ficheiro exportado é um objeto JSON simples. Também pode criá-lo manualmente para importar em bloco uma lista de servidores de outra fonte.</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produção", "color": -1754827 }
@@ -494,6 +494,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "Chave do meu VPS",
       "group":           "Produção"
@@ -520,6 +521,7 @@ Host target
                 <li><code>portForwardings</code> — regras de reencaminhamento de porta local separadas por nova linha em sintaxe SSH <code>-L</code>, ex. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — diretório inicial SFTP: <code>"last"</code> (lembrar o último visitado), <code>"fixed"</code> (usar sempre <code>sftpStartDir</code>), <code>"home"</code> (diretório pessoal do servidor). Predefinição: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — caminho a usar quando <code>sftpStartMode</code> é <code>"fixed"</code>.</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> para mostrar os ficheiros ocultos (dotfiles, nomes começados por ".") no explorador SFTP deste anfitrião. Predefinição <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> para ativar os algoritmos legados descritos acima. Predefinição: <code>false</code>.</li>
                 <li><code>keyLabel</code> — nome da chave SSH que este host usa. Ao importar, se existir uma chave com este nome, é associada ao host; caso contrário, o campo é ignorado. A própria chave nunca é incluída na cópia.</li>
                 <li><code>group</code> — nome do grupo a que o host pertence. Os grupos estão no array <code>groups</code> de nível superior, com <code>name</code> e <code>color</code> (ARGB como inteiro de 32 bits com sinal). Se um host referir um grupo ausente do array, este é criado automaticamente com uma cor predefinida — ao escrever o ficheiro à mão pode omitir o array.</li>

@@ -35,7 +35,7 @@ module.exports = {
   feat_jump_title:     'SUPPORT JUMP HOST',
   feat_jump_desc:      'Connectez-vous via un ou plusieurs hôtes bastions avec tunneling transparent. Transfert complet de l\'agent SSH.',
   feat_biometric_title:'VERROUILLAGE DE L\'APP',
-  feat_biometric_desc: 'Verrouillez l\'app par biométrie ou par le code PIN de l\'appareil — fonctionne même sur Android TV sans capteur d\'empreinte. Délai configurable.',
+  feat_biometric_desc: 'Verrouillez l\'app par biométrie, par le code PIN de l\'appareil ou par un PIN ou une phrase secrète intégrés — fonctionne même sur Android TV sans capteur d\'empreinte. Délai configurable.',
   feat_multilingual_title: 'MULTILINGUE',
   feat_multilingual_desc:  'Disponible en anglais, italien, français, allemand, espagnol, portugais, ukrainien, russe, chinois et japonais.',
   feat_theme_title:    'THÈME SOMBRE &amp; CLAIR',
@@ -442,8 +442,8 @@ Host target
   doc_security: `
             <h2>// SÉCURITÉ DE L'APP</h2>
             <h3>Verrouillage de l'app</h3>
-            <p>Choisissez comment l'app est protégée dans <strong>Paramètres → Sécurité → Verrouillage de l'app</strong> : <strong>Aucun</strong> (par défaut), <strong>Biométrie uniquement</strong> (empreinte digitale ou reconnaissance faciale) ou <strong>Verrouillage de l'appareil</strong> — le code PIN, le schéma ou le mot de passe de l'appareil, en plus de la biométrie. Quand un verrouillage est actif, SSHBorg exige une authentification avant d'afficher des hôtes, des identifiants ou des données de session.</p>
-            <p>L'option <strong>Verrouillage de l'appareil</strong> est utile sur les appareils sans matériel biométrique — comme Android TV — où vous pouvez déverrouiller avec le code PIN du système.</p>
+            <p>Choisissez comment l'app est protégée dans <strong>Paramètres → Sécurité → Verrouillage de l'app</strong> : <strong>Aucun</strong> (par défaut), <strong>Biométrie uniquement</strong> (empreinte digitale ou reconnaissance faciale), <strong>Verrouillage de l'appareil</strong> (le code PIN, le schéma ou le mot de passe de l'appareil, en plus de la biométrie) ou un <strong>PIN ou une phrase secrète</strong> intégrés. Quand un verrouillage est actif, SSHBorg exige une authentification avant d'afficher des hôtes, des identifiants ou des données de session.</p>
+            <p>Le <strong>PIN ou la phrase secrète</strong> intégrés fonctionnent sur tout appareil, même sans matériel biométrique ni verrouillage d'écran système — c'est donc le bon choix sur une Android TV. Les modifier ou les supprimer demande d'abord le code actuel. Il n'y a aucun moyen de le récupérer en cas d'oubli : vous devriez effacer les données de l'app ou la réinstaller, alors gardez une sauvegarde de vos hôtes.</p>
             <p>Vous pouvez définir un délai d'inactivité — après ce nombre de minutes en arrière-plan, l'app se verrouille automatiquement.</p>
             <h3>Protection des captures d'écran</h3>
             <p>Par défaut, SSHBorg bloque les captures d'écran et l'enregistrement d'écran pour empêcher le contenu sensible du terminal de fuiter via l'écran des apps récentes ou des outils de capture.</p>
@@ -476,7 +476,7 @@ Host target
             <h3>Format JSON</h3>
             <p>Le fichier exporté est un objet JSON standard. Vous pouvez également le créer manuellement pour importer en masse une liste de serveurs depuis une autre source.</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827 }
@@ -494,6 +494,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "Clé de mon VPS",
       "group":           "Production"
@@ -520,6 +521,7 @@ Host target
                 <li><code>portForwardings</code> — règles de redirection de port local séparées par des sauts de ligne en syntaxe SSH <code>-L</code>, ex. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — répertoire de départ SFTP : <code>"last"</code> (mémoriser le dernier visité), <code>"fixed"</code> (toujours utiliser <code>sftpStartDir</code>), <code>"home"</code> (dossier personnel du serveur). Par défaut : <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — chemin à utiliser quand <code>sftpStartMode</code> est <code>"fixed"</code>.</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> pour afficher les fichiers cachés (dotfiles, noms commençant par ".") dans l'explorateur SFTP de cet hôte. Par défaut <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> pour activer les algorithmes hérités décrits plus haut. Par défaut : <code>false</code>.</li>
                 <li><code>keyLabel</code> — nom de la clé SSH utilisée par cet hôte. À l'import, si une clé de ce nom existe, l'hôte y est relié ; sinon le champ est ignoré. La clé elle-même n'est jamais incluse dans la sauvegarde.</li>
                 <li><code>group</code> — nom du groupe auquel appartient l'hôte. Les groupes figurent dans le tableau <code>groups</code> au niveau racine, avec <code>name</code> et <code>color</code> (ARGB en entier 32 bits signé). Si un hôte référence un groupe absent du tableau, celui-ci est créé automatiquement avec une couleur par défaut — vous pouvez donc omettre le tableau en écrivant le fichier à la main.</li>

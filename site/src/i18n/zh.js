@@ -36,7 +36,7 @@ module.exports = {
   feat_jump_title:     '跳板机支持',
   feat_jump_desc:      '通过一台或多台堡垒主机进行透明隧道连接，完整支持 SSH 代理转发。',
   feat_biometric_title:'应用锁',
-  feat_biometric_desc: '用生物识别或设备 PIN 锁定应用——即使在没有指纹传感器的 Android TV 上也能使用。超时时间可自定义。',
+  feat_biometric_desc: '用生物识别、设备 PIN 或应用内 PIN／密码短语锁定应用——即使在没有指纹传感器的 Android TV 上也能使用。超时时间可自定义。',
   feat_multilingual_title: '多语言',
   feat_multilingual_desc:  '支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、俄语、中文和日语。',
   feat_theme_title:    '深色与浅色主题',
@@ -444,8 +444,8 @@ Host target
   doc_security: `
             <h2>// 应用安全</h2>
             <h3>应用锁</h3>
-            <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁），或 <strong>设备锁</strong>——除生物识别外，还可使用设备的 PIN、图案或密码。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。</p>
-            <p><strong>设备锁</strong> 适用于没有生物识别硬件的设备（如 Android TV），此时可用系统 PIN 解锁。</p>
+            <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁）、<strong>设备锁</strong>（除生物识别外，还可使用设备的 PIN、图案或密码），或应用内 <strong>PIN 或密码短语</strong>。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。</p>
+            <p>应用内 <strong>PIN 或密码短语</strong> 可在任何设备上使用，即使没有生物识别硬件或系统屏幕锁——因此它是 Android TV 上的正确选择。更改或移除时会先要求输入当前的。忘记后无法找回：你需要清除应用数据或重新安装，因此请保留主机的备份。</p>
             <p>您可以设置不活动超时——在后台等待该时长后，应用会自动锁定。</p>
             <h3>截图保护</h3>
             <p>SSHBorg 默认阻止截图和录屏，防止敏感的终端内容通过最近应用界面或截屏工具泄露。</p>
@@ -478,7 +478,7 @@ Host target
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "生产", "color": -1754827 }
@@ -496,6 +496,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "我的 VPS 密钥",
       "group":           "生产"
@@ -522,6 +523,7 @@ Host target
                 <li><code>portForwardings</code> — 以换行符分隔的本地端口转发规则，使用 SSH <code>-L</code> 语法，例如 <code>"8080:localhost:8080"</code>。</li>
                 <li><code>sftpStartMode</code> — SFTP 起始目录：<code>"last"</code>（记住上次访问的目录）、<code>"fixed"</code>（始终使用 <code>sftpStartDir</code>）、<code>"home"</code>（服务器主目录）。默认值：<code>"last"</code>。</li>
                 <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> 时在该主机的 SFTP 浏览器中显示隐藏文件（点文件，以 "." 开头的名称）。默认 <code>false</code>。</li>
                 <li><code>allowLegacyCiphers</code> — 设为 <code>true</code> 可启用上文介绍的旧式加密算法。默认为 <code>false</code>。</li>
                 <li><code>keyLabel</code> — 此主机所用 SSH 密钥的名称。导入时，如果存在同名密钥，则关联到该主机；否则忽略该字段。密钥本身从不包含在备份中。</li>
                 <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
