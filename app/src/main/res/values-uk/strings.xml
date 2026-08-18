@@ -219,6 +219,9 @@
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Назад до хостів</string>
     <string name="sftp_refresh_cd">Оновити</string>
+    <string name="sftp_show_hidden_cd">Показати приховані файли</string>
+    <string name="sftp_hide_hidden_cd">Сховати приховані файли</string>
+    <string name="host_sftp_show_hidden">Показати приховані файли</string>
     <string name="sftp_disconnect_cd">Відключитися</string>
     <string name="sftp_new_folder_cd">Нова папка</string>
     <string name="sftp_upload_file_cd">Завантажити файл</string>

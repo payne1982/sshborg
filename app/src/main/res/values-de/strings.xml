@@ -219,6 +219,9 @@
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Zurück zu Hosts</string>
     <string name="sftp_refresh_cd">Aktualisieren</string>
+    <string name="sftp_show_hidden_cd">Versteckte Dateien anzeigen</string>
+    <string name="sftp_hide_hidden_cd">Versteckte Dateien ausblenden</string>
+    <string name="host_sftp_show_hidden">Versteckte Dateien anzeigen</string>
     <string name="sftp_disconnect_cd">Trennen</string>
     <string name="sftp_new_folder_cd">Neuer Ordner</string>
     <string name="sftp_upload_file_cd">Datei hochladen</string>

@@ -55,6 +55,7 @@ fun AddEditHostScreen(
     val password by vm.password.collectAsState()
     val sftpStartMode by vm.sftpStartMode.collectAsState()
     val sftpStartDir by vm.sftpStartDir.collectAsState()
+    val sftpShowHidden by vm.sftpShowHidden.collectAsState()
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
@@ -402,6 +403,12 @@ fun AddEditHostScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = sftpShowHidden, onCheckedChange = { vm.sftpShowHidden.value = it })
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.host_sftp_show_hidden))
+            }
 
             if (hasStoredHostKeys) {
                 Spacer(Modifier.height(8.dp))

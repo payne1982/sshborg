@@ -69,6 +69,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     private val _opError = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val opError: SharedFlow<String> = _opError
 
+    /**
+     * Whether dotfiles (names starting with ".") are shown. Persisted per-host on
+     * [HostEntity.sftpShowHidden]; the toolbar toggle and the host editor both write that field, so
+     * the choice is permanent for the host. Default is hidden. The screen filters on this flag, so
+     * toggling is instant and never re-fetches the directory.
+     */
+    private val _showHidden = MutableStateFlow(false)
+    val showHidden: StateFlow<Boolean> = _showHidden
+
     /** Emitted when a file to be downloaded already exists in [downloadFolder]. */
     data class ConflictData(val entry: SftpEntry, val remotePath: String, val existingUri: Uri, val localDir: String)
     private val _conflictEvent = MutableSharedFlow<ConflictData>(extraBufferCapacity = 1)
@@ -114,6 +123,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun attach(id: String) {
         sessionId = id
+        seedShowHidden()
         val session = sessionManager.get(id) ?: run {
             _state.value = State.Error(getApplication<Application>().getString(R.string.error_session_not_found)); return
         }
@@ -129,6 +139,22 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Starts the SFTP connection for a newly created session. */
+    /** Seeds [showHidden] from the current session's host row (called on attach). */
+    private fun seedShowHidden() {
+        val hostId = sessionId?.let { sessionManager.get(it)?.hostId } ?: return
+        viewModelScope.launch { _showHidden.value = hostDao.getById(hostId)?.sftpShowHidden ?: false }
+    }
+
+    /** Flips dotfile visibility and persists it on the host, so the choice sticks for this host. */
+    fun toggleHidden() {
+        val hostId = sessionId?.let { sessionManager.get(it)?.hostId }
+        val newValue = !_showHidden.value
+        _showHidden.value = newValue
+        if (hostId != null) viewModelScope.launch {
+            hostDao.getById(hostId)?.let { hostDao.upsert(it.copy(sftpShowHidden = newValue)) }
+        }
+    }
+
     fun connect() {
         val id     = sessionId ?: return
         val hostId = sessionManager.get(id)?.hostId ?: return
@@ -137,6 +163,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val host = hostDao.getById(hostId) ?: run {
                 _state.value = State.Error(getApplication<Application>().getString(R.string.error_host_not_found)); return@launch
             }
+            _showHidden.value = host.sftpShowHidden
             var auth = buildAuth(host) ?: return@launch
             var wrongPassword = false
 

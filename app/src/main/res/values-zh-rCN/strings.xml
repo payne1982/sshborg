@@ -233,6 +233,9 @@
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">返回主机列表</string>
     <string name="sftp_refresh_cd">刷新</string>
+    <string name="sftp_show_hidden_cd">显示隐藏文件</string>
+    <string name="sftp_hide_hidden_cd">隐藏隐藏文件</string>
+    <string name="host_sftp_show_hidden">显示隐藏文件</string>
     <string name="sftp_disconnect_cd">断开连接</string>
     <string name="sftp_new_folder_cd">新建文件夹</string>
     <string name="sftp_upload_file_cd">上传文件</string>

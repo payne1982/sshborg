@@ -233,6 +233,9 @@
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">ホスト一覧に戻る</string>
     <string name="sftp_refresh_cd">更新</string>
+    <string name="sftp_show_hidden_cd">隠しファイルを表示</string>
+    <string name="sftp_hide_hidden_cd">隠しファイルを隠す</string>
+    <string name="host_sftp_show_hidden">隠しファイルを表示</string>
     <string name="sftp_disconnect_cd">切断</string>
     <string name="sftp_new_folder_cd">新しいフォルダ</string>
     <string name="sftp_upload_file_cd">ファイルをアップロード</string>

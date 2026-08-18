@@ -19,10 +19,14 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +49,7 @@ fun SftpScreen(
     vm: SftpViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsState()
+    val showHidden by vm.showHidden.collectAsState()
     val backgroundTransfers by vm.backgroundTransfers.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -173,6 +178,15 @@ fun SftpScreen(
                                 )
                             }
                         } else {
+                            IconButton(onClick = { vm.toggleHidden() }) {
+                                HiddenFilesEye(
+                                    active = showHidden,
+                                    contentDesc = stringResource(
+                                        if (showHidden) R.string.sftp_hide_hidden_cd
+                                        else R.string.sftp_show_hidden_cd
+                                    ),
+                                )
+                            }
                             IconButton(onClick = { selectionMode = true }) {
                                 Icon(Icons.Default.CheckBox, stringResource(R.string.sftp_select_items_cd))
                             }
@@ -273,7 +287,12 @@ fun SftpScreen(
                                     HorizontalDivider(thickness = 0.5.dp)
                                 }
                             }
-                            if (s.entries.isEmpty()) {
+                            // Dotfiles are hidden unless the per-host toggle is on. ".." is a
+                            // synthetic row above, never in entries, so it is never affected.
+                            val visibleEntries =
+                                if (showHidden) s.entries
+                                else s.entries.filter { !it.name.startsWith(".") }
+                            if (visibleEntries.isEmpty()) {
                                 item {
                                     Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
                                         Text(
@@ -283,7 +302,7 @@ fun SftpScreen(
                                     }
                                 }
                             } else {
-                                items(s.entries, key = { it.name }) { entry ->
+                                items(visibleEntries, key = { it.name }) { entry ->
                                     SftpEntryItem(
                                         entry          = entry,
                                         selectionMode  = selectionMode,
@@ -1173,4 +1192,26 @@ private fun PasswordDialog(
             TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
         },
     )
+}
+
+/**
+ * The "show hidden files" toggle icon: a normal eye when dotfiles are hidden, and the same eye
+ * with a red iris/pupil when hidden files are being shown. Material's eye is a single-path vector,
+ * so tinting it would recolour the whole eye — instead we keep the eye in the normal content colour
+ * and overlay a small red disc over its pupil only when [active].
+ */
+@Composable
+private fun HiddenFilesEye(active: Boolean, contentDesc: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.semantics { contentDescription = contentDesc },
+    ) {
+        Icon(Icons.Default.Visibility, contentDescription = null)
+        if (active) {
+            // Sits over the eye's iris/pupil; radius ≈ Material eye iris in a 24dp icon.
+            Canvas(Modifier.size(24.dp)) {
+                drawCircle(color = Color(0xFFE53935), radius = size.minDimension * 0.14f, center = center)
+            }
+        }
+    }
 }
