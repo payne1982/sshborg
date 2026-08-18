@@ -83,10 +83,15 @@ existing path.
 ## Settings — set / change
 
 Extend the lock-mode options: None / Biometric / Device credential / **PIN or
-passphrase**. Choosing the last opens a set-up flow: pick kind (PIN/passphrase),
-enter, then confirm (mismatch → retry). "Change secret" requires the current
-one. Switching away clears the stored hash. On a TV, hide the Biometric and
-Device options (they don't work there) so the in-app secret is the obvious pick.
+passphrase**. Choosing the last first shows a **disclaimer** — a forgotten
+secret cannot be recovered; the only way back in is clearing app data or
+reinstalling, which loses saved servers and keys without a backup — then opens a
+set-up flow: pick kind (PIN/passphrase), enter, then confirm (mismatch → retry).
+"Change secret" **requires entering the current one first** (checked via a
+non-throttling `AppLockManager.checkSecret`, so it never trips the unlock
+screen's lockout), preventing an accidental replacement the user won't remember.
+Switching away clears the stored hash. On a TV, hide the Biometric and Device
+options (they don't work there) so the in-app secret is the obvious pick.
 
 ## First-run nudge on TV
 
