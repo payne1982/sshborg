@@ -13,11 +13,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.sshborg.data.AppLockManager
 import com.sshborg.data.AppPreferences
+import com.sshborg.ui.lock.AppLockScreen
 import com.sshborg.ui.theme.SshBorgTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -26,6 +32,11 @@ class MainActivity : AppCompatActivity() {
 
     private var privacyOverlay: View? = null
     private var isAuthenticating = false
+
+    // In-app lock (LOCK_SECRET): the Compose lock gate is drawn over the app content.
+    private val showAppLock = mutableStateOf(false)
+    private val lockKind = mutableStateOf(AppLockManager.Kind.PIN)
+    private val initialLockoutSeconds = mutableStateOf(0L)
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op */ }
@@ -43,7 +54,23 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val nightMode by prefs.nightMode.collectAsState(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             SshBorgTheme(nightMode = nightMode) {
-                AppNavigation()
+                Box(Modifier.fillMaxSize()) {
+                    AppNavigation()
+                    // Opaque lock gate on top of (and preserving) the live app content.
+                    if (showAppLock.value) {
+                        val app = application as SshBorgApp
+                        AppLockScreen(
+                            kind = lockKind.value,
+                            verify = { app.appLockManager.verify(it) },
+                            onUnlocked = {
+                                app.lastAuthTime = System.currentTimeMillis()
+                                showAppLock.value = false
+                                setPrivacy(false)
+                            },
+                            initialLockoutSeconds = initialLockoutSeconds.value,
+                        )
+                    }
+                }
             }
         }
         // Plain View on top of Compose — visibility controlled directly, no recomposition involved
@@ -93,13 +120,30 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val mode = app.appPreferences.lockMode.first()
             if (mode == AppPreferences.LOCK_NONE) {
+                showAppLock.value = false
                 setPrivacy(false)
                 return@launch
             }
             val timeoutMs = app.appPreferences.lockTimeoutSeconds.first() * 1_000L
             val elapsed = System.currentTimeMillis() - app.lastAuthTime
             if (elapsed <= timeoutMs) {
+                showAppLock.value = false
                 setPrivacy(false)
+                return@launch
+            }
+            if (mode == AppPreferences.LOCK_SECRET) {
+                val kind = app.appLockManager.kind()
+                if (kind == null) {
+                    // Mode selected but no secret stored — nothing to check, don't lock out.
+                    showAppLock.value = false
+                    setPrivacy(false)
+                    return@launch
+                }
+                lockKind.value = kind
+                initialLockoutSeconds.value = app.appLockManager.lockoutRemainingSeconds()
+                showAppLock.value = true
+                // Keep the plain-View cover until the Compose gate has drawn, so no content flashes.
+                window.decorView.post { setPrivacy(false) }
                 return@launch
             }
             isAuthenticating = true

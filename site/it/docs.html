@@ -903,8 +903,8 @@ Host target
 
             <h2>// SICUREZZA DELL'APP</h2>
             <h3>Blocco app</h3>
-            <p>Scegli come proteggere l'app in <strong>Impostazioni → Sicurezza → Blocco app</strong>: <strong>Nessuno</strong> (predefinito), <strong>Solo biometrico</strong> (impronta digitale o riconoscimento facciale) oppure <strong>Blocco del dispositivo</strong> — il PIN, la sequenza o la password del dispositivo, oltre alla biometria. Quando un blocco è attivo, SSHBorg richiede l'autenticazione prima di mostrare qualsiasi host, credenziale o dato di sessione.</p>
-            <p>L'opzione <strong>Blocco del dispositivo</strong> è utile sui dispositivi senza hardware biometrico — come le Android TV — dove puoi sbloccare con il PIN di sistema.</p>
+            <p>Scegli come proteggere l'app in <strong>Impostazioni → Sicurezza → Blocco app</strong>: <strong>Nessuno</strong> (predefinito), <strong>Solo biometrico</strong> (impronta digitale o riconoscimento facciale), <strong>Blocco del dispositivo</strong> (il PIN, la sequenza o la password del dispositivo, oltre alla biometria) o un <strong>PIN o passphrase</strong> in-app. Quando un blocco è attivo, SSHBorg richiede l'autenticazione prima di mostrare qualsiasi host, credenziale o dato di sessione.</p>
+            <p>Il <strong>PIN o passphrase</strong> in-app funziona su qualsiasi dispositivo, anche senza hardware biometrico o un blocco schermo di sistema — per questo è la scelta giusta su una Android TV. Per cambiarlo o rimuoverlo viene chiesto prima quello attuale. Non è recuperabile se dimenticato: dovresti cancellare i dati dell'app o reinstallarla, quindi tieni un backup dei tuoi host.</p>
             <p>Puoi impostare un timeout di inattività — dopo quel numero di minuti in background l'app si blocca automaticamente.</p>
             <h3>Protezione screenshot</h3>
             <p>Per impostazione predefinita SSHBorg blocca screenshot e registrazione dello schermo per evitare che il contenuto sensibile del terminale trapeli tramite la schermata delle app recenti o strumenti di cattura dello schermo.</p>
@@ -939,7 +939,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>Il file esportato è un normale oggetto JSON. È possibile crearlo manualmente per importare in blocco una lista di server da un'altra fonte.</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produzione", "color": -1754827 }
@@ -957,6 +957,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "Chiave VPS",
       "group":           "Produzione"
@@ -983,6 +984,7 @@ Host target
                 <li><code>portForwardings</code> — regole di port forwarding locale separate da newline in sintassi SSH <code>-L</code>, es. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — cartella iniziale SFTP: <code>"last"</code> (ricorda l'ultima visitata), <code>"fixed"</code> (usa sempre <code>sftpStartDir</code>), <code>"home"</code> (home del server). Valore predefinito: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — percorso da usare quando <code>sftpStartMode</code> è <code>"fixed"</code>.</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> per mostrare i file nascosti (dotfile, nomi che iniziano con ".") nel browser SFTP di questo host. Predefinito <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> per abilitare gli algoritmi legacy descritti sopra. Predefinito: <code>false</code>.</li>
                 <li><code>keyLabel</code> — nome della chiave SSH usata da questo host. All'importazione, se esiste una chiave con questo nome viene collegata all'host; altrimenti il campo viene ignorato. La chiave stessa non è mai inclusa nel backup.</li>
                 <li><code>group</code> — nome del gruppo a cui appartiene l'host. I gruppi sono elencati nell'array <code>groups</code> in cima al file, con <code>name</code> e <code>color</code> (ARGB come intero a 32 bit con segno). Se un host fa riferimento a un gruppo assente dall'array, il gruppo viene creato automaticamente con un colore predefinito: scrivendo il file a mano puoi quindi omettere l'array.</li>

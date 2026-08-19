@@ -1,0 +1,4 @@
+• Duplica un host dal suo menù per riusarne le impostazioni in una nuova connessione — comodo per raggiungere lo stesso server su porta o jump host diversi
+• Mostra o nascondi i file nascosti (dotfile) nel browser SFTP — salvato per ogni host
+• Nuovo blocco app: proteggi l'app con un PIN o una passphrase in-app
+• Aggiornate le librerie e gli strumenti di build dell'app alle ultime versioni stabili

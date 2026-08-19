@@ -25,6 +25,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
+import com.sshborg.isTelevision
+import com.sshborg.ui.lock.ConfirmSecretDialog
+import com.sshborg.ui.lock.LockSecretDialog
 
 private val TIMEOUT_OPTIONS = listOf(
     0     to R.string.timeout_immediately,
@@ -44,6 +47,7 @@ private val LOCK_MODE_OPTIONS = listOf(
     AppPreferences.LOCK_NONE      to R.string.settings_lock_mode_none,
     AppPreferences.LOCK_BIOMETRIC to R.string.settings_lock_mode_biometric,
     AppPreferences.LOCK_DEVICE    to R.string.settings_lock_mode_device,
+    AppPreferences.LOCK_SECRET    to R.string.settings_lock_mode_pin,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +90,11 @@ fun SettingsScreen(
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
     var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var lockModeMenuExpanded by remember { mutableStateOf(false) }
+    var showLockDisclaimer by remember { mutableStateOf(false) }
+    var showLockSecretDialog by remember { mutableStateOf(false) }
+    var lockDialogIsChange by remember { mutableStateOf(false) }
+    var showConfirmCurrent by remember { mutableStateOf(false) }
+    var pendingLockMode by remember { mutableStateOf<Int?>(null) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
     var themeMenuExpanded by remember { mutableStateOf(false) }
     var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
@@ -95,6 +104,7 @@ fun SettingsScreen(
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
+    val isTv = remember { isTelevision(context) }
 
     // Map seconds to string resource id, then resolve the label
     val currentTimeoutResId = TIMEOUT_OPTIONS.find { it.first == lockTimeoutSeconds }?.second
@@ -501,16 +511,33 @@ fun SettingsScreen(
                             expanded = lockModeMenuExpanded,
                             onDismissRequest = { lockModeMenuExpanded = false },
                         ) {
-                            LOCK_MODE_OPTIONS.forEach { (mode, labelResId) ->
-                                // The two authentication modes need a device secure lock;
-                                // "None" is always selectable so the user can turn the lock off.
-                                val enabled = mode == AppPreferences.LOCK_NONE || biometricAvailable
+                            // Biometric/device modes need a device secure lock and are
+                            // filtered out entirely on a TV, where they don't work; None and
+                            // the in-app PIN/passphrase are always offered.
+                            val lockOptions = if (isTv)
+                                LOCK_MODE_OPTIONS.filter {
+                                    it.first == AppPreferences.LOCK_NONE || it.first == AppPreferences.LOCK_SECRET
+                                }
+                            else LOCK_MODE_OPTIONS
+                            lockOptions.forEach { (mode, labelResId) ->
+                                val enabled = mode == AppPreferences.LOCK_NONE ||
+                                    mode == AppPreferences.LOCK_SECRET || biometricAvailable
                                 DropdownMenuItem(
                                     text = { Text(stringResource(labelResId)) },
                                     enabled = enabled,
                                     onClick = {
-                                        vm.setLockMode(mode)
                                         lockModeMenuExpanded = false
+                                        when {
+                                            mode == lockMode -> Unit  // already the active mode
+                                            // Leaving the in-app lock needs the current secret.
+                                            lockMode == AppPreferences.LOCK_SECRET -> {
+                                                pendingLockMode = mode
+                                                showConfirmCurrent = true
+                                            }
+                                            // Enabling it: warn about no-recovery, then capture it.
+                                            mode == AppPreferences.LOCK_SECRET -> showLockDisclaimer = true
+                                            else -> vm.setLockMode(mode)
+                                        }
                                     },
                                 )
                             }
@@ -518,6 +545,62 @@ fun SettingsScreen(
                     }
                 },
             )
+
+            // Change the stored PIN/passphrase (only while that mode is active).
+            if (lockMode == AppPreferences.LOCK_SECRET) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_change_secret)) },
+                    trailingContent = {
+                        OutlinedButton(onClick = { lockDialogIsChange = true; showLockSecretDialog = true }) {
+                            Text(stringResource(R.string.action_change))
+                        }
+                    },
+                )
+            }
+
+            if (showLockDisclaimer) {
+                AlertDialog(
+                    onDismissRequest = { showLockDisclaimer = false },
+                    title = { Text(stringResource(R.string.lock_disclaimer_title)) },
+                    text  = { Text(stringResource(R.string.lock_disclaimer_body)) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showLockDisclaimer = false
+                            lockDialogIsChange = false
+                            showLockSecretDialog = true
+                        }) { Text(stringResource(R.string.lock_disclaimer_continue)) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLockDisclaimer = false }) {
+                            Text(stringResource(R.string.action_cancel))
+                        }
+                    },
+                )
+            }
+
+            if (showConfirmCurrent) {
+                ConfirmSecretDialog(
+                    onDismiss = { showConfirmCurrent = false; pendingLockMode = null },
+                    verify = { vm.checkAppLockSecret(it) },
+                    onVerified = {
+                        pendingLockMode?.let { vm.setLockMode(it) }
+                        showConfirmCurrent = false
+                        pendingLockMode = null
+                    },
+                )
+            }
+
+            if (showLockSecretDialog) {
+                LockSecretDialog(
+                    onDismiss = { showLockSecretDialog = false; lockDialogIsChange = false },
+                    onConfirm = { kind, secret ->
+                        vm.setAppLockSecret(kind, secret)
+                        showLockSecretDialog = false
+                        lockDialogIsChange = false
+                    },
+                    verifyCurrent = if (lockDialogIsChange) ({ vm.checkAppLockSecret(it) }) else null,
+                )
+            }
 
             // Lock timeout — only shown when a lock is enabled
             if (lockMode != AppPreferences.LOCK_NONE) {

@@ -44,6 +44,8 @@ data class HostEntity(
     val sftpStartMode: String = "last",
     /** Persisted last-visited path ("last" mode) or user-specified path ("fixed" mode). */
     val sftpStartDir: String? = null,
+    /** If true, the SFTP browser shows dotfiles (names starting with "."). Default hides them. */
+    val sftpShowHidden: Boolean = false,
     /** If true, legacy/weak cipher algorithms are appended to the negotiation list (for old servers). */
     val allowLegacyCiphers: Boolean = false,
     /** Null = ungrouped; otherwise ID of the [GroupEntity] this host belongs to. */

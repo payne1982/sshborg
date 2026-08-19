@@ -1,0 +1,4 @@
+• Duplica un host desde su menú para reutilizar su configuración en una nueva conexión, ideal para llegar al mismo servidor por un puerto o salto distinto
+• Muestra u oculta los archivos ocultos (dotfiles) en el explorador SFTP, guardado por host
+• Nuevo bloqueo de app: protégela con un PIN o frase de contraseña en la app
+• Bibliotecas y herramientas de compilación de la app actualizadas a las últimas versiones estables

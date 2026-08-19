@@ -36,7 +36,7 @@ module.exports = {
   feat_jump_title:     '踏み台ホスト対応',
   feat_jump_desc:      '1台以上の踏み台ホストを透過的なトンネルで経由して接続。SSHエージェント転送に完全対応。',
   feat_biometric_title:'アプリのロック',
-  feat_biometric_desc: '生体認証や端末のPINでアプリをロック。指紋センサーのないAndroid TVでも使えます。タイムアウトは設定可能。',
+  feat_biometric_desc: '生体認証、端末のPIN、またはアプリ内のPIN・パスフレーズでアプリをロック。指紋センサーのないAndroid TVでも使えます。タイムアウトは設定可能。',
   feat_multilingual_title: '多言語対応',
   feat_multilingual_desc:  '英語、イタリア語、フランス語、ドイツ語、スペイン語、ポルトガル語、ウクライナ語、ロシア語、中国語、日本語に対応。',
   feat_theme_title:    'ダーク＆ライトテーマ',
@@ -444,8 +444,8 @@ Host target
   doc_security: `
             <h2>// アプリのセキュリティ</h2>
             <h3>アプリのロック</h3>
-            <p><strong>設定 → セキュリティ → アプリのロック</strong> で保護方法を選べます：<strong>なし</strong>（既定）、<strong>生体認証のみ</strong>（指紋または顔認証）、<strong>デバイスのロック</strong>（生体認証に加え、端末のPIN・パターン・パスワード）。ロックが有効な場合、SSHBorgはホスト、認証情報、セッションデータを表示する前に認証を要求します。</p>
-            <p><strong>デバイスのロック</strong> は、Android TVなど生体認証ハードウェアがない端末で便利で、システムのPINで解除できます。</p>
+            <p><strong>設定 → セキュリティ → アプリのロック</strong> で保護方法を選べます：<strong>なし</strong>（既定）、<strong>生体認証のみ</strong>（指紋または顔認証）、<strong>デバイスのロック</strong>（生体認証に加え、端末のPIN・パターン・パスワード）、またはアプリ内の <strong>PIN・パスフレーズ</strong>。ロックが有効な場合、SSHBorgはホスト、認証情報、セッションデータを表示する前に認証を要求します。</p>
+            <p>アプリ内の <strong>PIN・パスフレーズ</strong> は、生体認証ハードウェアやシステムの画面ロックがなくても、どの端末でも使えます。そのためAndroid TVでは最適な選択です。変更や解除の際は、まず現在のものを尋ねられます。忘れると復元できません。アプリのデータを消去するか再インストールが必要になるため、ホストのバックアップを保管してください。</p>
             <p>非アクティブタイムアウトを設定できます。バックグラウンドでその時間が経過すると、アプリは自動的にロックされます。</p>
             <h3>スクリーンショット保護</h3>
             <p>SSHBorgはデフォルトでスクリーンショットと画面録画をブロックし、機密性の高い端末内容が最近使ったアプリの画面やスクリーンキャプチャツールから漏れないようにします。</p>
@@ -478,7 +478,7 @@ Host target
             <h3>JSON形式</h3>
             <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "本番", "color": -1754827 }
@@ -496,6 +496,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "私の VPS 鍵",
       "group":           "本番"
@@ -522,6 +523,7 @@ Host target
                 <li><code>portForwardings</code> — SSH <code>-L</code> 構文による改行区切りのローカルポート転送ルール（例：<code>"8080:localhost:8080"</code>）。</li>
                 <li><code>sftpStartMode</code> — SFTPの開始ディレクトリ：<code>"last"</code>（最後に訪問したディレクトリを記憶）、<code>"fixed"</code>（常に <code>sftpStartDir</code> を使用）、<code>"home"</code>（サーバーのホームディレクトリ）。デフォルト：<code>"last"</code>。</li>
                 <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> でこのホストの SFTP ブラウザに隠しファイル（ドットファイル、"." で始まる名前）を表示します。既定は <code>false</code>。</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> にすると、前述のレガシー暗号アルゴリズムが有効になります。既定は <code>false</code> です。</li>
                 <li><code>keyLabel</code> — このホストが使用するSSH鍵の名前。インポート時に同じ名前の鍵があればホストにリンクされ、なければ無視されます。鍵そのものはバックアップに含まれません。</li>
                 <li><code>group</code> — ホストが属するグループ名。グループはトップレベルの <code>groups</code> 配列に <code>name</code> と <code>color</code>（符号付き 32 ビット整数の ARGB）で記載します。配列にないグループをホストが参照している場合は既定の色で自動作成されるため、手書きの場合は配列を丸ごと省略してもかまいません。</li>

@@ -10,6 +10,8 @@
     <string name="action_delete">Elimina</string>
     <string name="action_save">Salva</string>
     <string name="action_edit">Modifica</string>
+    <string name="action_duplicate">Duplica</string>
+    <string name="host_clone_label">%1$s (copia)</string>
     <string name="action_back">Indietro</string>
     <string name="action_connect">Connetti</string>
     <string name="action_close">Chiudi</string>
@@ -217,6 +219,9 @@
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Torna agli host</string>
     <string name="sftp_refresh_cd">Aggiorna</string>
+    <string name="sftp_show_hidden_cd">Mostra file nascosti</string>
+    <string name="sftp_hide_hidden_cd">Nascondi file nascosti</string>
+    <string name="host_sftp_show_hidden">Mostra file nascosti</string>
     <string name="sftp_disconnect_cd">Disconnetti</string>
     <string name="sftp_new_folder_cd">Nuova cartella</string>
     <string name="sftp_upload_file_cd">Carica file</string>
@@ -356,4 +361,30 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Consenti screenshot</string>
     <string name="settings_allow_screenshots_subtitle">Permetti screenshot e registrazione dello schermo. Lascia disattivato per proteggere i contenuti sensibili.</string>
+    <string name="lock_title">Sblocca SSHBorg</string>
+    <string name="lock_enter_pin">Inserisci il PIN</string>
+    <string name="lock_enter_passphrase">Inserisci la passphrase</string>
+    <string name="lock_incorrect">Errato — riprova</string>
+    <string name="lock_locked_out">Troppi tentativi. Riprova tra %1$d s</string>
+    <string name="lock_delete_cd">Cancella</string>
+    <string name="lock_reveal_cd">Mostra o nascondi</string>
+    <string name="action_change">Cambia</string>
+    <string name="lock_submit_cd">Sblocca</string>
+    <string name="settings_lock_mode_pin">PIN o passphrase</string>
+    <string name="settings_change_secret">Cambia PIN o passphrase</string>
+    <string name="lock_set_title">Imposta PIN o passphrase</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Passphrase</string>
+    <string name="lock_confirm">Conferma</string>
+    <string name="lock_mismatch">Non corrispondono</string>
+    <string name="lock_too_short">Troppo corto</string>
+    <string name="tv_lock_nudge_title">Proteggi l\'app sulla TV</string>
+    <string name="tv_lock_nudge_body">Chiunque abbia il telecomando può accedere ai server e alle chiavi salvate. Imposta un PIN o una passphrase per bloccare l\'app.</string>
+    <string name="tv_lock_nudge_setup">Configura</string>
+    <string name="tv_lock_nudge_dismiss">Non ora</string>
+    <string name="lock_current">PIN o passphrase attuale</string>
+    <string name="lock_disclaimer_title">Nessun recupero se dimenticato</string>
+    <string name="lock_disclaimer_body">Non è possibile recuperare un PIN o una passphrase dimenticati. Se lo dimentichi, dovrai cancellare i dati dell\'app o reinstallarla, perdendo host e chiavi salvate se non hai un backup.</string>
+    <string name="lock_disclaimer_continue">Ho capito</string>
+    <string name="lock_confirm_current_title">Inserisci il PIN o la passphrase attuale</string>
 </resources>

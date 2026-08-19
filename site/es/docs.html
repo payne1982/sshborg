@@ -903,8 +903,8 @@ Host target
 
             <h2>// SEGURIDAD DE LA APP</h2>
             <h3>Bloqueo de la app</h3>
-            <p>Elige cómo se protege la app en <strong>Ajustes → Seguridad → Bloqueo de la app</strong>: <strong>Ninguno</strong> (predeterminado), <strong>Solo biométrico</strong> (huella dactilar o reconocimiento facial) o <strong>Bloqueo del dispositivo</strong> — el PIN, el patrón o la contraseña del dispositivo, además de la biometría. Cuando hay un bloqueo activo, SSHBorg requiere autenticación antes de mostrar cualquier host, credencial o dato de sesión.</p>
-            <p>La opción <strong>Bloqueo del dispositivo</strong> es útil en dispositivos sin hardware biométrico —como Android TV—, donde puedes desbloquear con el PIN del sistema.</p>
+            <p>Elige cómo se protege la app en <strong>Ajustes → Seguridad → Bloqueo de la app</strong>: <strong>Ninguno</strong> (predeterminado), <strong>Solo biométrico</strong> (huella dactilar o reconocimiento facial), <strong>Bloqueo del dispositivo</strong> (el PIN, el patrón o la contraseña del dispositivo, además de la biometría) o un <strong>PIN o frase de contraseña</strong> en la app. Cuando hay un bloqueo activo, SSHBorg requiere autenticación antes de mostrar cualquier host, credencial o dato de sesión.</p>
+            <p>El <strong>PIN o frase de contraseña</strong> en la app funciona en cualquier dispositivo, incluso sin hardware biométrico ni un bloqueo de pantalla del sistema, por lo que es la opción adecuada en una Android TV. Para cambiarlo o quitarlo se pide primero el actual. No se puede recuperar si se olvida: tendrías que borrar los datos de la app o reinstalarla, así que guarda una copia de seguridad de tus hosts.</p>
             <p>Puedes establecer un tiempo de espera por inactividad — tras ese número de minutos en segundo plano, la app se bloquea automáticamente.</p>
             <h3>Protección de capturas de pantalla</h3>
             <p>Por defecto, SSHBorg bloquea las capturas de pantalla y la grabación de pantalla para evitar que el contenido sensible del terminal se filtre a través de la pantalla de apps recientes o herramientas de captura.</p>
@@ -939,7 +939,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>El archivo exportado es un objeto JSON estándar. También puedes crearlo manualmente para importar en bloque una lista de servidores desde otra fuente.</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Producción", "color": -1754827 }
@@ -957,6 +957,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "Clave de mi VPS",
       "group":           "Producción"
@@ -983,6 +984,7 @@ Host target
                 <li><code>portForwardings</code> — reglas de reenvío de puerto local separadas por saltos de línea en sintaxis SSH <code>-L</code>, p. ej. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — directorio de inicio SFTP: <code>"last"</code> (recordar el último visitado), <code>"fixed"</code> (usar siempre <code>sftpStartDir</code>), <code>"home"</code> (directorio principal del servidor). Por defecto: <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — ruta a usar cuando <code>sftpStartMode</code> es <code>"fixed"</code>.</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> para mostrar los archivos ocultos (dotfiles, nombres que empiezan por ".") en el explorador SFTP de este host. Predeterminado <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> para habilitar los algoritmos heredados descritos más arriba. Por defecto <code>false</code>.</li>
                 <li><code>keyLabel</code> — nombre de la clave SSH que usa este host. Al importar, si existe una clave con este nombre se vincula al host; de lo contrario, el campo se ignora. La clave en sí nunca se incluye en la copia.</li>
                 <li><code>group</code> — nombre del grupo al que pertenece el host. Los grupos se listan en el array <code>groups</code> del nivel superior, con <code>name</code> y <code>color</code> (ARGB como entero de 32 bits con signo). Si un host hace referencia a un grupo que no está en el array, se crea automáticamente con un color por defecto — al escribir el archivo a mano puedes omitir el array.</li>

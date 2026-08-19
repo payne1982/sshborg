@@ -903,8 +903,8 @@ Host target
 
             <h2>// APP SECURITY</h2>
             <h3>App lock</h3>
-            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), or <strong>Device lock</strong> — the device PIN, pattern, or password, alongside biometrics. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
-            <p>The <strong>Device lock</strong> option is useful on devices without biometric hardware — such as Android TV — where you can unlock with the system PIN instead.</p>
+            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), <strong>Device lock</strong> (the device PIN, pattern, or password, alongside biometrics), or an in-app <strong>PIN or passphrase</strong>. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
+            <p>The in-app <strong>PIN or passphrase</strong> works on any device, even without biometric hardware or a system screen lock — which makes it the right choice on an Android TV. Changing or removing it asks for the current one first. There is no way to recover it if forgotten: you would have to clear the app's data or reinstall, so keep a backup of your hosts.</p>
             <p>You can set an inactivity timeout — after that many minutes in the background the app locks automatically.</p>
             <h3>Screenshot protection</h3>
             <p>By default SSHBorg blocks screenshots and screen recording to prevent sensitive terminal content from leaking via the recent-apps screen or screen capture tools.</p>
@@ -939,7 +939,7 @@ Host target
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{
-  "version": 4,
+  "version": 5,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827 }
@@ -957,6 +957,7 @@ Host target
       "portForwardings": null,
       "sftpStartMode":   "last",
       "sftpStartDir":    null,
+      "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
       "keyLabel":         "My VPS key",
       "group":           "Production"
@@ -983,6 +984,7 @@ Host target
                 <li><code>portForwardings</code> — newline-separated local port-forwarding rules in SSH <code>-L</code> syntax, e.g. <code>"8080:localhost:8080"</code>.</li>
                 <li><code>sftpStartMode</code> — SFTP starting directory: <code>"last"</code> (remember last visited), <code>"fixed"</code> (always use <code>sftpStartDir</code>), <code>"home"</code> (server home). Defaults to <code>"last"</code>.</li>
                 <li><code>sftpStartDir</code> — path to use when <code>sftpStartMode</code> is <code>"fixed"</code>.</li>
+                <li><code>sftpShowHidden</code> — <code>true</code> to show hidden files (dotfiles, names starting with ".") in the SFTP browser for this host. Defaults to <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> to enable the legacy cipher algorithms described above. Defaults to <code>false</code>.</li>
                 <li><code>keyLabel</code> — name of the SSH key this host uses. On import, if a key with this name exists it is linked to the host; otherwise the field is ignored. The key itself is never included in the backup.</li>
                 <li><code>group</code> — name of the group the host belongs to. Groups are listed in the top-level <code>groups</code> array with their <code>name</code> and <code>color</code> (ARGB as a signed 32-bit integer). If a host references a group that is not in the array, it is created automatically with a default color — so you can omit the array entirely when writing the file by hand.</li>

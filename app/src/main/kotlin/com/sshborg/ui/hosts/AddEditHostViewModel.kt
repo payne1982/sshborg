@@ -49,6 +49,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var sftpStartMode = MutableStateFlow("last")
     /** Path shown/edited in the starting directory field (managed or user-entered). */
     var sftpStartDir = MutableStateFlow("")
+    /** Whether the SFTP browser shows dotfiles for this host. Default hides them. */
+    var sftpShowHidden = MutableStateFlow(false)
     var allowLegacyCiphers = MutableStateFlow(false)
     /** Null = ungrouped; otherwise the selected group's ID. */
     var groupId = MutableStateFlow<Long?>(null)
@@ -112,6 +114,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
                 ?.split(",")?.mapNotNull { it.trim().toLongOrNull() } ?: emptyList()
             sftpStartMode.value = h.sftpStartMode
             sftpStartDir.value = h.sftpStartDir ?: ""
+            sftpShowHidden.value = h.sftpShowHidden
             allowLegacyCiphers.value = h.allowLegacyCiphers
             groupId.value = h.groupId
             hostColor.value = h.color
@@ -181,6 +184,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             jumpHostIdList   = newJumpHostIdList,
             sftpStartMode        = sftpStartMode.value,
             sftpStartDir         = newSftpStartDir,
+            sftpShowHidden       = sftpShowHidden.value,
             allowLegacyCiphers   = allowLegacyCiphers.value,
             groupId              = groupId.value,
             color                = hostColor.value,

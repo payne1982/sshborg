@@ -10,6 +10,8 @@
     <string name="action_delete">Видалити</string>
     <string name="action_save">Зберегти</string>
     <string name="action_edit">Редагувати</string>
+    <string name="action_duplicate">Дублювати</string>
+    <string name="host_clone_label">%1$s (копія)</string>
     <string name="action_back">Назад</string>
     <string name="action_connect">Підключитися</string>
     <string name="action_close">Закрити</string>
@@ -217,6 +219,9 @@
     <!-- ── SFTP screen ─────────────────────────────────────────────────── -->
     <string name="sftp_back_cd">Назад до хостів</string>
     <string name="sftp_refresh_cd">Оновити</string>
+    <string name="sftp_show_hidden_cd">Показати приховані файли</string>
+    <string name="sftp_hide_hidden_cd">Сховати приховані файли</string>
+    <string name="host_sftp_show_hidden">Показати приховані файли</string>
     <string name="sftp_disconnect_cd">Відключитися</string>
     <string name="sftp_new_folder_cd">Нова папка</string>
     <string name="sftp_upload_file_cd">Завантажити файл</string>
@@ -359,4 +364,30 @@
     </plurals>
     <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
     <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Залиште вимкненим для захисту конфіденційного вмісту.</string>
+    <string name="lock_title">Розблокувати SSHBorg</string>
+    <string name="lock_enter_pin">Введіть PIN-код</string>
+    <string name="lock_enter_passphrase">Введіть парольну фразу</string>
+    <string name="lock_incorrect">Неправильно — спробуйте ще раз</string>
+    <string name="lock_locked_out">Забагато спроб. Повторіть через %1$d с</string>
+    <string name="lock_delete_cd">Видалити</string>
+    <string name="lock_reveal_cd">Показати або сховати</string>
+    <string name="action_change">Змінити</string>
+    <string name="lock_submit_cd">Розблокувати</string>
+    <string name="settings_lock_mode_pin">PIN або парольна фраза</string>
+    <string name="settings_change_secret">Змінити PIN або парольну фразу</string>
+    <string name="lock_set_title">Установити PIN або парольну фразу</string>
+    <string name="lock_kind_pin">PIN</string>
+    <string name="lock_kind_passphrase">Парольна фраза</string>
+    <string name="lock_confirm">Підтвердити</string>
+    <string name="lock_mismatch">Не збігаються</string>
+    <string name="lock_too_short">Надто короткий</string>
+    <string name="tv_lock_nudge_title">Захистіть застосунок на телевізорі</string>
+    <string name="tv_lock_nudge_body">Будь-хто з пультом може отримати доступ до збережених серверів і ключів. Установіть PIN або парольну фразу, щоб заблокувати застосунок.</string>
+    <string name="tv_lock_nudge_setup">Налаштувати</string>
+    <string name="tv_lock_nudge_dismiss">Не зараз</string>
+    <string name="lock_current">Поточний PIN або парольна фраза</string>
+    <string name="lock_disclaimer_title">Відновлення неможливе, якщо забудете</string>
+    <string name="lock_disclaimer_body">Забутий PIN або парольну фразу неможливо відновити. Тоді доведеться очистити дані застосунку або перевстановити його, втративши збережені сервери й ключі, якщо немає резервної копії.</string>
+    <string name="lock_disclaimer_continue">Зрозуміло</string>
+    <string name="lock_confirm_current_title">Введіть поточний PIN або парольну фразу</string>
 </resources>
