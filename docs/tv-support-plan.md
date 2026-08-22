@@ -90,9 +90,13 @@ instead of the system biometric prompt.
   focus.
 - **Focus pass**: verify focus order and a visible focus indicator for the
   non-text controls across all six screens on a TV emulator. ← in progress.
-- **Site docs (TODO)**: document clearly on the website that on a TV a **physical
-  keyboard (USB or Bluetooth)** is required for the terminal and for text entry;
-  the remote alone drives navigation but not comfortable text input.
+- **Site docs (TODO)**: document clearly on the website, for TV users:
+  - a **physical keyboard (USB or Bluetooth)** is required for the terminal and
+    for comfortable text entry; the remote alone drives navigation but not text.
+  - **row menus** (host actions, group edit/delete, SFTP rename/delete/download):
+    press the remote's **Menu / options key** (or **long-press OK**) on the
+    focused row. CENTER is the primary action (connect / open / download).
+  - the on-screen keyboard's **OK/Go connects** on the password prompt.
 
 ## 3. Minor listing improvements (from #3, non-blocking)
 
@@ -106,8 +110,12 @@ instead of the system biometric prompt.
 
 ## 4. Play Console process (after section 1)
 
-- **TV screenshots** (16:9) and a **store TV banner** (1280×720; distinct from
-  the launcher banner already in the manifest).
+- **TV screenshots**: 16:9 (1280×720 or 1920×1080), 1–8. (Have 4.)
+- **Leanback launcher banner**: 320×180 — already in the repo
+  (`res/drawable-xhdpi/tv_banner.png`) and declared in the manifest. Done.
+- **Feature graphic**: 1024×500, required for the store listing (this is the
+  "banner" the listing shows above the screenshots — a promo graphic, not a
+  screenshot). Still to produce.
 - **Opt into the Android TV form factor** and complete the TV quality
   declaration → submit for Google's manual TV review.
 
