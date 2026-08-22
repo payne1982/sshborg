@@ -22,13 +22,22 @@ The store's TV review, and basic safety, gate on these. They must land first.
 
 **Status: implemented on `V1_DEV_TV`, verified on a phone.** AppLockManager
 (PBKDF2 + throttling), the adaptive AppLockScreen, MainActivity integration, the
-Settings option with set/change flow and TV filtering, and the first-run TV
-nudge are all in and working. Refinements from hands-on testing: a show/hide
-reveal toggle on entry, PIN dots that grow instead of exposing the max (now 12),
-a button-styled "Change" action, a no-recovery disclaimer before enabling, the
-current secret required to change **or** disable the lock, and an open-padlock
-unlock button. See `tv-pin-lock-design.md`. **Remaining here:** a D-pad pass on a
-TV emulator (the lock UI was built D-pad-friendly but not yet exercised on a TV).
+Settings option with set/change flow and TV filtering are all in and working.
+Refinements from hands-on testing: a show/hide reveal toggle on entry, PIN dots
+that grow instead of exposing the max (now 12), a button-styled "Change" action,
+a no-recovery disclaimer before enabling, the current secret required to change
+**or** disable the lock, and an open-padlock unlock button. See
+`tv-pin-lock-design.md`.
+
+The first-run TV nudge was folded into the existing security reminder (one
+dialog, one dismissed flag, "remind me later" / "don't show again" on every
+device; only the wording differs on a TV) rather than kept as a second stacked
+dialog. Also fixed during TV testing on the emulator: the privacy cover no
+longer flashes on every foreground when no lock is configured (it's only drawn
+when a lock is actually active).
+
+**Remaining here:** a D-pad pass on a TV emulator (the lock UI was built
+D-pad-friendly but not yet exercised on a TV).
 
 ### 1a. In-app PIN / passphrase lock (app-lock phase 2)
 
