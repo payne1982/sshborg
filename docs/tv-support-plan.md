@@ -77,8 +77,16 @@ instead of the system biometric prompt.
   each row's menu. Host rows already had one; added it to SFTP rows and Hosts
   group headers, gated on `isTouchless(context)` (no touchscreen, or a TV) so
   touch devices keep the long-press and are visually unchanged.
-- **Focus pass**: verify focus order and a visible focus indicator across all
-  six screens on a TV emulator. ← still to do (needs an emulator/device).
+- **Text entry**: on a TV, focusing a text field opens the leanback IME, which
+  is a separate window that captures the D-pad — custom in-app focus interception
+  can't override it (an experimental `dpadFieldNav` modifier was tried and
+  reverted). We keep the standard flow instead: `imeAction Next` chains the form
+  fields (advancing in traversal order) so the on-screen or a Bluetooth keyboard
+  fills the form. SSHBorg is text-heavy, so **a Bluetooth keyboard is the
+  realistic input on a TV**; the D-pad handles the non-text controls (lists,
+  menus, dropdowns, switches) via Compose's default focus.
+- **Focus pass**: verify focus order and a visible focus indicator for the
+  non-text controls across all six screens on a TV emulator. ← in progress.
 
 ## 3. Minor listing improvements (from #3, non-blocking)
 
