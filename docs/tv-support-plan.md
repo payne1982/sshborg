@@ -71,8 +71,10 @@ instead of the system biometric prompt.
 
 - **Terminal**: `KEYCODE_BACK` is not consumed, so the remote's Back leaves the
   terminal; D-pad keys are consumed as shell cursor keys, so navigating *inside*
-  the terminal needs an external keyboard. Acceptable; at most add a visible
-  hint. Low priority.
+  the terminal needs an external keyboard. The soft keyboard on a TV is a
+  floating window that overlaps the extra-key bar instead of pushing it up, so
+  the extra-key bar is now **hidden on a TV while the soft keyboard shows**
+  (`isTv && imeVisible`); with a physical keyboard (no soft keyboard) it stays.
 - **Context menus** — **done**. A focusable overflow ("⋮") button now surfaces
   each row's menu. Host rows already had one; added it to SFTP rows and Hosts
   group headers, gated on `isTouchless(context)` (no touchscreen, or a TV) so
@@ -81,12 +83,16 @@ instead of the system biometric prompt.
   is a separate window that captures the D-pad — custom in-app focus interception
   can't override it (an experimental `dpadFieldNav` modifier was tried and
   reverted). We keep the standard flow instead: `imeAction Next` chains the form
-  fields (advancing in traversal order) so the on-screen or a Bluetooth keyboard
-  fills the form. SSHBorg is text-heavy, so **a Bluetooth keyboard is the
-  realistic input on a TV**; the D-pad handles the non-text controls (lists,
-  menus, dropdowns, switches) via Compose's default focus.
+  fields (advancing in traversal order) so the on-screen or a real keyboard fills
+  the form. SSHBorg is text-heavy, so **a physical keyboard (USB or Bluetooth —
+  Android TV supports both) is the realistic input on a TV**; the D-pad handles
+  the non-text controls (lists, menus, dropdowns, switches) via Compose's default
+  focus.
 - **Focus pass**: verify focus order and a visible focus indicator for the
   non-text controls across all six screens on a TV emulator. ← in progress.
+- **Site docs (TODO)**: document clearly on the website that on a TV a **physical
+  keyboard (USB or Bluetooth)** is required for the terminal and for text entry;
+  the remote alone drives navigation but not comfortable text input.
 
 ## 3. Minor listing improvements (from #3, non-blocking)
 
