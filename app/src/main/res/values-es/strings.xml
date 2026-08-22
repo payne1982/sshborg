@@ -383,8 +383,6 @@
     <string name="lock_too_short">Demasiado corto</string>
     <string name="tv_lock_nudge_title">Protege la app en el televisor</string>
     <string name="tv_lock_nudge_body">Cualquiera con el mando puede acceder a tus servidores y claves guardados. Configura un PIN o frase de contraseña y activa el cifrado por hardware en Ajustes para protegerlos.</string>
-    <string name="tv_lock_nudge_setup">Configurar</string>
-    <string name="tv_lock_nudge_dismiss">Ahora no</string>
     <string name="lock_current">PIN o frase de contraseña actual</string>
     <string name="lock_disclaimer_title">Sin recuperación si se olvida</string>
     <string name="lock_disclaimer_body">No se puede recuperar un PIN o frase de contraseña olvidados. Si lo olvidas, tendrás que borrar los datos de la app o reinstalarla, perdiendo servidores y claves guardados si no tienes copia de seguridad.</string>

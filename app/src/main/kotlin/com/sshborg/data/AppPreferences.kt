@@ -47,7 +47,6 @@ class AppPreferences(private val context: Context) {
         val LOCK_SECRET_ITER     = intPreferencesKey("lock_secret_iterations")
         val LOCK_FAILED_ATTEMPTS = intPreferencesKey("lock_failed_attempts")
         val LOCK_LOCKOUT_UNTIL   = longPreferencesKey("lock_lockout_until")   // epoch millis
-        val TV_LOCK_NUDGE_SHOWN  = booleanPreferencesKey("tv_lock_nudge_shown")
     }
 
     /**
@@ -271,14 +270,6 @@ class AppPreferences(private val context: Context) {
             it[Keys.LOCK_FAILED_ATTEMPTS] = failedAttempts
             it[Keys.LOCK_LOCKOUT_UNTIL] = lockoutUntil
         }
-    }
-
-    /** Whether the one-time "set a PIN" nudge has been shown on a TV. */
-    val tvLockNudgeShown: Flow<Boolean> =
-        context.dataStore.data.map { it[Keys.TV_LOCK_NUDGE_SHOWN] ?: false }
-
-    suspend fun setTvLockNudgeShown() {
-        context.dataStore.edit { it[Keys.TV_LOCK_NUDGE_SHOWN] = true }
     }
 
     // ── Settings backup ──────────────────────────────────────────────────────

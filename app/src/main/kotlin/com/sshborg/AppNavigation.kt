@@ -107,8 +107,10 @@ fun AppNavigation() {
         )
     }
 
-    // Delayed security reminder (shown if the app lock or keystore encryption is not enabled)
-    // Key on showPrivacyDialog so the reminder waits until privacy policy is accepted
+    // Delayed security reminder (shown if the app lock or keystore encryption is not enabled).
+    // Same dialog on every device — only the wording differs on a TV, where the remote-access
+    // risk is the point. Key on showPrivacyDialog so it waits until privacy is accepted.
+    val isTv = remember { isTelevision(context) }
     var showSecurityReminder by remember { mutableStateOf(false) }
     LaunchedEffect(showPrivacyDialog) {
         if (showPrivacyDialog) return@LaunchedEffect
@@ -117,16 +119,14 @@ fun AppNavigation() {
         if (!dismissed) {
             val locked   = app.appPreferences.lockMode.first() != AppPreferences.LOCK_NONE
             val keystore = app.appPreferences.keystoreEncryption.first()
-            // On a TV the dedicated lock nudge (HostsScreen) already covers this, so
-            // don't stack the generic reminder on top of it.
-            if ((!locked || !keystore) && !isTelevision(context)) showSecurityReminder = true
+            if (!locked || !keystore) showSecurityReminder = true
         }
     }
     if (showSecurityReminder) {
         AlertDialog(
             onDismissRequest = { showSecurityReminder = false },
-            title = { Text(stringResource(R.string.security_reminder_title)) },
-            text  = { Text(stringResource(R.string.security_reminder_body)) },
+            title = { Text(stringResource(if (isTv) R.string.tv_lock_nudge_title else R.string.security_reminder_title)) },
+            text  = { Text(stringResource(if (isTv) R.string.tv_lock_nudge_body else R.string.security_reminder_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     showSecurityReminder = false

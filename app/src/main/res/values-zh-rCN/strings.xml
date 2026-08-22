@@ -388,8 +388,6 @@
     <string name="lock_too_short">太短</string>
     <string name="tv_lock_nudge_title">在电视上保护应用</string>
     <string name="tv_lock_nudge_body">任何拿到遥控器的人都能访问已保存的服务器和密钥。请在设置中设置 PIN 或密码短语，并开启硬件加密，以保护它们。</string>
-    <string name="tv_lock_nudge_setup">设置</string>
-    <string name="tv_lock_nudge_dismiss">以后再说</string>
     <string name="lock_current">当前 PIN 或密码短语</string>
     <string name="lock_disclaimer_title">忘记后无法找回</string>
     <string name="lock_disclaimer_body">忘记的 PIN 或密码短语无法找回。届时你需要清除应用数据或重新安装，若没有备份将丢失已保存的服务器和密钥。</string>

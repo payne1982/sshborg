@@ -35,10 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
-import com.sshborg.data.AppPreferences
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
-import com.sshborg.isTelevision
 import com.sshborg.isTouchless
 import com.sshborg.service.SessionManager
 
@@ -82,31 +80,8 @@ fun HostsScreen(
     var sessionPickerHost by remember { mutableStateOf<HostEntity?>(null) }
     var sessionPickerType by remember { mutableStateOf(SessionManager.SessionType.Shell) }
 
-    // One-time nudge on a TV: biometric/device locks usually don't work there, so
-    // suggest setting an in-app PIN/passphrase to protect saved servers and keys.
-    val lockMode      by vm.lockMode.collectAsState()
-    val tvNudgeShown  by vm.tvLockNudgeShown.collectAsState()
-    val isTv = remember { isTelevision(context) }
     // Touchless devices can't long-press a group header: show a focusable ⋮ instead.
     val isTouchless = remember { isTouchless(context) }
-    var nudgeDismissed by remember { mutableStateOf(false) }
-    if (isTv && lockMode == AppPreferences.LOCK_NONE && !tvNudgeShown && !nudgeDismissed) {
-        AlertDialog(
-            onDismissRequest = { nudgeDismissed = true },
-            title = { Text(stringResource(R.string.tv_lock_nudge_title)) },
-            text  = { Text(stringResource(R.string.tv_lock_nudge_body)) },
-            confirmButton = {
-                TextButton(onClick = { vm.markTvLockNudgeShown(); onSettingsClick() }) {
-                    Text(stringResource(R.string.tv_lock_nudge_setup))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { vm.markTvLockNudgeShown(); nudgeDismissed = true }) {
-                    Text(stringResource(R.string.action_dont_show_again))
-                }
-            },
-        )
-    }
 
     Scaffold(
         topBar = {

@@ -383,8 +383,6 @@
     <string name="lock_too_short">Trop court</string>
     <string name="tv_lock_nudge_title">Protégez l\'app sur votre TV</string>
     <string name="tv_lock_nudge_body">Toute personne ayant la télécommande peut accéder à vos serveurs et clés enregistrés. Définissez un PIN ou une phrase secrète et activez le chiffrement matériel dans les Paramètres pour les protéger.</string>
-    <string name="tv_lock_nudge_setup">Configurer</string>
-    <string name="tv_lock_nudge_dismiss">Plus tard</string>
     <string name="lock_current">PIN ou phrase secrète actuel</string>
     <string name="lock_disclaimer_title">Aucune récupération en cas d\'oubli</string>
     <string name="lock_disclaimer_body">Un PIN ou une phrase secrète oublié ne peut pas être récupéré. Vous devrez alors effacer les données de l\'app ou la réinstaller, perdant vos serveurs et clés enregistrés sans sauvegarde.</string>

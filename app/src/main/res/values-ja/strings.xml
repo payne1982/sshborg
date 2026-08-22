@@ -388,8 +388,6 @@
     <string name="lock_too_short">短すぎます</string>
     <string name="tv_lock_nudge_title">テレビでアプリを保護</string>
     <string name="tv_lock_nudge_body">リモコンを持つ人は誰でも保存済みのサーバーや鍵にアクセスできます。設定で PIN またはパスフレーズを設定し、ハードウェア暗号化を有効にして保護してください。</string>
-    <string name="tv_lock_nudge_setup">設定</string>
-    <string name="tv_lock_nudge_dismiss">後で</string>
     <string name="lock_current">現在の PIN またはパスフレーズ</string>
     <string name="lock_disclaimer_title">忘れると復元できません</string>
     <string name="lock_disclaimer_body">忘れた PIN やパスフレーズは復元できません。その場合はアプリのデータを消去するか再インストールが必要で、バックアップがなければ保存済みのサーバーや鍵を失います。</string>
