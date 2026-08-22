@@ -32,6 +32,10 @@ class MainActivity : AppCompatActivity() {
 
     private var privacyOverlay: View? = null
     private var isAuthenticating = false
+    // Whether a lock is actually configured. When it isn't, there's nothing to hide
+    // before auth, so onStop must not cover content (it would just flash on every return).
+    // Cached from onStart so onStop can read it synchronously.
+    private var lockActive = false
 
     // In-app lock (LOCK_SECRET): the Compose lock gate is drawn over the app content.
     private val showAppLock = mutableStateOf(false)
@@ -108,7 +112,9 @@ class MainActivity : AppCompatActivity() {
         // is not followed by onStart, so an onPause cover would get stuck grey until the
         // user fully backgrounds and reopens the app. onStop <-> onStart is symmetric.
         // The recents thumbnail is protected independently by FLAG_SECURE (see onResume).
-        setPrivacy(true)
+        // Only cover when a lock is configured; otherwise the cover has nothing to hide and
+        // would just flash on every foreground while onStart asynchronously clears it.
+        if (lockActive) setPrivacy(true)
     }
 
     override fun onStart() {
@@ -119,6 +125,7 @@ class MainActivity : AppCompatActivity() {
         val app = application as SshBorgApp
         lifecycleScope.launch {
             val mode = app.appPreferences.lockMode.first()
+            lockActive = mode != AppPreferences.LOCK_NONE
             if (mode == AppPreferences.LOCK_NONE) {
                 showAppLock.value = false
                 setPrivacy(false)
@@ -135,6 +142,7 @@ class MainActivity : AppCompatActivity() {
                 val kind = app.appLockManager.kind()
                 if (kind == null) {
                     // Mode selected but no secret stored — nothing to check, don't lock out.
+                    lockActive = false
                     showAppLock.value = false
                     setPrivacy(false)
                     return@launch

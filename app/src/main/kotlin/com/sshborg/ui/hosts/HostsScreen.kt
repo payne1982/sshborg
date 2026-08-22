@@ -102,7 +102,7 @@ fun HostsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { vm.markTvLockNudgeShown(); nudgeDismissed = true }) {
-                    Text(stringResource(R.string.tv_lock_nudge_dismiss))
+                    Text(stringResource(R.string.action_dont_show_again))
                 }
             },
         )
