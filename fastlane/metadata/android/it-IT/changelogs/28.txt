@@ -1,0 +1,4 @@
+• Supporto Android TV: installa e naviga col telecomando — per scrivere è consigliata una tastiera fisica (USB o Bluetooth)
+• Inserimento testo più fluido con la tastiera su dispositivi non touch come Android TV
+• Corretto il login con password sui server che offrono solo l'autenticazione keyboard-interactive
+• SFTP: nuova opzione per elencare le cartelle prima dei file

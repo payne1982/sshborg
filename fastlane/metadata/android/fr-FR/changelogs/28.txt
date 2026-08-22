@@ -1,0 +1,4 @@
+• Prise en charge d'Android TV : installez et naviguez à la télécommande — un clavier physique (USB ou Bluetooth) est recommandé pour la saisie
+• Saisie de texte plus fluide au clavier sur les appareils sans écran tactile comme Android TV
+• Correction de la connexion par mot de passe sur les serveurs n'offrant que l'authentification keyboard-interactive
+• SFTP : nouvelle option pour lister les dossiers avant les fichiers
