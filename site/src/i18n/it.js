@@ -104,7 +104,8 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Catene multi-hop</a></li>
             <li><a href="#sessions">Sessioni multiple</a></li>
             <li><a href="#security">Sicurezza dell'app</a></li>
-            <li><a href="#backup">Backup configurazione</a></li>`,
+            <li><a href="#backup">Backup configurazione</a></li>
+            <li><a href="#android-tv">Android TV</a></li>`,
 
   doc_adding_host: `
             <h2>// AGGIUNGERE UN HOST</h2>
@@ -455,6 +456,23 @@ Host target
                 <div class="callout-label">// NOTA SUL BACKUP</div>
                 Poiché le chiavi sono memorizzate nell'Android Keystore, <strong>non possono essere salvate nel backup</strong> cloud di Android e non si trasferiranno automaticamente su un nuovo telefono. Prima di cambiare dispositivo, assicurati di autorizzare una nuova chiave generata sul nuovo dispositivo su tutti i tuoi server.
             </div>`,
+
+  doc_android_tv: `
+            <h2>// ANDROID TV</h2>
+            <p>SSHBorg funziona su Android TV e Google TV. Si usa con il D-pad del telecomando, ma trattandosi di un'app molto basata sul testo, una tastiera fisica fa una grande differenza.</p>
+            <h3>Navigare col telecomando</h3>
+            <ul>
+                <li><strong>Frecce del D-pad</strong> — spostano il focus tra righe e controlli.</li>
+                <li><strong>OK (centrale)</strong> — l'azione primaria: connettere un host, aprire una cartella, scaricare un file, espandere un gruppo.</li>
+                <li><strong>Indietro</strong> — sale di livello o esce dalla schermata.</li>
+            </ul>
+            <h3>Aprire il menu di una riga</h3>
+            <p>Per rinominare, eliminare, modificare, duplicare o scaricare da una riga, apri il suo menu: premi il <strong>tasto Menu (opzioni)</strong> del telecomando sulla riga con il focus, oppure <strong>tieni premuto OK</strong> (pressione lunga). OK da solo esegue l'azione primaria, non il menu.</p>
+            <h3>Scrivere: usa una tastiera fisica</h3>
+            <p>Una <strong>tastiera fisica — USB o Bluetooth</strong> (Android TV supporta entrambe) è fortemente consigliata, e di fatto necessaria per il terminale. Con una tastiera i campi di testo e la shell funzionano normalmente.</p>
+            <p>Senza, la tastiera a schermo gestisce comunque inserimenti brevi: metti il focus su un campo, premi OK per aprirlo, digita e premi <strong>OK / Vai</strong> sulla tastiera per confermare — nel prompt della password questo connette direttamente. Inserire comandi shell con la tastiera a schermo, però, è poco pratico.</p>
+            <h3>Bloccare l'app su una TV</h3>
+            <p>Una TV di solito non ha lettore di impronte né blocco schermo, quindi proteggi l'app con il blocco integrato con <strong>PIN o passphrase</strong> (Impostazioni → Sicurezza) — funziona interamente col telecomando o una tastiera. Vedi <a href="#security">Sicurezza dell'app</a>.</p>`,
 
   doc_backup: `
             <h2>// BACKUP CONFIGURAZIONE</h2>

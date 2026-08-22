@@ -103,7 +103,8 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Cadenas multi-salto</a></li>
             <li><a href="#sessions">Sesiones múltiples</a></li>
             <li><a href="#security">Seguridad de la app</a></li>
-            <li><a href="#backup">Copia de seguridad</a></li>`,
+            <li><a href="#backup">Copia de seguridad</a></li>
+            <li><a href="#android-tv">Android TV</a></li>`,
 
   doc_adding_host: `
             <h2>// AÑADIR UN HOST</h2>
@@ -454,6 +455,23 @@ Host target
                 <div class="callout-label">// NOTA SOBRE COPIAS DE SEGURIDAD</div>
                 Como las claves se almacenan en el Android Keystore, <strong>no pueden incluirse en la copia de seguridad</strong> en la nube de Android y no se transferirán automáticamente a un nuevo teléfono. Antes de cambiar de dispositivo, asegúrate de autorizar una nueva clave generada en el nuevo dispositivo en todos tus servidores.
             </div>`,
+
+  doc_android_tv: `
+            <h2>// ANDROID TV</h2>
+            <p>SSHBorg funciona en Android TV y Google TV. Se maneja con el D-pad del mando, pero al ser una app con mucho texto, un teclado físico marca una gran diferencia.</p>
+            <h3>Navegar con el mando</h3>
+            <ul>
+                <li><strong>Flechas del D-pad</strong> — mueven el foco entre filas y controles.</li>
+                <li><strong>OK (centro)</strong> — la acción principal: conectar a un host, abrir una carpeta, descargar un archivo, expandir un grupo.</li>
+                <li><strong>Atrás</strong> — subir un nivel o salir de la pantalla.</li>
+            </ul>
+            <h3>Abrir el menú de una fila</h3>
+            <p>Para renombrar, eliminar, editar, duplicar o descargar desde una fila, abre su menú: pulsa la <strong>tecla Menú (opciones)</strong> del mando sobre la fila enfocada, o <strong>mantén pulsado OK</strong> (pulsación larga). OK por sí solo ejecuta la acción principal, no el menú.</p>
+            <h3>Escribir: usa un teclado físico</h3>
+            <p>Se recomienda encarecidamente un <strong>teclado físico — USB o Bluetooth</strong> (Android TV admite ambos), y es prácticamente imprescindible para el terminal. Con él, los campos de texto y la shell funcionan con normalidad.</p>
+            <p>Sin él, el teclado en pantalla sirve para entradas cortas: enfoca un campo, pulsa OK para abrirlo, escribe y pulsa <strong>OK / Ir</strong> en el teclado para confirmar — en la solicitud de contraseña esto conecta directamente. Escribir comandos de shell con el teclado en pantalla, sin embargo, es poco práctico.</p>
+            <h3>Bloquear la app en un TV</h3>
+            <p>Un TV normalmente no tiene lector de huellas ni bloqueo de pantalla, así que protege la app con el bloqueo integrado por <strong>PIN o frase de contraseña</strong> (Ajustes → Seguridad) — funciona por completo con el mando o un teclado. Consulta <a href="#security">Seguridad de la app</a>.</p>`,
 
   doc_backup: `
             <h2>// COPIA DE SEGURIDAD DE LA CONFIGURACIÓN</h2>
