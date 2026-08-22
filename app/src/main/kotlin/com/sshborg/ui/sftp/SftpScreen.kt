@@ -748,7 +748,9 @@ private fun SftpEntryItem(
     Box {
         ListItem(
             modifier = Modifier.combinedClickable(
-                onClick = onClick,
+                // Touchless (D-pad): the trailing buttons aren't reachable and long-press isn't
+                // practical, so CENTER opens the action menu (which carries the primary action too).
+                onClick = { if (showOverflow && !selectionMode) menuExpanded = true else onClick() },
                 onLongClick = { menuExpanded = true },
             ),
             leadingContent = {
@@ -825,24 +827,33 @@ private fun SftpEntryItem(
                             modifier = Modifier.size(18.dp),
                         )
                     }
-                    // Touchless devices can't long-press: expose the row menu as a ⋮ button.
-                    if (showOverflow && !selectionMode) {
-                        IconButton(
-                            onClick = { menuExpanded = true },
-                            modifier = Modifier.size(40.dp),
-                        ) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.sftp_options_cd),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        }
-                    }
                 }
             },
         )
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            // On touchless devices CENTER opens this menu, so the primary action lives here too.
+            if (showOverflow && !selectionMode) {
+                if (entry.isDir) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sftp_menu_open)) },
+                        leadingIcon = { Icon(Icons.Default.Folder, null) },
+                        onClick = { menuExpanded = false; onClick() },
+                    )
+                    if (!entry.isLink) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sftp_download_folder_cd)) },
+                            leadingIcon = { Icon(Icons.Default.Download, null) },
+                            onClick = { menuExpanded = false; onDownloadFolder() },
+                        )
+                    }
+                } else {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sftp_download_cd)) },
+                        leadingIcon = { Icon(Icons.Default.Download, null) },
+                        onClick = { menuExpanded = false; onClick() },
+                    )
+                }
+            }
             if (onDownloadInBackground != null) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.sftp_menu_download_in_background)) },

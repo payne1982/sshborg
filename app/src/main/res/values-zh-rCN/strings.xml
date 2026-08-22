@@ -40,7 +40,6 @@
     <string name="hosts_settings_cd">设置</string>
     <string name="hosts_help_cd">帮助</string>
     <string name="hosts_options_cd">选项</string>
-    <string name="sftp_options_cd">选项</string>
     <string name="hosts_press_back_to_exit">再按一次返回键退出</string>
     <string name="hosts_delete_title">删除主机</string>
     <string name="hosts_delete_message">删除"%1$s"？</string>
@@ -273,6 +272,7 @@
     <string name="sftp_mkdir_title">新建文件夹</string>
     <string name="sftp_mkdir_folder_name">文件夹名称</string>
 
+    <string name="sftp_menu_open">打开</string>
     <string name="sftp_menu_rename">重命名</string>
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>

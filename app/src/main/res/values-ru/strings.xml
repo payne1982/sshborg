@@ -41,7 +41,6 @@
     <string name="hosts_settings_cd">Настройки</string>
     <string name="hosts_help_cd">Справка</string>
     <string name="hosts_options_cd">Параметры</string>
-    <string name="sftp_options_cd">Параметры</string>
     <string name="hosts_press_back_to_exit">Нажмите «Назад» ещё раз для выхода</string>
     <string name="hosts_delete_title">Удалить хост</string>
     <string name="hosts_delete_message">Удалить «%1$s»?</string>
@@ -274,6 +273,7 @@
     <string name="sftp_mkdir_title">Новая папка</string>
     <string name="sftp_mkdir_folder_name">Название папки</string>
 
+    <string name="sftp_menu_open">Открыть</string>
     <string name="sftp_menu_rename">Переименовать</string>
     <string name="sftp_menu_delete">Удалить</string>
     <string name="sftp_menu_download_in_background">Скачать в фоне</string>

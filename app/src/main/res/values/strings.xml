@@ -41,7 +41,6 @@
     <string name="hosts_settings_cd">Settings</string>
     <string name="hosts_help_cd">Help</string>
     <string name="hosts_options_cd">Options</string>
-    <string name="sftp_options_cd">Options</string>
     <string name="hosts_press_back_to_exit">Press back again to exit</string>
     <string name="hosts_delete_title">Delete host</string>
     <string name="hosts_delete_message">Delete \"%1$s\"?</string>
@@ -274,6 +273,7 @@
     <string name="sftp_mkdir_title">New folder</string>
     <string name="sftp_mkdir_folder_name">Folder name</string>
 
+    <string name="sftp_menu_open">Open</string>
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>

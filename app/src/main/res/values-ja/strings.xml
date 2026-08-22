@@ -40,7 +40,6 @@
     <string name="hosts_settings_cd">設定</string>
     <string name="hosts_help_cd">ヘルプ</string>
     <string name="hosts_options_cd">オプション</string>
-    <string name="sftp_options_cd">オプション</string>
     <string name="hosts_press_back_to_exit">もう一度戻るボタンで終了</string>
     <string name="hosts_delete_title">ホストを削除</string>
     <string name="hosts_delete_message">"%1$s" を削除しますか？</string>
@@ -273,6 +272,7 @@
     <string name="sftp_mkdir_title">新しいフォルダ</string>
     <string name="sftp_mkdir_folder_name">フォルダ名</string>
 
+    <string name="sftp_menu_open">開く</string>
     <string name="sftp_menu_rename">名前変更</string>
     <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
     <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>

@@ -39,7 +39,6 @@
     <string name="hosts_settings_cd">Налаштування</string>
     <string name="hosts_help_cd">Довідка</string>
     <string name="hosts_options_cd">Параметри</string>
-    <string name="sftp_options_cd">Параметри</string>
     <string name="hosts_press_back_to_exit">Натисніть ще раз для виходу</string>
     <string name="hosts_delete_title">Видалити хост</string>
     <string name="hosts_delete_message">Видалити \"%1$s\"?</string>
@@ -259,6 +258,7 @@
     <string name="sftp_mkdir_title">Нова папка</string>
     <string name="sftp_mkdir_folder_name">Назва папки</string>
 
+    <string name="sftp_menu_open">Відкрити</string>
     <string name="sftp_menu_rename">Перейменувати</string>
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
