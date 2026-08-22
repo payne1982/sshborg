@@ -117,7 +117,9 @@ fun AppNavigation() {
         if (!dismissed) {
             val locked   = app.appPreferences.lockMode.first() != AppPreferences.LOCK_NONE
             val keystore = app.appPreferences.keystoreEncryption.first()
-            if (!locked || !keystore) showSecurityReminder = true
+            // On a TV the dedicated lock nudge (HostsScreen) already covers this, so
+            // don't stack the generic reminder on top of it.
+            if ((!locked || !keystore) && !isTelevision(context)) showSecurityReminder = true
         }
     }
     if (showSecurityReminder) {
