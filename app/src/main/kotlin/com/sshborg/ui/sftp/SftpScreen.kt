@@ -36,6 +36,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import com.sshborg.R
 import com.sshborg.isTouchless
@@ -747,12 +752,22 @@ private fun SftpEntryItem(
 
     Box {
         ListItem(
-            modifier = Modifier.combinedClickable(
-                // Touchless (D-pad): the trailing buttons aren't reachable and long-press isn't
-                // practical, so CENTER opens the action menu (which carries the primary action too).
-                onClick = { if (showOverflow && !selectionMode) menuExpanded = true else onClick() },
-                onLongClick = { menuExpanded = true },
-            ),
+            modifier = Modifier
+                // D-pad CENTER opens the action menu (trailing buttons aren't focusable and a
+                // long-press isn't practical with a remote). This catches only KEY events, so a
+                // mouse/touch click still runs the primary action below via onClick.
+                .then(
+                    if (showOverflow) Modifier.onPreviewKeyEvent { ev ->
+                        if (!selectionMode && ev.type == KeyEventType.KeyDown &&
+                            (ev.key == Key.DirectionCenter || ev.key == Key.Enter || ev.key == Key.NumPadEnter)) {
+                            menuExpanded = true; true
+                        } else false
+                    } else Modifier
+                )
+                .combinedClickable(
+                    onClick = onClick,                       // mouse/touch: primary action
+                    onLongClick = { menuExpanded = true },
+                ),
             leadingContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
