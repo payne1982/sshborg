@@ -105,7 +105,8 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
-            <li><a href="#backup">Configuration Backup</a></li>`,
+            <li><a href="#backup">Configuration Backup</a></li>
+            <li><a href="#android-tv">Android TV</a></li>`,
 
   doc_adding_host: `
             <h2>// ADDING A HOST</h2>
@@ -456,6 +457,23 @@ Host target
                 <div class="callout-label">// BACKUP NOTE</div>
                 Because keys are stored in the Android Keystore, they <strong>cannot be backed up</strong> via Android's cloud backup mechanism and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
             </div>`,
+
+  doc_android_tv: `
+            <h2>// ANDROID TV</h2>
+            <p>SSHBorg runs on Android TV and Google TV. It works with the remote's D-pad, but because it is a text-heavy app, a physical keyboard makes a real difference.</p>
+            <h3>Navigating with the remote</h3>
+            <ul>
+                <li><strong>D-pad arrows</strong> — move the focus between rows and controls.</li>
+                <li><strong>OK (center)</strong> — the primary action: connect to a host, open a folder, download a file, expand a group.</li>
+                <li><strong>Back</strong> — go up a level or leave the screen.</li>
+            </ul>
+            <h3>Opening a row's menu</h3>
+            <p>To rename, delete, edit, duplicate or download from a row, open its menu: press the remote's <strong>Menu (options) key</strong> on the focused row, or <strong>hold OK</strong> (long-press). OK by itself runs the primary action, not the menu.</p>
+            <h3>Typing: use a physical keyboard</h3>
+            <p>A <strong>physical keyboard — USB or Bluetooth</strong> (Android TV supports both) is strongly recommended, and effectively required for the terminal. With one, text fields and the shell behave normally.</p>
+            <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical.</p>
+            <h3>Locking the app on a TV</h3>
+            <p>A TV usually has no fingerprint reader or screen lock, so protect the app with the built-in <strong>PIN or passphrase</strong> lock (Settings → Security) — it works entirely with the remote or a keyboard. See <a href="#security">App Security</a>.</p>`,
 
   doc_backup: `
             <h2>// CONFIGURATION BACKUP</h2>

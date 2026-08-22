@@ -148,6 +148,7 @@
     <string name="settings_section_general">Allgemein</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Sicherheit</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
 
     <string name="settings_confirm_exit_title">Beenden bestätigen</string>
@@ -155,6 +156,8 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_sftp_dirs_first_title">Ordner vor Dateien</string>
+    <string name="settings_sftp_dirs_first_subtitle">Im SFTP-Browser Ordner vor Dateien auflisten</string>
     <string name="settings_double_tap_title">Doppeltipp-Aktion</string>
     <string name="settings_double_tap_subtitle">Was ein Doppeltippen im Terminal an die Shell sendet</string>
     <string name="settings_double_tap_none">Nichts</string>
@@ -255,6 +258,7 @@
     <string name="sftp_mkdir_title">Neuer Ordner</string>
     <string name="sftp_mkdir_folder_name">Ordnername</string>
 
+    <string name="sftp_menu_open">Öffnen</string>
     <string name="sftp_menu_rename">Umbenennen</string>
     <string name="sftp_menu_download_in_background">Im Hintergrund herunterladen</string>
     <string name="sftp_background_downloads_title">Hintergrund-Downloads</string>
@@ -378,9 +382,7 @@
     <string name="lock_mismatch">Stimmen nicht überein</string>
     <string name="lock_too_short">Zu kurz</string>
     <string name="tv_lock_nudge_title">App auf dem TV schützen</string>
-    <string name="tv_lock_nudge_body">Jeder mit der Fernbedienung kann auf deine gespeicherten Server und Schlüssel zugreifen. Lege einen PIN oder eine Passphrase fest, um die App zu sperren.</string>
-    <string name="tv_lock_nudge_setup">Einrichten</string>
-    <string name="tv_lock_nudge_dismiss">Nicht jetzt</string>
+    <string name="tv_lock_nudge_body">Jeder mit der Fernbedienung kann auf deine gespeicherten Server und Schlüssel zugreifen. Lege in den Einstellungen einen PIN oder eine Passphrase fest und aktiviere die Hardwareverschlüsselung, um sie zu schützen.</string>
     <string name="lock_current">Aktueller PIN oder Passphrase</string>
     <string name="lock_disclaimer_title">Keine Wiederherstellung bei Verlust</string>
     <string name="lock_disclaimer_body">Ein vergessener PIN oder eine vergessene Passphrase lässt sich nicht wiederherstellen. Dann musst du die App-Daten löschen oder die App neu installieren – und verlierst gespeicherte Server und Schlüssel ohne Backup.</string>

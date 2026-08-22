@@ -63,6 +63,7 @@ fun SettingsScreen(
     val keystoreEncryption    by vm.keystoreEncryption.collectAsState()
     val confirmExit           by vm.confirmExit.collectAsState()
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
+    val sftpSortDirsFirst     by vm.sftpSortDirsFirst.collectAsState()
     val keepScreenOn          by vm.keepScreenOn.collectAsState()
     val terminalColorScheme   by vm.terminalColorScheme.collectAsState()
     val doubleTapAction       by vm.doubleTapAction.collectAsState()
@@ -462,6 +463,27 @@ fun SettingsScreen(
                     Switch(
                         checked = extraKeysBarPinned,
                         onCheckedChange = { vm.setExtraKeysBarPinned(it) },
+                    )
+                },
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+            // ── SFTP section ──────────────────────────────────────────────────
+            Text(
+                stringResource(R.string.settings_section_sftp),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_sftp_dirs_first_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_sftp_dirs_first_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = sftpSortDirsFirst,
+                        onCheckedChange = { vm.setSftpSortDirsFirst(it) },
                     )
                 },
             )

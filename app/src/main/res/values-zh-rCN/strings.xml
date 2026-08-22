@@ -152,6 +152,7 @@
     <string name="settings_section_general">通用</string>
     <string name="settings_section_terminal">终端</string>
     <string name="settings_section_security">安全</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">备份</string>
 
     <string name="settings_theme_title">主题</string>
@@ -164,6 +165,8 @@
 
     <string name="settings_invert_scroll_title">反转终端滚动</string>
     <string name="settings_invert_scroll_subtitle">向上滑动查看较早的输出而非较新的</string>
+    <string name="settings_sftp_dirs_first_title">文件夹排在文件之前</string>
+    <string name="settings_sftp_dirs_first_subtitle">在 SFTP 浏览器中，将文件夹排在文件之前</string>
     <string name="settings_double_tap_title">双击操作</string>
     <string name="settings_double_tap_subtitle">在终端双击时向 shell 发送的内容</string>
     <string name="settings_double_tap_none">无</string>
@@ -269,6 +272,7 @@
     <string name="sftp_mkdir_title">新建文件夹</string>
     <string name="sftp_mkdir_folder_name">文件夹名称</string>
 
+    <string name="sftp_menu_open">打开</string>
     <string name="sftp_menu_rename">重命名</string>
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>
@@ -383,9 +387,7 @@
     <string name="lock_mismatch">不匹配</string>
     <string name="lock_too_short">太短</string>
     <string name="tv_lock_nudge_title">在电视上保护应用</string>
-    <string name="tv_lock_nudge_body">任何拿到遥控器的人都能访问已保存的服务器和密钥。设置 PIN 或密码短语来锁定应用。</string>
-    <string name="tv_lock_nudge_setup">设置</string>
-    <string name="tv_lock_nudge_dismiss">以后再说</string>
+    <string name="tv_lock_nudge_body">任何拿到遥控器的人都能访问已保存的服务器和密钥。请在设置中设置 PIN 或密码短语，并开启硬件加密，以保护它们。</string>
     <string name="lock_current">当前 PIN 或密码短语</string>
     <string name="lock_disclaimer_title">忘记后无法找回</string>
     <string name="lock_disclaimer_body">忘记的 PIN 或密码短语无法找回。届时你需要清除应用数据或重新安装，若没有备份将丢失已保存的服务器和密钥。</string>

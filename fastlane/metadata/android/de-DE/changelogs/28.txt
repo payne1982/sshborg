@@ -1,0 +1,4 @@
+• Android-TV-Unterstützung: installieren und mit der Fernbedienung navigieren — zum Tippen wird eine physische Tastatur (USB oder Bluetooth) empfohlen
+• Flüssigere Texteingabe mit einer Tastatur auf Nicht-Touch-Geräten wie Android TV
+• Passwort-Login auf Servern korrigiert, die nur keyboard-interactive-Authentifizierung anbieten
+• SFTP: neue Option, Ordner vor Dateien aufzulisten

@@ -148,6 +148,7 @@
     <string name="settings_section_general">Général</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Sécurité</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Sauvegarde</string>
 
     <string name="settings_confirm_exit_title">Confirmer la sortie</string>
@@ -155,6 +156,8 @@
 
     <string name="settings_invert_scroll_title">Inverser le défilement du terminal</string>
     <string name="settings_invert_scroll_subtitle">Glisser vers le haut pour voir la sortie la plus ancienne</string>
+    <string name="settings_sftp_dirs_first_title">Dossiers avant les fichiers</string>
+    <string name="settings_sftp_dirs_first_subtitle">Dans l\'explorateur SFTP, lister les dossiers avant les fichiers</string>
     <string name="settings_double_tap_title">Action du double appui</string>
     <string name="settings_double_tap_subtitle">Ce qu\'un double appui sur le terminal envoie au shell</string>
     <string name="settings_double_tap_none">Rien</string>
@@ -255,6 +258,7 @@
     <string name="sftp_mkdir_title">Nouveau dossier</string>
     <string name="sftp_mkdir_folder_name">Nom du dossier</string>
 
+    <string name="sftp_menu_open">Ouvrir</string>
     <string name="sftp_menu_rename">Renommer</string>
     <string name="sftp_menu_download_in_background">Télécharger en arrière-plan</string>
     <string name="sftp_background_downloads_title">Téléchargements en arrière-plan</string>
@@ -378,9 +382,7 @@
     <string name="lock_mismatch">Ne correspondent pas</string>
     <string name="lock_too_short">Trop court</string>
     <string name="tv_lock_nudge_title">Protégez l\'app sur votre TV</string>
-    <string name="tv_lock_nudge_body">Toute personne ayant la télécommande peut accéder à vos serveurs et clés enregistrés. Définissez un PIN ou une phrase secrète pour verrouiller l\'app.</string>
-    <string name="tv_lock_nudge_setup">Configurer</string>
-    <string name="tv_lock_nudge_dismiss">Plus tard</string>
+    <string name="tv_lock_nudge_body">Toute personne ayant la télécommande peut accéder à vos serveurs et clés enregistrés. Définissez un PIN ou une phrase secrète et activez le chiffrement matériel dans les Paramètres pour les protéger.</string>
     <string name="lock_current">PIN ou phrase secrète actuel</string>
     <string name="lock_disclaimer_title">Aucune récupération en cas d\'oubli</string>
     <string name="lock_disclaimer_body">Un PIN ou une phrase secrète oublié ne peut pas être récupéré. Vous devrez alors effacer les données de l\'app ou la réinstaller, perdant vos serveurs et clés enregistrés sans sauvegarde.</string>

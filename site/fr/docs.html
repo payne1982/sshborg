@@ -533,6 +533,7 @@
             <li><a href="#sessions">Sessions multiples</a></li>
             <li><a href="#security">Sécurité de l'app</a></li>
             <li><a href="#backup">Sauvegarde de la configuration</a></li>
+            <li><a href="#android-tv">Android TV</a></li>
         </ul>
     </nav>
 
@@ -994,6 +995,25 @@ Host target
                 <div class="callout-label">// CHAMPS OPTIONNELS</div>
                 Tous les champs sauf <code>label</code>, <code>hostname</code> et <code>username</code> sont optionnels. Les champs omis prennent leur valeur par défaut.
             </div>
+        </div>
+
+        <div class="doc-section" id="android-tv">
+
+            <h2>// ANDROID TV</h2>
+            <p>SSHBorg fonctionne sur Android TV et Google TV. Il s'utilise avec le pavé directionnel de la télécommande, mais comme c'est une app très axée sur le texte, un clavier physique change tout.</p>
+            <h3>Naviguer avec la télécommande</h3>
+            <ul>
+                <li><strong>Flèches du D-pad</strong> — déplacent le focus entre les lignes et les contrôles.</li>
+                <li><strong>OK (centre)</strong> — l'action principale : se connecter à un hôte, ouvrir un dossier, télécharger un fichier, déployer un groupe.</li>
+                <li><strong>Retour</strong> — remonter d'un niveau ou quitter l'écran.</li>
+            </ul>
+            <h3>Ouvrir le menu d'une ligne</h3>
+            <p>Pour renommer, supprimer, modifier, dupliquer ou télécharger depuis une ligne, ouvrez son menu : appuyez sur la <strong>touche Menu (options)</strong> de la télécommande sur la ligne sélectionnée, ou <strong>maintenez OK</strong> (appui long). OK seul exécute l'action principale, pas le menu.</p>
+            <h3>Saisie : utilisez un clavier physique</h3>
+            <p>Un <strong>clavier physique — USB ou Bluetooth</strong> (Android TV prend en charge les deux) est fortement recommandé, et pratiquement indispensable pour le terminal. Avec lui, les champs de texte et le shell fonctionnent normalement.</p>
+            <p>Sans clavier, le clavier à l'écran gère tout de même les saisies courtes : sélectionnez un champ, appuyez sur OK pour l'ouvrir, tapez, puis appuyez sur <strong>OK / Valider</strong> du clavier pour confirmer — sur l'invite de mot de passe, cela connecte directement. Saisir des commandes shell avec le clavier à l'écran reste toutefois peu pratique.</p>
+            <h3>Verrouiller l'app sur un téléviseur</h3>
+            <p>Un téléviseur n'a généralement ni lecteur d'empreinte ni verrouillage d'écran : protégez l'app avec le verrouillage intégré par <strong>code PIN ou phrase secrète</strong> (Paramètres → Sécurité) — il fonctionne entièrement à la télécommande ou au clavier. Voir <a href="#security">Sécurité de l'app</a>.</p>
         </div>
 
     </div><!-- /doc-content -->

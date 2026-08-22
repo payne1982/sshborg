@@ -1,0 +1,60 @@
+<en-US>
+• Android TV support: install and navigate with the remote — a physical keyboard (USB or Bluetooth) is recommended for typing
+• Smoother text entry with a keyboard on non-touch devices like Android TV
+• Fixed password login on servers that only offer keyboard-interactive authentication
+• SFTP: new option to list folders before files
+</en-US>
+<it-IT>
+• Supporto Android TV: installa e naviga col telecomando — per scrivere è consigliata una tastiera fisica (USB o Bluetooth)
+• Inserimento testo più fluido con la tastiera su dispositivi non touch come Android TV
+• Corretto il login con password sui server che offrono solo l'autenticazione keyboard-interactive
+• SFTP: nuova opzione per elencare le cartelle prima dei file
+</it-IT>
+<de-DE>
+• Android-TV-Unterstützung: installieren und mit der Fernbedienung navigieren — zum Tippen wird eine physische Tastatur (USB oder Bluetooth) empfohlen
+• Flüssigere Texteingabe mit einer Tastatur auf Nicht-Touch-Geräten wie Android TV
+• Passwort-Login auf Servern korrigiert, die nur keyboard-interactive-Authentifizierung anbieten
+• SFTP: neue Option, Ordner vor Dateien aufzulisten
+</de-DE>
+<es-ES>
+• Compatibilidad con Android TV: instala y navega con el mando — para escribir se recomienda un teclado físico (USB o Bluetooth)
+• Entrada de texto más fluida con teclado en dispositivos sin pantalla táctil como Android TV
+• Corregido el inicio de sesión con contraseña en servidores que solo ofrecen autenticación keyboard-interactive
+• SFTP: nueva opción para listar las carpetas antes que los archivos
+</es-ES>
+<fr-FR>
+• Prise en charge d'Android TV : installez et naviguez à la télécommande — un clavier physique (USB ou Bluetooth) est recommandé pour la saisie
+• Saisie de texte plus fluide au clavier sur les appareils sans écran tactile comme Android TV
+• Correction de la connexion par mot de passe sur les serveurs n'offrant que l'authentification keyboard-interactive
+• SFTP : nouvelle option pour lister les dossiers avant les fichiers
+</fr-FR>
+<pt-PT>
+• Suporte para Android TV: instale e navegue com o comando — para escrever recomenda-se um teclado físico (USB ou Bluetooth)
+• Introdução de texto mais fluida com teclado em dispositivos sem toque como o Android TV
+• Corrigido o início de sessão com palavra-passe em servidores que só oferecem autenticação keyboard-interactive
+• SFTP: nova opção para listar as pastas antes dos ficheiros
+</pt-PT>
+<uk>
+• Підтримка Android TV: встановлення й навігація з пульта — для введення рекомендується фізична клавіатура (USB або Bluetooth)
+• Плавніше введення тексту з клавіатурою на несенсорних пристроях, як-от Android TV
+• Виправлено вхід за паролем на серверах, які пропонують лише автентифікацію keyboard-interactive
+• SFTP: нова опція показувати теки перед файлами
+</uk>
+<ru-RU>
+• Поддержка Android TV: установка и навигация с пульта — для ввода рекомендуется физическая клавиатура (USB или Bluetooth)
+• Более удобный ввод текста с клавиатурой на несенсорных устройствах, таких как Android TV
+• Исправлен вход по паролю на серверах, предлагающих только аутентификацию keyboard-interactive
+• SFTP: новая опция показывать папки перед файлами
+</ru-RU>
+<zh-CN>
+• 支持 Android TV：可用遥控器安装和导航——输入文字建议使用实体键盘（USB 或蓝牙）
+• 在 Android TV 等非触摸设备上，使用键盘输入文字更顺畅
+• 修复了仅提供 keyboard-interactive 认证的服务器上的密码登录
+• SFTP：新增选项，可将文件夹排在文件之前
+</zh-CN>
+<ja-JP>
+• Android TV 対応：リモコンでインストール・操作できます。文字入力には物理キーボード（USB または Bluetooth）を推奨します
+• Android TV などの非タッチデバイスで、キーボードによる文字入力がスムーズに
+• keyboard-interactive 認証のみを提供するサーバーでのパスワードログインを修正
+• SFTP：フォルダをファイルより先に表示するオプションを追加
+</ja-JP>

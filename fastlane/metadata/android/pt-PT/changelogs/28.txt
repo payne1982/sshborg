@@ -1,0 +1,4 @@
+• Suporte para Android TV: instale e navegue com o comando — para escrever recomenda-se um teclado físico (USB ou Bluetooth)
+• Introdução de texto mais fluida com teclado em dispositivos sem toque como o Android TV
+• Corrigido o início de sessão com palavra-passe em servidores que só oferecem autenticação keyboard-interactive
+• SFTP: nova opção para listar as pastas antes dos ficheiros

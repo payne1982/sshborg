@@ -78,6 +78,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     private val _showHidden = MutableStateFlow(false)
     val showHidden: StateFlow<Boolean> = _showHidden
 
+    /**
+     * App-wide preference: list folders before files. When off, entries are sorted
+     * by name only. Applied at display time in the screen; never re-fetches.
+     */
+    val sortDirsFirst: StateFlow<Boolean> =
+        sshBorgApp.appPreferences.sftpSortDirsFirst
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     /** Emitted when a file to be downloaded already exists in [downloadFolder]. */
     data class ConflictData(val entry: SftpEntry, val remotePath: String, val existingUri: Uri, val localDir: String)
     private val _conflictEvent = MutableSharedFlow<ConflictData>(extraBufferCapacity = 1)

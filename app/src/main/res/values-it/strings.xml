@@ -148,6 +148,7 @@
     <string name="settings_section_general">Generale</string>
     <string name="settings_section_terminal">Terminale</string>
     <string name="settings_section_security">Sicurezza</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
 
     <string name="settings_confirm_exit_title">Conferma uscita</string>
@@ -155,6 +156,8 @@
 
     <string name="settings_invert_scroll_title">Inverti scorrimento terminale</string>
     <string name="settings_invert_scroll_subtitle">Scorri su per vedere l\'output più vecchio invece di quello più recente</string>
+    <string name="settings_sftp_dirs_first_title">Cartelle prima dei file</string>
+    <string name="settings_sftp_dirs_first_subtitle">Nel browser SFTP, elenca le cartelle prima dei file</string>
     <string name="settings_double_tap_title">Azione doppio tocco</string>
     <string name="settings_double_tap_subtitle">Cosa invia alla shell un doppio tocco sul terminale</string>
     <string name="settings_double_tap_none">Niente</string>
@@ -255,6 +258,7 @@
     <string name="sftp_mkdir_title">Nuova cartella</string>
     <string name="sftp_mkdir_folder_name">Nome cartella</string>
 
+    <string name="sftp_menu_open">Apri</string>
     <string name="sftp_menu_rename">Rinomina</string>
     <string name="sftp_menu_download_in_background">Scarica in background</string>
     <string name="sftp_background_downloads_title">Download in background</string>
@@ -379,9 +383,7 @@
     <string name="lock_mismatch">Non corrispondono</string>
     <string name="lock_too_short">Troppo corto</string>
     <string name="tv_lock_nudge_title">Proteggi l\'app sulla TV</string>
-    <string name="tv_lock_nudge_body">Chiunque abbia il telecomando può accedere ai server e alle chiavi salvate. Imposta un PIN o una passphrase per bloccare l\'app.</string>
-    <string name="tv_lock_nudge_setup">Configura</string>
-    <string name="tv_lock_nudge_dismiss">Non ora</string>
+    <string name="tv_lock_nudge_body">Chiunque abbia il telecomando può accedere ai server e alle chiavi salvate. Imposta un PIN o una passphrase — e attiva la cifratura hardware — nelle Impostazioni per proteggerli.</string>
     <string name="lock_current">PIN o passphrase attuale</string>
     <string name="lock_disclaimer_title">Nessun recupero se dimenticato</string>
     <string name="lock_disclaimer_body">Non è possibile recuperare un PIN o una passphrase dimenticati. Se lo dimentichi, dovrai cancellare i dati dell\'app o reinstallarla, perdendo host e chiavi salvate se non hai un backup.</string>

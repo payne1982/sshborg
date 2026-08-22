@@ -31,14 +31,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
-import com.sshborg.data.AppPreferences
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
-import com.sshborg.isTelevision
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.onMenuKey
 import com.sshborg.service.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,29 +82,8 @@ fun HostsScreen(
     var sessionPickerHost by remember { mutableStateOf<HostEntity?>(null) }
     var sessionPickerType by remember { mutableStateOf(SessionManager.SessionType.Shell) }
 
-    // One-time nudge on a TV: biometric/device locks usually don't work there, so
-    // suggest setting an in-app PIN/passphrase to protect saved servers and keys.
-    val lockMode      by vm.lockMode.collectAsState()
-    val tvNudgeShown  by vm.tvLockNudgeShown.collectAsState()
-    val isTv = remember { isTelevision(context) }
-    var nudgeDismissed by remember { mutableStateOf(false) }
-    if (isTv && lockMode == AppPreferences.LOCK_NONE && !tvNudgeShown && !nudgeDismissed) {
-        AlertDialog(
-            onDismissRequest = { nudgeDismissed = true },
-            title = { Text(stringResource(R.string.tv_lock_nudge_title)) },
-            text  = { Text(stringResource(R.string.tv_lock_nudge_body)) },
-            confirmButton = {
-                TextButton(onClick = { vm.markTvLockNudgeShown(); onSettingsClick() }) {
-                    Text(stringResource(R.string.tv_lock_nudge_setup))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { vm.markTvLockNudgeShown(); nudgeDismissed = true }) {
-                    Text(stringResource(R.string.tv_lock_nudge_dismiss))
-                }
-            },
-        )
-    }
+    // Touchless devices can't long-press a group header: show a focusable ⋮ instead.
+    val isTouchless = remember { isTouchless(context) }
 
     Scaffold(
         topBar = {
@@ -196,6 +176,7 @@ fun HostsScreen(
                             onToggle = { vm.toggleGroupCollapsed(group) },
                             onEdit   = { groupToEdit = group },
                             onDelete = { groupToDelete = group },
+                            showOverflow = isTouchless,
                         )
                     }
                     if (!group.collapsed) {
@@ -343,15 +324,18 @@ private fun GroupHeader(
     onToggle: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    showOverflow: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
     Box {
         ListItem(
-            modifier = Modifier.combinedClickable(
-                onClick     = onToggle,
-                onLongClick = { menuExpanded = true },
-            ),
+            modifier = Modifier
+                .onMenuKey { menuExpanded = true }   // D-pad "options" key opens the group menu
+                .combinedClickable(
+                    onClick     = onToggle,
+                    onLongClick = { menuExpanded = true },
+                ),
             leadingContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -370,18 +354,31 @@ private fun GroupHeader(
                     style = MaterialTheme.typography.titleSmall,
                 )
             },
+            trailingContent = if (showOverflow) {
+                {
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.hosts_options_cd))
+                    }
+                }
+            } else null,
         )
-        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_edit)) },
-                leadingIcon = { Icon(Icons.Default.Edit, null) },
-                onClick = { menuExpanded = false; onEdit() },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_delete)) },
-                leadingIcon = { Icon(Icons.Default.Delete, null) },
-                onClick = { menuExpanded = false; onDelete() },
-            )
+        Box(Modifier.align(Alignment.TopEnd)) {
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
+                offset = DpOffset(x = (-8).dp, y = 0.dp),
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_edit)) },
+                    leadingIcon = { Icon(Icons.Default.Edit, null) },
+                    onClick = { menuExpanded = false; onEdit() },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_delete)) },
+                    leadingIcon = { Icon(Icons.Default.Delete, null) },
+                    onClick = { menuExpanded = false; onDelete() },
+                )
+            }
         }
     }
     HorizontalDivider(thickness = 0.5.dp)
@@ -405,10 +402,12 @@ private fun HostItem(
     var menuExpanded by remember { mutableStateOf(false) }
 
     ListItem(
-        modifier = Modifier.combinedClickable(
-            onClick     = onClick,
-            onLongClick = { menuExpanded = true },
-        ),
+        modifier = Modifier
+            .onMenuKey { menuExpanded = true }   // D-pad "options" key opens the host menu
+            .combinedClickable(
+                onClick     = onClick,
+                onLongClick = { menuExpanded = true },
+            ),
         headlineContent = { Text(host.label) },
         supportingContent = {
             Text(

@@ -1,0 +1,4 @@
+• Compatibilidad con Android TV: instala y navega con el mando — para escribir se recomienda un teclado físico (USB o Bluetooth)
+• Entrada de texto más fluida con teclado en dispositivos sin pantalla táctil como Android TV
+• Corregido el inicio de sesión con contraseña en servidores que solo ofrecen autenticación keyboard-interactive
+• SFTP: nueva opción para listar las carpetas antes que los archivos

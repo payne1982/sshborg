@@ -103,7 +103,8 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Multi-Hop-Ketten</a></li>
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
             <li><a href="#security">App-Sicherheit</a></li>
-            <li><a href="#backup">Konfiguration sichern</a></li>`,
+            <li><a href="#backup">Konfiguration sichern</a></li>
+            <li><a href="#android-tv">Android TV</a></li>`,
 
   doc_adding_host: `
             <h2>// HOST HINZUFÜGEN</h2>
@@ -454,6 +455,23 @@ Host target
                 <div class="callout-label">// HINWEIS ZUM BACKUP</div>
                 Da Schlüssel im Android Keystore gespeichert sind, können sie <strong>nicht über Androids Cloud-Backup</strong> gesichert werden und werden nicht automatisch auf ein neues Gerät übertragen. Stelle vor einem Gerätewechsel sicher, dass du einen auf dem neuen Gerät generierten Schlüssel auf allen deinen Servern autorisierst.
             </div>`,
+
+  doc_android_tv: `
+            <h2>// ANDROID TV</h2>
+            <p>SSHBorg läuft auf Android TV und Google TV. Es funktioniert mit dem D-Pad der Fernbedienung, aber da es eine textlastige App ist, macht eine physische Tastatur einen großen Unterschied.</p>
+            <h3>Navigation mit der Fernbedienung</h3>
+            <ul>
+                <li><strong>D-Pad-Pfeile</strong> — bewegen den Fokus zwischen Zeilen und Bedienelementen.</li>
+                <li><strong>OK (Mitte)</strong> — die primäre Aktion: mit einem Host verbinden, einen Ordner öffnen, eine Datei herunterladen, eine Gruppe aufklappen.</li>
+                <li><strong>Zurück</strong> — eine Ebene höher oder Bildschirm verlassen.</li>
+            </ul>
+            <h3>Das Menü einer Zeile öffnen</h3>
+            <p>Zum Umbenennen, Löschen, Bearbeiten, Duplizieren oder Herunterladen einer Zeile das Menü öffnen: die <strong>Menü-(Optionen-)Taste</strong> der Fernbedienung auf der fokussierten Zeile drücken oder <strong>OK gedrückt halten</strong> (langer Druck). OK allein führt die primäre Aktion aus, nicht das Menü.</p>
+            <h3>Tippen: eine physische Tastatur verwenden</h3>
+            <p>Eine <strong>physische Tastatur — USB oder Bluetooth</strong> (Android TV unterstützt beide) wird dringend empfohlen und ist für das Terminal praktisch erforderlich. Damit funktionieren Textfelder und die Shell normal.</p>
+            <p>Ohne eine solche bewältigt die Bildschirmtastatur trotzdem kurze Eingaben: ein Feld fokussieren, OK drücken, um es zu öffnen, tippen und <strong>OK / Los</strong> auf der Tastatur drücken — bei der Passwortabfrage verbindet dies direkt. Shell-Befehle mit der Bildschirmtastatur einzugeben ist jedoch unpraktisch.</p>
+            <h3>Die App auf einem TV sperren</h3>
+            <p>Ein TV hat meist keinen Fingerabdrucksensor und keine Bildschirmsperre — schütze die App daher mit der integrierten <strong>PIN- oder Passphrase-Sperre</strong> (Einstellungen → Sicherheit); sie funktioniert vollständig mit der Fernbedienung oder einer Tastatur. Siehe <a href="#security">App-Sicherheit</a>.</p>`,
 
   doc_backup: `
             <h2>// KONFIGURATION SICHERN</h2>

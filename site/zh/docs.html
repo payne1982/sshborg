@@ -533,6 +533,7 @@
             <li><a href="#sessions">多会话</a></li>
             <li><a href="#security">应用安全</a></li>
             <li><a href="#backup">配置备份</a></li>
+            <li><a href="#android-tv">Android TV</a></li>
         </ul>
     </nav>
 
@@ -994,6 +995,25 @@ Host target
                 <div class="callout-label">// 可选字段</div>
                 除 <code>label</code>、<code>hostname</code> 和 <code>username</code> 外，所有字段均为可选。省略的字段将使用默认值。
             </div>
+        </div>
+
+        <div class="doc-section" id="android-tv">
+
+            <h2>// ANDROID TV</h2>
+            <p>SSHBorg 可在 Android TV 和 Google TV 上运行。可用遥控器的方向键操作，但由于这是一款文字较多的应用，外接实体键盘会带来很大便利。</p>
+            <h3>使用遥控器导航</h3>
+            <ul>
+                <li><strong>方向键</strong> — 在行与控件之间移动焦点。</li>
+                <li><strong>OK（中键）</strong> — 主操作：连接主机、打开文件夹、下载文件、展开分组。</li>
+                <li><strong>返回</strong> — 上一级或退出当前界面。</li>
+            </ul>
+            <h3>打开某一行的菜单</h3>
+            <p>要对某一行进行重命名、删除、编辑、复制或下载，请打开其菜单：在选中该行时按遥控器的 <strong>菜单（选项）键</strong>，或 <strong>长按 OK</strong>。单按 OK 执行主操作，而非打开菜单。</p>
+            <h3>输入文字：请使用实体键盘</h3>
+            <p>强烈建议使用 <strong>实体键盘（USB 或蓝牙</strong>，Android TV 两者都支持），终端基本上离不开它。有了键盘，文本框和 shell 都能正常使用。</p>
+            <p>没有键盘时，屏幕键盘仍可用于简短输入：聚焦一个输入框，按 OK 打开，输入后按键盘上的 <strong>OK / 前往</strong> 确认——在密码提示框中这会直接连接。但用屏幕键盘输入 shell 命令并不实用。</p>
+            <h3>在 TV 上锁定应用</h3>
+            <p>TV 通常没有指纹识别或屏幕锁，因此请用内置的 <strong>PIN 或密码短语</strong> 锁保护应用（设置 → 安全）——它完全可用遥控器或键盘操作。参见 <a href="#security">应用安全</a>。</p>
         </div>
 
     </div><!-- /doc-content -->

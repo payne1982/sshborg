@@ -1,0 +1,4 @@
+• Android TV support: install and navigate with the remote — a physical keyboard (USB or Bluetooth) is recommended for typing
+• Smoother text entry with a keyboard on non-touch devices like Android TV
+• Fixed password login on servers that only offer keyboard-interactive authentication
+• SFTP: new option to list folders before files

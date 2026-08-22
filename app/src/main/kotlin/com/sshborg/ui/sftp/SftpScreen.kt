@@ -17,10 +17,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +37,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import com.sshborg.R
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.onMenuKey
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
 import com.sshborg.ui.common.ProblemContent
@@ -48,8 +54,13 @@ fun SftpScreen(
     onBack: () -> Unit,
     vm: SftpViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
+    // Touchless devices (TVs, D-pad) can't long-press a row, so its context menu
+    // is surfaced as a focusable overflow ("⋮") button instead.
+    val isTouchless = remember { isTouchless(context) }
     val state by vm.state.collectAsState()
     val showHidden by vm.showHidden.collectAsState()
+    val sortDirsFirst by vm.sortDirsFirst.collectAsState()
     val backgroundTransfers by vm.backgroundTransfers.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -263,10 +274,19 @@ fun SftpScreen(
                     LaunchedEffect(s) { isRefreshing = false }
                     val listState = rememberLazyListState()
                     LaunchedEffect(s.path) { listState.scrollToItem(0) }
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = { isRefreshing = true; vm.refreshListing() },
-                        modifier = Modifier.fillMaxSize(),
+                    // Pull-to-refresh, but only on a touchscreen: with a D-pad the focus
+                    // "bumping" the top edge would otherwise trigger it accidentally. Touchless
+                    // devices refresh via the toolbar button instead.
+                    val ptrState = rememberPullToRefreshState()
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .pullToRefresh(
+                                isRefreshing = isRefreshing,
+                                state = ptrState,
+                                enabled = !isTouchless,
+                                onRefresh = { isRefreshing = true; vm.refreshListing() },
+                            ),
                     ) {
                         LazyColumn(
                             state = listState,
@@ -289,9 +309,14 @@ fun SftpScreen(
                             }
                             // Dotfiles are hidden unless the per-host toggle is on. ".." is a
                             // synthetic row above, never in entries, so it is never affected.
-                            val visibleEntries =
+                            val filteredEntries =
                                 if (showHidden) s.entries
                                 else s.entries.filter { !it.name.startsWith(".") }
+                            // listDir returns dirs-first; when the preference is off, re-sort by
+                            // name only so folders and files interleave alphabetically.
+                            val visibleEntries =
+                                if (sortDirsFirst) filteredEntries
+                                else filteredEntries.sortedBy { it.name.lowercase() }
                             if (visibleEntries.isEmpty()) {
                                 item {
                                     Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
@@ -324,10 +349,16 @@ fun SftpScreen(
                                         } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
+                                        showOverflow   = isTouchless,
                                     )
                                 }
                             }
                         }
+                        PullToRefreshDefaults.Indicator(
+                            state = ptrState,
+                            isRefreshing = isRefreshing,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                        )
                     }
                 }
 
@@ -712,15 +743,21 @@ private fun SftpEntryItem(
     onDownloadInBackground: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
+    showOverflow: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
     Box {
         ListItem(
-            modifier = Modifier.combinedClickable(
-                onClick = onClick,
-                onLongClick = { menuExpanded = true },
-            ),
+            modifier = Modifier
+                // Remote/keyboard Menu key opens the action menu; CENTER stays the primary
+                // action (open a folder / download a file). Trailing buttons aren't D-pad-
+                // focusable and a long-press isn't practical with a remote.
+                .onMenuKey(enabled = showOverflow && !selectionMode) { menuExpanded = true }
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = { menuExpanded = true },
+                ),
             leadingContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -774,29 +811,59 @@ private fun SftpEntryItem(
                 }
             },
             trailingContent = {
-                if (entry.isDir && !entry.isLink && !selectionMode) {
-                    IconButton(
-                        onClick = onDownloadFolder,
-                        modifier = Modifier.size(40.dp),
-                    ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (entry.isDir && !entry.isLink && !selectionMode) {
+                        IconButton(
+                            onClick = onDownloadFolder,
+                            modifier = Modifier.size(40.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Download,
+                                contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        }
+                    } else if (!entry.isDir) {
                         Icon(
                             Icons.Default.Download,
-                            contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                            contentDescription = stringResource(R.string.sftp_download_cd),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp),
                         )
                     }
-                } else if (!entry.isDir) {
-                    Icon(
-                        Icons.Default.Download,
-                        contentDescription = stringResource(R.string.sftp_download_cd),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp),
-                    )
                 }
             },
         )
-        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+        Box(Modifier.align(Alignment.TopEnd)) {
+        DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false },
+            offset = DpOffset(x = (-8).dp, y = 0.dp),
+        ) {
+            // On touchless devices CENTER opens this menu, so the primary action lives here too.
+            if (showOverflow && !selectionMode) {
+                if (entry.isDir) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sftp_menu_open)) },
+                        leadingIcon = { Icon(Icons.Default.Folder, null) },
+                        onClick = { menuExpanded = false; onClick() },
+                    )
+                    if (!entry.isLink) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.sftp_download_folder_cd)) },
+                            leadingIcon = { Icon(Icons.Default.Download, null) },
+                            onClick = { menuExpanded = false; onDownloadFolder() },
+                        )
+                    }
+                } else {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sftp_download_cd)) },
+                        leadingIcon = { Icon(Icons.Default.Download, null) },
+                        onClick = { menuExpanded = false; onClick() },
+                    )
+                }
+            }
             if (onDownloadInBackground != null) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.sftp_menu_download_in_background)) },
@@ -821,6 +888,7 @@ private fun SftpEntryItem(
                 },
                 onClick = { menuExpanded = false; onDelete() },
             )
+        }
         }
     }
     HorizontalDivider(thickness = 0.5.dp)
@@ -1172,8 +1240,10 @@ private fun PasswordDialog(
                     visualTransformation = if (pwdVisible) androidx.compose.ui.text.input.VisualTransformation.None
                                            else androidx.compose.ui.text.input.PasswordVisualTransformation(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Password,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Go,
                     ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(onGo = { onSubmit(pwd) }),
                     trailingIcon = {
                         TextButton(onClick = { pwdVisible = !pwdVisible }) {
                             Text(
