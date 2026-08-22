@@ -36,14 +36,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import com.sshborg.R
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.onMenuKey
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
 import com.sshborg.ui.common.ProblemContent
@@ -753,19 +749,12 @@ private fun SftpEntryItem(
     Box {
         ListItem(
             modifier = Modifier
-                // D-pad CENTER opens the action menu (trailing buttons aren't focusable and a
-                // long-press isn't practical with a remote). This catches only KEY events, so a
-                // mouse/touch click still runs the primary action below via onClick.
-                .then(
-                    if (showOverflow) Modifier.onPreviewKeyEvent { ev ->
-                        if (!selectionMode && ev.type == KeyEventType.KeyDown &&
-                            (ev.key == Key.DirectionCenter || ev.key == Key.Enter || ev.key == Key.NumPadEnter)) {
-                            menuExpanded = true; true
-                        } else false
-                    } else Modifier
-                )
+                // Remote/keyboard Menu key opens the action menu; CENTER stays the primary
+                // action (open a folder / download a file). Trailing buttons aren't D-pad-
+                // focusable and a long-press isn't practical with a remote.
+                .onMenuKey(enabled = showOverflow && !selectionMode) { menuExpanded = true }
                 .combinedClickable(
-                    onClick = onClick,                       // mouse/touch: primary action
+                    onClick = onClick,
                     onLongClick = { menuExpanded = true },
                 ),
             leadingContent = {

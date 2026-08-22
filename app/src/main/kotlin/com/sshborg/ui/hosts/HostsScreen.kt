@@ -38,6 +38,7 @@ import com.sshborg.R
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.onMenuKey
 import com.sshborg.service.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -328,10 +329,12 @@ private fun GroupHeader(
 
     Box {
         ListItem(
-            modifier = Modifier.combinedClickable(
-                onClick     = onToggle,
-                onLongClick = { menuExpanded = true },
-            ),
+            modifier = Modifier
+                .onMenuKey { menuExpanded = true }   // D-pad "options" key opens the group menu
+                .combinedClickable(
+                    onClick     = onToggle,
+                    onLongClick = { menuExpanded = true },
+                ),
             leadingContent = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -392,10 +395,12 @@ private fun HostItem(
     var menuExpanded by remember { mutableStateOf(false) }
 
     ListItem(
-        modifier = Modifier.combinedClickable(
-            onClick     = onClick,
-            onLongClick = { menuExpanded = true },
-        ),
+        modifier = Modifier
+            .onMenuKey { menuExpanded = true }   // D-pad "options" key opens the host menu
+            .combinedClickable(
+                onClick     = onClick,
+                onLongClick = { menuExpanded = true },
+            ),
         headlineContent = { Text(host.label) },
         supportingContent = {
             Text(
