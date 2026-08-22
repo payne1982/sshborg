@@ -39,6 +39,7 @@ import com.sshborg.data.AppPreferences
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
 import com.sshborg.isTelevision
+import com.sshborg.isTouchless
 import com.sshborg.service.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +87,8 @@ fun HostsScreen(
     val lockMode      by vm.lockMode.collectAsState()
     val tvNudgeShown  by vm.tvLockNudgeShown.collectAsState()
     val isTv = remember { isTelevision(context) }
+    // Touchless devices can't long-press a group header: show a focusable ⋮ instead.
+    val isTouchless = remember { isTouchless(context) }
     var nudgeDismissed by remember { mutableStateOf(false) }
     if (isTv && lockMode == AppPreferences.LOCK_NONE && !tvNudgeShown && !nudgeDismissed) {
         AlertDialog(
@@ -196,6 +199,7 @@ fun HostsScreen(
                             onToggle = { vm.toggleGroupCollapsed(group) },
                             onEdit   = { groupToEdit = group },
                             onDelete = { groupToDelete = group },
+                            showOverflow = isTouchless,
                         )
                     }
                     if (!group.collapsed) {
@@ -343,6 +347,7 @@ private fun GroupHeader(
     onToggle: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    showOverflow: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -370,6 +375,13 @@ private fun GroupHeader(
                     style = MaterialTheme.typography.titleSmall,
                 )
             },
+            trailingContent = if (showOverflow) {
+                {
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.hosts_options_cd))
+                    }
+                }
+            } else null,
         )
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
             DropdownMenuItem(

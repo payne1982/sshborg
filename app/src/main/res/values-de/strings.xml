@@ -39,6 +39,7 @@
     <string name="hosts_settings_cd">Einstellungen</string>
     <string name="hosts_help_cd">Hilfe</string>
     <string name="hosts_options_cd">Optionen</string>
+    <string name="sftp_options_cd">Optionen</string>
     <string name="hosts_press_back_to_exit">Nochmal drücken zum Beenden</string>
     <string name="hosts_delete_title">Host löschen</string>
     <string name="hosts_delete_message">\"%1$s\" löschen?</string>
@@ -148,6 +149,7 @@
     <string name="settings_section_general">Allgemein</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Sicherheit</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
 
     <string name="settings_confirm_exit_title">Beenden bestätigen</string>
@@ -155,6 +157,8 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_sftp_dirs_first_title">Ordner vor Dateien</string>
+    <string name="settings_sftp_dirs_first_subtitle">Im SFTP-Browser Ordner vor Dateien auflisten</string>
     <string name="settings_double_tap_title">Doppeltipp-Aktion</string>
     <string name="settings_double_tap_subtitle">Was ein Doppeltippen im Terminal an die Shell sendet</string>
     <string name="settings_double_tap_none">Nichts</string>

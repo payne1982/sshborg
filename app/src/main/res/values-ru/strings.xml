@@ -41,6 +41,7 @@
     <string name="hosts_settings_cd">Настройки</string>
     <string name="hosts_help_cd">Справка</string>
     <string name="hosts_options_cd">Параметры</string>
+    <string name="sftp_options_cd">Параметры</string>
     <string name="hosts_press_back_to_exit">Нажмите «Назад» ещё раз для выхода</string>
     <string name="hosts_delete_title">Удалить хост</string>
     <string name="hosts_delete_message">Удалить «%1$s»?</string>
@@ -153,6 +154,7 @@
     <string name="settings_section_general">Общие</string>
     <string name="settings_section_terminal">Терминал</string>
     <string name="settings_section_security">Безопасность</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Резервное копирование</string>
 
     <string name="settings_theme_title">Тема</string>
@@ -165,6 +167,8 @@
 
     <string name="settings_invert_scroll_title">Инвертировать прокрутку терминала</string>
     <string name="settings_invert_scroll_subtitle">Смахивание вверх покажет старый вывод вместо нового</string>
+    <string name="settings_sftp_dirs_first_title">Папки перед файлами</string>
+    <string name="settings_sftp_dirs_first_subtitle">В браузере SFTP показывать папки перед файлами</string>
     <string name="settings_double_tap_title">Действие двойного касания</string>
     <string name="settings_double_tap_subtitle">Что двойное касание терминала отправляет в оболочку</string>
     <string name="settings_double_tap_none">Ничего</string>

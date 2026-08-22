@@ -39,6 +39,7 @@
     <string name="hosts_settings_cd">Ajustes</string>
     <string name="hosts_help_cd">Ayuda</string>
     <string name="hosts_options_cd">Opciones</string>
+    <string name="sftp_options_cd">Opciones</string>
     <string name="hosts_press_back_to_exit">Pulsa atrás de nuevo para salir</string>
     <string name="hosts_delete_title">Eliminar host</string>
     <string name="hosts_delete_message">¿Eliminar \"%1$s\"?</string>
@@ -148,6 +149,7 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Seguridad</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Copia de seguridad</string>
 
     <string name="settings_confirm_exit_title">Confirmar salida</string>
@@ -155,6 +157,8 @@
 
     <string name="settings_invert_scroll_title">Invertir desplazamiento del terminal</string>
     <string name="settings_invert_scroll_subtitle">Desliza hacia arriba para ver la salida más antigua</string>
+    <string name="settings_sftp_dirs_first_title">Carpetas antes que archivos</string>
+    <string name="settings_sftp_dirs_first_subtitle">En el explorador SFTP, listar las carpetas antes que los archivos</string>
     <string name="settings_double_tap_title">Acción de doble toque</string>
     <string name="settings_double_tap_subtitle">Qué envía a la shell un doble toque en el terminal</string>
     <string name="settings_double_tap_none">Nada</string>

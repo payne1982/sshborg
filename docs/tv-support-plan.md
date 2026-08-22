@@ -64,18 +64,21 @@ instead of the system biometric prompt.
   terminal; D-pad keys are consumed as shell cursor keys, so navigating *inside*
   the terminal needs an external keyboard. Acceptable; at most add a visible
   hint. Low priority.
-- **Context menus** are currently reachable only via a long-press of OK (the row
-  long-press). It works but is hard to discover — consider a genuinely
-  focusable overflow ("⋮") affordance on the Hosts and SFTP rows.
+- **Context menus** — **done**. A focusable overflow ("⋮") button now surfaces
+  each row's menu. Host rows already had one; added it to SFTP rows and Hosts
+  group headers, gated on `isTouchless(context)` (no touchscreen, or a TV) so
+  touch devices keep the long-press and are visually unchanged.
 - **Focus pass**: verify focus order and a visible focus indicator across all
-  six screens on a TV emulator.
+  six screens on a TV emulator. ← still to do (needs an emulator/device).
 
 ## 3. Minor listing improvements (from #3, non-blocking)
 
 - **SFTP**: surface *where* a downloaded file was saved — **done** (the download
   result shows "Saved: <path>").
-- **SFTP**: optional setting to not sort folders before files (`listDir`
-  currently forces dirs-first).
+- **SFTP**: optional setting to not sort folders before files — **done**. A
+  "Folders before files" switch in a new Settings **SFTP** section, default on;
+  when off the browser sorts by name only at display time (`listDir` still
+  returns dirs-first, the screen re-sorts).
 - **SFTP**: hide dotfiles — **done** (versionCode 27).
 
 ## 4. Play Console process (after section 1)
@@ -95,6 +98,7 @@ instead of the system biometric prompt.
 
 1. ~~1a — in-app PIN lock (the bulk of the work).~~ **Done.**
 2. ~~1b — TV detection and first-run steering.~~ **Done.**
-3. 2 — D-pad focus pass on the emulator. ← next
-4. 3 — the remaining minor SFTP improvement (optional folder/file sort).
-5. 4 — Play Console assets + opt-in + review.
+3. ~~2 — focusable overflow ("⋮") menus on touchless devices.~~ **Done.**
+4. ~~3 — optional folder/file sort setting.~~ **Done.**
+5. 2 — D-pad focus pass on the emulator (order/focus indicator). ← next, needs an emulator/device.
+6. 4 — Play Console assets + opt-in + review.

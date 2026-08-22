@@ -34,7 +34,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import com.sshborg.R
+import com.sshborg.isTouchless
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
 import com.sshborg.ui.common.ProblemContent
@@ -48,8 +50,13 @@ fun SftpScreen(
     onBack: () -> Unit,
     vm: SftpViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
+    // Touchless devices (TVs, D-pad) can't long-press a row, so its context menu
+    // is surfaced as a focusable overflow ("⋮") button instead.
+    val isTouchless = remember { isTouchless(context) }
     val state by vm.state.collectAsState()
     val showHidden by vm.showHidden.collectAsState()
+    val sortDirsFirst by vm.sortDirsFirst.collectAsState()
     val backgroundTransfers by vm.backgroundTransfers.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -289,9 +296,14 @@ fun SftpScreen(
                             }
                             // Dotfiles are hidden unless the per-host toggle is on. ".." is a
                             // synthetic row above, never in entries, so it is never affected.
-                            val visibleEntries =
+                            val filteredEntries =
                                 if (showHidden) s.entries
                                 else s.entries.filter { !it.name.startsWith(".") }
+                            // listDir returns dirs-first; when the preference is off, re-sort by
+                            // name only so folders and files interleave alphabetically.
+                            val visibleEntries =
+                                if (sortDirsFirst) filteredEntries
+                                else filteredEntries.sortedBy { it.name.lowercase() }
                             if (visibleEntries.isEmpty()) {
                                 item {
                                     Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
@@ -324,6 +336,7 @@ fun SftpScreen(
                                         } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
+                                        showOverflow   = isTouchless,
                                     )
                                 }
                             }
@@ -712,6 +725,7 @@ private fun SftpEntryItem(
     onDownloadInBackground: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
+    showOverflow: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -774,25 +788,41 @@ private fun SftpEntryItem(
                 }
             },
             trailingContent = {
-                if (entry.isDir && !entry.isLink && !selectionMode) {
-                    IconButton(
-                        onClick = onDownloadFolder,
-                        modifier = Modifier.size(40.dp),
-                    ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (entry.isDir && !entry.isLink && !selectionMode) {
+                        IconButton(
+                            onClick = onDownloadFolder,
+                            modifier = Modifier.size(40.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Download,
+                                contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        }
+                    } else if (!entry.isDir) {
                         Icon(
                             Icons.Default.Download,
-                            contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                            contentDescription = stringResource(R.string.sftp_download_cd),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp),
                         )
                     }
-                } else if (!entry.isDir) {
-                    Icon(
-                        Icons.Default.Download,
-                        contentDescription = stringResource(R.string.sftp_download_cd),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp),
-                    )
+                    // Touchless devices can't long-press: expose the row menu as a ⋮ button.
+                    if (showOverflow && !selectionMode) {
+                        IconButton(
+                            onClick = { menuExpanded = true },
+                            modifier = Modifier.size(40.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.sftp_options_cd),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        }
+                    }
                 }
             },
         )

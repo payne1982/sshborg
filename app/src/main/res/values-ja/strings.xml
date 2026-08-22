@@ -40,6 +40,7 @@
     <string name="hosts_settings_cd">設定</string>
     <string name="hosts_help_cd">ヘルプ</string>
     <string name="hosts_options_cd">オプション</string>
+    <string name="sftp_options_cd">オプション</string>
     <string name="hosts_press_back_to_exit">もう一度戻るボタンで終了</string>
     <string name="hosts_delete_title">ホストを削除</string>
     <string name="hosts_delete_message">"%1$s" を削除しますか？</string>
@@ -152,6 +153,7 @@
     <string name="settings_section_general">一般</string>
     <string name="settings_section_terminal">ターミナル</string>
     <string name="settings_section_security">セキュリティ</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">バックアップ</string>
 
     <string name="settings_theme_title">テーマ</string>
@@ -164,6 +166,8 @@
 
     <string name="settings_invert_scroll_title">ターミナルのスクロールを反転</string>
     <string name="settings_invert_scroll_subtitle">上にスワイプして新しい出力ではなく古い出力を表示</string>
+    <string name="settings_sftp_dirs_first_title">フォルダをファイルより先に</string>
+    <string name="settings_sftp_dirs_first_subtitle">SFTP ブラウザでフォルダをファイルより先に表示</string>
     <string name="settings_double_tap_title">ダブルタップの動作</string>
     <string name="settings_double_tap_subtitle">ターミナルをダブルタップしたときにシェルへ送る内容</string>
     <string name="settings_double_tap_none">なし</string>

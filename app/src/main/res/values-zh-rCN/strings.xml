@@ -40,6 +40,7 @@
     <string name="hosts_settings_cd">设置</string>
     <string name="hosts_help_cd">帮助</string>
     <string name="hosts_options_cd">选项</string>
+    <string name="sftp_options_cd">选项</string>
     <string name="hosts_press_back_to_exit">再按一次返回键退出</string>
     <string name="hosts_delete_title">删除主机</string>
     <string name="hosts_delete_message">删除"%1$s"？</string>
@@ -152,6 +153,7 @@
     <string name="settings_section_general">通用</string>
     <string name="settings_section_terminal">终端</string>
     <string name="settings_section_security">安全</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">备份</string>
 
     <string name="settings_theme_title">主题</string>
@@ -164,6 +166,8 @@
 
     <string name="settings_invert_scroll_title">反转终端滚动</string>
     <string name="settings_invert_scroll_subtitle">向上滑动查看较早的输出而非较新的</string>
+    <string name="settings_sftp_dirs_first_title">文件夹排在文件之前</string>
+    <string name="settings_sftp_dirs_first_subtitle">在 SFTP 浏览器中，将文件夹排在文件之前</string>
     <string name="settings_double_tap_title">双击操作</string>
     <string name="settings_double_tap_subtitle">在终端双击时向 shell 发送的内容</string>
     <string name="settings_double_tap_none">无</string>

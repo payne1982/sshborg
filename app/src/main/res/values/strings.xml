@@ -41,6 +41,7 @@
     <string name="hosts_settings_cd">Settings</string>
     <string name="hosts_help_cd">Help</string>
     <string name="hosts_options_cd">Options</string>
+    <string name="sftp_options_cd">Options</string>
     <string name="hosts_press_back_to_exit">Press back again to exit</string>
     <string name="hosts_delete_title">Delete host</string>
     <string name="hosts_delete_message">Delete \"%1$s\"?</string>
@@ -153,6 +154,7 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Security</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
 
     <string name="settings_theme_title">Theme</string>
@@ -165,6 +167,8 @@
 
     <string name="settings_invert_scroll_title">Invert terminal scroll</string>
     <string name="settings_invert_scroll_subtitle">Swipe up to see older output instead of newer</string>
+    <string name="settings_sftp_dirs_first_title">Folders before files</string>
+    <string name="settings_sftp_dirs_first_subtitle">In the SFTP browser, list folders before files</string>
     <string name="settings_double_tap_title">Double-tap action</string>
     <string name="settings_double_tap_subtitle">What a double-tap on the terminal sends to the shell</string>
     <string name="settings_double_tap_none">Nothing</string>

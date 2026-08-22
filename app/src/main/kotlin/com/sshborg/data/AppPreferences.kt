@@ -34,6 +34,7 @@ class AppPreferences(private val context: Context) {
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
         val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
+        val SFTP_SORT_DIRS_FIRST      = booleanPreferencesKey("sftp_sort_dirs_first")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val EXTRA_KEYS_BAR_PINNED        = booleanPreferencesKey("extra_keys_bar_pinned")
@@ -101,6 +102,14 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setInvertTerminalScroll(enabled: Boolean) {
         context.dataStore.edit { it[Keys.INVERT_TERMINAL_SCROLL] = enabled }
+    }
+
+    /** In the SFTP browser, list folders before files. Default true (folders first). */
+    val sftpSortDirsFirst: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.SFTP_SORT_DIRS_FIRST] ?: true }
+
+    suspend fun setSftpSortDirsFirst(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.SFTP_SORT_DIRS_FIRST] = enabled }
     }
 
     suspend fun setNightMode(mode: Int) {
