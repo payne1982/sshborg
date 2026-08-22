@@ -1202,8 +1202,10 @@ private fun PasswordDialog(
                     visualTransformation = if (pwdVisible) androidx.compose.ui.text.input.VisualTransformation.None
                                            else androidx.compose.ui.text.input.PasswordVisualTransformation(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Password,
+                        imeAction = androidx.compose.ui.text.input.ImeAction.Go,
                     ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(onGo = { onSubmit(pwd) }),
                     trailingIcon = {
                         TextButton(onClick = { pwdVisible = !pwdVisible }) {
                             Text(
