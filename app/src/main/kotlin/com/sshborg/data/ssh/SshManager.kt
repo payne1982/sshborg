@@ -120,8 +120,9 @@ object SshManager {
             val jumpSession = jumpJsch.getSession(jump.username ?: params.username, jump.host, jump.port)
             if (proxy != null) jumpSession.setProxy(proxy)
 
-            jumpSession.setUserInfo(object : UserInfo {
+            jumpSession.setUserInfo(object : UserInfo, UIKeyboardInteractive {
                 private var passwordUsed = false
+                private var kbiUsed = false
                 override fun getPassphrase(): String? = null
                 override fun getPassword(): String? = (jumpAuth as? SshAuth.Password)?.password
                 override fun promptPassword(message: String?): Boolean {
@@ -137,13 +138,23 @@ object SshManager {
                     return onHostKeyVerify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
                 }
                 override fun showMessage(message: String?) {}
+                override fun promptKeyboardInteractive(
+                    destination: String?, name: String?, instruction: String?,
+                    prompt: Array<out String>?, echo: BooleanArray?,
+                ): Array<String>? {
+                    val pw = (jumpAuth as? SshAuth.Password)?.password ?: return null
+                    if (prompt.isNullOrEmpty()) return arrayOf()
+                    if (kbiUsed) return null
+                    kbiUsed = true
+                    return Array(prompt.size) { pw }
+                }
             })
 
             val jumpConfig = Properties().apply {
                 setProperty("StrictHostKeyChecking", if (jump.knownHostsEntry.isNullOrBlank()) "ask" else "yes")
                 setProperty("PreferredAuthentications", when (jumpAuth) {
                     is SshAuth.PublicKey -> "publickey"
-                    is SshAuth.Password  -> "password"
+                    is SshAuth.Password  -> "password,keyboard-interactive"
                 })
                 setProperty("HashKnownHosts", "no")
                 setProperty("TCPKeepAlive", "yes")
@@ -194,8 +205,9 @@ object SshManager {
         if (proxy != null) session.setProxy(proxy)
 
         // Tag the session with the jump sessions so ShellSession/SftpSession can clean them up
-        session.setUserInfo(object : UserInfo {
+        session.setUserInfo(object : UserInfo, UIKeyboardInteractive {
             private var passwordUsed = false
+            private var kbiUsed = false
             override fun getPassphrase(): String? = null
             override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
             override fun promptPassword(message: String?): Boolean {
@@ -211,13 +223,25 @@ object SshManager {
                 return onHostKeyVerify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
             }
             override fun showMessage(message: String?) {}
+            // Servers with `PasswordAuthentication no` but `KbdInteractiveAuthentication yes`
+            // deliver the typed password over keyboard-interactive; answer its prompt(s) with it.
+            override fun promptKeyboardInteractive(
+                destination: String?, name: String?, instruction: String?,
+                prompt: Array<out String>?, echo: BooleanArray?,
+            ): Array<String>? {
+                val pw = (params.auth as? SshAuth.Password)?.password ?: return null
+                if (prompt.isNullOrEmpty()) return arrayOf()   // info-only round: continue
+                if (kbiUsed) return null                        // don't retry a wrong password forever
+                kbiUsed = true
+                return Array(prompt.size) { pw }
+            }
         })
 
         val config = Properties().apply {
             setProperty("StrictHostKeyChecking", "ask")
             setProperty("PreferredAuthentications", when (params.auth) {
                 is SshAuth.PublicKey -> "publickey"
-                is SshAuth.Password  -> "password"
+                is SshAuth.Password  -> "password,keyboard-interactive"
             })
             setProperty("HashKnownHosts", "no")
             setProperty("TCPKeepAlive", "yes")
