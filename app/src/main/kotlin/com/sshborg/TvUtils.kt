@@ -15,3 +15,13 @@ fun isTelevision(context: Context): Boolean {
     if (uiMode?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) return true
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 }
+
+/**
+ * True when the device has no touchscreen (a TV, or any D-pad/mouse-driven device).
+ * Such devices can't long-press a row to open its context menu, so the row shows a
+ * focusable overflow ("⋮") button instead. Televisions are always included.
+ */
+fun isTouchless(context: Context): Boolean {
+    if (isTelevision(context)) return true
+    return !context.packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)
+}

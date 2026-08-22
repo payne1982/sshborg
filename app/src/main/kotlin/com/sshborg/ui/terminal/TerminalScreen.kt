@@ -28,7 +28,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.sshborg.R
 import com.sshborg.SshBorgApp
+import com.sshborg.isTelevision
 import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
@@ -84,6 +87,10 @@ fun TerminalScreen(
 
     val app = LocalContext.current.applicationContext as SshBorgApp
     val ctx = LocalContext.current
+    // On a TV the soft keyboard is a floating window that overlaps the extra-key bar
+    // instead of pushing it up; hide the bar while that keyboard is showing (a TV terminal
+    // is meant for a physical keyboard anyway). No effect on touch devices.
+    val isTv = remember { isTelevision(ctx) }
     var inSelectionMode by remember { mutableStateOf(false) }
     // Held here rather than in the ViewModel: the ViewModel outlives the composition,
     // so a View reference there keeps the Activity alive after the screen is gone.
@@ -274,8 +281,9 @@ fun TerminalScreen(
                     )
                 }
 
-                // Extra key bar — when the soft keyboard is open, or pinned to stay put
-                if (imeVisible || extraBarPinned) {
+                // Extra key bar — when the soft keyboard is open, or pinned to stay put.
+                // On a TV, suppress it while the soft keyboard shows (it would just overlap).
+                if ((imeVisible || extraBarPinned) && !(isTv && imeVisible)) {
                     ExtraKeyRow(
                         ctrlActive       = ctrlActive,
                         altActive        = altActive,
@@ -815,7 +823,8 @@ private fun PasswordDialog(
                     onValueChange = { password = it },
                     label = { Text(stringResource(R.string.password_field_label)) },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Go),
+                    keyboardActions = KeyboardActions(onGo = { onConfirm(password) }),
                     singleLine = true,
                     isError = wrongPassword,
                     trailingIcon = {

@@ -152,6 +152,7 @@
     <string name="settings_section_general">一般</string>
     <string name="settings_section_terminal">ターミナル</string>
     <string name="settings_section_security">セキュリティ</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">バックアップ</string>
 
     <string name="settings_theme_title">テーマ</string>
@@ -164,6 +165,8 @@
 
     <string name="settings_invert_scroll_title">ターミナルのスクロールを反転</string>
     <string name="settings_invert_scroll_subtitle">上にスワイプして新しい出力ではなく古い出力を表示</string>
+    <string name="settings_sftp_dirs_first_title">フォルダをファイルより先に</string>
+    <string name="settings_sftp_dirs_first_subtitle">SFTP ブラウザでフォルダをファイルより先に表示</string>
     <string name="settings_double_tap_title">ダブルタップの動作</string>
     <string name="settings_double_tap_subtitle">ターミナルをダブルタップしたときにシェルへ送る内容</string>
     <string name="settings_double_tap_none">なし</string>
@@ -269,6 +272,7 @@
     <string name="sftp_mkdir_title">新しいフォルダ</string>
     <string name="sftp_mkdir_folder_name">フォルダ名</string>
 
+    <string name="sftp_menu_open">開く</string>
     <string name="sftp_menu_rename">名前変更</string>
     <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
     <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>
@@ -383,9 +387,7 @@
     <string name="lock_mismatch">一致しません</string>
     <string name="lock_too_short">短すぎます</string>
     <string name="tv_lock_nudge_title">テレビでアプリを保護</string>
-    <string name="tv_lock_nudge_body">リモコンを持つ人は誰でも保存済みのサーバーや鍵にアクセスできます。PIN またはパスフレーズを設定してアプリをロックしてください。</string>
-    <string name="tv_lock_nudge_setup">設定</string>
-    <string name="tv_lock_nudge_dismiss">後で</string>
+    <string name="tv_lock_nudge_body">リモコンを持つ人は誰でも保存済みのサーバーや鍵にアクセスできます。設定で PIN またはパスフレーズを設定し、ハードウェア暗号化を有効にして保護してください。</string>
     <string name="lock_current">現在の PIN またはパスフレーズ</string>
     <string name="lock_disclaimer_title">忘れると復元できません</string>
     <string name="lock_disclaimer_body">忘れた PIN やパスフレーズは復元できません。その場合はアプリのデータを消去するか再インストールが必要で、バックアップがなければ保存済みのサーバーや鍵を失います。</string>

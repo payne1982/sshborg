@@ -153,6 +153,7 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Security</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
 
     <string name="settings_theme_title">Theme</string>
@@ -165,6 +166,8 @@
 
     <string name="settings_invert_scroll_title">Invert terminal scroll</string>
     <string name="settings_invert_scroll_subtitle">Swipe up to see older output instead of newer</string>
+    <string name="settings_sftp_dirs_first_title">Folders before files</string>
+    <string name="settings_sftp_dirs_first_subtitle">In the SFTP browser, list folders before files</string>
     <string name="settings_double_tap_title">Double-tap action</string>
     <string name="settings_double_tap_subtitle">What a double-tap on the terminal sends to the shell</string>
     <string name="settings_double_tap_none">Nothing</string>
@@ -270,6 +273,7 @@
     <string name="sftp_mkdir_title">New folder</string>
     <string name="sftp_mkdir_folder_name">Folder name</string>
 
+    <string name="sftp_menu_open">Open</string>
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>
@@ -389,9 +393,7 @@
     <string name="lock_mismatch">They don\'t match</string>
     <string name="lock_too_short">Too short</string>
     <string name="tv_lock_nudge_title">Protect the app on your TV</string>
-    <string name="tv_lock_nudge_body">Anyone with the remote can reach your saved servers and keys. Set a PIN or passphrase to lock the app.</string>
-    <string name="tv_lock_nudge_setup">Set up</string>
-    <string name="tv_lock_nudge_dismiss">Not now</string>
+    <string name="tv_lock_nudge_body">Anyone with the remote can reach your saved servers and keys. Set a PIN or passphrase — and turn on hardware encryption — in Settings to protect them.</string>
     <string name="lock_current">Current PIN or passphrase</string>
     <string name="lock_disclaimer_title">No recovery if forgotten</string>
     <string name="lock_disclaimer_body">There\'s no way to recover a forgotten PIN or passphrase. If you forget it, you\'ll have to clear the app\'s data or reinstall — losing your saved servers and keys unless you have a backup.</string>

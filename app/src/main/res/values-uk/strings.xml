@@ -148,6 +148,7 @@
     <string name="settings_section_general">Загальне</string>
     <string name="settings_section_terminal">Термінал</string>
     <string name="settings_section_security">Безпека</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Резервна копія</string>
 
     <string name="settings_confirm_exit_title">Підтвердити вихід</string>
@@ -155,6 +156,8 @@
 
     <string name="settings_invert_scroll_title">Інвертувати прокручування терміналу</string>
     <string name="settings_invert_scroll_subtitle">Проведіть вгору, щоб побачити старіший вивід</string>
+    <string name="settings_sftp_dirs_first_title">Теки перед файлами</string>
+    <string name="settings_sftp_dirs_first_subtitle">У браузері SFTP показувати теки перед файлами</string>
     <string name="settings_double_tap_title">Дія подвійного дотику</string>
     <string name="settings_double_tap_subtitle">Що подвійний дотик до термінала надсилає в оболонку</string>
     <string name="settings_double_tap_none">Нічого</string>
@@ -255,6 +258,7 @@
     <string name="sftp_mkdir_title">Нова папка</string>
     <string name="sftp_mkdir_folder_name">Назва папки</string>
 
+    <string name="sftp_menu_open">Відкрити</string>
     <string name="sftp_menu_rename">Перейменувати</string>
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
@@ -382,9 +386,7 @@
     <string name="lock_mismatch">Не збігаються</string>
     <string name="lock_too_short">Надто короткий</string>
     <string name="tv_lock_nudge_title">Захистіть застосунок на телевізорі</string>
-    <string name="tv_lock_nudge_body">Будь-хто з пультом може отримати доступ до збережених серверів і ключів. Установіть PIN або парольну фразу, щоб заблокувати застосунок.</string>
-    <string name="tv_lock_nudge_setup">Налаштувати</string>
-    <string name="tv_lock_nudge_dismiss">Не зараз</string>
+    <string name="tv_lock_nudge_body">Будь-хто з пультом може отримати доступ до збережених серверів і ключів. Установіть PIN або парольну фразу та ввімкніть апаратне шифрування в Налаштуваннях, щоб захистити їх.</string>
     <string name="lock_current">Поточний PIN або парольна фраза</string>
     <string name="lock_disclaimer_title">Відновлення неможливе, якщо забудете</string>
     <string name="lock_disclaimer_body">Забутий PIN або парольну фразу неможливо відновити. Тоді доведеться очистити дані застосунку або перевстановити його, втративши збережені сервери й ключі, якщо немає резервної копії.</string>

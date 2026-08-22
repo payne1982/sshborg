@@ -40,6 +40,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val invertTerminalScroll: StateFlow<Boolean> =
         prefs.invertTerminalScroll.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val sftpSortDirsFirst: StateFlow<Boolean> =
+        prefs.sftpSortDirsFirst.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     val nightMode: StateFlow<Int> =
         prefs.nightMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
@@ -130,6 +133,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setInvertTerminalScroll(enabled: Boolean) {
         viewModelScope.launch { prefs.setInvertTerminalScroll(enabled) }
+    }
+
+    fun setSftpSortDirsFirst(enabled: Boolean) {
+        viewModelScope.launch { prefs.setSftpSortDirsFirst(enabled) }
     }
 
     fun setLockTimeoutSeconds(seconds: Int) {

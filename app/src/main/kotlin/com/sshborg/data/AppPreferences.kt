@@ -34,6 +34,7 @@ class AppPreferences(private val context: Context) {
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
         val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
+        val SFTP_SORT_DIRS_FIRST      = booleanPreferencesKey("sftp_sort_dirs_first")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val EXTRA_KEYS_BAR_PINNED        = booleanPreferencesKey("extra_keys_bar_pinned")
@@ -46,7 +47,6 @@ class AppPreferences(private val context: Context) {
         val LOCK_SECRET_ITER     = intPreferencesKey("lock_secret_iterations")
         val LOCK_FAILED_ATTEMPTS = intPreferencesKey("lock_failed_attempts")
         val LOCK_LOCKOUT_UNTIL   = longPreferencesKey("lock_lockout_until")   // epoch millis
-        val TV_LOCK_NUDGE_SHOWN  = booleanPreferencesKey("tv_lock_nudge_shown")
     }
 
     /**
@@ -101,6 +101,14 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setInvertTerminalScroll(enabled: Boolean) {
         context.dataStore.edit { it[Keys.INVERT_TERMINAL_SCROLL] = enabled }
+    }
+
+    /** In the SFTP browser, list folders before files. Default true (folders first). */
+    val sftpSortDirsFirst: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.SFTP_SORT_DIRS_FIRST] ?: true }
+
+    suspend fun setSftpSortDirsFirst(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.SFTP_SORT_DIRS_FIRST] = enabled }
     }
 
     suspend fun setNightMode(mode: Int) {
@@ -262,14 +270,6 @@ class AppPreferences(private val context: Context) {
             it[Keys.LOCK_FAILED_ATTEMPTS] = failedAttempts
             it[Keys.LOCK_LOCKOUT_UNTIL] = lockoutUntil
         }
-    }
-
-    /** Whether the one-time "set a PIN" nudge has been shown on a TV. */
-    val tvLockNudgeShown: Flow<Boolean> =
-        context.dataStore.data.map { it[Keys.TV_LOCK_NUDGE_SHOWN] ?: false }
-
-    suspend fun setTvLockNudgeShown() {
-        context.dataStore.edit { it[Keys.TV_LOCK_NUDGE_SHOWN] = true }
     }
 
     // ── Settings backup ──────────────────────────────────────────────────────

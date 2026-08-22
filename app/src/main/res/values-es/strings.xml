@@ -148,6 +148,7 @@
     <string name="settings_section_general">General</string>
     <string name="settings_section_terminal">Terminal</string>
     <string name="settings_section_security">Seguridad</string>
+    <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Copia de seguridad</string>
 
     <string name="settings_confirm_exit_title">Confirmar salida</string>
@@ -155,6 +156,8 @@
 
     <string name="settings_invert_scroll_title">Invertir desplazamiento del terminal</string>
     <string name="settings_invert_scroll_subtitle">Desliza hacia arriba para ver la salida más antigua</string>
+    <string name="settings_sftp_dirs_first_title">Carpetas antes que archivos</string>
+    <string name="settings_sftp_dirs_first_subtitle">En el explorador SFTP, listar las carpetas antes que los archivos</string>
     <string name="settings_double_tap_title">Acción de doble toque</string>
     <string name="settings_double_tap_subtitle">Qué envía a la shell un doble toque en el terminal</string>
     <string name="settings_double_tap_none">Nada</string>
@@ -255,6 +258,7 @@
     <string name="sftp_mkdir_title">Nueva carpeta</string>
     <string name="sftp_mkdir_folder_name">Nombre de carpeta</string>
 
+    <string name="sftp_menu_open">Abrir</string>
     <string name="sftp_menu_rename">Renombrar</string>
     <string name="sftp_menu_download_in_background">Descargar en segundo plano</string>
     <string name="sftp_background_downloads_title">Descargas en segundo plano</string>
@@ -378,9 +382,7 @@
     <string name="lock_mismatch">No coinciden</string>
     <string name="lock_too_short">Demasiado corto</string>
     <string name="tv_lock_nudge_title">Protege la app en el televisor</string>
-    <string name="tv_lock_nudge_body">Cualquiera con el mando puede acceder a tus servidores y claves guardados. Establece un PIN o frase de contraseña para bloquear la app.</string>
-    <string name="tv_lock_nudge_setup">Configurar</string>
-    <string name="tv_lock_nudge_dismiss">Ahora no</string>
+    <string name="tv_lock_nudge_body">Cualquiera con el mando puede acceder a tus servidores y claves guardados. Configura un PIN o frase de contraseña y activa el cifrado por hardware en Ajustes para protegerlos.</string>
     <string name="lock_current">PIN o frase de contraseña actual</string>
     <string name="lock_disclaimer_title">Sin recuperación si se olvida</string>
     <string name="lock_disclaimer_body">No se puede recuperar un PIN o frase de contraseña olvidados. Si lo olvidas, tendrás que borrar los datos de la app o reinstalarla, perdiendo servidores y claves guardados si no tienes copia de seguridad.</string>
