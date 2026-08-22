@@ -396,7 +396,7 @@
     <string name="lock_mismatch">Не совпадают</string>
     <string name="lock_too_short">Слишком короткий</string>
     <string name="tv_lock_nudge_title">Защитите приложение на телевизоре</string>
-    <string name="tv_lock_nudge_body">Любой, у кого есть пульт, может получить доступ к сохранённым серверам и ключам. Задайте PIN или парольную фразу, чтобы заблокировать приложение.</string>
+    <string name="tv_lock_nudge_body">Любой, у кого есть пульт, может получить доступ к сохранённым серверам и ключам. Задайте PIN или парольную фразу и включите аппаратное шифрование в настройках, чтобы защитить их.</string>
     <string name="tv_lock_nudge_setup">Настроить</string>
     <string name="tv_lock_nudge_dismiss">Не сейчас</string>
     <string name="lock_current">Текущий PIN или парольная фраза</string>

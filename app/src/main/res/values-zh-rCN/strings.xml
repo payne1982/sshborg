@@ -387,7 +387,7 @@
     <string name="lock_mismatch">不匹配</string>
     <string name="lock_too_short">太短</string>
     <string name="tv_lock_nudge_title">在电视上保护应用</string>
-    <string name="tv_lock_nudge_body">任何拿到遥控器的人都能访问已保存的服务器和密钥。设置 PIN 或密码短语来锁定应用。</string>
+    <string name="tv_lock_nudge_body">任何拿到遥控器的人都能访问已保存的服务器和密钥。请在设置中设置 PIN 或密码短语，并开启硬件加密，以保护它们。</string>
     <string name="tv_lock_nudge_setup">设置</string>
     <string name="tv_lock_nudge_dismiss">以后再说</string>
     <string name="lock_current">当前 PIN 或密码短语</string>

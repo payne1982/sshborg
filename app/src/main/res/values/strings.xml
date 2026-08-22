@@ -393,7 +393,7 @@
     <string name="lock_mismatch">They don\'t match</string>
     <string name="lock_too_short">Too short</string>
     <string name="tv_lock_nudge_title">Protect the app on your TV</string>
-    <string name="tv_lock_nudge_body">Anyone with the remote can reach your saved servers and keys. Set a PIN or passphrase to lock the app.</string>
+    <string name="tv_lock_nudge_body">Anyone with the remote can reach your saved servers and keys. Set a PIN or passphrase — and turn on hardware encryption — in Settings to protect them.</string>
     <string name="tv_lock_nudge_setup">Set up</string>
     <string name="tv_lock_nudge_dismiss">Not now</string>
     <string name="lock_current">Current PIN or passphrase</string>
