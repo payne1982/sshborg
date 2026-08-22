@@ -9,12 +9,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.verticalScroll
@@ -36,21 +30,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.Screen
 import com.sshborg.data.db.GroupEntity
-
-/**
- * Makes a single-line field traversable with a D-pad/remote: Down moves to the next
- * focusable in order, Up to the previous. Left/Right are left alone for cursor movement.
- * Only for single-line fields — a multi-line field needs Up/Down for the cursor.
- */
-private fun Modifier.dpadFieldNav(focusManager: FocusManager): Modifier =
-    onPreviewKeyEvent { ev ->
-        if (ev.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-        when (ev.key) {
-            Key.DirectionDown -> focusManager.moveFocus(FocusDirection.Next)
-            Key.DirectionUp   -> focusManager.moveFocus(FocusDirection.Previous)
-            else -> false
-        }
-    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,7 +107,7 @@ fun AddEditHostScreen(
             OutlinedTextField(
                 value = label, onValueChange = { vm.label.value = it },
                 label = { Text(stringResource(R.string.host_field_label)) },
-                modifier = Modifier.fillMaxWidth().dpadFieldNav(focusManager),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = nextField,
@@ -137,7 +116,7 @@ fun AddEditHostScreen(
                 value = hostname,
                 onValueChange = { vm.hostname.value = it.filter { c -> c.isLetterOrDigit() || c in ".-:_" } },
                 label = { Text(stringResource(R.string.host_field_hostname)) },
-                modifier = Modifier.fillMaxWidth().dpadFieldNav(focusManager),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
                 keyboardActions = nextField,
@@ -146,7 +125,7 @@ fun AddEditHostScreen(
                 OutlinedTextField(
                     value = username, onValueChange = { vm.username.value = it },
                     label = { Text(stringResource(R.string.host_field_username)) },
-                    modifier = Modifier.weight(1f).dpadFieldNav(focusManager),
+                    modifier = Modifier.weight(1f),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = nextField,
@@ -155,7 +134,7 @@ fun AddEditHostScreen(
                     value = port,
                     onValueChange = { vm.port.value = it.filter { c -> c.isDigit() } },
                     label = { Text(stringResource(R.string.host_field_port)) },
-                    modifier = Modifier.width(90.dp).dpadFieldNav(focusManager),
+                    modifier = Modifier.width(90.dp),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                     keyboardActions = nextField,
@@ -176,8 +155,7 @@ fun AddEditHostScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                        .dpadFieldNav(focusManager),
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(groupMenuExpanded) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     singleLine = true,
@@ -263,7 +241,7 @@ fun AddEditHostScreen(
                 OutlinedTextField(
                     value = password, onValueChange = { vm.password.value = it },
                     label = { Text(stringResource(R.string.host_field_password)) },
-                    modifier = Modifier.fillMaxWidth().dpadFieldNav(focusManager),
+                    modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
