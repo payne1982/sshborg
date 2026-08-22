@@ -6,7 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -95,11 +99,18 @@ fun AddEditHostScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // "Next" on the keyboard advances to the following field; this makes the form
+            // fillable with a D-pad/remote on a TV and is a no-op change for touch users.
+            val focusManager = LocalFocusManager.current
+            val nextField = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+
             OutlinedTextField(
                 value = label, onValueChange = { vm.label.value = it },
                 label = { Text(stringResource(R.string.host_field_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = nextField,
             )
             OutlinedTextField(
                 value = hostname,
@@ -107,7 +118,8 @@ fun AddEditHostScreen(
                 label = { Text(stringResource(R.string.host_field_hostname)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
+                keyboardActions = nextField,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -115,6 +127,8 @@ fun AddEditHostScreen(
                     label = { Text(stringResource(R.string.host_field_username)) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = nextField,
                 )
                 OutlinedTextField(
                     value = port,
@@ -122,7 +136,8 @@ fun AddEditHostScreen(
                     label = { Text(stringResource(R.string.host_field_port)) },
                     modifier = Modifier.width(90.dp),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                    keyboardActions = nextField,
                 )
             }
             ExposedDropdownMenuBox(
