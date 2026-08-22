@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -361,17 +362,23 @@ private fun GroupHeader(
                 }
             } else null,
         )
-        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_edit)) },
-                leadingIcon = { Icon(Icons.Default.Edit, null) },
-                onClick = { menuExpanded = false; onEdit() },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_delete)) },
-                leadingIcon = { Icon(Icons.Default.Delete, null) },
-                onClick = { menuExpanded = false; onDelete() },
-            )
+        Box(Modifier.align(Alignment.TopEnd)) {
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
+                offset = DpOffset(x = (-8).dp, y = 0.dp),
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_edit)) },
+                    leadingIcon = { Icon(Icons.Default.Edit, null) },
+                    onClick = { menuExpanded = false; onEdit() },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_delete)) },
+                    leadingIcon = { Icon(Icons.Default.Delete, null) },
+                    onClick = { menuExpanded = false; onDelete() },
+                )
+            }
         }
     }
     HorizontalDivider(thickness = 0.5.dp)

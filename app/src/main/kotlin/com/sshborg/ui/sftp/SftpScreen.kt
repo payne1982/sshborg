@@ -23,6 +23,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -834,7 +835,12 @@ private fun SftpEntryItem(
                 }
             },
         )
-        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+        Box(Modifier.align(Alignment.TopEnd)) {
+        DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false },
+            offset = DpOffset(x = (-8).dp, y = 0.dp),
+        ) {
             // On touchless devices CENTER opens this menu, so the primary action lives here too.
             if (showOverflow && !selectionMode) {
                 if (entry.isDir) {
@@ -882,6 +888,7 @@ private fun SftpEntryItem(
                 },
                 onClick = { menuExpanded = false; onDelete() },
             )
+        }
         }
     }
     HorizontalDivider(thickness = 0.5.dp)
