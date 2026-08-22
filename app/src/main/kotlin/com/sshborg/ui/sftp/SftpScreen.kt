@@ -17,7 +17,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.Alignment
@@ -270,10 +272,19 @@ fun SftpScreen(
                     LaunchedEffect(s) { isRefreshing = false }
                     val listState = rememberLazyListState()
                     LaunchedEffect(s.path) { listState.scrollToItem(0) }
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = { isRefreshing = true; vm.refreshListing() },
-                        modifier = Modifier.fillMaxSize(),
+                    // Pull-to-refresh, but only on a touchscreen: with a D-pad the focus
+                    // "bumping" the top edge would otherwise trigger it accidentally. Touchless
+                    // devices refresh via the toolbar button instead.
+                    val ptrState = rememberPullToRefreshState()
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .pullToRefresh(
+                                isRefreshing = isRefreshing,
+                                state = ptrState,
+                                enabled = !isTouchless,
+                                onRefresh = { isRefreshing = true; vm.refreshListing() },
+                            ),
                     ) {
                         LazyColumn(
                             state = listState,
@@ -341,6 +352,11 @@ fun SftpScreen(
                                 }
                             }
                         }
+                        PullToRefreshDefaults.Indicator(
+                            state = ptrState,
+                            isRefreshing = isRefreshing,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                        )
                     }
                 }
 
