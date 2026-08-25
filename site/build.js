@@ -8,16 +8,16 @@ const path = require('path');
 const BASE_URL = 'https://sshborg.com';
 
 const LANGUAGES = [
-  { code: 'en', hreflang: 'en',      dir: '',   root: '',    htmlLang: 'en',      ogLocale: 'en_US' },
-  { code: 'it', hreflang: 'it',      dir: 'it', root: '../', htmlLang: 'it',      ogLocale: 'it_IT' },
-  { code: 'de', hreflang: 'de',      dir: 'de', root: '../', htmlLang: 'de',      ogLocale: 'de_DE' },
-  { code: 'es', hreflang: 'es',      dir: 'es', root: '../', htmlLang: 'es',      ogLocale: 'es_ES' },
-  { code: 'fr', hreflang: 'fr',      dir: 'fr', root: '../', htmlLang: 'fr',      ogLocale: 'fr_FR' },
-  { code: 'pt', hreflang: 'pt',      dir: 'pt', root: '../', htmlLang: 'pt',      ogLocale: 'pt_PT' },
-  { code: 'uk', hreflang: 'uk',      dir: 'uk', root: '../', htmlLang: 'uk',      ogLocale: 'uk_UA' },
-  { code: 'ru', hreflang: 'ru',      dir: 'ru', root: '../', htmlLang: 'ru',      ogLocale: 'ru_RU' },
-  { code: 'zh', hreflang: 'zh-Hans', dir: 'zh', root: '../', htmlLang: 'zh-Hans', ogLocale: 'zh_CN' },
-  { code: 'ja', hreflang: 'ja',      dir: 'ja', root: '../', htmlLang: 'ja',      ogLocale: 'ja_JP' },
+  { code: 'en', hreflang: 'en',      dir: '',   root: '',    htmlLang: 'en',      ogLocale: 'en_US', fdroid: 'en'      },
+  { code: 'it', hreflang: 'it',      dir: 'it', root: '../', htmlLang: 'it',      ogLocale: 'it_IT', fdroid: 'it'      },
+  { code: 'de', hreflang: 'de',      dir: 'de', root: '../', htmlLang: 'de',      ogLocale: 'de_DE', fdroid: 'de'      },
+  { code: 'es', hreflang: 'es',      dir: 'es', root: '../', htmlLang: 'es',      ogLocale: 'es_ES', fdroid: 'es'      },
+  { code: 'fr', hreflang: 'fr',      dir: 'fr', root: '../', htmlLang: 'fr',      ogLocale: 'fr_FR', fdroid: 'fr'      },
+  { code: 'pt', hreflang: 'pt',      dir: 'pt', root: '../', htmlLang: 'pt',      ogLocale: 'pt_PT', fdroid: 'pt_PT'   },
+  { code: 'uk', hreflang: 'uk',      dir: 'uk', root: '../', htmlLang: 'uk',      ogLocale: 'uk_UA', fdroid: 'uk'      },
+  { code: 'ru', hreflang: 'ru',      dir: 'ru', root: '../', htmlLang: 'ru',      ogLocale: 'ru_RU', fdroid: 'ru'      },
+  { code: 'zh', hreflang: 'zh-Hans', dir: 'zh', root: '../', htmlLang: 'zh-Hans', ogLocale: 'zh_CN', fdroid: 'zh_Hans' },
+  { code: 'ja', hreflang: 'ja',      dir: 'ja', root: '../', htmlLang: 'ja',      ogLocale: 'ja_JP', fdroid: 'ja'      },
 ];
 
 // Pages to generate in all languages (privacy_policy stays English-only)
@@ -102,7 +102,7 @@ function build() {
       const canonical = `    <link rel="canonical" href="${pageUrl(page, lang)}">`;
       let   html      = tpl.replace('<!--HREFLANG-->', `${hreflangBlock(page)}\n${canonical}`);
 
-      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang), CANONICAL_URL: pageUrl(page, lang), OG_LOCALE: lang.ogLocale });
+      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang), CANONICAL_URL: pageUrl(page, lang), OG_LOCALE: lang.ogLocale, FDROID_URL: `https://f-droid.org/${lang.fdroid}/packages/com.sshborg/` });
 
       const outFile = path.join(SITE_DIR, lang.dir, `${page}.html`);
       fs.writeFileSync(outFile, html, 'utf8');
