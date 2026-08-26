@@ -1,6 +1,9 @@
 package com.sshborg
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import com.jcraft.jsch.JSch
 import com.sshborg.data.AppLockManager
 import com.sshborg.data.AppPreferences
@@ -33,5 +36,28 @@ class SshBorgApp : Application() {
         // Capture JSch's own diagnostics: an in-memory ring buffer (always) so a dropped
         // connection can show a real cause, plus Logcat output in debug builds only.
         JSch.setLogger(SshDiagnostics)
+
+        // Debug-only: track the active network transport so a disconnect breadcrumb can show
+        // whether Wi-Fi/cellular flipped around the drop (see SshDiagnostics). Never in release.
+        if (BuildConfig.DEBUG) registerNetworkDiagnostics()
+    }
+
+    private fun registerNetworkDiagnostics() {
+        val cm = getSystemService(ConnectivityManager::class.java) ?: return
+        val cb = object : ConnectivityManager.NetworkCallback() {
+            override fun onLost(network: Network) = SshDiagnostics.setNet("none")
+            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                SshDiagnostics.setNet(
+                    when {
+                        caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)     -> "wifi"
+                        caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "cellular"
+                        caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> "ethernet"
+                        caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)      -> "vpn"
+                        else -> "other"
+                    }
+                )
+            }
+        }
+        runCatching { cm.registerDefaultNetworkCallback(cb) }
     }
 }
