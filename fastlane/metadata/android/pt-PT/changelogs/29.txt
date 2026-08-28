@@ -1,0 +1,1 @@
+• Corrigido: renomear uma chave SSH agora também atualiza o comentário dentro da chave pública

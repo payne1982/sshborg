@@ -1,0 +1,30 @@
+<en-US>
+• Fixed: renaming an SSH key now also updates the comment inside its public key
+</en-US>
+<it-IT>
+• Corretto: rinominando una chiave SSH ora si aggiorna anche il commento dentro la chiave pubblica
+</it-IT>
+<de-DE>
+• Behoben: beim Umbenennen eines SSH-Schlüssels wird jetzt auch der Kommentar im öffentlichen Schlüssel aktualisiert
+</de-DE>
+<es-ES>
+• Corregido: al renombrar una clave SSH ahora también se actualiza el comentario dentro de la clave pública
+</es-ES>
+<fr-FR>
+• Corrigé : renommer une clé SSH met désormais aussi à jour le commentaire dans la clé publique
+</fr-FR>
+<pt-PT>
+• Corrigido: renomear uma chave SSH agora também atualiza o comentário dentro da chave pública
+</pt-PT>
+<uk>
+• Виправлено: перейменування SSH-ключа тепер оновлює й коментар усередині відкритого ключа
+</uk>
+<ru-RU>
+• Исправлено: переименование SSH-ключа теперь обновляет и комментарий внутри открытого ключа
+</ru-RU>
+<zh-CN>
+• 修复：重命名 SSH 密钥时，现在也会更新公钥内的注释
+</zh-CN>
+<ja-JP>
+• 修正：SSH 鍵の名前を変更すると、公開鍵内のコメントも更新されるようになりました
+</ja-JP>

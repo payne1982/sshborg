@@ -1,0 +1,1 @@
+• Behoben: beim Umbenennen eines SSH-Schlüssels wird jetzt auch der Kommentar im öffentlichen Schlüssel aktualisiert

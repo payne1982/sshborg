@@ -1,0 +1,1 @@
+• Corrigé : renommer une clé SSH met désormais aussi à jour le commentaire dans la clé publique

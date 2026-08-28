@@ -1,0 +1,1 @@
+• Corretto: rinominando una chiave SSH ora si aggiorna anche il commento dentro la chiave pubblica
