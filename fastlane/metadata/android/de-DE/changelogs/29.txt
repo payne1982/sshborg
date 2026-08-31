@@ -1,1 +1,2 @@
 • Behoben: beim Umbenennen eines SSH-Schlüssels wird jetzt auch der Kommentar im öffentlichen Schlüssel aktualisiert
+• Aufgefrischtes App-Symbol, das den Rahmen ausfüllt – auch auf Android TV

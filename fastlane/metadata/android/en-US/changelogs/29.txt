@@ -1,1 +1,2 @@
 • Fixed: renaming an SSH key now also updates the comment inside its public key
+• Refreshed app icon that fills the frame, also on Android TV

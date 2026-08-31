@@ -1,1 +1,2 @@
 • Corrigido: renomear uma chave SSH agora também atualiza o comentário dentro da chave pública
+• Ícone do app renovado que preenche o quadro, também na Android TV
