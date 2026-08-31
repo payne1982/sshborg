@@ -1,0 +1,40 @@
+<en-US>
+• Fixed: renaming an SSH key now also updates the comment inside its public key
+• Refreshed app icon that fills the frame, also on Android TV
+</en-US>
+<it-IT>
+• Corretto: rinominando una chiave SSH ora si aggiorna anche il commento dentro la chiave pubblica
+• Icona dell'app rinnovata, ora riempie meglio lo schermo, anche su Android TV
+</it-IT>
+<de-DE>
+• Behoben: beim Umbenennen eines SSH-Schlüssels wird jetzt auch der Kommentar im öffentlichen Schlüssel aktualisiert
+• Aufgefrischtes App-Symbol, das den Rahmen ausfüllt – auch auf Android TV
+</de-DE>
+<es-ES>
+• Corregido: al renombrar una clave SSH ahora también se actualiza el comentario dentro de la clave pública
+• Icono de la app renovado que llena el marco, también en Android TV
+</es-ES>
+<fr-FR>
+• Corrigé : renommer une clé SSH met désormais aussi à jour le commentaire dans la clé publique
+• Icône de l'app rafraîchie qui remplit le cadre, aussi sur Android TV
+</fr-FR>
+<pt-PT>
+• Corrigido: renomear uma chave SSH agora também atualiza o comentário dentro da chave pública
+• Ícone do app renovado que preenche o quadro, também na Android TV
+</pt-PT>
+<uk>
+• Виправлено: перейменування SSH-ключа тепер оновлює й коментар усередині відкритого ключа
+• Оновлений значок застосунку, що заповнює рамку, зокрема на Android TV
+</uk>
+<ru-RU>
+• Исправлено: переименование SSH-ключа теперь обновляет и комментарий внутри открытого ключа
+• Обновлённый значок приложения, заполняющий рамку, в том числе на Android TV
+</ru-RU>
+<zh-CN>
+• 修复：重命名 SSH 密钥时，现在也会更新公钥内的注释
+• 更新了应用图标，现已填满整个画面，包括在 Android TV 上
+</zh-CN>
+<ja-JP>
+• 修正：SSH 鍵の名前を変更すると、公開鍵内のコメントも更新されるようになりました
+• アプリアイコンを刷新し、Android TV でも枠いっぱいに表示されるようになりました
+</ja-JP>

@@ -1,0 +1,2 @@
+• Corretto: rinominando una chiave SSH ora si aggiorna anche il commento dentro la chiave pubblica
+• Icona dell'app rinnovata, ora riempie meglio lo schermo, anche su Android TV

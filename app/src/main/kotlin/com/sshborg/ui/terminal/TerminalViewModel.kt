@@ -409,6 +409,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 while (isActive && session.isConnected) {
                     val n = session.inputStream.read(buf)
+                    com.sshborg.data.ssh.SshDiagnostics.onRead(n)   // debug-only breadcrumb
                     if (n < 0) {
                         var waited = 0
                         while (session.exitStatus == -1 && waited < 1000) {
@@ -462,7 +463,11 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 if (cleanExit) {
                     _navBack.tryEmit(Unit)
                 } else {
-                    _state.value = ConnectionState.Disconnected(causeSummary, causeDetail)
+                    // Debug builds append session/network breadcrumbs so a remote tester can copy
+                    // the error overlay instead of running adb logcat. No-op in release.
+                    val diag = com.sshborg.data.ssh.SshDiagnostics.snapshot()
+                    val detailWithDiag = if (diag != null) (causeDetail.orEmpty() + diag) else causeDetail
+                    _state.value = ConnectionState.Disconnected(causeSummary, detailWithDiag)
                 }
             }
         }

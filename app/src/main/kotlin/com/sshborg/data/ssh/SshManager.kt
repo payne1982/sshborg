@@ -1,5 +1,6 @@
 package com.sshborg.data.ssh
 
+import com.sshborg.BuildConfig
 import com.jcraft.jsch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
@@ -435,8 +436,14 @@ class ShellSession(
     /** Writes [data] to the remote shell's stdin and flushes, serialized against other writers. */
     fun write(data: ByteArray) {
         synchronized(writeLock) {
-            stdinOutput.write(data)
-            stdinOutput.flush()
+            try {
+                stdinOutput.write(data)
+                stdinOutput.flush()
+                if (BuildConfig.DEBUG) SshDiagnostics.event("write ${data.size}b")
+            } catch (e: Exception) {
+                SshDiagnostics.onWriteError(e)   // debug-only; record before it propagates
+                throw e
+            }
         }
     }
 
@@ -445,6 +452,7 @@ class ShellSession(
     }
 
     fun disconnect() {
+        if (BuildConfig.DEBUG) SshDiagnostics.event("app disconnect() [shell]")
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
         jumpSessions.reversed().forEach { runCatching { it.disconnect() } }

@@ -1,0 +1,2 @@
+• Corrigé : renommer une clé SSH met désormais aussi à jour le commentaire dans la clé publique
+• Icône de l'app rafraîchie qui remplit le cadre, aussi sur Android TV
