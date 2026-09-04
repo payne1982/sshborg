@@ -287,32 +287,45 @@ fun AddEditHostScreen(
                 }
             } else {
                 // Key selector
-                Box {
-                    OutlinedTextField(
-                        value = keys.find { it.id == selectedKeyId }?.label
-                            ?: stringResource(R.string.host_key_select_placeholder),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.host_auth_ssh_key)) },
+                val keyValueText = keys.find { it.id == selectedKeyId }?.label
+                    ?: stringResource(R.string.host_key_select_placeholder)
+                val keyItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
+                    keys.forEach { key ->
+                        DropdownMenuItem(
+                            text = { Text(key.label) },
+                            onClick = { vm.selectedKeyId.value = key.id; dismiss() },
+                        )
+                    }
+                    if (keys.isEmpty()) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.host_key_no_keys)) },
+                            onClick = { dismiss() },
+                        )
+                    }
+                }
+                if (touchless) {
+                    TvSelectField(
+                        label = stringResource(R.string.host_auth_ssh_key),
+                        valueText = keyValueText,
                         modifier = Modifier.fillMaxWidth(),
-                        trailingIcon = {
-                            TextButton(onClick = { keyMenuExpanded = true }) {
-                                Text(stringResource(R.string.host_key_change))
-                            }
-                        },
+                        menuItems = keyItems,
                     )
-                    DropdownMenu(expanded = keyMenuExpanded, onDismissRequest = { keyMenuExpanded = false }) {
-                        keys.forEach { key ->
-                            DropdownMenuItem(
-                                text = { Text(key.label) },
-                                onClick = { vm.selectedKeyId.value = key.id; keyMenuExpanded = false },
-                            )
-                        }
-                        if (keys.isEmpty()) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.host_key_no_keys)) },
-                                onClick = { keyMenuExpanded = false }
-                            )
+                } else {
+                    Box {
+                        OutlinedTextField(
+                            value = keyValueText,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.host_auth_ssh_key)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            trailingIcon = {
+                                TextButton(onClick = { keyMenuExpanded = true }) {
+                                    Text(stringResource(R.string.host_key_change))
+                                }
+                            },
+                        )
+                        DropdownMenu(expanded = keyMenuExpanded, onDismissRequest = { keyMenuExpanded = false }) {
+                            keyItems { keyMenuExpanded = false }
                         }
                     }
                 }

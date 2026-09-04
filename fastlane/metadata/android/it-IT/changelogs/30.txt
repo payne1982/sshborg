@@ -1,0 +1,2 @@
+• Navigazione col D-pad più fluida su Android TV — campi di testo e menu a tendina ora si usano bene col telecomando
+• Corretta la schermata di blocco sulle TV in orizzontale, dove l'ultima riga poteva essere tagliata

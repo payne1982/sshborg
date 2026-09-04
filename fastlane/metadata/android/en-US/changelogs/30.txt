@@ -1,0 +1,2 @@
+• Smoother D-pad navigation on Android TV — text fields and dropdowns are now easy to use with the remote
+• Fixed the lock screen on landscape TVs, where the bottom row could be cut off

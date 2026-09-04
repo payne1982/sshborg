@@ -1,0 +1,2 @@
+• Navegação com D-pad mais fluida na Android TV — campos de texto e menus suspensos funcionam bem com o comando
+• Corrigido o ecrã de bloqueio em TVs na horizontal, onde a última linha podia ficar cortada

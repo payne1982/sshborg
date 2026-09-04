@@ -1,0 +1,2 @@
+• Navigation au D-pad plus fluide sur Android TV — champs de texte et menus déroulants s'utilisent bien à la télécommande
+• Correction de l'écran de verrouillage sur les TV en paysage, où la dernière rangée pouvait être coupée
