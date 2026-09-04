@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +31,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.Screen
 import com.sshborg.data.db.GroupEntity
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.TvSelectField
+import com.sshborg.ui.common.TvTapField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +44,12 @@ fun AddEditHostScreen(
     vm: AddEditHostViewModel = viewModel(),
 ) {
     val isNew = hostId == Screen.AddEditHost.NEW_ID
+
+    // On a touchless device (TV/D-pad) the free-text fields become "tap to edit" rows:
+    // navigating onto one no longer forces the on-screen keyboard to grab focus — you
+    // move with ↑/↓ and press OK to edit in a dialog. Touch devices keep the inline fields.
+    val context = LocalContext.current
+    val touchless = remember { isTouchless(context) }
 
     LaunchedEffect(hostId) { vm.loadHost(hostId) }
 
@@ -104,83 +114,94 @@ fun AddEditHostScreen(
             val focusManager = LocalFocusManager.current
             val nextField = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Next) })
 
-            OutlinedTextField(
+            HostField(
                 value = label, onValueChange = { vm.label.value = it },
-                label = { Text(stringResource(R.string.host_field_label)) },
+                label = stringResource(R.string.host_field_label),
+                touchless = touchless,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                keyboardActions = nextField,
+                imeAction = ImeAction.Next, keyboardActions = nextField,
             )
-            OutlinedTextField(
+            HostField(
                 value = hostname,
                 onValueChange = { vm.hostname.value = it.filter { c -> c.isLetterOrDigit() || c in ".-:_" } },
-                label = { Text(stringResource(R.string.host_field_hostname)) },
+                label = stringResource(R.string.host_field_hostname),
+                touchless = touchless,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
-                keyboardActions = nextField,
+                keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next, keyboardActions = nextField,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
+                HostField(
                     value = username, onValueChange = { vm.username.value = it },
-                    label = { Text(stringResource(R.string.host_field_username)) },
+                    label = stringResource(R.string.host_field_username),
+                    touchless = touchless,
                     modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = nextField,
+                    imeAction = ImeAction.Next, keyboardActions = nextField,
                 )
-                OutlinedTextField(
+                HostField(
                     value = port,
                     onValueChange = { vm.port.value = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.host_field_port)) },
+                    label = stringResource(R.string.host_field_port),
+                    touchless = touchless,
                     modifier = Modifier.width(90.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-                    keyboardActions = nextField,
+                    keyboardType = KeyboardType.Number, imeAction = ImeAction.Next, keyboardActions = nextField,
                 )
             }
-            ExposedDropdownMenuBox(
-                expanded = groupMenuExpanded,
-                onExpandedChange = { groupMenuExpanded = it },
-            ) {
-                val selectedGroup = groups.find { it.id == groupId }
-                OutlinedTextField(
-                    value = selectedGroup?.name ?: stringResource(R.string.host_group_none),
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.host_group_label)) },
+            val selectedGroup = groups.find { it.id == groupId }
+            val groupItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.host_group_none)) },
+                    onClick = { vm.groupId.value = null; dismiss() },
+                )
+                groups.forEach { group ->
+                    DropdownMenuItem(
+                        leadingIcon = { Box(Modifier.size(14.dp).background(Color(group.color), CircleShape)) },
+                        text = { Text(group.name) },
+                        onClick = { vm.groupId.value = group.id; dismiss() },
+                    )
+                }
+                HorizontalDivider()
+                DropdownMenuItem(
+                    leadingIcon = { Icon(Icons.Default.Add, null) },
+                    text = { Text(stringResource(R.string.host_group_new)) },
+                    onClick = { dismiss(); showNewGroupDialog = true },
+                )
+            }
+            if (touchless) {
+                TvSelectField(
+                    label = stringResource(R.string.host_group_label),
+                    valueText = selectedGroup?.name ?: stringResource(R.string.host_group_none),
+                    modifier = Modifier.fillMaxWidth(),
                     leadingIcon = selectedGroup?.let { g ->
                         { Box(Modifier.size(14.dp).background(Color(g.color), CircleShape)) }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(groupMenuExpanded) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    singleLine = true,
+                    menuItems = groupItems,
                 )
-                ExposedDropdownMenu(
+            } else {
+                ExposedDropdownMenuBox(
                     expanded = groupMenuExpanded,
-                    onDismissRequest = { groupMenuExpanded = false },
+                    onExpandedChange = { groupMenuExpanded = it },
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.host_group_none)) },
-                        onClick = { vm.groupId.value = null; groupMenuExpanded = false },
+                    OutlinedTextField(
+                        value = selectedGroup?.name ?: stringResource(R.string.host_group_none),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.host_group_label)) },
+                        leadingIcon = selectedGroup?.let { g ->
+                            { Box(Modifier.size(14.dp).background(Color(g.color), CircleShape)) }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(groupMenuExpanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        singleLine = true,
                     )
-                    groups.forEach { group ->
-                        DropdownMenuItem(
-                            leadingIcon = { Box(Modifier.size(14.dp).background(Color(group.color), CircleShape)) },
-                            text = { Text(group.name) },
-                            onClick = { vm.groupId.value = group.id; groupMenuExpanded = false },
-                        )
+                    ExposedDropdownMenu(
+                        expanded = groupMenuExpanded,
+                        onDismissRequest = { groupMenuExpanded = false },
+                    ) {
+                        groupItems { groupMenuExpanded = false }
                     }
-                    HorizontalDivider()
-                    DropdownMenuItem(
-                        leadingIcon = { Icon(Icons.Default.Add, null) },
-                        text = { Text(stringResource(R.string.host_group_new)) },
-                        onClick = { groupMenuExpanded = false; showNewGroupDialog = true },
-                    )
                 }
             }
             Row(
@@ -238,22 +259,32 @@ fun AddEditHostScreen(
             }
 
             if (!useKey) {
-                OutlinedTextField(
-                    value = password, onValueChange = { vm.password.value = it },
-                    label = { Text(stringResource(R.string.host_field_password)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        TextButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Text(
-                                if (passwordVisible) stringResource(R.string.action_hide)
-                                else stringResource(R.string.action_show)
-                            )
-                        }
-                    },
-                )
+                if (touchless) {
+                    HostField(
+                        value = password, onValueChange = { vm.password.value = it },
+                        label = stringResource(R.string.host_field_password),
+                        touchless = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = KeyboardType.Password, isPassword = true,
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = password, onValueChange = { vm.password.value = it },
+                        label = { Text(stringResource(R.string.host_field_password)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Text(
+                                    if (passwordVisible) stringResource(R.string.action_hide)
+                                    else stringResource(R.string.action_show)
+                                )
+                            }
+                        },
+                    )
+                }
             } else {
                 // Key selector
                 Box {
@@ -329,21 +360,22 @@ fun AddEditHostScreen(
             }
 
             if (jumpMode == "simple") {
-                OutlinedTextField(
+                HostField(
                     value = jumpHosts,
                     onValueChange = { vm.jumpHosts.value = it },
-                    label = { Text(stringResource(R.string.host_field_jump_hosts)) },
-                    placeholder = { Text(stringResource(R.string.host_jump_hosts_placeholder)) },
-                    supportingText = { Text(stringResource(R.string.host_jump_hosts_supporting)) },
+                    label = stringResource(R.string.host_field_jump_hosts),
+                    touchless = touchless,
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                    keyboardType = KeyboardType.Uri,
+                    placeholder = stringResource(R.string.host_jump_hosts_placeholder),
+                    supporting = stringResource(R.string.host_jump_hosts_supporting),
                 )
             } else {
                 // Host-list mode: one row per hop
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     jumpHostIds.forEachIndexed { index, selectedId ->
                         JumpHostRow(
+                            touchless        = touchless,
                             selectedId       = selectedId,
                             options          = availableJumpHosts,
                             onSelect         = { newId ->
@@ -371,15 +403,16 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_port_forwarding), style = MaterialTheme.typography.titleSmall)
 
-            OutlinedTextField(
+            HostField(
                 value = portForwardings,
                 onValueChange = { vm.portForwardings.value = it },
-                label = { Text(stringResource(R.string.host_field_port_forwarding)) },
-                placeholder = { Text(stringResource(R.string.host_port_forwarding_placeholder)) },
-                supportingText = { Text(stringResource(R.string.host_port_forwarding_supporting)) },
+                label = stringResource(R.string.host_field_port_forwarding),
+                touchless = touchless,
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 2,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                keyboardType = KeyboardType.Uri,
+                singleLine = false, minLines = 2,
+                placeholder = stringResource(R.string.host_port_forwarding_placeholder),
+                supporting = stringResource(R.string.host_port_forwarding_supporting),
             )
 
             HorizontalDivider()
@@ -408,15 +441,15 @@ fun AddEditHostScreen(
                 "home" -> "~"
                 else   -> sftpStartDir
             }
-            OutlinedTextField(
+            HostField(
                 value = startDirValue,
                 onValueChange = { if (sftpStartMode == "fixed") vm.sftpStartDir.value = it },
-                label = { Text(stringResource(R.string.host_field_start_directory)) },
+                label = stringResource(R.string.host_field_start_directory),
+                touchless = touchless,
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = sftpStartMode != "fixed",
                 enabled = sftpStartMode == "fixed",
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                keyboardType = KeyboardType.Uri,
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -489,6 +522,7 @@ fun AddEditHostScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun JumpHostRow(
+    touchless: Boolean,
     selectedId: Long,
     options: List<AddEditHostViewModel.JumpHostOption>,
     onSelect: (Long) -> Unit,
@@ -496,58 +530,72 @@ private fun JumpHostRow(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val selected = options.find { it.host.id == selectedId }
+    val jumpItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
+        options.forEach { option ->
+            DropdownMenuItem(
+                text = {
+                    Column {
+                        Text(
+                            option.host.label,
+                            color = if (option.isSelectable) LocalContentColor.current
+                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                        )
+                        if (!option.isSelectable) {
+                            Text(
+                                stringResource(R.string.host_jump_no_password),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            )
+                        }
+                    }
+                },
+                onClick = {
+                    if (option.isSelectable) {
+                        onSelect(option.host.id)
+                        dismiss()
+                    }
+                },
+                enabled = option.isSelectable,
+            )
+        }
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-            modifier = Modifier.weight(1f),
-        ) {
-            OutlinedTextField(
-                value = selected?.host?.label
+        if (touchless) {
+            TvSelectField(
+                label = stringResource(R.string.host_section_jump_hosts),
+                valueText = selected?.host?.label
                     ?: stringResource(R.string.host_jump_select_placeholder),
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                singleLine = true,
+                modifier = Modifier.weight(1f),
+                showLabel = false,
+                menuItems = jumpItems,
             )
-            ExposedDropdownMenu(
+        } else {
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false },
+                onExpandedChange = { expanded = it },
+                modifier = Modifier.weight(1f),
             ) {
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = {
-                            Column {
-                                Text(
-                                    option.host.label,
-                                    color = if (option.isSelectable) LocalContentColor.current
-                                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                                )
-                                if (!option.isSelectable) {
-                                    Text(
-                                        stringResource(R.string.host_jump_no_password),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                                    )
-                                }
-                            }
-                        },
-                        onClick = {
-                            if (option.isSelectable) {
-                                onSelect(option.host.id)
-                                expanded = false
-                            }
-                        },
-                        enabled = option.isSelectable,
-                    )
+                OutlinedTextField(
+                    value = selected?.host?.label
+                        ?: stringResource(R.string.host_jump_select_placeholder),
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    singleLine = true,
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    jumpItems { expanded = false }
                 }
             }
         }
@@ -557,3 +605,59 @@ private fun JumpHostRow(
         }
     }
 }
+
+/**
+ * A host form text field. On a touchscreen it is the usual inline [OutlinedTextField].
+ * On a touchless device (TV/D-pad) — where a focused text field would open the on-screen
+ * keyboard and trap the focus, so ↑/↓ can no longer move between fields — it instead
+ * renders a focusable "tap to edit" row ([TvTapField]) that opens the keyboard only on OK.
+ * Read-only/disabled fields keep the inline control in both modes.
+ */
+@Composable
+private fun HostField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    touchless: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    isPassword: Boolean = false,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    placeholder: String? = null,
+    supporting: String? = null,
+) {
+    if (touchless && enabled && !readOnly) {
+        TvTapField(
+            value = value,
+            onValueChange = onValueChange,
+            label = label,
+            modifier = modifier,
+            keyboardType = keyboardType,
+            isPassword = isPassword,
+            singleLine = singleLine,
+            placeholder = placeholder,
+            supporting = supporting,
+        )
+        return
+    }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        singleLine = singleLine,
+        minLines = minLines,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+        keyboardActions = keyboardActions,
+        placeholder = placeholder?.let { { Text(it) } },
+        supportingText = supporting?.let { { Text(it) } },
+    )
+}
+

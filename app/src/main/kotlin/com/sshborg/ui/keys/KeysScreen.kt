@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.db.SshKeyEntity
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.TvTapField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -279,6 +281,8 @@ private fun ImportKeyDialog(
     var passphrase by remember { mutableStateOf("") }
     var passphraseVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val importContext = LocalContext.current
+    val touchless = remember { isTouchless(importContext) }
     val errorEncrypted   = stringResource(R.string.keys_import_error_encrypted)
     val errorWrongPass   = stringResource(R.string.keys_import_error_wrong_passphrase)
     val errorInvalid     = stringResource(R.string.keys_import_error_invalid)
@@ -292,13 +296,22 @@ private fun ImportKeyDialog(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                OutlinedTextField(
-                    value = label,
-                    onValueChange = { label = it; errorMessage = "" },
-                    label = { Text(stringResource(R.string.keygen_field_label)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (touchless) {
+                    TvTapField(
+                        value = label,
+                        onValueChange = { label = it; errorMessage = "" },
+                        label = stringResource(R.string.keygen_field_label),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = label,
+                        onValueChange = { label = it; errorMessage = "" },
+                        label = { Text(stringResource(R.string.keygen_field_label)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
                 OutlinedButton(
                     onClick = onLoadFromFile,
                     modifier = Modifier.fillMaxWidth(),
@@ -307,31 +320,52 @@ private fun ImportKeyDialog(
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.keys_import_load_from_file))
                 }
-                OutlinedTextField(
-                    value = pem,
-                    onValueChange = { onPemChange(it); errorMessage = "" },
-                    label = { Text(stringResource(R.string.keys_import_pem_label)) },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
-                    textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace),
-                    maxLines = 8,
-                )
-                OutlinedTextField(
-                    value = passphrase,
-                    onValueChange = { passphrase = it; errorMessage = "" },
-                    label = { Text(stringResource(R.string.keys_import_passphrase_label)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        TextButton(onClick = { passphraseVisible = !passphraseVisible }) {
-                            Text(
-                                if (passphraseVisible) stringResource(R.string.action_hide)
-                                else stringResource(R.string.action_show)
-                            )
-                        }
-                    },
-                )
+                if (touchless) {
+                    TvTapField(
+                        value = pem,
+                        onValueChange = { onPemChange(it); errorMessage = "" },
+                        label = stringResource(R.string.keys_import_pem_label),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = false,
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = pem,
+                        onValueChange = { onPemChange(it); errorMessage = "" },
+                        label = { Text(stringResource(R.string.keys_import_pem_label)) },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
+                        textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace),
+                        maxLines = 8,
+                    )
+                }
+                if (touchless) {
+                    TvTapField(
+                        value = passphrase,
+                        onValueChange = { passphrase = it; errorMessage = "" },
+                        label = stringResource(R.string.keys_import_passphrase_label),
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = KeyboardType.Password,
+                        isPassword = true,
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = passphrase,
+                        onValueChange = { passphrase = it; errorMessage = "" },
+                        label = { Text(stringResource(R.string.keys_import_passphrase_label)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            TextButton(onClick = { passphraseVisible = !passphraseVisible }) {
+                                Text(
+                                    if (passphraseVisible) stringResource(R.string.action_hide)
+                                    else stringResource(R.string.action_show)
+                                )
+                            }
+                        },
+                    )
+                }
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,
@@ -374,18 +408,29 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
     val types = listOf("ed25519", "rsa", "ecdsa")
     val ecdsaCurves = listOf("256", "384", "521")
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    val genContext = LocalContext.current
+    val touchless = remember { isTouchless(genContext) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.keygen_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = label, onValueChange = { label = it },
-                    label = { Text(stringResource(R.string.keygen_field_label)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (touchless) {
+                    TvTapField(
+                        value = label,
+                        onValueChange = { label = it },
+                        label = stringResource(R.string.keygen_field_label),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = label, onValueChange = { label = it },
+                        label = { Text(stringResource(R.string.keygen_field_label)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
 
                 Text(stringResource(R.string.keygen_key_type), style = MaterialTheme.typography.labelMedium)
                 types.forEach { t ->
@@ -402,16 +447,26 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    "rsa" -> OutlinedTextField(
-                        value = rsaBits,
-                        onValueChange = { if (it.all(Char::isDigit)) rsaBits = it },
-                        label = { Text(stringResource(R.string.keygen_size_bits)) },
-                        singleLine = true,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    "rsa" -> if (touchless) {
+                        TvTapField(
+                            value = rsaBits,
+                            onValueChange = { if (it.all(Char::isDigit)) rsaBits = it },
+                            label = stringResource(R.string.keygen_size_bits),
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardType = KeyboardType.Number,
+                        )
+                    } else {
+                        OutlinedTextField(
+                            value = rsaBits,
+                            onValueChange = { if (it.all(Char::isDigit)) rsaBits = it },
+                            label = { Text(stringResource(R.string.keygen_size_bits)) },
+                            singleLine = true,
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                     "ecdsa" -> {
                         Text(stringResource(R.string.keygen_curve_bits), style = MaterialTheme.typography.labelMedium)
                         ecdsaCurves.forEach { curve ->

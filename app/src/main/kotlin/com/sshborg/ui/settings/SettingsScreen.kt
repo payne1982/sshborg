@@ -20,12 +20,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
 import com.sshborg.isTelevision
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.TvSelectField
+import com.sshborg.ui.common.TvTapField
 import com.sshborg.ui.lock.ConfirmSecretDialog
 import com.sshborg.ui.lock.LockSecretDialog
 
@@ -89,23 +93,21 @@ fun SettingsScreen(
     }
 
     var showEnableEncryptionDialog by remember { mutableStateOf(false) }
-    var timeoutMenuExpanded by remember { mutableStateOf(false) }
     var lockModeMenuExpanded by remember { mutableStateOf(false) }
     var showLockDisclaimer by remember { mutableStateOf(false) }
     var showLockSecretDialog by remember { mutableStateOf(false) }
     var lockDialogIsChange by remember { mutableStateOf(false) }
     var showConfirmCurrent by remember { mutableStateOf(false) }
     var pendingLockMode by remember { mutableStateOf<Int?>(null) }
-    var languageMenuExpanded by remember { mutableStateOf(false) }
-    var themeMenuExpanded by remember { mutableStateOf(false) }
-    var terminalColorsMenuExpanded by remember { mutableStateOf(false) }
-    var doubleTapMenuExpanded by remember { mutableStateOf(false) }
     var scrollbackText by remember(scrollbackLines) { mutableStateOf(scrollbackLines.toString()) }
     var fontSizeText by remember(terminalFontSize) { mutableStateOf(terminalFontSize.toString()) }
     var currentLocaleTag by remember { mutableStateOf(vm.currentLocaleTag) }
 
     val biometricAvailable = remember { BiometricHelper.canAuthenticate(context) }
     val isTv = remember { isTelevision(context) }
+    // On touchless devices (TV/D-pad) the inline numeric fields would trap the focus behind
+    // the on-screen keyboard, so there they become "tap to edit" fields (saved on close).
+    val touchless = remember { isTouchless(context) }
 
     // Map seconds to string resource id, then resolve the label
     val currentTimeoutResId = TIMEOUT_OPTIONS.find { it.first == lockTimeoutSeconds }?.second
@@ -175,37 +177,13 @@ fun SettingsScreen(
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_language)) },
                 trailingContent = {
-                    ExposedDropdownMenuBox(
-                        expanded = languageMenuExpanded,
-                        onExpandedChange = { languageMenuExpanded = it },
-                    ) {
-                        OutlinedTextField(
-                            value = currentLanguageLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(languageMenuExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .width(180.dp),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            singleLine = true,
-                        )
-                        ExposedDropdownMenu(
-                            expanded = languageMenuExpanded,
-                            onDismissRequest = { languageMenuExpanded = false },
-                        ) {
-                            languageOptions.forEach { (tag, label) ->
-                                DropdownMenuItem(
-                                    text = { Text(label) },
-                                    onClick = {
-                                        languageMenuExpanded = false
-                                        currentLocaleTag = tag
-                                        vm.setLocale(tag)
-                                    },
-                                )
-                            }
-                        }
-                    }
+                    SettingSelect(
+                        label = stringResource(R.string.settings_language),
+                        selected = currentLocaleTag,
+                        options = languageOptions,
+                        onSelect = { tag -> currentLocaleTag = tag; vm.setLocale(tag) },
+                        touchless = touchless,
+                    )
                 },
             )
 
@@ -220,36 +198,13 @@ fun SettingsScreen(
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_theme_title)) },
                 trailingContent = {
-                    ExposedDropdownMenuBox(
-                        expanded = themeMenuExpanded,
-                        onExpandedChange = { themeMenuExpanded = it },
-                    ) {
-                        OutlinedTextField(
-                            value = currentThemeLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(themeMenuExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .width(180.dp),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            singleLine = true,
-                        )
-                        ExposedDropdownMenu(
-                            expanded = themeMenuExpanded,
-                            onDismissRequest = { themeMenuExpanded = false },
-                        ) {
-                            themeOptions.forEach { (mode, label) ->
-                                DropdownMenuItem(
-                                    text = { Text(label) },
-                                    onClick = {
-                                        themeMenuExpanded = false
-                                        vm.setNightMode(mode)
-                                    },
-                                )
-                            }
-                        }
-                    }
+                    SettingSelect(
+                        label = stringResource(R.string.settings_theme_title),
+                        selected = nightMode,
+                        options = themeOptions,
+                        onSelect = { vm.setNightMode(it) },
+                        touchless = touchless,
+                    )
                 },
             )
 
@@ -274,36 +229,13 @@ fun SettingsScreen(
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_terminal_colors_title)) },
                 trailingContent = {
-                    ExposedDropdownMenuBox(
-                        expanded = terminalColorsMenuExpanded,
-                        onExpandedChange = { terminalColorsMenuExpanded = it },
-                    ) {
-                        OutlinedTextField(
-                            value = currentTerminalColorsLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(terminalColorsMenuExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .width(180.dp),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            singleLine = true,
-                        )
-                        ExposedDropdownMenu(
-                            expanded = terminalColorsMenuExpanded,
-                            onDismissRequest = { terminalColorsMenuExpanded = false },
-                        ) {
-                            terminalColorOptions.forEach { (scheme, label) ->
-                                DropdownMenuItem(
-                                    text = { Text(label) },
-                                    onClick = {
-                                        terminalColorsMenuExpanded = false
-                                        vm.setTerminalColorScheme(scheme)
-                                    },
-                                )
-                            }
-                        }
-                    }
+                    SettingSelect(
+                        label = stringResource(R.string.settings_terminal_colors_title),
+                        selected = terminalColorScheme,
+                        options = terminalColorOptions,
+                        onSelect = { vm.setTerminalColorScheme(it) },
+                        touchless = touchless,
+                    )
                 },
             )
 
@@ -319,36 +251,13 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_double_tap_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_double_tap_subtitle)) },
                 trailingContent = {
-                    ExposedDropdownMenuBox(
-                        expanded = doubleTapMenuExpanded,
-                        onExpandedChange = { doubleTapMenuExpanded = it },
-                    ) {
-                        OutlinedTextField(
-                            value = currentDoubleTapLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(doubleTapMenuExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .width(180.dp),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            singleLine = true,
-                        )
-                        ExposedDropdownMenu(
-                            expanded = doubleTapMenuExpanded,
-                            onDismissRequest = { doubleTapMenuExpanded = false },
-                        ) {
-                            doubleTapOptions.forEach { (action, label) ->
-                                DropdownMenuItem(
-                                    text = { Text(label) },
-                                    onClick = {
-                                        doubleTapMenuExpanded = false
-                                        vm.setDoubleTapAction(action)
-                                    },
-                                )
-                            }
-                        }
-                    }
+                    SettingSelect(
+                        label = stringResource(R.string.settings_double_tap_title),
+                        selected = doubleTapAction,
+                        options = doubleTapOptions,
+                        onSelect = { vm.setDoubleTapAction(it) },
+                        touchless = touchless,
+                    )
                 },
             )
 
@@ -385,20 +294,32 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_font_size_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_font_size_subtitle)) },
                 trailingContent = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
+                    if (touchless) {
+                        TvTapField(
                             value = fontSizeText,
                             onValueChange = { fontSizeText = it.filter { c -> c.isDigit() } },
-                            modifier = Modifier.width(90.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(onDone = { saveFontSize(); focusManager.clearFocus() }),
+                            label = stringResource(R.string.settings_font_size_title),
+                            showLabel = false,
+                            modifier = Modifier.width(96.dp),
+                            keyboardType = KeyboardType.Number,
+                            onDone = saveFontSize,
                         )
-                        IconButton(onClick = saveFontSize) {
-                            Icon(Icons.Default.Check, contentDescription = null)
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = fontSizeText,
+                                onValueChange = { fontSizeText = it.filter { c -> c.isDigit() } },
+                                modifier = Modifier.width(90.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = { saveFontSize(); focusManager.clearFocus() }),
+                            )
+                            IconButton(onClick = saveFontSize) {
+                                Icon(Icons.Default.Check, contentDescription = null)
+                            }
                         }
                     }
                 },
@@ -413,20 +334,32 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_scrollback_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_scrollback_subtitle)) },
                 trailingContent = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
+                    if (touchless) {
+                        TvTapField(
                             value = scrollbackText,
                             onValueChange = { scrollbackText = it.filter { c -> c.isDigit() } },
-                            modifier = Modifier.width(90.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(onDone = { saveScrollback(); focusManager.clearFocus() }),
+                            label = stringResource(R.string.settings_scrollback_title),
+                            showLabel = false,
+                            modifier = Modifier.width(96.dp),
+                            keyboardType = KeyboardType.Number,
+                            onDone = saveScrollback,
                         )
-                        IconButton(onClick = saveScrollback) {
-                            Icon(Icons.Default.Check, contentDescription = null)
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = scrollbackText,
+                                onValueChange = { scrollbackText = it.filter { c -> c.isDigit() } },
+                                modifier = Modifier.width(90.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = { saveScrollback(); focusManager.clearFocus() }),
+                            )
+                            IconButton(onClick = saveScrollback) {
+                                Icon(Icons.Default.Check, contentDescription = null)
+                            }
                         }
                     }
                 },
@@ -514,54 +447,68 @@ fun SettingsScreen(
                     )
                 },
                 trailingContent = {
-                    ExposedDropdownMenuBox(
-                        expanded = lockModeMenuExpanded,
-                        onExpandedChange = { lockModeMenuExpanded = it },
-                    ) {
-                        OutlinedTextField(
-                            value = currentLockLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(lockModeMenuExpanded) },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .width(160.dp),
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            singleLine = true,
-                        )
-                        ExposedDropdownMenu(
-                            expanded = lockModeMenuExpanded,
-                            onDismissRequest = { lockModeMenuExpanded = false },
-                        ) {
-                            // Biometric/device modes need a device secure lock and are
-                            // filtered out entirely on a TV, where they don't work; None and
-                            // the in-app PIN/passphrase are always offered.
-                            val lockOptions = if (isTv)
-                                LOCK_MODE_OPTIONS.filter {
-                                    it.first == AppPreferences.LOCK_NONE || it.first == AppPreferences.LOCK_SECRET
-                                }
-                            else LOCK_MODE_OPTIONS
-                            lockOptions.forEach { (mode, labelResId) ->
-                                val enabled = mode == AppPreferences.LOCK_NONE ||
-                                    mode == AppPreferences.LOCK_SECRET || biometricAvailable
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(labelResId)) },
-                                    enabled = enabled,
-                                    onClick = {
-                                        lockModeMenuExpanded = false
-                                        when {
-                                            mode == lockMode -> Unit  // already the active mode
-                                            // Leaving the in-app lock needs the current secret.
-                                            lockMode == AppPreferences.LOCK_SECRET -> {
-                                                pendingLockMode = mode
-                                                showConfirmCurrent = true
-                                            }
-                                            // Enabling it: warn about no-recovery, then capture it.
-                                            mode == AppPreferences.LOCK_SECRET -> showLockDisclaimer = true
-                                            else -> vm.setLockMode(mode)
+                    // Item list shared by the touch dropdown and the touchless picker.
+                    val lockItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
+                        // Biometric/device modes need a device secure lock and are filtered
+                        // out entirely on a TV, where they don't work; None and the in-app
+                        // PIN/passphrase are always offered.
+                        val lockOptions = if (isTv)
+                            LOCK_MODE_OPTIONS.filter {
+                                it.first == AppPreferences.LOCK_NONE || it.first == AppPreferences.LOCK_SECRET
+                            }
+                        else LOCK_MODE_OPTIONS
+                        lockOptions.forEach { (mode, labelResId) ->
+                            val enabled = mode == AppPreferences.LOCK_NONE ||
+                                mode == AppPreferences.LOCK_SECRET || biometricAvailable
+                            DropdownMenuItem(
+                                text = { Text(stringResource(labelResId)) },
+                                enabled = enabled,
+                                onClick = {
+                                    dismiss()
+                                    when {
+                                        mode == lockMode -> Unit  // already the active mode
+                                        // Leaving the in-app lock needs the current secret.
+                                        lockMode == AppPreferences.LOCK_SECRET -> {
+                                            pendingLockMode = mode
+                                            showConfirmCurrent = true
                                         }
-                                    },
-                                )
+                                        // Enabling it: warn about no-recovery, then capture it.
+                                        mode == AppPreferences.LOCK_SECRET -> showLockDisclaimer = true
+                                        else -> vm.setLockMode(mode)
+                                    }
+                                },
+                            )
+                        }
+                    }
+                    if (touchless) {
+                        TvSelectField(
+                            label = stringResource(R.string.settings_app_lock_title),
+                            valueText = currentLockLabel,
+                            modifier = Modifier.width(160.dp),
+                            showLabel = false,
+                            menuItems = lockItems,
+                        )
+                    } else {
+                        ExposedDropdownMenuBox(
+                            expanded = lockModeMenuExpanded,
+                            onExpandedChange = { lockModeMenuExpanded = it },
+                        ) {
+                            OutlinedTextField(
+                                value = currentLockLabel,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(lockModeMenuExpanded) },
+                                modifier = Modifier
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                    .width(160.dp),
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                singleLine = true,
+                            )
+                            ExposedDropdownMenu(
+                                expanded = lockModeMenuExpanded,
+                                onDismissRequest = { lockModeMenuExpanded = false },
+                            ) {
+                                lockItems { lockModeMenuExpanded = false }
                             }
                         }
                     }
@@ -630,36 +577,14 @@ fun SettingsScreen(
                     headlineContent = { Text(stringResource(R.string.settings_lock_after_title)) },
                     supportingContent = { Text(stringResource(R.string.settings_lock_after_subtitle)) },
                     trailingContent = {
-                        ExposedDropdownMenuBox(
-                            expanded = timeoutMenuExpanded,
-                            onExpandedChange = { timeoutMenuExpanded = it },
-                        ) {
-                            OutlinedTextField(
-                                value = currentTimeoutLabel,
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(timeoutMenuExpanded) },
-                                modifier = Modifier
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                    .width(160.dp),
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                singleLine = true,
-                            )
-                            ExposedDropdownMenu(
-                                expanded = timeoutMenuExpanded,
-                                onDismissRequest = { timeoutMenuExpanded = false },
-                            ) {
-                                TIMEOUT_OPTIONS.forEach { (seconds, labelResId) ->
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(labelResId)) },
-                                        onClick = {
-                                            vm.setLockTimeoutSeconds(seconds)
-                                            timeoutMenuExpanded = false
-                                        },
-                                    )
-                                }
-                            }
-                        }
+                        SettingSelect(
+                            label = stringResource(R.string.settings_lock_after_title),
+                            selected = lockTimeoutSeconds,
+                            options = TIMEOUT_OPTIONS.map { (seconds, resId) -> seconds to stringResource(resId) },
+                            onSelect = { vm.setLockTimeoutSeconds(it) },
+                            touchless = touchless,
+                            width = 160.dp,
+                        )
                     },
                 )
             }
@@ -753,5 +678,55 @@ fun SettingsScreen(
                 }
             },
         )
+    }
+}
+
+/**
+ * A single-choice setting. On touch it is the usual [ExposedDropdownMenuBox]; on a touchless
+ * device (TV/D-pad) it becomes a [TvSelectField], whose plain anchor a D-pad can move past —
+ * unlike the dropdown box, whose text-field anchor traps the focus on a TV.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> SettingSelect(
+    label: String,
+    selected: T,
+    options: List<Pair<T, String>>,
+    onSelect: (T) -> Unit,
+    touchless: Boolean,
+    width: Dp = 180.dp,
+) {
+    val valueText = options.find { it.first == selected }?.second ?: options.firstOrNull()?.second ?: ""
+    if (touchless) {
+        TvSelectField(
+            label = label,
+            valueText = valueText,
+            modifier = Modifier.width(width),
+            showLabel = false,
+        ) { dismiss ->
+            options.forEach { (value, optLabel) ->
+                DropdownMenuItem(text = { Text(optLabel) }, onClick = { onSelect(value); dismiss() })
+            }
+        }
+    } else {
+        var expanded by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+            OutlinedTextField(
+                value = valueText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .width(width),
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                singleLine = true,
+            )
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                options.forEach { (value, optLabel) ->
+                    DropdownMenuItem(text = { Text(optLabel) }, onClick = { onSelect(value); expanded = false })
+                }
+            }
+        }
     }
 }

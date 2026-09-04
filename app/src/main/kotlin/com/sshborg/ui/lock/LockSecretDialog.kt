@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -17,6 +18,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import com.sshborg.data.AppLockManager
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.TvTapField
 import kotlinx.coroutines.launch
 
 private const val PIN_MIN = 4
@@ -37,6 +40,8 @@ fun LockSecretDialog(
     verifyCurrent: (suspend (CharArray) -> Boolean)? = null,
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val touchless = remember { isTouchless(context) }
     var current by remember { mutableStateOf("") }
     var currentWrong by remember { mutableStateOf(false) }
     var kind by remember { mutableStateOf(AppLockManager.Kind.PIN) }
@@ -93,44 +98,78 @@ fun LockSecretDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (needsCurrent) {
-                    OutlinedTextField(
-                        value = current,
-                        onValueChange = { current = it; currentWrong = false },
-                        label = { Text(stringResource(R.string.lock_current)) },
-                        singleLine = true,
-                        isError = currentWrong,
-                        visualTransformation = revealVisual,
-                        trailingIcon = revealIcon,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    if (touchless) {
+                        TvTapField(
+                            value = current,
+                            onValueChange = { current = it; currentWrong = false },
+                            label = stringResource(R.string.lock_current),
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardType = KeyboardType.Password,
+                            isPassword = true,
+                        )
+                    } else {
+                        OutlinedTextField(
+                            value = current,
+                            onValueChange = { current = it; currentWrong = false },
+                            label = { Text(stringResource(R.string.lock_current)) },
+                            singleLine = true,
+                            isError = currentWrong,
+                            visualTransformation = revealVisual,
+                            trailingIcon = revealIcon,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                     HorizontalDivider()
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     KindOption(stringResource(R.string.lock_kind_pin), isPin) { selectKind(AppLockManager.Kind.PIN) }
                     KindOption(stringResource(R.string.lock_kind_passphrase), !isPin) { selectKind(AppLockManager.Kind.PASSPHRASE) }
                 }
-                OutlinedTextField(
-                    value = secret,
-                    onValueChange = { secret = filterInput(it) },
-                    label = { Text(stringResource(if (isPin) R.string.lock_enter_pin else R.string.lock_enter_passphrase)) },
-                    singleLine = true,
-                    visualTransformation = revealVisual,
-                    trailingIcon = revealIcon,
-                    keyboardOptions = keyboard,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = confirm,
-                    onValueChange = { confirm = filterInput(it) },
-                    label = { Text(stringResource(R.string.lock_confirm)) },
-                    singleLine = true,
-                    isError = confirm.isNotEmpty() && !matches,
-                    visualTransformation = revealVisual,
-                    trailingIcon = revealIcon,
-                    keyboardOptions = keyboard,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                val secretKeyboardType = if (isPin) KeyboardType.NumberPassword else KeyboardType.Password
+                if (touchless) {
+                    TvTapField(
+                        value = secret,
+                        onValueChange = { secret = filterInput(it) },
+                        label = stringResource(if (isPin) R.string.lock_enter_pin else R.string.lock_enter_passphrase),
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = secretKeyboardType,
+                        isPassword = true,
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = secret,
+                        onValueChange = { secret = filterInput(it) },
+                        label = { Text(stringResource(if (isPin) R.string.lock_enter_pin else R.string.lock_enter_passphrase)) },
+                        singleLine = true,
+                        visualTransformation = revealVisual,
+                        trailingIcon = revealIcon,
+                        keyboardOptions = keyboard,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                if (touchless) {
+                    TvTapField(
+                        value = confirm,
+                        onValueChange = { confirm = filterInput(it) },
+                        label = stringResource(R.string.lock_confirm),
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = secretKeyboardType,
+                        isPassword = true,
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = confirm,
+                        onValueChange = { confirm = filterInput(it) },
+                        label = { Text(stringResource(R.string.lock_confirm)) },
+                        singleLine = true,
+                        isError = confirm.isNotEmpty() && !matches,
+                        visualTransformation = revealVisual,
+                        trailingIcon = revealIcon,
+                        keyboardOptions = keyboard,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
                 if (error != null) {
                     Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }

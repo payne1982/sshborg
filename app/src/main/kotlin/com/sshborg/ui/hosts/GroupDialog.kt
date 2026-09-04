@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntOffset
@@ -26,6 +27,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import com.sshborg.data.db.GroupEntity
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.TvTapField
 
 /**
  * Classic gradient color picker (saturation/brightness square + hue bar) with
@@ -176,18 +179,31 @@ fun GroupDialog(
 ) {
     var name  by remember { mutableStateOf(initialName) }
     var color by remember { mutableIntStateOf(initialColor) }
+    val context = LocalContext.current
+    val touchless = remember { isTouchless(context) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text(stringResource(R.string.group_dialog_name)) },
-                    singleLine = true,
-                )
+                if (touchless) {
+                    // On a TV/D-pad the inline field's keyboard would trap the focus and
+                    // block reaching the colour swatches; a tap-to-edit field frees ↑/↓.
+                    TvTapField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = stringResource(R.string.group_dialog_name),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text(stringResource(R.string.group_dialog_name)) },
+                        singleLine = true,
+                    )
+                }
                 ColorPickerContent(color = color, onColorChange = { color = it })
             }
         },
