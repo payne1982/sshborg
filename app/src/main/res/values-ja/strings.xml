@@ -393,4 +393,7 @@
     <string name="lock_disclaimer_body">忘れた PIN やパスフレーズは復元できません。その場合はアプリのデータを消去するか再インストールが必要で、バックアップがなければ保存済みのサーバーや鍵を失います。</string>
     <string name="lock_disclaimer_continue">了解しました</string>
     <string name="lock_confirm_current_title">現在の PIN またはパスフレーズを入力</string>
+    <string name="color_hue">色相</string>
+    <string name="color_saturation">彩度</string>
+    <string name="color_brightness">明度</string>
 </resources>

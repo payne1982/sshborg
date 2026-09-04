@@ -389,4 +389,7 @@
     <string name="lock_disclaimer_body">Non è possibile recuperare un PIN o una passphrase dimenticati. Se lo dimentichi, dovrai cancellare i dati dell\'app o reinstallarla, perdendo host e chiavi salvate se non hai un backup.</string>
     <string name="lock_disclaimer_continue">Ho capito</string>
     <string name="lock_confirm_current_title">Inserisci il PIN o la passphrase attuale</string>
+    <string name="color_hue">Tonalità</string>
+    <string name="color_saturation">Saturazione</string>
+    <string name="color_brightness">Luminosità</string>
 </resources>

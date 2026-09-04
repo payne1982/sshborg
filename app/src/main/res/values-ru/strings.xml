@@ -402,4 +402,7 @@
     <string name="lock_disclaimer_body">Забытый PIN или парольную фразу нельзя восстановить. Тогда придётся очистить данные приложения или переустановить его, потеряв сохранённые серверы и ключи, если нет резервной копии.</string>
     <string name="lock_disclaimer_continue">Понятно</string>
     <string name="lock_confirm_current_title">Введите текущий PIN или парольную фразу</string>
+    <string name="color_hue">Оттенок</string>
+    <string name="color_saturation">Насыщенность</string>
+    <string name="color_brightness">Яркость</string>
 </resources>

@@ -399,4 +399,7 @@
     <string name="lock_disclaimer_body">There\'s no way to recover a forgotten PIN or passphrase. If you forget it, you\'ll have to clear the app\'s data or reinstall — losing your saved servers and keys unless you have a backup.</string>
     <string name="lock_disclaimer_continue">I understand</string>
     <string name="lock_confirm_current_title">Enter your current PIN or passphrase</string>
+    <string name="color_hue">Hue</string>
+    <string name="color_saturation">Saturation</string>
+    <string name="color_brightness">Brightness</string>
 </resources>
