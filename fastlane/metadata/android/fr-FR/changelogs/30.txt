@@ -1,2 +1,3 @@
+• Barre de touches personnalisable : choisissez une disposition (une rangée, deux rangées, minimale) ou créez la vôtre avec les touches voulues, des macros texte et jusqu'à trois rangées — changement direct depuis la barre avec ⇄
 • Navigation au D-pad plus fluide sur Android TV — champs de texte et menus déroulants s'utilisent bien à la télécommande
 • Correction de l'écran de verrouillage sur les TV en paysage, où la dernière rangée pouvait être coupée

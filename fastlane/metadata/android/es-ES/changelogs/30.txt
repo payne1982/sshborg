@@ -1,2 +1,3 @@
+• Barra de teclas extra personalizable: elige un diseño (una fila, dos filas, mínimo) o crea el tuyo con las teclas que quieras, macros de texto y hasta tres filas; cambia desde la propia barra con ⇄
 • Navegación con D-pad más fluida en Android TV: campos de texto y menús desplegables ahora se usan bien con el mando
 • Corregida la pantalla de bloqueo en TV en horizontal, donde la última fila podía quedar cortada
