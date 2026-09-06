@@ -125,8 +125,10 @@ per-cluster override): people switch layout to stay there.
    in place for a scrolling row of bar-name keys (plus ✕), same height, so
    the keyboard and the terminal don't move; Back closes it; D-pad works
    because the names are ordinary keys.
-2. **Settings → Terminal → "Extra key bar layout"** — `SettingSelect` row
-   (TV-safe via `TvSelectField`), same ordered list.
+2. **Settings → Terminal → "Extra key bar layout"** — one row "In use: <bar>"
+   with a *Customise* button (a button, not a clickable row, so the D-pad
+   reaches it) that opens the bar list. The dropdown was dropped as redundant
+   with the list's radio buttons.
 
 A per-host override (`HostEntity.extraBarId`) stays a possible follow-up.
 
@@ -155,8 +157,8 @@ acts on the selection:
 - ◀ ▶ move within the row; ⇅ moves to the previous/next row (menu when there
   are more than two rows); + inserts after the selection (or appends when
   nothing is selected).
-- Row controls: "Add row" / "Remove row" (max 3), per-row "fit to width"
-  switch.
+- Row controls: "Add row" / "Remove row" (max 3); per row a *Scroll | Fill*
+  segmented choice (a switch plus a sentence explaining it was unclear).
 - Bar options: name (`TvTapField` on touchless), font size (Small/Medium/Large
   via `SettingSelect`).
 - **Why this instead of drag & drop:** it's one code path that works
@@ -215,13 +217,14 @@ Terminal height: a two-row bar takes ~40dp more; that's the user's choice and
 4. Settings row (select) + on-bar switch menu.
 5. Strings ×10 locales, phone pass done; TV emulator pass (hp450) still to do.
 
-**Phase 2 — custom bars**
+**Phase 2 — custom bars — DONE (`c7f77f4`), verified on a phone**
 6. Bar list screen (custom first, duplicate preset → custom).
 7. Editor screen with WYSIWYG preview + selection toolbar, row controls, bar
    options.
 8. Key catalogue dialog incl. custom text keys.
-9. Backup import/export of custom bars; site docs chapter; release notes.
-10. D-pad pass on every new screen; touch pass on phone.
+9. Backup import/export of custom bars — done in Phase 1 (format v6).
+   Site docs chapter + release notes: still to do.
+10. D-pad pass on every new screen (hp450 emulator): still to do; touch pass done.
 
 **Phase 3 — optional polish**
 - Drag & drop reordering on touch (keep the toolbar as the D-pad path).
