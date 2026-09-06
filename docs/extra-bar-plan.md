@@ -83,23 +83,18 @@ data class ExtraBar(
 - Custom text keys cover `/`, `-`, `|`, `~`, `sudo `, `ls -la\n`, … Multi-char
   text with `\n` makes them command macros for free.
 
-### Presets (code, localised names)
+### Presets (code, localised names) — as shipped in Phase 1
 
-| id | rows | fit | notes |
-|----|------|-----|-------|
-| `standard` | current single row | no | today's bar, unchanged |
-| `two_rows` | `ESC / - HOME ↑ END PGUP` / `TAB CTRL ALT ← ↓ → PGDN` | yes | what #12 asks for |
-| `two_rows_fn` | as above + third row `F1…F12` scrolling | mixed | fit rows 1–2, scroll row 3 |
-| `minimal` | `ESC TAB CTRL ↑ ↓ ← → [pin]` | yes | phones in portrait |
+| id | rows | fit | font | notes |
+|----|------|-----|------|-------|
+| `standard` | today's row + `[⇄]` after F12 | no | S | unchanged for existing users |
+| `natural` | `ESC Tab Ctrl Alt [spell] / - \| ~ ← ↑ ↓ → Home End PgUp PgDn Del [paste] [pin] F1…F12 [⇄]` | no | M | one row ordered by frequency of use; arrows in physical-keyboard order |
+| `natural_2` | `ESC / - Home ↑ End PgUp [paste] [pin]` / `Tab Ctrl Alt ← ↓ → PgDn [spell] [⇄]` | yes | M | the two-row arrangement of #12, 9 aligned columns |
+| `natural_3` | as `natural_2` + third row `F1…F12` scrolling | mixed | M | |
+| `minimal` | `ESC Tab Ctrl ↑ ↓ ← → [⇄]` | yes | M | phones in portrait |
 
-Open question: whether `two_rows` should also carry `[paste] [pin] [switch]`
-at the end of row 2 (it fits on a phone in portrait: 10 keys) or leave those
-to the overflow/menu. Proposal: include `[switch]` only; paste and pin are
-reachable from the standard bar and the editor.
-
-`fitToWidth` per row rather than per bar would let `two_rows_fn` work
-naturally; keep the flag per row in the model (`ExtraBarRow(keys, fit)`), the
-editor exposes it as one toggle per row.
+`fit` is per row (`ExtraBarRow.fit`); stretched keys use 2dp horizontal padding
+so nine columns fit a 360dp phone.
 
 ## 2. Storage
 
@@ -118,23 +113,22 @@ Presets are never stored, so they can change between versions without a
 migration. Custom bars keep a `formatVersion` field for future key kinds;
 unknown key kinds are dropped on load, never crash.
 
-## 3. Switching bars quickly
+## 3. Switching bars quickly — done in Phase 1
 
-Custom bars first, then presets, active one checked. Three entry points, in
-order of value:
+Custom bars first, then presets, active one highlighted. Selection is
+**global and permanent** from both entry points (unlike the pin, which has a
+per-cluster override): people switch layout to stay there.
 
-1. **On the bar** — an `Action(SWITCH_BAR)` key (icon `⇄` / `keyboard`) opens
-   a `DropdownMenu` anchored to the key. Every preset ends with it; a custom
-   bar may drop it. On a TV the menu is the same focusable `DropdownMenu`
-   already used for row menus.
-2. **Settings → Terminal → "Extra key bar"** — a `SettingSelect`-style row
-   (already TV-safe via `TvSelectField`) with the same ordered list, plus a
-   "Customise…" row that opens the bar list screen (§4).
-3. Optional: terminal `TopAppBar` overflow — there is none today (only the
-   disconnect action), so skip unless the bar's own key proves insufficient.
+1. **On the bar** — the `Action(SWITCH_BAR)` key (`⇄`). It does *not* open a
+   popup: a `DropdownMenu` is a separate window that steals focus, closes the
+   soft keyboard and leaves the menu floating. Instead the bar swaps its keys
+   in place for a scrolling row of bar-name keys (plus ✕), same height, so
+   the keyboard and the terminal don't move; Back closes it; D-pad works
+   because the names are ordinary keys.
+2. **Settings → Terminal → "Extra key bar layout"** — `SettingSelect` row
+   (TV-safe via `TvSelectField`), same ordered list.
 
-Selection is **global** in this iteration. A per-host override
-(`HostEntity.extraBarId`) is a small follow-up if anyone asks.
+A per-host override (`HostEntity.extraBarId`) stays a possible follow-up.
 
 ## 4. Editor — one interaction model for touch and D-pad
 
@@ -212,14 +206,14 @@ Terminal height: a two-row bar takes ~40dp more; that's the user's choice and
 
 ## 6. Work breakdown
 
-**Phase 1 — presets (shippable alone, covers "choosing from layouts is ok")**
+**Phase 1 — presets — DONE (`54122bb`), verified on a phone**
 1. Model + presets + JSON (de)serialiser + unit tests for round-trip and
    escapes.
 2. `AppPreferences`: `extra_bar_selected`, `extra_bar_custom`, backup v6.
 3. Data-driven `ExtraKeyBar` renderer with fit/scroll rows, font scale,
-   `SWITCH_BAR` + `TOGGLE_KEYBOARD` actions.
+   `SWITCH_BAR` (inline chooser) + `KEYBOARD` show/hide actions.
 4. Settings row (select) + on-bar switch menu.
-5. Strings ×10 locales, phone + TV emulator pass (hp450).
+5. Strings ×10 locales, phone pass done; TV emulator pass (hp450) still to do.
 
 **Phase 2 — custom bars**
 6. Bar list screen (custom first, duplicate preset → custom).
