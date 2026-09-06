@@ -28,9 +28,11 @@ import com.sshborg.R
 import com.sshborg.data.AppPreferences
 import com.sshborg.isTelevision
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.SettingSelect
 import com.sshborg.ui.common.TvSelectField
 import com.sshborg.ui.common.TvTapField
 import com.sshborg.ui.lock.ConfirmSecretDialog
+import com.sshborg.ui.terminal.extraBarName
 import com.sshborg.ui.lock.LockSecretDialog
 
 private val TIMEOUT_OPTIONS = listOf(
@@ -58,6 +60,7 @@ private val LOCK_MODE_OPTIONS = listOf(
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onExtraBars: () -> Unit = {},
     vm: SettingsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -74,6 +77,7 @@ fun SettingsScreen(
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
+    val extraBar              by vm.extraBar.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -400,6 +404,22 @@ fun SettingsScreen(
                 },
             )
 
+            // Extra-key bar layout (#12): one row showing the active bar; the picker with
+            // the radio list (custom bars first, then presets) and the editor live behind it.
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_extra_bar_layout_title)) },
+                supportingContent = {
+                    Text(stringResource(R.string.settings_extra_bar_in_use, extraBarName(extraBar)))
+                },
+                // A button rather than a clickable row: reachable by D-pad, same style as
+                // the app-lock "Change" action.
+                trailingContent = {
+                    OutlinedButton(onClick = onExtraBars) {
+                        Text(stringResource(R.string.settings_extra_bar_customize_title))
+                    }
+                },
+            )
+
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
             // ── SFTP section ──────────────────────────────────────────────────
@@ -681,52 +701,3 @@ fun SettingsScreen(
     }
 }
 
-/**
- * A single-choice setting. On touch it is the usual [ExposedDropdownMenuBox]; on a touchless
- * device (TV/D-pad) it becomes a [TvSelectField], whose plain anchor a D-pad can move past —
- * unlike the dropdown box, whose text-field anchor traps the focus on a TV.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun <T> SettingSelect(
-    label: String,
-    selected: T,
-    options: List<Pair<T, String>>,
-    onSelect: (T) -> Unit,
-    touchless: Boolean,
-    width: Dp = 180.dp,
-) {
-    val valueText = options.find { it.first == selected }?.second ?: options.firstOrNull()?.second ?: ""
-    if (touchless) {
-        TvSelectField(
-            label = label,
-            valueText = valueText,
-            modifier = Modifier.width(width),
-            showLabel = false,
-        ) { dismiss ->
-            options.forEach { (value, optLabel) ->
-                DropdownMenuItem(text = { Text(optLabel) }, onClick = { onSelect(value); dismiss() })
-            }
-        }
-    } else {
-        var expanded by remember { mutableStateOf(false) }
-        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-            OutlinedTextField(
-                value = valueText,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                modifier = Modifier
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    .width(width),
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                singleLine = true,
-            )
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                options.forEach { (value, optLabel) ->
-                    DropdownMenuItem(text = { Text(optLabel) }, onClick = { onSelect(value); expanded = false })
-                }
-            }
-        }
-    }
-}

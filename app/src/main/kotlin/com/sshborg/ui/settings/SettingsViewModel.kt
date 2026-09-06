@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
+import com.sshborg.data.ExtraBar
+import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.db.HostEntity
 import kotlinx.coroutines.Dispatchers
@@ -81,6 +83,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     val extraKeysBarPinned: StateFlow<Boolean> =
         prefs.extraKeysBarPinned.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /** The extra-key bar in use, for the Settings row label. */
+    val extraBar: StateFlow<ExtraBar> =
+        prefs.extraBar.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExtraBarPresets.all.first())
 
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
@@ -244,7 +250,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 5)
+                    put("version", 6)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
