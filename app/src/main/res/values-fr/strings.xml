@@ -391,4 +391,13 @@
     <string name="color_hue">Teinte</string>
     <string name="color_saturation">Saturation</string>
     <string name="color_brightness">Luminosité</string>
+    <string name="settings_extra_bar_layout_title">Disposition de la barre de touches</string>
+    <string name="settings_extra_bar_layout_subtitle">Choisissez les touches affichées par la barre et leur disposition. Vous pouvez aussi changer de disposition depuis la barre.</string>
+    <string name="extra_bar_preset_standard">Standard</string>
+    <string name="extra_bar_preset_natural">Naturelle</string>
+    <string name="extra_bar_preset_natural_2">Naturelle ×2</string>
+    <string name="extra_bar_preset_natural_3">Naturelle ×3</string>
+    <string name="extra_bar_preset_minimal">Minimale</string>
+    <string name="terminal_switch_bar_cd">Changer de barre de touches</string>
+    <string name="terminal_keyboard_cd">Afficher ou masquer le clavier</string>
 </resources>

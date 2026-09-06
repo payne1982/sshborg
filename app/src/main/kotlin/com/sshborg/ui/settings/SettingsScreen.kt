@@ -31,6 +31,7 @@ import com.sshborg.isTouchless
 import com.sshborg.ui.common.TvSelectField
 import com.sshborg.ui.common.TvTapField
 import com.sshborg.ui.lock.ConfirmSecretDialog
+import com.sshborg.ui.terminal.extraBarName
 import com.sshborg.ui.lock.LockSecretDialog
 
 private val TIMEOUT_OPTIONS = listOf(
@@ -74,6 +75,8 @@ fun SettingsScreen(
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
+    val extraBarSelectedId    by vm.extraBarSelectedId.collectAsState()
+    val allExtraBars          by vm.allExtraBars.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -396,6 +399,22 @@ fun SettingsScreen(
                     Switch(
                         checked = extraKeysBarPinned,
                         onCheckedChange = { vm.setExtraKeysBarPinned(it) },
+                    )
+                },
+            )
+
+            // Extra-key bar layout (#12): custom bars first, then the presets.
+            val extraBarOptions = allExtraBars.map { it.id to extraBarName(it) }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_extra_bar_layout_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_extra_bar_layout_subtitle)) },
+                trailingContent = {
+                    SettingSelect(
+                        label = stringResource(R.string.settings_extra_bar_layout_title),
+                        selected = extraBarSelectedId,
+                        options = extraBarOptions,
+                        onSelect = { vm.setExtraBarSelectedId(it) },
+                        touchless = touchless,
                     )
                 },
             )

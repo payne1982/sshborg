@@ -396,4 +396,13 @@
     <string name="color_hue">色相</string>
     <string name="color_saturation">彩度</string>
     <string name="color_brightness">明度</string>
+    <string name="settings_extra_bar_layout_title">拡張キーバーのレイアウト</string>
+    <string name="settings_extra_bar_layout_subtitle">バーに表示するキーと並び方を選びます。バー上からもレイアウトを切り替えられます。</string>
+    <string name="extra_bar_preset_standard">標準</string>
+    <string name="extra_bar_preset_natural">ナチュラル</string>
+    <string name="extra_bar_preset_natural_2">ナチュラル ×2</string>
+    <string name="extra_bar_preset_natural_3">ナチュラル ×3</string>
+    <string name="extra_bar_preset_minimal">最小</string>
+    <string name="terminal_switch_bar_cd">キーバーを切り替え</string>
+    <string name="terminal_keyboard_cd">キーボードを表示／非表示</string>
 </resources>

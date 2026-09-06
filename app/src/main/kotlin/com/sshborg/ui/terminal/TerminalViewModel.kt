@@ -6,6 +6,8 @@ import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
+import com.sshborg.data.ExtraBar
+import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
 import com.sshborg.service.SessionManager
@@ -90,6 +92,16 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     /** Flips the pin, storing a concrete override for the current terminal cluster. */
     fun toggleExtraBarPinned() {
         sessionManager.setExtraBarPinned(!extraBarPinned.value)
+    }
+
+    /** Layout of the extra-key bar (issue #12) and the list offered by its switch menu. */
+    val extraBar: StateFlow<ExtraBar> =
+        prefs.extraBar.stateIn(viewModelScope, SharingStarted.Eagerly, ExtraBarPresets.all.first())
+    val allExtraBars: StateFlow<List<ExtraBar>> =
+        prefs.allExtraBars.stateIn(viewModelScope, SharingStarted.Eagerly, ExtraBarPresets.all)
+
+    fun selectExtraBar(id: String) {
+        viewModelScope.launch { prefs.setExtraBarSelectedId(id) }
     }
 
     /** Prompt string detected from first terminal render, used to strip it from the input line. */

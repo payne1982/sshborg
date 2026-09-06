@@ -395,4 +395,13 @@
     <string name="color_hue">Відтінок</string>
     <string name="color_saturation">Насиченість</string>
     <string name="color_brightness">Яскравість</string>
+    <string name="settings_extra_bar_layout_title">Розкладка панелі додаткових клавіш</string>
+    <string name="settings_extra_bar_layout_subtitle">Оберіть, які клавіші показує панель і як вони розташовані. Розкладку можна змінити й на самій панелі.</string>
+    <string name="extra_bar_preset_standard">Стандартна</string>
+    <string name="extra_bar_preset_natural">Природна</string>
+    <string name="extra_bar_preset_natural_2">Природна ×2</string>
+    <string name="extra_bar_preset_natural_3">Природна ×3</string>
+    <string name="extra_bar_preset_minimal">Мінімальна</string>
+    <string name="terminal_switch_bar_cd">Змінити панель клавіш</string>
+    <string name="terminal_keyboard_cd">Показати або сховати клавіатуру</string>
 </resources>

@@ -391,4 +391,13 @@
     <string name="color_hue">Farbton</string>
     <string name="color_saturation">Sättigung</string>
     <string name="color_brightness">Helligkeit</string>
+    <string name="settings_extra_bar_layout_title">Layout der Zusatztastenleiste</string>
+    <string name="settings_extra_bar_layout_subtitle">Wähle, welche Tasten die Leiste zeigt und wie sie angeordnet sind. Das Layout lässt sich auch direkt auf der Leiste wechseln.</string>
+    <string name="extra_bar_preset_standard">Standard</string>
+    <string name="extra_bar_preset_natural">Natürlich</string>
+    <string name="extra_bar_preset_natural_2">Natürlich ×2</string>
+    <string name="extra_bar_preset_natural_3">Natürlich ×3</string>
+    <string name="extra_bar_preset_minimal">Minimal</string>
+    <string name="terminal_switch_bar_cd">Tastenleiste wechseln</string>
+    <string name="terminal_keyboard_cd">Tastatur ein- oder ausblenden</string>
 </resources>

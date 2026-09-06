@@ -402,4 +402,13 @@
     <string name="color_hue">Hue</string>
     <string name="color_saturation">Saturation</string>
     <string name="color_brightness">Brightness</string>
+    <string name="settings_extra_bar_layout_title">Extra key bar layout</string>
+    <string name="settings_extra_bar_layout_subtitle">Choose which keys the bar shows and how they are arranged. You can also switch layout from the bar itself.</string>
+    <string name="extra_bar_preset_standard">Standard</string>
+    <string name="extra_bar_preset_natural">Natural</string>
+    <string name="extra_bar_preset_natural_2">Natural ×2</string>
+    <string name="extra_bar_preset_natural_3">Natural ×3</string>
+    <string name="extra_bar_preset_minimal">Minimal</string>
+    <string name="terminal_switch_bar_cd">Switch key bar</string>
+    <string name="terminal_keyboard_cd">Show or hide keyboard</string>
 </resources>

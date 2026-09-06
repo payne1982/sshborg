@@ -396,4 +396,13 @@
     <string name="color_hue">色相</string>
     <string name="color_saturation">饱和度</string>
     <string name="color_brightness">亮度</string>
+    <string name="settings_extra_bar_layout_title">额外按键栏布局</string>
+    <string name="settings_extra_bar_layout_subtitle">选择按键栏显示哪些按键以及如何排列。也可以直接在按键栏上切换布局。</string>
+    <string name="extra_bar_preset_standard">标准</string>
+    <string name="extra_bar_preset_natural">自然</string>
+    <string name="extra_bar_preset_natural_2">自然 ×2</string>
+    <string name="extra_bar_preset_natural_3">自然 ×3</string>
+    <string name="extra_bar_preset_minimal">精简</string>
+    <string name="terminal_switch_bar_cd">切换按键栏</string>
+    <string name="terminal_keyboard_cd">显示或隐藏键盘</string>
 </resources>

@@ -405,4 +405,13 @@
     <string name="color_hue">Оттенок</string>
     <string name="color_saturation">Насыщенность</string>
     <string name="color_brightness">Яркость</string>
+    <string name="settings_extra_bar_layout_title">Раскладка панели дополнительных клавиш</string>
+    <string name="settings_extra_bar_layout_subtitle">Выберите, какие клавиши показывает панель и как они расположены. Раскладку можно сменить и на самой панели.</string>
+    <string name="extra_bar_preset_standard">Стандартная</string>
+    <string name="extra_bar_preset_natural">Естественная</string>
+    <string name="extra_bar_preset_natural_2">Естественная ×2</string>
+    <string name="extra_bar_preset_natural_3">Естественная ×3</string>
+    <string name="extra_bar_preset_minimal">Минимальная</string>
+    <string name="terminal_switch_bar_cd">Сменить панель клавиш</string>
+    <string name="terminal_keyboard_cd">Показать или скрыть клавиатуру</string>
 </resources>

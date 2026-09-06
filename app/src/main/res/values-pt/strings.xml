@@ -391,4 +391,13 @@
     <string name="color_hue">Matiz</string>
     <string name="color_saturation">Saturação</string>
     <string name="color_brightness">Brilho</string>
+    <string name="settings_extra_bar_layout_title">Disposição da barra de teclas extra</string>
+    <string name="settings_extra_bar_layout_subtitle">Escolha que teclas a barra mostra e como estão dispostas. Também pode mudar a disposição a partir da própria barra.</string>
+    <string name="extra_bar_preset_standard">Padrão</string>
+    <string name="extra_bar_preset_natural">Natural</string>
+    <string name="extra_bar_preset_natural_2">Natural ×2</string>
+    <string name="extra_bar_preset_natural_3">Natural ×3</string>
+    <string name="extra_bar_preset_minimal">Mínima</string>
+    <string name="terminal_switch_bar_cd">Mudar barra de teclas</string>
+    <string name="terminal_keyboard_cd">Mostrar ou ocultar o teclado</string>
 </resources>
