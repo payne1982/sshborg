@@ -25,6 +25,9 @@ import com.sshborg.service.SshForegroundService
 import com.sshborg.ui.hosts.AddEditHostScreen
 import com.sshborg.ui.hosts.HostsScreen
 import com.sshborg.ui.keys.KeysScreen
+import com.sshborg.ui.extrabar.ExtraBarEditorScreen
+import com.sshborg.ui.extrabar.ExtraBarEditorViewModel
+import com.sshborg.ui.extrabar.ExtraBarsScreen
 import com.sshborg.ui.settings.SettingsScreen
 import com.sshborg.ui.sftp.SftpScreen
 import com.sshborg.ui.terminal.TerminalScreen
@@ -43,6 +46,10 @@ sealed class Screen(val route: String) {
     }
     object Keys : Screen("keys")
     object Settings : Screen("settings")
+    object ExtraBars : Screen("extrabars")
+    object ExtraBarEditor : Screen("extrabars/{barId}") {
+        fun routeFor(id: String) = "extrabars/$id"
+    }
 }
 
 @Composable
@@ -222,7 +229,27 @@ fun AppNavigation() {
         }
 
         composable(Screen.Settings.route) {
-            SettingsScreen(onBack = { navController.popBackStack() })
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onExtraBars = { navController.navigate(Screen.ExtraBars.route) },
+            )
+        }
+
+        composable(Screen.ExtraBars.route) {
+            ExtraBarsScreen(
+                onBack = { navController.popBackStack() },
+                onEdit = { id -> navController.navigate(Screen.ExtraBarEditor.routeFor(id)) },
+            )
+        }
+
+        composable(
+            Screen.ExtraBarEditor.route,
+            arguments = listOf(navArgument("barId") { type = NavType.StringType }),
+        ) { entry ->
+            ExtraBarEditorScreen(
+                barId = entry.arguments?.getString("barId") ?: ExtraBarEditorViewModel.NEW_ID,
+                onBack = { navController.popBackStack() },
+            )
         }
     }
 }

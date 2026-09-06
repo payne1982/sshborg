@@ -105,6 +105,10 @@ fun ExtraKeyBar(
     bars: List<ExtraBar>,
     onSelectBar: (String) -> Unit,
     modifier: Modifier = Modifier,
+    /** Editor preview: keys select instead of sending; [selected] is (row, index). */
+    editing: Boolean = false,
+    selected: Pair<Int, Int>? = null,
+    onSelectKey: (Pair<Int, Int>) -> Unit = {},
 ) {
     val fontSize = bar.fontScale.sp.sp
     // The switch key swaps the keys for a row of bar names in place: same height, no
@@ -124,14 +128,20 @@ fun ExtraKeyBar(
                 .padding(horizontal = 2.dp, vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            bar.rows.forEach { row ->
+            bar.rows.forEachIndexed { r, row ->
                 val rowModifier =
                     if (row.fit) Modifier.fillMaxWidth()
                     else Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
                 Row(rowModifier, horizontalArrangement = Arrangement.spacedBy(1.dp)) {
-                    row.keys.forEach { key ->
+                    row.keys.forEachIndexed { i, key ->
                         val keyModifier = if (row.fit) Modifier.weight(1f) else Modifier
-                        ExtraKeyItem(key, state, fontSize, keyModifier, fit = row.fit, onSwitch = { choosing = true })
+                        val pos = r to i
+                        ExtraKeyItem(
+                            key, state, fontSize, keyModifier, fit = row.fit,
+                            onSwitch = { choosing = true },
+                            selectOverride = if (editing) ({ onSelectKey(pos) }) else null,
+                            highlighted = editing && selected == pos,
+                        )
                     }
                 }
             }
@@ -167,57 +177,73 @@ private fun RowScope.ExtraKeyItem(
     modifier: Modifier,
     fit: Boolean,
     onSwitch: () -> Unit,
+    /** Editor preview: replaces every key's action with "select me". */
+    selectOverride: (() -> Unit)? = null,
+    highlighted: Boolean = false,
 ) {
     // Stretched keys get their room from the weight; a narrow phone with 9 columns
     // can't afford 8dp of padding each side around "Home" or "PgUp".
     val hPad = if (fit) 2.dp else 8.dp
+    val editing = selectOverride != null
+    fun click(real: () -> Unit): () -> Unit = selectOverride ?: real
     when (key) {
         is ExtraKeyDef.Special -> ExtraKey(
             label = key.displayLabel, fontSize = fontSize, modifier = modifier, hPad = hPad,
-            isArrow = key.key.isArrow, repeatOnHold = key.repeatOnHold,
-            onClick = { state.onKey(key.key.bytes(state.cursorKeys)) },
+            active = highlighted, isArrow = key.key.isArrow, repeatOnHold = key.repeatOnHold && !editing,
+            onClick = click { state.onKey(key.key.bytes(state.cursorKeys)) },
         )
         is ExtraKeyDef.Modifier -> ExtraKey(
             label = key.displayLabel, fontSize = fontSize, modifier = modifier, hPad = hPad,
-            active = if (key.mod == ModKey.CTRL) state.ctrlActive else state.altActive,
-            onClick = if (key.mod == ModKey.CTRL) state.onCtrlToggle else state.onAltToggle,
+            active = highlighted || (if (key.mod == ModKey.CTRL) state.ctrlActive else state.altActive),
+            onClick = click(if (key.mod == ModKey.CTRL) state.onCtrlToggle else state.onAltToggle),
         )
         is ExtraKeyDef.Text -> ExtraKey(
             label = key.displayLabel, fontSize = fontSize, modifier = modifier, hPad = hPad,
-            onClick = { state.onKey(key.unescaped.toByteArray(Charsets.UTF_8)) },
+            active = highlighted,
+            onClick = click { state.onKey(key.unescaped.toByteArray(Charsets.UTF_8)) },
         )
         is ExtraKeyDef.Action -> when (key.action) {
             BarAction.PASTE -> {
                 val clipboard = LocalClipboard.current
                 val scope = rememberCoroutineScope()
-                IconKey(Icons.Filled.ContentPaste, stringResource(R.string.terminal_paste_cd), modifier, iconSize = 24.dp, hPad = hPad) {
-                    scope.launch {
-                        clipboard.getClipEntry()?.clipData?.getItemAt(0)?.text?.toString()
-                            ?.toByteArray(Charsets.UTF_8)
-                            ?.let { state.onKey(it) }
-                    }
-                }
+                IconKey(Icons.Filled.ContentPaste, stringResource(R.string.terminal_paste_cd), modifier,
+                    active = highlighted, iconSize = 24.dp, hPad = hPad,
+                    onClick = click {
+                        scope.launch {
+                            clipboard.getClipEntry()?.clipData?.getItemAt(0)?.text?.toString()
+                                ?.toByteArray(Charsets.UTF_8)
+                                ?.let { state.onKey(it) }
+                        }
+                    },
+                )
             }
             BarAction.PIN -> IconKey(
                 if (state.pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
-                stringResource(R.string.terminal_pin_keys_cd), modifier, active = state.pinned, hPad = hPad,
-                onClick = state.onPinToggle,
+                stringResource(R.string.terminal_pin_keys_cd), modifier, active = highlighted || state.pinned, hPad = hPad,
+                onClick = click(state.onPinToggle),
             )
             BarAction.WORD_MODE -> IconKey(
-                Icons.Filled.Spellcheck, null, modifier, active = state.wordMode, hPad = hPad,
-                onClick = state.onWordModeToggle,
+                Icons.Filled.Spellcheck, null, modifier, active = highlighted || state.wordMode, hPad = hPad,
+                onClick = click(state.onWordModeToggle),
             )
             BarAction.KEYBOARD -> IconKey(
                 Icons.Filled.Keyboard, stringResource(R.string.terminal_keyboard_cd), modifier, hPad = hPad,
-                active = state.keyboardVisible, onClick = state.onKeyboardToggle,
+                active = highlighted || state.keyboardVisible, onClick = click(state.onKeyboardToggle),
             )
             BarAction.SWITCH_BAR -> IconKey(
                 Icons.Filled.SwapHoriz, stringResource(R.string.terminal_switch_bar_cd), modifier, hPad = hPad,
-                onClick = onSwitch,
+                active = highlighted, onClick = click(onSwitch),
             )
         }
     }
 }
+
+/** A no-op state for previews (editor): nothing toggles, nothing is sent. */
+fun previewExtraBarState() = ExtraBarState(
+    ctrlActive = false, altActive = false, wordMode = false, pinned = false, keyboardVisible = false,
+    onCtrlToggle = {}, onAltToggle = {}, onWordModeToggle = {}, onPinToggle = {}, onKeyboardToggle = {},
+    onKey = {}, cursorKeys = { byteArrayOf() },
+)
 
 @Composable
 private fun IconKey(

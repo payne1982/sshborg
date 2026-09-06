@@ -84,14 +84,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val extraKeysBarPinned: StateFlow<Boolean> =
         prefs.extraKeysBarPinned.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val extraBarSelectedId: StateFlow<String> =
-        prefs.extraBarSelectedId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExtraBarPresets.STANDARD)
-    val allExtraBars: StateFlow<List<ExtraBar>> =
-        prefs.allExtraBars.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExtraBarPresets.all)
-
-    fun setExtraBarSelectedId(id: String) {
-        viewModelScope.launch { prefs.setExtraBarSelectedId(id) }
-    }
+    /** The extra-key bar in use, for the Settings row label. */
+    val extraBar: StateFlow<ExtraBar> =
+        prefs.extraBar.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExtraBarPresets.all.first())
 
     val lockTimeoutSeconds: StateFlow<Int> =
         prefs.lockTimeoutSeconds.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
