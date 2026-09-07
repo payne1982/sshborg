@@ -443,7 +443,7 @@
     <string name="extra_key_group_custom">カスタムテキスト</string>
     <string name="extra_key_text">送信するテキスト</string>
     <string name="extra_key_label">ラベル（任意）</string>
-    <string name="extra_key_text_hint">\n = Enter、\t = Tab、\e = Esc。複数文字でマクロになります。</string>
+    <string name="extra_key_text_hint">\\n = Enter、\\t = Tab、\\e = Esc。複数文字でマクロになります。</string>
     <string name="extra_key_use_text">テキストを使用</string>
     <string name="extra_key_action_paste">貼り付け</string>
     <string name="extra_key_action_pin">バーを固定</string>

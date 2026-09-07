@@ -439,7 +439,7 @@
     <string name="extra_key_group_custom">Testo personalizzato</string>
     <string name="extra_key_text">Testo da inviare</string>
     <string name="extra_key_label">Etichetta (opzionale)</string>
-    <string name="extra_key_text_hint">\n = Invio, \t = Tab, \e = Esc. Più caratteri formano una macro.</string>
+    <string name="extra_key_text_hint">\\n = Invio, \\t = Tab, \\e = Esc. Più caratteri formano una macro.</string>
     <string name="extra_key_use_text">Usa testo</string>
     <string name="extra_key_action_paste">Incolla</string>
     <string name="extra_key_action_pin">Fissa barra</string>

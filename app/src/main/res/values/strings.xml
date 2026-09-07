@@ -449,7 +449,7 @@
     <string name="extra_key_group_custom">Custom text</string>
     <string name="extra_key_text">Text to send</string>
     <string name="extra_key_label">Label (optional)</string>
-    <string name="extra_key_text_hint">\n = Enter, \t = Tab, \e = Esc. Several characters make a macro.</string>
+    <string name="extra_key_text_hint">\\n = Enter, \\t = Tab, \\e = Esc. Several characters make a macro.</string>
     <string name="extra_key_use_text">Use text</string>
     <string name="extra_key_action_paste">Paste</string>
     <string name="extra_key_action_pin">Pin bar</string>

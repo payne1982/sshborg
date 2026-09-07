@@ -442,7 +442,7 @@
     <string name="extra_key_group_custom">Власний текст</string>
     <string name="extra_key_text">Текст для надсилання</string>
     <string name="extra_key_label">Підпис (необов\'язково)</string>
-    <string name="extra_key_text_hint">\n = Enter, \t = Tab, \e = Esc. Кілька символів утворюють макрос.</string>
+    <string name="extra_key_text_hint">\\n = Enter, \\t = Tab, \\e = Esc. Кілька символів утворюють макрос.</string>
     <string name="extra_key_use_text">Використати текст</string>
     <string name="extra_key_action_paste">Вставити</string>
     <string name="extra_key_action_pin">Закріпити панель</string>

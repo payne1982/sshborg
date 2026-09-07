@@ -438,7 +438,7 @@
     <string name="extra_key_group_custom">Texte personnalisé</string>
     <string name="extra_key_text">Texte à envoyer</string>
     <string name="extra_key_label">Libellé (facultatif)</string>
-    <string name="extra_key_text_hint">\n = Entrée, \t = Tab, \e = Échap. Plusieurs caractères forment une macro.</string>
+    <string name="extra_key_text_hint">\\n = Entrée, \\t = Tab, \\e = Échap. Plusieurs caractères forment une macro.</string>
     <string name="extra_key_use_text">Utiliser le texte</string>
     <string name="extra_key_action_paste">Coller</string>
     <string name="extra_key_action_pin">Épingler la barre</string>

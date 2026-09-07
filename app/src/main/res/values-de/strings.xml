@@ -438,7 +438,7 @@
     <string name="extra_key_group_custom">Eigener Text</string>
     <string name="extra_key_text">Zu sendender Text</string>
     <string name="extra_key_label">Beschriftung (optional)</string>
-    <string name="extra_key_text_hint">\n = Eingabe, \t = Tab, \e = Esc. Mehrere Zeichen ergeben ein Makro.</string>
+    <string name="extra_key_text_hint">\\n = Eingabe, \\t = Tab, \\e = Esc. Mehrere Zeichen ergeben ein Makro.</string>
     <string name="extra_key_use_text">Text verwenden</string>
     <string name="extra_key_action_paste">Einfügen</string>
     <string name="extra_key_action_pin">Leiste anheften</string>

@@ -443,7 +443,7 @@
     <string name="extra_key_group_custom">自定义文本</string>
     <string name="extra_key_text">要发送的文本</string>
     <string name="extra_key_label">标签（可选）</string>
-    <string name="extra_key_text_hint">\n = 回车，\t = Tab，\e = Esc。多个字符可组成宏。</string>
+    <string name="extra_key_text_hint">\\n = 回车，\\t = Tab，\\e = Esc。多个字符可组成宏。</string>
     <string name="extra_key_use_text">使用文本</string>
     <string name="extra_key_action_paste">粘贴</string>
     <string name="extra_key_action_pin">固定按键栏</string>
