@@ -1,3 +1,4 @@
-• Barra de teclas extra personalizável: escolha uma disposição (uma linha, duas linhas, mínima) ou crie a sua com as teclas que quiser, macros de texto e até três linhas — muda-se diretamente na barra com ⇄
-• Navegação com D-pad mais fluida na Android TV — campos de texto e menus suspensos funcionam bem com o comando
+• Barra de teclas extra personalizável: escolha uma disposição (uma linha, duas linhas, mínima) ou crie a sua com as teclas que quiser, macros de texto e até três linhas — muda-se na barra com ⇄
+• Navegação com D-pad mais fluida na Android TV: campos de texto e menus funcionam bem com o comando
 • Corrigido o ecrã de bloqueio em TVs na horizontal, onde a última linha podia ficar cortada
+• Barra de seleção: “Copiar tudo” no fim e atenuado, para não ser tocado em vez de “Copiar seleção”

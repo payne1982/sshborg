@@ -740,11 +740,18 @@ private fun SelectionBar(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment     = Alignment.CenterVertically,
         ) {
+            // "Copy all" used to sit right next to "Copy selection" with the same look and
+            // the same first word, and got tapped by mistake. The two everyday actions keep
+            // their plain style; the rare one goes last, after a gap, smaller and dimmer.
             TextButton(onClick = onCopySelection) { Text(labelCopySelection) }
-            TextButton(onClick = onCopyAll)       { Text(labelCopyAll) }
             if (labelPaste != null && onPaste != null) {
                 TextButton(onClick = onPaste) { Text(labelPaste) }
             }
+            Spacer(Modifier.width(10.dp))
+            TextButton(
+                onClick = onCopyAll,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+            ) { Text(labelCopyAll, style = MaterialTheme.typography.labelMedium) }
         }
     }
 }

@@ -1,3 +1,4 @@
-• Barra tasti extra personalizzabile: scegli un layout (riga singola, due righe, minimale) o creane una tua con i tasti che vuoi, macro di testo e fino a tre righe — si cambia direttamente dalla barra con ⇄
-• Navigazione col D-pad più fluida su Android TV — campi di testo e menu a tendina ora si usano bene col telecomando
+• Barra tasti extra personalizzabile: scegli un layout (una riga, due righe, minimale) o creane una tua con i tasti che vuoi, macro di testo e fino a tre righe — cambio dalla barra con ⇄
+• Navigazione col D-pad più fluida su Android TV: campi di testo e tendine si usano bene col telecomando
 • Corretta la schermata di blocco sulle TV in orizzontale, dove l'ultima riga poteva essere tagliata
+• Barra di selezione: “Copia tutto” in fondo e attenuato, per non toccarlo al posto di “Copia selezione”
