@@ -3,6 +3,9 @@ package com.sshborg.ui.terminal
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -12,16 +15,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
@@ -36,23 +34,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
-import androidx.compose.material3.ripple
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlinx.coroutines.isActive
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import com.sshborg.R
 import com.sshborg.SshBorgApp
 import com.sshborg.isTelevision
@@ -62,14 +46,6 @@ import com.sshborg.terminal.TerminalView
 import com.sshborg.ui.common.ProblemContent
 import kotlinx.coroutines.delay
 
-private val ExtraKeyFont = FontFamily(
-    Font(R.font.roboto_condensed_regular),
-    Font(R.font.roboto_condensed_bold, FontWeight.Bold),
-)
-private val ArrowKeyFont = FontFamily(
-    Font(R.font.jetbrains_mono_regular),
-    Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
-)
 @Suppress("UNUSED_VARIABLE")
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -122,6 +98,9 @@ fun TerminalScreen(
     }
     val suggestions   by vm.suggestions.collectAsState()
     val extraBarPinned by vm.extraBarPinned.collectAsState()
+    val extraBar       by vm.extraBar.collectAsState()
+    val allExtraBars   by vm.allExtraBars.collectAsState()
+    val rootView = LocalView.current
 
     // Tab bar data. All open Shell sessions, grouped by host (order preserved).
     // One host  -> per-session tabs (#1 #2 …); many hosts -> one tab per host.
@@ -284,17 +263,32 @@ fun TerminalScreen(
                 // Extra key bar — when the soft keyboard is open, or pinned to stay put.
                 // On a TV, suppress it while the soft keyboard shows (it would just overlap).
                 if ((imeVisible || extraBarPinned) && !(isTv && imeVisible)) {
-                    ExtraKeyRow(
-                        ctrlActive       = ctrlActive,
-                        altActive        = altActive,
-                        wordMode         = wordMode,
-                        pinned           = extraBarPinned,
-                        onCtrlToggle     = { ctrlActive = !ctrlActive },
-                        onAltToggle      = { altActive  = !altActive  },
-                        onWordModeToggle = { wordMode   = !wordMode   },
-                        onPinToggle      = { vm.toggleExtraBarPinned() },
-                        onKey            = { bytes -> sendInput(bytes) },
-                        cursorKeys       = { vm.cursorKeyBytes(it) },
+                    ExtraKeyBar(
+                        bar   = extraBar,
+                        bars  = allExtraBars,
+                        onSelectBar = { vm.selectExtraBar(it) },
+                        state = ExtraBarState(
+                            ctrlActive       = ctrlActive,
+                            altActive        = altActive,
+                            wordMode         = wordMode,
+                            pinned           = extraBarPinned,
+                            keyboardVisible  = imeVisible,
+                            onCtrlToggle     = { ctrlActive = !ctrlActive },
+                            onAltToggle      = { altActive  = !altActive  },
+                            onWordModeToggle = { wordMode   = !wordMode   },
+                            onPinToggle      = { vm.toggleExtraBarPinned() },
+                            onKeyboardToggle = {
+                                if (imeVisible) {
+                                    val imm = ctx.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+                                        as android.view.inputmethod.InputMethodManager
+                                    imm.hideSoftInputFromWindow(rootView.windowToken, 0)
+                                } else {
+                                    terminalView?.showKeyboard()
+                                }
+                            },
+                            onKey            = { bytes -> sendInput(bytes) },
+                            cursorKeys       = { vm.cursorKeyBytes(it) },
+                        ),
                     )
                 }
             }
@@ -612,179 +606,6 @@ private fun SuggestionRow(suggestions: List<String>, sticky: Boolean, onSelect: 
 }
 
 @Composable
-private fun ExtraKeyRow(
-    ctrlActive: Boolean,
-    altActive: Boolean,
-    wordMode: Boolean,
-    pinned: Boolean,
-    onCtrlToggle: () -> Unit,
-    onAltToggle: () -> Unit,
-    onWordModeToggle: () -> Unit,
-    onPinToggle: () -> Unit,
-    onKey: (ByteArray) -> Unit,
-    cursorKeys: (Char) -> ByteArray,
-) {
-    val clipboardManager = LocalClipboard.current
-    val scope = rememberCoroutineScope()
-    val pasteContentDesc = stringResource(R.string.terminal_paste_cd)
-    val pinContentDesc = stringResource(R.string.terminal_pin_keys_cd)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 2.dp, vertical = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(1.dp),
-    ) {
-        ExtraKey("Ctrl", active = ctrlActive, onClick = onCtrlToggle)
-        ExtraKey("Alt",  active = altActive,  onClick = onAltToggle)
-        Box(
-            modifier = Modifier
-                .background(
-                    if (wordMode) MaterialTheme.colorScheme.primaryContainer
-                    else MaterialTheme.colorScheme.surface,
-                    MaterialTheme.shapes.extraSmall,
-                )
-                .clickable(onClick = onWordModeToggle)
-                .padding(horizontal = 8.dp, vertical = 7.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                Icons.Filled.Spellcheck,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = if (wordMode) MaterialTheme.colorScheme.onPrimaryContainer
-                       else MaterialTheme.colorScheme.onSurface,
-            )
-        }
-        Spacer(Modifier.width(4.dp))
-        ExtraKey("ESC",  onClick = { onKey(byteArrayOf(0x1B)) })
-        ExtraKey("Tab",  onClick = { onKey(byteArrayOf(0x09)) })
-        ExtraKey("↑", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('A')) })
-        ExtraKey("↓", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('B')) })
-        ExtraKey("←", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('D')) })
-        ExtraKey("→", horizontalPadding = 10.dp, repeatOnHold = true, onClick = { onKey(cursorKeys('C')) })
-        ExtraKey("Home", onClick = { onKey("\u001b[H".toByteArray()) })
-        ExtraKey("End",  onClick = { onKey("\u001b[F".toByteArray()) })
-        ExtraKey("PgUp", repeatOnHold = true, onClick = { onKey("\u001b[5~".toByteArray()) })
-        ExtraKey("PgDn", repeatOnHold = true, onClick = { onKey("\u001b[6~".toByteArray()) })
-        ExtraKey("Del",  onClick = { onKey("\u001b[3~".toByteArray()) })
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
-                .clickable {
-                    scope.launch {
-                        clipboardManager.getClipEntry()?.clipData?.getItemAt(0)?.text?.toString()
-                            ?.toByteArray(Charsets.UTF_8)
-                            ?.let { onKey(it) }
-                    }
-                }
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(Icons.Filled.ContentPaste, contentDescription = pasteContentDesc,
-                modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
-        }
-        // Pin: keep this bar visible even with the keyboard closed. Filled = pinned.
-        Box(
-            modifier = Modifier
-                .background(
-                    if (pinned) MaterialTheme.colorScheme.primaryContainer
-                    else MaterialTheme.colorScheme.surface,
-                    MaterialTheme.shapes.extraSmall,
-                )
-                .clickable(onClick = onPinToggle)
-                .padding(horizontal = 8.dp, vertical = 7.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                if (pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
-                contentDescription = pinContentDesc,
-                modifier = Modifier.size(18.dp),
-                tint = if (pinned) MaterialTheme.colorScheme.onPrimaryContainer
-                       else MaterialTheme.colorScheme.onSurface,
-            )
-        }
-        Spacer(Modifier.width(4.dp))
-        ExtraKey("F1",  onClick = { onKey("\u001bOP".toByteArray()) })
-        ExtraKey("F2",  onClick = { onKey("\u001bOQ".toByteArray()) })
-        ExtraKey("F3",  onClick = { onKey("\u001bOR".toByteArray()) })
-        ExtraKey("F4",  onClick = { onKey("\u001bOS".toByteArray()) })
-        ExtraKey("F5",  onClick = { onKey("\u001b[15~".toByteArray()) })
-        ExtraKey("F6",  onClick = { onKey("\u001b[17~".toByteArray()) })
-        ExtraKey("F7",  onClick = { onKey("\u001b[18~".toByteArray()) })
-        ExtraKey("F8",  onClick = { onKey("\u001b[19~".toByteArray()) })
-        ExtraKey("F9",  onClick = { onKey("\u001b[20~".toByteArray()) })
-        ExtraKey("F10", onClick = { onKey("\u001b[21~".toByteArray()) })
-        ExtraKey("F11", onClick = { onKey("\u001b[23~".toByteArray()) })
-        ExtraKey("F12", onClick = { onKey("\u001b[24~".toByteArray()) })
-    }
-}
-
-@Composable
-private fun ExtraKey(
-    label: String,
-    active: Boolean = false,
-    horizontalPadding: androidx.compose.ui.unit.Dp = 8.dp,
-    // Hold-to-repeat, like the keyboard's own backspace (issue #11): tap = one press,
-    // hold = keep firing until released. Off by default so ordinary keys still tap once.
-    repeatOnHold: Boolean = false,
-    onClick: () -> Unit,
-) {
-    val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
-    val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-    val interaction = remember { MutableInteractionSource() }
-    val scope = rememberCoroutineScope()
-    // For repeat keys we drive the gesture ourselves (fire on down, then auto-repeat),
-    // so clickable is replaced by pointerInput + an explicit ripple to keep the press
-    // feedback. Timings follow the system key-repeat values, matching backspace.
-    val pressModifier = if (repeatOnHold) {
-        Modifier
-            .indication(interaction, ripple())
-            .pointerInput(onClick) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    val press = PressInteraction.Press(down.position)
-                    interaction.tryEmit(press)
-                    onClick()  // immediate first press, like backspace on key-down
-                    val repeatJob = scope.launch {
-                        delay(android.view.ViewConfiguration.getKeyRepeatTimeout().toLong())
-                        while (isActive) {
-                            onClick()
-                            delay(android.view.ViewConfiguration.getKeyRepeatDelay().toLong())
-                        }
-                    }
-                    val up = waitForUpOrCancellation()
-                    repeatJob.cancel()
-                    interaction.tryEmit(
-                        if (up != null) PressInteraction.Release(press) else PressInteraction.Cancel(press)
-                    )
-                }
-            }
-    } else {
-        Modifier.clickable(onClick = onClick)
-    }
-    Box(
-        modifier = Modifier
-            .background(bg, MaterialTheme.shapes.extraSmall)
-            .then(pressModifier)
-            .padding(horizontal = horizontalPadding, vertical = 4.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        val isArrow = label.length == 1 && label[0] in "↑↓←→"
-        Text(
-            label,
-            fontSize = 12.sp,
-            fontFamily = if (isArrow) ArrowKeyFont else ExtraKeyFont,
-            fontWeight = if (active || isArrow) FontWeight.Bold else FontWeight.Medium,
-            maxLines = 1,
-            color = textColor,
-        )
-    }
-}
-
-@Composable
 private fun LoadingOverlay(message: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f), shape = MaterialTheme.shapes.medium) {
@@ -919,11 +740,18 @@ private fun SelectionBar(
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment     = Alignment.CenterVertically,
         ) {
+            // "Copy all" used to sit right next to "Copy selection" with the same look and
+            // the same first word, and got tapped by mistake. The two everyday actions keep
+            // their plain style; the rare one goes last, after a gap, smaller and dimmer.
             TextButton(onClick = onCopySelection) { Text(labelCopySelection) }
-            TextButton(onClick = onCopyAll)       { Text(labelCopyAll) }
             if (labelPaste != null && onPaste != null) {
                 TextButton(onClick = onPaste) { Text(labelPaste) }
             }
+            Spacer(Modifier.width(10.dp))
+            TextButton(
+                onClick = onCopyAll,
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+            ) { Text(labelCopyAll, style = MaterialTheme.typography.labelMedium) }
         }
     }
 }

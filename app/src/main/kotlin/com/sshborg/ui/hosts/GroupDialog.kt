@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntOffset
@@ -26,6 +27,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import com.sshborg.data.db.GroupEntity
+import com.sshborg.isTouchless
+import com.sshborg.ui.common.TvTapField
 
 /**
  * Classic gradient color picker (saturation/brightness square + hue bar) with
@@ -37,6 +40,8 @@ import com.sshborg.data.db.GroupEntity
  */
 @Composable
 fun ColorPickerContent(color: Int, onColorChange: (Int) -> Unit) {
+    val ctx = LocalContext.current
+    val touchless = remember { isTouchless(ctx) }
     val initialHsv = remember { FloatArray(3).also { AndroidColor.colorToHSV(color, it) } }
     var hue by remember { mutableFloatStateOf(initialHsv[0]) }
     var sat by remember { mutableFloatStateOf(initialHsv[1]) }
@@ -70,79 +75,100 @@ fun ColorPickerContent(color: Int, onColorChange: (Int) -> Unit) {
             }
         }
 
-        // Saturation (x) / brightness (y) square for the current hue
-        var svSize by remember { mutableStateOf(IntSize.Zero) }
-        fun svUpdate(pos: Offset) {
-            if (svSize == IntSize.Zero) return
-            setHsv(
-                hue,
-                (pos.x / svSize.width).coerceIn(0f, 1f),
-                1f - (pos.y / svSize.height).coerceIn(0f, 1f),
-            )
-        }
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Brush.horizontalGradient(listOf(Color.White, Color.hsv(hue, 1f, 1f))))
-                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black)))
-                .onSizeChanged { svSize = it }
-                .pointerInput(Unit) { detectTapGestures { svUpdate(it) } }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, _ -> change.consume(); svUpdate(change.position) }
-                },
-        ) {
-            Box(
-                Modifier
-                    .offset {
-                        IntOffset(
-                            (sat * svSize.width).toInt() - 10.dp.roundToPx(),
-                            ((1f - bri) * svSize.height).toInt() - 10.dp.roundToPx(),
-                        )
-                    }
-                    .size(20.dp)
-                    .border(1.dp, Color(0x80000000.toInt()), CircleShape)
-                    .padding(1.dp)
-                    .border(2.dp, Color.White, CircleShape),
-            )
-        }
-
-        // Hue bar
-        var hueSize by remember { mutableStateOf(IntSize.Zero) }
-        fun hueUpdate(pos: Offset) {
-            if (hueSize == IntSize.Zero) return
-            setHsv((pos.x / hueSize.width).coerceIn(0f, 1f) * 360f, sat, bri)
-        }
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(24.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    Brush.horizontalGradient(
-                        (0..6).map { Color.hsv(it * 60f, 1f, 1f) }
-                    )
+        if (touchless) {
+            // A D-pad can't drag the square/bar, so offer H/S/B sliders instead — Slider
+            // adjusts with ←/→ and ↑/↓ moves focus between the three. Swatches above and the
+            // hex preview below still apply.
+            ColorSlider(
+                "${stringResource(R.string.color_hue)}  ${hue.toInt()}°",
+                hue, 0f..360f,
+                Brush.horizontalGradient((0..6).map { Color.hsv(it * 60f, 1f, 1f) }),
+            ) { setHsv(it, sat, bri) }
+            ColorSlider(
+                "${stringResource(R.string.color_saturation)}  ${(sat * 100).toInt()}%",
+                sat, 0f..1f,
+                Brush.horizontalGradient(listOf(Color.hsv(hue, 0f, bri), Color.hsv(hue, 1f, bri))),
+            ) { setHsv(hue, it, bri) }
+            ColorSlider(
+                "${stringResource(R.string.color_brightness)}  ${(bri * 100).toInt()}%",
+                bri, 0f..1f,
+                Brush.horizontalGradient(listOf(Color.hsv(hue, sat, 0f), Color.hsv(hue, sat, 1f))),
+            ) { setHsv(hue, sat, it) }
+        } else {
+            // Saturation (x) / brightness (y) square for the current hue
+            var svSize by remember { mutableStateOf(IntSize.Zero) }
+            fun svUpdate(pos: Offset) {
+                if (svSize == IntSize.Zero) return
+                setHsv(
+                    hue,
+                    (pos.x / svSize.width).coerceIn(0f, 1f),
+                    1f - (pos.y / svSize.height).coerceIn(0f, 1f),
                 )
-                .onSizeChanged { hueSize = it }
-                .pointerInput(Unit) { detectTapGestures { hueUpdate(it) } }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, _ -> change.consume(); hueUpdate(change.position) }
-                },
-        ) {
+            }
             Box(
                 Modifier
-                    .offset {
-                        IntOffset(
-                            (hue / 360f * hueSize.width).toInt() - 10.dp.roundToPx(),
-                            (hueSize.height - 20.dp.roundToPx()) / 2,
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Brush.horizontalGradient(listOf(Color.White, Color.hsv(hue, 1f, 1f))))
+                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black)))
+                    .onSizeChanged { svSize = it }
+                    .pointerInput(Unit) { detectTapGestures { svUpdate(it) } }
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, _ -> change.consume(); svUpdate(change.position) }
+                    },
+            ) {
+                Box(
+                    Modifier
+                        .offset {
+                            IntOffset(
+                                (sat * svSize.width).toInt() - 10.dp.roundToPx(),
+                                ((1f - bri) * svSize.height).toInt() - 10.dp.roundToPx(),
+                            )
+                        }
+                        .size(20.dp)
+                        .border(1.dp, Color(0x80000000.toInt()), CircleShape)
+                        .padding(1.dp)
+                        .border(2.dp, Color.White, CircleShape),
+                )
+            }
+
+            // Hue bar
+            var hueSize by remember { mutableStateOf(IntSize.Zero) }
+            fun hueUpdate(pos: Offset) {
+                if (hueSize == IntSize.Zero) return
+                setHsv((pos.x / hueSize.width).coerceIn(0f, 1f) * 360f, sat, bri)
+            }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            (0..6).map { Color.hsv(it * 60f, 1f, 1f) }
                         )
-                    }
-                    .size(20.dp)
-                    .border(1.dp, Color(0x80000000.toInt()), CircleShape)
-                    .padding(1.dp)
-                    .border(2.dp, Color.White, CircleShape),
-            )
+                    )
+                    .onSizeChanged { hueSize = it }
+                    .pointerInput(Unit) { detectTapGestures { hueUpdate(it) } }
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, _ -> change.consume(); hueUpdate(change.position) }
+                    },
+            ) {
+                Box(
+                    Modifier
+                        .offset {
+                            IntOffset(
+                                (hue / 360f * hueSize.width).toInt() - 10.dp.roundToPx(),
+                                (hueSize.height - 20.dp.roundToPx()) / 2,
+                            )
+                        }
+                        .size(20.dp)
+                        .border(1.dp, Color(0x80000000.toInt()), CircleShape)
+                        .padding(1.dp)
+                        .border(2.dp, Color.White, CircleShape),
+                )
+            }
         }
 
         Row(
@@ -176,18 +202,31 @@ fun GroupDialog(
 ) {
     var name  by remember { mutableStateOf(initialName) }
     var color by remember { mutableIntStateOf(initialColor) }
+    val context = LocalContext.current
+    val touchless = remember { isTouchless(context) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text(stringResource(R.string.group_dialog_name)) },
-                    singleLine = true,
-                )
+                if (touchless) {
+                    // On a TV/D-pad the inline field's keyboard would trap the focus and
+                    // block reaching the colour swatches; a tap-to-edit field frees ↑/↓.
+                    TvTapField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = stringResource(R.string.group_dialog_name),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text(stringResource(R.string.group_dialog_name)) },
+                        singleLine = true,
+                    )
+                }
                 ColorPickerContent(color = color, onColorChange = { color = it })
             }
         },
@@ -232,4 +271,43 @@ fun HostColorDialog(
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
+}
+
+/**
+ * A labelled slider for the touchless (D-pad) colour picker. The gradient [trackBrush]
+ * (hue spectrum / grey→colour / black→colour) is drawn behind a Slider with a transparent
+ * track, so the bar shows what it does while the Slider keeps native D-pad handling.
+ */
+@Composable
+private fun ColorSlider(
+    label: String,
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+    trackBrush: Brush,
+    onChange: (Float) -> Unit,
+) {
+    Column {
+        Text(label, style = MaterialTheme.typography.labelMedium)
+        Box(contentAlignment = Alignment.Center) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(trackBrush),
+            )
+            Slider(
+                value = value,
+                onValueChange = onChange,
+                valueRange = range,
+                colors = SliderDefaults.colors(
+                    activeTrackColor = Color.Transparent,
+                    inactiveTrackColor = Color.Transparent,
+                    activeTickColor = Color.Transparent,
+                    inactiveTickColor = Color.Transparent,
+                ),
+            )
+        }
+    }
 }

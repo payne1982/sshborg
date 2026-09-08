@@ -282,7 +282,19 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Colar</strong> — cola a área de transferência no terminal.</li>
             </ul>
             <h3>Teclas de função</h3>
-            <p>Deslize a barra para a direita para aceder às teclas <strong>F1 a F12</strong>.</p>`,
+            <p>Deslize a barra para a direita para aceder às teclas <strong>F1 a F12</strong>.</p>
+            <h3>Disposições e barras personalizadas</h3>
+            <p>A barra existe em várias disposições. Toque na tecla <strong>⇄</strong> da barra para mudar: as teclas dão lugar à lista de barras disponíveis, toque numa e está feito — a escolha fica guardada. Também pode escolher e gerir as barras em <strong>Definições → Terminal → Disposição da barra de teclas extra → Personalizar</strong>.</p>
+            <ul>
+                <li><strong>Padrão</strong> — a clássica linha única com deslocamento.</li>
+                <li><strong>Natural</strong> — uma linha ordenada por frequência de uso, com <code>/ - | ~</code> e as setas na ordem do teclado (← ↑ ↓ →).</li>
+                <li><strong>Natural ×2</strong> — duas linhas que preenchem a largura: <code>ESC / - Home ↑ End PgUp</code> sobre <code>Tab Ctrl Alt ← ↓ → PgDn</code>.</li>
+                <li><strong>Natural ×3</strong> — o mesmo mais uma terceira linha com as teclas de função.</li>
+                <li><strong>Mínima</strong> — apenas ESC, Tab, Ctrl e as setas, para ecrãs estreitos.</li>
+            </ul>
+            <p>Para criar a sua, duplique uma predefinição (menu <strong>⋮</strong> ao lado) ou crie uma barra nova. O editor mostra a barra exatamente como vai ficar: toque numa tecla para a selecionar e use os botões abaixo para a mover para a esquerda ou direita, para outra linha, alterá-la, adicionar uma tecla a seguir ou removê-la. Cada linha pode <em>deslocar-se</em> (as teclas mantêm a largura natural) ou <em>preencher</em> a largura do ecrã (até cerca de nove teclas por linha num telemóvel). Até três linhas; o tamanho das teclas é ajustável.</p>
+            <p>Além das teclas habituais, uma barra personalizada pode ter <strong>teclas de texto</strong>: qualquer texto, enviado tal como está — um simples <code>|</code>, um prefixo <code>sudo </code> ou um comando inteiro. Use <code>\\n</code> para Enter, <code>\\t</code> para Tab e <code>\\e</code> para Escape; assim <code>ls -la\\n</code> torna-se uma macro de um toque. Há mais duas teclas de ação: <strong>fixar</strong> mantém a barra visível com o teclado fechado e <strong>teclado</strong> mostra ou oculta o teclado.</p>
+            <p>As barras personalizadas fazem parte da cópia de segurança das definições. Na Android TV tudo funciona com o comando: as teclas e botões do editor são acessíveis com o D-pad.</p>`,
 
   doc_agent_forwarding: `
             <h2>// REENCAMINHAMENTO DE AGENTE</h2>

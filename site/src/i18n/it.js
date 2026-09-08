@@ -283,7 +283,19 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Incolla</strong> — incolla gli appunti nel terminale.</li>
             </ul>
             <h3>Tasti funzione</h3>
-            <p>Scorri la barra verso destra per raggiungere i tasti <strong>da F1 a F12</strong>.</p>`,
+            <p>Scorri la barra verso destra per raggiungere i tasti <strong>da F1 a F12</strong>.</p>
+            <h3>Layout e barre personalizzate</h3>
+            <p>La barra esiste in più layout. Tocca il tasto <strong>⇄</strong> sulla barra per cambiarlo: i tasti lasciano il posto all'elenco delle barre disponibili, ne tocchi una e hai finito — la scelta viene ricordata. Puoi scegliere e gestire le barre anche da <strong>Impostazioni → Terminale → Layout barra tasti extra → Personalizza</strong>.</p>
+            <ul>
+                <li><strong>Standard</strong> — la classica riga singola a scorrimento.</li>
+                <li><strong>Naturale</strong> — una riga ordinata per frequenza d'uso, con <code>/ - | ~</code> e le frecce nell'ordine della tastiera (← ↑ ↓ →).</li>
+                <li><strong>Naturale ×2</strong> — due righe che riempiono la larghezza: <code>ESC / - Home ↑ End PgUp</code> sopra <code>Tab Ctrl Alt ← ↓ → PgDn</code>.</li>
+                <li><strong>Naturale ×3</strong> — come sopra più una terza riga con i tasti funzione.</li>
+                <li><strong>Minimale</strong> — solo ESC, Tab, Ctrl e le frecce, per schermi stretti.</li>
+            </ul>
+            <p>Per crearne una tua, duplica un preset (menu <strong>⋮</strong> accanto) oppure crea una barra nuova. L'editor mostra la barra esattamente come apparirà: tocca un tasto per selezionarlo, poi usa i pulsanti sotto per spostarlo a sinistra o a destra, in un'altra riga, cambiarlo, aggiungere un tasto dopo di lui o rimuoverlo. Ogni riga può <em>scorrere</em> (i tasti tengono la larghezza naturale) oppure <em>riempire</em> la larghezza dello schermo (fino a circa nove tasti per riga su un telefono). Fino a tre righe; la dimensione dei tasti è regolabile.</p>
+            <p>Oltre ai tasti soliti, una barra personalizzata può contenere <strong>tasti di testo</strong>: un testo qualsiasi, inviato così com'è — un singolo <code>|</code>, un prefisso <code>sudo </code> o un comando intero. Usa <code>\\n</code> per Invio, <code>\\t</code> per Tab e <code>\\e</code> per Esc, così <code>ls -la\\n</code> diventa una macro a un tocco. Ci sono altri due tasti azione: <strong>puntina</strong> tiene la barra visibile a tastiera chiusa, <strong>tastiera</strong> mostra o nasconde la tastiera.</p>
+            <p>Le barre personalizzate sono incluse nel backup delle impostazioni. Su Android TV funziona tutto col telecomando: tasti e pulsanti dell'editor sono raggiungibili col D-pad.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT FORWARDING</h2>

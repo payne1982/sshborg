@@ -1,0 +1,4 @@
+• Anpassbare Zusatztastenleiste: Layout wählen (eine Reihe, zwei Reihen, minimal) oder eigene Leiste mit beliebigen Tasten, Textmakros und bis zu drei Reihen – Wechsel in der Leiste mit ⇄
+• Flüssigere D-Pad-Navigation auf Android TV: Textfelder und Auswahlmenüs per Fernbedienung gut bedienbar
+• Sperrbildschirm auf Quer-TVs korrigiert, wo die unterste Reihe abgeschnitten sein konnte
+• Auswahlleiste: „Alles kopieren“ ans Ende und abgeschwächt, damit es nicht statt „Auswahl kopieren“ getippt wird

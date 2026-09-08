@@ -282,7 +282,19 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Coller</strong> — coller le presse-papiers dans le terminal.</li>
             </ul>
             <h3>Touches de fonction</h3>
-            <p>Faites défiler la barre vers la droite pour atteindre les touches <strong>F1 à F12</strong>.</p>`,
+            <p>Faites défiler la barre vers la droite pour atteindre les touches <strong>F1 à F12</strong>.</p>
+            <h3>Dispositions et barres personnalisées</h3>
+            <p>La barre existe en plusieurs dispositions. Touchez la touche <strong>⇄</strong> de la barre pour changer : les touches laissent place à la liste des barres disponibles, touchez-en une et c'est fait — le choix est mémorisé. Vous pouvez aussi choisir et gérer les barres dans <strong>Paramètres → Terminal → Disposition de la barre de touches → Personnaliser</strong>.</p>
+            <ul>
+                <li><strong>Standard</strong> — la rangée unique classique, qui défile.</li>
+                <li><strong>Naturelle</strong> — une rangée ordonnée par fréquence d'usage, avec <code>/ - | ~</code> et les flèches dans l'ordre du clavier (← ↑ ↓ →).</li>
+                <li><strong>Naturelle ×2</strong> — deux rangées qui remplissent la largeur : <code>ESC / - Home ↑ End PgUp</code> au-dessus de <code>Tab Ctrl Alt ← ↓ → PgDn</code>.</li>
+                <li><strong>Naturelle ×3</strong> — la même chose plus une troisième rangée avec les touches de fonction.</li>
+                <li><strong>Minimale</strong> — seulement ESC, Tab, Ctrl et les flèches, pour les écrans étroits.</li>
+            </ul>
+            <p>Pour créer la vôtre, dupliquez un préréglage (menu <strong>⋮</strong> à côté) ou créez une nouvelle barre. L'éditeur montre la barre exactement telle qu'elle apparaîtra : touchez une touche pour la sélectionner, puis utilisez les boutons en dessous pour la déplacer à gauche ou à droite, vers une autre rangée, la changer, ajouter une touche après elle ou la retirer. Chaque rangée peut <em>défiler</em> (les touches gardent leur largeur naturelle) ou <em>remplir</em> la largeur de l'écran (jusqu'à environ neuf touches par rangée sur un téléphone). Jusqu'à trois rangées ; la taille des touches est réglable.</p>
+            <p>En plus des touches habituelles, une barre personnalisée peut contenir des <strong>touches texte</strong> : n'importe quel texte, envoyé tel quel — un simple <code>|</code>, un préfixe <code>sudo </code> ou une commande entière. Utilisez <code>\\n</code> pour Entrée, <code>\\t</code> pour Tab et <code>\\e</code> pour Échap ; ainsi <code>ls -la\\n</code> devient une macro en une touche. Deux autres touches d'action existent : <strong>épingler</strong> garde la barre visible clavier fermé, <strong>clavier</strong> affiche ou masque le clavier.</p>
+            <p>Les barres personnalisées font partie de la sauvegarde des paramètres. Sur Android TV, tout fonctionne à la télécommande : les touches et boutons de l'éditeur sont accessibles au D-pad.</p>`,
 
   doc_agent_forwarding: `
             <h2>// TRANSFERT D'AGENT</h2>

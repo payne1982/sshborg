@@ -282,7 +282,19 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Einfügen</strong> — Zwischenablage in das Terminal einfügen.</li>
             </ul>
             <h3>Funktionstasten</h3>
-            <p>Scrolle die Leiste nach rechts, um die Tasten <strong>F1 bis F12</strong> zu erreichen.</p>`,
+            <p>Scrolle die Leiste nach rechts, um die Tasten <strong>F1 bis F12</strong> zu erreichen.</p>
+            <h3>Layouts und eigene Leisten</h3>
+            <p>Die Leiste gibt es in mehreren Layouts. Tippe auf die Taste <strong>⇄</strong> in der Leiste, um zu wechseln: Die Tasten machen der Liste der verfügbaren Leisten Platz, eine antippen, fertig — die Wahl wird gespeichert. Leisten lassen sich auch unter <strong>Einstellungen → Terminal → Layout der Zusatztastenleiste → Anpassen</strong> auswählen und verwalten.</p>
+            <ul>
+                <li><strong>Standard</strong> — die klassische einzelne, scrollende Reihe.</li>
+                <li><strong>Natürlich</strong> — eine Reihe nach Nutzungshäufigkeit, mit <code>/ - | ~</code> und den Pfeilen in Tastaturreihenfolge (← ↑ ↓ →).</li>
+                <li><strong>Natürlich ×2</strong> — zwei Reihen über die volle Breite: <code>ESC / - Home ↑ End PgUp</code> über <code>Tab Ctrl Alt ← ↓ → PgDn</code>.</li>
+                <li><strong>Natürlich ×3</strong> — dasselbe plus eine dritte Reihe mit den Funktionstasten.</li>
+                <li><strong>Minimal</strong> — nur ESC, Tab, Ctrl und die Pfeile, für schmale Bildschirme.</li>
+            </ul>
+            <p>Für eine eigene Leiste dupliziere eine Vorlage (Menü <strong>⋮</strong> daneben) oder lege eine neue an. Der Editor zeigt die Leiste genau so, wie sie aussehen wird: Tippe eine Taste an, um sie auszuwählen, und verschiebe sie mit den Schaltflächen darunter nach links oder rechts oder in eine andere Reihe, ändere sie, füge danach eine Taste ein oder entferne sie. Jede Reihe kann entweder <em>scrollen</em> (Tasten behalten ihre natürliche Breite) oder die Bildschirmbreite <em>füllen</em> (auf einem Telefon bis zu etwa neun Tasten pro Reihe). Bis zu drei Reihen; die Tastengröße ist einstellbar.</p>
+            <p>Neben den üblichen Tasten kann eine eigene Leiste <strong>Texttasten</strong> enthalten: beliebiger Text, der so gesendet wird, wie er ist — ein einzelnes <code>|</code>, ein <code>sudo </code>-Präfix oder ein ganzer Befehl. <code>\\n</code> steht für Eingabe, <code>\\t</code> für Tab und <code>\\e</code> für Escape, sodass <code>ls -la\\n</code> zu einem Makro mit einem Tipp wird. Zwei weitere Aktionstasten: <strong>Anheften</strong> hält die Leiste bei geschlossener Tastatur sichtbar, <strong>Tastatur</strong> blendet die Tastatur ein oder aus.</p>
+            <p>Eigene Leisten sind im Einstellungs-Backup enthalten. Auf Android TV funktioniert alles mit der Fernbedienung: Tasten und Schaltflächen des Editors sind per D-Pad erreichbar.</p>`,
 
   doc_agent_forwarding: `
             <h2>// AGENT-FORWARDING</h2>

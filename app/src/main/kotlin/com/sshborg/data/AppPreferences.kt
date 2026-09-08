@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
@@ -38,6 +39,8 @@ class AppPreferences(private val context: Context) {
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val EXTRA_KEYS_BAR_PINNED        = booleanPreferencesKey("extra_keys_bar_pinned")
+        val EXTRA_BAR_SELECTED           = stringPreferencesKey("extra_bar_selected")   // ExtraBar id
+        val EXTRA_BAR_CUSTOM             = stringPreferencesKey("extra_bar_custom")     // JSON array
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
         val PRIVACY_POLICY_ACCEPTED      = booleanPreferencesKey("privacy_policy_accepted")
         // In-app lock secret (mode LOCK_SECRET): a salted PBKDF2 hash, never the secret itself.
@@ -210,6 +213,32 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.EXTRA_KEYS_BAR_PINNED] = enabled }
     }
 
+    /** Id of the extra-key bar layout in use (a preset or a custom bar). */
+    val extraBarSelectedId: Flow<String> =
+        context.dataStore.data.map { it[Keys.EXTRA_BAR_SELECTED] ?: ExtraBarPresets.STANDARD }
+
+    suspend fun setExtraBarSelectedId(id: String) {
+        context.dataStore.edit { it[Keys.EXTRA_BAR_SELECTED] = id }
+    }
+
+    /** User-defined bars, stored as one JSON array. */
+    val customExtraBars: Flow<List<ExtraBar>> =
+        context.dataStore.data.map { ExtraBarJson.decodeAll(it[Keys.EXTRA_BAR_CUSTOM]) }
+
+    suspend fun setCustomExtraBars(bars: List<ExtraBar>) {
+        context.dataStore.edit { it[Keys.EXTRA_BAR_CUSTOM] = ExtraBarJson.encodeAll(bars) }
+    }
+
+    /** Custom bars first, then the presets — the order every picker shows. */
+    val allExtraBars: Flow<List<ExtraBar>> =
+        customExtraBars.map { it + ExtraBarPresets.all }
+
+    /** The bar to render: the selected one, or the standard preset if it no longer exists. */
+    val extraBar: Flow<ExtraBar> =
+        combine(extraBarSelectedId, customExtraBars) { id, custom ->
+            custom.find { it.id == id } ?: ExtraBarPresets.byId(id) ?: ExtraBarPresets.all.first()
+        }
+
     val securityReminderDismissed: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.SECURITY_REMINDER_DISMISSED] ?: false }
 
@@ -304,6 +333,9 @@ class AppPreferences(private val context: Context) {
             put("suggestions_bar_sticky", p[Keys.SUGGESTIONS_BAR_STICKY] ?: false)
             put("extra_keys_bar_pinned",  p[Keys.EXTRA_KEYS_BAR_PINNED] ?: false)
             put("double_tap_action",      p[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE)
+            put("extra_bar_selected",     p[Keys.EXTRA_BAR_SELECTED] ?: ExtraBarPresets.STANDARD)
+            put("extra_bar_custom",       org.json.JSONArray(ExtraBarJson.encodeAll(
+                ExtraBarJson.decodeAll(p[Keys.EXTRA_BAR_CUSTOM]))))
         }
     }
 
@@ -324,6 +356,11 @@ class AppPreferences(private val context: Context) {
             if (obj.has("suggestions_bar_sticky")) p[Keys.SUGGESTIONS_BAR_STICKY] = obj.getBoolean("suggestions_bar_sticky")
             if (obj.has("extra_keys_bar_pinned"))  p[Keys.EXTRA_KEYS_BAR_PINNED] = obj.getBoolean("extra_keys_bar_pinned")
             if (obj.has("double_tap_action"))      p[Keys.DOUBLE_TAP_ACTION] = obj.getInt("double_tap_action").coerceIn(DOUBLE_TAP_NONE, DOUBLE_TAP_TAB_TWICE)
+            // Custom bars replace the local set (they carry their own ids); a selected id that
+            // resolves to nothing falls back to the standard preset at read time.
+            val customBars = obj.optJSONArray("extra_bar_custom")?.toString()
+            if (customBars != null) p[Keys.EXTRA_BAR_CUSTOM] = ExtraBarJson.encodeAll(ExtraBarJson.decodeAll(customBars))
+            if (obj.has("extra_bar_selected"))     p[Keys.EXTRA_BAR_SELECTED] = obj.getString("extra_bar_selected")
         }
     }
 }

@@ -732,6 +732,18 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>功能键</h3>
             <p>向右滑动按键栏可访问 <strong>F1 至 F12</strong> 功能键。</p>
+            <h3>布局与自定义按键栏</h3>
+            <p>按键栏有多种布局。点按栏上的 <strong>⇄</strong> 键即可切换：按键会让位于可用按键栏列表，点按其中一个即可，选择会被记住。也可以在<strong>设置 → 终端 → 额外按键栏布局 → 自定义</strong>中选择和管理按键栏。</p>
+            <ul>
+                <li><strong>标准</strong> — 经典的单行滚动栏。</li>
+                <li><strong>自然</strong> — 按使用频率排列的单行，包含 <code>/ - | ~</code>，方向键按键盘顺序排列（← ↑ ↓ →）。</li>
+                <li><strong>自然 ×2</strong> — 两行铺满宽度：<code>ESC / - Home ↑ End PgUp</code> 在上，<code>Tab Ctrl Alt ← ↓ → PgDn</code> 在下。</li>
+                <li><strong>自然 ×3</strong> — 同上，另加第三行功能键。</li>
+                <li><strong>精简</strong> — 只有 ESC、Tab、Ctrl 和方向键，适合窄屏。</li>
+            </ul>
+            <p>要创建自己的按键栏，可复制一个预设（旁边的 <strong>⋮</strong> 菜单）或新建一个。编辑器会按实际外观显示按键栏：点按一个按键将其选中，然后用下方按钮把它左右移动、移到另一行、更改、在其后添加按键或移除。每一行可以<em>滚动</em>（按键保持自然宽度）或<em>填满</em>屏幕宽度（手机上每行最多约九个按键）。最多三行；按键大小可调。</p>
+            <p>除了常规按键，自定义按键栏还可以包含<strong>文本键</strong>：任意文本原样发送——单个 <code>|</code>、<code>sudo </code> 前缀或一整条命令。用 <code>\n</code> 表示回车、<code>\t</code> 表示 Tab、<code>\e</code> 表示 Esc，这样 <code>ls -la\n</code> 就成了一键宏。另有两个操作键：<strong>固定</strong>在键盘关闭时仍保持按键栏可见，<strong>键盘</strong>显示或隐藏键盘。</p>
+            <p>自定义按键栏包含在设置备份中。在 Android TV 上一切都可用遥控器操作：编辑器的按键和按钮都能用方向键到达。</p>
         </div>
 
         <div class="doc-section" id="agent-forwarding">
