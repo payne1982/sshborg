@@ -1,2 +1,2 @@
 • Ahora se puede ordenar la lista de hosts y grupos (alfabético, usados recientemente, más usados o a mano)
-• El desplazamiento ya no descuadra la pantalla en tmux, vim y otras apps a pantalla completa; con el modo ratón activo en tmux, deslizar recorre su historial
+• Corregido el desplazamiento en apps a pantalla completa como tmux, vim, nano y less

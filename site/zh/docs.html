@@ -702,6 +702,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
             </ul>
+            <p><strong>全屏程序。</strong> 占据整个屏幕的程序 — tmux、vim、nano、less — 没有自己的回滚缓冲区，因此在它们运行期间，视图会停留在当前画面，而不会滑入下面的 shell 输出。</p>
+            <p>要在其中滚动，需要由程序自己处理。在 tmux 中，将 <code>set -g mouse on</code> 加入 <code>~/.tmux.conf</code>：此后滑动即可翻阅手指所在窗格的历史。任何接受鼠标输入的程序同理，例如设置了 <code>set mouse=a</code> 的 vim。使用 <code>screen</code> 时，请检查 <code>~/.screenrc</code> 中是否有 <code>altscreen on</code> — 许多系统默认关闭它，此时 screen 会直接画在普通回滚缓冲区之上。</p>
         </div>
 
         <div class="doc-section" id="terminal-settings">

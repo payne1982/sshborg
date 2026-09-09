@@ -258,7 +258,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>ズーム</strong> — ピンチ操作でフォントサイズを拡大・縮小。</li>
                 <li><strong>テキストのコピー</strong> — 端末の任意の場所を長押しして選択モードに入ります。ハンドルをドラッグして選択範囲を調整し、<em>選択をコピー</em> でハイライトされたテキストのみコピー、または <em>すべてコピー</em> で全出力をコピー。他の場所をタップするとキャンセル。</li>
                 <li><strong>貼り付け</strong> — キーボードが開いているときに表示される追加キーバーの <em>貼り付け</em> ボタンを使用。</li>
-            </ul>`,
+            </ul>
+            <p><strong>全画面アプリ。</strong> tmux、vim、nano、less のように画面全体を占有するプログラムは独自のスクロールバックを持たないため、実行中は表示が現在の画面に固定され、その下にあるシェルの出力へずれ込むことはありません。</p>
+            <p>その中でスクロールするには、アプリ側が対応している必要があります。tmux では <code>~/.tmux.conf</code> に <code>set -g mouse on</code> を追加すると、スワイプで指の下にあるペインの履歴をたどれます。<code>set mouse=a</code> を設定した vim など、マウス入力を受け付けるプログラムでも同様です。<code>screen</code> の場合は <code>~/.screenrc</code> に <code>altscreen on</code> があるか確認してください。多くのシステムでは既定で無効になっており、その場合 screen は通常のスクロールバックの上に描画します。</p>`,
 
   doc_terminal_settings: `
             <h2>// ターミナル設定</h2>

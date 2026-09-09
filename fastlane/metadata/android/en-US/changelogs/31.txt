@@ -1,2 +1,2 @@
 • You can now order the host and group list (alphabetical, recently used, most used or by hand)
-• Scrolling no longer garbles the screen in tmux, vim and other full-screen apps; with mouse mode on in tmux, a swipe scrolls its history
+• Fixed scrolling inside full-screen apps such as tmux, vim, nano and less

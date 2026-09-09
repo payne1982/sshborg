@@ -702,6 +702,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare.</li>
                 <li><strong>Incollare</strong> — usa il tasto <em>Incolla</em> nella barra dei tasti extra (visibile quando la tastiera è aperta).</li>
             </ul>
+            <p><strong>App a tutto schermo.</strong> I programmi che occupano l'intero schermo — tmux, vim, nano, less — non hanno una cronologia propria, quindi mentre sono in esecuzione la vista resta sulla schermata attiva invece di scivolare nell'output della shell che sta sotto.</p>
+            <p>Per scorrere al loro interno deve essere l'applicazione a occuparsene. In tmux aggiungi <code>set -g mouse on</code> in <code>~/.tmux.conf</code>: lo swipe scorre allora la cronologia del pannello sotto al dito. Lo stesso vale per qualsiasi programma che accetti input dal mouse, come vim con <code>set mouse=a</code>. Con <code>screen</code>, verifica che in <code>~/.screenrc</code> ci sia <code>altscreen on</code> — su molti sistemi è disattivato di default, e screen disegna sopra alla normale cronologia.</p>
         </div>
 
         <div class="doc-section" id="terminal-settings">

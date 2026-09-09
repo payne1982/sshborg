@@ -256,7 +256,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — mit zwei Fingern zoomen, um die Textgröße anzupassen.</li>
                 <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen.</li>
                 <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
-            </ul>`,
+            </ul>
+            <p><strong>Vollbild-Anwendungen.</strong> Programme, die den ganzen Bildschirm übernehmen — tmux, vim, nano, less — haben keinen eigenen Verlauf, daher bleibt die Ansicht währenddessen auf dem laufenden Bildschirm und rutscht nicht in die darunterliegende Shell-Ausgabe.</p>
+            <p>Das Scrollen darin muss die Anwendung selbst übernehmen. In tmux <code>set -g mouse on</code> in <code>~/.tmux.conf</code> eintragen: Eine Wischgeste scrollt dann den Verlauf des Bereichs unter dem Finger. Das gilt für jedes Programm, das Mauseingaben annimmt, etwa vim mit <code>set mouse=a</code>. Bei <code>screen</code> prüfen, ob in <code>~/.screenrc</code> <code>altscreen on</code> steht — auf vielen Systemen ist es standardmäßig aus, und screen zeichnet dann über den normalen Verlauf.</p>`,
 
   doc_terminal_settings: `
             <h2>// TERMINAL-EINSTELLUNGEN</h2>

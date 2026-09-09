@@ -258,7 +258,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — pinch to increase or decrease the text size.</li>
                 <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
-            </ul>`,
+            </ul>
+            <p><strong>Full-screen apps.</strong> Programs that take over the whole screen — tmux, vim, nano, less — have no scrollback of their own, so while one is running the view stays on the live screen instead of drifting into the shell output underneath it.</p>
+            <p>To scroll inside them, the application has to handle the scrolling itself. In tmux, add <code>set -g mouse on</code> to <code>~/.tmux.conf</code>: a swipe then scrolls the history of the pane under your finger. The same goes for any program that accepts mouse input, such as vim with <code>set mouse=a</code>. With <code>screen</code>, check that <code>altscreen on</code> is set in <code>~/.screenrc</code> — on many systems it is off by default, and screen then draws over the ordinary scrollback.</p>`,
 
   doc_terminal_settings: `
             <h2>// TERMINAL SETTINGS</h2>

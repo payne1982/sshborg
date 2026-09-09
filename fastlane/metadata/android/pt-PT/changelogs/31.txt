@@ -1,2 +1,2 @@
 • Agora é possível ordenar a lista de hosts e grupos (alfabética, usados recentemente, mais usados ou à mão)
-• O deslocamento já não estraga o ecrã em tmux, vim e outras apps de ecrã inteiro; com o modo rato ativo no tmux, deslizar percorre o seu histórico
+• Corrigido o deslocamento em apps de ecrã inteiro como tmux, vim, nano e less

@@ -256,7 +256,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — faça pinça para aumentar ou diminuir o tamanho do texto.</li>
                 <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar.</li>
                 <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
-            </ul>`,
+            </ul>
+            <p><strong>Aplicações de ecrã inteiro.</strong> Os programas que ocupam todo o ecrã — tmux, vim, nano, less — não têm histórico próprio, por isso enquanto estão em execução a vista permanece no ecrã ativo em vez de deslizar para a saída da shell que está por baixo.</p>
+            <p>Para rolar dentro deles, é a aplicação que tem de tratar disso. No tmux, adicione <code>set -g mouse on</code> ao <code>~/.tmux.conf</code>: deslizar percorre então o histórico do painel sob o seu dedo. O mesmo se aplica a qualquer programa que aceite entrada do rato, como o vim com <code>set mouse=a</code>. Com o <code>screen</code>, verifique se <code>altscreen on</code> está em <code>~/.screenrc</code> — em muitos sistemas está desativado por omissão, e o screen desenha por cima do histórico normal.</p>`,
 
   doc_terminal_settings: `
             <h2>// DEFINIÇÕES DO TERMINAL</h2>

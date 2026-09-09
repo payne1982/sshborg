@@ -256,7 +256,9 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Zoom</strong> — pellizca para aumentar o reducir el tamaño del texto.</li>
                 <li><strong>Copiar texto</strong> — mantén pulsado en cualquier lugar del terminal para entrar en modo selección. Arrastra los controladores para ajustar el área seleccionada, luego toca <em>Copiar selección</em> para copiar solo el texto resaltado, o <em>Copiar todo</em> para copiar toda la salida. Toca fuera para cancelar.</li>
                 <li><strong>Pegar</strong> — usa el botón <em>Pegar</em> en la barra de teclas adicionales (visible cuando el teclado está abierto).</li>
-            </ul>`,
+            </ul>
+            <p><strong>Aplicaciones a pantalla completa.</strong> Los programas que ocupan toda la pantalla — tmux, vim, nano, less — no tienen historial propio, así que mientras están en ejecución la vista permanece en la pantalla activa en lugar de deslizarse hacia la salida de la shell que hay debajo.</p>
+            <p>Para desplazarse dentro de ellos, la aplicación debe encargarse del desplazamiento. En tmux, añade <code>set -g mouse on</code> a <code>~/.tmux.conf</code>: al deslizar se recorre el historial del panel que hay bajo tu dedo. Lo mismo vale para cualquier programa que acepte entrada de ratón, como vim con <code>set mouse=a</code>. Con <code>screen</code>, comprueba que en <code>~/.screenrc</code> esté <code>altscreen on</code>: en muchos sistemas está desactivado por defecto y screen dibuja sobre el historial normal.</p>`,
 
   doc_terminal_settings: `
             <h2>// AJUSTES DEL TERMINAL</h2>
