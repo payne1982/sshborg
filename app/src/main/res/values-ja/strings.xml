@@ -450,4 +450,12 @@
     <string name="extra_key_action_word_mode">単語モード</string>
     <string name="extra_key_action_switch">バーを切り替え</string>
     <string name="extra_key_action_keyboard">キーボード</string>
+    <string name="settings_host_sort_title">ホスト一覧の並び順</string>
+    <string name="settings_host_sort_subtitle">手動以外ではグループはアルファベット順のままです</string>
+    <string name="settings_host_sort_alpha">アルファベット順</string>
+    <string name="settings_host_sort_recent">最近使った順</string>
+    <string name="settings_host_sort_popular">よく使う順</string>
+    <string name="settings_host_sort_manual">手動</string>
+    <string name="hosts_move_up">上へ移動</string>
+    <string name="hosts_move_down">下へ移動</string>
 </resources>

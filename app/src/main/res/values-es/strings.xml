@@ -445,4 +445,12 @@
     <string name="extra_key_action_word_mode">Modo palabra</string>
     <string name="extra_key_action_switch">Cambiar barra</string>
     <string name="extra_key_action_keyboard">Teclado</string>
+    <string name="settings_host_sort_title">Orden de la lista de hosts</string>
+    <string name="settings_host_sort_subtitle">Los grupos siguen en orden alfabético salvo en el orden manual</string>
+    <string name="settings_host_sort_alpha">Alfabético</string>
+    <string name="settings_host_sort_recent">Usados recientemente</string>
+    <string name="settings_host_sort_popular">Más usados</string>
+    <string name="settings_host_sort_manual">Manual</string>
+    <string name="hosts_move_up">Subir</string>
+    <string name="hosts_move_down">Bajar</string>
 </resources>

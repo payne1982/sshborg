@@ -450,4 +450,12 @@
     <string name="extra_key_action_word_mode">单词模式</string>
     <string name="extra_key_action_switch">切换按键栏</string>
     <string name="extra_key_action_keyboard">键盘</string>
+    <string name="settings_host_sort_title">主机列表排序</string>
+    <string name="settings_host_sort_subtitle">除手动排序外，分组始终按字母顺序</string>
+    <string name="settings_host_sort_alpha">字母顺序</string>
+    <string name="settings_host_sort_recent">最近使用</string>
+    <string name="settings_host_sort_popular">最常使用</string>
+    <string name="settings_host_sort_manual">手动</string>
+    <string name="hosts_move_up">上移</string>
+    <string name="hosts_move_down">下移</string>
 </resources>

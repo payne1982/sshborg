@@ -446,4 +446,12 @@
     <string name="extra_key_action_word_mode">Modalità parola</string>
     <string name="extra_key_action_switch">Cambia barra</string>
     <string name="extra_key_action_keyboard">Tastiera</string>
+    <string name="settings_host_sort_title">Ordinamento host</string>
+    <string name="settings_host_sort_subtitle">I gruppi restano alfabetici tranne nell\'ordine manuale</string>
+    <string name="settings_host_sort_alpha">Alfabetico</string>
+    <string name="settings_host_sort_recent">Recenti</string>
+    <string name="settings_host_sort_popular">Più usati</string>
+    <string name="settings_host_sort_manual">Manuale</string>
+    <string name="hosts_move_up">Sposta su</string>
+    <string name="hosts_move_down">Sposta giù</string>
 </resources>

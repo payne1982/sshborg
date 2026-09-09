@@ -510,6 +510,7 @@
         <ul>
             <li><a href="#adding-host">Adding a Host</a></li>
             <li><a href="#host-groups">Host Groups</a></li>
+            <li class="sub"><a href="#host-groups">List order</a></li>
             <li><a href="#sftp">SFTP File Manager</a></li>
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Upload &amp; download</a></li>
@@ -580,6 +581,16 @@
             </ul>
             <p>Colors can be picked from the quick swatches or mixed freely with the gradient color picker. A host can also have its <strong>own color</strong> — set it in the host editor, right below the group — which overrides the group color and works for ungrouped hosts too.</p>
             <p>Hosts without a group stay at the top of the list, and if you never create a group the list looks and behaves exactly as before.</p>
+            <h3>List order</h3>
+            <p>Choose how the list is arranged in <strong>Settings → Host list order</strong>:</p>
+            <ul>
+                <li><strong>Alphabetical</strong> (default) — groups by name, hosts by label inside each one.</li>
+                <li><strong>Recently used</strong> — the host you connected to last comes first; hosts never used sit at the bottom.</li>
+                <li><strong>Most used</strong> — the hosts with the most connections first.</li>
+                <li><strong>Manual</strong> — the order you set by hand.</li>
+            </ul>
+            <p>In the first three modes the groups stay in alphabetical order, so the section headers never move and only the hosts inside them are rearranged. In manual order the groups can be moved as well.</p>
+            <p>To rearrange, pick <strong>Manual</strong>, then open the menu of a host or of a group header — the <strong>⋮</strong> button, a long press, or the <em>Menu</em> key on a TV remote — and use <strong>Move up</strong> / <strong>Move down</strong>. A host only moves inside its own section: to put it in another group, change the group in the host editor. Switching to manual keeps exactly the order that was on screen at that moment, so nothing jumps, and hosts added later go to the end of their section.</p>
         </div>
 
         <div class="doc-section" id="sftp">
@@ -948,14 +959,15 @@ Host target
                 <li>Hosts not present in the file are <strong>left unchanged</strong>.</li>
                 <li>An updated host keeps its saved password, key and accepted host key — the backup never carries them.</li>
                 <li>A host with no key is linked to a key whose name matches the exported <code>keyLabel</code>, if one exists; otherwise the field is ignored.</li>
+                <li>An updated host keeps the usage data this device already has — last connection, counter and manual position; the file only fills in what is missing.</li>
 </ul>
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{
-  "version": 5,
+  "version": 7,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
-    { "name": "Production", "color": -1754827 }
+    { "name": "Production", "color": -1754827, "position": 0 }
   ],
   "hosts": [
     {
@@ -972,6 +984,9 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "position":        0,
+      "lastConnected":   1757404800000,
+      "connectCount":    12,
       "keyLabel":         "My VPS key",
       "group":           "Production"
     }
@@ -1002,6 +1017,9 @@ Host target
                 <li><code>keyLabel</code> — name of the SSH key this host uses. On import, if a key with this name exists it is linked to the host; otherwise the field is ignored. The key itself is never included in the backup.</li>
                 <li><code>group</code> — name of the group the host belongs to. Groups are listed in the top-level <code>groups</code> array with their <code>name</code> and <code>color</code> (ARGB as a signed 32-bit integer). If a host references a group that is not in the array, it is created automatically with a default color — so you can omit the array entirely when writing the file by hand.</li>
                 <li><code>color</code> — optional per-host color (ARGB as a signed 32-bit integer). It overrides the group color.</li>
+                            <li><code>position</code> — place of the host in the manual list order, counted inside its own section (the ungrouped block, or one group). Omit it and the host is appended at the end. Groups carry a <code>position</code> of their own in the <code>groups</code> array.</li>
+                <li><code>lastConnected</code> — time of the last connection, in milliseconds since the Unix epoch. Feeds the "recently used" order.</li>
+                <li><code>connectCount</code> — how many terminal sessions were opened to this host. Feeds the "most used" order.</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// OPTIONAL FIELDS</div>

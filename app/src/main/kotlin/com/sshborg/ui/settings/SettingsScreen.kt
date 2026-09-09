@@ -78,6 +78,7 @@ fun SettingsScreen(
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
     val extraBar              by vm.extraBar.collectAsState()
+    val hostSortMode          by vm.hostSortMode.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -208,6 +209,30 @@ fun SettingsScreen(
                         options = themeOptions,
                         onSelect = { vm.setNightMode(it) },
                         touchless = touchless,
+                    )
+                },
+            )
+
+            // Host list order (#16). Manual adds "move up/down" to the row menus in the
+            // host list; the other modes leave the groups alphabetical and reorder the
+            // hosts inside them.
+            val hostSortOptions = listOf(
+                AppPreferences.HOST_SORT_ALPHA   to stringResource(R.string.settings_host_sort_alpha),
+                AppPreferences.HOST_SORT_RECENT  to stringResource(R.string.settings_host_sort_recent),
+                AppPreferences.HOST_SORT_POPULAR to stringResource(R.string.settings_host_sort_popular),
+                AppPreferences.HOST_SORT_MANUAL  to stringResource(R.string.settings_host_sort_manual),
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_host_sort_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_host_sort_subtitle)) },
+                trailingContent = {
+                    SettingSelect(
+                        label = stringResource(R.string.settings_host_sort_title),
+                        selected = hostSortMode,
+                        options = hostSortOptions,
+                        onSelect = { vm.setHostSortMode(it) },
+                        touchless = touchless,
+                        width = 160.dp,
                     )
                 },
             )

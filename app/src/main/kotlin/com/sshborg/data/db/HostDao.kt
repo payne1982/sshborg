@@ -20,8 +20,12 @@ interface HostDao {
     @Delete
     suspend fun delete(host: HostEntity)
 
-    @Query("UPDATE hosts SET lastConnected = :ts WHERE id = :id")
-    suspend fun updateLastConnected(id: Long, ts: Long)
+    /** One connection: stamps the time and bumps the counter the "most used" order reads. */
+    @Query("UPDATE hosts SET lastConnected = :ts, connectCount = connectCount + 1 WHERE id = :id")
+    suspend fun recordConnection(id: Long, ts: Long)
+
+    @Query("UPDATE hosts SET position = :position WHERE id = :id")
+    suspend fun updatePosition(id: Long, position: Int)
 
     @Query("UPDATE hosts SET groupId = NULL WHERE groupId = :groupId")
     suspend fun clearGroup(groupId: Long)

@@ -81,6 +81,7 @@ module.exports = {
 
   doc_toc: `            <li><a href="#adding-host">Host hinzufügen</a></li>
             <li><a href="#host-groups">Host-Gruppen</a></li>
+            <li class="sub"><a href="#host-groups">Reihenfolge</a></li>
             <li><a href="#sftp">SFTP-Dateimanager</a></li>
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Hoch- &amp; Herunterladen</a></li>
@@ -142,7 +143,17 @@ module.exports = {
                 <li><strong>Löschen</strong> — halte die Überschrift gedrückt und wähle <em>Löschen</em>. Die Hosts der Gruppe werden <em>nicht</em> gelöscht — sie sind danach einfach ohne Gruppe.</li>
             </ul>
             <p>Farben lassen sich aus den Schnellauswahl-Feldern wählen oder frei mit dem Verlaufs-Farbwähler mischen. Ein Host kann auch eine <strong>eigene Farbe</strong> haben — einstellbar im Host-Editor direkt unter der Gruppe —, die die Gruppenfarbe überschreibt und auch für Hosts ohne Gruppe funktioniert.</p>
-            <p>Hosts ohne Gruppe bleiben oben in der Liste, und solange du keine Gruppe erstellst, sieht die Liste genauso aus und verhält sich genauso wie bisher.</p>`,
+            <p>Hosts ohne Gruppe bleiben oben in der Liste, und solange du keine Gruppe erstellst, sieht die Liste genauso aus und verhält sich genauso wie bisher.</p>
+            <h3>Reihenfolge</h3>
+            <p>Wähle unter <strong>Einstellungen → Reihenfolge der Hostliste</strong>, wie die Liste angeordnet wird:</p>
+            <ul>
+                <li><strong>Alphabetisch</strong> (Standard) — Gruppen nach Name, Hosts nach Bezeichnung innerhalb jeder Gruppe.</li>
+                <li><strong>Zuletzt verwendet</strong> — der zuletzt verbundene Host steht oben; nie verwendete Hosts stehen unten.</li>
+                <li><strong>Am meisten verwendet</strong> — Hosts mit den meisten Verbindungen zuerst.</li>
+                <li><strong>Manuell</strong> — die Reihenfolge, die du selbst festlegst.</li>
+            </ul>
+            <p>In den ersten drei Modi bleiben die Gruppen alphabetisch, sodass die Abschnittsüberschriften nie wandern und nur die Hosts darin neu angeordnet werden. In der manuellen Reihenfolge lassen sich auch die Gruppen verschieben.</p>
+            <p>Zum Umsortieren wähle <strong>Manuell</strong>, öffne dann das Menü eines Hosts oder einer Gruppenüberschrift — die Schaltfläche <strong>⋮</strong>, ein langer Druck oder die <em>Menü</em>-Taste der TV-Fernbedienung — und nutze <strong>Nach oben</strong> / <strong>Nach unten</strong>. Ein Host bewegt sich nur innerhalb seines eigenen Abschnitts: um ihn in eine andere Gruppe zu legen, ändere die Gruppe im Host-Editor. Beim Wechsel auf manuell bleibt genau die Reihenfolge erhalten, die gerade zu sehen war, es springt also nichts, und später hinzugefügte Hosts landen am Ende ihres Abschnitts.</p>`,
 
   doc_sftp: `
             <h2>// SFTP-DATEIMANAGER</h2>
@@ -502,14 +513,15 @@ Host target
                 <li>Hosts, die nicht in der Datei vorhanden sind, bleiben <strong>unverändert</strong>.</li>
                 <li>Ein aktualisierter Host behält gespeichertes Passwort, Schlüssel und akzeptierten Hostschlüssel — die Sicherung enthält sie nie.</li>
                 <li>Ein Host ohne Schlüssel wird mit einem Schlüssel verknüpft, dessen Name dem exportierten <code>keyLabel</code> entspricht, sofern vorhanden; andernfalls wird das Feld ignoriert.</li>
+                <li>Ein aktualisierter Host behält die Nutzungsdaten, die dieses Gerät bereits hat — letzte Verbindung, Zähler und manuelle Position; die Datei ergänzt nur, was fehlt.</li>
 </ul>
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 5,
+  "version": 7,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
-    { "name": "Produktion", "color": -1754827 }
+    { "name": "Produktion", "color": -1754827, "position": 0 }
   ],
   "hosts": [
     {
@@ -526,6 +538,9 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "position":        0,
+      "lastConnected":   1757404800000,
+      "connectCount":    12,
       "keyLabel":         "Mein VPS-Schlüssel",
       "group":           "Produktion"
     }
@@ -556,6 +571,9 @@ Host target
                 <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
                 <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>
+                            <li><code>position</code> — Platz des Hosts in der manuellen Reihenfolge, gezählt innerhalb seines Abschnitts (der Block ohne Gruppe oder eine Gruppe). Ohne Angabe wird der Host hinten angehängt. Auch Gruppen haben im Array <code>groups</code> ihre eigene <code>position</code>.</li>
+                <li><code>lastConnected</code> — Zeitpunkt der letzten Verbindung, in Millisekunden seit der Unix-Epoche. Speist die Reihenfolge „Zuletzt verwendet".</li>
+                <li><code>connectCount</code> — wie viele Terminal-Sitzungen zu diesem Host geöffnet wurden. Speist die Reihenfolge „Am meisten verwendet".</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// OPTIONALE FELDER</div>

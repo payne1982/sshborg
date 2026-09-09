@@ -449,4 +449,12 @@
     <string name="extra_key_action_word_mode">Режим слів</string>
     <string name="extra_key_action_switch">Змінити панель</string>
     <string name="extra_key_action_keyboard">Клавіатура</string>
+    <string name="settings_host_sort_title">Порядок списку хостів</string>
+    <string name="settings_host_sort_subtitle">Групи лишаються за абеткою, крім ручного порядку</string>
+    <string name="settings_host_sort_alpha">За абеткою</string>
+    <string name="settings_host_sort_recent">Нещодавні</string>
+    <string name="settings_host_sort_popular">Найчастіші</string>
+    <string name="settings_host_sort_manual">Вручну</string>
+    <string name="hosts_move_up">Перемістити вгору</string>
+    <string name="hosts_move_down">Перемістити вниз</string>
 </resources>
