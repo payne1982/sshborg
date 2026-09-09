@@ -1,1 +1,2 @@
 • Die Host- und Gruppenliste lässt sich jetzt sortieren (alphabetisch, zuletzt verwendet, am meisten verwendet oder von Hand)
+• Das Scrollen zerlegt die Anzeige in tmux, vim und anderen Vollbild-Apps nicht mehr; mit aktivem Maus-Modus in tmux scrollt eine Wischgeste dessen Verlauf

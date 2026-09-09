@@ -1,1 +1,2 @@
 • Ora è possibile ordinare la lista degli host e dei gruppi (alfabetico, recenti, più usati o a mano)
+• Lo scorrimento non sballa più la schermata in tmux, vim e altre app a tutto schermo; con il mouse attivo in tmux lo swipe scorre la sua cronologia
