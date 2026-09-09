@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.*
 import android.view.inputmethod.*
 import com.sshborg.data.AppPreferences
+import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.hypot
 
@@ -53,6 +54,11 @@ class TerminalView @JvmOverloads constructor(
     // (dy / cellH) to whole lines every event discarded the fraction, so slow drags
     // never accumulated enough to move and felt laggy/dropped. Carry it across events.
     private var scrollRemainderY = 0f
+
+    // Wheel-report accumulators: one for travel in lines (finger drag or momentum), one for a
+    // real wheel's notches (fractional on precision mice). Both convert into whole notches.
+    private var wheelTravel = 0f
+    private var wheelNotches = 0f
 
     /** When true, swipe up = see newer content (inverted from natural scroll). */
     var invertScroll: Boolean = false
@@ -253,6 +259,11 @@ class TerminalView @JvmOverloads constructor(
             val buf = emu.buffer
 
             val totalScrollback = buf.scrollbackSize
+            // A full-screen app may have opened while the view was scrolled up into the
+            // history: pin it back to the live screen, otherwise the app would repaint in
+            // the middle of unrelated shell output.
+            val cap = if (emu.altScreenActive) 0 else totalScrollback
+            if (scrollbackOffset > cap) { cancelFling(); scrollbackOffset = cap }
             val viewStart = totalScrollback - scrollbackOffset
             cachedViewStart = viewStart
 
@@ -495,12 +506,60 @@ class TerminalView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Highest scrollback offset the view may show. The alternate screen (vim, less, tmux…)
+     * has no history of its own, so there the view stays pinned to the live screen: scrolling
+     * it would drag up the shell history sitting underneath the full-screen app, which is
+     * neither what the app is drawing nor anything the user can act on.
+     */
+    private val maxScrollOffset: Int
+        get() {
+            val emu = emulator ?: return 0
+            synchronized(emu) { return if (emu.altScreenActive) 0 else emu.buffer.scrollbackSize }
+        }
+
+    /**
+     * True when wheel movement should be reported to the remote app instead of scrolling the
+     * view. Deliberately limited to the alternate screen: on the main screen there is real
+     * history above the cursor and scrolling it locally is what the user is after, while on
+     * the alternate screen the view is pinned (see [maxScrollOffset]), so the notches have
+     * nothing to do here and are better spent on the app, which scrolls itself — in tmux,
+     * that means its own copy-mode history rather than the shell output underneath it.
+     */
+    private fun reportsWheel(emu: TerminalEmulator): Boolean {
+        // While the user is selecting, gestures belong to the selection, not to the app.
+        if (inSelectionMode) return false
+        synchronized(emu) { return emu.altScreenActive && emu.mouseReporting }
+    }
+
+    /** Turns whatever whole notches have accumulated in [wheelTravel] into a report. */
+    private fun emitWheelTravel(emu: TerminalEmulator, x: Float, y: Float) {
+        val notches = (wheelTravel / WHEEL_NOTCH_LINES).toInt()
+        if (notches == 0) return
+        wheelTravel -= notches * WHEEL_NOTCH_LINES
+        sendWheel(emu, notches, x, y)
+    }
+
+    /**
+     * Reports [notches] wheel steps (positive = up/back) at the given pixel position.
+     * Coordinates matter: they tell the app which pane the pointer — or the finger — is over.
+     */
+    private fun sendWheel(emu: TerminalEmulator, notches: Int, x: Float, y: Float) {
+        if (notches == 0 || cellW <= 0f || cellH <= 0f) return
+        val col = (x / cellW).toInt().coerceIn(0, (termColumns - 1).coerceAtLeast(0))
+        val row = (y / cellH).toInt().coerceIn(0, (termRows - 1).coerceAtLeast(0))
+        val out = java.io.ByteArrayOutputStream()
+        repeat(abs(notches)) {
+            val report = synchronized(emu) { emu.mouseWheelReport(notches > 0, col, row) } ?: return@repeat
+            out.write(report)
+        }
+        if (out.size() > 0) onInput?.invoke(out.toByteArray())
+    }
+
     /** True if there is scrollback left to reveal in [dir] (+1 = older/up, -1 = newer/down). */
     private fun canAutoScroll(dir: Int): Boolean {
-        val emu = emulator ?: return false
-        val maxScrollback: Int
-        synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
-        return if (dir > 0) scrollbackOffset < maxScrollback else scrollbackOffset > 0
+        if (emulator == null) return false
+        return if (dir > 0) scrollbackOffset < maxScrollOffset else scrollbackOffset > 0
     }
 
     private fun scheduleAutoScroll(dir: Int) {
@@ -513,7 +572,7 @@ class TerminalView @JvmOverloads constructor(
                 val emu = emulator ?: return
                 val maxScrollback: Int
                 synchronized(emu) { maxScrollback = emu.buffer.scrollbackSize }
-                val newOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollback)
+                val newOffset = (scrollbackOffset + autoScrollDir).coerceIn(0, maxScrollOffset)
                 if (newOffset == scrollbackOffset) { cancelAutoScroll(); return }  // nothing left to reveal
                 scrollbackOffset = newOffset
                 val viewStart = maxScrollback - scrollbackOffset
@@ -540,19 +599,45 @@ class TerminalView @JvmOverloads constructor(
      * space as onScroll, i.e. already sign-adjusted for invertScroll by the caller.
      */
     private fun startFling(velocity: Float) {
-        val buf = emulator?.buffer ?: return
+        if (emulator == null) return
         if (cellH <= 0f) return
         cancelFling()
-        val maxPixels = (buf.scrollbackSize * cellH).toInt()
+        val maxPixels = (maxScrollOffset * cellH).toInt()
         if (maxPixels <= 0) return
         val startY = (scrollbackOffset * cellH).toInt().coerceIn(0, maxPixels)
         scroller.fling(0, startY, 0, velocity.toInt(), 0, 0, 0, maxPixels)
         val r = object : Runnable {
             override fun run() {
                 if (!scroller.computeScrollOffset()) { flingRunnable = null; return }
-                val maxOff = emulator?.buffer?.scrollbackSize ?: 0
-                scrollbackOffset = (scroller.currY / cellH).toInt().coerceIn(0, maxOff)
+                scrollbackOffset = (scroller.currY / cellH).toInt().coerceIn(0, maxScrollOffset)
                 invalidate()
+                if (scroller.isFinished) flingRunnable = null else postOnAnimation(this)
+            }
+        }
+        flingRunnable = r
+        postOnAnimation(r)
+    }
+
+    /**
+     * Momentum for a reported wheel. The view itself can't move here (it is pinned to the
+     * alternate screen), so instead of scrolling pixels the scroller is run over a virtual
+     * span and each frame's travel is turned into further notches: the remote app keeps
+     * scrolling and decelerates on its own. [velocity] uses onScroll's sign convention.
+     */
+    private fun startWheelFling(emu: TerminalEmulator, velocity: Float, x: Float, y: Float) {
+        if (cellH <= 0f) return
+        cancelFling()
+        // Start halfway so the fling can run either way, and let the span cap the burst.
+        val span = (WHEEL_FLING_MAX_LINES * cellH).toInt()
+        scroller.fling(0, span, 0, (velocity * WHEEL_FLING_DAMPING).toInt(), 0, 0, 0, span * 2)
+        var lastLines = span / cellH
+        val r = object : Runnable {
+            override fun run() {
+                if (!scroller.computeScrollOffset()) { flingRunnable = null; return }
+                val nowLines = scroller.currY / cellH
+                wheelTravel += nowLines - lastLines
+                lastLines = nowLines
+                emitWheelTravel(emu, x, y)
                 if (scroller.isFinished) flingRunnable = null else postOnAnimation(this)
             }
         }
@@ -670,6 +755,32 @@ class TerminalView @JvmOverloads constructor(
         onInput?.invoke(bytes)
     }
 
+    /**
+     * A real mouse wheel (USB or Bluetooth) arrives here, not through the touch path: one
+     * notch is ±1 on [MotionEvent.AXIS_VSCROLL], fractional on precision wheels. Positive is
+     * away from the user, i.e. back in the history — that direction is fixed by the hardware
+     * convention, so [invertScroll], which is about which way a finger drags, doesn't apply.
+     */
+    override fun onGenericMotionEvent(event: MotionEvent): Boolean {
+        if (event.action != MotionEvent.ACTION_SCROLL) return super.onGenericMotionEvent(event)
+        val emu = emulator ?: return false
+        val v = event.getAxisValue(MotionEvent.AXIS_VSCROLL)
+        if (v == 0f) return false
+        wheelNotches += v
+        val notches = wheelNotches.toInt()
+        if (notches == 0) return true
+        wheelNotches -= notches
+        if (reportsWheel(emu)) {
+            sendWheel(emu, notches, event.x, event.y)
+        } else {
+            cancelFling()
+            scrollbackOffset = (scrollbackOffset + notches * LOCAL_WHEEL_LINES)
+                .coerceIn(0, maxScrollOffset)
+            invalidate()
+        }
+        return true
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         val bytes = keyEventToBytes(keyCode, event) ?: return super.onKeyDown(keyCode, event)
         emitInput(bytes)
@@ -742,25 +853,33 @@ class TerminalView @JvmOverloads constructor(
             // Start each gesture with a clean accumulator so leftover fraction from a
             // previous drag can't nudge the view on the next touch-down.
             scrollRemainderY = 0f
+            wheelTravel = 0f
             // A new touch stops any in-flight momentum (tap-to-halt, like a scroll view).
             cancelFling()
             return true
         }
         override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             if (inSelectionMode) return false
+            val emu = emulator ?: return false
             // Match onScroll's sign convention so momentum continues the drag direction.
-            startFling(if (invertScroll) -velocityY else velocityY)
+            val v = if (invertScroll) -velocityY else velocityY
+            if (reportsWheel(emu)) startWheelFling(emu, v, e2.x, e2.y) else startFling(v)
             return true
         }
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
-            val buf = emulator?.buffer ?: return false
+            val emu = emulator ?: return false
             if (cellH <= 0f) return false
             scrollRemainderY += if (invertScroll) dy else -dy
             val lines = (scrollRemainderY / cellH).toInt()
             if (lines != 0) {
                 scrollRemainderY -= lines * cellH
-                scrollbackOffset = (scrollbackOffset + lines).coerceIn(0, buf.scrollbackSize)
-                invalidate()
+                if (reportsWheel(emu)) {
+                    wheelTravel += lines
+                    emitWheelTravel(emu, e2.x, e2.y)
+                } else {
+                    scrollbackOffset = (scrollbackOffset + lines).coerceIn(0, maxScrollOffset)
+                    invalidate()
+                }
             }
             return true
         }
@@ -978,6 +1097,26 @@ class TerminalView @JvmOverloads constructor(
     }
 
     companion object {
+        /**
+         * Lines of travel per reported wheel notch. One notch per line keeps the content
+         * moving roughly with the finger: tmux advances its copy-mode history about a line
+         * per notch, so a coarser ratio here made a long swipe crawl.
+         */
+        private const val WHEEL_NOTCH_LINES = 1
+
+        /** Lines of local scrollback per notch of a real wheel — the usual desktop step. */
+        private const val LOCAL_WHEEL_LINES = 3
+
+        /** Virtual span of a reported-wheel fling; caps how far one flick can carry. */
+        private const val WHEEL_FLING_MAX_LINES = 400
+
+        /**
+         * Momentum applied to a reported-wheel flick, relative to the local scrollback fling.
+         * A full-strength flick overshot badly here: the view stays still, so there is no
+         * moving content to judge the speed against and even a gentle flick ran away.
+         */
+        private const val WHEEL_FLING_DAMPING = 0.7f
+
         private val DARK_FG  = Color.rgb(204, 204, 204)
         private val DARK_BG  = Color.BLACK
         private val LIGHT_FG = Color.rgb(51, 51, 51)

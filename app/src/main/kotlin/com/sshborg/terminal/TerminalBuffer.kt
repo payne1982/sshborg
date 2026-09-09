@@ -51,6 +51,14 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     var scrollTop = 0
     var scrollBottom = rows - 1
 
+    /**
+     * True while the alternate screen is showing (vim, less, tmux…). The alternate screen
+     * has no history: lines that scroll off it are discarded instead of being pushed into
+     * [scrollback], which would otherwise interleave a full-screen app's redraws with the
+     * shell history sitting underneath it.
+     */
+    var altScreen = false
+
     // --- Read access ---
 
     /**
@@ -137,11 +145,13 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     /** Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom. */
     fun scrollUp(count: Int = 1) {
         repeat(count) {
-            // Push top line into scrollback
-            val evicted = screen[scrollTop].copyOf()
-            if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
-            scrollback.addLast(evicted)
-            scrollbackWrapped.addLast(screenWrapped[scrollTop])
+            // Push top line into scrollback (never from the alternate screen, which has no history)
+            if (!altScreen) {
+                val evicted = screen[scrollTop].copyOf()
+                if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
+                scrollback.addLast(evicted)
+                scrollbackWrapped.addLast(screenWrapped[scrollTop])
+            }
             // Shift lines up within scroll region
             for (r in scrollTop until scrollBottom) {
                 screen[r] = screen[r + 1]
@@ -288,11 +298,13 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         // How many top lines to push into scrollback to keep cursor in view
         val scrollNeeded = if (newRows < oldRows) (cursorRow - newRows + 1).coerceAtLeast(0) else 0
         if (scrollNeeded > 0) {
-            for (i in 0 until scrollNeeded) {
-                val evicted = screen[i].copyOf()
-                if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
-                scrollback.addLast(evicted)
-                scrollbackWrapped.addLast(screenWrapped[i])
+            if (!altScreen) {
+                for (i in 0 until scrollNeeded) {
+                    val evicted = screen[i].copyOf()
+                    if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
+                    scrollback.addLast(evicted)
+                    scrollbackWrapped.addLast(screenWrapped[i])
+                }
             }
             screen = Array(newRows) { r ->
                 val oldR = r + scrollNeeded
