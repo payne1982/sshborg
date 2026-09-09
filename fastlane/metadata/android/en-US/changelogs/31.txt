@@ -1,0 +1,1 @@
+• You can now order the host and group list (alphabetical, recently used, most used or by hand)

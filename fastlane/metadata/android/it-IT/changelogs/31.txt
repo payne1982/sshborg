@@ -1,0 +1,1 @@
+• Ora è possibile ordinare la lista degli host e dei gruppi (alfabetico, recenti, più usati o a mano)

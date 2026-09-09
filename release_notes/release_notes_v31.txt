@@ -1,0 +1,30 @@
+<en-US>
+• You can now order the host and group list (alphabetical, recently used, most used or by hand)
+</en-US>
+<it-IT>
+• Ora è possibile ordinare la lista degli host e dei gruppi (alfabetico, recenti, più usati o a mano)
+</it-IT>
+<de-DE>
+• Die Host- und Gruppenliste lässt sich jetzt sortieren (alphabetisch, zuletzt verwendet, am meisten verwendet oder von Hand)
+</de-DE>
+<es-ES>
+• Ahora se puede ordenar la lista de hosts y grupos (alfabético, usados recientemente, más usados o a mano)
+</es-ES>
+<fr-FR>
+• Il est désormais possible de classer la liste des hôtes et des groupes (alphabétique, utilisés récemment, les plus utilisés ou à la main)
+</fr-FR>
+<pt-PT>
+• Agora é possível ordenar a lista de hosts e grupos (alfabética, usados recentemente, mais usados ou à mão)
+</pt-PT>
+<uk>
+• Тепер список хостів і груп можна впорядкувати (за абеткою, нещодавні, найчастіші або вручну)
+</uk>
+<ru-RU>
+• Теперь список хостов и групп можно упорядочить (по алфавиту, недавние, часто используемые или вручную)
+</ru-RU>
+<zh-CN>
+• 现在可以排列主机和分组列表（字母顺序、最近使用、最常使用或手动）
+</zh-CN>
+<ja-JP>
+• ホストとグループの一覧を並べ替えられるようになりました（アルファベット順・最近使った順・よく使う順・手動）
+</ja-JP>

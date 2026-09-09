@@ -1,0 +1,1 @@
+• Il est désormais possible de classer la liste des hôtes et des groupes (alphabétique, utilisés récemment, les plus utilisés ou à la main)

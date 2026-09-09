@@ -1,0 +1,1 @@
+• Die Host- und Gruppenliste lässt sich jetzt sortieren (alphabetisch, zuletzt verwendet, am meisten verwendet oder von Hand)
