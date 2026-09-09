@@ -510,6 +510,7 @@
         <ul>
             <li><a href="#adding-host">Ajouter un hôte</a></li>
             <li><a href="#host-groups">Groupes d'hôtes</a></li>
+            <li class="sub"><a href="#host-groups">Ordre de la liste</a></li>
             <li><a href="#sftp">Gestionnaire SFTP</a></li>
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Envoyer et télécharger</a></li>
@@ -580,6 +581,16 @@
             </ul>
             <p>Les couleurs se choisissent parmi les pastilles rapides ou librement avec le sélecteur à dégradé. Un hôte peut aussi avoir sa <strong>propre couleur</strong> — définie dans l'éditeur d'hôte, juste sous le groupe — qui prime sur la couleur du groupe et fonctionne aussi pour les hôtes sans groupe.</p>
             <p>Les hôtes sans groupe restent en haut de la liste et, si vous ne créez aucun groupe, la liste garde exactement l'aspect et le comportement d'avant.</p>
+            <h3>Ordre de la liste</h3>
+            <p>Choisissez la disposition de la liste dans <strong>Paramètres → Ordre de la liste des hôtes</strong> :</p>
+            <ul>
+                <li><strong>Alphabétique</strong> (par défaut) — groupes par nom, hôtes par libellé dans chacun.</li>
+                <li><strong>Utilisés récemment</strong> — l'hôte auquel vous vous êtes connecté en dernier passe en tête ; ceux jamais utilisés restent en bas.</li>
+                <li><strong>Les plus utilisés</strong> — d'abord les hôtes ayant le plus de connexions.</li>
+                <li><strong>Manuel</strong> — l'ordre que vous définissez vous-même.</li>
+            </ul>
+            <p>Dans les trois premiers modes les groupes restent alphabétiques : les en-têtes de section ne bougent jamais et seuls les hôtes qu'ils contiennent sont réorganisés. En ordre manuel, les groupes se déplacent aussi.</p>
+            <p>Pour réorganiser, choisissez <strong>Manuel</strong>, puis ouvrez le menu d'un hôte ou d'un en-tête de groupe — le bouton <strong>⋮</strong>, un appui long, ou la touche <em>Menu</em> de la télécommande sur TV — et utilisez <strong>Monter</strong> / <strong>Descendre</strong>. Un hôte ne se déplace qu'à l'intérieur de sa propre section : pour le placer dans un autre groupe, changez le groupe dans l'éditeur d'hôte. Le passage en manuel conserve exactement l'ordre affiché à cet instant, rien ne saute donc, et les hôtes ajoutés ensuite vont à la fin de leur section.</p>
         </div>
 
         <div class="doc-section" id="sftp">
@@ -948,14 +959,15 @@ Host target
                 <li>Les hôtes absents du fichier restent <strong>inchangés</strong>.</li>
                 <li>Un hôte mis à jour conserve son mot de passe, sa clé et sa clé d'hôte acceptée — la sauvegarde ne les contient jamais.</li>
                 <li>Un hôte sans clé est relié à une clé dont le nom correspond au <code>keyLabel</code> exporté, s'il en existe une ; sinon le champ est ignoré.</li>
+                <li>Un hôte mis à jour conserve les données d'usage déjà présentes sur cet appareil — dernière connexion, compteur et position manuelle ; le fichier ne comble que ce qui manque.</li>
 </ul>
             <h3>Format JSON</h3>
             <p>Le fichier exporté est un objet JSON standard. Vous pouvez également le créer manuellement pour importer en masse une liste de serveurs depuis une autre source.</p>
             <pre><code>{
-  "version": 5,
+  "version": 7,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
-    { "name": "Production", "color": -1754827 }
+    { "name": "Production", "color": -1754827, "position": 0 }
   ],
   "hosts": [
     {
@@ -972,6 +984,9 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "position":        0,
+      "lastConnected":   1757404800000,
+      "connectCount":    12,
       "keyLabel":         "Clé de mon VPS",
       "group":           "Production"
     }
@@ -1002,6 +1017,9 @@ Host target
                 <li><code>keyLabel</code> — nom de la clé SSH utilisée par cet hôte. À l'import, si une clé de ce nom existe, l'hôte y est relié ; sinon le champ est ignoré. La clé elle-même n'est jamais incluse dans la sauvegarde.</li>
                 <li><code>group</code> — nom du groupe auquel appartient l'hôte. Les groupes figurent dans le tableau <code>groups</code> au niveau racine, avec <code>name</code> et <code>color</code> (ARGB en entier 32 bits signé). Si un hôte référence un groupe absent du tableau, celui-ci est créé automatiquement avec une couleur par défaut — vous pouvez donc omettre le tableau en écrivant le fichier à la main.</li>
                 <li><code>color</code> — couleur facultative de l'hôte (ARGB en entier 32 bits signé). Elle prime sur la couleur du groupe.</li>
+                            <li><code>position</code> — place de l'hôte dans l'ordre manuel, comptée à l'intérieur de sa propre section (le bloc sans groupe, ou un groupe). Sans valeur, l'hôte est ajouté à la fin. Les groupes ont leur propre <code>position</code> dans le tableau <code>groups</code>.</li>
+                <li><code>lastConnected</code> — date de la dernière connexion, en millisecondes depuis l'époque Unix. Alimente l'ordre « utilisés récemment ».</li>
+                <li><code>connectCount</code> — nombre de sessions de terminal ouvertes vers cet hôte. Alimente l'ordre « les plus utilisés ».</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// CHAMPS OPTIONNELS</div>

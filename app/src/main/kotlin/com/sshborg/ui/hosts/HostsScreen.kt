@@ -11,7 +11,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
+import com.sshborg.data.AppPreferences
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
 import com.sshborg.isTouchless
@@ -58,7 +59,11 @@ fun HostsScreen(
 ) {
     val hosts       by vm.hosts.collectAsState()
     val groups      by vm.groups.collectAsState()
+    val sortMode    by vm.hostSortMode.collectAsState()
     val confirmExit by vm.confirmExit.collectAsState()
+    // Move up/down only makes sense while the list follows the manual order; in every other
+    // mode the arrows would appear to do nothing, so they are not offered.
+    val manualOrder = sortMode == AppPreferences.HOST_SORT_MANUAL
     val context     = LocalContext.current
 
     // Double-back-to-exit
@@ -112,7 +117,7 @@ fun HostsScreen(
     ) { padding ->
         // Host rows for one section; groupColor tints the leading icon (null = default).
         fun LazyListScope.hostItems(list: List<HostEntity>, groupColor: Color?) {
-            items(list, key = { it.id }) { host ->
+            itemsIndexed(list, key = { _, host -> host.id }) { index, host ->
                 val shellSessions = sessions.filter {
                     it.hostId == host.id && it.type == SessionManager.SessionType.Shell
                 }
@@ -143,6 +148,10 @@ fun HostsScreen(
                     onDelete      = { hostToDelete = host },
                     onNewTerminal = { onNewTerminal(host.id, host.label) },
                     onNewSftp     = { onNewSftp(host.id, host.label) },
+                    showMove      = manualOrder,
+                    canMoveUp     = index > 0,
+                    canMoveDown   = index < list.lastIndex,
+                    onMove        = { delta -> vm.moveHost(host, delta) },
                 )
             }
         }
@@ -168,7 +177,7 @@ fun HostsScreen(
                 contentPadding = PaddingValues(bottom = 88.dp),
             ) {
                 hostItems(ungrouped, groupColor = null)
-                groups.forEach { group ->
+                groups.forEachIndexed { index, group ->
                     item(key = "g-${group.id}") {
                         GroupHeader(
                             group    = group,
@@ -177,6 +186,10 @@ fun HostsScreen(
                             onEdit   = { groupToEdit = group },
                             onDelete = { groupToDelete = group },
                             showOverflow = isTouchless,
+                            showMove     = manualOrder,
+                            canMoveUp    = index > 0,
+                            canMoveDown  = index < groups.lastIndex,
+                            onMove       = { delta -> vm.moveGroup(group, delta) },
                         )
                     }
                     if (!group.collapsed) {
@@ -325,6 +338,10 @@ private fun GroupHeader(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     showOverflow: Boolean = false,
+    showMove: Boolean = false,
+    canMoveUp: Boolean = false,
+    canMoveDown: Boolean = false,
+    onMove: (Int) -> Unit = {},
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -368,6 +385,10 @@ private fun GroupHeader(
                 onDismissRequest = { menuExpanded = false },
                 offset = DpOffset(x = (-8).dp, y = 0.dp),
             ) {
+                if (showMove) {
+                    MoveMenuItems(canMoveUp, canMoveDown) { delta -> menuExpanded = false; onMove(delta) }
+                    HorizontalDivider()
+                }
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_edit)) },
                     leadingIcon = { Icon(Icons.Default.Edit, null) },
@@ -398,6 +419,10 @@ private fun HostItem(
     onDelete: () -> Unit,
     onNewTerminal: () -> Unit,
     onNewSftp: () -> Unit,
+    showMove: Boolean = false,
+    canMoveUp: Boolean = false,
+    canMoveDown: Boolean = false,
+    onMove: (Int) -> Unit = {},
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -504,6 +529,10 @@ private fun HostItem(
                         )
                     }
                     HorizontalDivider()
+                    if (showMove) {
+                        MoveMenuItems(canMoveUp, canMoveDown) { delta -> menuExpanded = false; onMove(delta) }
+                        HorizontalDivider()
+                    }
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.action_edit)) },
                         leadingIcon = { Icon(Icons.Default.Edit, null) },
@@ -524,6 +553,27 @@ private fun HostItem(
         },
     )
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+/**
+ * "Move up" / "Move down" for the manual list order (#16). Greyed out at the ends of the
+ * section rather than hidden, so the row's own boundary is visible instead of the menu
+ * changing shape as you travel through the list.
+ */
+@Composable
+private fun MoveMenuItems(canMoveUp: Boolean, canMoveDown: Boolean, onMove: (Int) -> Unit) {
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.hosts_move_up)) },
+        leadingIcon = { Icon(Icons.Default.KeyboardArrowUp, null) },
+        enabled = canMoveUp,
+        onClick = { onMove(-1) },
+    )
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.hosts_move_down)) },
+        leadingIcon = { Icon(Icons.Default.KeyboardArrowDown, null) },
+        enabled = canMoveDown,
+        onClick = { onMove(1) },
+    )
 }
 
 

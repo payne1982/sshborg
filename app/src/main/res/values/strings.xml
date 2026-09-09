@@ -456,4 +456,12 @@
     <string name="extra_key_action_word_mode">Word mode</string>
     <string name="extra_key_action_switch">Switch bar</string>
     <string name="extra_key_action_keyboard">Keyboard</string>
+    <string name="settings_host_sort_title">Host list order</string>
+    <string name="settings_host_sort_subtitle">Groups stay alphabetical except in manual order</string>
+    <string name="settings_host_sort_alpha">Alphabetical</string>
+    <string name="settings_host_sort_recent">Recently used</string>
+    <string name="settings_host_sort_popular">Most used</string>
+    <string name="settings_host_sort_manual">Manual</string>
+    <string name="hosts_move_up">Move up</string>
+    <string name="hosts_move_down">Move down</string>
 </resources>

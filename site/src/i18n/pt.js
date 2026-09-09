@@ -81,6 +81,7 @@ module.exports = {
 
   doc_toc: `            <li><a href="#adding-host">Adicionar um host</a></li>
             <li><a href="#host-groups">Grupos de hosts</a></li>
+            <li class="sub"><a href="#host-groups">Ordem da lista</a></li>
             <li><a href="#sftp">Gestor de ficheiros SFTP</a></li>
             <li class="sub"><a href="#sftp">Navegação</a></li>
             <li class="sub"><a href="#sftp">Carregar e transferir</a></li>
@@ -142,7 +143,17 @@ module.exports = {
                 <li><strong>Eliminar</strong> — mantenha premido o cabeçalho e escolha <em>Eliminar</em>. Os hosts do grupo <em>não</em> são apagados: ficam simplesmente sem grupo.</li>
             </ul>
             <p>As cores escolhem-se das amostras rápidas ou livremente com o seletor de gradiente. Um host também pode ter uma <strong>cor própria</strong> — definida no editor do host, logo abaixo do grupo — que prevalece sobre a cor do grupo e funciona também para hosts sem grupo.</p>
-            <p>Os hosts sem grupo permanecem no topo da lista e, se nunca criar um grupo, a lista mantém exatamente o aspeto e o comportamento de sempre.</p>`,
+            <p>Os hosts sem grupo permanecem no topo da lista e, se nunca criar um grupo, a lista mantém exatamente o aspeto e o comportamento de sempre.</p>
+            <h3>Ordem da lista</h3>
+            <p>Escolha como a lista é disposta em <strong>Definições → Ordem da lista de hosts</strong>:</p>
+            <ul>
+                <li><strong>Alfabética</strong> (predefinição) — grupos por nome e hosts por etiqueta dentro de cada um.</li>
+                <li><strong>Usados recentemente</strong> — em cima o host a que se ligou por último; os nunca usados ficam no fim.</li>
+                <li><strong>Mais usados</strong> — primeiro os hosts com mais ligações.</li>
+                <li><strong>Manual</strong> — a ordem que define à mão.</li>
+            </ul>
+            <p>Nos três primeiros modos os grupos mantêm-se por ordem alfabética, por isso os cabeçalhos de secção nunca se movem e só os hosts lá dentro são reorganizados. Na ordem manual também se podem mover os grupos.</p>
+            <p>Para reordenar escolha <strong>Manual</strong> e abra o menu de um host ou de um cabeçalho de grupo — o botão <strong>⋮</strong>, um toque longo ou a tecla <em>Menu</em> do comando na TV — e use <strong>Mover para cima</strong> / <strong>Mover para baixo</strong>. Um host só se move dentro da sua própria secção: para o pôr noutro grupo, altere o grupo no editor do host. Ao mudar para manual mantém-se exatamente a ordem que estava no ecrã nesse momento, por isso nada salta, e os hosts adicionados depois vão para o fim da sua secção.</p>`,
 
   doc_sftp: `
             <h2>// GESTOR DE FICHEIROS SFTP</h2>
@@ -502,14 +513,15 @@ Host target
                 <li>Os hosts não presentes no ficheiro ficam <strong>inalterados</strong>.</li>
                 <li>Um host atualizado mantém a palavra-passe, a chave e a chave de host aceite guardadas — a cópia nunca as contém.</li>
                 <li>Um host sem chave é associado a uma chave cujo nome corresponde ao <code>keyLabel</code> exportado, se existir; caso contrário, o campo é ignorado.</li>
+                <li>Um host atualizado mantém os dados de utilização que este dispositivo já tem — última ligação, contador e posição manual; o ficheiro só preenche o que falta.</li>
 </ul>
             <h3>Formato JSON</h3>
             <p>O ficheiro exportado é um objeto JSON simples. Também pode criá-lo manualmente para importar em bloco uma lista de servidores de outra fonte.</p>
             <pre><code>{
-  "version": 5,
+  "version": 7,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
-    { "name": "Produção", "color": -1754827 }
+    { "name": "Produção", "color": -1754827, "position": 0 }
   ],
   "hosts": [
     {
@@ -526,6 +538,9 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "position":        0,
+      "lastConnected":   1757404800000,
+      "connectCount":    12,
       "keyLabel":         "Chave do meu VPS",
       "group":           "Produção"
     }
@@ -556,6 +571,9 @@ Host target
                 <li><code>keyLabel</code> — nome da chave SSH que este host usa. Ao importar, se existir uma chave com este nome, é associada ao host; caso contrário, o campo é ignorado. A própria chave nunca é incluída na cópia.</li>
                 <li><code>group</code> — nome do grupo a que o host pertence. Os grupos estão no array <code>groups</code> de nível superior, com <code>name</code> e <code>color</code> (ARGB como inteiro de 32 bits com sinal). Se um host referir um grupo ausente do array, este é criado automaticamente com uma cor predefinida — ao escrever o ficheiro à mão pode omitir o array.</li>
                 <li><code>color</code> — cor opcional do host (ARGB como inteiro de 32 bits com sinal). Prevalece sobre a cor do grupo.</li>
+                            <li><code>position</code> — lugar do host na ordem manual, contado dentro da sua própria secção (o bloco sem grupo ou um grupo). Se omitido, o host é acrescentado no fim. Os grupos têm a sua própria <code>position</code> no array <code>groups</code>.</li>
+                <li><code>lastConnected</code> — momento da última ligação, em milissegundos desde a época Unix. Alimenta a ordem "usados recentemente".</li>
+                <li><code>connectCount</code> — quantas sessões de terminal foram abertas para este host. Alimenta a ordem "mais usados".</li>
             </ul>
             <div class="callout callout-info">
                 <div class="callout-label">// CAMPOS OPCIONAIS</div>

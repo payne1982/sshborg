@@ -39,6 +39,7 @@ class AppPreferences(private val context: Context) {
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
         val EXTRA_KEYS_BAR_PINNED        = booleanPreferencesKey("extra_keys_bar_pinned")
+        val HOST_SORT_MODE               = intPreferencesKey("host_sort_mode")
         val EXTRA_BAR_SELECTED           = stringPreferencesKey("extra_bar_selected")   // ExtraBar id
         val EXTRA_BAR_CUSTOM             = stringPreferencesKey("extra_bar_custom")     // JSON array
         val SECURITY_REMINDER_DISMISSED  = booleanPreferencesKey("security_reminder_dismissed")
@@ -174,6 +175,11 @@ class AppPreferences(private val context: Context) {
         const val TERMINAL_SCHEME_LIGHT = 1
         const val TERMINAL_SCHEME_FOLLOW_APP = 2
 
+        const val HOST_SORT_ALPHA   = 0
+        const val HOST_SORT_RECENT  = 1
+        const val HOST_SORT_POPULAR = 2
+        const val HOST_SORT_MANUAL  = 3
+
         const val DOUBLE_TAP_NONE = 0
         const val DOUBLE_TAP_TAB = 1
         const val DOUBLE_TAP_TAB_TWICE = 2
@@ -211,6 +217,15 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setExtraKeysBarPinned(enabled: Boolean) {
         context.dataStore.edit { it[Keys.EXTRA_KEYS_BAR_PINNED] = enabled }
+    }
+
+    /** Order of the host list and its groups; see [HostSort]. Default alphabetical, which is
+     *  what the list has always shown. */
+    val hostSortMode: Flow<Int> =
+        context.dataStore.data.map { it[Keys.HOST_SORT_MODE] ?: HOST_SORT_ALPHA }
+
+    suspend fun setHostSortMode(mode: Int) {
+        context.dataStore.edit { it[Keys.HOST_SORT_MODE] = mode }
     }
 
     /** Id of the extra-key bar layout in use (a preset or a custom bar). */
@@ -333,6 +348,7 @@ class AppPreferences(private val context: Context) {
             put("suggestions_bar_sticky", p[Keys.SUGGESTIONS_BAR_STICKY] ?: false)
             put("extra_keys_bar_pinned",  p[Keys.EXTRA_KEYS_BAR_PINNED] ?: false)
             put("double_tap_action",      p[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE)
+            put("host_sort_mode",         p[Keys.HOST_SORT_MODE] ?: HOST_SORT_ALPHA)
             put("extra_bar_selected",     p[Keys.EXTRA_BAR_SELECTED] ?: ExtraBarPresets.STANDARD)
             put("extra_bar_custom",       org.json.JSONArray(ExtraBarJson.encodeAll(
                 ExtraBarJson.decodeAll(p[Keys.EXTRA_BAR_CUSTOM]))))
@@ -360,6 +376,7 @@ class AppPreferences(private val context: Context) {
             // resolves to nothing falls back to the standard preset at read time.
             val customBars = obj.optJSONArray("extra_bar_custom")?.toString()
             if (customBars != null) p[Keys.EXTRA_BAR_CUSTOM] = ExtraBarJson.encodeAll(ExtraBarJson.decodeAll(customBars))
+            if (obj.has("host_sort_mode"))         p[Keys.HOST_SORT_MODE] = obj.getInt("host_sort_mode").coerceIn(HOST_SORT_ALPHA, HOST_SORT_MANUAL)
             if (obj.has("extra_bar_selected"))     p[Keys.EXTRA_BAR_SELECTED] = obj.getString("extra_bar_selected")
         }
     }
