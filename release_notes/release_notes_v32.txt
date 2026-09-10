@@ -1,0 +1,30 @@
+<en-US>
+• Android TV: full-size banner and icon on the home screen
+</en-US>
+<it-IT>
+• Android TV: banner e icona a dimensione piena nella schermata principale
+</it-IT>
+<de-DE>
+• Android TV: Banner und Symbol in voller Größe auf dem Startbildschirm
+</de-DE>
+<es-ES>
+• Android TV: banner e icono a tamaño completo en la pantalla de inicio
+</es-ES>
+<fr-FR>
+• Android TV : bannière et icône en pleine taille sur l'écran d'accueil
+</fr-FR>
+<pt-PT>
+• Android TV: banner e ícone em tamanho completo no ecrã inicial
+</pt-PT>
+<uk>
+• Android TV: банер і піктограма повного розміру на головному екрані
+</uk>
+<ru-RU>
+• Android TV: баннер и значок полного размера на главном экране
+</ru-RU>
+<zh-CN>
+• Android TV：主屏幕上显示完整尺寸的横幅和图标
+</zh-CN>
+<ja-JP>
+• Android TV：ホーム画面にフルサイズのバナーとアイコンを表示
+</ja-JP>
