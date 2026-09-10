@@ -1,0 +1,5 @@
+• Anpassbare Zusatztastenleiste: Layout wählen oder eigene Leiste mit beliebigen Tasten, Textmakros und bis zu drei Reihen – Wechsel in der Leiste mit ⇄
+• Flüssigere D-Pad-Navigation auf Android TV: Textfelder und Auswahlmenüs per Fernbedienung gut bedienbar
+• Sperrbildschirm auf Quer-TVs korrigiert
+• Auswahlleiste: „Alles kopieren“ ans Ende und abgeschwächt, damit es nicht versehentlich getippt wird
+• Android TV: Die App zeigt jetzt ihr Banner auf dem Startbildschirm
