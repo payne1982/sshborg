@@ -1,5 +1,1 @@
-• Customizable extra-key bar: pick a layout or build your own with any keys, text macros and up to three rows — switch from the bar with ⇄
-• Smoother D-pad navigation on Android TV: text fields and dropdowns now work well with the remote
-• Fixed the lock screen on landscape TVs
-• Selection bar: “Copy all” moved last and toned down, so it isn't tapped by mistake
 • Android TV: the app now shows its banner on the home screen
