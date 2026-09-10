@@ -1,70 +1,30 @@
 <en-US>
-• Customizable extra-key bar: pick a layout or build your own with any keys, text macros and up to three rows — switch from the bar with ⇄
-• Smoother D-pad navigation on Android TV: text fields and dropdowns now work well with the remote
-• Fixed the lock screen on landscape TVs
-• Selection bar: “Copy all” moved last and toned down, so it isn't tapped by mistake
 • Android TV: the app now shows its banner on the home screen
 </en-US>
 <it-IT>
-• Barra tasti extra personalizzabile: scegli un layout o creane una tua con i tasti che vuoi, macro di testo e fino a tre righe — si cambia dalla barra con ⇄
-• Navigazione col D-pad più fluida su Android TV: campi di testo e tendine si usano bene col telecomando
-• Corretta la schermata di blocco sulle TV in orizzontale
-• Barra di selezione: “Copia tutto” in fondo e attenuato, per non toccarlo per sbaglio
 • Android TV: l'app mostra il suo banner nella schermata principale
 </it-IT>
 <de-DE>
-• Anpassbare Zusatztastenleiste: Layout wählen oder eigene Leiste mit beliebigen Tasten, Textmakros und bis zu drei Reihen – Wechsel in der Leiste mit ⇄
-• Flüssigere D-Pad-Navigation auf Android TV: Textfelder und Auswahlmenüs per Fernbedienung gut bedienbar
-• Sperrbildschirm auf Quer-TVs korrigiert
-• Auswahlleiste: „Alles kopieren“ ans Ende und abgeschwächt, damit es nicht versehentlich getippt wird
 • Android TV: Die App zeigt jetzt ihr Banner auf dem Startbildschirm
 </de-DE>
 <es-ES>
-• Barra de teclas extra personalizable: elige un diseño o crea el tuyo con cualquier tecla, macros de texto y hasta tres filas; cambia desde la barra con ⇄
-• Navegación con D-pad más fluida en Android TV: campos de texto y desplegables ahora se usan bien con el mando
-• Corregida la pantalla de bloqueo en TV en horizontal
-• Barra de selección: «Copiar todo» al final y atenuado, para no pulsarlo por error
 • Android TV: la app ya muestra su banner en la pantalla de inicio
 </es-ES>
 <fr-FR>
-• Barre de touches personnalisable : une ou deux rangées, minimale, ou la vôtre avec les touches voulues et des macros texte — changement depuis la barre avec ⇄
-• Navigation D-pad plus fluide sur Android TV : champs de texte et menus s'utilisent bien à la télécommande
-• Écran de verrouillage corrigé sur les TV en paysage
-• Barre de sélection : « Tout copier » à la fin et atténué, pour ne plus le toucher par erreur
 • Android TV : la bannière de l'application s'affiche sur l'écran d'accueil
 </fr-FR>
 <pt-PT>
-• Barra de teclas extra personalizável: escolha uma disposição ou crie a sua com as teclas que quiser, macros de texto e até três linhas — muda-se na barra com ⇄
-• Navegação com D-pad mais fluida na Android TV: campos de texto e menus funcionam bem com o comando
-• Corrigido o ecrã de bloqueio em TVs na horizontal
-• Barra de seleção: “Copiar tudo” no fim e atenuado, para não ser tocado por engano
 • Android TV: a app mostra agora o seu banner no ecrã inicial
 </pt-PT>
 <uk>
-• Налаштовувана панель додаткових клавіш: оберіть розкладку або створіть власну з будь-якими клавішами, текстовими макросами й до трьох рядів — перемикання з панелі через ⇄
-• Зручніша навігація D-pad на Android TV: текстові поля та списки легко використовувати з пульта
-• Виправлено екран блокування на горизонтальних ТБ
-• Панель виділення: «Копіювати все» в кінці й приглушено, щоб не натиснути помилково
 • Android TV: застосунок показує свій банер на головному екрані
 </uk>
 <ru-RU>
-• Настраиваемая панель дополнительных клавиш: выберите раскладку или создайте свою с любыми клавишами, текстовыми макросами и до трёх рядов — переключение с панели через ⇄
-• Удобнее навигация D-pad на Android TV: текстовые поля и списки легко использовать с пульта
-• Исправлен экран блокировки на горизонтальных ТВ
-• Панель выделения: «Копировать всё» в конце и приглушено, чтобы не нажать по ошибке
 • Android TV: приложение показывает свой баннер на главном экране
 </ru-RU>
 <zh-CN>
-• 可自定义的额外按键栏：选择布局（单行、两行、精简）或用任意按键、文本宏和最多三行自建按键栏——在栏上用 ⇄ 直接切换
-• 改进 Android TV 上的 D-pad 导航——现在可用遥控器方便地操作文本框和下拉菜单
-• 修复横屏电视上的锁屏，底部一行不再被裁切
-• 选择栏：“全部复制”移到末尾并淡化，不再误触代替“复制所选”
 • Android TV：应用现在会在主屏幕显示自己的横幅
 </zh-CN>
 <ja-JP>
-• 拡張キーバーをカスタマイズ可能に：レイアウト（1 段・2 段・最小）を選ぶか、好きなキー・テキストマクロ・最大 3 段で自分のバーを作成——バー上の ⇄ でそのまま切り替え
-• Android TV での D-pad 操作を改善——リモコンでテキスト入力欄やドロップダウンを使いやすくしました
-• 横向きテレビでロック画面が下端で見切れる問題を修正
-• 選択バー：「すべてコピー」を末尾に移して目立たなくし、「選択をコピー」と押し間違えないようにしました
 • Android TV：ホーム画面にアプリのバナーが表示されるようになりました
 </ja-JP>
