@@ -1,0 +1,5 @@
+• Barra de teclas extra personalizável: escolha uma disposição ou crie a sua com as teclas que quiser, macros de texto e até três linhas — muda-se na barra com ⇄
+• Navegação com D-pad mais fluida na Android TV: campos de texto e menus funcionam bem com o comando
+• Corrigido o ecrã de bloqueio em TVs na horizontal
+• Barra de seleção: “Copiar tudo” no fim e atenuado, para não ser tocado por engano
+• Android TV: a app mostra agora o seu banner no ecrã inicial
