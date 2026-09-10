@@ -38,6 +38,26 @@ sync with what the IME thinks the buffer contains. Every bug in this area is a
 2. what the IME's `Editable` believes is on screen,
 3. our local mirror (`composingText`, `composingDeletedByCommit`).
 
+### Side effect: voice typing only works in word mode
+
+Outside word mode `onCreateInputConnection` declares `inputType = TYPE_NULL` —
+"I am not a text editor, send me raw key events". Gboard's mic key then has
+nothing to commit into: the voice panel may open, but no text ever reaches the
+terminal. Turning word mode on switches the field to `TYPE_CLASS_TEXT` and
+dictation starts working. **Observed on device 2026-09-10**, user-confirmed.
+
+This is inherent to raw mode, not a bug to fix: `TYPE_NULL` is exactly what gets
+us per-keystroke bytes instead of an editing protocol. The answer to a user
+report is "enable word mode (the spell-check icon in the extra-key bar) while
+dictating".
+
+Do not confuse it with a **red herring that looks identical from the user's
+side**: Gboard's own *"No permission to enable: Voice typing"* error. That is
+Gboard missing `RECORD_AUDIO` (typically denied once with "don't ask again"), or
+the Android 12+ global microphone toggle being off — fixed in Settings › Apps ›
+Gboard › Permissions. SSHBorg declares no audio permission and needs none: a host
+app never does for keyboard dictation. Users will still report it as our bug.
+
 ---
 
 ## 2. The key state we track
