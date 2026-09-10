@@ -1,5 +1,1 @@
-• Barre de touches personnalisable : une ou deux rangées, minimale, ou la vôtre avec les touches voulues et des macros texte — changement depuis la barre avec ⇄
-• Navigation D-pad plus fluide sur Android TV : champs de texte et menus s'utilisent bien à la télécommande
-• Écran de verrouillage corrigé sur les TV en paysage
-• Barre de sélection : « Tout copier » à la fin et atténué, pour ne plus le toucher par erreur
 • Android TV : la bannière de l'application s'affiche sur l'écran d'accueil

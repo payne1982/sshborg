@@ -1,5 +1,1 @@
-• Barra tasti extra personalizzabile: scegli un layout o creane una tua con i tasti che vuoi, macro di testo e fino a tre righe — si cambia dalla barra con ⇄
-• Navigazione col D-pad più fluida su Android TV: campi di testo e tendine si usano bene col telecomando
-• Corretta la schermata di blocco sulle TV in orizzontale
-• Barra di selezione: “Copia tutto” in fondo e attenuato, per non toccarlo per sbaglio
 • Android TV: l'app mostra il suo banner nella schermata principale
