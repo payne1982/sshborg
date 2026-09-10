@@ -284,6 +284,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>Mode texte</h3>
             <p>L'icône de vérification orthographique bascule le clavier entre le <em>mode terminal</em> et le <em>mode texte</em>. En mode terminal (par défaut) la correction automatique et les suggestions de mots sont désactivées — idéal pour les commandes et les chemins de fichiers. En mode texte le clavier se comporte comme un champ de texte normal, avec les suggestions et la correction automatique activées. Utile pour taper du langage naturel via SSH, par exemple avec Claude Code ou d'autres outils interactifs.</p>
+            <p>Le mode texte est aussi ce qui permet la saisie vocale. La touche microphone du clavier a besoin d'un vrai champ de texte où écrire : en mode terminal la dictée ne produit rien — passez en mode texte avant de dicter.</p>
             <h3>Navigation et édition</h3>
             <ul>
                 <li><strong>ESC</strong> — touche Échap.</li>

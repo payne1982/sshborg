@@ -284,6 +284,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>Modo palavra</h3>
             <p>O ícone de verificação ortográfica alterna o teclado entre o <em>modo terminal</em> e o <em>modo palavra</em>. No modo terminal (predefinido) a autocorreção e as sugestões de palavras estão desativadas — ideal para comandos e caminhos de ficheiros. No modo palavra o teclado comporta-se como um campo de texto normal, com sugestões e autocorreção ativadas. Útil ao escrever linguagem natural via SSH, por exemplo com Claude Code ou outras ferramentas interativas.</p>
+            <p>O modo palavra é também o que faz funcionar o ditado por voz. A tecla de microfone do teclado precisa de um campo de texto real onde escrever, por isso no modo terminal o ditado não produz nada — mude para o modo palavra antes de ditar.</p>
             <h3>Navegação e edição</h3>
             <ul>
                 <li><strong>ESC</strong> — tecla Escape.</li>

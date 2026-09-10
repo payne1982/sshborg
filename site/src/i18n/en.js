@@ -286,6 +286,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>Word mode</h3>
             <p>The spellcheck icon toggles the keyboard between <em>terminal mode</em> and <em>word mode</em>. In terminal mode (default) autocorrect and word suggestions are disabled — ideal for commands and file paths. In word mode the keyboard behaves like a normal text field, with suggestions and autocorrect enabled. Useful when typing natural language over SSH, for example with Claude Code or other interactive tools.</p>
+            <p>Word mode is also what makes voice typing work. The keyboard's microphone key needs a real text field to write into, so dictation produces nothing in terminal mode — switch to word mode before dictating.</p>
             <h3>Navigation and editing</h3>
             <ul>
                 <li><strong>ESC</strong> — Escape key.</li>
