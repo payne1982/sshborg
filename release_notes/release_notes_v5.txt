@@ -1,0 +1,70 @@
+<en-US>
+Upgraded SSH library (JSch 2.27.9).
+SSH key rename support.
+Jump hosts field always visible, labeled "Jump hosts (-J)".
+Fixed SFTP downloads saving files with wrong name across sessions.
+SFTP file list now scrolls past the upload button.
+Fixed terminal screen going black after exiting vim.
+Fixed stray characters at prompt after vim exit.
+Hostname and port fields now reject invalid characters.
+</en-US>
+<it-IT>
+Aggiornata la libreria SSH (JSch 2.27.9).
+Supporto alla rinomina delle chiavi SSH.
+Il campo Jump hosts è ora sempre visibile con etichetta "Jump hosts (-J)".
+Risolto il problema dei file SFTP salvati con nome errato tra sessioni diverse.
+La lista file SFTP ora scorre oltre il pulsante di upload.
+Risolto lo schermo nero nel terminale dopo l'uscita da vim.
+Rimossi i caratteri errati al prompt dopo l'uscita da vim.
+I campi hostname e porta ora rifiutano caratteri non validi.
+</it-IT>
+<de-DE>
+SSH-Bibliothek aktualisiert (JSch 2.27.9).
+SSH-Schlüssel umbenennen.
+Jump-Hosts-Feld immer sichtbar, beschriftet mit "Jump hosts (-J)".
+SFTP-Downloads speicherten Dateien sitzungsübergreifend mit falschem Namen – behoben.
+SFTP-Dateiliste scrollt jetzt über den Upload-Button hinaus.
+Schwarzer Terminalbildschirm nach vim-Beenden behoben.
+Fehlerhafte Zeichen am Prompt nach vim-Beenden entfernt.
+Hostname- und Port-Felder lehnen jetzt ungültige Zeichen ab.
+</de-DE>
+<es-ES>
+Biblioteca SSH actualizada (JSch 2.27.9).
+Soporte para renombrar claves SSH.
+El campo Jump hosts siempre visible, etiquetado como "Jump hosts (-J)".
+Corregida la descarga SFTP que guardaba archivos con nombre incorrecto entre sesiones.
+La lista de archivos SFTP ahora se desplaza más allá del botón de subida.
+Corregida la pantalla negra en el terminal al salir de vim.
+Eliminados caracteres incorrectos en el prompt al salir de vim.
+Los campos hostname y puerto ahora rechazan caracteres no válidos.
+</es-ES>
+<fr-FR>
+Bibliothèque SSH mise à jour (JSch 2.27.9).
+Renommage des clés SSH.
+Champ Jump hosts toujours visible, libellé "Jump hosts (-J)".
+Correction des téléchargements SFTP sauvegardant des fichiers avec un mauvais nom entre sessions.
+La liste de fichiers SFTP défile désormais au-delà du bouton d'envoi.
+Correction de l'écran noir dans le terminal après avoir quitté vim.
+Suppression des caractères erronés dans le prompt après vim.
+Les champs hostname et port rejettent maintenant les caractères invalides.
+</fr-FR>
+<pt-PT>
+Biblioteca SSH atualizada (JSch 2.27.9).
+Suporte para renomear chaves SSH.
+Campo Jump hosts sempre visível, com rótulo "Jump hosts (-J)".
+Corrigidos downloads SFTP que guardavam ficheiros com nome errado entre sessões.
+A lista de ficheiros SFTP faz scroll além do botão de envio.
+Corrigido ecrã preto no terminal após sair do vim.
+Removidos caracteres incorretos no prompt após sair do vim.
+Os campos hostname e porta rejeitam agora caracteres inválidos.
+</pt-PT>
+<uk>
+Оновлено бібліотеку SSH (JSch 2.27.9).
+Перейменування SSH-ключів.
+Поле Jump hosts завжди видиме, з міткою "Jump hosts (-J)".
+Виправлено завантаження SFTP, що зберігало файли з неправильною назвою між сесіями.
+Список файлів SFTP тепер прокручується за кнопку завантаження.
+Виправлено чорний екран у терміналі після виходу з vim.
+Видалено зайві символи в рядку після виходу з vim.
+Поля hostname і порт тепер відхиляють недійсні символи.
+</uk>

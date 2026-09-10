@@ -1,0 +1,49 @@
+<en-US>
+• Shell command history suggestions while typing
+• Fixed terminal content being cut off when the keyboard appears
+• Fixed a crash on screen draw
+• Separate SSH and SFTP session counters on each host
+• New screenshot permission setting
+</en-US>
+<it-IT>
+• Suggerimenti dalla cronologia dei comandi durante la digitazione
+• Corretto il troncamento del contenuto del terminale all'apertura della tastiera
+• Corretto un crash durante il rendering dello schermo
+• Contatori separati per sessioni SSH e SFTP su ogni host
+• Nuova impostazione per il permesso agli screenshot
+</it-IT>
+<de-DE>
+• Verlaufsvorschläge bei der Befehlseingabe im Terminal
+• Fehler behoben: Terminalinhalt wurde beim Öffnen der Tastatur abgeschnitten
+• Absturz beim Zeichnen des Bildschirms behoben
+• Getrennte Zähler für SSH- und SFTP-Sitzungen je Host
+• Neue Einstellung für die Bildschirmfoto-Berechtigung
+</de-DE>
+<es-ES>
+• Sugerencias del historial de comandos al escribir
+• Corregido el recorte del contenido del terminal al abrir el teclado
+• Corregido un error que causaba cierres inesperados al dibujar la pantalla
+• Contadores separados para sesiones SSH y SFTP por host
+• Nueva opción para el permiso de capturas de pantalla
+</es-ES>
+<fr-FR>
+• Suggestions de l'historique des commandes lors de la saisie
+• Correction du contenu tronqué du terminal à l'ouverture du clavier
+• Correction d'un crash lors du rendu de l'écran
+• Compteurs séparés pour les sessions SSH et SFTP par hôte
+• Nouveau paramètre pour l'autorisation des captures d'écran
+</fr-FR>
+<pt-PT>
+• Sugestões do histórico de comandos ao digitar
+• Corrigido o corte do conteúdo do terminal ao abrir o teclado
+• Corrigido um crash ao renderizar o ecrã
+• Contadores separados para sessões SSH e SFTP por host
+• Nova definição para permissão de capturas de ecrã
+</pt-PT>
+<uk>
+• Підказки з історії команд під час введення
+• Виправлено обрізання вмісту терміналу при відкритті клавіатури
+• Виправлено збій під час відображення екрана
+• Окремі лічильники для SSH та SFTP-сесій на кожному хості
+• Нове налаштування дозволу на знімки екрана
+</uk>
