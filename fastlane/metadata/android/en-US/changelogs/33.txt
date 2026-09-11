@@ -1,2 +1,3 @@
 • You can now order the host and group list (alphabetical, recently used, most used or by hand)
 • Fixed scrolling inside full-screen apps such as tmux, vim, nano and less
+• Fixed keys in the key bar that could keep repeating after you let go
