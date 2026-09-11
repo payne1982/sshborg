@@ -1,3 +1,4 @@
 • Die Host- und Gruppenliste lässt sich jetzt sortieren (alphabetisch, zuletzt verwendet, am meisten verwendet oder von Hand)
 • Scrollen in Vollbild-Apps wie tmux, vim, nano und less korrigiert
 • Tasten der Tastenleiste, die nach dem Loslassen weiter wiederholten, korrigiert
+• Der Wortmodus pausiert jetzt die Befehlsvorschläge

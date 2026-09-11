@@ -2,49 +2,59 @@
 • You can now order the host and group list (alphabetical, recently used, most used or by hand)
 • Fixed scrolling inside full-screen apps such as tmux, vim, nano and less
 • Fixed keys in the key bar that could keep repeating after you let go
+• Word mode now pauses command suggestions
 </en-US>
 <it-IT>
 • Ora è possibile ordinare la lista degli host e dei gruppi (alfabetico, recenti, più usati o a mano)
 • Sistemato lo scorrimento nelle app a tutto schermo come tmux, vim, nano e less
 • Sistemati i tasti della barra che a volte continuavano a ripetersi dopo il rilascio
+• La modalità parola ora mette in pausa i suggerimenti dei comandi
 </it-IT>
 <de-DE>
 • Die Host- und Gruppenliste lässt sich jetzt sortieren (alphabetisch, zuletzt verwendet, am meisten verwendet oder von Hand)
 • Scrollen in Vollbild-Apps wie tmux, vim, nano und less korrigiert
 • Tasten der Tastenleiste, die nach dem Loslassen weiter wiederholten, korrigiert
+• Der Wortmodus pausiert jetzt die Befehlsvorschläge
 </de-DE>
 <es-ES>
 • Ahora se puede ordenar la lista de hosts y grupos (alfabético, usados recientemente, más usados o a mano)
 • Corregido el desplazamiento en apps a pantalla completa como tmux, vim, nano y less
 • Corregidas las teclas de la barra que podían seguir repitiéndose tras soltarlas
+• El modo palabra ahora pausa las sugerencias de comandos
 </es-ES>
 <fr-FR>
 • Il est désormais possible de classer la liste des hôtes et des groupes (alphabétique, utilisés récemment, les plus utilisés ou à la main)
 • Correction du défilement dans les applications plein écran comme tmux, vim, nano et less
 • Correction des touches de la barre qui pouvaient continuer à se répéter après le relâchement
+• Le mode mot met désormais les suggestions de commandes en pause
 </fr-FR>
 <pt-PT>
 • Agora é possível ordenar a lista de hosts e grupos (alfabética, usados recentemente, mais usados ou à mão)
 • Corrigido o deslocamento em apps de ecrã inteiro como tmux, vim, nano e less
 • Corrigidas as teclas da barra que podiam continuar a repetir-se após soltar
+• O modo palavra agora pausa as sugestões de comandos
 </pt-PT>
 <uk>
 • Тепер список хостів і груп можна впорядкувати (за абеткою, нещодавні, найчастіші або вручну)
 • Виправлено прокручування в повноекранних програмах, як-от tmux, vim, nano та less
 • Виправлено клавіші на панелі, які могли продовжувати повторюватися після відпускання
+• Режим слів тепер призупиняє підказки команд
 </uk>
 <ru-RU>
 • Теперь список хостов и групп можно упорядочить (по алфавиту, недавние, часто используемые или вручную)
 • Исправлена прокрутка в полноэкранных программах, таких как tmux, vim, nano и less
 • Исправлены клавиши на панели, которые могли продолжать повторяться после отпускания
+• Режим слов теперь приостанавливает подсказки команд
 </ru-RU>
 <zh-CN>
 • 现在可以排列主机和分组列表（字母顺序、最近使用、最常使用或手动）
 • 修复了 tmux、vim、nano、less 等全屏程序中的滚动
 • 修复了按键栏中松手后仍可能持续触发的按键
+• 单词模式现在会暂停命令建议
 </zh-CN>
 <ja-JP>
 • ホストとグループの一覧を並べ替えられるようになりました（アルファベット順・最近使った順・よく使う順・手動）
 • tmux、vim、nano、less などの全画面アプリでのスクロールを修正しました
 • キー列のキーが離した後も連続入力され続けることがある問題を修正
+• 単語モード中はコマンド候補を一時停止
 </ja-JP>

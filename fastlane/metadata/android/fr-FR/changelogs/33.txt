@@ -1,3 +1,4 @@
 • Il est désormais possible de classer la liste des hôtes et des groupes (alphabétique, utilisés récemment, les plus utilisés ou à la main)
 • Correction du défilement dans les applications plein écran comme tmux, vim, nano et less
 • Correction des touches de la barre qui pouvaient continuer à se répéter après le relâchement
+• Le mode mot met désormais les suggestions de commandes en pause

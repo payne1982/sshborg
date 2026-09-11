@@ -1,3 +1,4 @@
 • Ora è possibile ordinare la lista degli host e dei gruppi (alfabetico, recenti, più usati o a mano)
 • Sistemato lo scorrimento nelle app a tutto schermo come tmux, vim, nano e less
 • Sistemati i tasti della barra che a volte continuavano a ripetersi dopo il rilascio
+• La modalità parola ora mette in pausa i suggerimenti dei comandi

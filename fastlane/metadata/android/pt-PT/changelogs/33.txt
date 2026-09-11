@@ -1,3 +1,4 @@
 • Agora é possível ordenar a lista de hosts e grupos (alfabética, usados recentemente, mais usados ou à mão)
 • Corrigido o deslocamento em apps de ecrã inteiro como tmux, vim, nano e less
 • Corrigidas as teclas da barra que podiam continuar a repetir-se após soltar
+• O modo palavra agora pausa as sugestões de comandos
