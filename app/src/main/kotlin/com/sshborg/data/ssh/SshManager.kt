@@ -31,6 +31,12 @@ object SshManager {
     /** How often the watchdog looks at the clock. */
     private const val DEADLINE_TICK_MS = 250L
 
+    /** Budget for the first attempt, before the silent retry. */
+    private const val FIRST_ATTEMPT_MS = 20_000L
+
+    /** How long the liveness probe waits for the jump host to grant a channel. */
+    private const val PROBE_MS = 5_000
+
     /**
      * Holds the sessions an attempt has opened so far, so they can be closed from outside.
      *
@@ -43,10 +49,14 @@ object SshManager {
         private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ) {
         private val sessions = mutableListOf<Session>()
+        private val jumpHops = mutableListOf<Session>()
         private var aborted = false
 
         /** Set while a host-key dialog is up, so the user's own thinking time isn't counted. */
         @Volatile var waitingForUser = false
+
+        /** True once the attempt has asked the user something. */
+        @Volatile var promptShown = false
 
         /** True when the watchdog, and not the caller, ended the attempt. */
         @Volatile var timedOut = false
@@ -55,6 +65,9 @@ object SshManager {
         @Volatile private var stage = "starting"
         @Volatile private var worker: Thread? = null
         @Volatile private var stuck: Throwable? = null
+
+        /** What the liveness probe found, when one was run. */
+        @Volatile private var jumpAnswered: Boolean? = null
 
         /**
          * Marks the stage the attempt has reached. Cheap on purpose — it runs on the connect
@@ -76,12 +89,36 @@ object SshManager {
             stuck = Throwable("blocked while $stage").apply { stackTrace = frames }
         }
 
+        /**
+         * Asks the last jump hop for a channel, to find out whether it is still talking to us
+         * at all. It answers the one question the stack alone cannot: a stall waiting for the
+         * final host means either that the host stayed silent, or that the way back from the
+         * jump host closed while we waited — the same symptom, two different machines at
+         * fault. Must run before [abort], while the hop is still connected.
+         */
+        fun probeJumpLiveness() {
+            val hop = synchronized(this) { jumpHops.lastOrNull() } ?: return
+            jumpAnswered = runCatching {
+                val channel = hop.openChannel("session")
+                try { channel.connect(PROBE_MS) } finally { runCatching { channel.disconnect() } }
+                true
+            }.getOrDefault(false)
+        }
+
         /** The failure to report, carrying the stage in its message and the frames as cause. */
         val timeoutError: JSchException
-            get() = JSchException("Connection timed out while $stage", stuck)
+            get() {
+                val verdict = when (jumpAnswered) {
+                    true  -> " (the jump host was still answering, the host itself was not)"
+                    false -> " (the jump host had stopped answering too)"
+                    null  -> ""
+                }
+                return JSchException("Connection timed out while $stage$verdict", stuck)
+            }
 
         /** The host-key callback, wrapped so it stops the clock for as long as it blocks. */
         val verify: (String, String, String) -> Boolean = { hostname, fingerprint, keyLine ->
+            promptShown = true
             waitingForUser = true
             try { onHostKeyVerify(hostname, fingerprint, keyLine) } finally { waitingForUser = false }
         }
@@ -90,11 +127,18 @@ object SshManager {
             if (aborted) runCatching { session.disconnect() } else sessions.add(session)
         }
 
+        /** As [track], but the hop is also the one the liveness probe will question. */
+        @Synchronized fun trackJump(session: Session) {
+            track(session)
+            if (!aborted) jumpHops.add(session)
+        }
+
         /** Closes everything opened so far; safe to call more than once. */
         @Synchronized fun abort() {
             aborted = true
             sessions.forEach { runCatching { it.disconnect() } }
             sessions.clear()
+            jumpHops.clear()
         }
     }
 
@@ -112,9 +156,30 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
         block: suspend (ConnectGuard) -> T,
     ): T {
-        val guard = ConnectGuard(onHostKeyVerify)
         // A hop's worth of handshake on top of the base budget for every jump in the chain.
-        val budgetMs = 30_000L + 15_000L * params.jumpHosts.size
+        val fullBudget = 30_000L + 15_000L * params.jumpHosts.size
+        // The first attempt is kept on a short leash, because the failure this guards against
+        // is a mobile path that has gone one-way: waiting longer never rescues it, and a fresh
+        // attempt over a fresh socket connects immediately. A link merely slow gets the whole
+        // budget on the second go.
+        val firstGuard = ConnectGuard(onHostKeyVerify)
+        try {
+            return attempt(firstGuard, minOf(FIRST_ATTEMPT_MS, fullBudget), probeOnTimeout = false, block = block)
+        } catch (e: Throwable) {
+            // Retried only for our own deadline, and only if the attempt asked the user
+            // nothing: making someone accept the same host key twice is worse than the wait.
+            if (e is CancellationException || !firstGuard.timedOut || firstGuard.promptShown) throw e
+        }
+        return attempt(ConnectGuard(onHostKeyVerify), fullBudget, probeOnTimeout = true, block = block)
+    }
+
+    /** One connect attempt under [budgetMs]; see [guardedConnect]. */
+    private suspend fun <T> attempt(
+        guard: ConnectGuard,
+        budgetMs: Long,
+        probeOnTimeout: Boolean,
+        block: suspend (ConnectGuard) -> T,
+    ): T {
         val work = connectScope.async { block(guard) }
         val watchdog = connectScope.launch {
             var left = budgetMs
@@ -125,6 +190,7 @@ object SshManager {
             if (!work.isActive) return@launch
             guard.timedOut = true
             guard.captureStuckFrame()
+            if (probeOnTimeout) guard.probeJumpLiveness()
             guard.abort()
         }
         try {
@@ -253,7 +319,7 @@ object SshManager {
             }
 
             val jumpSession = jumpJsch.getSession(jump.username ?: params.username, jump.host, jump.port)
-            guard.track(jumpSession)
+            guard.trackJump(jumpSession)
             if (proxy != null) jumpSession.setProxy(proxy)
 
             jumpSession.setUserInfo(object : UserInfo, UIKeyboardInteractive {
