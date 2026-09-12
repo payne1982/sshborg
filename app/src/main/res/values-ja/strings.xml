@@ -155,6 +155,7 @@
     <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">バックアップ</string>
     <string name="settings_section_about">アプリ情報</string>
+    <string name="settings_about_app">SSHBorg Android 版</string>
     <string name="settings_about_version">バージョン %1$s (%2$d)</string>
 
     <string name="settings_theme_title">テーマ</string>

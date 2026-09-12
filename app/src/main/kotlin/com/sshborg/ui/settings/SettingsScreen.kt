@@ -716,7 +716,11 @@ fun SettingsScreen(
             )
 
             ListItem(
-                headlineContent = { Text(stringResource(R.string.app_name)) },
+                // Named per platform, not just "SSHBorg": this row leaves the app in the
+                // screenshots attached to bug reports, where nothing else says which
+                // edition it is. The platform goes in the name rather than beside the
+                // number, where "Android version 1.16.2" would read as the OS release.
+                headlineContent = { Text(stringResource(R.string.settings_about_app)) },
                 supportingContent = {
                     // The version code matters as much as the name: it is the number Play
                     // talks about, and the only thing telling two builds of the same

@@ -151,6 +151,7 @@
     <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
     <string name="settings_section_about">Informazioni</string>
+    <string name="settings_about_app">SSHBorg per Android</string>
     <string name="settings_about_version">Versione %1$s (%2$d)</string>
 
     <string name="settings_confirm_exit_title">Conferma uscita</string>
