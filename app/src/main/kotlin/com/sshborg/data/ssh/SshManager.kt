@@ -339,7 +339,7 @@ object SshManager {
             }
             jumpSession.setConfig(jumpConfig)
             jumpSession.setServerAliveInterval(15_000)
-            jumpSession.setServerAliveCountMax(6)
+            jumpSession.setServerAliveCountMax(20)
 
             // The read timeout connect() leaves behind is deliberately kept — see the note on
             // the target session below.
@@ -429,10 +429,18 @@ object SshManager {
             if (params.allowLegacyCiphers) applyLegacyCiphers(this)
         }
         session.setConfig(config)
-        // Keepalive every 15s, give up after 6 missed (~90s). Frequent probes keep the WiFi
-        // path warm (see the WifiLock in SshForegroundService) and detect a real death sooner.
+        // Keepalive every 15s, give up after 20 missed (~5 minutes). The two numbers answer
+        // different questions. The interval keeps the path warm (see the WifiLock in
+        // SshForegroundService) and wants to stay short. The count decides how long a silence
+        // is tolerated before the session is declared dead, and wants to be generous: a tunnel
+        // or a lift is a silence a TCP connection often survives, and until 2026-09 the count
+        // never ran at all — setTimeout(0) after connect had disabled the mechanism — so no
+        // session was ever given up this way. A connection that dies with an actual error
+        // still reports immediately; this threshold only governs the silent, half-open case.
+        // Note the count advances only while the app is running: a frozen process wakes to a
+        // single expired read, not to one per minute spent frozen.
         session.setServerAliveInterval(15_000)
-        session.setServerAliveCountMax(6)
+        session.setServerAliveCountMax(20)
 
         // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
         // channel-level flag but never sets Session.agent_forwarding. Fix via reflection.
