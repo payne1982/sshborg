@@ -466,6 +466,8 @@ object SshManager {
     /** JSch [Proxy] implementation that tunnels through an already-connected SSH [Session]. */
     private class JumpProxy(private val via: Session) : com.jcraft.jsch.Proxy {
         private var channel: com.jcraft.jsch.ChannelDirectTCPIP? = null
+        private var tunnelIn: java.io.InputStream? = null
+        private var tunnelOut: java.io.OutputStream? = null
 
         override fun connect(sf: com.jcraft.jsch.SocketFactory?, host: String, port: Int, timeout: Int) {
             val ch = via.openChannel("direct-tcpip") as com.jcraft.jsch.ChannelDirectTCPIP
@@ -473,12 +475,25 @@ object SshManager {
             ch.setPort(port)
             ch.setOrgIPAddress("127.0.0.1")
             ch.setOrgPort(0)
+            // Both streams BEFORE connect, and not as a matter of taste: getInputStream() is
+            // what installs the pipe that arriving channel data is written into, and until it
+            // has run Channel.write() hits a NullPointerException on the missing stream and
+            // *swallows it* — the bytes are dropped without a trace. The jump host confirms
+            // the channel only once its own connection to the target is up, so the target's
+            // SSH banner can be immediately behind that confirmation, in the same read: the
+            // jump session's reader thread then hands both to the channel while our thread is
+            // still on its way back out of connect(). Losing the banner deadlocks the
+            // handshake — we go on waiting for a greeting that will not be sent twice, the
+            // target waits for the key exchange we cannot start. JSch knows the trap and logs
+            // "getInputStream() should be called before connect()" when it catches us late.
+            tunnelIn = ch.inputStream
+            tunnelOut = ch.outputStream
             ch.connect(if (timeout <= 0) 20_000 else timeout)
             channel = ch
         }
 
-        override fun getInputStream(): java.io.InputStream = channel!!.inputStream
-        override fun getOutputStream(): java.io.OutputStream = channel!!.outputStream
+        override fun getInputStream(): java.io.InputStream = tunnelIn!!
+        override fun getOutputStream(): java.io.OutputStream = tunnelOut!!
         override fun getSocket(): java.net.Socket? = null
         override fun close() { runCatching { channel?.disconnect() } }
     }
