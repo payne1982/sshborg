@@ -31,9 +31,6 @@ object SshManager {
     /** How often the watchdog looks at the clock. */
     private const val DEADLINE_TICK_MS = 250L
 
-    /** Budget for the first attempt, before the silent retry. */
-    private const val FIRST_ATTEMPT_MS = 20_000L
-
     /** How long the liveness probe waits for the jump host to grant a channel. */
     private const val PROBE_MS = 5_000
 
@@ -54,9 +51,6 @@ object SshManager {
 
         /** Set while a host-key dialog is up, so the user's own thinking time isn't counted. */
         @Volatile var waitingForUser = false
-
-        /** True once the attempt has asked the user something. */
-        @Volatile var promptShown = false
 
         /** True when the watchdog, and not the caller, ended the attempt. */
         @Volatile var timedOut = false
@@ -118,7 +112,6 @@ object SshManager {
 
         /** The host-key callback, wrapped so it stops the clock for as long as it blocks. */
         val verify: (String, String, String) -> Boolean = { hostname, fingerprint, keyLine ->
-            promptShown = true
             waitingForUser = true
             try { onHostKeyVerify(hostname, fingerprint, keyLine) } finally { waitingForUser = false }
         }
@@ -156,30 +149,12 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
         block: suspend (ConnectGuard) -> T,
     ): T {
+        val guard = ConnectGuard(onHostKeyVerify)
         // A hop's worth of handshake on top of the base budget for every jump in the chain.
-        val fullBudget = 30_000L + 15_000L * params.jumpHosts.size
-        // The first attempt is kept on a short leash, because the failure this guards against
-        // is a mobile path that has gone one-way: waiting longer never rescues it, and a fresh
-        // attempt over a fresh socket connects immediately. A link merely slow gets the whole
-        // budget on the second go.
-        val firstGuard = ConnectGuard(onHostKeyVerify)
-        try {
-            return attempt(firstGuard, minOf(FIRST_ATTEMPT_MS, fullBudget), probeOnTimeout = false, block = block)
-        } catch (e: Throwable) {
-            // Retried only for our own deadline, and only if the attempt asked the user
-            // nothing: making someone accept the same host key twice is worse than the wait.
-            if (e is CancellationException || !firstGuard.timedOut || firstGuard.promptShown) throw e
-        }
-        return attempt(ConnectGuard(onHostKeyVerify), fullBudget, probeOnTimeout = true, block = block)
-    }
-
-    /** One connect attempt under [budgetMs]; see [guardedConnect]. */
-    private suspend fun <T> attempt(
-        guard: ConnectGuard,
-        budgetMs: Long,
-        probeOnTimeout: Boolean,
-        block: suspend (ConnectGuard) -> T,
-    ): T {
+        val budgetMs = 30_000L + 15_000L * params.jumpHosts.size
+        // One attempt, deliberately: retrying automatically would paper over the stall while
+        // we are still working out which machine causes it, and a failure nobody sees is a
+        // failure nobody can diagnose. The retry belongs here once that is settled.
         val work = connectScope.async { block(guard) }
         val watchdog = connectScope.launch {
             var left = budgetMs
@@ -190,7 +165,7 @@ object SshManager {
             if (!work.isActive) return@launch
             guard.timedOut = true
             guard.captureStuckFrame()
-            if (probeOnTimeout) guard.probeJumpLiveness()
+            guard.probeJumpLiveness()
             guard.abort()
         }
         try {
