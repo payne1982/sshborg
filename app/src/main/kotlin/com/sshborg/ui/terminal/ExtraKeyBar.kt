@@ -46,6 +46,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -68,10 +69,21 @@ private val ExtraKeyFont = FontFamily(
     Font(R.font.roboto_condensed_regular),
     Font(R.font.roboto_condensed_bold, FontWeight.Bold),
 )
-private val ArrowKeyFont = FontFamily(
-    Font(R.font.jetbrains_mono_regular),
-    Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
-)
+/**
+ * Arrow glyphs in the terminal's own font, loaded from the assets the [com.sshborg.terminal
+ * .TerminalView] already ships. The Nerd Font is a superset of plain JetBrains Mono, so the
+ * plain pair in res/font was 544 KB of duplicate outlines for four arrows.
+ */
+@Composable
+private fun arrowKeyFont(): FontFamily {
+    val assets = LocalContext.current.assets
+    return remember(assets) {
+        FontFamily(
+            Font("fonts/JetBrainsMonoNerdFontMono-Regular.ttf", assets),
+            Font("fonts/JetBrainsMonoNerdFontMono-Bold.ttf", assets, FontWeight.Bold),
+        )
+    }
+}
 
 /** Toggle states the bar reflects and the callbacks it drives; owned by the terminal screen. */
 class ExtraBarState(
@@ -351,7 +363,7 @@ private fun ExtraKey(
         Text(
             label,
             fontSize = fontSize,
-            fontFamily = if (isArrow) ArrowKeyFont else ExtraKeyFont,
+            fontFamily = if (isArrow) arrowKeyFont() else ExtraKeyFont,
             fontWeight = if (active || isArrow) FontWeight.Bold else FontWeight.Medium,
             maxLines = 1,
             color = textColor,
