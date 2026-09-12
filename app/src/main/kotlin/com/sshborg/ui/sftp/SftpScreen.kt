@@ -560,13 +560,25 @@ fun SftpScreen(
             title = { Text(stringResource(R.string.sftp_conflict_title)) },
             text  = { Text(stringResource(R.string.sftp_conflict_message, conflict.entry.name)) },
             confirmButton = {
-                Column(horizontalAlignment = Alignment.End) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) }) {
+                // The two real choices stacked in one full-width column, Cancel beside the
+                // lower one. Side by side they had to share the width and the longer label
+                // broke over two lines; stacked, each gets the whole column. Overwrite sits
+                // at the bottom, nearest the thumb, and the label is the same width as the
+                // other choice so neither reads as the default.
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        OutlinedButton(
+                            onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
                             Text(stringResource(R.string.action_keep_both))
                         }
                         OutlinedButton(
                             onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) },
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
                             ),
@@ -577,7 +589,6 @@ fun SftpScreen(
                             Text(stringResource(R.string.action_overwrite))
                         }
                     }
-                    Spacer(Modifier.height(4.dp))
                     TextButton(onClick = { pendingConflict = null }) {
                         Text(stringResource(R.string.action_cancel))
                     }
