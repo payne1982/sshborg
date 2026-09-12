@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
+import com.sshborg.BuildConfig
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
 import com.sshborg.isTelevision
@@ -701,6 +702,33 @@ fun SettingsScreen(
                     OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
                         Text(stringResource(R.string.settings_backup_import_action))
                     }
+                },
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+            // ── About section ─────────────────────────────────────────────────
+            Text(
+                stringResource(R.string.settings_section_about),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.app_name)) },
+                supportingContent = {
+                    // The version code matters as much as the name: it is the number Play
+                    // talks about, and the only thing telling two builds of the same
+                    // version apart. Debug builds say so, since they install alongside
+                    // the store one and look identical from here.
+                    Text(
+                        stringResource(
+                            R.string.settings_about_version,
+                            BuildConfig.VERSION_NAME,
+                            BuildConfig.VERSION_CODE,
+                        ) + if (BuildConfig.DEBUG) " · debug" else ""
+                    )
                 },
             )
         }
