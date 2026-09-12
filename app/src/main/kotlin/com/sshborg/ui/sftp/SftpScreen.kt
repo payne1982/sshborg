@@ -610,11 +610,12 @@ fun SftpScreen(
                     batchConflict.conflictCount, batchConflict.totalCount))
             },
             confirmButton = {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Row {
+                // Laid out like the single-file conflict above: the two choices stacked in the
+                // left column, Cancel beside the lower one. Side by side these two are the
+                // longest label pair in the app (41 characters together in German), so a plain
+                // Row squeezed both and broke them over two lines.
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                    Column(Modifier.weight(1f)) {
                         TextButton(onClick = {
                             pendingBatchConflict = null
                             vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.SKIP_EXISTING)
