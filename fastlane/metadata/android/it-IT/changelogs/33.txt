@@ -2,3 +2,4 @@
 • Sistemato lo scorrimento nelle app a tutto schermo come tmux, vim, nano e less
 • Sistemati i tasti della barra che a volte continuavano a ripetersi dopo il rilascio
 • La modalità parola ora mette in pausa i suggerimenti dei comandi
+• Sistemate le connessioni tramite jump host che potevano restare a caricare all'infinito

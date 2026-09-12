@@ -2,3 +2,4 @@
 • Fixed scrolling inside full-screen apps such as tmux, vim, nano and less
 • Fixed keys in the key bar that could keep repeating after you let go
 • Word mode now pauses command suggestions
+• Fixed connections through a jump host that could stay loading forever

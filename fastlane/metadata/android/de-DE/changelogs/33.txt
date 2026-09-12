@@ -2,3 +2,4 @@
 • Scrollen in Vollbild-Apps wie tmux, vim, nano und less korrigiert
 • Tasten der Tastenleiste, die nach dem Loslassen weiter wiederholten, korrigiert
 • Der Wortmodus pausiert jetzt die Befehlsvorschläge
+• Verbindungen über einen Jump-Host, die endlos luden, korrigiert

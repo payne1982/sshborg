@@ -2,3 +2,4 @@
 • Corregido el desplazamiento en apps a pantalla completa como tmux, vim, nano y less
 • Corregidas las teclas de la barra que podían seguir repitiéndose tras soltarlas
 • El modo palabra ahora pausa las sugerencias de comandos
+• Corregidas las conexiones a través de un host de salto que podían quedarse cargando sin fin
