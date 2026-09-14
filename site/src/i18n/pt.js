@@ -479,7 +479,7 @@ Host target
             <h2>// SESSÕES MÚLTIPLAS</h2>
             <p>O SSHBorg permite manter várias sessões de terminal SSH e gestor de ficheiros SFTP abertas ao mesmo tempo, mesmo para servidores diferentes.</p>
             <ul>
-                <li>Abra uma sessão a partir do ecrã de hosts tocando em <strong>Terminal</strong> ou <strong>SFTP</strong>.</li>
+                <li>Toque num host para abrir um terminal, ou escolha <strong>Ficheiros</strong> no respetivo menu para abrir o gestor de ficheiros. Se o host já tiver sessões abertas, o mesmo menu abre outras.</li>
                 <li>Mude entre sessões abertas com os separadores por baixo do terminal; um host com várias sessões abre um seletor numerado.</li>
                 <li>As sessões permanecem ativas em segundo plano enquanto a ligação de rede se mantiver — no iOS apenas durante pouco tempo, veja <a href="#connection-drops">Quedas de ligação</a>.</li>
                 <li>A lista de hosts mostra um pequeno distintivo junto a cada host com o número de sessões SSH e SFTP ativas, para ver de relance o que está aberto.</li>

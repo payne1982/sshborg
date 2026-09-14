@@ -479,7 +479,7 @@ Host target
             <h2>// MEHRERE SITZUNGEN</h2>
             <p>SSHBorg ermöglicht es, mehrere SSH-Terminal- und SFTP-Dateimanager-Sitzungen gleichzeitig offen zu halten, auch zu verschiedenen Servern.</p>
             <ul>
-                <li>Sitzungen über den Host-Bildschirm öffnen durch Antippen von <strong>Terminal</strong> oder <strong>SFTP</strong>.</li>
+                <li>Tippe auf einen Host, um ein Terminal zu öffnen, oder wähle <strong>Dateien</strong> in seinem Menü, um den Dateimanager zu öffnen. Hat der Host bereits offene Sitzungen, öffnet dasselbe Menü weitere.</li>
                 <li>Mit den Tabs unter dem Terminal zwischen offenen Sitzungen wechseln; ein Host mit mehreren Sitzungen öffnet eine nummerierte Auswahl.</li>
                 <li>Sitzungen bleiben im Hintergrund aktiv, solange die Netzwerkverbindung besteht — unter iOS nur kurz, siehe <a href="#connection-drops">Verbindungsabbrüche</a>.</li>
                 <li>Die Host-Liste zeigt ein kleines Abzeichen neben jedem Host mit der Anzahl aktiver SSH- und SFTP-Sitzungen, sodass du auf einen Blick sehen kannst, was offen ist.</li>

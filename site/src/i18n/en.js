@@ -482,7 +482,7 @@ Host target
             <h2>// MULTIPLE SESSIONS</h2>
             <p>SSHBorg lets you keep several SSH terminal sessions and SFTP file manager sessions open at the same time, even to different servers.</p>
             <ul>
-                <li>Open a session from the hosts screen by tapping <strong>Terminal</strong> or <strong>SFTP</strong>.</li>
+                <li>Tap a host to open a terminal, or choose <strong>Files</strong> in its menu to open the file manager. On a host that already has sessions open, the same menu opens further ones.</li>
                 <li>Switch between open sessions with the tabs below the terminal; a host with several sessions opens a numbered picker.</li>
                 <li>Sessions stay alive in the background as long as the network connection holds — on iOS only for a short while, see <a href="#connection-drops">Connection Drops</a>.</li>
                 <li>The host list shows a small badge next to each host with the number of active SSH and SFTP sessions, so you can see at a glance what is open.</li>

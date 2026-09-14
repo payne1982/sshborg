@@ -9,7 +9,7 @@ const BASE_URL = 'https://sshborg.com';
 
 // App Store page. The number is the app's Apple ID, shown in App Store Connect
 // under App Information; the link only resolves once the app is released.
-const APP_STORE_URL = 'https://apps.apple.com/app/idXXXXXXXXXX';
+const APP_STORE_URL = 'https://apps.apple.com/app/id6811622926';
 
 // The two apps live in separate repositories, each with its own issue tracker.
 const REPO_ANDROID = 'https://github.com/payne1982/sshborg';
