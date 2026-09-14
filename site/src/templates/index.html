@@ -30,12 +30,12 @@
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "SSHBorg",
-      "operatingSystem": "Android",
+      "operatingSystem": "Android, iOS",
       "applicationCategory": "DeveloperApplication",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "description": "{{meta_description}}",
       "url": "https://sshborg.com/",
-      "downloadUrl": "https://play.google.com/store/apps/details?id=com.sshborg",
+      "downloadUrl": ["https://play.google.com/store/apps/details?id=com.sshborg", "{{APP_STORE_URL}}"],
       "inLanguage": "{{LANG}}"
     }
     </script>
@@ -382,6 +382,8 @@
         .dl-play:hover   { background: rgba(0,255,136,0.08);  text-shadow: 0 0 8px var(--neon-green); }
         .dl-ag:hover     { background: rgba(0,212,255,0.08);  text-shadow: 0 0 8px var(--neon-blue); }
         .dl-fdroid:hover { background: rgba(200,124,48,0.10); text-shadow: 0 0 8px var(--copper); }
+        .dl-appstore       { color: var(--text); }
+        .dl-appstore:hover { background: rgba(168,212,180,0.08); text-shadow: 0 0 8px var(--text); }
 
         /* ── Section layout ──────────────────────────────────── */
         section {
@@ -493,6 +495,35 @@
             font-size: 0.9em;
             margin-bottom: 28px;
         }
+
+        /* ── Support section ─────────────────────────────────── */
+        .support-section h2 {
+            color: var(--neon-blue);
+            text-shadow: 0 0 6px rgba(0,212,255,0.5);
+        }
+        .support-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .support-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--neon-green);
+            font-family: var(--font-mono);
+            font-size: 0.95em;
+            letter-spacing: 0.06em;
+            padding: 12px 26px;
+            border: 1px solid var(--neon-green);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .support-btn:hover {
+            background: rgba(0,255,136,0.10);
+            box-shadow: 0 0 16px rgba(0,255,136,0.35);
+        }
+        .tip-section p.support-source { margin: 26px 0 0; }
 
         /* ── Footer ──────────────────────────────────────────── */
         footer {
@@ -613,7 +644,7 @@
         <a href="#features">{{nav_features}}</a>
         <a href="#security">{{nav_security}}</a>
         <a href="docs.html">{{nav_guide}}</a>
-        <a href="https://github.com/payne1982/sshborg/issues">{{nav_support}}</a>
+        <a href="#support">{{nav_support}}</a>
         <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
         <a href="#tip">{{nav_tip}}</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">{{nav_contact}}</a>
@@ -642,6 +673,7 @@
         <span class="badge badge-green">&#10003; {{badge_no_cloud}}</span>
         <span class="badge badge-blue">{{badge_free}}</span>
         <span class="badge badge-blue">{{badge_android}}</span>
+        <span class="badge badge-blue">{{badge_ios}}</span>
     </div>
     <div class="cta-wrap">
         <div class="dl-dropdown" id="dlDropdown">
@@ -663,6 +695,14 @@
                         <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
                     </svg>
                     <span>{{cta_play}}</span>
+                </a>
+                <a class="dl-option dl-appstore"
+                   href="{{APP_STORE_URL}}"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+                    </svg>
+                    <span>{{cta_appstore}}</span>
                 </a>
                 <a class="dl-option dl-ag"
                    href="https://appgallery.huawei.com/app/C117647135"
@@ -761,13 +801,29 @@
             <span class="badge badge-green">{{sec_badge_analytics}}</span>
             <span class="badge badge-green">{{sec_badge_sdks}}</span>
             <span class="badge badge-green">{{sec_badge_screenshots}}</span>
-            <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener"><span class="badge badge-green">{{sec_badge_opensource}}</span></a>
+            <a href="#support"><span class="badge badge-green">{{sec_badge_opensource}}</span></a>
         </div>
         <p style="margin-top:28px;">
             <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{security_pp_link}}</a>
         </p>
     </div>
 </section>
+
+<!-- Support -->
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<div class="tip-section support-section" id="support">
+    <h2>{{support_title}}</h2>
+    <p>{{support_desc}}</p>
+    <div class="support-buttons">
+        <a class="support-btn" href="{{REPO_ANDROID}}/issues" target="_blank" rel="noopener">{{support_issues_android}}</a>
+        <a class="support-btn" href="{{REPO_IOS}}/issues" target="_blank" rel="noopener">{{support_issues_ios}}</a>
+    </div>
+    <p class="support-source">
+        {{footer_source}}: <a href="{{REPO_ANDROID}}" target="_blank" rel="noopener">Android</a> &middot;
+        <a href="{{REPO_IOS}}" target="_blank" rel="noopener">iOS</a>
+    </p>
+</div>
 
 <!-- Tip -->
 <div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
@@ -786,12 +842,13 @@
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
         <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg/issues">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">{{footer_source}}</a> &nbsp;&#9135;&nbsp;
+        <a href="#support">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
+        {{footer_source}}: <a href="{{REPO_ANDROID}}" target="_blank" rel="noopener">Android</a> &middot; <a href="{{REPO_IOS}}" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a>
+        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
+        <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
 

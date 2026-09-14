@@ -7,6 +7,14 @@ const path = require('path');
 // ── Configuration ──────────────────────────────────────────────────────────────
 const BASE_URL = 'https://sshborg.com';
 
+// App Store page. The number is the app's Apple ID, shown in App Store Connect
+// under App Information; the link only resolves once the app is released.
+const APP_STORE_URL = 'https://apps.apple.com/app/idXXXXXXXXXX';
+
+// The two apps live in separate repositories, each with its own issue tracker.
+const REPO_ANDROID = 'https://github.com/payne1982/sshborg';
+const REPO_IOS     = 'https://github.com/payne1982/sshborg-ios';
+
 const LANGUAGES = [
   { code: 'en', hreflang: 'en',      dir: '',   root: '',    htmlLang: 'en',      ogLocale: 'en_US', fdroid: 'en'      },
   { code: 'it', hreflang: 'it',      dir: 'it', root: '../', htmlLang: 'it',      ogLocale: 'it_IT', fdroid: 'it'      },
@@ -102,7 +110,7 @@ function build() {
       const canonical = `    <link rel="canonical" href="${pageUrl(page, lang)}">`;
       let   html      = tpl.replace('<!--HREFLANG-->', `${hreflangBlock(page)}\n${canonical}`);
 
-      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang), CANONICAL_URL: pageUrl(page, lang), OG_LOCALE: lang.ogLocale, FDROID_URL: `https://f-droid.org/${lang.fdroid}/packages/com.sshborg/` });
+      html = applyVars(html, { ...tr, LANG: lang.htmlLang, ROOT: lang.root, LANG_SWITCHER: langSwitcher(page, lang), CANONICAL_URL: pageUrl(page, lang), OG_LOCALE: lang.ogLocale, FDROID_URL: `https://f-droid.org/${lang.fdroid}/packages/com.sshborg/`, APP_STORE_URL, REPO_ANDROID, REPO_IOS });
 
       const outFile = path.join(SITE_DIR, lang.dir, `${page}.html`);
       fs.writeFileSync(outFile, html, 'utf8');

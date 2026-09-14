@@ -1,8 +1,8 @@
 'use strict';
 module.exports = {
   // ── index.html ─────────────────────────────────────────────────────────────
-  page_title:        'SSHBorg – Android SSH & SFTP 客户端',
-  meta_description:  'SSHBorg 是一款功能强大的 Android SSH 和 SFTP 客户端。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。',
+  page_title:        'SSHBorg – Android 与 iOS 的 SSH & SFTP 客户端',
+  meta_description:  'SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。',
 
   nav_features:  '功能',
   nav_security:  '安全',
@@ -12,18 +12,20 @@ module.exports = {
   nav_tip:       '打赏',
   nav_contact:   '联系我们',
 
-  hero_sub: '功能强大的 Android SSH &amp; SFTP 客户端。<br>直接从手机安全管理您的服务器。',
+  hero_sub: '功能强大的 Android 与 iOS SSH &amp; SFTP 客户端。<br>直接从手机安全管理您的服务器。',
 
   badge_no_ads:      '无广告',
   badge_no_tracking: '无跟踪',
   badge_no_cloud:    '无云端',
   badge_free:        '免费',
   badge_android:     'Android 10+',
+  badge_ios: 'iOS 16+',
 
   cta_download:   '下载',
   cta_play:       'Google Play',
   cta_appgallery: 'AppGallery',
   cta_fdroid:     'F-Droid',
+  cta_appstore: 'App Store',
 
   features_title: '// 系统功能',
 
@@ -36,7 +38,7 @@ module.exports = {
   feat_jump_title:     '跳板机支持',
   feat_jump_desc:      '通过一台或多台堡垒主机进行透明隧道连接，完整支持 SSH 代理转发。',
   feat_biometric_title:'应用锁',
-  feat_biometric_desc: '用生物识别、设备 PIN 或应用内 PIN／密码短语锁定应用——即使在没有指纹传感器的 Android TV 上也能使用。超时时间可自定义。',
+  feat_biometric_desc: '用生物识别或设备密码锁定应用——在 Android 上还可以使用应用内 PIN／密码短语，即使在 Android TV 上也能使用。超时时间可自定义。',
   feat_multilingual_title: '多语言',
   feat_multilingual_desc:  '支持英语、意大利语、法语、德语、西班牙语、葡萄牙语、乌克兰语、俄语、中文和日语。',
   feat_theme_title:    '深色与浅色主题',
@@ -47,10 +49,10 @@ module.exports = {
   security_title: '// 隐私优先，由设计保障',
   security_desc:  'SSHBorg 从不收集您的数据。一切留在您的设备上——您的凭据、密钥和连接。',
 
-  sec_badge_keystore:   'Android 密钥库加密',
+  sec_badge_keystore:   '设备硬件加密',
   sec_badge_analytics:  '无分析追踪',
   sec_badge_sdks:       '无第三方 SDK',
-  sec_badge_screenshots:'截图保护',
+  sec_badge_screenshots:'屏幕内容保护',
   sec_badge_opensource: '开源 — GPL v3',
 
   security_pp_link: '阅读完整隐私政策 &rarr;',
@@ -59,6 +61,10 @@ module.exports = {
   tip_desc:   'SSHBorg 免费提供，无广告，无跟踪。如果它为您节省了时间，一点打赏可以让它持续下去。',
   kofi_cta:        '在 Ko-fi 上支持我',
   kofi_hero_cta:   '打赏我',
+  support_title: '// 支持',
+  support_desc: '发现了 bug 或有好点子？请在您所用应用的代码仓库中提交 issue——也可以直接给我写信。',
+  support_issues_android: 'Android 问题反馈',
+  support_issues_ios: 'iOS 问题反馈',
 
   footer_privacy: '隐私政策',
   footer_issues:  '问题与反馈',
@@ -67,7 +73,7 @@ module.exports = {
 
   // ── docs.html ──────────────────────────────────────────────────────────────
   page_title_docs:       'SSHBorg – 用户指南',
-  meta_description_docs: 'SSHBorg 用户指南：SSH 密钥、跳板机、代理转发、命令建议、tmux 等。',
+  meta_description_docs: 'SSHBorg Android 与 iOS 用户指南：SSH 密钥、跳板机、代理转发、命令建议、tmux 等。',
 
   nav_home:           '主页',
   nav_getting_started:'快速入门',
@@ -77,7 +83,7 @@ module.exports = {
   nav_backup:         '备份',
 
   doc_page_title:    '// 用户指南',
-  doc_page_subtitle: '操作指南——逐步指导，充分利用 SSHBorg。',
+  doc_page_subtitle: '操作指南——逐步指导，在 Android 和 iOS 上充分利用 SSHBorg。iOS 版有所不同之处，会以标有 iOS 的说明注明。',
 
   toc_title: '// 目录',
 
@@ -111,7 +117,7 @@ module.exports = {
 
   doc_adding_host: `
             <h2>// 添加主机</h2>
-            <p>在主机列表界面点击 <strong>+</strong> 按钮添加新服务器。</p>
+            <p>在主机列表界面点击 <strong>+</strong> 按钮添加新服务器（在 iOS 上会弹出一个小菜单：选择<em>添加主机</em>）。</p>
             <h3>必填字段</h3>
             <ul>
                 <li><strong>主机名 / IP</strong> — 服务器地址或 IP，支持 IPv4 和 IPv6。</li>
@@ -137,6 +143,7 @@ module.exports = {
                 <li>选择<strong>新建分组…</strong>，输入名称并从预设颜色中挑选一个。</li>
                 <li>保存主机后，主机列表会将该分组显示为独立的区块。</li>
             </ol>
+            <p>在 iOS 上也可以单独创建分组：点击 <strong>+</strong> 按钮 → <em>新建分组</em>。</p>
             <h3>使用分组</h3>
             <ul>
                 <li><strong>折叠 / 展开</strong> — 点按分组标题即可折叠或重新展开。状态会被记住，重启应用后也不会丢失。</li>
@@ -144,7 +151,7 @@ module.exports = {
                 <li><strong>编辑</strong> — 长按分组标题并选择<em>编辑</em>，可重命名分组或更换颜色。</li>
                 <li><strong>删除</strong> — 长按标题并选择<em>删除</em>。组内的主机<em>不会</em>被删除，只是变为未分组。</li>
             </ul>
-            <p>颜色可以从快捷色板中选择，也可以用渐变取色器自由调配。主机还可以拥有<strong>自己的颜色</strong>——在主机编辑器中、分组下方设置——它会覆盖分组颜色，对未分组的主机同样有效。</p>
+            <p>颜色可以从快捷色板中选择，在 Android 上也可以用渐变取色器自由调配——iOS 上从色板中选择。主机还可以拥有<strong>自己的颜色</strong>——在主机编辑器中、分组下方设置——它会覆盖分组颜色，对未分组的主机同样有效。</p>
             <p>未分组的主机始终显示在列表顶部；如果不创建任何分组，列表的外观和行为与以前完全相同。</p>
             <h3>列表排序</h3>
             <p>在<strong>设置 → 主机列表排序</strong>中选择列表的排列方式：</p>
@@ -155,11 +162,11 @@ module.exports = {
                 <li><strong>手动</strong>——由你自己设定的顺序。</li>
             </ul>
             <p>前三种方式中分组始终保持字母顺序，因此分组标题不会移动，只有组内的主机重新排列。手动排序时分组也可以移动。</p>
-            <p>要调整顺序，请选择<strong>手动</strong>，然后打开某个主机或分组标题的菜单——<strong>⋮</strong> 按钮、长按，或电视遥控器上的<em>菜单</em>键——并使用<strong>上移</strong> / <strong>下移</strong>。主机只能在自己所属的区块内移动：要放到另一个分组，请在主机编辑器中更改分组。切换到手动时会完整保留当时屏幕上的顺序，因此不会发生跳动；之后新增的主机会排到所属区块的末尾。</p>`,
+            <p>要调整顺序，请选择<strong>手动</strong>，然后打开某个主机或分组标题的菜单——<strong>⋮</strong> 按钮（iOS 上为 <strong>…</strong>）、长按，或Android TV 遥控器上的<em>菜单</em>键——并使用<strong>上移</strong> / <strong>下移</strong>。主机只能在自己所属的区块内移动：要放到另一个分组，请在主机编辑器中更改分组。切换到手动时会完整保留当时屏幕上的顺序，因此不会发生跳动；之后新增的主机会排到所属区块的末尾。</p>`,
 
   doc_sftp: `
             <h2>// SFTP 文件管理器</h2>
-            <p>SFTP 文件管理器让您直接从手机浏览、上传、下载、重命名和删除服务器上的文件。在主机列表界面点击 <strong>SFTP</strong> 开启 SFTP 会话。</p>
+            <p>SFTP 文件管理器让您直接从手机浏览、上传、下载、重命名和删除服务器上的文件。在主机列表界面，通过主机菜单中的<strong>文件</strong>打开它。</p>
             <h3>浏览</h3>
             <p>点击文件夹进入。使用返回箭头或点击路径栏中的任意段落跳转到上级目录。</p>
             <p>符号链接显示有小链接图标角标。点击符号链接会导航到其目标：若指向目录则进入，若指向文件则与普通文件相同。</p>
@@ -177,13 +184,23 @@ module.exports = {
             <ul>
                 <li><strong>下载</strong> — 一次性下载所有选中的文件和文件夹，带进度对话框和取消支持。</li>
                 <li><strong>删除</strong> — 删除所有选中的项目。删除非空文件夹会递归删除其所有内容。<em>此操作不可撤销。</em></li>
-            </ul>`,
+            </ul>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                <ul>
+                    <li><strong>上传</strong> — 打开<strong>操作</strong>菜单（⋯）并选择<em>上传…</em>；通过系统的“文件”浏览器选择文件。</li>
+                    <li><strong>下载保存位置</strong> — 保存到 SSHBorg 自己的文件夹，“文件” App 中显示在<em>我的 iPhone → SSHBorg</em>（iPad 上为<em>我的 iPad</em>）。下载从不覆盖任何文件：若名称已被占用，新文件会得到一个带编号的名称。</li>
+                    <li><strong>文件夹</strong> — 长按文件或文件夹打开其菜单：<em>下载</em>、<em>重命名</em>、<em>删除</em>。</li>
+                    <li><strong>多选</strong> — 在“操作”菜单中选择<em>选择项目</em>，然后勾选项目。长按则会打开该项目的菜单。</li>
+                    <li><strong>上传冲突</strong> — 对话框提供<em>覆盖</em>、<em>保留两者</em>（上传的文件会获得新名称）或<em>取消</em>。</li>
+                </ul>
+            </div>`,
 
   doc_ssh_keys: `
             <h2>// SSH 密钥</h2>
             <p>基于密钥的认证比密码更安全，设置完成后无需记忆或输入任何内容。</p>
             <h3>生成密钥</h3>
-            <p>前往 <strong>设置 → SSH 密钥 → 生成新密钥</strong>。SSHBorg 支持：</p>
+            <p>点击主机列表界面顶部的<strong>钥匙</strong>图标打开 <strong>SSH 密钥</strong>，然后生成新密钥。SSHBorg 支持：</p>
             <ul>
                 <li><strong>Ed25519</strong> — 推荐。快速、紧凑且安全。</li>
                 <li><strong>ECDSA（P-256 / P-384）</strong> — 与旧版服务器有良好兼容性。</li>
@@ -197,7 +214,7 @@ module.exports = {
             <h3>在服务器上授权密钥</h3>
             <p>生成密钥后，点击密钥查看其 <strong>公钥</strong>。复制并粘贴到服务器上目标用户的 <code>~/.ssh/authorized_keys</code> 文件中。</p>
             <ol class="steps">
-                <li>在手机上，打开 SSHBorg → 设置 → SSH 密钥 → 点击密钥 → 复制公钥。</li>
+                <li>在手机上，打开 SSHBorg → SSH 密钥（主机列表界面的钥匙图标）→ 点击密钥 → 复制公钥。</li>
                 <li>登录您的服务器（使用密码或已有密钥）。</li>
                 <li>将公钥追加到授权密钥文件：
                     <pre><code>mkdir -p ~/.ssh
@@ -211,9 +228,10 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
                 <div class="callout-label">// 服务器要求</div>
                 确保服务器的 <code>/etc/ssh/sshd_config</code> 中有 <code>PubkeyAuthentication yes</code>。大多数发行版默认启用，但部分加固镜像可能禁用此选项。
             </div>
-            <h3>密钥额外加密</h3>
-            <p>SSHBorg 提供可选的 <strong>额外密码短语</strong>（设置 → SSH 密钥 → 点击密钥 → 启用加密）。启用后，密钥将使用 SSHBorg 不存储的密码短语加密——每次使用密钥时都需要输入。</p>
-            <p>如果您在手机上存储了敏感服务器凭据，或未启用应用锁，强烈建议启用此功能。</p>`,
+            <h3>加密存储的密钥和密码</h3>
+            <p>开启 <strong>设置 → 安全 → 加密敏感数据</strong>，即可使用保存在设备安全硬件中的密钥（Android 上为 Android 密钥库，iOS 上为钥匙串）加密存储私钥和已保存的主机密码。在您启用之前该选项保持关闭；首次启动时显示的安全提示会指向它。</p>
+            <p>加密数据与设备以及本次安装的应用绑定：卸载应用后，已存储的密钥无法恢复，您需要生成新密钥并重新在服务器上授权。如果您在手机上保存了敏感的服务器凭据，强烈建议同时启用应用锁和此选项。</p>
+            <p>导入受密码短语保护的密钥时，只需在导入时用密码短语解锁一次。</p>`,
 
   doc_suggestions: `
             <h2>// 命令建议</h2>
@@ -256,7 +274,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>滚动历史</strong> — 上下滑动浏览终端回滚缓冲区。</li>
                 <li><strong>缩放</strong> — 捏合手势放大或缩小文字。</li>
-                <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。</li>
+                <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。 在 iOS 上，长按会选中手指下的单词并打开系统菜单，其中有<em>拷贝</em>、<em>粘贴</em>和<em>全选</em>；拖动选区任一端可扩大选区。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
             </ul>
             <p><strong>全屏程序。</strong> 占据整个屏幕的程序 — tmux、vim、nano、less — 没有自己的回滚缓冲区，因此在它们运行期间，视图会停留在当前画面，而不会滑入下面的 shell 输出。</p>
@@ -270,7 +288,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>保持屏幕常亮</strong> — 终端打开时阻止屏幕熄灭。查看日志或运行长时间命令时很实用。默认关闭。</li>
                 <li><strong>默认字体大小</strong> — 新终端会话的初始文字大小；每个会话中仍可用双指缩放。</li>
                 <li><strong>回滚缓冲区</strong>、<strong>反向滚动</strong>和<strong>命令建议</strong> — 分别控制保留多少输出历史、滚动方向，以及上文介绍的建议栏。</li>
-                <li><strong>双击操作</strong> — 可选：在终端双击时发送 <em>Tab</em>（自动补全），或连按两次 <em>Tab</em>（列出所有候选项）。默认关闭。</li>
+                <li><strong>双击操作</strong> — 可选：在终端双击时发送 <em>Tab</em>（自动补全），或连按两次 <em>Tab</em>（列出所有候选项）。默认关闭。 在 iOS 上，此选项关闭时双击会选中一个单词。</li>
             </ul>`,
 
   doc_extra_keys: `
@@ -286,7 +304,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>文字模式</h3>
             <p>拼写检查图标可在<em>终端模式</em>和<em>文字模式</em>之间切换键盘。终端模式（默认）下自动更正和词语建议被禁用——适合输入命令和文件路径。文字模式下键盘像普通文本框一样工作，启用词语建议和自动更正。通过 SSH 输入自然语言时很有用，例如使用 Claude Code 或其他交互式工具。</p>
-            <p>文字模式也是语音输入的前提。键盘的麦克风键需要一个真正的文本框来写入，因此在终端模式下语音输入不会产生任何内容——听写前请切换到文字模式。</p>
+            <p>在 Android 上，文字模式也是语音输入的前提。键盘的麦克风键需要一个真正的文本框来写入，因此在终端模式下语音输入不会产生任何内容——听写前请切换到文字模式。</p>
             <h3>导航与编辑</h3>
             <ul>
                 <li><strong>ESC</strong> — Escape 键。</li>
@@ -308,7 +326,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>自然 ×3</strong> — 同上，另加第三行功能键。</li>
                 <li><strong>精简</strong> — 只有 ESC、Tab、Ctrl 和方向键，适合窄屏。</li>
             </ul>
-            <p>要创建自己的按键栏，可复制一个预设（旁边的 <strong>⋮</strong> 菜单）或新建一个。编辑器会按实际外观显示按键栏：点按一个按键将其选中，然后用下方按钮把它左右移动、移到另一行、更改、在其后添加按键或移除。每一行可以<em>滚动</em>（按键保持自然宽度）或<em>填满</em>屏幕宽度（手机上每行最多约九个按键）。最多三行；按键大小可调。</p>
+            <p>要创建自己的按键栏，可复制一个预设（旁边的 <strong>⋮</strong> 菜单，iOS 上为长按）或新建一个。编辑器会按实际外观显示按键栏：点按一个按键将其选中，然后用下方按钮把它左右移动、移到另一行、更改、在其后添加按键或移除。每一行可以<em>滚动</em>（按键保持自然宽度）或<em>填满</em>屏幕宽度（手机上每行最多约九个按键）。最多三行；按键大小可调。</p>
             <p>除了常规按键，自定义按键栏还可以包含<strong>文本键</strong>：任意文本原样发送——单个 <code>|</code>、<code>sudo </code> 前缀或一整条命令。用 <code>\\n</code> 表示回车、<code>\\t</code> 表示 Tab、<code>\\e</code> 表示 Esc，这样 <code>ls -la\\n</code> 就成了一键宏。另有两个操作键：<strong>固定</strong>在键盘关闭时仍保持按键栏可见，<strong>键盘</strong>显示或隐藏键盘。</p>
             <p>自定义按键栏包含在设置备份中。在 Android TV 上一切都可用遥控器操作：编辑器的按键和按钮都能用方向键到达。</p>`,
 
@@ -344,6 +362,10 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>主机密钥类型：</strong> <code>ssh-dss</code>（DSA 1024-bit）</li>
             </ul>
             <p>服务器始终协商双方都支持的最强算法，因此启用此选项不会削弱与现代服务器的连接安全性。</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                在 iOS 上无法使用 <code>ssh-dss</code> 主机密钥：应用所用的 SSH 库已不再包含 DSA，因此仅提供 DSA 主机密钥的服务器，即使开启此选项，也无法从 iPhone 或 iPad 连接。
+            </div>
             <div class="callout callout-warn">
                 <div class="callout-label">// 安全提示</div>
                 此列表中的算法在密码学上被认为较弱。仅对无法升级的服务器启用此选项。
@@ -360,6 +382,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>空闲超时</strong> — 运营商和 NAT 路由器通常在几分钟后断开空闲连接。长时间运行但静默的会话（查看日志、等待输入）容易受此影响。</li>
                 <li><strong>信号丢失</strong> — 隧道、地下车库或信号弱区域都可能短暂断网，足以终止会话。</li>
                 <li><strong>Android 后台限制</strong> — 为了省电，Android 会限制应用在后台持续运行的时长。在后台累计约六小时后，系统会停止 SSHBorg 的会话；你会收到通知，重新打开应用即可重新连接。将应用切回前台会重置此限制。</li>
+                <li><strong>iOS 会在后台挂起应用</strong> — SSHBorg 离开屏幕约三十秒后，iOS 会将其挂起，连接随之断开。回到应用时，SSHBorg 会自动重新连接（仅在未保存密码时才会询问密码），并在输出中标记该位置：这是一个新的 shell，旧 shell 中运行的内容已经丢失。在 iOS 上，终端复用器是在使用其他应用时让工作继续运行的唯一方法。</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
@@ -459,8 +482,8 @@ Host target
             <p>SSHBorg 允许您同时保持多个 SSH 终端会话和 SFTP 文件管理器会话，甚至可以连接到不同的服务器。</p>
             <ul>
                 <li>在主机列表界面点击 <strong>终端</strong> 或 <strong>SFTP</strong> 开启会话。</li>
-                <li>使用界面顶部的会话选择器在已开启的会话之间切换。</li>
-                <li>只要网络连接正常，会话在后台保持活跃。</li>
+                <li>使用终端下方的标签页在已开启的会话之间切换；拥有多个会话的主机会打开带编号的选择器。</li>
+                <li>只要网络连接正常，会话在后台保持活跃——在 iOS 上只能维持很短时间，参见<a href="#connection-drops">连接断开</a>。</li>
                 <li>主机列表在每台主机旁显示小角标，标明活跃的 SSH 和 SFTP 会话数量，方便一目了然。</li>
             </ul>
             <div class="callout callout-info">
@@ -474,14 +497,22 @@ Host target
             <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁）、<strong>设备锁</strong>（除生物识别外，还可使用设备的 PIN、图案或密码），或应用内 <strong>PIN 或密码短语</strong>。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。</p>
             <p>应用内 <strong>PIN 或密码短语</strong> 可在任何设备上使用，即使没有生物识别硬件或系统屏幕锁——因此它是 Android TV 上的正确选择。更改或移除时会先要求输入当前的。忘记后无法找回：你需要清除应用数据或重新安装，因此请保留主机的备份。</p>
             <p>您可以设置不活动超时——在后台等待该时长后，应用会自动锁定。</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                应用锁提供<strong>无</strong>、<strong>仅生物识别</strong>（面容 ID 或触控 ID）和<strong>设备锁</strong>（设备密码或生物识别）。没有应用内 PIN 或密码短语。
+            </div>
             <h3>截图保护</h3>
             <p>SSHBorg 默认阻止截图和录屏，防止敏感的终端内容通过最近应用界面或截屏工具泄露。</p>
             <p>如果需要截图（例如分享终端输出），可在 <strong>设置 → 安全 → 允许截图</strong> 中临时禁用截图保护。</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                iOS 不允许应用阻止截屏或录屏，因此没有此设置。启用应用锁后，SSHBorg 一离开屏幕就会遮盖其内容，主机和终端不会出现在 App 切换器中。
+            </div>
             <h3>凭据存储</h3>
-            <p>所有凭据（密码、私钥、密码短语）均使用 <strong>Android 密钥库</strong>（Android 10+ 提供的硬件支持的安全飞地）加密存储。它们永不写入外部存储或在任何地方传输。</p>
+            <p>开启<strong>加密敏感数据</strong>后（参见<a href="#ssh-keys">SSH 密钥</a>），密码和私钥会使用保存在 <strong>Android 密钥库</strong>（Android 10+ 上由硬件支持）或 iOS <strong>钥匙串</strong>中、仅限本设备的密钥加密存储。凭据永不写入外部存储，也不会传输到任何地方。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 备份说明</div>
-                由于密钥存储在 Android 密钥库中，它们<strong>无法</strong>通过 Android 云备份机制备份，也不会自动迁移到新手机。更换设备前，请确保在新设备上生成新密钥并在所有服务器上授权。
+                由于加密密钥永远不会离开设备的安全硬件，密钥<strong>无法</strong>从云备份或设备备份中恢复，也不会自动迁移到新手机。更换设备前，请确保在新设备上生成新密钥并在所有服务器上授权。
             </div>`,
 
   doc_android_tv: `
@@ -509,7 +540,7 @@ Host target
                 备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 密钥材料需要在新设备上重新设置。不过备份会记录每个主机所用密钥的<em>名称</em>：如果在导入前重新创建同名密钥，其主机会自动重新关联。
             </div>
             <h3>导出</h3>
-            <p>前往 <strong>设置 → 备份 → 导出备份</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_backup.json</code>。</p>
+            <p>前往 <strong>设置 → 备份 → 导出备份</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_backup.json</code>（iOS 上为 <code>sshborg-backup-</code><em>日期</em><code>.json</code>）。</p>
             <h3>导入</h3>
             <p>前往 <strong>设置 → 备份 → 导入备份</strong>。选择之前导出（或手动创建）的 <code>.json</code> 文件。SSHBorg 将其与现有主机列表合并：</p>
             <ul>

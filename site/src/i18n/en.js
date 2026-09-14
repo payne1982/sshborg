@@ -1,8 +1,8 @@
 'use strict';
 module.exports = {
   // ── index.html ─────────────────────────────────────────────────────────────
-  page_title:        'SSHBorg – SSH & SFTP Client for Android',
-  meta_description:  'SSHBorg is a powerful SSH and SFTP client for Android. Manage your servers securely from your phone with key authentication, encrypted storage, and biometric lock.',
+  page_title:        'SSHBorg – SSH & SFTP Client for Android and iOS',
+  meta_description:  'SSHBorg is a powerful SSH and SFTP client for Android, iPhone and iPad. Manage your servers securely from your phone with key authentication, encrypted storage, and biometric lock.',
 
   nav_features:  'Features',
   nav_security:  'Security',
@@ -12,18 +12,20 @@ module.exports = {
   nav_tip:       'Leave a Tip',
   nav_contact:   'Contact',
 
-  hero_sub: 'A powerful SSH &amp; SFTP client for Android.<br>Manage your servers securely, directly from your phone.',
+  hero_sub: 'A powerful SSH &amp; SFTP client for Android and iOS.<br>Manage your servers securely, directly from your phone.',
 
   badge_no_ads:      'No ads',
   badge_no_tracking: 'No tracking',
   badge_no_cloud:    'No cloud',
   badge_free:        'Free',
   badge_android:     'Android 10+',
+  badge_ios:         'iOS 16+',
 
   cta_download:   'DOWNLOAD',
   cta_play:       'Google Play',
   cta_appgallery: 'AppGallery',
   cta_fdroid:     'F-Droid',
+  cta_appstore:   'App Store',
 
   features_title: '// SYSTEM CAPABILITIES',
 
@@ -36,7 +38,7 @@ module.exports = {
   feat_jump_title:     'JUMP HOST SUPPORT',
   feat_jump_desc:      'Connect through one or more bastion hosts with transparent tunnelling. Full SSH agent forwarding.',
   feat_biometric_title:'APP LOCK',
-  feat_biometric_desc: 'Lock the app with biometrics, your device PIN, or an in-app PIN or passphrase — works even on Android TV without a fingerprint sensor. Configurable timeout.',
+  feat_biometric_desc: 'Lock the app with biometrics or your device passcode — and on Android also with an in-app PIN or passphrase, which works even on Android TV. Configurable timeout.',
   feat_multilingual_title: 'MULTILINGUAL',
   feat_multilingual_desc:  'Available in English, Italian, French, German, Spanish, Portuguese, Ukrainian, Russian, Chinese, and Japanese.',
   feat_theme_title:    'DARK &amp; LIGHT THEME',
@@ -47,10 +49,10 @@ module.exports = {
   security_title: '// PRIVACY FIRST, BY DESIGN',
   security_desc:  'SSHBorg never collects your data. Everything stays on your device — your credentials, your keys, your connections.',
 
-  sec_badge_keystore:   'Android Keystore encryption',
+  sec_badge_keystore:   'Device hardware encryption',
   sec_badge_analytics:  'No analytics',
   sec_badge_sdks:       'No third-party SDKs',
-  sec_badge_screenshots:'Screenshot protection',
+  sec_badge_screenshots:'Screen content protection',
   sec_badge_opensource: 'Open source — GPL v3',
 
   security_pp_link: 'Read the full Privacy Policy &rarr;',
@@ -60,6 +62,11 @@ module.exports = {
   kofi_cta:        'Support me on Ko-fi',
   kofi_hero_cta:   'Leave me a tip',
 
+  support_title:          '// SUPPORT',
+  support_desc:           'Found a bug or have an idea? Open an issue in the repository of the app you use — or just write to me.',
+  support_issues_android: 'Android issues',
+  support_issues_ios:     'iOS issues',
+
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Issues &amp; Feedback',
   footer_source:  'Source Code',
@@ -67,7 +74,7 @@ module.exports = {
 
   // ── docs.html ──────────────────────────────────────────────────────────────
   page_title_docs:       'SSHBorg – User Guide',
-  meta_description_docs: 'SSHBorg user guide: SSH keys, jump hosts, agent forwarding, command suggestions, tmux, and more.',
+  meta_description_docs: 'SSHBorg user guide for Android and iOS: SSH keys, jump hosts, agent forwarding, command suggestions, tmux, and more.',
 
   nav_home:          'Home',
   nav_getting_started:'Getting Started',
@@ -77,7 +84,7 @@ module.exports = {
   nav_backup:        'Backup',
 
   doc_page_title:    '// USER GUIDE',
-  doc_page_subtitle: 'Operational guide — what to do, step by step, to get the most out of SSHBorg.',
+  doc_page_subtitle: 'Operational guide — what to do, step by step, to get the most out of SSHBorg on Android and iOS. Where the iOS app differs, a note marked iOS says so.',
 
   toc_title: '// CONTENTS',
 
@@ -111,7 +118,7 @@ module.exports = {
 
   doc_adding_host: `
             <h2>// ADDING A HOST</h2>
-            <p>Tap the <strong>+</strong> button on the hosts screen to add a new server.</p>
+            <p>Tap the <strong>+</strong> button on the hosts screen to add a new server (on iOS it opens a short menu: choose <em>Add Host</em>).</p>
             <h3>Required fields</h3>
             <ul>
                 <li><strong>Hostname / IP</strong> — the server address or IP. Both IPv4 and IPv6 are supported.</li>
@@ -137,6 +144,7 @@ module.exports = {
                 <li>Choose <strong>New group…</strong>, type a name and pick one of the predefined colors.</li>
                 <li>Save the host — the host list now shows the group as its own section.</li>
             </ol>
+            <p>On iOS a group can also be created on its own, from the <strong>+</strong> button → <em>New group</em>.</p>
             <h3>Working with groups</h3>
             <ul>
                 <li><strong>Collapse / expand</strong> — tap a group header to fold or reopen it. The state is remembered, even after restarting the app.</li>
@@ -144,7 +152,7 @@ module.exports = {
                 <li><strong>Edit</strong> — long-press the group header and choose <em>Edit</em> to rename the group or change its color.</li>
                 <li><strong>Delete</strong> — long-press the header and choose <em>Delete</em>. The hosts in the group are <em>not</em> deleted — they simply become ungrouped.</li>
             </ul>
-            <p>Colors can be picked from the quick swatches or mixed freely with the gradient color picker. A host can also have its <strong>own color</strong> — set it in the host editor, right below the group — which overrides the group color and works for ungrouped hosts too.</p>
+            <p>Colors can be picked from the quick swatches or, on Android, mixed freely with the gradient color picker — on iOS the swatches are the choice. A host can also have its <strong>own color</strong> — set it in the host editor, right below the group — which overrides the group color and works for ungrouped hosts too.</p>
             <p>Hosts without a group stay at the top of the list, and if you never create a group the list looks and behaves exactly as before.</p>
             <h3>List order</h3>
             <p>Choose how the list is arranged in <strong>Settings → Host list order</strong>:</p>
@@ -155,11 +163,11 @@ module.exports = {
                 <li><strong>Manual</strong> — the order you set by hand.</li>
             </ul>
             <p>In the first three modes the groups stay in alphabetical order, so the section headers never move and only the hosts inside them are rearranged. In manual order the groups can be moved as well.</p>
-            <p>To rearrange, pick <strong>Manual</strong>, then open the menu of a host or of a group header — the <strong>⋮</strong> button, a long press, or the <em>Menu</em> key on a TV remote — and use <strong>Move up</strong> / <strong>Move down</strong>. A host only moves inside its own section: to put it in another group, change the group in the host editor. Switching to manual keeps exactly the order that was on screen at that moment, so nothing jumps, and hosts added later go to the end of their section.</p>`,
+            <p>To rearrange, pick <strong>Manual</strong>, then open the menu of a host or of a group header — the <strong>⋮</strong> button (<strong>…</strong> on iOS), a long press, or the <em>Menu</em> key on an Android TV remote — and use <strong>Move up</strong> / <strong>Move down</strong>. A host only moves inside its own section: to put it in another group, change the group in the host editor. Switching to manual keeps exactly the order that was on screen at that moment, so nothing jumps, and hosts added later go to the end of their section.</p>`,
 
   doc_sftp: `
             <h2>// SFTP FILE MANAGER</h2>
-            <p>The SFTP file manager lets you browse, upload, download, rename, and delete files on your server directly from your phone. Open an SFTP session from the hosts screen by tapping <strong>SFTP</strong>.</p>
+            <p>The SFTP file manager lets you browse, upload, download, rename, and delete files on your server directly from your phone. Open it from the hosts screen with <strong>Files</strong> in a host's menu.</p>
             <h3>Navigation</h3>
             <p>Tap a folder to open it. Use the back arrow or tap any segment of the path bar to jump up the directory tree.</p>
             <p>Symbolic links are shown with a small link icon badge. Tapping a symlink navigates to its target: if it points to a directory you enter it, if it points to a file it behaves like a regular file.</p>
@@ -177,13 +185,23 @@ module.exports = {
             <ul>
                 <li><strong>Download</strong> — downloads all selected files and folders at once, with a progress dialog and cancellation support.</li>
                 <li><strong>Delete</strong> — deletes all selected items. Deleting a non-empty folder removes all its contents recursively. <em>There is no undo.</em></li>
-            </ul>`,
+            </ul>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                <ul>
+                    <li><strong>Upload</strong> — open the <strong>Actions</strong> menu (⋯) and choose <em>Upload…</em>; files are picked with the system Files browser.</li>
+                    <li><strong>Where downloads go</strong> — into SSHBorg's own folder, which the Files app shows under <em>On My iPhone → SSHBorg</em> (<em>On My iPad</em> on an iPad). A download never overwrites anything: if the name is taken, the new file gets a numbered name.</li>
+                    <li><strong>Folders</strong> — long-press a file or folder for its menu: <em>Download</em>, <em>Rename</em>, <em>Delete</em>.</li>
+                    <li><strong>Multi-select</strong> — choose <em>Select items</em> in the Actions menu, then tick the items. A long press opens the item's menu instead.</li>
+                    <li><strong>Upload conflicts</strong> — the dialog offers <em>Overwrite</em>, <em>Keep both</em> (the upload gets a new name) or <em>Cancel</em>.</li>
+                </ul>
+            </div>`,
 
   doc_ssh_keys: `
             <h2>// SSH KEYS</h2>
             <p>Key-based authentication is more secure than passwords and does not require you to remember or type anything after setup.</p>
             <h3>Generating a key</h3>
-            <p>Go to <strong>Settings → SSH Keys → Generate new key</strong>. SSHBorg supports:</p>
+            <p>Tap the <strong>key</strong> icon at the top of the hosts screen to open <strong>SSH Keys</strong>, then generate a new key. SSHBorg supports:</p>
             <ul>
                 <li><strong>Ed25519</strong> — recommended. Fast, compact, and secure.</li>
                 <li><strong>ECDSA (P-256 / P-384)</strong> — good compatibility with older servers.</li>
@@ -197,7 +215,7 @@ module.exports = {
             <h3>Authorizing the key on the server</h3>
             <p>After generating a key, tap it to see the <strong>public key</strong>. Copy it and paste it into the server's <code>~/.ssh/authorized_keys</code> file for the user you want to log in as.</p>
             <ol class="steps">
-                <li>On your phone, open SSHBorg → Settings → SSH Keys → tap the key → copy the public key.</li>
+                <li>On your phone, open SSHBorg → SSH Keys (the key icon on the hosts screen) → tap the key → copy the public key.</li>
                 <li>Log into your server (with a password, or another key you already have).</li>
                 <li>Append the public key to the authorized keys file:
                     <pre><code>mkdir -p ~/.ssh
@@ -211,9 +229,10 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
                 <div class="callout-label">// SERVER REQUIREMENT</div>
                 Make sure your server has <code>PubkeyAuthentication yes</code> in <code>/etc/ssh/sshd_config</code>. This is the default on most distributions, but some hardened images disable it.
             </div>
-            <h3>Additional key encryption</h3>
-            <p>SSHBorg offers an optional <strong>additional passphrase</strong> for your keys (Settings → SSH Keys → tap a key → Enable encryption). When enabled, the key is encrypted with a passphrase that SSHBorg does not store — you will be asked to enter it each time the key is used.</p>
-            <p>This is strongly recommended if you store sensitive server credentials on your phone, or if you don't have an app lock enabled.</p>`,
+            <h3>Encrypting stored keys and passwords</h3>
+            <p>Turn on <strong>Settings → Security → Encrypt sensitive data</strong> to store private keys and saved host passwords encrypted with a key held in the device's secure hardware — the Android Keystore, or the Keychain on iOS. It stays off until you enable it; the security tip shown at first launch points to it.</p>
+            <p>Encrypted data is bound to the device and to this installation of the app: after uninstalling, the stored keys cannot be recovered, and you would generate new ones and authorize them on your servers again. Together with an app lock, this is strongly recommended if you keep sensitive server credentials on your phone.</p>
+            <p>A key you import that is protected by a passphrase is unlocked with it once, when you import it.</p>`,
 
   doc_suggestions: `
             <h2>// COMMAND SUGGESTIONS</h2>
@@ -256,7 +275,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>Scroll history</strong> — swipe up or down to browse the terminal's scrollback buffer.</li>
                 <li><strong>Zoom</strong> — pinch to increase or decrease the text size.</li>
-                <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel.</li>
+                <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel. On iOS a long press selects the word under your finger and opens the system menu with <em>Copy</em>, <em>Paste</em> and <em>Select All</em>; drag from either end of the selection to extend it.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
             </ul>
             <p><strong>Full-screen apps.</strong> Programs that take over the whole screen — tmux, vim, nano, less — have no scrollback of their own, so while one is running the view stays on the live screen instead of drifting into the shell output underneath it.</p>
@@ -270,7 +289,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Keep screen on</strong> — prevents the display from turning off while a terminal is open. Handy when watching logs or long-running commands. Off by default.</li>
                 <li><strong>Default font size</strong> — the text size new terminal sessions start with; you can still pinch-zoom each session individually.</li>
                 <li><strong>Scrollback</strong>, <strong>inverted scrolling</strong> and <strong>command suggestions</strong> — control how much output history is kept, the scroll direction, and the suggestion bar described above.</li>
-                <li><strong>Double-tap action</strong> — optionally make a double-tap on the terminal send <em>Tab</em> (auto-complete), or two Tabs (list all candidates). Off by default.</li>
+                <li><strong>Double-tap action</strong> — optionally make a double-tap on the terminal send <em>Tab</em> (auto-complete), or two Tabs (list all candidates). Off by default; on iOS, while it is off, a double-tap selects a word.</li>
             </ul>`,
 
   doc_extra_keys: `
@@ -286,7 +305,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>Word mode</h3>
             <p>The spellcheck icon toggles the keyboard between <em>terminal mode</em> and <em>word mode</em>. In terminal mode (default) autocorrect and word suggestions are disabled — ideal for commands and file paths. In word mode the keyboard behaves like a normal text field, with suggestions and autocorrect enabled. Useful when typing natural language over SSH, for example with Claude Code or other interactive tools.</p>
-            <p>Word mode is also what makes voice typing work. The keyboard's microphone key needs a real text field to write into, so dictation produces nothing in terminal mode — switch to word mode before dictating.</p>
+            <p>On Android, word mode is also what makes voice typing work. The keyboard's microphone key needs a real text field to write into, so dictation produces nothing in terminal mode — switch to word mode before dictating.</p>
             <h3>Navigation and editing</h3>
             <ul>
                 <li><strong>ESC</strong> — Escape key.</li>
@@ -308,7 +327,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Natural ×3</strong> — the same plus a third row with the function keys.</li>
                 <li><strong>Minimal</strong> — just ESC, Tab, Ctrl and the arrows, for narrow screens.</li>
             </ul>
-            <p>To build your own, duplicate a preset (the <strong>⋮</strong> menu next to it) or create a new bar. The editor shows the bar exactly as it will look: tap a key to select it, then use the buttons below to move it left or right, to another row, change it, add a key after it or remove it. Each row can either <em>scroll</em> (keys keep their natural width) or <em>fill</em> the screen width (up to about nine keys per row on a phone). Up to three rows; the key size is adjustable.</p>
+            <p>To build your own, duplicate a preset (the <strong>⋮</strong> menu next to it, or a long press on iOS) or create a new bar. The editor shows the bar exactly as it will look: tap a key to select it, then use the buttons below to move it left or right, to another row, change it, add a key after it or remove it. Each row can either <em>scroll</em> (keys keep their natural width) or <em>fill</em> the screen width (up to about nine keys per row on a phone). Up to three rows; the key size is adjustable.</p>
             <p>Besides the usual keys, a custom bar can hold <strong>text keys</strong>: any text, sent as typed — a single <code>|</code>, a <code>sudo </code> prefix, or a whole command. Use <code>\\n</code> for Enter, <code>\\t</code> for Tab and <code>\\e</code> for Escape, so <code>ls -la\\n</code> becomes a one-tap macro. Two more action keys are available: <strong>pin</strong> keeps the bar visible with the keyboard closed, <strong>keyboard</strong> shows or hides the keyboard.</p>
             <p>Custom bars are included in the settings backup. On Android TV everything works with the remote: the editor's keys and buttons are all reachable with the D-pad.</p>`,
 
@@ -344,6 +363,10 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Host key type:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
             </ul>
             <p>The server always negotiates the strongest algorithm both sides support, so enabling this option does not weaken connections to modern servers — the legacy algorithms are only used when the server cannot offer anything better.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                On iOS <code>ssh-dss</code> host keys are not available: the SSH library the app is built with no longer includes DSA, so a server whose only host key is DSA cannot be reached from an iPhone or iPad, even with this option on.
+            </div>
             <div class="callout callout-warn">
                 <div class="callout-label">// SECURITY NOTE</div>
                 The algorithms in this list are considered cryptographically weak. Enable this option only for servers you cannot upgrade.
@@ -360,6 +383,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Idle timeouts</strong> — carriers and NAT routers often drop idle connections after a few minutes. Long-running but silent sessions (watching logs, waiting for input) are vulnerable to this.</li>
                 <li><strong>Signal loss</strong> — tunnels, underground car parks, or simply a weak signal can briefly drop the network, which is enough to kill a session.</li>
                 <li><strong>Android background limits</strong> — to save battery, Android limits how long an app may keep working in the background. After about six cumulative hours in the background, the system stops SSHBorg's sessions; you get a notification and can reconnect by reopening the app. Bringing the app to the foreground resets this limit.</li>
+                <li><strong>iOS suspends apps in the background</strong> — about thirty seconds after SSHBorg leaves the screen, iOS suspends it and its connections drop. When you come back, SSHBorg reconnects by itself (asking for the password only if none is saved) and marks the spot in the output: it is a new shell, and whatever was running in the old one is gone. On iOS a multiplexer is the only way to keep work running while you use another app.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANT</div>
@@ -459,8 +483,8 @@ Host target
             <p>SSHBorg lets you keep several SSH terminal sessions and SFTP file manager sessions open at the same time, even to different servers.</p>
             <ul>
                 <li>Open a session from the hosts screen by tapping <strong>Terminal</strong> or <strong>SFTP</strong>.</li>
-                <li>Switch between open sessions using the session selector at the top of the screen.</li>
-                <li>Sessions stay alive in the background as long as the network connection holds.</li>
+                <li>Switch between open sessions with the tabs below the terminal; a host with several sessions opens a numbered picker.</li>
+                <li>Sessions stay alive in the background as long as the network connection holds — on iOS only for a short while, see <a href="#connection-drops">Connection Drops</a>.</li>
                 <li>The host list shows a small badge next to each host with the number of active SSH and SFTP sessions, so you can see at a glance what is open.</li>
             </ul>
             <div class="callout callout-info">
@@ -474,14 +498,22 @@ Host target
             <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), <strong>Device lock</strong> (the device PIN, pattern, or password, alongside biometrics), or an in-app <strong>PIN or passphrase</strong>. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
             <p>The in-app <strong>PIN or passphrase</strong> works on any device, even without biometric hardware or a system screen lock — which makes it the right choice on an Android TV. Changing or removing it asks for the current one first. There is no way to recover it if forgotten: you would have to clear the app's data or reinstall, so keep a backup of your hosts.</p>
             <p>You can set an inactivity timeout — after that many minutes in the background the app locks automatically.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                The lock offers <strong>None</strong>, <strong>Biometric only</strong> (Face ID or Touch ID) and <strong>Device lock</strong> (the device passcode or biometrics). There is no in-app PIN or passphrase.
+            </div>
             <h3>Screenshot protection</h3>
             <p>By default SSHBorg blocks screenshots and screen recording to prevent sensitive terminal content from leaking via the recent-apps screen or screen capture tools.</p>
             <p>If you need to take a screenshot (e.g. to share a terminal output), you can temporarily disable screenshot protection in <strong>Settings → Security → Allow screenshots</strong>.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                iOS does not let an app block screenshots or screen recording, so there is no such setting. With an app lock enabled, SSHBorg covers its contents the moment it leaves the screen, so hosts and terminals do not show in the app switcher.
+            </div>
             <h3>Credential storage</h3>
-            <p>All credentials (passwords, private keys, passphrases) are stored encrypted using the <strong>Android Keystore</strong> — a hardware-backed secure enclave available on Android 10+. They are never written to external storage or transmitted anywhere.</p>
+            <p>With <strong>Encrypt sensitive data</strong> turned on (see <a href="#ssh-keys">SSH Keys</a>), passwords and private keys are stored encrypted with a key held in the <strong>Android Keystore</strong> — hardware-backed on Android 10+ — or, on iOS, in the <strong>Keychain</strong>, restricted to this device. Credentials are never written to external storage or transmitted anywhere.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// BACKUP NOTE</div>
-                Because keys are stored in the Android Keystore, they <strong>cannot be backed up</strong> via Android's cloud backup mechanism and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
+                Because the encryption key never leaves the device's secure hardware, keys <strong>cannot be restored</strong> from a cloud or device backup and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
             </div>`,
 
   doc_android_tv: `
@@ -509,7 +541,7 @@ Host target
                 The backup includes your host configurations and app settings (terminal, appearance, behaviour). <strong>Passwords and SSH keys are never exported</strong> — the key material must be set up again on a new device. The backup does record the <em>name</em> of the key each host uses, so if you re-create a key with the same name before importing, its hosts are re-linked to it automatically.
             </div>
             <h3>Exporting</h3>
-            <p>Go to <strong>Settings → Backup → Export backup</strong>. Choose where to save the file using the system file picker. The file is named <code>sshborg_backup.json</code> by default.</p>
+            <p>Go to <strong>Settings → Backup → Export backup</strong>. Choose where to save the file using the system file picker. The file is named <code>sshborg_backup.json</code> by default (<code>sshborg-backup-</code><em>date</em><code>.json</code> on iOS).</p>
             <h3>Importing</h3>
             <p>Go to <strong>Settings → Backup → Import backup</strong>. Select the <code>.json</code> file you previously exported (or created manually). SSHBorg merges it with the existing host list:</p>
             <ul>

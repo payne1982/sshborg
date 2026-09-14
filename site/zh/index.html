@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSHBorg – Android SSH & SFTP 客户端</title>
-    <meta name="description" content="SSHBorg 是一款功能强大的 Android SSH 和 SFTP 客户端。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
+    <title>SSHBorg – Android 与 iOS 的 SSH & SFTP 客户端</title>
+    <meta name="description" content="SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
     <meta name="google-site-verification" content="SZtev8mERq_TIrzE1TF875yUkGgf7diHRQi694RJt-M">
     <link rel="icon" type="image/x-icon"  href="../favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -26,14 +26,14 @@
     <meta property="og:type"        content="website">
     <meta property="og:site_name"   content="SSHBorg">
     <meta property="og:url"         content="https://sshborg.com/zh/">
-    <meta property="og:title"       content="SSHBorg – Android SSH & SFTP 客户端">
-    <meta property="og:description" content="SSHBorg 是一款功能强大的 Android SSH 和 SFTP 客户端。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
+    <meta property="og:title"       content="SSHBorg – Android 与 iOS 的 SSH & SFTP 客户端">
+    <meta property="og:description" content="SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
     <meta property="og:image"       content="https://sshborg.com/logo.png">
     <meta property="og:locale"      content="zh_CN">
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary">
-    <meta name="twitter:title"       content="SSHBorg – Android SSH & SFTP 客户端">
-    <meta name="twitter:description" content="SSHBorg 是一款功能强大的 Android SSH 和 SFTP 客户端。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
+    <meta name="twitter:title"       content="SSHBorg – Android 与 iOS 的 SSH & SFTP 客户端">
+    <meta name="twitter:description" content="SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
     <meta name="twitter:image"       content="https://sshborg.com/logo.png">
     <!-- JSON-LD -->
     <script type="application/ld+json">
@@ -41,12 +41,12 @@
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "SSHBorg",
-      "operatingSystem": "Android",
+      "operatingSystem": "Android, iOS",
       "applicationCategory": "DeveloperApplication",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "description": "SSHBorg 是一款功能强大的 Android SSH 和 SFTP 客户端。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。",
+      "description": "SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。",
       "url": "https://sshborg.com/",
-      "downloadUrl": "https://play.google.com/store/apps/details?id=com.sshborg",
+      "downloadUrl": ["https://play.google.com/store/apps/details?id=com.sshborg", "https://apps.apple.com/app/idXXXXXXXXXX"],
       "inLanguage": "zh-Hans"
     }
     </script>
@@ -393,6 +393,8 @@
         .dl-play:hover   { background: rgba(0,255,136,0.08);  text-shadow: 0 0 8px var(--neon-green); }
         .dl-ag:hover     { background: rgba(0,212,255,0.08);  text-shadow: 0 0 8px var(--neon-blue); }
         .dl-fdroid:hover { background: rgba(200,124,48,0.10); text-shadow: 0 0 8px var(--copper); }
+        .dl-appstore       { color: var(--text); }
+        .dl-appstore:hover { background: rgba(168,212,180,0.08); text-shadow: 0 0 8px var(--text); }
 
         /* ── Section layout ──────────────────────────────────── */
         section {
@@ -504,6 +506,35 @@
             font-size: 0.9em;
             margin-bottom: 28px;
         }
+
+        /* ── Support section ─────────────────────────────────── */
+        .support-section h2 {
+            color: var(--neon-blue);
+            text-shadow: 0 0 6px rgba(0,212,255,0.5);
+        }
+        .support-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .support-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--neon-green);
+            font-family: var(--font-mono);
+            font-size: 0.95em;
+            letter-spacing: 0.06em;
+            padding: 12px 26px;
+            border: 1px solid var(--neon-green);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .support-btn:hover {
+            background: rgba(0,255,136,0.10);
+            box-shadow: 0 0 16px rgba(0,255,136,0.35);
+        }
+        .tip-section p.support-source { margin: 26px 0 0; }
 
         /* ── Footer ──────────────────────────────────────────── */
         footer {
@@ -624,7 +655,7 @@
         <a href="#features">功能</a>
         <a href="#security">安全</a>
         <a href="docs.html">用户指南</a>
-        <a href="https://github.com/payne1982/sshborg/issues">支持</a>
+        <a href="#support">支持</a>
         <a href="../privacy_policy.html" target="_blank" rel="noopener">隐私政策</a>
         <a href="#tip">打赏</a>
         <a href="mailto:massimiliano.playdev AT gmail.com">联系我们</a>
@@ -659,13 +690,14 @@
         <span class="prompt">&gt; </span>TUNNEL READY<span class="ok"> ████████ 100%</span>
     </div>
     <h1>SSHBorg</h1>
-    <p class="hero-sub">功能强大的 Android SSH &amp; SFTP 客户端。<br>直接从手机安全管理您的服务器。</p>
+    <p class="hero-sub">功能强大的 Android 与 iOS SSH &amp; SFTP 客户端。<br>直接从手机安全管理您的服务器。</p>
     <div class="hero-badges">
         <span class="badge badge-green">&#10003; 无广告</span>
         <span class="badge badge-green">&#10003; 无跟踪</span>
         <span class="badge badge-green">&#10003; 无云端</span>
         <span class="badge badge-blue">免费</span>
         <span class="badge badge-blue">Android 10+</span>
+        <span class="badge badge-blue">iOS 16+</span>
     </div>
     <div class="cta-wrap">
         <div class="dl-dropdown" id="dlDropdown">
@@ -687,6 +719,14 @@
                         <path d="M3.18 23.76c.3.17.65.19.97.07l11.65-11.65L12.1 8.48 3.18 23.76zM20.7 10.37l-2.83-1.63-3.19 3.19 3.19 3.19 2.85-1.64c.81-.47.81-1.65-.02-2.11zM2.01 1.05C1.72 1.36 1.56 1.8 1.56 2.34v19.32c0 .54.16.98.46 1.29l.07.07 10.82-10.82v-.25L2.08.98l-.07.07zM12.1 11.18l3.71-3.71-10.62-6.1 6.91 9.81z"/>
                     </svg>
                     <span>Google Play</span>
+                </a>
+                <a class="dl-option dl-appstore"
+                   href="https://apps.apple.com/app/idXXXXXXXXXX"
+                   role="menuitem" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+                    </svg>
+                    <span>App Store</span>
                 </a>
                 <a class="dl-option dl-ag"
                    href="https://appgallery.huawei.com/app/C117647135"
@@ -749,7 +789,7 @@
         <div class="feature-card">
             <div class="feature-icon">&#128274;</div>
             <h3>应用锁</h3>
-            <p>用生物识别、设备 PIN 或应用内 PIN／密码短语锁定应用——即使在没有指纹传感器的 Android TV 上也能使用。超时时间可自定义。</p>
+            <p>用生物识别或设备密码锁定应用——在 Android 上还可以使用应用内 PIN／密码短语，即使在 Android TV 上也能使用。超时时间可自定义。</p>
         </div>
 
         <div class="feature-card">
@@ -781,17 +821,33 @@
         <h2>// 隐私优先，由设计保障</h2>
         <p>SSHBorg 从不收集您的数据。一切留在您的设备上——您的凭据、密钥和连接。</p>
         <div class="security-list">
-            <span class="badge badge-green">Android 密钥库加密</span>
+            <span class="badge badge-green">设备硬件加密</span>
             <span class="badge badge-green">无分析追踪</span>
             <span class="badge badge-green">无第三方 SDK</span>
-            <span class="badge badge-green">截图保护</span>
-            <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener"><span class="badge badge-green">开源 — GPL v3</span></a>
+            <span class="badge badge-green">屏幕内容保护</span>
+            <a href="#support"><span class="badge badge-green">开源 — GPL v3</span></a>
         </div>
         <p style="margin-top:28px;">
             <a href="../privacy_policy.html" target="_blank" rel="noopener">阅读完整隐私政策 &rarr;</a>
         </p>
     </div>
 </section>
+
+<!-- Support -->
+<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+
+<div class="tip-section support-section" id="support">
+    <h2>// 支持</h2>
+    <p>发现了 bug 或有好点子？请在您所用应用的代码仓库中提交 issue——也可以直接给我写信。</p>
+    <div class="support-buttons">
+        <a class="support-btn" href="https://github.com/payne1982/sshborg/issues" target="_blank" rel="noopener">Android 问题反馈</a>
+        <a class="support-btn" href="https://github.com/payne1982/sshborg-ios/issues" target="_blank" rel="noopener">iOS 问题反馈</a>
+    </div>
+    <p class="support-source">
+        源代码: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot;
+        <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a>
+    </p>
+</div>
 
 <!-- Tip -->
 <div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
@@ -810,12 +866,13 @@
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
         <a href="../privacy_policy.html" target="_blank" rel="noopener">隐私政策</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg/issues">问题与反馈</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">源代码</a> &nbsp;&#9135;&nbsp;
+        <a href="#support">问题与反馈</a> &nbsp;&#9135;&nbsp;
+        源代码: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot; <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        SSH 连接由以下驱动 <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a>
+        SSH 连接由以下驱动 <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
+        <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
 

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
-  page_title:        'SSHBorg – Client SSH e SFTP per Android',
-  meta_description:  'SSHBorg è un potente client SSH e SFTP per Android. Gestisci i tuoi server in sicurezza dal telefono con autenticazione a chiave, storage cifrato e blocco biometrico.',
+  page_title:        'SSHBorg – Client SSH e SFTP per Android e iOS',
+  meta_description:  'SSHBorg è un potente client SSH e SFTP per Android, iPhone e iPad. Gestisci i tuoi server in sicurezza dal telefono con autenticazione a chiave, storage cifrato e blocco biometrico.',
 
   nav_features:  'Funzionalità',
   nav_security:  'Sicurezza',
@@ -11,18 +11,20 @@ module.exports = {
   nav_tip:       'Lascia una mancia',
   nav_contact:   'Contatto',
 
-  hero_sub: 'Un potente client SSH &amp; SFTP per Android.<br>Gestisci i tuoi server in sicurezza, direttamente dal telefono.',
+  hero_sub: 'Un potente client SSH &amp; SFTP per Android e iOS.<br>Gestisci i tuoi server in sicurezza, direttamente dal telefono.',
 
   badge_no_ads:      'Senza pubblicità',
   badge_no_tracking: 'Senza tracciamento',
   badge_no_cloud:    'Senza cloud',
   badge_free:        'Gratuito',
   badge_android:     'Android 10+',
+  badge_ios: 'iOS 16+',
 
   cta_download:   'SCARICA',
   cta_play:       'Google Play',
   cta_appgallery: 'AppGallery',
   cta_fdroid:     'F-Droid',
+  cta_appstore: 'App Store',
 
   features_title: '// FUNZIONALITÀ',
 
@@ -35,7 +37,7 @@ module.exports = {
   feat_jump_title:     'JUMP HOST',
   feat_jump_desc:      'Connettiti attraverso uno o più bastion host con tunnelling trasparente. Forwarding completo dell\'agente SSH.',
   feat_biometric_title:'BLOCCO APP',
-  feat_biometric_desc: 'Blocca l\'app con la biometria, il PIN del dispositivo o un PIN/passphrase in-app — funziona anche su Android TV senza sensore di impronte. Timeout configurabile.',
+  feat_biometric_desc: 'Blocca l\'app con la biometria o il codice del dispositivo — e su Android anche con un PIN o una passphrase in-app, che funziona perfino su Android TV. Timeout configurabile.',
   feat_multilingual_title: 'MULTILINGUA',
   feat_multilingual_desc:  'Disponibile in inglese, italiano, francese, tedesco, spagnolo, portoghese, ucraino, russo, cinese e giapponese.',
   feat_theme_title:    'TEMA SCURO E CHIARO',
@@ -46,10 +48,10 @@ module.exports = {
   security_title: '// PRIVACY BY DESIGN',
   security_desc:  'SSHBorg non raccoglie mai i tuoi dati. Tutto rimane sul tuo dispositivo — credenziali, chiavi, connessioni.',
 
-  sec_badge_keystore:   'Cifratura Android Keystore',
+  sec_badge_keystore:   'Cifratura hardware del dispositivo',
   sec_badge_analytics:  'Nessuna analisi',
   sec_badge_sdks:       'Nessun SDK di terze parti',
-  sec_badge_screenshots:'Protezione screenshot',
+  sec_badge_screenshots:'Protezione dei contenuti a schermo',
   sec_badge_opensource: 'Open source — GPL v3',
 
   security_pp_link: 'Leggi la Privacy Policy completa &rarr;',
@@ -58,6 +60,10 @@ module.exports = {
   tip_desc:   'SSHBorg è gratuito, senza pubblicità e senza tracciamento. Se ti fa risparmiare tempo, una piccola mancia aiuta a mantenerlo.',
   kofi_cta:        'Supportami su Ko-fi',
   kofi_hero_cta:   'Lasciami una mancia',
+  support_title: '// SUPPORTO',
+  support_desc: 'Hai trovato un bug o hai un\'idea? Apri una segnalazione nel repository dell\'app che usi — oppure scrivimi.',
+  support_issues_android: 'Segnalazioni Android',
+  support_issues_ios: 'Segnalazioni iOS',
 
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Segnalazioni &amp; Feedback',
@@ -66,7 +72,7 @@ module.exports = {
 
   // ── docs.html ──────────────────────────────────────────────────────────────
   page_title_docs:       'SSHBorg – Guida utente',
-  meta_description_docs: 'Guida operativa di SSHBorg: chiavi SSH, jump host, agent forwarding, suggerimenti comandi, tmux e molto altro.',
+  meta_description_docs: 'Guida operativa di SSHBorg per Android e iOS: chiavi SSH, jump host, agent forwarding, suggerimenti comandi, tmux e molto altro.',
 
   nav_home:           'Home',
   nav_getting_started:'Per iniziare',
@@ -76,7 +82,7 @@ module.exports = {
   nav_backup:         'Backup',
 
   doc_page_title:    '// GUIDA UTENTE',
-  doc_page_subtitle: 'Guida operativa — cosa fare, passo dopo passo, per sfruttare al massimo SSHBorg.',
+  doc_page_subtitle: 'Guida operativa — cosa fare, passo dopo passo, per sfruttare al massimo SSHBorg su Android e iOS. Dove l\'app iOS si comporta diversamente, lo dice una nota contrassegnata iOS.',
 
   toc_title: '// INDICE',
 
@@ -110,7 +116,7 @@ module.exports = {
 
   doc_adding_host: `
             <h2>// AGGIUNGERE UN HOST</h2>
-            <p>Tocca il pulsante <strong>+</strong> nella schermata degli host per aggiungere un nuovo server.</p>
+            <p>Tocca il pulsante <strong>+</strong> nella schermata degli host per aggiungere un nuovo server (su iOS apre un piccolo menu: scegli <em>Aggiungi Host</em>).</p>
             <h3>Campi obbligatori</h3>
             <ul>
                 <li><strong>Hostname / IP</strong> — l'indirizzo o l'IP del server. Sono supportati sia IPv4 che IPv6.</li>
@@ -136,6 +142,7 @@ module.exports = {
                 <li>Scegli <strong>Nuovo gruppo…</strong>, digita un nome e seleziona uno dei colori predefiniti.</li>
                 <li>Salva l'host — l'elenco degli host ora mostra il gruppo come sezione dedicata.</li>
             </ol>
+            <p>Su iOS un gruppo si può creare anche da solo, dal pulsante <strong>+</strong> → <em>Nuovo gruppo</em>.</p>
             <h3>Usare i gruppi</h3>
             <ul>
                 <li><strong>Comprimi / espandi</strong> — tocca l'intestazione di un gruppo per chiuderlo o riaprirlo. Lo stato viene ricordato, anche dopo il riavvio dell'app.</li>
@@ -143,7 +150,7 @@ module.exports = {
                 <li><strong>Modifica</strong> — tieni premuta l'intestazione e scegli <em>Modifica</em> per rinominare il gruppo o cambiarne il colore.</li>
                 <li><strong>Elimina</strong> — tieni premuta l'intestazione e scegli <em>Elimina</em>. Gli host del gruppo <em>non</em> vengono cancellati: tornano semplicemente senza gruppo.</li>
             </ul>
-            <p>I colori si scelgono dagli swatch rapidi o liberamente con il selettore a gradiente. Un host può anche avere un <strong>colore proprio</strong> — si imposta nell'editor dell'host, subito sotto il gruppo — che prevale sul colore del gruppo e funziona anche per gli host senza gruppo.</p>
+            <p>I colori si scelgono dagli swatch rapidi o, su Android, liberamente con il selettore a gradiente — su iOS si sceglie tra gli swatch. Un host può anche avere un <strong>colore proprio</strong> — si imposta nell'editor dell'host, subito sotto il gruppo — che prevale sul colore del gruppo e funziona anche per gli host senza gruppo.</p>
             <p>Gli host senza gruppo restano in cima all'elenco e, se non crei alcun gruppo, l'elenco appare e si comporta esattamente come prima.</p>
             <h3>Ordinamento</h3>
             <p>Scegli come disporre la lista da <strong>Impostazioni → Ordinamento host</strong>:</p>
@@ -154,11 +161,11 @@ module.exports = {
                 <li><strong>Manuale</strong> — l'ordine che imposti tu.</li>
             </ul>
             <p>Nelle prime tre modalità i gruppi restano in ordine alfabetico, così le intestazioni non si spostano mai e cambia solo la disposizione degli host al loro interno. Nell'ordine manuale si possono spostare anche i gruppi.</p>
-            <p>Per riordinare scegli <strong>Manuale</strong>, poi apri il menu di un host o di un'intestazione di gruppo — il pulsante <strong>⋮</strong>, una pressione prolungata oppure il tasto <em>Menu</em> del telecomando su TV — e usa <strong>Sposta su</strong> / <strong>Sposta giù</strong>. Un host si sposta solo dentro la propria sezione: per metterlo in un altro gruppo cambia il gruppo nell'editor dell'host. Passando a manuale viene mantenuto esattamente l'ordine che avevi a schermo in quel momento, quindi non si scompiglia niente, e gli host aggiunti in seguito finiscono in fondo alla loro sezione.</p>`,
+            <p>Per riordinare scegli <strong>Manuale</strong>, poi apri il menu di un host o di un'intestazione di gruppo — il pulsante <strong>⋮</strong> (<strong>…</strong> su iOS), una pressione prolungata oppure il tasto <em>Menu</em> del telecomando su Android TV — e usa <strong>Sposta su</strong> / <strong>Sposta giù</strong>. Un host si sposta solo dentro la propria sezione: per metterlo in un altro gruppo cambia il gruppo nell'editor dell'host. Passando a manuale viene mantenuto esattamente l'ordine che avevi a schermo in quel momento, quindi non si scompiglia niente, e gli host aggiunti in seguito finiscono in fondo alla loro sezione.</p>`,
 
   doc_sftp: `
             <h2>// FILE MANAGER SFTP</h2>
-            <p>Il file manager SFTP ti permette di navigare, caricare, scaricare, rinominare ed eliminare file sul server direttamente dal telefono. Apri una sessione SFTP dalla schermata degli host toccando <strong>SFTP</strong>.</p>
+            <p>Il file manager SFTP ti permette di navigare, caricare, scaricare, rinominare ed eliminare file sul server direttamente dal telefono. Aprilo dalla schermata degli host con <strong>File</strong> nel menu dell'host.</p>
             <h3>Navigazione</h3>
             <p>Tocca una cartella per aprirla. Usa la freccia indietro o tocca qualsiasi segmento della barra del percorso per risalire nell'albero delle directory.</p>
             <p>I link simbolici sono mostrati con un piccolo badge a forma di catena. Toccare un link simbolico naviga verso la sua destinazione: se punta a una cartella la si entra, se punta a un file si comporta come un file normale.</p>
@@ -176,13 +183,23 @@ module.exports = {
             <ul>
                 <li><strong>Scarica</strong> — scarica tutti i file e le cartelle selezionati in una volta, con un dialogo di avanzamento e supporto all'annullamento.</li>
                 <li><strong>Elimina</strong> — elimina tutti gli elementi selezionati. L'eliminazione di una cartella non vuota rimuove tutto il suo contenuto ricorsivamente. <em>Non è possibile annullare l'operazione.</em></li>
-            </ul>`,
+            </ul>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                <ul>
+                    <li><strong>Caricare</strong> — apri il menu <strong>Azioni</strong> (⋯) e scegli <em>Carica…</em>; i file si scelgono con il selettore di sistema dell'app File.</li>
+                    <li><strong>Dove finiscono i download</strong> — nella cartella di SSHBorg, che l'app File mostra in <em>Su iPhone → SSHBorg</em> (<em>Su iPad</em> su un iPad). Un download non sovrascrive mai nulla: se il nome è già usato, il nuovo file riceve un nome numerato.</li>
+                    <li><strong>Cartelle</strong> — tieni premuto un file o una cartella per il suo menu: <em>Scarica</em>, <em>Rinomina</em>, <em>Elimina</em>.</li>
+                    <li><strong>Selezione multipla</strong> — scegli <em>Seleziona elementi</em> nel menu Azioni, poi spunta gli elementi. Una pressione prolungata apre invece il menu dell'elemento.</li>
+                    <li><strong>Conflitti in caricamento</strong> — la finestra offre <em>Sovrascrivi</em>, <em>Mantieni entrambi</em> (il file caricato riceve un nuovo nome) o <em>Annulla</em>.</li>
+                </ul>
+            </div>`,
 
   doc_ssh_keys: `
             <h2>// CHIAVI SSH</h2>
             <p>L'autenticazione tramite chiave è più sicura delle password e, una volta configurata, non richiede di ricordare o digitare nulla.</p>
             <h3>Generare una chiave</h3>
-            <p>Vai in <strong>Impostazioni → Chiavi SSH → Genera nuova chiave</strong>. SSHBorg supporta:</p>
+            <p>Tocca l'icona della <strong>chiave</strong> in alto nella schermata degli host per aprire <strong>Chiavi SSH</strong>, poi genera una nuova chiave. SSHBorg supporta:</p>
             <ul>
                 <li><strong>Ed25519</strong> — consigliata. Veloce, compatta e sicura.</li>
                 <li><strong>ECDSA (P-256 / P-384)</strong> — buona compatibilità con server più vecchi.</li>
@@ -196,7 +213,7 @@ module.exports = {
             <h3>Autorizzare la chiave sul server</h3>
             <p>Dopo aver generato una chiave, toccala per vedere la <strong>chiave pubblica</strong>. Copiala e incollala nel file <code>~/.ssh/authorized_keys</code> del server per l'utente con cui vuoi accedere.</p>
             <ol class="steps">
-                <li>Sul telefono, apri SSHBorg → Impostazioni → Chiavi SSH → tocca la chiave → copia la chiave pubblica.</li>
+                <li>Sul telefono, apri SSHBorg → Chiavi SSH (l'icona della chiave nella schermata degli host) → tocca la chiave → copia la chiave pubblica.</li>
                 <li>Accedi al tuo server (con una password, o un'altra chiave già presente).</li>
                 <li>Aggiungi la chiave pubblica al file delle chiavi autorizzate:
                     <pre><code>mkdir -p ~/.ssh
@@ -210,9 +227,10 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
                 <div class="callout-label">// REQUISITO SERVER</div>
                 Assicurati che il server abbia <code>PubkeyAuthentication yes</code> in <code>/etc/ssh/sshd_config</code>. È il valore predefinito sulla maggior parte delle distribuzioni, ma alcune immagini hardened lo disabilitano.
             </div>
-            <h3>Cifratura aggiuntiva della chiave</h3>
-            <p>SSHBorg offre una <strong>passphrase aggiuntiva</strong> opzionale per le tue chiavi (Impostazioni → Chiavi SSH → tocca una chiave → Abilita cifratura). Quando attiva, la chiave viene cifrata con una passphrase che SSHBorg non memorizza — ti verrà chiesta ogni volta che la chiave viene utilizzata.</p>
-            <p>È fortemente consigliata se conservi credenziali sensibili sul telefono, o se non hai un blocco app attivo.</p>`,
+            <h3>Cifrare chiavi e password salvate</h3>
+            <p>Attiva <strong>Impostazioni → Sicurezza → Cifra dati sensibili</strong> per conservare le chiavi private e le password degli host cifrate con una chiave custodita nell'hardware sicuro del dispositivo — l'Android Keystore, o il Portachiavi su iOS. Resta disattivata finché non la abiliti; il consiglio di sicurezza mostrato al primo avvio la segnala.</p>
+            <p>I dati cifrati sono legati al dispositivo e a questa installazione dell'app: dopo la disinstallazione le chiavi salvate non si possono recuperare, e dovresti generarne di nuove e autorizzarle di nuovo sui server. Insieme a un blocco app, è fortemente consigliata se conservi sul telefono credenziali sensibili.</p>
+            <p>Una chiave importata protetta da passphrase viene sbloccata una sola volta, al momento dell'importazione.</p>`,
 
   doc_suggestions: `
             <h2>// SUGGERIMENTI COMANDI</h2>
@@ -255,7 +273,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>Scorrere la cronologia</strong> — scorri su o giù per navigare nel buffer di scrollback del terminale.</li>
                 <li><strong>Zoom</strong> — pizzica per aumentare o diminuire la dimensione del testo.</li>
-                <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare.</li>
+                <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare. Su iOS una pressione prolungata seleziona la parola sotto il dito e apre il menu di sistema con <em>Copia</em>, <em>Incolla</em> e <em>Seleziona tutto</em>; trascina da un estremo della selezione per estenderla.</li>
                 <li><strong>Incollare</strong> — usa il tasto <em>Incolla</em> nella barra dei tasti extra (visibile quando la tastiera è aperta).</li>
             </ul>
             <p><strong>App a tutto schermo.</strong> I programmi che occupano l'intero schermo — tmux, vim, nano, less — non hanno una cronologia propria, quindi mentre sono in esecuzione la vista resta sulla schermata attiva invece di scivolare nell'output della shell che sta sotto.</p>
@@ -269,7 +287,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Mantieni lo schermo acceso</strong> — impedisce lo spegnimento dello schermo mentre un terminale è aperto. Comodo quando osservi log o comandi di lunga durata. Disattivato di default.</li>
                 <li><strong>Dimensione carattere predefinita</strong> — la dimensione del testo con cui partono le nuove sessioni; puoi comunque usare il pinch-zoom in ogni sessione.</li>
                 <li><strong>Scrollback</strong>, <strong>scorrimento invertito</strong> e <strong>suggerimenti dei comandi</strong> — controllano quanta cronologia di output viene conservata, la direzione dello scorrimento e la barra dei suggerimenti descritta sopra.</li>
-                <li><strong>Azione doppio tocco</strong> — se vuoi, un doppio tocco sul terminale invia <em>Tab</em> (autocompletamento) o due volte <em>Tab</em> (elenca tutti i candidati). Disattivato di default.</li>
+                <li><strong>Azione doppio tocco</strong> — se vuoi, un doppio tocco sul terminale invia <em>Tab</em> (autocompletamento) o due volte <em>Tab</em> (elenca tutti i candidati). Disattivato di default. Su iOS, finché è disattivata, un doppio tocco seleziona una parola.</li>
             </ul>`,
 
   doc_extra_keys: `
@@ -285,7 +303,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             </ul>
             <h3>Modalità parole</h3>
             <p>L'icona di correzione ortografica alterna la tastiera tra <em>modalità terminale</em> e <em>modalità parole</em>. In modalità terminale (predefinita) autocorrettore e suggerimenti di parole sono disabilitati — ideale per comandi e percorsi di file. In modalità parole la tastiera si comporta come un normale campo di testo, con suggerimenti e autocorrettore attivi. Utile quando si digita testo in linguaggio naturale via SSH, ad esempio con Claude Code o altri strumenti interattivi.</p>
-            <p>La modalità parole è anche ciò che fa funzionare la digitazione vocale. Il tasto microfono della tastiera ha bisogno di un vero campo di testo in cui scrivere, quindi in modalità terminale la dettatura non produce nulla — passa alla modalità parole prima di dettare.</p>
+            <p>Su Android la modalità parole è anche ciò che fa funzionare la digitazione vocale. Il tasto microfono della tastiera ha bisogno di un vero campo di testo in cui scrivere, quindi in modalità terminale la dettatura non produce nulla — passa alla modalità parole prima di dettare.</p>
             <h3>Navigazione e modifica</h3>
             <ul>
                 <li><strong>ESC</strong> — tasto Escape.</li>
@@ -307,7 +325,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Naturale ×3</strong> — come sopra più una terza riga con i tasti funzione.</li>
                 <li><strong>Minimale</strong> — solo ESC, Tab, Ctrl e le frecce, per schermi stretti.</li>
             </ul>
-            <p>Per crearne una tua, duplica un preset (menu <strong>⋮</strong> accanto) oppure crea una barra nuova. L'editor mostra la barra esattamente come apparirà: tocca un tasto per selezionarlo, poi usa i pulsanti sotto per spostarlo a sinistra o a destra, in un'altra riga, cambiarlo, aggiungere un tasto dopo di lui o rimuoverlo. Ogni riga può <em>scorrere</em> (i tasti tengono la larghezza naturale) oppure <em>riempire</em> la larghezza dello schermo (fino a circa nove tasti per riga su un telefono). Fino a tre righe; la dimensione dei tasti è regolabile.</p>
+            <p>Per crearne una tua, duplica un preset (menu <strong>⋮</strong> accanto, o una pressione prolungata su iOS) oppure crea una barra nuova. L'editor mostra la barra esattamente come apparirà: tocca un tasto per selezionarlo, poi usa i pulsanti sotto per spostarlo a sinistra o a destra, in un'altra riga, cambiarlo, aggiungere un tasto dopo di lui o rimuoverlo. Ogni riga può <em>scorrere</em> (i tasti tengono la larghezza naturale) oppure <em>riempire</em> la larghezza dello schermo (fino a circa nove tasti per riga su un telefono). Fino a tre righe; la dimensione dei tasti è regolabile.</p>
             <p>Oltre ai tasti soliti, una barra personalizzata può contenere <strong>tasti di testo</strong>: un testo qualsiasi, inviato così com'è — un singolo <code>|</code>, un prefisso <code>sudo </code> o un comando intero. Usa <code>\\n</code> per Invio, <code>\\t</code> per Tab e <code>\\e</code> per Esc, così <code>ls -la\\n</code> diventa una macro a un tocco. Ci sono altri due tasti azione: <strong>puntina</strong> tiene la barra visibile a tastiera chiusa, <strong>tastiera</strong> mostra o nasconde la tastiera.</p>
             <p>Le barre personalizzate sono incluse nel backup delle impostazioni. Su Android TV funziona tutto col telecomando: tasti e pulsanti dell'editor sono raggiungibili col D-pad.</p>`,
 
@@ -343,6 +361,10 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Tipo chiave host:</strong> <code>ssh-dss</code> (DSA 1024-bit)</li>
             </ul>
             <p>Il server negozia sempre l'algoritmo più forte disponibile su entrambi i lati, quindi abilitare questa opzione non indebolisce le connessioni ai server moderni — gli algoritmi legacy vengono usati solo se il server non può offrire nulla di meglio.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                Su iOS le chiavi host <code>ssh-dss</code> non sono disponibili: la libreria SSH con cui è compilata l'app non include più DSA, quindi un server che ha solo una chiave host DSA non è raggiungibile da iPhone o iPad, nemmeno con questa opzione attiva.
+            </div>
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA DI SICUREZZA</div>
                 Gli algoritmi in questo elenco sono considerati crittograficamente deboli. Abilitare questa opzione solo per server che non è possibile aggiornare.
@@ -359,6 +381,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Timeout di inattività</strong> — operatori e router NAT spesso chiudono le connessioni inattive dopo pochi minuti. Le sessioni attive ma silenziose (guardare log, aspettare input) sono vulnerabili a questo.</li>
                 <li><strong>Perdita di segnale</strong> — tunnel, parcheggi sotterranei o semplicemente un segnale debole possono interrompere brevemente la rete, il che è sufficiente per uccidere una sessione.</li>
                 <li><strong>Limiti di Android in background</strong> — per risparmiare batteria, Android limita quanto a lungo un'app può restare attiva in background. Dopo circa sei ore cumulative in background, il sistema interrompe le sessioni di SSHBorg; ricevi una notifica e puoi riconnetterti riaprendo l'app. Riportare l'app in primo piano azzera questo limite.</li>
+                <li><strong>iOS sospende le app in background</strong> — circa trenta secondi dopo che SSHBorg lascia lo schermo, iOS lo sospende e le sue connessioni cadono. Quando torni, SSHBorg si riconnette da solo (chiedendo la password solo se non è salvata) e segna il punto nell'output: è una nuova shell, e ciò che girava in quella vecchia è perso. Su iOS un multiplexer è l'unico modo per lasciare un lavoro in esecuzione mentre usi un'altra app.</li>
             </ul>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
@@ -458,8 +481,8 @@ Host target
             <p>SSHBorg permette di tenere aperte più sessioni di terminale SSH e di file manager SFTP contemporaneamente, anche verso server diversi.</p>
             <ul>
                 <li>Apri una sessione dalla schermata degli host toccando <strong>Terminale</strong> o <strong>SFTP</strong>.</li>
-                <li>Passa da una sessione all'altra usando il selettore di sessioni in cima alla schermata.</li>
-                <li>Le sessioni rimangono attive in background finché la connessione di rete regge.</li>
+                <li>Passa da una sessione all'altra con le schede sotto il terminale; un host con più sessioni apre un selettore numerato.</li>
+                <li>Le sessioni rimangono attive in background finché la connessione di rete regge — su iOS solo per poco, vedi <a href="#connection-drops">Connessioni instabili</a>.</li>
                 <li>L'elenco degli host mostra un piccolo badge accanto a ogni host con il numero di sessioni SSH e SFTP attive, così puoi vedere a colpo d'occhio cosa è aperto.</li>
             </ul>
             <div class="callout callout-info">
@@ -473,14 +496,22 @@ Host target
             <p>Scegli come proteggere l'app in <strong>Impostazioni → Sicurezza → Blocco app</strong>: <strong>Nessuno</strong> (predefinito), <strong>Solo biometrico</strong> (impronta digitale o riconoscimento facciale), <strong>Blocco del dispositivo</strong> (il PIN, la sequenza o la password del dispositivo, oltre alla biometria) o un <strong>PIN o passphrase</strong> in-app. Quando un blocco è attivo, SSHBorg richiede l'autenticazione prima di mostrare qualsiasi host, credenziale o dato di sessione.</p>
             <p>Il <strong>PIN o passphrase</strong> in-app funziona su qualsiasi dispositivo, anche senza hardware biometrico o un blocco schermo di sistema — per questo è la scelta giusta su una Android TV. Per cambiarlo o rimuoverlo viene chiesto prima quello attuale. Non è recuperabile se dimenticato: dovresti cancellare i dati dell'app o reinstallarla, quindi tieni un backup dei tuoi host.</p>
             <p>Puoi impostare un timeout di inattività — dopo quel numero di minuti in background l'app si blocca automaticamente.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                Il blocco offre <strong>Nessuno</strong>, <strong>Solo biometrico</strong> (Face ID o Touch ID) e <strong>Blocco del dispositivo</strong> (il codice del dispositivo o la biometria). Non esiste un PIN o una passphrase in-app.
+            </div>
             <h3>Protezione screenshot</h3>
             <p>Per impostazione predefinita SSHBorg blocca screenshot e registrazione dello schermo per evitare che il contenuto sensibile del terminale trapeli tramite la schermata delle app recenti o strumenti di cattura dello schermo.</p>
             <p>Se devi fare uno screenshot (es. per condividere un output del terminale), puoi disabilitare temporaneamente la protezione in <strong>Impostazioni → Sicurezza → Consenti screenshot</strong>.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                iOS non permette a un'app di bloccare screenshot o registrazioni dello schermo, quindi questa impostazione non esiste. Con un blocco app attivo, SSHBorg copre i propri contenuti appena lascia lo schermo, così host e terminali non compaiono nel multitasking.
+            </div>
             <h3>Archiviazione delle credenziali</h3>
-            <p>Tutte le credenziali (password, chiavi private, passphrase) sono memorizzate cifrate usando l'<strong>Android Keystore</strong> — un enclave sicuro basato su hardware disponibile su Android 10+. Non vengono mai scritte su storage esterno né trasmesse da nessuna parte.</p>
+            <p>Con <strong>Cifra dati sensibili</strong> attiva (vedi <a href="#ssh-keys">Chiavi SSH</a>), password e chiavi private sono conservate cifrate con una chiave custodita nell'<strong>Android Keystore</strong> — basato su hardware su Android 10+ — o, su iOS, nel <strong>Portachiavi</strong>, limitata a questo dispositivo. Le credenziali non vengono mai scritte su storage esterno né trasmesse da nessuna parte.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA SUL BACKUP</div>
-                Poiché le chiavi sono memorizzate nell'Android Keystore, <strong>non possono essere salvate nel backup</strong> cloud di Android e non si trasferiranno automaticamente su un nuovo telefono. Prima di cambiare dispositivo, assicurati di autorizzare una nuova chiave generata sul nuovo dispositivo su tutti i tuoi server.
+                Poiché la chiave di cifratura non lascia mai l'hardware sicuro del dispositivo, le chiavi <strong>non possono essere ripristinate</strong> da un backup cloud o del dispositivo e non si trasferiranno automaticamente su un nuovo telefono. Prima di cambiare dispositivo, assicurati di autorizzare una nuova chiave generata sul nuovo dispositivo su tutti i tuoi server.
             </div>`,
 
   doc_android_tv: `
@@ -508,7 +539,7 @@ Host target
                 Il backup include le configurazioni degli host e le impostazioni dell'app (terminale, aspetto, comportamento). <strong>Password e chiavi SSH non vengono mai esportate</strong> — il materiale della chiave va riconfigurato su un nuovo dispositivo. Il backup registra però il <em>nome</em> della chiave usata da ogni host: se ricrei una chiave con lo stesso nome prima di importare, i suoi host vengono ricollegati automaticamente.
             </div>
             <h3>Esportare</h3>
-            <p>Vai in <strong>Impostazioni → Backup → Esporta backup</strong>. Scegli dove salvare il file tramite il selettore file di sistema. Il file si chiama <code>sshborg_backup.json</code> per impostazione predefinita.</p>
+            <p>Vai in <strong>Impostazioni → Backup → Esporta backup</strong>. Scegli dove salvare il file tramite il selettore file di sistema. Il file si chiama <code>sshborg_backup.json</code> (<code>sshborg-backup-</code><em>data</em><code>.json</code> su iOS) per impostazione predefinita.</p>
             <h3>Importare</h3>
             <p>Vai in <strong>Impostazioni → Backup → Importa backup</strong>. Seleziona il file <code>.json</code> precedentemente esportato (o creato manualmente). SSHBorg lo unirà alla lista degli host esistenti:</p>
             <ul>
