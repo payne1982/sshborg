@@ -3,3 +3,4 @@
 • Fixed keys in the key bar that could keep repeating after you let go
 • Word mode now pauses command suggestions
 • Fixed connections through a jump host that could stay loading forever
+• Android TV: the selected key or button is now clearly highlighted

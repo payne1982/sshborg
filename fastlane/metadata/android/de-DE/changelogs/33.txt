@@ -3,3 +3,4 @@
 • Tasten der Tastenleiste, die nach dem Loslassen weiter wiederholten, korrigiert
 • Der Wortmodus pausiert jetzt die Befehlsvorschläge
 • Verbindungen über einen Jump-Host, die endlos luden, korrigiert
+• Android TV: ausgewählte Tasten und Schaltflächen sind jetzt gut sichtbar

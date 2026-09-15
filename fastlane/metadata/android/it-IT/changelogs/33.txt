@@ -3,3 +3,4 @@
 • Sistemati i tasti della barra che a volte continuavano a ripetersi dopo il rilascio
 • La modalità parola ora mette in pausa i suggerimenti dei comandi
 • Sistemate le connessioni tramite jump host che potevano restare a caricare all'infinito
+• Android TV: ora si vede bene il tasto o il pulsante selezionato
