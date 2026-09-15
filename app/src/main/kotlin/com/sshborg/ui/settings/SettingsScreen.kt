@@ -29,6 +29,7 @@ import com.sshborg.R
 import com.sshborg.data.AppPreferences
 import com.sshborg.isTelevision
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.FocusOutlinedButton
 import com.sshborg.ui.common.SettingSelect
 import com.sshborg.ui.common.TvSelectField
 import com.sshborg.ui.common.TvTapField
@@ -440,7 +441,7 @@ fun SettingsScreen(
                 // A button rather than a clickable row: reachable by D-pad, same style as
                 // the app-lock "Change" action.
                 trailingContent = {
-                    OutlinedButton(onClick = onExtraBars) {
+                    FocusOutlinedButton(onClick = onExtraBars) {
                         Text(stringResource(R.string.settings_extra_bar_customize_title))
                     }
                 },
@@ -578,7 +579,7 @@ fun SettingsScreen(
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_change_secret)) },
                     trailingContent = {
-                        OutlinedButton(onClick = { lockDialogIsChange = true; showLockSecretDialog = true }) {
+                        FocusOutlinedButton(onClick = { lockDialogIsChange = true; showLockSecretDialog = true }) {
                             Text(stringResource(R.string.action_change))
                         }
                     },
@@ -697,7 +698,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_export_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_export_subtitle)) },
                 trailingContent = {
-                    OutlinedButton(onClick = { exportLauncher.launch("sshborg_backup.json") }) {
+                    FocusOutlinedButton(onClick = { exportLauncher.launch("sshborg_backup.json") }) {
                         Text(stringResource(R.string.settings_backup_export_action))
                     }
                 },
@@ -711,7 +712,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_import_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_import_subtitle)) },
                 trailingContent = {
-                    OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
+                    FocusOutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
                         Text(stringResource(R.string.settings_backup_import_action))
                     }
                 },
@@ -756,7 +757,7 @@ fun SettingsScreen(
             title = { Text(stringResource(R.string.settings_encrypt_dialog_title)) },
             text  = { Text(stringResource(R.string.settings_encrypt_dialog_body)) },
             confirmButton = {
-                OutlinedButton(onClick = {
+                FocusOutlinedButton(onClick = {
                     showEnableEncryptionDialog = false
                     vm.enableKeystoreEncryption()
                 }) { Text(stringResource(R.string.action_enable)) }
