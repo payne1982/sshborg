@@ -316,7 +316,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <h3>Funktionstasten</h3>
             <p>Scrolle die Leiste nach rechts, um die Tasten <strong>F1 bis F12</strong> zu erreichen.</p>
             <h3>Layouts und eigene Leisten</h3>
-            <p>Die Leiste gibt es in mehreren Layouts. Tippe auf die Taste <strong>⇄</strong> in der Leiste, um zu wechseln: Die Tasten machen der Liste der verfügbaren Leisten Platz, eine antippen, fertig — die Wahl wird gespeichert. Leisten lassen sich auch unter <strong>Einstellungen → Terminal → Layout der Zusatztastenleiste → Anpassen</strong> auswählen und verwalten.</p>
+            <p>Die Leiste gibt es in mehreren Layouts. Tippe auf die Taste <strong>⇄</strong> in der Leiste, um zu wechseln: Die Tasten machen der Liste der verfügbaren Leisten Platz, eine antippen, fertig — die Wahl wird gespeichert. Leisten lassen sich auch unter <strong>Einstellungen → Terminal → Zusatztastenleiste → Anpassen</strong> auswählen und verwalten.</p>
             <ul>
                 <li><strong>Standard</strong> — die klassische einzelne, scrollende Reihe.</li>
                 <li><strong>Natürlich</strong> — eine Reihe nach Nutzungshäufigkeit, mit <code>/ - | ~</code> und den Pfeilen in Tastaturreihenfolge (← ↑ ↓ →).</li>

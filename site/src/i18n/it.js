@@ -317,7 +317,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <h3>Tasti funzione</h3>
             <p>Scorri la barra verso destra per raggiungere i tasti <strong>da F1 a F12</strong>.</p>
             <h3>Layout e barre personalizzate</h3>
-            <p>La barra esiste in più layout. Tocca il tasto <strong>⇄</strong> sulla barra per cambiarlo: i tasti lasciano il posto all'elenco delle barre disponibili, ne tocchi una e hai finito — la scelta viene ricordata. Puoi scegliere e gestire le barre anche da <strong>Impostazioni → Terminale → Layout barra tasti extra → Personalizza</strong>.</p>
+            <p>La barra esiste in più layout. Tocca il tasto <strong>⇄</strong> sulla barra per cambiarlo: i tasti lasciano il posto all'elenco delle barre disponibili, ne tocchi una e hai finito — la scelta viene ricordata. Puoi scegliere e gestire le barre anche da <strong>Impostazioni → Terminale → Barra tasti extra → Personalizza</strong>.</p>
             <ul>
                 <li><strong>Standard</strong> — la classica riga singola a scorrimento.</li>
                 <li><strong>Naturale</strong> — una riga ordinata per frequenza d'uso, con <code>/ - | ~</code> e le frecce nell'ordine della tastiera (← ↑ ↓ →).</li>

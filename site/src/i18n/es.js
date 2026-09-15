@@ -316,7 +316,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <h3>Teclas de función</h3>
             <p>Desplaza la barra hacia la derecha para acceder a las teclas <strong>F1 a F12</strong>.</p>
             <h3>Diseños y barras personalizadas</h3>
-            <p>La barra tiene varios diseños. Toca la tecla <strong>⇄</strong> de la barra para cambiar: las teclas dejan sitio a la lista de barras disponibles, tocas una y listo — la elección se recuerda. También puedes elegir y gestionar las barras en <strong>Ajustes → Terminal → Diseño de la barra de teclas extra → Personalizar</strong>.</p>
+            <p>La barra tiene varios diseños. Toca la tecla <strong>⇄</strong> de la barra para cambiar: las teclas dejan sitio a la lista de barras disponibles, tocas una y listo — la elección se recuerda. También puedes elegir y gestionar las barras en <strong>Ajustes → Terminal → Barra de teclas extra → Personalizar</strong>.</p>
             <ul>
                 <li><strong>Estándar</strong> — la clásica fila única con desplazamiento.</li>
                 <li><strong>Natural</strong> — una fila ordenada por frecuencia de uso, con <code>/ - | ~</code> y las flechas en el orden del teclado (← ↑ ↓ →).</li>

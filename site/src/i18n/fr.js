@@ -316,7 +316,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <h3>Touches de fonction</h3>
             <p>Faites défiler la barre vers la droite pour atteindre les touches <strong>F1 à F12</strong>.</p>
             <h3>Dispositions et barres personnalisées</h3>
-            <p>La barre existe en plusieurs dispositions. Touchez la touche <strong>⇄</strong> de la barre pour changer : les touches laissent place à la liste des barres disponibles, touchez-en une et c'est fait — le choix est mémorisé. Vous pouvez aussi choisir et gérer les barres dans <strong>Paramètres → Terminal → Disposition de la barre de touches → Personnaliser</strong>.</p>
+            <p>La barre existe en plusieurs dispositions. Touchez la touche <strong>⇄</strong> de la barre pour changer : les touches laissent place à la liste des barres disponibles, touchez-en une et c'est fait — le choix est mémorisé. Vous pouvez aussi choisir et gérer les barres dans <strong>Paramètres → Terminal → Barre de touches → Personnaliser</strong>.</p>
             <ul>
                 <li><strong>Standard</strong> — la rangée unique classique, qui défile.</li>
                 <li><strong>Naturelle</strong> — une rangée ordonnée par fréquence d'usage, avec <code>/ - | ~</code> et les flèches dans l'ordre du clavier (← ↑ ↓ →).</li>

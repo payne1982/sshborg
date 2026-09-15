@@ -319,7 +319,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <h3>Function keys</h3>
             <p>Scroll the bar to the right to reach <strong>F1 through F12</strong>.</p>
             <h3>Layouts and custom bars</h3>
-            <p>The bar comes in several layouts. Tap the <strong>⇄</strong> key on the bar to switch: the keys make room for the list of available bars, tap one and you are done — the choice is remembered. You can also pick and manage bars in <strong>Settings → Terminal → Extra key bar layout → Customise</strong>.</p>
+            <p>The bar comes in several layouts. Tap the <strong>⇄</strong> key on the bar to switch: the keys make room for the list of available bars, tap one and you are done — the choice is remembered. You can also pick and manage bars in <strong>Settings → Terminal → Extra key bar → Customise</strong>.</p>
             <ul>
                 <li><strong>Standard</strong> — the classic single scrolling row.</li>
                 <li><strong>Natural</strong> — one row ordered by frequency of use, with <code>/ - | ~</code> and the arrows in keyboard order (← ↑ ↓ →).</li>
