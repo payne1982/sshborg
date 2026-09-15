@@ -52,4 +52,12 @@ data class HostEntity(
     val groupId: Long? = null,
     /** Optional per-host ARGB color; overrides the group color. Null = group color or default. */
     val color: Int? = null,
+    /**
+     * Position inside its section (ungrouped block or group) for the manual list order.
+     * Null until the manual order is first seeded, and on every host created afterwards,
+     * which is what makes new hosts land at the end of their section. See HostSort.
+     */
+    val position: Int? = null,
+    /** How many terminal sessions were opened to this host; drives the "most used" order. */
+    val connectCount: Int = 0,
 )

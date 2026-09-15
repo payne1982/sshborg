@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
+import com.sshborg.data.AppPreferences
 import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
@@ -83,6 +84,15 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     val extraKeysBarPinned: StateFlow<Boolean> =
         prefs.extraKeysBarPinned.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val hostSortMode: StateFlow<Int> =
+        prefs.hostSortMode.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000), AppPreferences.HOST_SORT_ALPHA,
+        )
+
+    fun setHostSortMode(mode: Int) {
+        viewModelScope.launch { prefs.setHostSortMode(mode) }
+    }
 
     /** The extra-key bar in use, for the Settings row label. */
     val extraBar: StateFlow<ExtraBar> =
@@ -226,6 +236,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     groupsArr.put(JSONObject().apply {
                         put("name", g.name)
                         put("color", g.color)
+                        g.position?.let { put("position", it) }
                     })
                 }
                 val arr = JSONArray()
@@ -247,10 +258,15 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         h.keyId?.let { id -> keyLabelById[id]?.let { put("keyLabel", it) } }
                         h.groupId?.let { gid -> groupNameById[gid]?.let { put("group", it) } }
                         h.color?.let { put("color", it) }
+                        // Host list order (#16): without these a restore loses the manual
+                        // arrangement and both usage-based orders start from scratch.
+                        h.position?.let { put("position", it) }
+                        h.lastConnected?.let { put("lastConnected", it) }
+                        if (h.connectCount > 0) put("connectCount", h.connectCount)
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 6)
+                    put("version", 7)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
@@ -281,12 +297,13 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         val g = groupsArr.getJSONObject(i)
                         val name = g.getString("name")
                         val color = g.optInt("color", com.sshborg.data.db.GroupEntity.SWATCHES[0])
+                        val position = if (g.has("position")) g.getInt("position") else null
                         val existing = groupDao.getByName(name)
                         groupIdByName[name] =
                             if (existing != null) {
-                                groupDao.upsert(existing.copy(color = color)); existing.id
+                                groupDao.upsert(existing.copy(color = color, position = existing.position ?: position)); existing.id
                             } else {
-                                groupDao.upsert(com.sshborg.data.db.GroupEntity(name = name, color = color))
+                                groupDao.upsert(com.sshborg.data.db.GroupEntity(name = name, color = color, position = position))
                             }
                     }
                 }
@@ -321,7 +338,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         encryptedPassword = null,
                         knownHostsEntry = null,
                         agentForwarding = o.optBoolean("agentForwarding", false),
-                        lastConnected = null,
+                        lastConnected = if (o.has("lastConnected")) o.getLong("lastConnected") else null,
                         jumpHosts = o.optString("jumpHosts").takeIf { it.isNotEmpty() },
                         jumpHostKeys = null,
                         portForwardings = o.optString("portForwardings").takeIf { it.isNotEmpty() },
@@ -333,6 +350,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         allowLegacyCiphers = o.optBoolean("allowLegacyCiphers", false),
                         groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
                         color = if (o.has("color")) o.getInt("color") else null,
+                        position = if (o.has("position")) o.getInt("position") else null,
+                        connectCount = o.optInt("connectCount", 0),
                     )
                 }
                 val existingByLabel = hostDao.getAllOnce().associateBy { it.label }
@@ -342,7 +361,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     if (existing != null) {
                         // Preserve the fields the backup never carries so re-importing over
                         // an existing host doesn't wipe its credentials or saved state:
-                        // the password and last-connected time always stay. The key link is
+                        // the password always stays, and so does local usage data (last
+                        // connection, counter, manual position) — the backup only fills in
+                        // what this install has never recorded. The key link is
                         // kept too, but a host with no key adopts a same-named key resolved
                         // from the backup (existing.keyId ?: host.keyId) — never overwriting
                         // one already set, and never clearing it when the backup omits the name.
@@ -363,7 +384,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                             encryptedPassword = existing.encryptedPassword,
                             knownHostsEntry   = if (keepHostKey) existing.knownHostsEntry else null,
                             jumpHostKeys      = if (keepJumpKeys) existing.jumpHostKeys else null,
-                            lastConnected     = existing.lastConnected,
+                            // Local usage data and manual position win when present; the
+                            // backup's values fill in only what this install doesn't have.
+                            lastConnected     = existing.lastConnected ?: host.lastConnected,
+                            connectCount      = maxOf(existing.connectCount, host.connectCount),
+                            position          = existing.position ?: host.position,
                         ))
                         updated++
                     } else { hostDao.upsert(host); inserted++ }

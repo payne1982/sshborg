@@ -242,9 +242,13 @@ fun TerminalScreen(
                 // History suggestion chips — when keyboard is open and there are suggestions,
                 // or always when sticky mode is enabled (to prevent terminal resizing)
                 val suggestionsBarSticky by vm.suggestionsBarSticky.collectAsState()
-                if (imeVisible && (suggestions.isNotEmpty() || suggestionsBarSticky)) {
+                // Paused in word mode: the keyboard shows its own suggestion strip there, and
+                // ours would compete with it. Emptying the list rather than hiding the row keeps
+                // sticky mode's promise — reserved height, so the terminal doesn't resize.
+                val shownSuggestions = if (wordMode) emptyList() else suggestions
+                if (imeVisible && (shownSuggestions.isNotEmpty() || suggestionsBarSticky)) {
                     SuggestionRow(
-                        suggestions = suggestions,
+                        suggestions = shownSuggestions,
                         sticky = suggestionsBarSticky,
                         onSelect = { cmd ->
                             val currentInput = vm.getCurrentInputForCompletion()

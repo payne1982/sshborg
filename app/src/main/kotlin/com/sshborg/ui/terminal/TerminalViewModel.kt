@@ -316,7 +316,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         if (jCurrent.knownHostsEntry == null)
                             hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
-                    hostDao.updateLastConnected(hostId, System.currentTimeMillis())
+                    hostDao.recordConnection(hostId, System.currentTimeMillis())
                     lastConnectParams = SshConnectionParams(
                         hostname           = host.hostname,
                         port               = host.port,

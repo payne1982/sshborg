@@ -287,6 +287,15 @@
         }
         .callout-info .callout-label { color: var(--neon-blue); }
         .callout-warn .callout-label { color: var(--copper); }
+        /* Where the iOS app behaves differently from the Android one. */
+        .callout-ios {
+            border-color: var(--neon-green);
+            background: rgba(0,255,136,0.04);
+            color: var(--text);
+        }
+        .callout-ios .callout-label { color: var(--neon-green); }
+        .callout ul { margin: 6px 0 0; }
+        .callout li { font-size: 1em; }
 
         /* ── Steps ───────────────────────────────────────────── */
         .steps { counter-reset: step; padding-left: 0; list-style: none; margin-bottom: 14px; }
@@ -460,7 +469,7 @@
         <a href="#ssh-keys">{{nav_ssh_keys}}</a>
         <a href="#jump-hosts">{{nav_jump_hosts}}</a>
         <a href="#backup">{{nav_backup}}</a>
-        <a href="https://github.com/payne1982/sshborg/issues">{{nav_support}}</a>
+        <a href="index.html#support">{{nav_support}}</a>
         <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
     </div>
     <div class="nav-right">
@@ -565,12 +574,13 @@
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
         <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg/issues">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
-        <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">{{footer_source}}</a> &nbsp;&#9135;&nbsp;
+        <a href="index.html#support">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
+        {{footer_source}}: <a href="{{REPO_ANDROID}}" target="_blank" rel="noopener">Android</a> &middot; <a href="{{REPO_IOS}}" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a>
+        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
+        <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
 

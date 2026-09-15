@@ -22,4 +22,7 @@ interface GroupDao {
 
     @Query("UPDATE host_groups SET collapsed = :collapsed WHERE id = :id")
     suspend fun setCollapsed(id: Long, collapsed: Boolean)
+
+    @Query("UPDATE host_groups SET position = :position WHERE id = :id")
+    suspend fun updatePosition(id: Long, position: Int)
 }

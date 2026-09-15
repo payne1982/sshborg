@@ -150,6 +150,9 @@
     <string name="settings_section_security">Sicurezza</string>
     <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
+    <string name="settings_section_about">Informazioni</string>
+    <string name="settings_about_app">SSHBorg per Android</string>
+    <string name="settings_about_version">Versione %1$s (%2$d)</string>
 
     <string name="settings_confirm_exit_title">Conferma uscita</string>
     <string name="settings_confirm_exit_subtitle">Chiedi conferma prima di chiudere l\'app</string>
@@ -175,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Mostra suggerimenti dalla cronologia shell del server mentre si digita nel terminale</string>
     <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra dei suggerimenti a dimensione fissa per evitare il ridimensionamento del terminale quando i suggerimenti compaiono o scompaiono</string>
-    <string name="settings_extra_keys_bar_title">Tasti extra sempre visibili</string>
-    <string name="settings_extra_keys_bar_subtitle">Mantiene visibile la barra dei tasti extra (Ctrl, frecce, tasti F…) anche a tastiera chiusa. Puoi cambiarlo anche con il pin sulla barra.</string>
+    <string name="settings_extra_keys_bar_title">Sempre visibile</string>
+    <string name="settings_extra_keys_bar_subtitle">Anche a tastiera chiusa. Puoi cambiarlo anche con il pin sulla barra.</string>
 
     <string name="settings_app_lock_title">Blocco app</string>
     <string name="settings_lock_mode_none">Nessuno</string>
@@ -392,7 +395,8 @@
     <string name="color_hue">Tonalità</string>
     <string name="color_saturation">Saturazione</string>
     <string name="color_brightness">Luminosità</string>
-    <string name="settings_extra_bar_layout_title">Layout barra tasti extra</string>
+    <string name="settings_section_extra_bar">Barra tasti extra</string>
+    <string name="settings_extra_bar_layout_title">Tasti e disposizione</string>
     <string name="extra_bar_preset_standard">Standard</string>
     <string name="extra_bar_preset_natural">Naturale</string>
     <string name="extra_bar_preset_natural_2">Naturale ×2</string>
@@ -401,7 +405,7 @@
     <string name="terminal_switch_bar_cd">Cambia barra tasti</string>
     <string name="terminal_keyboard_cd">Mostra o nascondi tastiera</string>
     <string name="settings_extra_bar_customize_title">Personalizza</string>
-    <string name="settings_extra_bar_in_use">In uso: %1$s</string>
+    <string name="settings_extra_bar_in_use">Layout in uso: %1$s</string>
     <string name="extra_bars_title">Barre tasti extra</string>
     <string name="extra_bars_section_custom">Le tue barre</string>
     <string name="extra_bars_section_presets">Preset</string>
@@ -446,4 +450,12 @@
     <string name="extra_key_action_word_mode">Modalità parola</string>
     <string name="extra_key_action_switch">Cambia barra</string>
     <string name="extra_key_action_keyboard">Tastiera</string>
+    <string name="settings_host_sort_title">Ordinamento host</string>
+    <string name="settings_host_sort_subtitle">I gruppi restano alfabetici tranne nell\'ordine manuale</string>
+    <string name="settings_host_sort_alpha">Alfabetico</string>
+    <string name="settings_host_sort_recent">Recenti</string>
+    <string name="settings_host_sort_popular">Più usati</string>
+    <string name="settings_host_sort_manual">Manuale</string>
+    <string name="hosts_move_up">Sposta su</string>
+    <string name="hosts_move_down">Sposta giù</string>
 </resources>

@@ -2,7 +2,13 @@ package com.sshborg.data.ssh
 
 import com.sshborg.BuildConfig
 import com.jcraft.jsch.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -15,6 +21,170 @@ import java.util.Properties
 object SshManager {
 
     /**
+     * Blocking JSch calls run here rather than in the caller's scope. A socket read cannot be
+     * interrupted, so a connect stuck in one would hold a cancelled caller until it returned —
+     * which, through a jump host, is never. Off the caller's job tree the caller leaves at
+     * once and [ConnectGuard.abort] takes the half-built chain down behind it.
+     */
+    private val connectScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** How often the watchdog looks at the clock. */
+    private const val DEADLINE_TICK_MS = 250L
+
+    /** How long the liveness probe waits for the jump host to grant a channel. */
+    private const val PROBE_MS = 5_000
+
+    /**
+     * Holds the sessions an attempt has opened so far, so they can be closed from outside.
+     *
+     * Closing them is the only way to end a stuck connect: JSch applies its read timeout only
+     * when [com.jcraft.jsch.Proxy.getSocket] hands it a real socket, and a hop tunnelled
+     * through [JumpProxy] has none — so the handshake with the final host of a jump chain
+     * waits on a pipe with no deadline of any kind.
+     */
+    private class ConnectGuard(
+        private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+    ) {
+        private val sessions = mutableListOf<Session>()
+        private val jumpHops = mutableListOf<Session>()
+        private var aborted = false
+
+        /** Set while a host-key dialog is up, so the user's own thinking time isn't counted. */
+        @Volatile var waitingForUser = false
+
+        /** True when the watchdog, and not the caller, ended the attempt. */
+        @Volatile var timedOut = false
+
+        /** What the attempt was last seen doing, and the thread doing it. */
+        @Volatile private var stage = "starting"
+        @Volatile private var worker: Thread? = null
+        @Volatile private var stuck: Throwable? = null
+
+        /** What the liveness probe found, when one was run. */
+        @Volatile private var jumpAnswered: Boolean? = null
+
+        /**
+         * Marks the stage the attempt has reached. Cheap on purpose — it runs on the connect
+         * path — and it is the only thing that can tell the four ways a jump connect stalls
+         * apart afterwards: the TCP connect to the bastion, the bastion's own handshake, the
+         * tunnel being opened, and the handshake with the final host.
+         */
+        fun at(stage: String) {
+            this.stage = stage
+            worker = Thread.currentThread()
+        }
+
+        /**
+         * Photographs the blocked thread. Must run *before* [abort], which unblocks it: a
+         * moment later the interesting frame is gone and the stack shows the unwinding.
+         */
+        fun captureStuckFrame() {
+            val frames = worker?.stackTrace ?: return
+            stuck = Throwable("blocked while $stage").apply { stackTrace = frames }
+        }
+
+        /**
+         * Asks the last jump hop for a channel, to find out whether it is still talking to us
+         * at all. It answers the one question the stack alone cannot: a stall waiting for the
+         * final host means either that the host stayed silent, or that the way back from the
+         * jump host closed while we waited — the same symptom, two different machines at
+         * fault. Must run before [abort], while the hop is still connected.
+         */
+        fun probeJumpLiveness() {
+            val hop = synchronized(this) { jumpHops.lastOrNull() } ?: return
+            jumpAnswered = runCatching {
+                val channel = hop.openChannel("session")
+                try { channel.connect(PROBE_MS) } finally { runCatching { channel.disconnect() } }
+                true
+            }.getOrDefault(false)
+        }
+
+        /** The failure to report, carrying the stage in its message and the frames as cause. */
+        val timeoutError: JSchException
+            get() {
+                val verdict = when (jumpAnswered) {
+                    true  -> " (the jump host was still answering, the host itself was not)"
+                    false -> " (the jump host had stopped answering too)"
+                    null  -> ""
+                }
+                return JSchException("Connection timed out while $stage$verdict", stuck)
+            }
+
+        /** The host-key callback, wrapped so it stops the clock for as long as it blocks. */
+        val verify: (String, String, String) -> Boolean = { hostname, fingerprint, keyLine ->
+            waitingForUser = true
+            try { onHostKeyVerify(hostname, fingerprint, keyLine) } finally { waitingForUser = false }
+        }
+
+        @Synchronized fun track(session: Session) {
+            if (aborted) runCatching { session.disconnect() } else sessions.add(session)
+        }
+
+        /** As [track], but the hop is also the one the liveness probe will question. */
+        @Synchronized fun trackJump(session: Session) {
+            track(session)
+            if (!aborted) jumpHops.add(session)
+        }
+
+        /** Closes everything opened so far; safe to call more than once. */
+        @Synchronized fun abort() {
+            aborted = true
+            sessions.forEach { runCatching { it.disconnect() } }
+            sessions.clear()
+            jumpHops.clear()
+        }
+    }
+
+    /**
+     * Runs one connect attempt under a deadline, off the caller's job tree.
+     *
+     * Two things end it early: the watchdog, when the attempt has spent its budget, and the
+     * caller being cancelled — the X in the connecting overlay. Both land on
+     * [ConnectGuard.abort]: closing the sockets is what unblocks the JSch thread, which no
+     * cancellation can reach on its own, and it also keeps a cancelled attempt from leaving an
+     * authenticated session behind on the jump host.
+     */
+    private suspend fun <T> guardedConnect(
+        params: SshConnectionParams,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        block: suspend (ConnectGuard) -> T,
+    ): T {
+        val guard = ConnectGuard(onHostKeyVerify)
+        // A hop's worth of handshake on top of the base budget for every jump in the chain.
+        val budgetMs = 30_000L + 15_000L * params.jumpHosts.size
+        // One attempt, deliberately: retrying automatically would paper over the stall while
+        // we are still working out which machine causes it, and a failure nobody sees is a
+        // failure nobody can diagnose. The retry belongs here once that is settled.
+        val work = connectScope.async { block(guard) }
+        val watchdog = connectScope.launch {
+            var left = budgetMs
+            while (left > 0) {
+                delay(DEADLINE_TICK_MS)
+                if (!guard.waitingForUser) left -= DEADLINE_TICK_MS
+            }
+            if (!work.isActive) return@launch
+            guard.timedOut = true
+            guard.captureStuckFrame()
+            guard.probeJumpLiveness()
+            guard.abort()
+        }
+        try {
+            val session = work.await()
+            // The watchdog can fire in the instant the attempt finishes; it is already closing
+            // what we are holding, so don't hand the caller a session on its way out.
+            if (guard.timedOut) throw guard.timeoutError
+            return session
+        } catch (e: Throwable) {
+            guard.abort()
+            work.cancel()
+            if (guard.timedOut && e !is CancellationException) throw guard.timeoutError
+            throw e
+        } finally {
+            watchdog.cancel()
+        }
+    }
+
+    /**
      * Opens an interactive shell session.
      */
     suspend fun openShell(
@@ -23,9 +193,9 @@ object SshManager {
         columns: Int = 80,
         rows: Int = 24,
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
-    ): ShellSession = withContext(Dispatchers.IO) {
+    ): ShellSession = guardedConnect(params, onHostKeyVerify) { guard -> runInterruptible {
 
-        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, onHostKeyVerify)
+        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
@@ -45,11 +215,12 @@ object SshManager {
         // helper thread and the writer-thread tracking entirely.
         val channelOutput = channel.outputStream
 
+        guard.at("opening the shell")
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
         ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
-    }
+    } }
 
     /**
      * Opens an SFTP session.
@@ -57,20 +228,24 @@ object SshManager {
     suspend fun openSftp(
         params: SshConnectionParams,
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
-    ): SftpSession = withContext(Dispatchers.IO) {
+    ): SftpSession = guardedConnect(params, onHostKeyVerify) { guard ->
 
-        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, onHostKeyVerify)
+        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) =
+            runInterruptible { createSession(params, guard) }
 
-        val channel = session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp
-        channel.connect(10_000)
+        val channel = runInterruptible {
+            guard.at("opening the SFTP channel")
+            (session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp).also { it.connect(10_000) }
+        }
 
+        // Tighter than the attempt's own deadline: the transport is up by now, so a pwd that
+        // doesn't come back means the SFTP channel itself is wedged.
         val homePath = withTimeoutOrNull(5_000) {
-            runInterruptible { runCatching { channel.pwd() }.getOrDefault("/") }
+            runInterruptible { guard.at("reading the remote home directory"); runCatching { channel.pwd() }.getOrDefault("/") }
         } ?: run {
-            runCatching { channel.disconnect() }
-            runCatching { session.disconnect() }
-            jumpSessions.forEach { runCatching { it.disconnect() } }
-            throw JSchException("Connection timed out")
+            guard.captureStuckFrame()
+            guard.abort()
+            throw guard.timeoutError
         }
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
         SftpSession(session, channel, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates, homePath)
@@ -93,7 +268,7 @@ object SshManager {
      */
     private fun createSession(
         params: SshConnectionParams,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        guard: ConnectGuard,
     ): SessionResult {
         // ── 1. Build jump-host chain ────────────────────────────────────────────
         val jumpSessions = mutableListOf<Session>()
@@ -101,7 +276,7 @@ object SshManager {
         val newJumpHostKeyUpdates = mutableListOf<Pair<Long, String>>()
         var proxy: com.jcraft.jsch.Proxy? = null
 
-        for (jump in params.jumpHosts) {
+        for ((hop, jump) in params.jumpHosts.withIndex()) {
             // Use per-hop auth if provided (host-list mode), otherwise fall back to target auth
             val jumpAuth = jump.auth ?: params.auth
 
@@ -119,6 +294,7 @@ object SshManager {
             }
 
             val jumpSession = jumpJsch.getSession(jump.username ?: params.username, jump.host, jump.port)
+            guard.trackJump(jumpSession)
             if (proxy != null) jumpSession.setProxy(proxy)
 
             jumpSession.setUserInfo(object : UserInfo, UIKeyboardInteractive {
@@ -136,7 +312,7 @@ object SshManager {
                     val fp = message?.lines()
                         ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
                         ?: message ?: "unknown"
-                    return onHostKeyVerify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
+                    return guard.verify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
                 }
                 override fun showMessage(message: String?) {}
                 override fun promptKeyboardInteractive(
@@ -163,10 +339,13 @@ object SshManager {
             }
             jumpSession.setConfig(jumpConfig)
             jumpSession.setServerAliveInterval(15_000)
-            jumpSession.setServerAliveCountMax(6)
+            jumpSession.setServerAliveCountMax(20)
 
+            // The read timeout connect() leaves behind is deliberately kept — see the note on
+            // the target session below.
+            guard.at(if (proxy == null) "connecting to jump host ${hop + 1}"
+                     else "connecting to jump host ${hop + 1} through the previous hop")
             jumpSession.connect(20_000)
-            jumpSession.setTimeout(0)
 
             // Collect the host key so we can persist it if it was unknown
             if (jump.knownHostsEntry.isNullOrBlank()) {
@@ -203,6 +382,7 @@ object SshManager {
         }
 
         val session = jsch.getSession(params.username, params.hostname, params.port)
+        guard.track(session)
         if (proxy != null) session.setProxy(proxy)
 
         // Tag the session with the jump sessions so ShellSession/SftpSession can clean them up
@@ -221,7 +401,7 @@ object SshManager {
                 val fp = message?.lines()
                     ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
                     ?: message ?: "unknown"
-                return onHostKeyVerify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
+                return guard.verify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
             }
             override fun showMessage(message: String?) {}
             // Servers with `PasswordAuthentication no` but `KbdInteractiveAuthentication yes`
@@ -249,10 +429,18 @@ object SshManager {
             if (params.allowLegacyCiphers) applyLegacyCiphers(this)
         }
         session.setConfig(config)
-        // Keepalive every 15s, give up after 6 missed (~90s). Frequent probes keep the WiFi
-        // path warm (see the WifiLock in SshForegroundService) and detect a real death sooner.
+        // Keepalive every 15s, give up after 20 missed (~5 minutes). The two numbers answer
+        // different questions. The interval keeps the path warm (see the WifiLock in
+        // SshForegroundService) and wants to stay short. The count decides how long a silence
+        // is tolerated before the session is declared dead, and wants to be generous: a tunnel
+        // or a lift is a silence a TCP connection often survives, and until 2026-09 the count
+        // never ran at all — setTimeout(0) after connect had disabled the mechanism — so no
+        // session was ever given up this way. A connection that dies with an actual error
+        // still reports immediately; this threshold only governs the silent, half-open case.
+        // Note the count advances only while the app is running: a frozen process wakes to a
+        // single expired read, not to one per minute spent frozen.
         session.setServerAliveInterval(15_000)
-        session.setServerAliveCountMax(6)
+        session.setServerAliveCountMax(20)
 
         // Bug in JSch mwiede 0.2.19: ChannelSession.setAgentForwarding(true) sets only the
         // channel-level flag but never sets Session.agent_forwarding. Fix via reflection.
@@ -264,11 +452,18 @@ object SshManager {
             } catch (_: Exception) {}
         }
 
+        guard.at(if (proxy == null) "connecting to the host"
+                 else "connecting to the host through the jump chain")
         session.connect(20_000)
-        // JSch leaves a residual socket read timeout from the connect phase — reset to infinite.
-        session.setTimeout(0)
+        // Deliberately no setTimeout(0) here. JSch drives its keepalive entirely off the socket
+        // read timeout: the reader thread takes a SocketTimeoutException, sends a probe, and
+        // gives up after serverAliveCountMax of them. connect() leaves that timeout at exactly
+        // serverAliveInterval, so resetting it to infinite — which we did from before the
+        // keepalives existed until 2026-09 — silently stopped every probe from ever being sent,
+        // and a half-dead connection was then never detected.
 
         // Activate local port-forwarding rules (-L).
+        guard.at("setting up port forwarding")
         for (pf in params.portForwardings) {
             session.setPortForwardingL(pf.bindAddress, pf.localPort, pf.remoteHost, pf.remotePort)
         }
@@ -279,6 +474,8 @@ object SshManager {
     /** JSch [Proxy] implementation that tunnels through an already-connected SSH [Session]. */
     private class JumpProxy(private val via: Session) : com.jcraft.jsch.Proxy {
         private var channel: com.jcraft.jsch.ChannelDirectTCPIP? = null
+        private var tunnelIn: java.io.InputStream? = null
+        private var tunnelOut: java.io.OutputStream? = null
 
         override fun connect(sf: com.jcraft.jsch.SocketFactory?, host: String, port: Int, timeout: Int) {
             val ch = via.openChannel("direct-tcpip") as com.jcraft.jsch.ChannelDirectTCPIP
@@ -286,12 +483,25 @@ object SshManager {
             ch.setPort(port)
             ch.setOrgIPAddress("127.0.0.1")
             ch.setOrgPort(0)
+            // Both streams BEFORE connect, and not as a matter of taste: getInputStream() is
+            // what installs the pipe that arriving channel data is written into, and until it
+            // has run Channel.write() hits a NullPointerException on the missing stream and
+            // *swallows it* — the bytes are dropped without a trace. The jump host confirms
+            // the channel only once its own connection to the target is up, so the target's
+            // SSH banner can be immediately behind that confirmation, in the same read: the
+            // jump session's reader thread then hands both to the channel while our thread is
+            // still on its way back out of connect(). Losing the banner deadlocks the
+            // handshake — we go on waiting for a greeting that will not be sent twice, the
+            // target waits for the key exchange we cannot start. JSch knows the trap and logs
+            // "getInputStream() should be called before connect()" when it catches us late.
+            tunnelIn = ch.inputStream
+            tunnelOut = ch.outputStream
             ch.connect(if (timeout <= 0) 20_000 else timeout)
             channel = ch
         }
 
-        override fun getInputStream(): java.io.InputStream = channel!!.inputStream
-        override fun getOutputStream(): java.io.OutputStream = channel!!.outputStream
+        override fun getInputStream(): java.io.InputStream = tunnelIn!!
+        override fun getOutputStream(): java.io.OutputStream = tunnelOut!!
         override fun getSocket(): java.net.Socket? = null
         override fun close() { runCatching { channel?.disconnect() } }
     }

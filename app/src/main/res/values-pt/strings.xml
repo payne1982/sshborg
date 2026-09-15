@@ -150,6 +150,9 @@
     <string name="settings_section_security">Segurança</string>
     <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
+    <string name="settings_section_about">Informações</string>
+    <string name="settings_about_app">SSHBorg para Android</string>
+    <string name="settings_about_version">Versão %1$s (%2$d)</string>
 
     <string name="settings_confirm_exit_title">Confirmar saída</string>
     <string name="settings_confirm_exit_subtitle">Pedir confirmação antes de fechar a aplicação</string>
@@ -175,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Mostrar sugestões do histórico de shell do servidor ao digitar no terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barra de sugestões sempre visível</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantém a barra de sugestões em altura fixa para evitar o redimensionamento do terminal</string>
-    <string name="settings_extra_keys_bar_title">Teclas extra sempre visíveis</string>
-    <string name="settings_extra_keys_bar_subtitle">Mantém a barra de teclas extra (Ctrl, setas, teclas F…) visível mesmo com o teclado fechado. Também pode alterná-la com o pin na barra.</string>
+    <string name="settings_extra_keys_bar_title">Sempre visível</string>
+    <string name="settings_extra_keys_bar_subtitle">Mesmo com o teclado fechado. Também pode alternar com o pin na barra.</string>
 
     <string name="settings_app_lock_title">Bloqueio da app</string>
     <string name="settings_lock_mode_none">Nenhum</string>
@@ -391,7 +394,8 @@
     <string name="color_hue">Matiz</string>
     <string name="color_saturation">Saturação</string>
     <string name="color_brightness">Brilho</string>
-    <string name="settings_extra_bar_layout_title">Disposição da barra de teclas extra</string>
+    <string name="settings_section_extra_bar">Barra de teclas extra</string>
+    <string name="settings_extra_bar_layout_title">Teclas e disposição</string>
     <string name="extra_bar_preset_standard">Padrão</string>
     <string name="extra_bar_preset_natural">Natural</string>
     <string name="extra_bar_preset_natural_2">Natural ×2</string>
@@ -400,7 +404,7 @@
     <string name="terminal_switch_bar_cd">Mudar barra de teclas</string>
     <string name="terminal_keyboard_cd">Mostrar ou ocultar o teclado</string>
     <string name="settings_extra_bar_customize_title">Personalizar</string>
-    <string name="settings_extra_bar_in_use">Em uso: %1$s</string>
+    <string name="settings_extra_bar_in_use">Disposição atual: %1$s</string>
     <string name="extra_bars_title">Barras de teclas extra</string>
     <string name="extra_bars_section_custom">As suas barras</string>
     <string name="extra_bars_section_presets">Predefinições</string>
@@ -445,4 +449,12 @@
     <string name="extra_key_action_word_mode">Modo palavra</string>
     <string name="extra_key_action_switch">Mudar barra</string>
     <string name="extra_key_action_keyboard">Teclado</string>
+    <string name="settings_host_sort_title">Ordem da lista de hosts</string>
+    <string name="settings_host_sort_subtitle">Os grupos ficam alfabéticos exceto na ordem manual</string>
+    <string name="settings_host_sort_alpha">Alfabética</string>
+    <string name="settings_host_sort_recent">Usados recentemente</string>
+    <string name="settings_host_sort_popular">Mais usados</string>
+    <string name="settings_host_sort_manual">Manual</string>
+    <string name="hosts_move_up">Mover para cima</string>
+    <string name="hosts_move_down">Mover para baixo</string>
 </resources>

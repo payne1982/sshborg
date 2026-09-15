@@ -1,0 +1,6 @@
+• Vous pouvez désormais trier la liste des hôtes et des groupes (alphabétique, récents, les plus utilisés ou manuel)
+• Correction du défilement dans les apps plein écran comme tmux, vim, nano et less
+• Correction des touches de la barre qui continuaient à se répéter une fois relâchées
+• Le mode mot met en pause les suggestions de commandes
+• Correction des connexions via un hôte de saut qui pouvaient charger indéfiniment
+• Android TV : touche ou bouton sélectionné désormais bien visible

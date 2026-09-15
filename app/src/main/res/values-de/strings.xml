@@ -150,6 +150,9 @@
     <string name="settings_section_security">Sicherheit</string>
     <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Backup</string>
+    <string name="settings_section_about">Info</string>
+    <string name="settings_about_app">SSHBorg für Android</string>
+    <string name="settings_about_version">Version %1$s (%2$d)</string>
 
     <string name="settings_confirm_exit_title">Beenden bestätigen</string>
     <string name="settings_confirm_exit_subtitle">Vor dem Schließen der App um Bestätigung bitten</string>
@@ -175,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Vorschläge aus der Shell-Historie des Servers beim Tippen im Terminal anzeigen</string>
     <string name="settings_suggestions_bar_sticky_title">Vorschlagsleiste immer sichtbar</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Hält die Vorschlagsleiste auf fester Höhe, um Größenänderungen des Terminals zu vermeiden</string>
-    <string name="settings_extra_keys_bar_title">Zusatztasten immer sichtbar</string>
-    <string name="settings_extra_keys_bar_subtitle">Hält die Zusatztastenleiste (Strg, Pfeile, F-Tasten…) auch bei geschlossener Tastatur sichtbar. Auch über die Pinnadel auf der Leiste umschaltbar.</string>
+    <string name="settings_extra_keys_bar_title">Immer sichtbar</string>
+    <string name="settings_extra_keys_bar_subtitle">Auch bei geschlossener Tastatur. Auch über die Pinnadel auf der Leiste umschaltbar.</string>
 
     <string name="settings_app_lock_title">App-Sperre</string>
     <string name="settings_lock_mode_none">Keine</string>
@@ -391,7 +394,8 @@
     <string name="color_hue">Farbton</string>
     <string name="color_saturation">Sättigung</string>
     <string name="color_brightness">Helligkeit</string>
-    <string name="settings_extra_bar_layout_title">Layout der Zusatztastenleiste</string>
+    <string name="settings_section_extra_bar">Zusatztastenleiste</string>
+    <string name="settings_extra_bar_layout_title">Tasten und Anordnung</string>
     <string name="extra_bar_preset_standard">Standard</string>
     <string name="extra_bar_preset_natural">Natürlich</string>
     <string name="extra_bar_preset_natural_2">Natürlich ×2</string>
@@ -400,7 +404,7 @@
     <string name="terminal_switch_bar_cd">Tastenleiste wechseln</string>
     <string name="terminal_keyboard_cd">Tastatur ein- oder ausblenden</string>
     <string name="settings_extra_bar_customize_title">Anpassen</string>
-    <string name="settings_extra_bar_in_use">In Verwendung: %1$s</string>
+    <string name="settings_extra_bar_in_use">Aktives Layout: %1$s</string>
     <string name="extra_bars_title">Zusatztastenleisten</string>
     <string name="extra_bars_section_custom">Deine Leisten</string>
     <string name="extra_bars_section_presets">Vorlagen</string>
@@ -445,4 +449,12 @@
     <string name="extra_key_action_word_mode">Wortmodus</string>
     <string name="extra_key_action_switch">Leiste wechseln</string>
     <string name="extra_key_action_keyboard">Tastatur</string>
+    <string name="settings_host_sort_title">Reihenfolge der Hostliste</string>
+    <string name="settings_host_sort_subtitle">Gruppen bleiben alphabetisch, außer bei manueller Reihenfolge</string>
+    <string name="settings_host_sort_alpha">Alphabetisch</string>
+    <string name="settings_host_sort_recent">Zuletzt verwendet</string>
+    <string name="settings_host_sort_popular">Am meisten verwendet</string>
+    <string name="settings_host_sort_manual">Manuell</string>
+    <string name="hosts_move_up">Nach oben</string>
+    <string name="hosts_move_down">Nach unten</string>
 </resources>

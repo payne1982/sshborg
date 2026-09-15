@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -58,6 +60,7 @@ import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.ExtraKeyDef
 import com.sshborg.data.ModKey
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -66,10 +69,21 @@ private val ExtraKeyFont = FontFamily(
     Font(R.font.roboto_condensed_regular),
     Font(R.font.roboto_condensed_bold, FontWeight.Bold),
 )
-private val ArrowKeyFont = FontFamily(
-    Font(R.font.jetbrains_mono_regular),
-    Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
-)
+/**
+ * Arrow glyphs in the terminal's own font, loaded from the assets the [com.sshborg.terminal
+ * .TerminalView] already ships. The Nerd Font is a superset of plain JetBrains Mono, so the
+ * plain pair in res/font was 544 KB of duplicate outlines for four arrows.
+ */
+@Composable
+private fun arrowKeyFont(): FontFamily {
+    val assets = LocalContext.current.assets
+    return remember(assets) {
+        FontFamily(
+            Font("fonts/JetBrainsMonoNerdFontMono-Regular.ttf", assets),
+            Font("fonts/JetBrainsMonoNerdFontMono-Bold.ttf", assets, FontWeight.Bold),
+        )
+    }
+}
 
 /** Toggle states the bar reflects and the callbacks it drives; owned by the terminal screen. */
 class ExtraBarState(
@@ -292,31 +306,48 @@ private fun ExtraKey(
     val bg        = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     val textColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
     val interaction = remember { MutableInteractionSource() }
-    val scope = rememberCoroutineScope()
     // For repeat keys we drive the gesture ourselves (fire on down, then auto-repeat),
     // so clickable is replaced by pointerInput + an explicit ripple to keep the press
     // feedback. Timings follow the system key-repeat values, matching backspace.
+    //
+    // Two rules keep the repeat from outliving the finger (it used to: the key kept
+    // firing after release, cursor moving on its own). The gesture must NOT be keyed on
+    // the click lambda — the terminal screen builds a fresh ExtraBarState on every
+    // recomposition, so the lambda changes identity mid-press, pointerInput restarts and
+    // the gesture coroutine dies while suspended in waitForUpOrCancellation(); we read the
+    // latest lambda through rememberUpdatedState instead. And the repeat must be a child of
+    // the gesture's own scope, stopped in a finally, so a cancelled gesture takes it with
+    // it — the composition scope it used to run in survives a pointerInput restart.
+    val click = rememberUpdatedState(onClick)
     val pressModifier = if (repeatOnHold) {
         Modifier
             .indication(interaction, ripple())
-            .pointerInput(onClick) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    val press = PressInteraction.Press(down.position)
-                    interaction.tryEmit(press)
-                    onClick()  // immediate first press, like backspace on key-down
-                    val repeatJob = scope.launch {
-                        delay(android.view.ViewConfiguration.getKeyRepeatTimeout().toLong())
-                        while (isActive) {
-                            onClick()
-                            delay(android.view.ViewConfiguration.getKeyRepeatDelay().toLong())
+            .pointerInput(Unit) {
+                coroutineScope {
+                    val gestureScope = this
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        val press = PressInteraction.Press(down.position)
+                        interaction.tryEmit(press)
+                        click.value()  // immediate first press, like backspace on key-down
+                        var released = false
+                        val repeatJob = gestureScope.launch {
+                            delay(android.view.ViewConfiguration.getKeyRepeatTimeout().toLong())
+                            while (isActive) {
+                                click.value()
+                                delay(android.view.ViewConfiguration.getKeyRepeatDelay().toLong())
+                            }
+                        }
+                        try {
+                            released = waitForUpOrCancellation() != null
+                        } finally {
+                            repeatJob.cancel()
+                            interaction.tryEmit(
+                                if (released) PressInteraction.Release(press)
+                                else PressInteraction.Cancel(press)
+                            )
                         }
                     }
-                    val up = waitForUpOrCancellation()
-                    repeatJob.cancel()
-                    interaction.tryEmit(
-                        if (up != null) PressInteraction.Release(press) else PressInteraction.Cancel(press)
-                    )
                 }
             }
     } else {
@@ -332,7 +363,7 @@ private fun ExtraKey(
         Text(
             label,
             fontSize = fontSize,
-            fontFamily = if (isArrow) ArrowKeyFont else ExtraKeyFont,
+            fontFamily = if (isArrow) arrowKeyFont() else ExtraKeyFont,
             fontWeight = if (active || isArrow) FontWeight.Bold else FontWeight.Medium,
             maxLines = 1,
             color = textColor,

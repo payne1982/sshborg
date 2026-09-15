@@ -12,6 +12,8 @@ data class GroupEntity(
     val color: Int,
     /** Whether the group's section is collapsed in the host list. */
     val collapsed: Boolean = false,
+    /** Position in the manual list order; null until that order is first seeded. */
+    val position: Int? = null,
 ) {
     companion object {
         /** Predefined group colors, readable as icon tints on both light and dark surfaces. */

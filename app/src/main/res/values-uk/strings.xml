@@ -150,6 +150,9 @@
     <string name="settings_section_security">Безпека</string>
     <string name="settings_section_sftp">SFTP</string>
     <string name="settings_section_backup">Резервна копія</string>
+    <string name="settings_section_about">Про програму</string>
+    <string name="settings_about_app">SSHBorg для Android</string>
+    <string name="settings_about_version">Версія %1$s (%2$d)</string>
 
     <string name="settings_confirm_exit_title">Підтвердити вихід</string>
     <string name="settings_confirm_exit_subtitle">Запитувати підтвердження перед закриттям додатка</string>
@@ -175,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Показувати підказки з історії shell сервера під час введення в терміналі</string>
     <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Зберігає панель підказок фіксованої висоти, щоб уникнути зміни розміру терміналу</string>
-    <string name="settings_extra_keys_bar_title">Додаткові клавіші завжди видимі</string>
-    <string name="settings_extra_keys_bar_subtitle">Тримає панель додаткових клавіш (Ctrl, стрілки, клавіші F…) видимою навіть із закритою клавіатурою. Це також можна перемкнути шпилькою на панелі.</string>
+    <string name="settings_extra_keys_bar_title">Завжди видима</string>
+    <string name="settings_extra_keys_bar_subtitle">Навіть із закритою клавіатурою. Це також можна перемкнути шпилькою на панелі.</string>
 
     <string name="settings_app_lock_title">Блокування застосунку</string>
     <string name="settings_lock_mode_none">Немає</string>
@@ -395,7 +398,8 @@
     <string name="color_hue">Відтінок</string>
     <string name="color_saturation">Насиченість</string>
     <string name="color_brightness">Яскравість</string>
-    <string name="settings_extra_bar_layout_title">Розкладка панелі додаткових клавіш</string>
+    <string name="settings_section_extra_bar">Панель додаткових клавіш</string>
+    <string name="settings_extra_bar_layout_title">Клавіші та розкладка</string>
     <string name="extra_bar_preset_standard">Стандартна</string>
     <string name="extra_bar_preset_natural">Природна</string>
     <string name="extra_bar_preset_natural_2">Природна ×2</string>
@@ -404,7 +408,7 @@
     <string name="terminal_switch_bar_cd">Змінити панель клавіш</string>
     <string name="terminal_keyboard_cd">Показати або сховати клавіатуру</string>
     <string name="settings_extra_bar_customize_title">Налаштувати</string>
-    <string name="settings_extra_bar_in_use">Використовується: %1$s</string>
+    <string name="settings_extra_bar_in_use">Розкладка: %1$s</string>
     <string name="extra_bars_title">Панелі додаткових клавіш</string>
     <string name="extra_bars_section_custom">Ваші панелі</string>
     <string name="extra_bars_section_presets">Шаблони</string>
@@ -449,4 +453,12 @@
     <string name="extra_key_action_word_mode">Режим слів</string>
     <string name="extra_key_action_switch">Змінити панель</string>
     <string name="extra_key_action_keyboard">Клавіатура</string>
+    <string name="settings_host_sort_title">Порядок списку хостів</string>
+    <string name="settings_host_sort_subtitle">Групи лишаються за абеткою, крім ручного порядку</string>
+    <string name="settings_host_sort_alpha">За абеткою</string>
+    <string name="settings_host_sort_recent">Нещодавні</string>
+    <string name="settings_host_sort_popular">Найчастіші</string>
+    <string name="settings_host_sort_manual">Вручну</string>
+    <string name="hosts_move_up">Перемістити вгору</string>
+    <string name="hosts_move_down">Перемістити вниз</string>
 </resources>

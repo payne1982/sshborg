@@ -24,10 +24,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.BiometricHelper
+import com.sshborg.BuildConfig
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
 import com.sshborg.isTelevision
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.FocusOutlinedButton
 import com.sshborg.ui.common.SettingSelect
 import com.sshborg.ui.common.TvSelectField
 import com.sshborg.ui.common.TvTapField
@@ -78,6 +80,7 @@ fun SettingsScreen(
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
     val extraBar              by vm.extraBar.collectAsState()
+    val hostSortMode          by vm.hostSortMode.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
@@ -208,6 +211,30 @@ fun SettingsScreen(
                         options = themeOptions,
                         onSelect = { vm.setNightMode(it) },
                         touchless = touchless,
+                    )
+                },
+            )
+
+            // Host list order (#16). Manual adds "move up/down" to the row menus in the
+            // host list; the other modes leave the groups alphabetical and reorder the
+            // hosts inside them.
+            val hostSortOptions = listOf(
+                AppPreferences.HOST_SORT_ALPHA   to stringResource(R.string.settings_host_sort_alpha),
+                AppPreferences.HOST_SORT_RECENT  to stringResource(R.string.settings_host_sort_recent),
+                AppPreferences.HOST_SORT_POPULAR to stringResource(R.string.settings_host_sort_popular),
+                AppPreferences.HOST_SORT_MANUAL  to stringResource(R.string.settings_host_sort_manual),
+            )
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_host_sort_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_host_sort_subtitle)) },
+                trailingContent = {
+                    SettingSelect(
+                        label = stringResource(R.string.settings_host_sort_title),
+                        selected = hostSortMode,
+                        options = hostSortOptions,
+                        onSelect = { vm.setHostSortMode(it) },
+                        touchless = touchless,
+                        width = 160.dp,
                     )
                 },
             )
@@ -393,15 +420,15 @@ fun SettingsScreen(
                 )
             }
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_extra_keys_bar_title)) },
-                supportingContent = { Text(stringResource(R.string.settings_extra_keys_bar_subtitle)) },
-                trailingContent = {
-                    Switch(
-                        checked = extraKeysBarPinned,
-                        onCheckedChange = { vm.setExtraKeysBarPinned(it) },
-                    )
-                },
+            // ── Extra-key bar: a subsection of Terminal ───────────────────────────
+            // Its own heading, so the bar can be found at a glance instead of being the last of
+            // a long run of terminal switches. Grey rather than primary, and no divider above,
+            // so it reads as part of Terminal and not as a new section.
+            Text(
+                stringResource(R.string.settings_section_extra_bar),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
             )
 
             // Extra-key bar layout (#12): one row showing the active bar; the picker with
@@ -414,9 +441,21 @@ fun SettingsScreen(
                 // A button rather than a clickable row: reachable by D-pad, same style as
                 // the app-lock "Change" action.
                 trailingContent = {
-                    OutlinedButton(onClick = onExtraBars) {
+                    FocusOutlinedButton(onClick = onExtraBars) {
                         Text(stringResource(R.string.settings_extra_bar_customize_title))
                     }
+                },
+            )
+
+            // The default for new sessions; the pin on the bar overrides it for the open ones.
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_extra_keys_bar_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_extra_keys_bar_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = extraKeysBarPinned,
+                        onCheckedChange = { vm.setExtraKeysBarPinned(it) },
+                    )
                 },
             )
 
@@ -540,7 +579,7 @@ fun SettingsScreen(
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_change_secret)) },
                     trailingContent = {
-                        OutlinedButton(onClick = { lockDialogIsChange = true; showLockSecretDialog = true }) {
+                        FocusOutlinedButton(onClick = { lockDialogIsChange = true; showLockSecretDialog = true }) {
                             Text(stringResource(R.string.action_change))
                         }
                     },
@@ -659,7 +698,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_export_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_export_subtitle)) },
                 trailingContent = {
-                    OutlinedButton(onClick = { exportLauncher.launch("sshborg_backup.json") }) {
+                    FocusOutlinedButton(onClick = { exportLauncher.launch("sshborg_backup.json") }) {
                         Text(stringResource(R.string.settings_backup_export_action))
                     }
                 },
@@ -673,9 +712,40 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_import_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_import_subtitle)) },
                 trailingContent = {
-                    OutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
+                    FocusOutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
                         Text(stringResource(R.string.settings_backup_import_action))
                     }
+                },
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+            // ── About section ─────────────────────────────────────────────────
+            Text(
+                stringResource(R.string.settings_section_about),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+
+            ListItem(
+                // Named per platform, not just "SSHBorg": this row leaves the app in the
+                // screenshots attached to bug reports, where nothing else says which
+                // edition it is. The platform goes in the name rather than beside the
+                // number, where "Android version 1.16.2" would read as the OS release.
+                headlineContent = { Text(stringResource(R.string.settings_about_app)) },
+                supportingContent = {
+                    // The version code matters as much as the name: it is the number Play
+                    // talks about, and the only thing telling two builds of the same
+                    // version apart. Debug builds say so, since they install alongside
+                    // the store one and look identical from here.
+                    Text(
+                        stringResource(
+                            R.string.settings_about_version,
+                            BuildConfig.VERSION_NAME,
+                            BuildConfig.VERSION_CODE,
+                        ) + if (BuildConfig.DEBUG) " · debug" else ""
+                    )
                 },
             )
         }
@@ -687,7 +757,7 @@ fun SettingsScreen(
             title = { Text(stringResource(R.string.settings_encrypt_dialog_title)) },
             text  = { Text(stringResource(R.string.settings_encrypt_dialog_body)) },
             confirmButton = {
-                OutlinedButton(onClick = {
+                FocusOutlinedButton(onClick = {
                     showEnableEncryptionDialog = false
                     vm.enableKeystoreEncryption()
                 }) { Text(stringResource(R.string.action_enable)) }

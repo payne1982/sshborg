@@ -17,11 +17,22 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     // Alternate screen
     private var onAltScreen = false
+
+    /** True while a full-screen app (vim, less, tmux…) is drawing on the alternate screen. */
+    val altScreenActive: Boolean get() = onAltScreen
     private var savedMainScreen: Array<Array<TerminalBuffer.Cell>>? = null
     private var savedMainWrapFlags: BooleanArray? = null
 
     // Application cursor key mode (DECCKM, set by ESC[?1h / cleared by ESC[?1l)
     var applicationCursorKeys = false
+
+    // Mouse reporting: 0 = off, otherwise the DECSET mode the app turned on (1000 = clicks,
+    // 1002 = clicks and drags, 1003 = every motion). [mouseSgr] is the ?1006 encoding.
+    private var mouseMode = 0
+    private var mouseSgr = false
+
+    /** True while the remote app has asked to be sent mouse events. */
+    val mouseReporting: Boolean get() = mouseMode != 0
 
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
@@ -48,6 +59,25 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     }
 
     fun process(text: String) = process(text.toByteArray(Charsets.UTF_8))
+
+    /**
+     * Encodes one wheel notch as a mouse report, or null when the app has not asked for mouse
+     * events. [col] and [row] are 0-based cell coordinates; the wire format is 1-based.
+     */
+    fun mouseWheelReport(up: Boolean, col: Int, row: Int): ByteArray? {
+        if (mouseMode == 0) return null
+        val button = if (up) 64 else 65
+        val c = col.coerceAtLeast(0) + 1
+        val r = row.coerceAtLeast(0) + 1
+        if (mouseSgr) return "[<$button;$c;${r}M".toByteArray(Charsets.US_ASCII)
+        // Legacy X10 encoding: one byte per field offset by 32, so it cannot address past
+        // column or row 223. Everything modern asks for ?1006 instead.
+        if (c > 223 || r > 223) return null
+        return byteArrayOf(
+            0x1B, '['.code.toByte(), 'M'.code.toByte(),
+            (32 + button).toByte(), (32 + c).toByte(), (32 + r).toByte(),
+        )
+    }
 
     fun resize(cols: Int, rows: Int) {
         buffer.resize(cols, rows)
@@ -231,6 +261,8 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
                 25   -> buffer.cursorVisible = true
                 47, 1047 -> switchToAltScreen()
                 1049 -> { buffer.saveCursor(); switchToAltScreen() }
+                1000, 1002, 1003 -> mouseMode = p
+                1006 -> mouseSgr = true
                 else -> {}
             }
             'l' -> when (p) {
@@ -238,6 +270,10 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
                 25   -> buffer.cursorVisible = false
                 47, 1047 -> switchToMainScreen()
                 1049 -> { switchToMainScreen(); buffer.restoreCursor() }
+                // Apps usually clear all three; only the one actually in force may turn it off,
+                // so a blanket reset can't cancel a higher mode the app still wants.
+                1000, 1002, 1003 -> if (mouseMode == p) mouseMode = 0
+                1006 -> mouseSgr = false
                 else -> {}
             }
             else -> {}
@@ -375,6 +411,11 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     }
 
     private fun resetTerminal() {
+        // RIS from the alternate screen: leave it first, or the buffer would stay flagged as
+        // alt for good and silently stop recording history.
+        switchToMainScreen()
+        mouseMode = 0
+        mouseSgr = false
         buffer.eraseInDisplay(2)
         buffer.cursorRow = 0; buffer.cursorCol = 0
         buffer.scrollTop = 0; buffer.scrollBottom = buffer.rows - 1
@@ -387,6 +428,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             savedMainScreen = buffer.copyScreen()
             savedMainWrapFlags = buffer.copyWrapFlags()
             onAltScreen = true
+            buffer.altScreen = true
             buffer.eraseInDisplay(2)
             buffer.cursorRow = 0; buffer.cursorCol = 0
         }
@@ -395,6 +437,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     private fun switchToMainScreen() {
         if (onAltScreen) {
             onAltScreen = false
+            buffer.altScreen = false
             val snapshot = savedMainScreen
             if (snapshot != null) {
                 buffer.restoreScreen(snapshot)
