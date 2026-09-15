@@ -187,8 +187,8 @@
     <string name="settings_history_suggestions_subtitle">ターミナル入力中にサーバーのシェル履歴から候補を表示</string>
     <string name="settings_suggestions_bar_sticky_title">候補バーを常に表示</string>
     <string name="settings_suggestions_bar_sticky_subtitle">候補の表示・非表示でターミナルのサイズが変わらないよう、候補バーの高さを固定する</string>
-    <string name="settings_extra_keys_bar_title">追加キーを常に表示</string>
-    <string name="settings_extra_keys_bar_subtitle">キーボードを閉じていても追加キーバー（Ctrl、矢印、Fキーなど）を表示したままにします。バー上のピンでも切り替えられます。</string>
+    <string name="settings_extra_keys_bar_title">常に表示</string>
+    <string name="settings_extra_keys_bar_subtitle">キーボードを閉じていても表示します。バー上のピンでも切り替えられます。</string>
 
     <string name="settings_app_lock_title">アプリのロック</string>
     <string name="settings_lock_mode_none">なし</string>
@@ -399,7 +399,8 @@
     <string name="color_hue">色相</string>
     <string name="color_saturation">彩度</string>
     <string name="color_brightness">明度</string>
-    <string name="settings_extra_bar_layout_title">拡張キーバーのレイアウト</string>
+    <string name="settings_section_extra_bar">拡張キーバー</string>
+    <string name="settings_extra_bar_layout_title">キーとレイアウト</string>
     <string name="extra_bar_preset_standard">標準</string>
     <string name="extra_bar_preset_natural">ナチュラル</string>
     <string name="extra_bar_preset_natural_2">ナチュラル ×2</string>
@@ -408,7 +409,7 @@
     <string name="terminal_switch_bar_cd">キーバーを切り替え</string>
     <string name="terminal_keyboard_cd">キーボードを表示／非表示</string>
     <string name="settings_extra_bar_customize_title">カスタマイズ</string>
-    <string name="settings_extra_bar_in_use">使用中: %1$s</string>
+    <string name="settings_extra_bar_in_use">使用中のレイアウト: %1$s</string>
     <string name="extra_bars_title">拡張キーバー</string>
     <string name="extra_bars_section_custom">自分のバー</string>
     <string name="extra_bars_section_presets">プリセット</string>

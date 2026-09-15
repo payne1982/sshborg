@@ -188,8 +188,8 @@
     <string name="settings_history_suggestions_subtitle">Показывать подсказки из истории команд сервера при вводе в терминале</string>
     <string name="settings_suggestions_bar_sticky_title">Всегда видимая панель подсказок</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Держать панель подсказок фиксированной высоты, чтобы терминал не менялся в размере при их появлении или исчезновении</string>
-    <string name="settings_extra_keys_bar_title">Дополнительные клавиши всегда видимы</string>
-    <string name="settings_extra_keys_bar_subtitle">Держать панель дополнительных клавиш (Ctrl, стрелки, F-клавиши…) видимой даже при закрытой клавиатуре. Переключается также булавкой на панели.</string>
+    <string name="settings_extra_keys_bar_title">Всегда видима</string>
+    <string name="settings_extra_keys_bar_subtitle">Даже при закрытой клавиатуре. Переключается также булавкой на панели.</string>
 
     <string name="settings_app_lock_title">Блокировка приложения</string>
     <string name="settings_lock_mode_none">Нет</string>
@@ -408,7 +408,8 @@
     <string name="color_hue">Оттенок</string>
     <string name="color_saturation">Насыщенность</string>
     <string name="color_brightness">Яркость</string>
-    <string name="settings_extra_bar_layout_title">Раскладка панели дополнительных клавиш</string>
+    <string name="settings_section_extra_bar">Панель дополнительных клавиш</string>
+    <string name="settings_extra_bar_layout_title">Клавиши и раскладка</string>
     <string name="extra_bar_preset_standard">Стандартная</string>
     <string name="extra_bar_preset_natural">Естественная</string>
     <string name="extra_bar_preset_natural_2">Естественная ×2</string>
@@ -417,7 +418,7 @@
     <string name="terminal_switch_bar_cd">Сменить панель клавиш</string>
     <string name="terminal_keyboard_cd">Показать или скрыть клавиатуру</string>
     <string name="settings_extra_bar_customize_title">Настроить</string>
-    <string name="settings_extra_bar_in_use">Используется: %1$s</string>
+    <string name="settings_extra_bar_in_use">Раскладка: %1$s</string>
     <string name="extra_bars_title">Панели дополнительных клавиш</string>
     <string name="extra_bars_section_custom">Ваши панели</string>
     <string name="extra_bars_section_presets">Шаблоны</string>

@@ -419,15 +419,15 @@ fun SettingsScreen(
                 )
             }
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_extra_keys_bar_title)) },
-                supportingContent = { Text(stringResource(R.string.settings_extra_keys_bar_subtitle)) },
-                trailingContent = {
-                    Switch(
-                        checked = extraKeysBarPinned,
-                        onCheckedChange = { vm.setExtraKeysBarPinned(it) },
-                    )
-                },
+            // ── Extra-key bar: a subsection of Terminal ───────────────────────────
+            // Its own heading, so the bar can be found at a glance instead of being the last of
+            // a long run of terminal switches. Grey rather than primary, and no divider above,
+            // so it reads as part of Terminal and not as a new section.
+            Text(
+                stringResource(R.string.settings_section_extra_bar),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
             )
 
             // Extra-key bar layout (#12): one row showing the active bar; the picker with
@@ -443,6 +443,18 @@ fun SettingsScreen(
                     OutlinedButton(onClick = onExtraBars) {
                         Text(stringResource(R.string.settings_extra_bar_customize_title))
                     }
+                },
+            )
+
+            // The default for new sessions; the pin on the bar overrides it for the open ones.
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_extra_keys_bar_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_extra_keys_bar_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = extraKeysBarPinned,
+                        onCheckedChange = { vm.setExtraKeysBarPinned(it) },
+                    )
                 },
             )
 

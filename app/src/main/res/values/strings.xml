@@ -188,8 +188,8 @@
     <string name="settings_history_suggestions_subtitle">Show suggestions from the server shell history while typing in the terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Always-visible suggestion bar</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Keep the suggestion bar at a fixed height to prevent the terminal from resizing when suggestions appear or disappear</string>
-    <string name="settings_extra_keys_bar_title">Always-visible extra keys</string>
-    <string name="settings_extra_keys_bar_subtitle">Keep the extra key bar (Ctrl, arrows, F-keys…) visible even when the keyboard is closed. You can also toggle this with the pin on the bar.</string>
+    <string name="settings_extra_keys_bar_title">Always visible</string>
+    <string name="settings_extra_keys_bar_subtitle">Even with the keyboard closed. You can also toggle it with the pin on the bar.</string>
 
     <string name="settings_app_lock_title">App lock</string>
     <string name="settings_biometric_available">Require authentication when returning to the app</string>
@@ -405,7 +405,8 @@
     <string name="color_hue">Hue</string>
     <string name="color_saturation">Saturation</string>
     <string name="color_brightness">Brightness</string>
-    <string name="settings_extra_bar_layout_title">Extra key bar layout</string>
+    <string name="settings_section_extra_bar">Extra key bar</string>
+    <string name="settings_extra_bar_layout_title">Keys and layout</string>
     <string name="extra_bar_preset_standard">Standard</string>
     <string name="extra_bar_preset_natural">Natural</string>
     <string name="extra_bar_preset_natural_2">Natural ×2</string>
@@ -414,7 +415,7 @@
     <string name="terminal_switch_bar_cd">Switch key bar</string>
     <string name="terminal_keyboard_cd">Show or hide keyboard</string>
     <string name="settings_extra_bar_customize_title">Customise</string>
-    <string name="settings_extra_bar_in_use">In use: %1$s</string>
+    <string name="settings_extra_bar_in_use">Current layout: %1$s</string>
     <string name="extra_bars_title">Extra key bars</string>
     <string name="extra_bars_section_custom">Your bars</string>
     <string name="extra_bars_section_presets">Presets</string>

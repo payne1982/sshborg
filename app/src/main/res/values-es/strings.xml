@@ -178,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Mostrar sugerencias del historial de shell del servidor mientras se escribe en el terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barra de sugerencias siempre visible</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantiene la barra de sugerencias a altura fija para evitar el redimensionamiento del terminal</string>
-    <string name="settings_extra_keys_bar_title">Teclas adicionales siempre visibles</string>
-    <string name="settings_extra_keys_bar_subtitle">Mantiene visible la barra de teclas adicionales (Ctrl, flechas, teclas F…) incluso con el teclado cerrado. También puedes cambiarlo con el pin de la barra.</string>
+    <string name="settings_extra_keys_bar_title">Siempre visible</string>
+    <string name="settings_extra_keys_bar_subtitle">Incluso con el teclado cerrado. También puedes cambiarlo con el pin de la barra.</string>
 
     <string name="settings_app_lock_title">Bloqueo de la app</string>
     <string name="settings_lock_mode_none">Ninguno</string>
@@ -394,7 +394,8 @@
     <string name="color_hue">Tono</string>
     <string name="color_saturation">Saturación</string>
     <string name="color_brightness">Brillo</string>
-    <string name="settings_extra_bar_layout_title">Diseño de la barra de teclas extra</string>
+    <string name="settings_section_extra_bar">Barra de teclas extra</string>
+    <string name="settings_extra_bar_layout_title">Teclas y disposición</string>
     <string name="extra_bar_preset_standard">Estándar</string>
     <string name="extra_bar_preset_natural">Natural</string>
     <string name="extra_bar_preset_natural_2">Natural ×2</string>
@@ -403,7 +404,7 @@
     <string name="terminal_switch_bar_cd">Cambiar barra de teclas</string>
     <string name="terminal_keyboard_cd">Mostrar u ocultar el teclado</string>
     <string name="settings_extra_bar_customize_title">Personalizar</string>
-    <string name="settings_extra_bar_in_use">En uso: %1$s</string>
+    <string name="settings_extra_bar_in_use">Diseño en uso: %1$s</string>
     <string name="extra_bars_title">Barras de teclas extra</string>
     <string name="extra_bars_section_custom">Tus barras</string>
     <string name="extra_bars_section_presets">Preajustes</string>

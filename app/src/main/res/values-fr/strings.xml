@@ -178,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Afficher des suggestions tirées de l\'historique shell du serveur lors de la saisie dans le terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Maintient la barre de suggestions à hauteur fixe pour éviter le redimensionnement du terminal</string>
-    <string name="settings_extra_keys_bar_title">Touches supplémentaires toujours visibles</string>
-    <string name="settings_extra_keys_bar_subtitle">Garde la barre de touches supplémentaires (Ctrl, flèches, touches F…) visible même clavier fermé. Réglable aussi avec l\'épingle sur la barre.</string>
+    <string name="settings_extra_keys_bar_title">Toujours visible</string>
+    <string name="settings_extra_keys_bar_subtitle">Même clavier fermé. Réglable aussi avec l\'épingle sur la barre.</string>
 
     <string name="settings_app_lock_title">Verrouillage de l\'app</string>
     <string name="settings_lock_mode_none">Aucun</string>
@@ -394,7 +394,8 @@
     <string name="color_hue">Teinte</string>
     <string name="color_saturation">Saturation</string>
     <string name="color_brightness">Luminosité</string>
-    <string name="settings_extra_bar_layout_title">Disposition de la barre de touches</string>
+    <string name="settings_section_extra_bar">Barre de touches</string>
+    <string name="settings_extra_bar_layout_title">Touches et disposition</string>
     <string name="extra_bar_preset_standard">Standard</string>
     <string name="extra_bar_preset_natural">Naturelle</string>
     <string name="extra_bar_preset_natural_2">Naturelle ×2</string>
@@ -403,7 +404,7 @@
     <string name="terminal_switch_bar_cd">Changer de barre de touches</string>
     <string name="terminal_keyboard_cd">Afficher ou masquer le clavier</string>
     <string name="settings_extra_bar_customize_title">Personnaliser</string>
-    <string name="settings_extra_bar_in_use">Utilisée : %1$s</string>
+    <string name="settings_extra_bar_in_use">Disposition actuelle : %1$s</string>
     <string name="extra_bars_title">Barres de touches</string>
     <string name="extra_bars_section_custom">Vos barres</string>
     <string name="extra_bars_section_presets">Préréglages</string>

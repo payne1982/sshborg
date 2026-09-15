@@ -178,8 +178,8 @@
     <string name="settings_history_suggestions_subtitle">Mostrar sugestões do histórico de shell do servidor ao digitar no terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barra de sugestões sempre visível</string>
     <string name="settings_suggestions_bar_sticky_subtitle">Mantém a barra de sugestões em altura fixa para evitar o redimensionamento do terminal</string>
-    <string name="settings_extra_keys_bar_title">Teclas extra sempre visíveis</string>
-    <string name="settings_extra_keys_bar_subtitle">Mantém a barra de teclas extra (Ctrl, setas, teclas F…) visível mesmo com o teclado fechado. Também pode alterná-la com o pin na barra.</string>
+    <string name="settings_extra_keys_bar_title">Sempre visível</string>
+    <string name="settings_extra_keys_bar_subtitle">Mesmo com o teclado fechado. Também pode alternar com o pin na barra.</string>
 
     <string name="settings_app_lock_title">Bloqueio da app</string>
     <string name="settings_lock_mode_none">Nenhum</string>
@@ -394,7 +394,8 @@
     <string name="color_hue">Matiz</string>
     <string name="color_saturation">Saturação</string>
     <string name="color_brightness">Brilho</string>
-    <string name="settings_extra_bar_layout_title">Disposição da barra de teclas extra</string>
+    <string name="settings_section_extra_bar">Barra de teclas extra</string>
+    <string name="settings_extra_bar_layout_title">Teclas e disposição</string>
     <string name="extra_bar_preset_standard">Padrão</string>
     <string name="extra_bar_preset_natural">Natural</string>
     <string name="extra_bar_preset_natural_2">Natural ×2</string>
@@ -403,7 +404,7 @@
     <string name="terminal_switch_bar_cd">Mudar barra de teclas</string>
     <string name="terminal_keyboard_cd">Mostrar ou ocultar o teclado</string>
     <string name="settings_extra_bar_customize_title">Personalizar</string>
-    <string name="settings_extra_bar_in_use">Em uso: %1$s</string>
+    <string name="settings_extra_bar_in_use">Disposição atual: %1$s</string>
     <string name="extra_bars_title">Barras de teclas extra</string>
     <string name="extra_bars_section_custom">As suas barras</string>
     <string name="extra_bars_section_presets">Predefinições</string>
