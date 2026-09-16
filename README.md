@@ -53,3 +53,7 @@ signing.keyPassword=...
 ## License
 
 SSHBorg is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License v3.0](LICENSE).
+
+## iOS version
+
+Looking for the iOS repository? It is [payne1982/sshborg-ios](https://github.com/payne1982/sshborg-ios) — a separate app, written from scratch in Swift, sharing this one's design, its ten languages and its backup format.
