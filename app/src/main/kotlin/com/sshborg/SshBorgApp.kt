@@ -14,6 +14,9 @@ import com.sshborg.service.TransferManager
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
 
+/** How long a trip to a system picker may last without locking the app. */
+const val PICKER_GRACE_MS = 3 * 60_000L
+
 class SshBorgApp : Application() {
 
     val db by lazy { AppDatabase.getInstance(this) }
@@ -29,6 +32,18 @@ class SshBorgApp : Application() {
      * last unlock.
      */
     var lastAuthTime: Long = 0L
+
+    /**
+     * Set just before the app opens a system picker (file to upload, backup, key file): the
+     * return from it tolerates up to [PICKER_GRACE_MS] away even when the lock timeout is
+     * shorter, so "lock immediately" doesn't ask for the PIN after every file chosen. One-shot:
+     * the next return consumes it, whether or not a file was picked.
+     */
+    @Volatile private var pickerTrip = false
+
+    fun allowPickerTrip() { pickerTrip = true }
+
+    fun consumePickerTrip(): Boolean = pickerTrip.also { pickerTrip = false }
 
     override fun onCreate() {
         super.onCreate()

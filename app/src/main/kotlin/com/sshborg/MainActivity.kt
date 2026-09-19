@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -126,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         if (unlocked && !isAuthenticating) {
             (application as SshBorgApp).lastAuthTime = System.currentTimeMillis()
         }
+        if (BuildConfig.DEBUG) Log.d("AppLock", "onStop: unlocked=$unlocked authenticating=$isAuthenticating")
         unlocked = false
     }
 
@@ -136,6 +138,7 @@ class MainActivity : AppCompatActivity() {
         if (isAuthenticating) return
         unlocked = false   // until the check below says otherwise
         val app = application as SshBorgApp
+        val pickerTrip = app.consumePickerTrip()
         lifecycleScope.launch {
             val mode = app.appPreferences.lockMode.first()
             lockActive = mode != AppPreferences.LOCK_NONE
@@ -145,8 +148,11 @@ class MainActivity : AppCompatActivity() {
                 setPrivacy(false)
                 return@launch
             }
-            val timeoutMs = app.appPreferences.lockTimeoutSeconds.first() * 1_000L
+            val setTimeoutMs = app.appPreferences.lockTimeoutSeconds.first() * 1_000L
+            // Back from a system picker the app opened: allow a few minutes, if the setting is shorter.
+            val timeoutMs = if (pickerTrip) maxOf(setTimeoutMs, PICKER_GRACE_MS) else setTimeoutMs
             val elapsed = System.currentTimeMillis() - app.lastAuthTime
+            if (BuildConfig.DEBUG) Log.d("AppLock", "onStart: away ${elapsed}ms, timeout ${timeoutMs}ms, picker=$pickerTrip, stamped=${app.lastAuthTime > 0L}")
             if (app.lastAuthTime > 0L && elapsed <= timeoutMs) {
                 unlocked = true
                 showAppLock.value = false

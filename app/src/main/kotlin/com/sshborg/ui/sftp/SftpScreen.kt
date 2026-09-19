@@ -228,7 +228,7 @@ fun SftpScreen(
                     SmallFloatingActionButton(onClick = { showMkdirDialog = true }) {
                         Icon(Icons.Default.CreateNewFolder, stringResource(R.string.sftp_new_folder_cd))
                     }
-                    FloatingActionButton(onClick = { filePicker.launch("*/*") }) {
+                    FloatingActionButton(onClick = { (context.applicationContext as com.sshborg.SshBorgApp).allowPickerTrip(); filePicker.launch("*/*") }) {
                         Icon(Icons.Default.Upload, stringResource(R.string.sftp_upload_file_cd))
                     }
                 }
