@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
@@ -93,6 +93,8 @@ fun SftpScreen(
             selectedEntries = emptySet()
         }
     }
+
+    val listPositions = remember { ListPositions() }
 
     val atRoot    = currentPath == "/" || currentPath.isEmpty()
     val isListing = state is SftpViewModel.State.Listing
@@ -262,8 +264,7 @@ fun SftpScreen(
                 is SftpViewModel.State.Listing -> {
                     var isRefreshing by remember { mutableStateOf(false) }
                     LaunchedEffect(s) { isRefreshing = false }
-                    val listState = rememberLazyListState()
-                    LaunchedEffect(s.path) { listState.scrollToItem(0) }
+                    val listState = listPositions.stateFor(s.path)
                     // Pull-to-refresh, but only on a touchscreen: with a D-pad the focus
                     // "bumping" the top edge would otherwise trigger it accidentally. Touchless
                     // devices refresh via the toolbar button instead.
@@ -848,6 +849,27 @@ private fun SftpEntryItem(
         }
     }
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+/**
+ * One scroll position per folder, held at screen level. The list is only composed while the
+ * state is Listing, so a state kept inside it was thrown away by every progress screen (delete,
+ * upload, foreground download) and the refresh afterwards came back at the top.
+ * Entering a folder starts at the top; going back up to one restores where it was.
+ */
+private class ListPositions {
+    private val states = mutableMapOf<String, LazyListState>()
+    private var lastPath: String? = null
+
+    fun stateFor(path: String): LazyListState {
+        val prev = lastPath
+        if (prev != path) {
+            val goingUp = prev != null && prev.startsWith(path.trimEnd('/') + "/")
+            if (!goingUp) states.remove(path)
+            lastPath = path
+        }
+        return states.getOrPut(path) { LazyListState() }
+    }
 }
 
 @Composable
