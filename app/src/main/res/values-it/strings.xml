@@ -266,6 +266,13 @@
     <string name="sftp_menu_download_in_background">Scarica in background</string>
     <string name="sftp_background_downloads_title">Download in background</string>
     <string name="sftp_background_download_failed">Download non riuscito</string>
+    <string name="sftp_report_uploaded_n_of_m">Caricati %1$d di %2$d</string>
+    <string name="sftp_report_downloaded_n_of_m">Scaricati %1$d di %2$d</string>
+    <string name="sftp_report_not_attempted">Non tentati: %1$s</string>
+    <string name="sftp_report_show_errors">Mostra errori</string>
+    <string name="sftp_report_tap_for_details">Tocca per vedere gli errori</string>
+    <string name="sftp_report_local_file_failed">Impossibile creare il file in Download</string>
+    <string name="sftp_notify_see_details">Apri il trasferimento in SSHBorg per vedere gli errori.</string>
     <string name="sftp_background_skipped_exists">"%1$s" esiste già in Download. Download ignorato.</string>
     <string name="sftp_send_to_background">In background</string>
     <string name="sftp_background_dismiss_cd">Chiudi</string>
@@ -287,6 +294,8 @@
     <string name="sftp_nothing_to_download">Niente da scaricare</string>
     <string name="sftp_batch_conflict_title">Alcuni file esistono già</string>
     <string name="sftp_batch_conflict_message">%1$d di %2$d file esistono già nei Download. Come vuoi procedere?</string>
+    <string name="sftp_upload_conflict_message">\"%1$s\" esiste già in questa cartella sul server.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d di %2$d file esistono già in questa cartella sul server. Come vuoi procedere?</string>
     <string name="action_overwrite_all">Sovrascrivi tutto</string>
     <string name="action_skip_existing">Salta esistenti</string>
 

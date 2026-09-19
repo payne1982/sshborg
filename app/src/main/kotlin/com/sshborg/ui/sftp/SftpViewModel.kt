@@ -17,6 +17,7 @@ import com.sshborg.data.ssh.*
 import android.webkit.MimeTypeMap
 import com.sshborg.service.BackgroundTransfer
 import com.sshborg.service.DownloadIntents
+import com.sshborg.service.FileFailure
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.service.TransferTask
@@ -39,10 +40,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val skippedFiles: Int = 0,
             val startedAt: Long = 0L,
             val completedAt: Long = 0L,
+            /** The skipped files' report, reopenable from the completion screen. */
+            val report: ErrorReport? = null,
         ) : State
         data class Deleting(val name: String, val index: Int = 1, val total: Int = 1) : State
         data class Uploading(val filename: String, val bytesSent: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
-        data class Uploaded(val filename: String, val totalFiles: Int = 1) : State
         data class Error(val message: String, val detail: String? = null) : State
         object Disconnected : State
     }
@@ -66,8 +68,57 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     private val _state = MutableStateFlow<State>(State.Connecting)
     val state: StateFlow<State> = _state
 
+    /** Short notices (not errors) shown as a snackbar. */
     private val _opError = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val opError: SharedFlow<String> = _opError
+
+    /** The failure report on screen, if any; it stays until [dismissReport]. */
+    private val _report = MutableStateFlow<ErrorReport?>(null)
+    val report: StateFlow<ErrorReport?> = _report
+
+    fun dismissReport() { _report.value = null }
+
+    /** The last listing shown, to go back to when an operation fails without losing the connection. */
+    @Volatile private var lastListing: State.Listing? = null
+
+    init {
+        viewModelScope.launch { _state.collect { if (it is State.Listing) lastListing = it } }
+    }
+
+    fun showReport(r: ErrorReport) { _report.value = r }
+
+    /** Reopens the errors of a finished background transfer (a tap on its row). */
+    fun showTransferReport(t: BackgroundTransfer) { _report.value = transferReport(t) }
+
+    private fun transferReport(t: BackgroundTransfer) = ErrorReport(
+        title = if (t.totalFiles == 1) str(R.string.error_download_failed)
+                else str(R.string.sftp_report_downloaded_n_of_m, t.doneFiles, t.totalFiles),
+        failures     = t.failures,
+        notAttempted = t.notAttempted,
+    )
+
+    /**
+     * Shows [r] — unless the connection is what failed. Then the listing can't come back, so the
+     * screen goes to the connection-lost error carrying this report, which is the real cause:
+     * refreshing first would only put its own "inputstream is closed" there instead.
+     */
+    private fun report(r: ErrorReport, refresh: Boolean) {
+        if (sftpSession?.isConnected != true) {
+            connectionLost(r.asText(getApplication()))
+            return
+        }
+        // Never let a later failure (typically the refresh that follows) hide an earlier one:
+        // the first report is the cause, anything after it is added below it.
+        _report.update { shown -> shown?.let { it.copy(failures = it.failures + r.failures, notAttempted = it.notAttempted + r.notAttempted) } ?: r }
+        if (refresh) refreshListing()
+    }
+
+    private fun connectionLost(detail: String?) {
+        _state.value = State.Error(str(R.string.terminal_connection_lost), detail)
+        sessionId?.let { id -> sessionManager.update(id) { s -> s.copy(status = SessionManager.Status.Error) } }
+    }
+
+    private fun str(id: Int, vararg args: Any): String = getApplication<Application>().getString(id, *args)
 
     /**
      * Whether dotfiles (names starting with ".") are shown. Persisted per-host on
@@ -113,6 +164,18 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     private val batchConflictDecision = MutableSharedFlow<BatchConflictDecision>(extraBufferCapacity = 1)
 
     fun resolveBatchConflict(decision: BatchConflictDecision) { batchConflictDecision.tryEmit(decision) }
+
+    /** Emitted when files about to be uploaded already exist in the remote folder. */
+    sealed interface UploadConflict {
+        data class Single(val name: String) : UploadConflict
+        data class Batch(val conflictCount: Int, val totalCount: Int) : UploadConflict
+    }
+    enum class UploadDecision { OVERWRITE, KEEP_BOTH, SKIP_EXISTING, CANCEL }
+    private val _uploadConflictEvent = MutableSharedFlow<UploadConflict>(extraBufferCapacity = 1)
+    val uploadConflictEvent: SharedFlow<UploadConflict> = _uploadConflictEvent
+    private val uploadDecision = MutableSharedFlow<UploadDecision>(extraBufferCapacity = 1)
+
+    fun resolveUploadConflict(decision: UploadDecision) { uploadDecision.tryEmit(decision) }
 
     /** Job covering the Preparing phase of a batch download. */
     private var preparationJob: Job? = null
@@ -324,7 +387,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     sessionManager.update(sessionId ?: return@launch) { it.copy(sftpCurrentPath = path) }
                     _state.value = State.Listing(path, entries)
                 }.onFailure {
-                    _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_cannot_list_directory))
+                    report(ErrorReport(str(R.string.error_cannot_list_directory), listOf(FileFailure.of(path, it))), refresh = false)
                 }
             } finally {
                 navigating.set(false)
@@ -394,19 +457,24 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
             // Phase 1: collect all file tasks (expand folders recursively)
             val allTasks = mutableListOf<TransferTask>()
+            val unlisted = mutableListOf<FileFailure>()
             for (entry in entries) {
                 ensureActive()
                 val entryPath = "${currentPath.trimEnd('/')}/${entry.name}"
                 if (entry.isDir && !entry.isLink) {
-                    collectDirTasks(entryPath, "$downloadFolder${entry.name}/", allTasks)
+                    collectDirTasks(entryPath, "$downloadFolder${entry.name}/", allTasks, unlisted)
                 } else if (!entry.isDir) {
                     allTasks.add(TransferTask(entryPath, entry.name, downloadFolder))
                 }
             }
 
             if (allTasks.isEmpty()) {
-                _opError.tryEmit(context.getString(R.string.sftp_nothing_to_download))
-                refreshListing()
+                if (unlisted.isEmpty()) {
+                    _opError.tryEmit(context.getString(R.string.sftp_nothing_to_download))
+                    refreshListing()
+                } else {
+                    report(ErrorReport(str(R.string.error_download_failed), unlisted), refresh = true)
+                }
                 return@launch
             }
 
@@ -435,7 +503,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             if (tasksToDownload.isEmpty()) { refreshListing(); return@launch }
 
             preparationJob = null
-            startForegroundObservation(transferManager.enqueue(id, session, tasksToDownload))
+            startForegroundObservation(transferManager.enqueue(id, session, tasksToDownload, unlisted))
         }
     }
 
@@ -472,18 +540,21 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                             _state.value = State.Downloading(t.filename, t.localDir, t.bytesReceived, t.fileIndex, t.totalFiles, t.startedAt)
                         BackgroundTransfer.Status.Done -> {
                             transferManager.dismiss(transferId)
+                            val failed = t.failures.takeIf { it.isNotEmpty() }?.let { transferReport(t) }
                             _state.value = State.Downloaded(
                                 t.filename, t.localDir, t.totalFiles, t.skippedFiles,
                                 t.startedAt, t.completedAt ?: System.currentTimeMillis(),
+                                failed,
                             )
+                            // The user watched this one: show what was skipped right away.
+                            failed?.let { _report.value = it }
                             foregroundTransferId = null
                             foregroundObserveJob = null
                             thisJob.cancel()
                         }
                         BackgroundTransfer.Status.Error -> {
                             transferManager.dismiss(transferId)
-                            refreshListing()
-                            _opError.tryEmit(getApplication<Application>().getString(R.string.error_download_failed))
+                            report(transferReport(t), refresh = true)
                             foregroundTransferId = null
                             foregroundObserveJob = null
                             thisJob.cancel()
@@ -531,18 +602,19 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         remotePath: String,
         localDir: String,
         tasks: MutableList<TransferTask>,
+        unlisted: MutableList<FileFailure>,
     ) {
         runCatching {
             val entries = sftpSession!!.listDir(remotePath)
             for (entry in entries) {
                 val entryPath = "$remotePath/${entry.name}"
                 if (entry.isDir && !entry.isLink) {
-                    collectDirTasks(entryPath, "$localDir${entry.name}/", tasks)
+                    collectDirTasks(entryPath, "$localDir${entry.name}/", tasks, unlisted)
                 } else if (!entry.isDir) {
                     tasks.add(TransferTask(entryPath, entry.name, localDir))
                 }
             }
-        } // swallow per-subtree errors — remaining tasks continue
+        }.onFailure { unlisted += FileFailure.of(remotePath, it) }   // the rest of the batch continues
     }
 
     /**
@@ -576,6 +648,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Returns a name like "file(1).txt" that is not in [taken] (the remote folder's names). */
+    private fun uniqueRemoteName(original: String, taken: Set<String>): String {
+        val dot = original.lastIndexOf('.')
+        val base = if (dot > 0) original.substring(0, dot) else original
+        val ext  = if (dot > 0) original.substring(dot) else ""
+        return generateSequence(1) { it + 1 }.map { "$base($it)$ext" }.first { it !in taken }
+    }
+
     /** Returns a filename like "file(1).txt" that does not yet exist in [localDir]. */
     private fun uniqueFilename(original: String, localDir: String): String {
         val dot = original.lastIndexOf('.')
@@ -598,41 +678,80 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val total = uris.size
 
         viewModelScope.launch(Dispatchers.IO) {
-            var lastFilename = ""
-            for ((index, uri) in uris.withIndex()) {
-                val filename = context.contentResolver
+            // Names first, so files a lost connection never reaches can still be listed.
+            val names = uris.map { uri ->
+                context.contentResolver
                     .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
                     ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
                     ?: uri.lastPathSegment ?: "file"
-                lastFilename = filename
+            }
+
+            // Ask before replacing anything already on the server. The names come from a fresh
+            // listing, not the one on screen, which may be stale.
+            val existing = runCatching { sftpSession!!.listDir(currentPath).map { it.name }.toSet() }
+                .getOrElse {
+                    report(ErrorReport(str(R.string.error_upload_failed), listOf(FileFailure.of(currentPath, it))), refresh = true)
+                    return@launch
+                }
+            val clashing = names.filter { it in existing }
+            var targets = names   // remote name for each uri; null = skipped
+                .map<String, String?> { it }
+            if (clashing.isNotEmpty()) {
+                _uploadConflictEvent.tryEmit(
+                    if (total == 1) UploadConflict.Single(names.first())
+                    else UploadConflict.Batch(clashing.size, total)
+                )
+                when (uploadDecision.first()) {
+                    UploadDecision.CANCEL -> return@launch
+                    UploadDecision.OVERWRITE -> Unit
+                    UploadDecision.KEEP_BOTH -> {
+                        val taken = existing.toMutableSet()
+                        targets = names.map { n -> if (n in existing) uniqueRemoteName(n, taken).also { taken += it } else n }
+                    }
+                    UploadDecision.SKIP_EXISTING -> targets = names.map { n -> n.takeIf { it !in existing } }
+                }
+            }
+            val plan = uris.indices.mapNotNull { i -> targets[i]?.let { uris[i] to it } }
+            if (plan.isEmpty()) { refreshListing(); return@launch }
+            val planTotal = plan.size
+
+            val failures = mutableListOf<FileFailure>()
+            var notAttempted = emptyList<String>()
+            var uploaded = 0
+            for ((index, item) in plan.withIndex()) {
+                val (uri, filename) = item
+                // One failed file doesn't stop the batch, but a dead connection does: every
+                // remaining file would fail the same way.
+                if (sftpSession?.isConnected != true) {
+                    notAttempted = plan.drop(index).map { it.second }
+                    break
+                }
                 val remotePath = "${currentPath.trimEnd('/')}/$filename"
-                _state.value = State.Uploading(filename, 0L, index + 1, total)
-                val success = runCatching {
+                _state.value = State.Uploading(filename, 0L, index + 1, planTotal)
+                runCatching {
                     context.contentResolver.openInputStream(uri)!!.use { stream ->
                         sftpSession!!.uploadFile(stream, remotePath) { bytes ->
-                            _state.value = State.Uploading(filename, bytes, index + 1, total)
+                            _state.value = State.Uploading(filename, bytes, index + 1, planTotal)
                         }
                     }
-                }.onFailure {
-                    refreshListing()
-                    _opError.tryEmit(it.message ?: context.getString(R.string.error_upload_failed))
-                }.isSuccess
-                if (!success) return@launch
+                }.onSuccess { uploaded++ }
+                 .onFailure { failures += FileFailure.of(filename, it) }
             }
-            val s = State.Uploaded(lastFilename, total)
-            _state.value = s; postUploadNotification(s)
+            if (failures.isEmpty() && notAttempted.isEmpty()) {
+                // The view model refreshes by itself; the screen only shows the notice. (It used
+                // to be the screen, from an effect on an "Uploaded" state — an effect that can
+                // run twice, and did: two listings at once on the one channel.)
+                val msg = if (planTotal == 1) str(R.string.sftp_uploaded, plan.last().second)
+                          else str(R.string.sftp_uploaded_n_files, planTotal)
+                _opError.tryEmit(msg)
+                SshForegroundService.notifyUploadComplete(getApplication(), msg)
+                refreshListing()
+                return@launch
+            }
+            val title = if (planTotal == 1) str(R.string.error_upload_failed)
+                        else str(R.string.sftp_report_uploaded_n_of_m, uploaded, planTotal)
+            report(ErrorReport(title, failures, notAttempted), refresh = true)
         }
-    }
-
-    fun dismissUploaded() = refreshListing()
-
-    private fun postUploadNotification(s: State.Uploaded) {
-        val ctx = getApplication<Application>()
-        val msg = if (s.totalFiles == 1)
-            ctx.getString(R.string.sftp_uploaded, s.filename)
-        else
-            ctx.getString(R.string.sftp_uploaded_n_files, s.totalFiles)
-        SshForegroundService.notifyUploadComplete(ctx, msg)
     }
 
     // ── File operations ───────────────────────────────────────────────────────
@@ -648,7 +767,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             _state.value = State.Deleting(entry.name)
             runCatching {
                 if (entry.isDir && !entry.isLink) deleteRecursive(path) else sftpSession!!.deleteFile(path)
-            }.onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_delete_failed)) }
+            }.onFailure {
+                if (it is CancellationException) throw it
+                report(ErrorReport(str(R.string.error_delete_failed), listOf(FileFailure.of(entry.name, it))), refresh = true)
+                return@launch
+            }
             refreshListing()
         }
     }
@@ -659,18 +782,26 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             coroutineContext[Job]!!.invokeOnCompletion { cause ->
                 if (cause is CancellationException) refreshListing()
             }
+            val failures = mutableListOf<FileFailure>()
+            var notAttempted = emptyList<String>()
             for ((index, entry) in entries.withIndex()) {
                 ensureActive()
+                if (sftpSession?.isConnected != true) {
+                    notAttempted = entries.drop(index).map { it.name }
+                    break
+                }
                 _state.value = State.Deleting(entry.name, index + 1, total)
                 val path = "${currentPath.trimEnd('/')}/${entry.name}"
                 runCatching {
                     if (entry.isDir && !entry.isLink) deleteRecursive(path, index + 1, total)
                     else sftpSession!!.deleteFile(path)
                 }.onFailure {
-                    _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_delete_failed))
+                    if (it is CancellationException) throw it
+                    failures += FileFailure.of(entry.name, it)
                 }
             }
-            refreshListing()
+            if (failures.isEmpty() && notAttempted.isEmpty()) refreshListing()
+            else report(ErrorReport(str(R.string.error_delete_failed), failures, notAttempted), refresh = true)
         }
     }
 
@@ -695,36 +826,48 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val oldPath = "${currentPath.trimEnd('/')}/${entry.name}"
         val newPath = "${currentPath.trimEnd('/')}/$newName"
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { sftpSession!!.rename(oldPath, newPath); refreshListing() }
-                .onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_rename_failed)) }
+            runCatching { sftpSession!!.rename(oldPath, newPath) }
+                .onSuccess { refreshListing() }
+                .onFailure { report(ErrorReport(str(R.string.error_rename_failed), listOf(FileFailure.of(entry.name, it))), refresh = false) }
         }
     }
 
     fun createDirectory(currentPath: String, name: String) {
         val path = "${currentPath.trimEnd('/')}/$name"
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { sftpSession!!.mkdir(path); refreshListing() }
-                .onFailure { _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_create_directory_failed)) }
+            runCatching { sftpSession!!.mkdir(path) }
+                .onSuccess { refreshListing() }
+                .onFailure { report(ErrorReport(str(R.string.error_create_directory_failed), listOf(FileFailure.of(name, it))), refresh = false) }
         }
     }
 
     fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
+        // One refresh at a time: a request arriving while one runs is folded into a single
+        // rerun when it ends, so bursts of requests never become parallel listings.
+        if (!refreshing.compareAndSet(false, true)) { refreshAgain = true; return }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
-            }.onFailure {
-                // If the session is gone, a snackbar alone would leave the current state
-                // (e.g. the Downloading overlay) on screen with no way out.
-                if (sftpSession?.isConnected != true) {
-                    _state.value = State.Error(
-                        getApplication<Application>().getString(R.string.terminal_connection_lost),
-                        it.stackTraceToString(),
-                    )
-                    sessionId?.let { id -> sessionManager.update(id) { s -> s.copy(status = SessionManager.Status.Error) } }
-                } else {
-                    _opError.tryEmit(it.message ?: getApplication<Application>().getString(R.string.error_refresh_failed))
-                }
+            try { doRefresh(current) } finally {
+                refreshing.set(false)
+                if (refreshAgain) { refreshAgain = false; refreshListing() }
+            }
+        }
+    }
+
+    private val refreshing = java.util.concurrent.atomic.AtomicBoolean(false)
+    @Volatile private var refreshAgain = false
+
+    private fun doRefresh(current: String) {
+        runCatching {
+            _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
+        }.onFailure {
+            // If the session is gone, report() goes to the connection-lost screen: a dialog
+            // alone would leave the current state (e.g. the Downloading overlay) with no way out.
+            report(ErrorReport(str(R.string.error_refresh_failed), listOf(FileFailure.of(current, it))), refresh = false)
+            // Still connected: get off the progress screen that launched this refresh, back
+            // to the listing we had, so the screen doesn't hang on a spinner.
+            if (sftpSession?.isConnected == true && _state.value !is State.Listing) {
+                lastListing?.let { l -> _state.value = l }
             }
         }
     }

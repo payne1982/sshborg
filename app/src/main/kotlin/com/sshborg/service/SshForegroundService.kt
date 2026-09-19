@@ -235,12 +235,19 @@ class SshForegroundService : Service() {
             postTransferNotification(context, context.getString(R.string.sftp_download_complete), message, NOTIFICATION_ID_DOWNLOAD, contentIntent)
         }
 
-        fun notifyDownloadError(context: Context, filename: String) =
+        /** Tapping it brings SSHBorg back where it was, whose transfer list holds the errors. */
+        fun notifyDownloadError(context: Context, message: String) =
             postTransferNotification(
                 context,
                 context.getString(R.string.sftp_background_download_failed),
-                filename,
+                message,
                 NOTIFICATION_ID_DOWNLOAD_ERROR,
+                context.packageManager.getLaunchIntentForPackage(context.packageName)?.let { launch ->
+                    PendingIntent.getActivity(
+                        context, NOTIFICATION_ID_DOWNLOAD_ERROR, launch,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    )
+                },
             )
 
         fun notifyUploadComplete(context: Context, message: String) =

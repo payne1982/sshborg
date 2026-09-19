@@ -110,9 +110,6 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private var promptDetectJob: Job? = null
     private var suggestionsUpdateJob: Job? = null
 
-    /** Params saved after a successful connect, used to open the SFTP history channel. */
-    private var lastConnectParams: SshConnectionParams? = null
-
     /** Emitted when the remote shell exits cleanly — screen should navigate back automatically. */
     private val _navBack = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val navBack: SharedFlow<Unit> = _navBack
@@ -317,18 +314,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
                     hostDao.recordConnection(hostId, System.currentTimeMillis())
-                    lastConnectParams = SshConnectionParams(
-                        hostname           = host.hostname,
-                        port               = host.port,
-                        username           = host.username,
-                        auth               = auth,
-                        agentForwarding    = host.agentForwarding,
-                        knownHostsEntry    = session.hostKeyLine,
-                        jumpHosts          = jumpHosts,
-                        allowLegacyCiphers = host.allowLegacyCiphers,
-                    )
                     startReading(session)
-                    if (prefs.historySuggestions.first()) loadCommandHistory()
+                    if (prefs.historySuggestions.first()) loadCommandHistory(session)
                     return@launch
                 }
 
@@ -536,18 +523,19 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     // ── History suggestions helpers ───────────────────────────────────────────
 
     /**
-     * Opens a brief SFTP connection and tries to read the shell history file.
+     * Reads the shell history file over an SFTP channel on the terminal's own connection.
      * Tries ~/.bash_history, ~/.zsh_history, and fish history in order.
-     * Silently does nothing if the connection or file read fails.
+     * Silently does nothing if the channel or file read fails.
+     *
+     * It used to open a second SSH connection for this: a whole extra handshake and login
+     * (twice through a jump host, a second OTP prompt for keyboard-interactive users), and one
+     * that accepted whatever host key it was shown.
      */
-    private fun loadCommandHistory() {
-        val params = lastConnectParams ?: return
+    private fun loadCommandHistory(shell: ShellSession) {
         viewModelScope.launch(Dispatchers.IO) {
-            val sftp = runCatching {
-                SshManager.openSftp(params) { _, _, _ -> true }
-            }.getOrNull() ?: return@launch
+            val sftp = runCatching { shell.openSftpChannel() }.getOrNull() ?: return@launch
             try {
-                val home = sftp.homePath
+                val home = runCatching { sftp.home }.getOrNull() ?: return@launch
                 val candidates = listOf(
                     "$home/.bash_history",
                     "$home/.zsh_history",
@@ -556,7 +544,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 for (path in candidates) {
                     val content = runCatching {
                         val out = ByteArrayOutputStream()
-                        sftp.downloadFile(path, out) {}
+                        sftp.get(path, out)
                         out.toString(Charsets.UTF_8.name())
                     }.getOrNull() ?: continue
                     val commands = parseHistory(path, content)

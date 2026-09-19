@@ -99,7 +99,7 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
         ImportKeyDialog(
             pem = importPem,
             onPemChange = { importPem = it },
-            onLoadFromFile = { importFileLauncher.launch("*/*") },
+            onLoadFromFile = { (context.applicationContext as com.sshborg.SshBorgApp).allowPickerTrip(); importFileLauncher.launch("*/*") },
             onImport = { label, pem, passphrase, onError ->
                 vm.importKey(label, pem, passphrase, onError) { showImportDialog = false }
             },

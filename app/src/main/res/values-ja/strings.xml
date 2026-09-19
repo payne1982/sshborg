@@ -280,6 +280,13 @@
     <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
     <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>
     <string name="sftp_background_download_failed">ダウンロード失敗</string>
+    <string name="sftp_report_uploaded_n_of_m">%2$d 件中 %1$d 件をアップロードしました</string>
+    <string name="sftp_report_downloaded_n_of_m">%2$d 件中 %1$d 件をダウンロードしました</string>
+    <string name="sftp_report_not_attempted">未処理：%1$s</string>
+    <string name="sftp_report_show_errors">エラーを表示</string>
+    <string name="sftp_report_tap_for_details">タップしてエラーを表示</string>
+    <string name="sftp_report_local_file_failed">ダウンロードフォルダにファイルを作成できませんでした</string>
+    <string name="sftp_notify_see_details">SSHBorg で転送を開くとエラーを確認できます。</string>
     <string name="sftp_background_skipped_exists">"%1$s"はダウンロードフォルダに既に存在します。スキップしました。</string>
     <string name="sftp_send_to_background">バックグラウンド</string>
     <string name="sftp_background_dismiss_cd">閉じる</string>
@@ -301,6 +308,8 @@
     <string name="sftp_nothing_to_download">ダウンロードするものがありません</string>
     <string name="sftp_batch_conflict_title">一部のファイルが既に存在します</string>
     <string name="sftp_batch_conflict_message">%2$d 件中 %1$d 件のファイルが既にダウンロードフォルダに存在します。どうしますか？</string>
+    <string name="sftp_upload_conflict_message">"%1$s" はサーバーのこのフォルダに既に存在します。</string>
+    <string name="sftp_upload_batch_conflict_message">%2$d 件中 %1$d 件のファイルがサーバーのこのフォルダに既に存在します。どうしますか？</string>
     <string name="action_overwrite_all">すべて上書き</string>
     <string name="action_skip_existing">既存をスキップ</string>
 

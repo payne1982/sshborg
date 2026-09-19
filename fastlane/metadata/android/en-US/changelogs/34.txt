@@ -1,0 +1,6 @@
+• SFTP: fixed uploads that could drop the connection or end with an error
+• SFTP: errors stay on screen and can be copied; multi-file transfers skip failed files and list them
+• SFTP: uploads ask before replacing an existing file
+• SFTP: the list keeps its position after deleting, uploading or downloading
+• App lock: the timeout counts from leaving the app; picking a file no longer asks to unlock
+• Terminal: command history is read without a second login

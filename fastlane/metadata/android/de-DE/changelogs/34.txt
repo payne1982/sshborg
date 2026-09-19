@@ -1,0 +1,6 @@
+• SFTP: Uploads korrigiert, die die Verbindung trennen oder fehlschlagen konnten
+• SFTP: Fehler bleiben sichtbar und kopierbar; bei mehreren Dateien werden fehlerhafte übersprungen und aufgelistet
+• SFTP: Uploads fragen, bevor eine vorhandene Datei ersetzt wird
+• SFTP: Die Liste behält ihre Position nach Löschen, Upload und Download
+• App-Sperre: Zeit zählt ab Verlassen der App; nach der Dateiauswahl kein erneutes Entsperren
+• Terminal: Befehlsverlauf wird ohne zweite Anmeldung gelesen

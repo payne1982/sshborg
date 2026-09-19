@@ -698,7 +698,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_export_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_export_subtitle)) },
                 trailingContent = {
-                    FocusOutlinedButton(onClick = { exportLauncher.launch("sshborg_backup.json") }) {
+                    FocusOutlinedButton(onClick = { (context.applicationContext as com.sshborg.SshBorgApp).allowPickerTrip(); exportLauncher.launch("sshborg_backup.json") }) {
                         Text(stringResource(R.string.settings_backup_export_action))
                     }
                 },
@@ -712,7 +712,7 @@ fun SettingsScreen(
                 headlineContent = { Text(stringResource(R.string.settings_backup_import_title)) },
                 supportingContent = { Text(stringResource(R.string.settings_backup_import_subtitle)) },
                 trailingContent = {
-                    FocusOutlinedButton(onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }) {
+                    FocusOutlinedButton(onClick = { (context.applicationContext as com.sshborg.SshBorgApp).allowPickerTrip(); importLauncher.launch(arrayOf("application/json", "*/*")) }) {
                         Text(stringResource(R.string.settings_backup_import_action))
                     }
                 },

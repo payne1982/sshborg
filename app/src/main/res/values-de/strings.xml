@@ -266,6 +266,13 @@
     <string name="sftp_menu_download_in_background">Im Hintergrund herunterladen</string>
     <string name="sftp_background_downloads_title">Hintergrund-Downloads</string>
     <string name="sftp_background_download_failed">Download fehlgeschlagen</string>
+    <string name="sftp_report_uploaded_n_of_m">%1$d von %2$d hochgeladen</string>
+    <string name="sftp_report_downloaded_n_of_m">%1$d von %2$d heruntergeladen</string>
+    <string name="sftp_report_not_attempted">Nicht versucht: %1$s</string>
+    <string name="sftp_report_show_errors">Fehler anzeigen</string>
+    <string name="sftp_report_tap_for_details">Tippen, um die Fehler zu sehen</string>
+    <string name="sftp_report_local_file_failed">Datei konnte in Downloads nicht angelegt werden</string>
+    <string name="sftp_notify_see_details">Öffne die Übertragung in SSHBorg, um die Fehler zu sehen.</string>
     <string name="sftp_background_skipped_exists">„%1$s" ist bereits in Downloads vorhanden. Download übersprungen.</string>
     <string name="sftp_send_to_background">Im Hintergrund</string>
     <string name="sftp_background_dismiss_cd">Schließen</string>
@@ -286,6 +293,8 @@
     <string name="sftp_nothing_to_download">Nichts zum Herunterladen</string>
     <string name="sftp_batch_conflict_title">Einige Dateien existieren bereits</string>
     <string name="sftp_batch_conflict_message">%1$d von %2$d Dateien existieren bereits in Downloads. Was möchten Sie tun?</string>
+    <string name="sftp_upload_conflict_message">\"%1$s\" existiert bereits in diesem Ordner auf dem Server.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d von %2$d Dateien existieren bereits in diesem Ordner auf dem Server. Was möchten Sie tun?</string>
     <string name="action_overwrite_all">Alle überschreiben</string>
     <string name="action_skip_existing">Vorhandene überspringen</string>
 
