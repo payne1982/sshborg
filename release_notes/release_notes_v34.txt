@@ -1,90 +1,80 @@
 <en-US>
 • SFTP: fixed uploads that could drop the connection or end with an error
-• SFTP: errors stay on screen with the details and a Copy button
-• SFTP: multi-file transfers skip a failed file and list the failures at the end
-• SFTP: uploads ask before replacing a file that already exists
-• App lock: the timeout now counts from when you leave the app
-• App lock: picking a file no longer asks to unlock again
+• SFTP: errors stay on screen and can be copied; multi-file transfers skip failed files and list them
+• SFTP: uploads ask before replacing an existing file
+• SFTP: the list keeps its position after deleting, uploading or downloading
+• App lock: the timeout counts from leaving the app; picking a file no longer asks to unlock
 • Terminal: command history is read without a second login
 </en-US>
 <it-IT>
-• SFTP: sistemati gli upload che potevano far cadere la connessione o dare errore
-• SFTP: gli errori restano a schermo con i dettagli e il pulsante Copia
-• SFTP: nei trasferimenti di più file quelli falliti vengono saltati ed elencati alla fine
+• SFTP: sistemati gli upload che potevano far cadere la connessione o fallire
+• SFTP: gli errori restano a schermo e si copiano; nei trasferimenti multipli i file falliti vengono saltati ed elencati
 • SFTP: gli upload chiedono prima di sostituire un file esistente
-• Blocco app: il timeout parte da quando esci dall'app
-• Blocco app: scegliere un file non chiede più di sbloccare
+• SFTP: la lista mantiene la posizione dopo eliminazioni, upload e download
+• Blocco app: il timeout parte da quando esci; scegliere un file non richiede lo sblocco
 • Terminale: la cronologia dei comandi si legge senza un secondo login
 </it-IT>
 <de-DE>
 • SFTP: Uploads korrigiert, die die Verbindung trennen oder fehlschlagen konnten
-• SFTP: Fehler bleiben mit Details und Kopieren-Schaltfläche sichtbar
-• SFTP: Bei mehreren Dateien werden fehlerhafte übersprungen und am Ende aufgelistet
+• SFTP: Fehler bleiben sichtbar und kopierbar; bei mehreren Dateien werden fehlerhafte übersprungen und aufgelistet
 • SFTP: Uploads fragen, bevor eine vorhandene Datei ersetzt wird
-• App-Sperre: Die Zeit zählt ab dem Verlassen der App
-• App-Sperre: Nach der Dateiauswahl muss nicht erneut entsperrt werden
+• SFTP: Die Liste behält ihre Position nach Löschen, Upload und Download
+• App-Sperre: Zeit zählt ab Verlassen der App; nach der Dateiauswahl kein erneutes Entsperren
 • Terminal: Befehlsverlauf wird ohne zweite Anmeldung gelesen
 </de-DE>
 <es-ES>
 • SFTP: corregidas las subidas que podían cortar la conexión o fallar
-• SFTP: los errores se quedan en pantalla con detalles y botón Copiar
-• SFTP: con varios archivos, los que fallan se saltan y se listan al final
+• SFTP: los errores quedan en pantalla y se pueden copiar; con varios archivos, los fallidos se saltan y se listan
 • SFTP: las subidas preguntan antes de reemplazar un archivo existente
-• Bloqueo: el tiempo cuenta desde que sales de la app
-• Bloqueo: elegir un archivo ya no pide desbloquear otra vez
+• SFTP: la lista mantiene su posición tras borrar, subir o descargar
+• Bloqueo: el tiempo cuenta desde que sales; elegir un archivo ya no pide desbloquear
 • Terminal: el historial de comandos se lee sin un segundo inicio de sesión
 </es-ES>
 <fr-FR>
-• SFTP : correction des envois qui pouvaient couper la connexion ou échouer
-• SFTP : les erreurs restent à l'écran avec détails et bouton Copier
-• SFTP : avec plusieurs fichiers, ceux en échec sont ignorés et listés à la fin
-• SFTP : les envois demandent avant de remplacer un fichier existant
-• Verrouillage : le délai compte depuis la sortie de l'app
-• Verrouillage : choisir un fichier ne redemande plus le déverrouillage
+• SFTP : corrigé les envois qui pouvaient couper la connexion ou échouer
+• SFTP : les erreurs restent à l'écran et se copient ; avec plusieurs fichiers, ceux en échec sont ignorés et listés
+• SFTP : les envois demandent avant d'écraser un fichier existant
+• SFTP : la liste garde sa position après suppression, envoi et téléchargement
+• Verrouillage : délai compté dès la sortie de l'app ; plus redemandé après un choix de fichier
 • Terminal : l'historique des commandes est lu sans seconde connexion
 </fr-FR>
 <pt-PT>
 • SFTP: corrigidos os envios que podiam cortar a ligação ou falhar
-• SFTP: os erros ficam no ecrã com detalhes e botão Copiar
-• SFTP: com vários ficheiros, os que falham são saltados e listados no fim
+• SFTP: os erros ficam no ecrã e podem ser copiados; com vários ficheiros, os que falham são saltados e listados
 • SFTP: os envios perguntam antes de substituir um ficheiro existente
-• Bloqueio da app: o tempo conta a partir de quando sai da app
-• Bloqueio da app: escolher um ficheiro já não pede para desbloquear
+• SFTP: a lista mantém a posição após eliminar, enviar ou transferir
+• Bloqueio: o tempo conta desde que sai da app; escolher um ficheiro já não pede desbloqueio
 • Terminal: o histórico de comandos é lido sem um segundo login
 </pt-PT>
 <uk>
 • SFTP: виправлено вивантаження, які могли обривати з'єднання або завершуватися помилкою
-• SFTP: помилки залишаються на екрані з подробицями та кнопкою «Копіювати»
-• SFTP: передавання кількох файлів пропускає невдалі й наприкінці показує їх список
+• SFTP: помилки лишаються на екрані й копіюються; невдалі файли пропускаються та показуються списком
 • SFTP: вивантаження питає, перш ніж замінити наявний файл
-• Блокування: час тепер рахується від моменту виходу з програми
-• Блокування: вибір файлу більше не вимагає повторного розблокування
+• SFTP: список зберігає позицію після видалення, вивантаження чи завантаження
+• Блокування: час рахується від виходу з програми; вибір файлу не вимагає розблокування
 • Термінал: історія команд читається без повторного входу
 </uk>
 <ru-RU>
 • SFTP: исправлены загрузки, которые могли обрывать соединение или давать ошибку
-• SFTP: ошибки остаются на экране с подробностями и кнопкой «Копировать»
-• SFTP: при передаче нескольких файлов неудачные пропускаются и перечисляются в конце
+• SFTP: ошибки остаются на экране и копируются; неудачные файлы пропускаются и выводятся списком
 • SFTP: загрузка спрашивает, прежде чем заменить существующий файл
-• Блокировка: время отсчитывается с момента выхода из приложения
-• Блокировка: выбор файла больше не требует разблокировки
+• SFTP: список сохраняет позицию после удаления, загрузки и скачивания
+• Блокировка: время считается с выхода из приложения; выбор файла не требует разблокировки
 • Терминал: история команд читается без повторного входа
 </ru-RU>
 <zh-CN>
 • SFTP：修复了上传时可能断开连接或以错误结束的问题
-• SFTP：错误会保留在屏幕上，附带详情和“复制”按钮
-• SFTP：多文件传输会跳过失败的文件，并在最后列出
+• SFTP：错误会保留在屏幕上并可复制；多文件传输会跳过失败的文件并列出
 • SFTP：上传前如果文件已存在会先询问是否替换
-• 应用锁：超时现在从离开应用时开始计算
-• 应用锁：选择文件后不再要求重新解锁
+• SFTP：删除、上传或下载后列表保持原来的滚动位置
+• 应用锁：超时从离开应用时开始计算；选择文件后不再要求解锁
 • 终端：读取命令历史不再需要第二次登录
 </zh-CN>
 <ja-JP>
 • SFTP：接続が切れたりエラーで終わったりすることがあるアップロードを修正
-• SFTP：エラーは詳細と「コピー」ボタン付きで画面に残るように
-• SFTP：複数ファイルの転送は失敗したファイルを飛ばし、最後に一覧表示
+• SFTP：エラーは画面に残りコピー可能に。複数ファイルの転送は失敗したファイルを飛ばして一覧表示
 • SFTP：既存のファイルを置き換える前に確認するように
-• アプリロック：タイムアウトはアプリを離れた時点から数えるように
-• アプリロック：ファイル選択後に再度ロック解除を求めないように
+• SFTP：削除・アップロード・ダウンロード後もリストのスクロール位置を保持
+• アプリロック：タイムアウトはアプリを離れた時点から計算、ファイル選択後の再ロック解除は不要に
 • ターミナル：コマンド履歴の読み込みで二度目のログインが不要に
 </ja-JP>

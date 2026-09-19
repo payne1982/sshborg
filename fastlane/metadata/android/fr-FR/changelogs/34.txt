@@ -1,7 +1,6 @@
-• SFTP : correction des envois qui pouvaient couper la connexion ou échouer
-• SFTP : les erreurs restent à l'écran avec détails et bouton Copier
-• SFTP : avec plusieurs fichiers, ceux en échec sont ignorés et listés à la fin
-• SFTP : les envois demandent avant de remplacer un fichier existant
-• Verrouillage : le délai compte depuis la sortie de l'app
-• Verrouillage : choisir un fichier ne redemande plus le déverrouillage
+• SFTP : corrigé les envois qui pouvaient couper la connexion ou échouer
+• SFTP : les erreurs restent à l'écran et se copient ; avec plusieurs fichiers, ceux en échec sont ignorés et listés
+• SFTP : les envois demandent avant d'écraser un fichier existant
+• SFTP : la liste garde sa position après suppression, envoi et téléchargement
+• Verrouillage : délai compté dès la sortie de l'app ; plus redemandé après un choix de fichier
 • Terminal : l'historique des commandes est lu sans seconde connexion

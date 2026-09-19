@@ -1,7 +1,6 @@
 • SFTP: corregidas las subidas que podían cortar la conexión o fallar
-• SFTP: los errores se quedan en pantalla con detalles y botón Copiar
-• SFTP: con varios archivos, los que fallan se saltan y se listan al final
+• SFTP: los errores quedan en pantalla y se pueden copiar; con varios archivos, los fallidos se saltan y se listan
 • SFTP: las subidas preguntan antes de reemplazar un archivo existente
-• Bloqueo: el tiempo cuenta desde que sales de la app
-• Bloqueo: elegir un archivo ya no pide desbloquear otra vez
+• SFTP: la lista mantiene su posición tras borrar, subir o descargar
+• Bloqueo: el tiempo cuenta desde que sales; elegir un archivo ya no pide desbloquear
 • Terminal: el historial de comandos se lee sin un segundo inicio de sesión

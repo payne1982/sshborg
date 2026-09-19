@@ -1,7 +1,6 @@
 • SFTP: corrigidos os envios que podiam cortar a ligação ou falhar
-• SFTP: os erros ficam no ecrã com detalhes e botão Copiar
-• SFTP: com vários ficheiros, os que falham são saltados e listados no fim
+• SFTP: os erros ficam no ecrã e podem ser copiados; com vários ficheiros, os que falham são saltados e listados
 • SFTP: os envios perguntam antes de substituir um ficheiro existente
-• Bloqueio da app: o tempo conta a partir de quando sai da app
-• Bloqueio da app: escolher um ficheiro já não pede para desbloquear
+• SFTP: a lista mantém a posição após eliminar, enviar ou transferir
+• Bloqueio: o tempo conta desde que sai da app; escolher um ficheiro já não pede desbloqueio
 • Terminal: o histórico de comandos é lido sem um segundo login
