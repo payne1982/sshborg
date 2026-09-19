@@ -45,7 +45,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         ) : State
         data class Deleting(val name: String, val index: Int = 1, val total: Int = 1) : State
         data class Uploading(val filename: String, val bytesSent: Long, val fileIndex: Int = 1, val totalFiles: Int = 1) : State
-        data class Uploaded(val filename: String, val totalFiles: Int = 1) : State
         data class Error(val message: String, val detail: String? = null) : State
         object Disconnected : State
     }
@@ -739,25 +738,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                  .onFailure { failures += FileFailure.of(filename, it) }
             }
             if (failures.isEmpty() && notAttempted.isEmpty()) {
-                val s = State.Uploaded(plan.last().second, planTotal)
-                _state.value = s; postUploadNotification(s)
+                // The view model refreshes by itself; the screen only shows the notice. (It used
+                // to be the screen, from an effect on an "Uploaded" state — an effect that can
+                // run twice, and did: two listings at once on the one channel.)
+                val msg = if (planTotal == 1) str(R.string.sftp_uploaded, plan.last().second)
+                          else str(R.string.sftp_uploaded_n_files, planTotal)
+                _opError.tryEmit(msg)
+                SshForegroundService.notifyUploadComplete(getApplication(), msg)
+                refreshListing()
                 return@launch
             }
             val title = if (planTotal == 1) str(R.string.error_upload_failed)
                         else str(R.string.sftp_report_uploaded_n_of_m, uploaded, planTotal)
             report(ErrorReport(title, failures, notAttempted), refresh = true)
         }
-    }
-
-    fun dismissUploaded() = refreshListing()
-
-    private fun postUploadNotification(s: State.Uploaded) {
-        val ctx = getApplication<Application>()
-        val msg = if (s.totalFiles == 1)
-            ctx.getString(R.string.sftp_uploaded, s.filename)
-        else
-            ctx.getString(R.string.sftp_uploaded_n_files, s.totalFiles)
-        SshForegroundService.notifyUploadComplete(ctx, msg)
     }
 
     // ── File operations ───────────────────────────────────────────────────────
@@ -849,18 +843,35 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
+        if (BuildConfig.DEBUG) {
+            val caller = Throwable().stackTrace.drop(1).take(4).joinToString(" < ") { "${it.methodName}:${it.lineNumber}" }
+            android.util.Log.d("SftpSession", "refreshListing from $caller (state ${_state.value::class.simpleName})")
+        }
+        // One refresh at a time: a request arriving while one runs is folded into a single
+        // rerun when it ends, so bursts of requests never become parallel listings.
+        if (!refreshing.compareAndSet(false, true)) { refreshAgain = true; return }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
-            }.onFailure {
-                // If the session is gone, report() goes to the connection-lost screen: a dialog
-                // alone would leave the current state (e.g. the Downloading overlay) with no way out.
-                report(ErrorReport(str(R.string.error_refresh_failed), listOf(FileFailure.of(current, it))), refresh = false)
-                // Still connected: get off the progress screen that launched this refresh, back
-                // to the listing we had, so the screen doesn't hang on a spinner.
-                if (sftpSession?.isConnected == true && _state.value !is State.Listing) {
-                    lastListing?.let { l -> _state.value = l }
-                }
+            try { doRefresh(current) } finally {
+                refreshing.set(false)
+                if (refreshAgain) { refreshAgain = false; refreshListing() }
+            }
+        }
+    }
+
+    private val refreshing = java.util.concurrent.atomic.AtomicBoolean(false)
+    @Volatile private var refreshAgain = false
+
+    private fun doRefresh(current: String) {
+        runCatching {
+            _state.value = State.Listing(current, sftpSession!!.listDir(current), System.currentTimeMillis())
+        }.onFailure {
+            // If the session is gone, report() goes to the connection-lost screen: a dialog
+            // alone would leave the current state (e.g. the Downloading overlay) with no way out.
+            report(ErrorReport(str(R.string.error_refresh_failed), listOf(FileFailure.of(current, it))), refresh = false)
+            // Still connected: get off the progress screen that launched this refresh, back
+            // to the listing we had, so the screen doesn't hang on a spinner.
+            if (sftpSession?.isConnected == true && _state.value !is State.Listing) {
+                lastListing?.let { l -> _state.value = l }
             }
         }
     }

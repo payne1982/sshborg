@@ -84,21 +84,6 @@ fun SftpScreen(
         }
     }
 
-    // Uploaded: refresh listing immediately, show snackbar concurrently.
-    // (Foreground downloads now show a persistent completion screen with a Done button —
-    //  see the State.Downloaded branch below — so they are not handled here.)
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
-    val uploadedMsg = (state as? SftpViewModel.State.Uploaded)?.let { s ->
-        if (s.totalFiles > 1) stringResource(R.string.sftp_uploaded_n_files, s.totalFiles)
-        else stringResource(R.string.sftp_uploaded, s.filename)
-    }
-    LaunchedEffect(state) {
-        if (state is SftpViewModel.State.Uploaded) {
-            uploadedMsg?.let { scope.launch { snackbarHostState.showSnackbar(it) } }
-            vm.dismissUploaded()
-        }
-    }
-
     val currentPath = (state as? SftpViewModel.State.Listing)?.path ?: ""
 
     // Clear selection when navigating to a different directory
@@ -420,10 +405,6 @@ fun SftpScreen(
                         bytes   = s.bytesSent,
                         icon    = Icons.Default.Upload,
                     )
-                }
-
-                is SftpViewModel.State.Uploaded -> {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
 
                 is SftpViewModel.State.Error -> {
