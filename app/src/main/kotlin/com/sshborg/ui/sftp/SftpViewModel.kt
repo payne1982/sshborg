@@ -843,10 +843,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun refreshListing() {
         val current = pathStack.lastOrNull() ?: return
-        if (BuildConfig.DEBUG) {
-            val caller = Throwable().stackTrace.drop(1).take(4).joinToString(" < ") { "${it.methodName}:${it.lineNumber}" }
-            android.util.Log.d("SftpSession", "refreshListing from $caller (state ${_state.value::class.simpleName})")
-        }
         // One refresh at a time: a request arriving while one runs is folded into a single
         // rerun when it ends, so bursts of requests never become parallel listings.
         if (!refreshing.compareAndSet(false, true)) { refreshAgain = true; return }

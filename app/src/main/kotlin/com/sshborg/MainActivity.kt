@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -127,7 +126,6 @@ class MainActivity : AppCompatActivity() {
         if (unlocked && !isAuthenticating) {
             (application as SshBorgApp).lastAuthTime = System.currentTimeMillis()
         }
-        if (BuildConfig.DEBUG) Log.d("AppLock", "onStop: unlocked=$unlocked authenticating=$isAuthenticating")
         unlocked = false
     }
 
@@ -152,7 +150,6 @@ class MainActivity : AppCompatActivity() {
             // Back from a system picker the app opened: allow a few minutes, if the setting is shorter.
             val timeoutMs = if (pickerTrip) maxOf(setTimeoutMs, PICKER_GRACE_MS) else setTimeoutMs
             val elapsed = System.currentTimeMillis() - app.lastAuthTime
-            if (BuildConfig.DEBUG) Log.d("AppLock", "onStart: away ${elapsed}ms, timeout ${timeoutMs}ms, picker=$pickerTrip, stamped=${app.lastAuthTime > 0L}")
             if (app.lastAuthTime > 0L && elapsed <= timeoutMs) {
                 unlocked = true
                 showAppLock.value = false
