@@ -1,0 +1,7 @@
+• SFTP: sistemati gli upload che potevano far cadere la connessione o dare errore
+• SFTP: gli errori restano a schermo con i dettagli e il pulsante Copia
+• SFTP: nei trasferimenti di più file quelli falliti vengono saltati ed elencati alla fine
+• SFTP: gli upload chiedono prima di sostituire un file esistente
+• Blocco app: il timeout parte da quando esci dall'app
+• Blocco app: scegliere un file non chiede più di sbloccare
+• Terminale: la cronologia dei comandi si legge senza un secondo login
