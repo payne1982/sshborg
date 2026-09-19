@@ -74,7 +74,8 @@ fun SftpScreen(
         }
     }
 
-    // Non-fatal operation errors shown as snackbar without leaving listing
+    // Short notices shown as a snackbar without leaving the listing. Errors don't come this way:
+    // they go to the report dialog below, which stays until closed and can be copied.
     val unknownError = stringResource(R.string.error_unknown)
     LaunchedEffect(Unit) {
         vm.opError.collect { message ->
@@ -401,6 +402,7 @@ fun SftpScreen(
                         completedAt  = s.completedAt,
                         onOpen       = { vm.openDownloadedFile(s.filename, s.location) },
                         onDone       = vm::dismissDownloaded,
+                        onShowErrors = s.report?.let { r -> { vm.showReport(r) } },
                     )
                 }
 
@@ -446,12 +448,15 @@ fun SftpScreen(
                     onCancel   = vm::cancelBackgroundTransfer,
                     onDismiss  = vm::dismissBackgroundTransfer,
                     onOpen     = { vm.openDownloadedFile(it.filename, it.localDir) },
+                    onShowErrors = vm::showTransferReport,
                     modifier   = Modifier.align(Alignment.BottomCenter),
                     endPadding = if (isListing && !selectionMode) 80.dp else 12.dp,
                 )
             }
         }
     }
+
+    vm.report.collectAsState().value?.let { ErrorReportDialog(it, onDismiss = vm::dismissReport) }
 
     // Bulk delete confirmation dialog
     pendingBulkDelete?.let { entries ->
@@ -912,6 +917,7 @@ private fun BackgroundTransfersPanel(
     onCancel: (String) -> Unit,
     onDismiss: (String) -> Unit,
     onOpen: (BackgroundTransfer) -> Unit,
+    onShowErrors: (BackgroundTransfer) -> Unit,
     modifier: Modifier = Modifier,
     endPadding: Dp = 12.dp,
 ) {
@@ -929,22 +935,27 @@ private fun BackgroundTransfersPanel(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             )
             transfers.forEach { t ->
+                // A finished transfer that left files behind opens its error report on tap.
+                val hasReport = t.status != BackgroundTransfer.Status.Running &&
+                    (t.failures.isNotEmpty() || t.notAttempted.isNotEmpty())
+                val partial = t.status == BackgroundTransfer.Status.Done && hasReport
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .then(if (hasReport) Modifier.clickable { onShowErrors(t) } else Modifier)
                         .padding(horizontal = 12.dp, vertical = 2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(
-                        imageVector = when (t.status) {
+                        imageVector = if (partial) Icons.Default.Warning else when (t.status) {
                             BackgroundTransfer.Status.Done      -> Icons.Default.CheckCircle
                             BackgroundTransfer.Status.Error     -> Icons.Default.ErrorOutline
                             BackgroundTransfer.Status.Cancelled -> Icons.Default.Cancel
                             BackgroundTransfer.Status.Running   -> Icons.Default.Downloading
                         },
                         contentDescription = null,
-                        tint = when (t.status) {
+                        tint = if (partial) PartialTransferColor else when (t.status) {
                             BackgroundTransfer.Status.Done      -> MaterialTheme.colorScheme.primary
                             BackgroundTransfer.Status.Error     -> MaterialTheme.colorScheme.error
                             BackgroundTransfer.Status.Cancelled -> MaterialTheme.colorScheme.onSurfaceVariant
@@ -1001,6 +1012,15 @@ private fun BackgroundTransfersPanel(
                                 )
                             }
                         }
+                        if (hasReport) {
+                            Text(
+                                text = stringResource(R.string.sftp_report_tap_for_details),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (partial) PartialTransferColor else MaterialTheme.colorScheme.error,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                         TransferTimestamps(
                             startedAt   = t.startedAt,
                             completedAt = t.completedAt,
@@ -1030,6 +1050,9 @@ private fun BackgroundTransfersPanel(
         }
     }
 }
+
+/** A transfer that finished but skipped some files: not an error, not a clean success. */
+private val PartialTransferColor = Color(0xFFF57C00)
 
 private fun formatSize(bytes: Long): String = when {
     bytes < 1_024               -> "$bytes B"
@@ -1122,6 +1145,7 @@ private fun BoxScope.DownloadComplete(
     completedAt: Long,
     onOpen: () -> Unit,
     onDone: () -> Unit,
+    onShowErrors: (() -> Unit)?,
 ) {
     Column(
         Modifier
@@ -1193,6 +1217,11 @@ private fun BoxScope.DownloadComplete(
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             TransferTimestamps(startedAt = startedAt, completedAt = completedAt)
+        }
+        if (onShowErrors != null) {
+            TextButton(onClick = onShowErrors) {
+                Text(stringResource(R.string.sftp_report_show_errors), color = PartialTransferColor)
+            }
         }
         Button(onClick = onDone) {
             Text(stringResource(R.string.action_done))

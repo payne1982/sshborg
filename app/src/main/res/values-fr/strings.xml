@@ -266,6 +266,13 @@
     <string name="sftp_menu_download_in_background">Télécharger en arrière-plan</string>
     <string name="sftp_background_downloads_title">Téléchargements en arrière-plan</string>
     <string name="sftp_background_download_failed">Échec du téléchargement</string>
+    <string name="sftp_report_uploaded_n_of_m">%1$d sur %2$d envoyés</string>
+    <string name="sftp_report_downloaded_n_of_m">%1$d sur %2$d téléchargés</string>
+    <string name="sftp_report_not_attempted">Non tentés : %1$s</string>
+    <string name="sftp_report_show_errors">Voir les erreurs</string>
+    <string name="sftp_report_tap_for_details">Touchez pour voir les erreurs</string>
+    <string name="sftp_report_local_file_failed">Impossible de créer le fichier dans Téléchargements</string>
+    <string name="sftp_notify_see_details">Ouvrez le transfert dans SSHBorg pour voir les erreurs.</string>
     <string name="sftp_background_skipped_exists">"%1$s" existe déjà dans Téléchargements. Téléchargement ignoré.</string>
     <string name="sftp_send_to_background">Arrière-plan</string>
     <string name="sftp_background_dismiss_cd">Fermer</string>

@@ -266,6 +266,13 @@
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
     <string name="sftp_background_download_failed">Помилка завантаження</string>
+    <string name="sftp_report_uploaded_n_of_m">Вивантажено %1$d з %2$d</string>
+    <string name="sftp_report_downloaded_n_of_m">Завантажено %1$d з %2$d</string>
+    <string name="sftp_report_not_attempted">Не оброблено: %1$s</string>
+    <string name="sftp_report_show_errors">Показати помилки</string>
+    <string name="sftp_report_tap_for_details">Торкніться, щоб побачити помилки</string>
+    <string name="sftp_report_local_file_failed">Не вдалося створити файл у «Завантаженнях»</string>
+    <string name="sftp_notify_see_details">Відкрийте передавання в SSHBorg, щоб побачити помилки.</string>
     <string name="sftp_background_skipped_exists">"%1$s" вже є в Завантаженнях. Завантаження пропущено.</string>
     <string name="sftp_send_to_background">У фоні</string>
     <string name="sftp_background_dismiss_cd">Закрити</string>

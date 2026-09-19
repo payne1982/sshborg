@@ -280,6 +280,13 @@
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>
     <string name="sftp_background_download_failed">下载失败</string>
+    <string name="sftp_report_uploaded_n_of_m">已上传 %1$d / %2$d</string>
+    <string name="sftp_report_downloaded_n_of_m">已下载 %1$d / %2$d</string>
+    <string name="sftp_report_not_attempted">未处理：%1$s</string>
+    <string name="sftp_report_show_errors">查看错误</string>
+    <string name="sftp_report_tap_for_details">点按查看错误</string>
+    <string name="sftp_report_local_file_failed">无法在“下载”中创建文件</string>
+    <string name="sftp_notify_see_details">在 SSHBorg 中打开此传输以查看错误。</string>
     <string name="sftp_background_skipped_exists">"%1$s"已存在于下载目录中。已跳过下载。</string>
     <string name="sftp_send_to_background">后台</string>
     <string name="sftp_background_dismiss_cd">关闭</string>

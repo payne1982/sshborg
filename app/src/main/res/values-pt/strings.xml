@@ -266,6 +266,13 @@
     <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
     <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
     <string name="sftp_background_download_failed">Transferência falhada</string>
+    <string name="sftp_report_uploaded_n_of_m">Enviados %1$d de %2$d</string>
+    <string name="sftp_report_downloaded_n_of_m">Transferidos %1$d de %2$d</string>
+    <string name="sftp_report_not_attempted">Não tentados: %1$s</string>
+    <string name="sftp_report_show_errors">Ver erros</string>
+    <string name="sftp_report_tap_for_details">Toque para ver os erros</string>
+    <string name="sftp_report_local_file_failed">Não foi possível criar o ficheiro em Transferências</string>
+    <string name="sftp_notify_see_details">Abra a transferência no SSHBorg para ver os erros.</string>
     <string name="sftp_background_skipped_exists">"%1$s" já existe em Transferências. Transferência ignorada.</string>
     <string name="sftp_send_to_background">Segundo plano</string>
     <string name="sftp_background_dismiss_cd">Fechar</string>
