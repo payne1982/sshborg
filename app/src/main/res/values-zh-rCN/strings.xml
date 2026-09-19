@@ -308,6 +308,8 @@
     <string name="sftp_nothing_to_download">无可下载内容</string>
     <string name="sftp_batch_conflict_title">部分文件已存在</string>
     <string name="sftp_batch_conflict_message">%2$d 个文件中有 %1$d 个已存在于下载目录中。请选择操作：</string>
+    <string name="sftp_upload_conflict_message">"%1$s"已存在于服务器上的此文件夹中。</string>
+    <string name="sftp_upload_batch_conflict_message">%2$d 个文件中有 %1$d 个已存在于服务器上的此文件夹中。请选择操作：</string>
     <string name="action_overwrite_all">全部覆盖</string>
     <string name="action_skip_existing">跳过已存在</string>
 

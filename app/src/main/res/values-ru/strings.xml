@@ -309,6 +309,8 @@
     <string name="sftp_nothing_to_download">Нечего скачивать</string>
     <string name="sftp_batch_conflict_title">Некоторые файлы уже существуют</string>
     <string name="sftp_batch_conflict_message">%1$d из %2$d файлов уже есть в Downloads. Что сделать?</string>
+    <string name="sftp_upload_conflict_message">«%1$s» уже есть в этой папке на сервере.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d из %2$d файлов уже есть в этой папке на сервере. Что сделать?</string>
     <string name="action_overwrite_all">Заменить все</string>
     <string name="action_skip_existing">Пропустить существующие</string>
 

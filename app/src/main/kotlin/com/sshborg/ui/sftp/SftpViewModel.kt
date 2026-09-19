@@ -166,6 +166,18 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun resolveBatchConflict(decision: BatchConflictDecision) { batchConflictDecision.tryEmit(decision) }
 
+    /** Emitted when files about to be uploaded already exist in the remote folder. */
+    sealed interface UploadConflict {
+        data class Single(val name: String) : UploadConflict
+        data class Batch(val conflictCount: Int, val totalCount: Int) : UploadConflict
+    }
+    enum class UploadDecision { OVERWRITE, KEEP_BOTH, SKIP_EXISTING, CANCEL }
+    private val _uploadConflictEvent = MutableSharedFlow<UploadConflict>(extraBufferCapacity = 1)
+    val uploadConflictEvent: SharedFlow<UploadConflict> = _uploadConflictEvent
+    private val uploadDecision = MutableSharedFlow<UploadDecision>(extraBufferCapacity = 1)
+
+    fun resolveUploadConflict(decision: UploadDecision) { uploadDecision.tryEmit(decision) }
+
     /** Job covering the Preparing phase of a batch download. */
     private var preparationJob: Job? = null
     /** ID of the transfer currently shown in the foreground (mirrored to [_state]). */
@@ -637,6 +649,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Returns a name like "file(1).txt" that is not in [taken] (the remote folder's names). */
+    private fun uniqueRemoteName(original: String, taken: Set<String>): String {
+        val dot = original.lastIndexOf('.')
+        val base = if (dot > 0) original.substring(0, dot) else original
+        val ext  = if (dot > 0) original.substring(dot) else ""
+        return generateSequence(1) { it + 1 }.map { "$base($it)$ext" }.first { it !in taken }
+    }
+
     /** Returns a filename like "file(1).txt" that does not yet exist in [localDir]. */
     private fun uniqueFilename(original: String, localDir: String): String {
         val dot = original.lastIndexOf('.')
@@ -666,35 +686,65 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     ?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
                     ?: uri.lastPathSegment ?: "file"
             }
+
+            // Ask before replacing anything already on the server. The names come from a fresh
+            // listing, not the one on screen, which may be stale.
+            val existing = runCatching { sftpSession!!.listDir(currentPath).map { it.name }.toSet() }
+                .getOrElse {
+                    report(ErrorReport(str(R.string.error_upload_failed), listOf(FileFailure.of(currentPath, it))), refresh = true)
+                    return@launch
+                }
+            val clashing = names.filter { it in existing }
+            var targets = names   // remote name for each uri; null = skipped
+                .map<String, String?> { it }
+            if (clashing.isNotEmpty()) {
+                _uploadConflictEvent.tryEmit(
+                    if (total == 1) UploadConflict.Single(names.first())
+                    else UploadConflict.Batch(clashing.size, total)
+                )
+                when (uploadDecision.first()) {
+                    UploadDecision.CANCEL -> return@launch
+                    UploadDecision.OVERWRITE -> Unit
+                    UploadDecision.KEEP_BOTH -> {
+                        val taken = existing.toMutableSet()
+                        targets = names.map { n -> if (n in existing) uniqueRemoteName(n, taken).also { taken += it } else n }
+                    }
+                    UploadDecision.SKIP_EXISTING -> targets = names.map { n -> n.takeIf { it !in existing } }
+                }
+            }
+            val plan = uris.indices.mapNotNull { i -> targets[i]?.let { uris[i] to it } }
+            if (plan.isEmpty()) { refreshListing(); return@launch }
+            val planTotal = plan.size
+
             val failures = mutableListOf<FileFailure>()
             var notAttempted = emptyList<String>()
             var uploaded = 0
-            for ((index, uri) in uris.withIndex()) {
-                val filename = names[index]
+            for ((index, item) in plan.withIndex()) {
+                val (uri, filename) = item
                 // One failed file doesn't stop the batch, but a dead connection does: every
                 // remaining file would fail the same way.
                 if (sftpSession?.isConnected != true) {
-                    notAttempted = names.drop(index)
+                    notAttempted = plan.drop(index).map { it.second }
                     break
                 }
                 val remotePath = "${currentPath.trimEnd('/')}/$filename"
-                _state.value = State.Uploading(filename, 0L, index + 1, total)
+                _state.value = State.Uploading(filename, 0L, index + 1, planTotal)
                 runCatching {
                     context.contentResolver.openInputStream(uri)!!.use { stream ->
                         sftpSession!!.uploadFile(stream, remotePath) { bytes ->
-                            _state.value = State.Uploading(filename, bytes, index + 1, total)
+                            _state.value = State.Uploading(filename, bytes, index + 1, planTotal)
                         }
                     }
                 }.onSuccess { uploaded++ }
                  .onFailure { failures += FileFailure.of(filename, it) }
             }
             if (failures.isEmpty() && notAttempted.isEmpty()) {
-                val s = State.Uploaded(names.last(), total)
+                val s = State.Uploaded(plan.last().second, planTotal)
                 _state.value = s; postUploadNotification(s)
                 return@launch
             }
-            val title = if (total == 1) str(R.string.error_upload_failed)
-                        else str(R.string.sftp_report_uploaded_n_of_m, uploaded, total)
+            val title = if (planTotal == 1) str(R.string.error_upload_failed)
+                        else str(R.string.sftp_report_uploaded_n_of_m, uploaded, planTotal)
             report(ErrorReport(title, failures, notAttempted), refresh = true)
         }
     }

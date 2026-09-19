@@ -293,6 +293,8 @@
     <string name="sftp_nothing_to_download">Rien à télécharger</string>
     <string name="sftp_batch_conflict_title">Certains fichiers existent déjà</string>
     <string name="sftp_batch_conflict_message">%1$d fichier(s) sur %2$d existent déjà dans Téléchargements. Que souhaitez-vous faire ?</string>
+    <string name="sftp_upload_conflict_message">\"%1$s\" existe déjà dans ce dossier sur le serveur.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d fichier(s) sur %2$d existent déjà dans ce dossier sur le serveur. Que souhaitez-vous faire ?</string>
     <string name="action_overwrite_all">Tout écraser</string>
     <string name="action_skip_existing">Ignorer les existants</string>
 

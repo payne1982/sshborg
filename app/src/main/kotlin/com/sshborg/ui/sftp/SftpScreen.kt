@@ -127,12 +127,16 @@ fun SftpScreen(
     var showMkdirDialog  by remember { mutableStateOf(false) }
     var pendingConflict  by remember { mutableStateOf<SftpViewModel.ConflictData?>(null) }
     var pendingBatchConflict by remember { mutableStateOf<SftpViewModel.BatchConflictData?>(null) }
+    var pendingUploadConflict by remember { mutableStateOf<SftpViewModel.UploadConflict?>(null) }
 
     LaunchedEffect(Unit) {
         vm.conflictEvent.collect { pendingConflict = it }
     }
     LaunchedEffect(Unit) {
         vm.batchConflictEvent.collect { pendingBatchConflict = it }
+    }
+    LaunchedEffect(Unit) {
+        vm.uploadConflictEvent.collect { pendingUploadConflict = it }
     }
 
     // File picker — opens system file chooser, result forwarded to ViewModel
@@ -558,88 +562,42 @@ fun SftpScreen(
         )
     }
 
-    // Download conflict dialog (single-file downloads only)
+    // Download conflict dialogs
     pendingConflict?.let { conflict ->
-        AlertDialog(
-            onDismissRequest = { pendingConflict = null },
-            title = { Text(stringResource(R.string.sftp_conflict_title)) },
-            text  = { Text(stringResource(R.string.sftp_conflict_message, conflict.entry.name)) },
-            confirmButton = {
-                // The two real choices stacked in one full-width column, Cancel beside the
-                // lower one. Side by side they had to share the width and the longer label
-                // broke over two lines; stacked, each gets the whole column. Overwrite sits
-                // at the bottom, nearest the thumb, and the label is the same width as the
-                // other choice so neither reads as the default.
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        OutlinedButton(
-                            onClick = { pendingConflict = null; vm.downloadKeepBoth(conflict) },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(stringResource(R.string.action_keep_both))
-                        }
-                        OutlinedButton(
-                            onClick = { pendingConflict = null; vm.downloadOverwrite(conflict) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                                brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
-                            ),
-                        ) {
-                            Text(stringResource(R.string.action_overwrite))
-                        }
-                    }
-                    TextButton(onClick = { pendingConflict = null }) {
-                        Text(stringResource(R.string.action_cancel))
-                    }
-                }
-            },
+        FileConflictDialog(
+            message    = stringResource(R.string.sftp_conflict_message, conflict.entry.name),
+            onKeepBoth = { pendingConflict = null; vm.downloadKeepBoth(conflict) },
+            onOverwrite = { pendingConflict = null; vm.downloadOverwrite(conflict) },
+            onCancel   = { pendingConflict = null },
+        )
+    }
+    pendingBatchConflict?.let { batchConflict ->
+        val decide = { d: SftpViewModel.BatchConflictDecision -> pendingBatchConflict = null; vm.resolveBatchConflict(d) }
+        BatchConflictDialog(
+            message       = stringResource(R.string.sftp_batch_conflict_message, batchConflict.conflictCount, batchConflict.totalCount),
+            onSkip        = { decide(SftpViewModel.BatchConflictDecision.SKIP_EXISTING) },
+            onOverwriteAll = { decide(SftpViewModel.BatchConflictDecision.OVERWRITE_ALL) },
+            onCancel      = { decide(SftpViewModel.BatchConflictDecision.CANCEL) },
         )
     }
 
-    // Batch download conflict dialog
-    pendingBatchConflict?.let { batchConflict ->
-        AlertDialog(
-            onDismissRequest = {
-                pendingBatchConflict = null
-                vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.CANCEL)
-            },
-            title = { Text(stringResource(R.string.sftp_batch_conflict_title)) },
-            text  = {
-                Text(stringResource(R.string.sftp_batch_conflict_message,
-                    batchConflict.conflictCount, batchConflict.totalCount))
-            },
-            confirmButton = {
-                // Laid out like the single-file conflict above: the two choices stacked in the
-                // left column, Cancel beside the lower one. Side by side these two are the
-                // longest label pair in the app (41 characters together in German), so a plain
-                // Row squeezed both and broke them over two lines.
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-                    Column(Modifier.weight(1f)) {
-                        TextButton(onClick = {
-                            pendingBatchConflict = null
-                            vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.SKIP_EXISTING)
-                        }) { Text(stringResource(R.string.action_skip_existing)) }
-                        TextButton(onClick = {
-                            pendingBatchConflict = null
-                            vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.OVERWRITE_ALL)
-                        }) {
-                            Text(stringResource(R.string.action_overwrite_all),
-                                color = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                    TextButton(onClick = {
-                        pendingBatchConflict = null
-                        vm.resolveBatchConflict(SftpViewModel.BatchConflictDecision.CANCEL)
-                    }) { Text(stringResource(R.string.action_cancel)) }
-                }
-            },
-        )
+    // Upload conflict dialogs: the same two, about the remote folder
+    pendingUploadConflict?.let { conflict ->
+        val decide = { d: SftpViewModel.UploadDecision -> pendingUploadConflict = null; vm.resolveUploadConflict(d) }
+        when (conflict) {
+            is SftpViewModel.UploadConflict.Single -> FileConflictDialog(
+                message     = stringResource(R.string.sftp_upload_conflict_message, conflict.name),
+                onKeepBoth  = { decide(SftpViewModel.UploadDecision.KEEP_BOTH) },
+                onOverwrite = { decide(SftpViewModel.UploadDecision.OVERWRITE) },
+                onCancel    = { decide(SftpViewModel.UploadDecision.CANCEL) },
+            )
+            is SftpViewModel.UploadConflict.Batch -> BatchConflictDialog(
+                message        = stringResource(R.string.sftp_upload_batch_conflict_message, conflict.conflictCount, conflict.totalCount),
+                onSkip         = { decide(SftpViewModel.UploadDecision.SKIP_EXISTING) },
+                onOverwriteAll = { decide(SftpViewModel.UploadDecision.OVERWRITE) },
+                onCancel       = { decide(SftpViewModel.UploadDecision.CANCEL) },
+            )
+        }
     }
 
     // New folder dialog
@@ -1227,6 +1185,83 @@ private fun BoxScope.DownloadComplete(
             Text(stringResource(R.string.action_done))
         }
     }
+}
+
+/** "This file already exists": keep both, overwrite, or cancel. Used for downloads and uploads. */
+@Composable
+private fun FileConflictDialog(
+    message: String,
+    onKeepBoth: () -> Unit,
+    onOverwrite: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.sftp_conflict_title)) },
+        text  = { Text(message) },
+        confirmButton = {
+            // The two real choices stacked in one full-width column, Cancel beside the
+            // lower one. Side by side they had to share the width and the longer label
+            // broke over two lines; stacked, each gets the whole column. Overwrite sits
+            // at the bottom, nearest the thumb, and the label is the same width as the
+            // other choice so neither reads as the default.
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedButton(onClick = onKeepBoth, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.action_keep_both))
+                    }
+                    OutlinedButton(
+                        onClick = onOverwrite,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        ),
+                        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                            brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
+                        ),
+                    ) {
+                        Text(stringResource(R.string.action_overwrite))
+                    }
+                }
+                TextButton(onClick = onCancel) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        },
+    )
+}
+
+/** "Some files already exist": skip them, overwrite all, or cancel. Downloads and uploads. */
+@Composable
+private fun BatchConflictDialog(
+    message: String,
+    onSkip: () -> Unit,
+    onOverwriteAll: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.sftp_batch_conflict_title)) },
+        text  = { Text(message) },
+        confirmButton = {
+            // Laid out like the single-file conflict: the two choices stacked in the left
+            // column, Cancel beside the lower one. Side by side these two are the longest
+            // label pair in the app (41 characters together in German), so a plain Row
+            // squeezed both and broke them over two lines.
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                Column(Modifier.weight(1f)) {
+                    TextButton(onClick = onSkip) { Text(stringResource(R.string.action_skip_existing)) }
+                    TextButton(onClick = onOverwriteAll) {
+                        Text(stringResource(R.string.action_overwrite_all), color = MaterialTheme.colorScheme.error)
+                    }
+                }
+                TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
+            }
+        },
+    )
 }
 
 @Composable

@@ -293,6 +293,8 @@
     <string name="sftp_nothing_to_download">Нічого завантажувати</string>
     <string name="sftp_batch_conflict_title">Деякі файли вже існують</string>
     <string name="sftp_batch_conflict_message">%1$d з %2$d файлів вже є в Завантаженнях. Що ви хочете зробити?</string>
+    <string name="sftp_upload_conflict_message">«%1$s» вже є в цій папці на сервері.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d з %2$d файлів вже є в цій папці на сервері. Що ви хочете зробити?</string>
     <string name="action_overwrite_all">Перезаписати все</string>
     <string name="action_skip_existing">Пропустити наявні</string>
 

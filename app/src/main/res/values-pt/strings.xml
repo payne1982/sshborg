@@ -293,6 +293,8 @@
     <string name="sftp_nothing_to_download">Nada para transferir</string>
     <string name="sftp_batch_conflict_title">Alguns ficheiros já existem</string>
     <string name="sftp_batch_conflict_message">%1$d de %2$d ficheiros já existem nos Transferências. O que pretende fazer?</string>
+    <string name="sftp_upload_conflict_message">\"%1$s\" já existe nesta pasta do servidor.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d de %2$d ficheiros já existem nesta pasta do servidor. O que pretende fazer?</string>
     <string name="action_overwrite_all">Substituir tudo</string>
     <string name="action_skip_existing">Ignorar existentes</string>
 

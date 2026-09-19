@@ -294,6 +294,8 @@
     <string name="sftp_nothing_to_download">Niente da scaricare</string>
     <string name="sftp_batch_conflict_title">Alcuni file esistono già</string>
     <string name="sftp_batch_conflict_message">%1$d di %2$d file esistono già nei Download. Come vuoi procedere?</string>
+    <string name="sftp_upload_conflict_message">\"%1$s\" esiste già in questa cartella sul server.</string>
+    <string name="sftp_upload_batch_conflict_message">%1$d di %2$d file esistono già in questa cartella sul server. Come vuoi procedere?</string>
     <string name="action_overwrite_all">Sovrascrivi tutto</string>
     <string name="action_skip_existing">Salta esistenti</string>
 
