@@ -661,6 +661,14 @@ class ShellSession(
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
     }
 
+    /**
+     * Opens an SFTP channel on this connection, already authenticated and host-key checked —
+     * for a quick side read (the shell history) without logging in a second time. The caller
+     * owns the channel and must disconnect it; it runs alongside the shell, not in place of it.
+     */
+    fun openSftpChannel(timeoutMs: Int = 10_000): com.jcraft.jsch.ChannelSftp =
+        (session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp).also { it.connect(timeoutMs) }
+
     fun disconnect() {
         if (BuildConfig.DEBUG) SshDiagnostics.event("app disconnect() [shell]")
         runCatching { channel.disconnect() }
