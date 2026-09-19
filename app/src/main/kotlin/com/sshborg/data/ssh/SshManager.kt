@@ -709,17 +709,45 @@ class SftpSession(
      * own, takes a length out of the middle of it and fails with an IndexOutOfBoundsException
      * or a corrupt packet — and so does every request after it. A plain status from the server
      * (no such file, permission denied) is a complete reply and leaves the stream in step; any
-     * other failure — local I/O, a wrapped exception, anything during a transfer — does not.
+     * other failure — local I/O, a wrapped exception, a reply of the wrong type (JSch's
+     * SSH_FX_FAILURE with no message), anything during a transfer — does not.
+     *
+     * Operations take turns: a channel serves one request/reply exchange at a time, and two
+     * threads in it at once interleave their packets into the same buffer — the server then
+     * reads garbage (an unknown message type, a bad MAC) and the channel or the whole
+     * connection dies. A caller that finds the channel busy waits for it; debug builds log who
+     * held it, so the path that overlapped can be found.
      */
     private inline fun <T> op(transfer: Boolean = false, block: (com.jcraft.jsch.ChannelSftp) -> T): T {
-        val ch = channel
-        try {
-            return block(ch)
-        } catch (e: Exception) {
-            val inStep = !transfer && e is com.jcraft.jsch.SftpException && e.cause == null
-            if (!inStep) recycle(ch)
-            throw e
+        if (!opLock.tryLock()) {
+            if (BuildConfig.DEBUG) logContention()
+            opLock.lock()
         }
+        holder = Thread.currentThread()
+        try {
+            val ch = channel
+            try {
+                return block(ch)
+            } catch (e: Exception) {
+                val inStep = !transfer && e is com.jcraft.jsch.SftpException && e.cause == null &&
+                    !(e.id == com.jcraft.jsch.ChannelSftp.SSH_FX_FAILURE && e.message.isNullOrEmpty())
+                if (!inStep) recycle(ch)
+                throw e
+            }
+        } finally {
+            if (opLock.holdCount == 1) holder = null
+            opLock.unlock()
+        }
+    }
+
+    private val opLock = java.util.concurrent.locks.ReentrantLock()
+    @Volatile private var holder: Thread? = null
+
+    private fun logContention() {
+        val busy = holder ?: return
+        val here = Throwable("SFTP channel busy: waiting").stackTraceToString()
+        val there = Throwable("…held by ${busy.name}").apply { stackTrace = busy.stackTrace }.stackTraceToString()
+        android.util.Log.w("SftpSession", "$here\n$there")
     }
 
     /** Replaces [broken] with a new channel on the same session, if it is still the current one. */
