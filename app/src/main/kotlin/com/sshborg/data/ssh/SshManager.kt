@@ -681,7 +681,7 @@ data class SftpEntry(
 /** A live SFTP session. */
 class SftpSession(
     private val session: Session,
-    private val channel: com.jcraft.jsch.ChannelSftp,
+    channel: com.jcraft.jsch.ChannelSftp,
     val hostname: String,
     val hostKeyLine: String,
     private val jumpSessions: List<Session> = emptyList(),
@@ -692,13 +692,51 @@ class SftpSession(
     /** The working directory at the time the channel was opened (i.e. the user's home). */
     val homePath: String = "/",
 ) {
+    /**
+     * The foreground channel. Replaced by [recycle] when it can no longer be trusted — see there.
+     */
+    @Volatile private var channel: com.jcraft.jsch.ChannelSftp = channel
+
     val isConnected get() = channel.isConnected && session.isConnected
+
+    /**
+     * Runs [block] on the channel; if it fails in a way that can leave the channel out of step,
+     * swaps in a fresh channel before rethrowing.
+     *
+     * SFTP matches replies to requests by reading them in order from one stream. A transfer
+     * sends many writes ahead of their acknowledgements, so when it fails midway those
+     * acknowledgements are still on their way; the next request then reads a stale reply as its
+     * own, takes a length out of the middle of it and fails with an IndexOutOfBoundsException
+     * or a corrupt packet — and so does every request after it. A plain status from the server
+     * (no such file, permission denied) is a complete reply and leaves the stream in step; any
+     * other failure — local I/O, a wrapped exception, anything during a transfer — does not.
+     */
+    private inline fun <T> op(transfer: Boolean = false, block: (com.jcraft.jsch.ChannelSftp) -> T): T {
+        val ch = channel
+        try {
+            return block(ch)
+        } catch (e: Exception) {
+            val inStep = !transfer && e is com.jcraft.jsch.SftpException && e.cause == null
+            if (!inStep) recycle(ch)
+            throw e
+        }
+    }
+
+    /** Replaces [broken] with a new channel on the same session, if it is still the current one. */
+    private fun recycle(broken: com.jcraft.jsch.ChannelSftp) = synchronized(this) {
+        if (channel !== broken) return@synchronized
+        runCatching { broken.disconnect() }
+        if (!session.isConnected) return@synchronized
+        runCatching {
+            channel = (session.openChannel("sftp") as com.jcraft.jsch.ChannelSftp).also { it.connect(10_000) }
+        }
+    }
 
     /** Lists [path], returning entries sorted: dirs first, then files, both alphabetically. */
     @Suppress("UNCHECKED_CAST")
     fun listDir(path: String): List<SftpEntry> {
         val base = path.trimEnd('/')
-        val raw = channel.ls(path) as Collection<com.jcraft.jsch.ChannelSftp.LsEntry>
+        val raw = op { it.ls(path) } as Collection<com.jcraft.jsch.ChannelSftp.LsEntry>
         return raw
             .filter { it.filename != "." && it.filename != ".." }
             .map { e ->
@@ -706,7 +744,7 @@ class SftpSession(
                 // For symlinks we call stat() so isDir correctly reflects the target type.
                 val isLink = e.attrs.isLink
                 val isDir = if (isLink)
-                    runCatching { channel.stat("$base/${e.filename}").isDir }.getOrDefault(false)
+                    runCatching { op { it.stat("$base/${e.filename}") }.isDir }.getOrDefault(false)
                 else
                     e.attrs.isDir
                 SftpEntry(
@@ -730,11 +768,11 @@ class SftpSession(
         onProgress: (bytesReceived: Long) -> Unit = {},
     ) {
         var received = 0L
-        channel.get(remotePath, dest, object : com.jcraft.jsch.SftpProgressMonitor {
+        op(transfer = true) { it.get(remotePath, dest, object : com.jcraft.jsch.SftpProgressMonitor {
             override fun init(op: Int, src: String?, dest: String?, max: Long) {}
             override fun count(count: Long): Boolean { received += count; onProgress(received); return true }
             override fun end() {}
-        })
+        }) }
     }
 
     /**
@@ -747,18 +785,18 @@ class SftpSession(
         onProgress: (bytesSent: Long) -> Unit = {},
     ) {
         var sent = 0L
-        channel.put(src, remotePath, object : com.jcraft.jsch.SftpProgressMonitor {
+        op(transfer = true) { it.put(src, remotePath, object : com.jcraft.jsch.SftpProgressMonitor {
             override fun init(op: Int, src: String?, dest: String?, max: Long) {}
             override fun count(count: Long): Boolean { sent += count; onProgress(sent); return true }
             override fun end() {}
-        }, com.jcraft.jsch.ChannelSftp.OVERWRITE)
+        }, com.jcraft.jsch.ChannelSftp.OVERWRITE) }
     }
 
-    fun deleteFile(remotePath: String) = channel.rm(remotePath)
-    fun deleteDir(remotePath: String)  = channel.rmdir(remotePath)
+    fun deleteFile(remotePath: String) = op { it.rm(remotePath) }
+    fun deleteDir(remotePath: String)  = op { it.rmdir(remotePath) }
 
-    fun rename(oldPath: String, newPath: String) = channel.rename(oldPath, newPath)
-    fun mkdir(remotePath: String)      = channel.mkdir(remotePath)
+    fun rename(oldPath: String, newPath: String) = op { it.rename(oldPath, newPath) }
+    fun mkdir(remotePath: String)      = op { it.mkdir(remotePath) }
 
     /** Opens a second SFTP channel on the same authenticated session for background transfers. */
     fun openBackgroundChannel(): com.jcraft.jsch.ChannelSftp {

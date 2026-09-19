@@ -79,6 +79,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun dismissReport() { _report.value = null }
 
+    /** The last listing shown, to go back to when an operation fails without losing the connection. */
+    @Volatile private var lastListing: State.Listing? = null
+
+    init {
+        viewModelScope.launch { _state.collect { if (it is State.Listing) lastListing = it } }
+    }
+
     fun showReport(r: ErrorReport) { _report.value = r }
 
     /** Reopens the errors of a finished background transfer (a tap on its row). */
@@ -101,7 +108,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             connectionLost(r.asText(getApplication()))
             return
         }
-        _report.value = r
+        // Never let a later failure (typically the refresh that follows) hide an earlier one:
+        // the first report is the cause, anything after it is added below it.
+        _report.update { shown -> shown?.let { it.copy(failures = it.failures + r.failures, notAttempted = it.notAttempted + r.notAttempted) } ?: r }
         if (refresh) refreshListing()
     }
 
@@ -797,6 +806,11 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 // If the session is gone, report() goes to the connection-lost screen: a dialog
                 // alone would leave the current state (e.g. the Downloading overlay) with no way out.
                 report(ErrorReport(str(R.string.error_refresh_failed), listOf(FileFailure.of(current, it))), refresh = false)
+                // Still connected: get off the progress screen that launched this refresh, back
+                // to the listing we had, so the screen doesn't hang on a spinner.
+                if (sftpSession?.isConnected == true && _state.value !is State.Listing) {
+                    lastListing?.let { l -> _state.value = l }
+                }
             }
         }
     }
