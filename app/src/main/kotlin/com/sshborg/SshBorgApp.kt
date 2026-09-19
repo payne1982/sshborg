@@ -22,7 +22,12 @@ class SshBorgApp : Application() {
     val appPreferences by lazy { AppPreferences(this) }
     val appLockManager by lazy { AppLockManager(appPreferences) }
 
-    /** Timestamp of the last successful biometric authentication (in-memory only). */
+    /**
+     * When the user last had the app unlocked in front of them: set on unlock and again each
+     * time an unlocked app goes to the background (in-memory only; 0 = never, so a cold start
+     * always asks). The lock timeout counts from here — time spent away, not time since the
+     * last unlock.
+     */
     var lastAuthTime: Long = 0L
 
     override fun onCreate() {

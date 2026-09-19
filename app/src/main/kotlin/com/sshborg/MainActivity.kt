@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity() {
     // before auth, so onStop must not cover content (it would just flash on every return).
     // Cached from onStart so onStop can read it synchronously.
     private var lockActive = false
+    // True only while the app is actually unlocked on screen. Leaving it in that state is what
+    // starts the lock timeout; leaving it while the lock is still up must not, or backing out
+    // of the PIN screen and returning within the timeout would skip it.
+    private var unlocked = false
 
     // In-app lock (LOCK_SECRET): the Compose lock gate is drawn over the app content.
     private val showAppLock = mutableStateOf(false)
@@ -68,6 +72,7 @@ class MainActivity : AppCompatActivity() {
                             verify = { app.appLockManager.verify(it) },
                             onUnlocked = {
                                 app.lastAuthTime = System.currentTimeMillis()
+                                unlocked = true
                                 showAppLock.value = false
                                 setPrivacy(false)
                             },
@@ -115,6 +120,13 @@ class MainActivity : AppCompatActivity() {
         // Only cover when a lock is configured; otherwise the cover has nothing to hide and
         // would just flash on every foreground while onStart asynchronously clears it.
         if (lockActive) setPrivacy(true)
+        // The timeout counts from this moment: before, it counted from the last unlock, so
+        // a user who had been working in the app longer than the timeout was asked again after
+        // any brief trip out — the file picker, opening a download.
+        if (unlocked && !isAuthenticating) {
+            (application as SshBorgApp).lastAuthTime = System.currentTimeMillis()
+        }
+        unlocked = false
     }
 
     override fun onStart() {
@@ -122,18 +134,21 @@ class MainActivity : AppCompatActivity() {
         // Guard against re-entry: DEVICE_CREDENTIAL auth starts a new Activity which causes
         // onStop/onStart to fire while the original authenticate() call is still suspended.
         if (isAuthenticating) return
+        unlocked = false   // until the check below says otherwise
         val app = application as SshBorgApp
         lifecycleScope.launch {
             val mode = app.appPreferences.lockMode.first()
             lockActive = mode != AppPreferences.LOCK_NONE
             if (mode == AppPreferences.LOCK_NONE) {
+                unlocked = true
                 showAppLock.value = false
                 setPrivacy(false)
                 return@launch
             }
             val timeoutMs = app.appPreferences.lockTimeoutSeconds.first() * 1_000L
             val elapsed = System.currentTimeMillis() - app.lastAuthTime
-            if (elapsed <= timeoutMs) {
+            if (app.lastAuthTime > 0L && elapsed <= timeoutMs) {
+                unlocked = true
                 showAppLock.value = false
                 setPrivacy(false)
                 return@launch
@@ -143,12 +158,14 @@ class MainActivity : AppCompatActivity() {
                 if (kind == null) {
                     // Mode selected but no secret stored — nothing to check, don't lock out.
                     lockActive = false
+                    unlocked = true
                     showAppLock.value = false
                     setPrivacy(false)
                     return@launch
                 }
                 lockKind.value = kind
                 initialLockoutSeconds.value = app.appLockManager.lockoutRemainingSeconds()
+                unlocked = false
                 showAppLock.value = true
                 // Keep the plain-View cover until the Compose gate has drawn, so no content flashes.
                 window.decorView.post { setPrivacy(false) }
@@ -162,6 +179,7 @@ class MainActivity : AppCompatActivity() {
             isAuthenticating = false
             if (ok) {
                 app.lastAuthTime = System.currentTimeMillis()
+                unlocked = true
                 setPrivacy(false)
             } else {
                 finish()
