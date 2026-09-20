@@ -615,4 +615,10 @@ Host target
                 <div class="callout-label">// 可选字段</div>
                 除 <code>label</code>、<code>hostname</code> 和 <code>username</code> 外，所有字段均为可选。省略的字段将使用默认值。
             </div>`,
+
+  // ── changelog.html ─────────────────────────────────────────────────────────
+  nav_changelog:               '更新日志',
+  page_title_changelog:        'SSHBorg – 更新日志',
+  meta_description_changelog:  'SSHBorg {PLATFORM} 版的版本历史：每个版本的变化。',
+  changelog_subtitle:          '所有已发布的版本，从最新开始。',
 };

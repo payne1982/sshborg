@@ -1,41 +1,52 @@
 <!DOCTYPE html>
-<html lang="{{LANG}}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title_docs}}</title>
-    <meta name="description" content="{{meta_description_docs}}">
-    <link rel="icon" type="image/x-icon"  href="{{ROOT}}favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ROOT}}favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ROOT}}favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ROOT}}apple-touch-icon.png">
-    <!--HREFLANG-->
+    <title>SSHBorg – Changelog (iOS)</title>
+    <meta name="description" content="Release history of SSHBorg for iOS: what changed in every version.">
+    <link rel="icon" type="image/x-icon"  href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+        <link rel="alternate" hreflang="en" href="https://sshborg.com/changelog-ios.html">
+    <link rel="alternate" hreflang="it" href="https://sshborg.com/it/changelog-ios.html">
+    <link rel="alternate" hreflang="de" href="https://sshborg.com/de/changelog-ios.html">
+    <link rel="alternate" hreflang="es" href="https://sshborg.com/es/changelog-ios.html">
+    <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/changelog-ios.html">
+    <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/changelog-ios.html">
+    <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/changelog-ios.html">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/changelog-ios.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/changelog-ios.html">
+    <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/changelog-ios.html">
+    <link rel="alternate" hreflang="x-default" href="https://sshborg.com/changelog-ios.html">
+    <link rel="canonical" href="https://sshborg.com/changelog-ios.html">
     <!-- Open Graph -->
-    <meta property="og:type"        content="article">
+    <meta property="og:type"        content="website">
     <meta property="og:site_name"   content="SSHBorg">
-    <meta property="og:url"         content="{{CANONICAL_URL}}">
-    <meta property="og:title"       content="{{page_title_docs}}">
-    <meta property="og:description" content="{{meta_description_docs}}">
+    <meta property="og:url"         content="https://sshborg.com/changelog-ios.html">
+    <meta property="og:title"       content="SSHBorg – Changelog (iOS)">
+    <meta property="og:description" content="Release history of SSHBorg for iOS: what changed in every version.">
     <meta property="og:image"       content="https://sshborg.com/logo.png">
-    <meta property="og:locale"      content="{{OG_LOCALE}}">
+    <meta property="og:locale"      content="en_US">
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary">
-    <meta name="twitter:title"       content="{{page_title_docs}}">
-    <meta name="twitter:description" content="{{meta_description_docs}}">
+    <meta name="twitter:title"       content="SSHBorg – Changelog (iOS)">
+    <meta name="twitter:description" content="Release history of SSHBorg for iOS: what changed in every version.">
     <meta name="twitter:image"       content="https://sshborg.com/logo.png">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TechArticle",
-      "name": "{{page_title_docs}}",
-      "description": "{{meta_description_docs}}",
-      "url": "{{CANONICAL_URL}}",
-      "inLanguage": "{{LANG}}",
+      "@type": "CollectionPage",
+      "name": "SSHBorg – Changelog (iOS)",
+      "description": "Release history of SSHBorg for iOS: what changed in every version.",
+      "url": "https://sshborg.com/changelog-ios.html",
+      "inLanguage": "en",
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
     }
     </script>
-    <link rel="stylesheet" href="{{ROOT}}fonts.css">
+    <link rel="stylesheet" href="fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -452,6 +463,57 @@
             .toc { width: 100%; position: static; }
             .page-header h1 { font-size: 2em; }
         }
+        /* ── Changelog ─────────────────────────────────────────────────────── */
+        .changelog { max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .platform-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 0 0 40px;
+        }
+        .platform-tabs .tab {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+            padding: 8px 22px;
+            border: 1px solid var(--border-hi);
+            border-radius: 2px;
+            color: var(--muted);
+            background: var(--card);
+            text-decoration: none;
+            transition: color .15s, border-color .15s, box-shadow .15s;
+        }
+        .platform-tabs a.tab:hover {
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+        .platform-tabs .tab-active {
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.25);
+        }
+
+        .release { border-left: 2px solid var(--border-hi); padding: 0 0 4px 20px; margin-bottom: 34px; }
+        .release h2 {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            color: var(--neon-green);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .release-date { font-family: var(--font-body); font-size: 0.8rem; color: var(--muted); }
+        .release ul { list-style: none; }
+        .release li { position: relative; padding-left: 18px; margin-bottom: 8px; line-height: 1.6; }
+        .release li::before { content: '\25B8'; position: absolute; left: 0; color: var(--copper); }
+
+        @media (max-width: 600px) {
+            .changelog { padding: 28px 16px 60px; }
+            .release h2 { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
@@ -459,114 +521,56 @@
 <!-- Nav -->
 <nav>
     <a class="nav-brand" href="index.html">
-        <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
+        <img src="logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
-        <a href="index.html">{{nav_home}}</a>
-        <a href="changelog.html">{{nav_changelog}}</a>
-        <a href="#adding-host">{{nav_getting_started}}</a>
-        <a href="#sftp">{{nav_sftp}}</a>
-        <a href="#ssh-keys">{{nav_ssh_keys}}</a>
-        <a href="#jump-hosts">{{nav_jump_hosts}}</a>
-        <a href="#backup">{{nav_backup}}</a>
-        <a href="index.html#support">{{nav_support}}</a>
-        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
+        <a href="index.html">Home</a>
+        <a href="docs.html">User Guide</a>
+        <a href="index.html#support">Support</a>
+        <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a>
     </div>
     <div class="nav-right">
-        {{LANG_SWITCHER}}
+        <div class="lang-switcher">
+        <span class="lang-current">EN &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="it/changelog-ios.html">Italiano</a>
+            <a href="de/changelog-ios.html">Deutsch</a>
+            <a href="es/changelog-ios.html">Español</a>
+            <a href="fr/changelog-ios.html">Français</a>
+            <a href="pt/changelog-ios.html">Português</a>
+            <a href="uk/changelog-ios.html">Українська</a>
+            <a href="ru/changelog-ios.html">Русский</a>
+            <a href="zh/changelog-ios.html">中文</a>
+            <a href="ja/changelog-ios.html">日本語</a>
+        </div>
+    </div>
         <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
     </div>
 </nav>
 
 <!-- Page header -->
 <div class="page-header">
-    <h1>{{doc_page_title}}</h1>
-    <p>{{doc_page_subtitle}}</p>
+    <h1>Changelog</h1>
+    <p>Every released version, newest first.</p>
 </div>
 
-<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+<div class="gear-divider"><span>&#9881;</span><span>&#9881;</span><span>&#9881;</span></div>
 
-<!-- Docs layout -->
-<div class="docs-layout">
+<div class="changelog">
+    <div class="platform-tabs">
+        <a class="tab" href="changelog.html">Android</a>
+        <span class="tab tab-active" aria-current="page">iOS</span>
+    </div>
 
-    <!-- TOC -->
-    <nav class="toc" aria-label="Table of contents">
-        <div class="toc-title">{{toc_title}}</div>
-        <ul>
-{{doc_toc}}
-        </ul>
-    </nav>
-
-    <!-- Content -->
-    <div class="doc-content">
-
-        <div class="doc-section" id="adding-host">
-{{doc_adding_host}}
-        </div>
-
-        <div class="doc-section" id="host-groups">
-{{doc_host_groups}}
-        </div>
-
-        <div class="doc-section" id="sftp">
-{{doc_sftp}}
-        </div>
-
-        <div class="doc-section" id="ssh-keys">
-{{doc_ssh_keys}}
-        </div>
-
-        <div class="doc-section" id="suggestions">
-{{doc_suggestions}}
-        </div>
-
-        <div class="doc-section" id="terminal">
-{{doc_terminal}}
-        </div>
-
-        <div class="doc-section" id="terminal-settings">
-{{doc_terminal_settings}}
-        </div>
-
-        <div class="doc-section" id="extra-keys">
-{{doc_extra_keys}}
-        </div>
-
-        <div class="doc-section" id="agent-forwarding">
-{{doc_agent_forwarding}}
-        </div>
-
-        <div class="doc-section" id="legacy-ciphers">
-{{doc_legacy_ciphers}}
-        </div>
-
-        <div class="doc-section" id="connection-drops">
-{{doc_connection_drops}}
-        </div>
-
-        <div class="doc-section" id="jump-hosts">
-{{doc_jump_hosts}}
-        </div>
-
-        <div class="doc-section" id="sessions">
-{{doc_sessions}}
-        </div>
-
-        <div class="doc-section" id="security">
-{{doc_security}}
-        </div>
-
-        <div class="doc-section" id="backup">
-{{doc_backup}}
-        </div>
-
-        <div class="doc-section" id="android-tv">
-{{doc_android_tv}}
-        </div>
-
-    </div><!-- /doc-content -->
-</div><!-- /docs-layout -->
+        <article class="release">
+            <h2>1.0.0<span class="release-date">2026-09-14</span></h2>
+            <ul>
+                <li>First release on the App Store</li>
+                <li>SSH terminal, SFTP file manager, SSH keys, jump hosts, agent and port forwarding, in ten languages</li>
+            </ul>
+        </article>
+</div>
 
 <div class="gear-divider" style="max-width:1140px; margin: 0 auto 0; padding: 0 24px;"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
@@ -574,32 +578,16 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
-        <a href="index.html#support">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
-        {{footer_source}}: <a href="{{REPO_ANDROID}}" target="_blank" rel="noopener">Android</a> &middot; <a href="{{REPO_IOS}}" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
+        <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a> &nbsp;&#9135;&nbsp;
+        <a href="index.html#support">Issues &amp; Feedback</a> &nbsp;&#9135;&nbsp;
+        Source Code: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot; <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
+        SSH connectivity powered by <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
         <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
-
-<!-- TOC active link highlight on scroll -->
-<script>
-    const sections = document.querySelectorAll('.doc-section');
-    const tocLinks = document.querySelectorAll('.toc a');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                tocLinks.forEach(l => l.classList.remove('active'));
-                const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
-                if (active) active.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-    sections.forEach(s => observer.observe(s));
-</script>
 
 </body>
 </html>

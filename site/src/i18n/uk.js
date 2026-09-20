@@ -613,4 +613,10 @@ Host target
                 <div class="callout-label">// НЕОБОВ'ЯЗКОВІ ПОЛЯ</div>
                 Всі поля, крім <code>label</code>, <code>hostname</code> та <code>username</code>, є необов'язковими. Відсутні поля повертаються до значень за замовчуванням.
             </div>`,
+
+  // ── changelog.html ─────────────────────────────────────────────────────────
+  nav_changelog:               'Журнал змін',
+  page_title_changelog:        'SSHBorg – журнал змін',
+  meta_description_changelog:  'Історія версій SSHBorg для {PLATFORM}: що змінилося в кожній версії.',
+  changelog_subtitle:          'Усі випущені версії, від найновішої.',
 };
