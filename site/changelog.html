@@ -1,41 +1,52 @@
 <!DOCTYPE html>
-<html lang="{{LANG}}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title_docs}}</title>
-    <meta name="description" content="{{meta_description_docs}}">
-    <link rel="icon" type="image/x-icon"  href="{{ROOT}}favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ROOT}}favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ROOT}}favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ROOT}}apple-touch-icon.png">
-    <!--HREFLANG-->
+    <title>SSHBorg – Changelog (Android)</title>
+    <meta name="description" content="Release history of SSHBorg for Android: what changed in every version.">
+    <link rel="icon" type="image/x-icon"  href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+        <link rel="alternate" hreflang="en" href="https://sshborg.com/changelog.html">
+    <link rel="alternate" hreflang="it" href="https://sshborg.com/it/changelog.html">
+    <link rel="alternate" hreflang="de" href="https://sshborg.com/de/changelog.html">
+    <link rel="alternate" hreflang="es" href="https://sshborg.com/es/changelog.html">
+    <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/changelog.html">
+    <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/changelog.html">
+    <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/changelog.html">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/changelog.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/changelog.html">
+    <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/changelog.html">
+    <link rel="alternate" hreflang="x-default" href="https://sshborg.com/changelog.html">
+    <link rel="canonical" href="https://sshborg.com/changelog.html">
     <!-- Open Graph -->
-    <meta property="og:type"        content="article">
+    <meta property="og:type"        content="website">
     <meta property="og:site_name"   content="SSHBorg">
-    <meta property="og:url"         content="{{CANONICAL_URL}}">
-    <meta property="og:title"       content="{{page_title_docs}}">
-    <meta property="og:description" content="{{meta_description_docs}}">
+    <meta property="og:url"         content="https://sshborg.com/changelog.html">
+    <meta property="og:title"       content="SSHBorg – Changelog (Android)">
+    <meta property="og:description" content="Release history of SSHBorg for Android: what changed in every version.">
     <meta property="og:image"       content="https://sshborg.com/logo.png">
-    <meta property="og:locale"      content="{{OG_LOCALE}}">
+    <meta property="og:locale"      content="en_US">
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary">
-    <meta name="twitter:title"       content="{{page_title_docs}}">
-    <meta name="twitter:description" content="{{meta_description_docs}}">
+    <meta name="twitter:title"       content="SSHBorg – Changelog (Android)">
+    <meta name="twitter:description" content="Release history of SSHBorg for Android: what changed in every version.">
     <meta name="twitter:image"       content="https://sshborg.com/logo.png">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TechArticle",
-      "name": "{{page_title_docs}}",
-      "description": "{{meta_description_docs}}",
-      "url": "{{CANONICAL_URL}}",
-      "inLanguage": "{{LANG}}",
+      "@type": "CollectionPage",
+      "name": "SSHBorg – Changelog (Android)",
+      "description": "Release history of SSHBorg for Android: what changed in every version.",
+      "url": "https://sshborg.com/changelog.html",
+      "inLanguage": "en",
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
     }
     </script>
-    <link rel="stylesheet" href="{{ROOT}}fonts.css">
+    <link rel="stylesheet" href="fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -452,6 +463,33 @@
             .toc { width: 100%; position: static; }
             .page-header h1 { font-size: 2em; }
         }
+        /* ── Changelog ─────────────────────────────────────────────────────── */
+        .changelog { max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .platform-switch { margin-bottom: 32px; font-size: 0.9rem; }
+        .platform-switch a { color: var(--neon-blue); text-decoration: none; }
+        .platform-switch a:hover { text-shadow: 0 0 6px var(--neon-blue); }
+
+        .release { border-left: 2px solid var(--border-hi); padding: 0 0 4px 20px; margin-bottom: 34px; }
+        .release h2 {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            color: var(--neon-green);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .release-date { font-family: var(--font-body); font-size: 0.8rem; color: var(--muted); }
+        .release ul { list-style: none; }
+        .release li { position: relative; padding-left: 18px; margin-bottom: 8px; line-height: 1.6; }
+        .release li::before { content: '\25B8'; position: absolute; left: 0; color: var(--copper); }
+
+        @media (max-width: 600px) {
+            .changelog { padding: 28px 16px 60px; }
+            .release h2 { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
@@ -459,114 +497,219 @@
 <!-- Nav -->
 <nav>
     <a class="nav-brand" href="index.html">
-        <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
+        <img src="logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
-        <a href="index.html">{{nav_home}}</a>
-        <a href="changelog.html">{{nav_changelog}}</a>
-        <a href="#adding-host">{{nav_getting_started}}</a>
-        <a href="#sftp">{{nav_sftp}}</a>
-        <a href="#ssh-keys">{{nav_ssh_keys}}</a>
-        <a href="#jump-hosts">{{nav_jump_hosts}}</a>
-        <a href="#backup">{{nav_backup}}</a>
-        <a href="index.html#support">{{nav_support}}</a>
-        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
+        <a href="index.html">Home</a>
+        <a href="docs.html">User Guide</a>
+        <a href="index.html#support">Support</a>
+        <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a>
     </div>
     <div class="nav-right">
-        {{LANG_SWITCHER}}
+        <div class="lang-switcher">
+        <span class="lang-current">EN &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="it/changelog.html">Italiano</a>
+            <a href="de/changelog.html">Deutsch</a>
+            <a href="es/changelog.html">Español</a>
+            <a href="fr/changelog.html">Français</a>
+            <a href="pt/changelog.html">Português</a>
+            <a href="uk/changelog.html">Українська</a>
+            <a href="ru/changelog.html">Русский</a>
+            <a href="zh/changelog.html">中文</a>
+            <a href="ja/changelog.html">日本語</a>
+        </div>
+    </div>
         <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
     </div>
 </nav>
 
 <!-- Page header -->
 <div class="page-header">
-    <h1>{{doc_page_title}}</h1>
-    <p>{{doc_page_subtitle}}</p>
+    <h1>Changelog — Android</h1>
+    <p>Every released version, newest first.</p>
 </div>
 
-<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+<div class="gear-divider"><span>&#9881;</span><span>&#9881;</span><span>&#9881;</span></div>
 
-<!-- Docs layout -->
-<div class="docs-layout">
+<div class="changelog">
+    <div class="platform-switch">&#8594; <a href="changelog-ios.html">Changelog — iOS</a></div>
 
-    <!-- TOC -->
-    <nav class="toc" aria-label="Table of contents">
-        <div class="toc-title">{{toc_title}}</div>
-        <ul>
-{{doc_toc}}
-        </ul>
-    </nav>
-
-    <!-- Content -->
-    <div class="doc-content">
-
-        <div class="doc-section" id="adding-host">
-{{doc_adding_host}}
-        </div>
-
-        <div class="doc-section" id="host-groups">
-{{doc_host_groups}}
-        </div>
-
-        <div class="doc-section" id="sftp">
-{{doc_sftp}}
-        </div>
-
-        <div class="doc-section" id="ssh-keys">
-{{doc_ssh_keys}}
-        </div>
-
-        <div class="doc-section" id="suggestions">
-{{doc_suggestions}}
-        </div>
-
-        <div class="doc-section" id="terminal">
-{{doc_terminal}}
-        </div>
-
-        <div class="doc-section" id="terminal-settings">
-{{doc_terminal_settings}}
-        </div>
-
-        <div class="doc-section" id="extra-keys">
-{{doc_extra_keys}}
-        </div>
-
-        <div class="doc-section" id="agent-forwarding">
-{{doc_agent_forwarding}}
-        </div>
-
-        <div class="doc-section" id="legacy-ciphers">
-{{doc_legacy_ciphers}}
-        </div>
-
-        <div class="doc-section" id="connection-drops">
-{{doc_connection_drops}}
-        </div>
-
-        <div class="doc-section" id="jump-hosts">
-{{doc_jump_hosts}}
-        </div>
-
-        <div class="doc-section" id="sessions">
-{{doc_sessions}}
-        </div>
-
-        <div class="doc-section" id="security">
-{{doc_security}}
-        </div>
-
-        <div class="doc-section" id="backup">
-{{doc_backup}}
-        </div>
-
-        <div class="doc-section" id="android-tv">
-{{doc_android_tv}}
-        </div>
-
-    </div><!-- /doc-content -->
-</div><!-- /docs-layout -->
+        <article class="release">
+            <h2>1.17.1<span class="release-date">2026-09-19</span></h2>
+            <ul>
+                <li>SFTP: fixed uploads that could drop the connection or end with an error</li>
+                <li>SFTP: errors stay on screen and can be copied; multi-file transfers skip failed files and list them</li>
+                <li>SFTP: uploads ask before replacing an existing file</li>
+                <li>SFTP: the list keeps its position after deleting, uploading or downloading</li>
+                <li>App lock: the timeout counts from leaving the app; picking a file no longer asks to unlock</li>
+                <li>Terminal: command history is read without a second login</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.17.0<span class="release-date">2026-09-15</span></h2>
+            <ul>
+                <li>You can now order the host and group list (alphabetical, recently used, most used or by hand)</li>
+                <li>Fixed scrolling inside full-screen apps such as tmux, vim, nano and less</li>
+                <li>Fixed keys in the key bar that could keep repeating after you let go</li>
+                <li>Word mode now pauses command suggestions</li>
+                <li>Fixed connections through a jump host that could stay loading forever</li>
+                <li>Android TV: the selected key or button is now clearly highlighted</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.16.2<span class="release-date">2026-09-10</span></h2>
+            <ul>
+                <li>Android TV: full-size banner and icon on the home screen</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.16.0<span class="release-date">2026-09-09</span></h2>
+            <ul>
+                <li>Customizable extra-key bar: pick a layout (single row, two rows, minimal) or build your own with any keys, text macros and up to three rows — switch from the bar with ⇄</li>
+                <li>Smoother D-pad navigation on Android TV: text fields and dropdowns now work well with the remote</li>
+                <li>Fixed the lock screen on landscape TVs, where the bottom row could be cut off</li>
+                <li>Selection bar: “Copy all” moved last and toned down, so it isn't tapped instead of “Copy selection”</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.15.1<span class="release-date">2026-08-31</span></h2>
+            <ul>
+                <li>Fixed: renaming an SSH key now also updates the comment inside its public key</li>
+                <li>Refreshed app icon that fills the frame, also on Android TV</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.15.0<span class="release-date">2026-08-23</span></h2>
+            <ul>
+                <li>Android TV support: install and navigate with the remote — a physical keyboard (USB or Bluetooth) is recommended for typing</li>
+                <li>Smoother text entry with a keyboard on non-touch devices like Android TV</li>
+                <li>Fixed password login on servers that only offer keyboard-interactive authentication</li>
+                <li>SFTP: new option to list folders before files</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.14.0<span class="release-date">2026-08-19</span></h2>
+            <ul>
+                <li>Duplicate a host from its menu to reuse its settings for a new connection — handy for reaching the same server on a different port or jump host</li>
+                <li>Show or hide hidden files (dotfiles) in the SFTP browser — saved per host</li>
+                <li>New app lock option: protect the app with an in-app PIN or passphrase</li>
+                <li>Updated the app's libraries and build tools to their latest stable versions</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.13.1<span class="release-date">2026-08-12</span></h2>
+            <ul>
+                <li>Redesigned connection error and disconnect screens: a clear summary plus expandable details you can scroll and copy</li>
+                <li>More stable connections: keeps Wi-Fi awake during active sessions and checks the link more often</li>
+                <li>Fixed a rare crash and now notifies you when Android's background time limit stops your sessions</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.13.0<span class="release-date">2026-08-08</span></h2>
+            <ul>
+                <li>Switch between sessions on different hosts right from the terminal tab bar</li>
+                <li>Tap a downloaded file's name to open it, from the download screen or the transfers panel</li>
+                <li>Better display of emoji and wide (CJK) characters in the terminal</li>
+                <li>Fixed cut-off text at the top of the first terminal session</li>
+                <li>Fixed background sessions that could stop accepting input</li>
+                <li>Keep the extra key bar visible with the keyboard closed</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.12.1<span class="release-date">2026-08-05</span></h2>
+            <ul>
+                <li>Improved text selection near the terminal edges</li>
+                <li>Fixed a grey screen that could get stuck in some situations</li>
+                <li>Improved SFTP navigation to prevent connection drops</li>
+                <li>Tap a download notification to open the file, and see the destination path</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.12.0<span class="release-date">2026-08-02</span></h2>
+            <ul>
+                <li>New app-lock options: biometric, device PIN/pattern, or none — usable on Android TV</li>
+                <li>Terminal now renders Nerd Font / Powerline glyphs (e.g. Starship prompts)</li>
+                <li>Backups remember each host's key by name</li>
+                <li>Paste added to the terminal selection popup</li>
+                <li>Arrow keys and PgUp/PgDn in the key bar now auto-repeat when held</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.11.1<span class="release-date">2026-07-29</span></h2>
+            <ul>
+                <li>Fixed a missing interface font</li>
+                <li>Fixed command suggestions not appearing after switching session tabs</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.11.0<span class="release-date">2026-07-26</span></h2>
+            <ul>
+                <li>The app is now available in Russian, thanks to a community translation</li>
+                <li>Fixed a memory leak when leaving a terminal session</li>
+                <li>Smoother, more responsive terminal scrolling</li>
+                <li>The terminal now returns to the bottom when you type</li>
+                <li>Optional double-tap to send Tab (auto-complete)</li>
+                <li>Backups now include app settings, not just hosts</li>
+                <li>New option to reset a host's accepted key</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.10.0<span class="release-date">2026-07-23</span></h2>
+            <ul>
+                <li>Hosts can now be organized into collapsible color-coded groups, with custom per-host colors too</li>
+                <li>New light terminal color scheme (black on white), also able to follow the app theme</li>
+                <li>New setting to keep the screen on while a terminal is open</li>
+                <li>Physical keyboard: Ctrl and Alt key combinations now work in the terminal</li>
+                <li>Fixed a crash when generating SSH keys on Android 12 and older, plus minor fixes</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.9.0<span class="release-date">2026-07-18</span></h2>
+            <ul>
+                <li>SFTP: fixed several issues when cancelling downloads</li>
+                <li>Terminal: selection handles are easier to drag, and copied text no longer contains fake line breaks where long lines wrap</li>
+                <li>New setting: default terminal font size</li>
+                <li>App lock: unlock is now biometric-only (PIN/pattern only if no biometrics are enrolled)</li>
+                <li>Updated internal libraries</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.8.0<span class="release-date">2026-06-20</span></h2>
+            <ul>
+                <li>SSH agent forwarding: fixed a message-framing bug that could break sessions with recent OpenSSH servers (jsch 2.28.3)</li>
+                <li>Hosts list: the last host is no longer hidden behind the add button when the list fills the screen</li>
+                <li>Downloads: show start and finish date/time; foreground downloads end on a completion screen with a Done button</li>
+                <li>Session tabs: new browser-style tab bar, and the keyboard stays open when you switch tabs</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.7.0<span class="release-date">2026-06-09</span></h2>
+            <ul>
+                <li>SFTP: background downloads — download files without blocking the file browser; long-press a file for the "Download in background" option</li>
+                <li>SFTP: active downloads can be sent to background at any time using the "Background" button</li>
+                <li>Host settings: "Allow Legacy Ciphers" option for connecting to old servers that only support outdated algorithms (AES-CBC, 3DES, DH-group1/14-sha1, DSA)</li>
+                <li>Terminal: improved spell-check (word) mode</li>
+                <li>Minor bug fixes and improvements</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.6.1<span class="release-date">2026-05-19</span></h2>
+            <ul>
+                <li>SFTP: fixed a hang when connecting via jump host on mobile networks — the connection now times out and shows an error instead of spinning indefinitely</li>
+                <li>Terminal: word mode — tapping a spell correction suggestion now correctly replaces the mistyped word (Android 13+)</li>
+                <li>Minor bug fixes and improvements</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.6<span class="release-date">2026-05-17</span></h2>
+            <ul>
+                <li>Terminal: fixed "connection lost" message appearing after a normal exit (exit/logout command)</li>
+                <li>Updated JSch SSH library to version 2.28.2, which includes a fix for agent forwarding when the client sends an extension message (SSH2_AGENTC_EXTENSION)</li>
+            </ul>
+        </article>
+</div>
 
 <div class="gear-divider" style="max-width:1140px; margin: 0 auto 0; padding: 0 24px;"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
@@ -574,32 +717,16 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
-        <a href="index.html#support">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
-        {{footer_source}}: <a href="{{REPO_ANDROID}}" target="_blank" rel="noopener">Android</a> &middot; <a href="{{REPO_IOS}}" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
+        <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a> &nbsp;&#9135;&nbsp;
+        <a href="index.html#support">Issues &amp; Feedback</a> &nbsp;&#9135;&nbsp;
+        Source Code: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot; <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
+        SSH connectivity powered by <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
         <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
-
-<!-- TOC active link highlight on scroll -->
-<script>
-    const sections = document.querySelectorAll('.doc-section');
-    const tocLinks = document.querySelectorAll('.toc a');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                tocLinks.forEach(l => l.classList.remove('active'));
-                const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
-                if (active) active.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-    sections.forEach(s => observer.observe(s));
-</script>
 
 </body>
 </html>

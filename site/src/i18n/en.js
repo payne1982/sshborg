@@ -616,4 +616,10 @@ Host target
                 <div class="callout-label">// OPTIONAL FIELDS</div>
                 All fields except <code>label</code>, <code>hostname</code>, and <code>username</code> are optional. Omitted fields fall back to their defaults.
             </div>`,
+
+  // ── changelog.html ─────────────────────────────────────────────────────────
+  nav_changelog:               'Changelog',
+  page_title_changelog:        'SSHBorg – Changelog',
+  meta_description_changelog:  'Release history of SSHBorg for {PLATFORM}: what changed in every version.',
+  changelog_subtitle:          'Every released version, newest first.',
 };

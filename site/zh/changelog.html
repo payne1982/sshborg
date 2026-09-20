@@ -1,41 +1,52 @@
 <!DOCTYPE html>
-<html lang="{{LANG}}">
+<html lang="zh-Hans">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title_docs}}</title>
-    <meta name="description" content="{{meta_description_docs}}">
-    <link rel="icon" type="image/x-icon"  href="{{ROOT}}favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ROOT}}favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ROOT}}favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ROOT}}apple-touch-icon.png">
-    <!--HREFLANG-->
+    <title>SSHBorg – 更新日志 (Android)</title>
+    <meta name="description" content="SSHBorg Android 版的版本历史：每个版本的变化。">
+    <link rel="icon" type="image/x-icon"  href="../favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+        <link rel="alternate" hreflang="en" href="https://sshborg.com/changelog.html">
+    <link rel="alternate" hreflang="it" href="https://sshborg.com/it/changelog.html">
+    <link rel="alternate" hreflang="de" href="https://sshborg.com/de/changelog.html">
+    <link rel="alternate" hreflang="es" href="https://sshborg.com/es/changelog.html">
+    <link rel="alternate" hreflang="fr" href="https://sshborg.com/fr/changelog.html">
+    <link rel="alternate" hreflang="pt" href="https://sshborg.com/pt/changelog.html">
+    <link rel="alternate" hreflang="uk" href="https://sshborg.com/uk/changelog.html">
+    <link rel="alternate" hreflang="ru" href="https://sshborg.com/ru/changelog.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://sshborg.com/zh/changelog.html">
+    <link rel="alternate" hreflang="ja" href="https://sshborg.com/ja/changelog.html">
+    <link rel="alternate" hreflang="x-default" href="https://sshborg.com/changelog.html">
+    <link rel="canonical" href="https://sshborg.com/zh/changelog.html">
     <!-- Open Graph -->
-    <meta property="og:type"        content="article">
+    <meta property="og:type"        content="website">
     <meta property="og:site_name"   content="SSHBorg">
-    <meta property="og:url"         content="{{CANONICAL_URL}}">
-    <meta property="og:title"       content="{{page_title_docs}}">
-    <meta property="og:description" content="{{meta_description_docs}}">
+    <meta property="og:url"         content="https://sshborg.com/zh/changelog.html">
+    <meta property="og:title"       content="SSHBorg – 更新日志 (Android)">
+    <meta property="og:description" content="SSHBorg Android 版的版本历史：每个版本的变化。">
     <meta property="og:image"       content="https://sshborg.com/logo.png">
-    <meta property="og:locale"      content="{{OG_LOCALE}}">
+    <meta property="og:locale"      content="zh_CN">
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary">
-    <meta name="twitter:title"       content="{{page_title_docs}}">
-    <meta name="twitter:description" content="{{meta_description_docs}}">
+    <meta name="twitter:title"       content="SSHBorg – 更新日志 (Android)">
+    <meta name="twitter:description" content="SSHBorg Android 版的版本历史：每个版本的变化。">
     <meta name="twitter:image"       content="https://sshborg.com/logo.png">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TechArticle",
-      "name": "{{page_title_docs}}",
-      "description": "{{meta_description_docs}}",
-      "url": "{{CANONICAL_URL}}",
-      "inLanguage": "{{LANG}}",
+      "@type": "CollectionPage",
+      "name": "SSHBorg – 更新日志 (Android)",
+      "description": "SSHBorg Android 版的版本历史：每个版本的变化。",
+      "url": "https://sshborg.com/zh/changelog.html",
+      "inLanguage": "zh-Hans",
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
     }
     </script>
-    <link rel="stylesheet" href="{{ROOT}}fonts.css">
+    <link rel="stylesheet" href="../fonts.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -452,6 +463,33 @@
             .toc { width: 100%; position: static; }
             .page-header h1 { font-size: 2em; }
         }
+        /* ── Changelog ─────────────────────────────────────────────────────── */
+        .changelog { max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .platform-switch { margin-bottom: 32px; font-size: 0.9rem; }
+        .platform-switch a { color: var(--neon-blue); text-decoration: none; }
+        .platform-switch a:hover { text-shadow: 0 0 6px var(--neon-blue); }
+
+        .release { border-left: 2px solid var(--border-hi); padding: 0 0 4px 20px; margin-bottom: 34px; }
+        .release h2 {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            color: var(--neon-green);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .release-date { font-family: var(--font-body); font-size: 0.8rem; color: var(--muted); }
+        .release ul { list-style: none; }
+        .release li { position: relative; padding-left: 18px; margin-bottom: 8px; line-height: 1.6; }
+        .release li::before { content: '\25B8'; position: absolute; left: 0; color: var(--copper); }
+
+        @media (max-width: 600px) {
+            .changelog { padding: 28px 16px 60px; }
+            .release h2 { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
@@ -459,114 +497,219 @@
 <!-- Nav -->
 <nav>
     <a class="nav-brand" href="index.html">
-        <img src="{{ROOT}}logo.png" alt="SSHBorg logo">
+        <img src="../logo.png" alt="SSHBorg logo">
         SSHBorg
     </a>
     <div class="nav-links">
-        <a href="index.html">{{nav_home}}</a>
-        <a href="changelog.html">{{nav_changelog}}</a>
-        <a href="#adding-host">{{nav_getting_started}}</a>
-        <a href="#sftp">{{nav_sftp}}</a>
-        <a href="#ssh-keys">{{nav_ssh_keys}}</a>
-        <a href="#jump-hosts">{{nav_jump_hosts}}</a>
-        <a href="#backup">{{nav_backup}}</a>
-        <a href="index.html#support">{{nav_support}}</a>
-        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
+        <a href="index.html">主页</a>
+        <a href="docs.html">用户指南</a>
+        <a href="index.html#support">支持</a>
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">隐私政策</a>
     </div>
     <div class="nav-right">
-        {{LANG_SWITCHER}}
+        <div class="lang-switcher">
+        <span class="lang-current">ZH &#9660;</span>
+        <div class="lang-dropdown">
+            <a href="../changelog.html">English</a>
+            <a href="../it/changelog.html">Italiano</a>
+            <a href="../de/changelog.html">Deutsch</a>
+            <a href="../es/changelog.html">Español</a>
+            <a href="../fr/changelog.html">Français</a>
+            <a href="../pt/changelog.html">Português</a>
+            <a href="../uk/changelog.html">Українська</a>
+            <a href="../ru/changelog.html">Русский</a>
+            <a href="../ja/changelog.html">日本語</a>
+        </div>
+    </div>
         <button class="nav-hamburger" aria-label="Menu" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
     </div>
 </nav>
 
 <!-- Page header -->
 <div class="page-header">
-    <h1>{{doc_page_title}}</h1>
-    <p>{{doc_page_subtitle}}</p>
+    <h1>更新日志 — Android</h1>
+    <p>所有已发布的版本，从最新开始。</p>
 </div>
 
-<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+<div class="gear-divider"><span>&#9881;</span><span>&#9881;</span><span>&#9881;</span></div>
 
-<!-- Docs layout -->
-<div class="docs-layout">
+<div class="changelog">
+    <div class="platform-switch">&#8594; <a href="changelog-ios.html">更新日志 — iOS</a></div>
 
-    <!-- TOC -->
-    <nav class="toc" aria-label="Table of contents">
-        <div class="toc-title">{{toc_title}}</div>
-        <ul>
-{{doc_toc}}
-        </ul>
-    </nav>
-
-    <!-- Content -->
-    <div class="doc-content">
-
-        <div class="doc-section" id="adding-host">
-{{doc_adding_host}}
-        </div>
-
-        <div class="doc-section" id="host-groups">
-{{doc_host_groups}}
-        </div>
-
-        <div class="doc-section" id="sftp">
-{{doc_sftp}}
-        </div>
-
-        <div class="doc-section" id="ssh-keys">
-{{doc_ssh_keys}}
-        </div>
-
-        <div class="doc-section" id="suggestions">
-{{doc_suggestions}}
-        </div>
-
-        <div class="doc-section" id="terminal">
-{{doc_terminal}}
-        </div>
-
-        <div class="doc-section" id="terminal-settings">
-{{doc_terminal_settings}}
-        </div>
-
-        <div class="doc-section" id="extra-keys">
-{{doc_extra_keys}}
-        </div>
-
-        <div class="doc-section" id="agent-forwarding">
-{{doc_agent_forwarding}}
-        </div>
-
-        <div class="doc-section" id="legacy-ciphers">
-{{doc_legacy_ciphers}}
-        </div>
-
-        <div class="doc-section" id="connection-drops">
-{{doc_connection_drops}}
-        </div>
-
-        <div class="doc-section" id="jump-hosts">
-{{doc_jump_hosts}}
-        </div>
-
-        <div class="doc-section" id="sessions">
-{{doc_sessions}}
-        </div>
-
-        <div class="doc-section" id="security">
-{{doc_security}}
-        </div>
-
-        <div class="doc-section" id="backup">
-{{doc_backup}}
-        </div>
-
-        <div class="doc-section" id="android-tv">
-{{doc_android_tv}}
-        </div>
-
-    </div><!-- /doc-content -->
-</div><!-- /docs-layout -->
+        <article class="release">
+            <h2>1.17.1<span class="release-date">2026-09-19</span></h2>
+            <ul>
+                <li>SFTP：修复了上传时可能断开连接或以错误结束的问题</li>
+                <li>SFTP：错误会保留在屏幕上并可复制；多文件传输会跳过失败的文件并列出</li>
+                <li>SFTP：上传前如果文件已存在会先询问是否替换</li>
+                <li>SFTP：删除、上传或下载后列表保持原来的滚动位置</li>
+                <li>应用锁：超时从离开应用时开始计算；选择文件后不再要求解锁</li>
+                <li>终端：读取命令历史不再需要第二次登录</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.17.0<span class="release-date">2026-09-15</span></h2>
+            <ul>
+                <li>现在可以排列主机和分组列表（字母顺序、最近使用、最常使用或手动）</li>
+                <li>修复了 tmux、vim、nano、less 等全屏程序中的滚动</li>
+                <li>修复了按键栏中松手后仍可能持续触发的按键</li>
+                <li>单词模式现在会暂停命令建议</li>
+                <li>修复了通过跳板机连接时可能一直转圈的问题</li>
+                <li>Android TV：选中的按键或按钮现在清晰可见</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.16.2<span class="release-date">2026-09-10</span></h2>
+            <ul>
+                <li>Android TV：主屏幕上显示完整尺寸的横幅和图标</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.16.0<span class="release-date">2026-09-09</span></h2>
+            <ul>
+                <li>可自定义的额外按键栏：选择布局（单行、两行、精简）或用任意按键、文本宏和最多三行自建按键栏——在栏上用 ⇄ 直接切换</li>
+                <li>改进 Android TV 上的 D-pad 导航——现在可用遥控器方便地操作文本框和下拉菜单</li>
+                <li>修复横屏电视上的锁屏，底部一行不再被裁切</li>
+                <li>选择栏：“全部复制”移到末尾并淡化，不再误触代替“复制所选”</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.15.1<span class="release-date">2026-08-31</span></h2>
+            <ul>
+                <li>修复：重命名 SSH 密钥时，现在也会更新公钥内的注释</li>
+                <li>更新了应用图标，现已填满整个画面，包括在 Android TV 上</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.15.0<span class="release-date">2026-08-23</span></h2>
+            <ul>
+                <li>支持 Android TV：可用遥控器安装和导航——输入文字建议使用实体键盘（USB 或蓝牙）</li>
+                <li>在 Android TV 等非触摸设备上，使用键盘输入文字更顺畅</li>
+                <li>修复了仅提供 keyboard-interactive 认证的服务器上的密码登录</li>
+                <li>SFTP：新增选项，可将文件夹排在文件之前</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.14.0<span class="release-date">2026-08-19</span></h2>
+            <ul>
+                <li>从主机菜单复制主机，以便在新连接中重用其设置——适合以不同端口或跳板机连接同一服务器</li>
+                <li>在 SFTP 浏览器中显示或隐藏隐藏文件（点文件），按主机保存</li>
+                <li>新的应用锁：用应用内 PIN 或密码短语保护应用</li>
+                <li>已将应用的库和构建工具更新到最新稳定版本</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.13.1<span class="release-date">2026-08-12</span></h2>
+            <ul>
+                <li>重新设计的连接错误和断开界面：清晰的摘要，以及可展开、可滚动、可复制的详情</li>
+                <li>更稳定的连接：会话期间保持 Wi-Fi 唤醒，并更频繁地检查链路</li>
+                <li>修复了一个罕见的崩溃，现在当 Android 的后台时间限制停止会话时会通知你</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.13.0<span class="release-date">2026-08-08</span></h2>
+            <ul>
+                <li>直接从终端标签栏在不同主机的会话之间切换</li>
+                <li>点按已下载文件的名称即可打开它，可在下载界面或传输面板中操作</li>
+                <li>改进终端中表情符号和宽字符（中日韩）的显示</li>
+                <li>修复了首个终端会话顶部文本被截断的问题</li>
+                <li>修复了后台会话可能停止接受输入的问题</li>
+                <li>键盘关闭时也保持额外按键栏可见</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.12.1<span class="release-date">2026-08-05</span></h2>
+            <ul>
+                <li>改进了终端边缘附近的文本选择</li>
+                <li>修复了某些情况下可能卡住的灰色屏幕</li>
+                <li>改进了 SFTP 导航，防止连接中断</li>
+                <li>点按下载通知即可打开文件并查看保存路径</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.12.0<span class="release-date">2026-08-02</span></h2>
+            <ul>
+                <li>新增应用锁方式：生物识别、设备 PIN/图案或无——适用于 Android TV</li>
+                <li>终端现可显示 Nerd Font / Powerline 字形（如 Starship 提示符）</li>
+                <li>备份按名称记住每个主机的密钥</li>
+                <li>终端选择菜单中新增“粘贴”</li>
+                <li>按键栏中的方向键和 PgUp/PgDn 现在长按可连续触发</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.11.1<span class="release-date">2026-07-29</span></h2>
+            <ul>
+                <li>修复了缺失的界面字体</li>
+                <li>修复了切换会话标签页后命令建议不显示的问题</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.11.0<span class="release-date">2026-07-26</span></h2>
+            <ul>
+                <li>应用现已支持俄语，感谢社区贡献的翻译</li>
+                <li>修复了退出终端会话时的内存泄漏</li>
+                <li>终端滚动更流畅、更灵敏</li>
+                <li>输入时终端自动回到底部</li>
+                <li>可选：双击发送 Tab（自动补全）</li>
+                <li>备份现在也包含应用设置</li>
+                <li>新增重置主机已接受密钥的选项</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.10.0<span class="release-date">2026-07-23</span></h2>
+            <ul>
+                <li>主机现在可以整理到可折叠的彩色分组中，也可为单个主机自定义颜色</li>
+                <li>新增终端浅色配色（白底黑字），也可跟随应用主题</li>
+                <li>新增设置：终端打开时保持屏幕常亮</li>
+                <li>实体键盘：终端中现已支持 Ctrl 和 Alt 组合键</li>
+                <li>修复了在 Android 12 及更早版本上生成 SSH 密钥时的崩溃，以及其他小修复</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.9.0<span class="release-date">2026-07-18</span></h2>
+            <ul>
+                <li>SFTP：修复了取消下载时的多个问题</li>
+                <li>终端：选择手柄更易拖动，复制的文本不再在长行自动换行处插入多余的换行符</li>
+                <li>新增设置：终端默认字体大小</li>
+                <li>应用锁定：解锁仅限生物识别（仅在未录入生物识别时才可用 PIN/图案）</li>
+                <li>更新了内部库</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.8.0<span class="release-date">2026-06-20</span></h2>
+            <ul>
+                <li>SSH 代理转发：修复了可能导致与较新 OpenSSH 服务器会话中断的消息分帧错误（jsch 2.28.3）</li>
+                <li>主机列表：当列表占满屏幕时，最后一个主机不再被添加按钮遮挡</li>
+                <li>下载：显示开始和完成的日期时间；前台下载现在以带有“完成”按钮的完成界面结束</li>
+                <li>会话标签：以浏览器风格重新设计了多会话标签栏，切换标签时键盘现在保持打开</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.7.0<span class="release-date">2026-06-09</span></h2>
+            <ul>
+                <li>SFTP：后台下载 — 下载文件时不阻塞文件浏览器；长按文件选择"后台下载"</li>
+                <li>SFTP：点击"后台"按钮可随时将正在进行的下载切换至后台</li>
+                <li>主机设置：新增"允许旧版加密"选项，用于连接仅支持过时算法的旧服务器（AES-CBC、3DES、DH-group1/14-sha1、DSA）</li>
+                <li>终端：改进了拼写检查模式</li>
+                <li>小错误修复和改进</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.6.1<span class="release-date">2026-05-19</span></h2>
+            <ul>
+                <li>SFTP：修复通过跳板机在移动网络连接时卡死的问题——现在连接超时后会显示错误，而非无限转圈</li>
+                <li>终端：单词模式 — 点击拼写纠正建议现在能正确替换输入错误的单词（Android 13+）</li>
+                <li>小错误修复和改进</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.6<span class="release-date">2026-05-17</span></h2>
+            <ul>
+                <li>终端：修复正常退出（exit/logout 命令）后显示"连接已断开"消息的问题</li>
+                <li>将 JSch SSH 库更新至 2.28.2 版本，修复了客户端发送扩展消息（SSH2_AGENTC_EXTENSION）时代理转发的问题</li>
+            </ul>
+        </article>
+</div>
 
 <div class="gear-divider" style="max-width:1140px; margin: 0 auto 0; padding: 0 24px;"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
@@ -574,32 +717,16 @@
 <footer>
     <p>
         &copy; 2026 SSHBorg &nbsp;&#9135;&nbsp;
-        <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{footer_privacy}}</a> &nbsp;&#9135;&nbsp;
-        <a href="index.html#support">{{footer_issues}}</a> &nbsp;&#9135;&nbsp;
-        {{footer_source}}: <a href="{{REPO_ANDROID}}" target="_blank" rel="noopener">Android</a> &middot; <a href="{{REPO_IOS}}" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
+        <a href="../privacy_policy.html" target="_blank" rel="noopener">隐私政策</a> &nbsp;&#9135;&nbsp;
+        <a href="index.html#support">问题与反馈</a> &nbsp;&#9135;&nbsp;
+        源代码: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot; <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">
-        {{footer_powered}} <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
+        SSH 连接由以下驱动 <a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener">mwiede/jsch</a> (Android) &middot;
         <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
-
-<!-- TOC active link highlight on scroll -->
-<script>
-    const sections = document.querySelectorAll('.doc-section');
-    const tocLinks = document.querySelectorAll('.toc a');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                tocLinks.forEach(l => l.classList.remove('active'));
-                const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
-                if (active) active.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-    sections.forEach(s => observer.observe(s));
-</script>
 
 </body>
 </html>

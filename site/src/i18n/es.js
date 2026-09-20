@@ -613,4 +613,10 @@ Host target
                 <div class="callout-label">// CAMPOS OPCIONALES</div>
                 Todos los campos excepto <code>label</code>, <code>hostname</code> y <code>username</code> son opcionales. Los campos omitidos adoptan sus valores por defecto.
             </div>`,
+
+  // ── changelog.html ─────────────────────────────────────────────────────────
+  nav_changelog:               'Historial de versiones',
+  page_title_changelog:        'SSHBorg – Historial de versiones',
+  meta_description_changelog:  'Historial de versiones de SSHBorg para {PLATFORM}: qué cambió en cada versión.',
+  changelog_subtitle:          'Todas las versiones publicadas, de la más reciente.',
 };

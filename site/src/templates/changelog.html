@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{page_title_docs}}</title>
-    <meta name="description" content="{{meta_description_docs}}">
+    <title>{{CHANGELOG_TITLE}}</title>
+    <meta name="description" content="{{CHANGELOG_DESC}}">
     <link rel="icon" type="image/x-icon"  href="{{ROOT}}favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ROOT}}favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ROOT}}favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ROOT}}apple-touch-icon.png">
     <!--HREFLANG-->
     <!-- Open Graph -->
-    <meta property="og:type"        content="article">
+    <meta property="og:type"        content="website">
     <meta property="og:site_name"   content="SSHBorg">
     <meta property="og:url"         content="{{CANONICAL_URL}}">
-    <meta property="og:title"       content="{{page_title_docs}}">
-    <meta property="og:description" content="{{meta_description_docs}}">
+    <meta property="og:title"       content="{{CHANGELOG_TITLE}}">
+    <meta property="og:description" content="{{CHANGELOG_DESC}}">
     <meta property="og:image"       content="https://sshborg.com/logo.png">
     <meta property="og:locale"      content="{{OG_LOCALE}}">
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary">
-    <meta name="twitter:title"       content="{{page_title_docs}}">
-    <meta name="twitter:description" content="{{meta_description_docs}}">
+    <meta name="twitter:title"       content="{{CHANGELOG_TITLE}}">
+    <meta name="twitter:description" content="{{CHANGELOG_DESC}}">
     <meta name="twitter:image"       content="https://sshborg.com/logo.png">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TechArticle",
-      "name": "{{page_title_docs}}",
-      "description": "{{meta_description_docs}}",
+      "@type": "CollectionPage",
+      "name": "{{CHANGELOG_TITLE}}",
+      "description": "{{CHANGELOG_DESC}}",
       "url": "{{CANONICAL_URL}}",
       "inLanguage": "{{LANG}}",
       "isPartOf": { "@type": "WebSite", "name": "SSHBorg", "url": "https://sshborg.com/" }
@@ -452,6 +452,33 @@
             .toc { width: 100%; position: static; }
             .page-header h1 { font-size: 2em; }
         }
+        /* ── Changelog ─────────────────────────────────────────────────────── */
+        .changelog { max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .platform-switch { margin-bottom: 32px; font-size: 0.9rem; }
+        .platform-switch a { color: var(--neon-blue); text-decoration: none; }
+        .platform-switch a:hover { text-shadow: 0 0 6px var(--neon-blue); }
+
+        .release { border-left: 2px solid var(--border-hi); padding: 0 0 4px 20px; margin-bottom: 34px; }
+        .release h2 {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            color: var(--neon-green);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .release-date { font-family: var(--font-body); font-size: 0.8rem; color: var(--muted); }
+        .release ul { list-style: none; }
+        .release li { position: relative; padding-left: 18px; margin-bottom: 8px; line-height: 1.6; }
+        .release li::before { content: '\25B8'; position: absolute; left: 0; color: var(--copper); }
+
+        @media (max-width: 600px) {
+            .changelog { padding: 28px 16px 60px; }
+            .release h2 { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
@@ -464,12 +491,7 @@
     </a>
     <div class="nav-links">
         <a href="index.html">{{nav_home}}</a>
-        <a href="changelog.html">{{nav_changelog}}</a>
-        <a href="#adding-host">{{nav_getting_started}}</a>
-        <a href="#sftp">{{nav_sftp}}</a>
-        <a href="#ssh-keys">{{nav_ssh_keys}}</a>
-        <a href="#jump-hosts">{{nav_jump_hosts}}</a>
-        <a href="#backup">{{nav_backup}}</a>
+        <a href="docs.html">{{nav_guide}}</a>
         <a href="index.html#support">{{nav_support}}</a>
         <a href="{{ROOT}}privacy_policy.html" target="_blank" rel="noopener">{{nav_privacy}}</a>
     </div>
@@ -481,92 +503,17 @@
 
 <!-- Page header -->
 <div class="page-header">
-    <h1>{{doc_page_title}}</h1>
-    <p>{{doc_page_subtitle}}</p>
+    <h1>{{CHANGELOG_H1}}</h1>
+    <p>{{changelog_subtitle}}</p>
 </div>
 
-<div class="gear-divider"><span>⚙</span><span>⚙</span><span>⚙</span></div>
+<div class="gear-divider"><span>&#9881;</span><span>&#9881;</span><span>&#9881;</span></div>
 
-<!-- Docs layout -->
-<div class="docs-layout">
+<div class="changelog">
+    <div class="platform-switch">&#8594; <a href="{{OTHER_PAGE}}">{{OTHER_LABEL}}</a></div>
 
-    <!-- TOC -->
-    <nav class="toc" aria-label="Table of contents">
-        <div class="toc-title">{{toc_title}}</div>
-        <ul>
-{{doc_toc}}
-        </ul>
-    </nav>
-
-    <!-- Content -->
-    <div class="doc-content">
-
-        <div class="doc-section" id="adding-host">
-{{doc_adding_host}}
-        </div>
-
-        <div class="doc-section" id="host-groups">
-{{doc_host_groups}}
-        </div>
-
-        <div class="doc-section" id="sftp">
-{{doc_sftp}}
-        </div>
-
-        <div class="doc-section" id="ssh-keys">
-{{doc_ssh_keys}}
-        </div>
-
-        <div class="doc-section" id="suggestions">
-{{doc_suggestions}}
-        </div>
-
-        <div class="doc-section" id="terminal">
-{{doc_terminal}}
-        </div>
-
-        <div class="doc-section" id="terminal-settings">
-{{doc_terminal_settings}}
-        </div>
-
-        <div class="doc-section" id="extra-keys">
-{{doc_extra_keys}}
-        </div>
-
-        <div class="doc-section" id="agent-forwarding">
-{{doc_agent_forwarding}}
-        </div>
-
-        <div class="doc-section" id="legacy-ciphers">
-{{doc_legacy_ciphers}}
-        </div>
-
-        <div class="doc-section" id="connection-drops">
-{{doc_connection_drops}}
-        </div>
-
-        <div class="doc-section" id="jump-hosts">
-{{doc_jump_hosts}}
-        </div>
-
-        <div class="doc-section" id="sessions">
-{{doc_sessions}}
-        </div>
-
-        <div class="doc-section" id="security">
-{{doc_security}}
-        </div>
-
-        <div class="doc-section" id="backup">
-{{doc_backup}}
-        </div>
-
-        <div class="doc-section" id="android-tv">
-{{doc_android_tv}}
-        </div>
-
-    </div><!-- /doc-content -->
-</div><!-- /docs-layout -->
+{{RELEASES}}
+</div>
 
 <div class="gear-divider" style="max-width:1140px; margin: 0 auto 0; padding: 0 24px;"><span>⚙</span><span>⚙</span><span>⚙</span></div>
 
@@ -584,22 +531,6 @@
         <a href="https://libssh2.org" target="_blank" rel="noopener">libssh2</a> (iOS)
     </p>
 </footer>
-
-<!-- TOC active link highlight on scroll -->
-<script>
-    const sections = document.querySelectorAll('.doc-section');
-    const tocLinks = document.querySelectorAll('.toc a');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                tocLinks.forEach(l => l.classList.remove('active'));
-                const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
-                if (active) active.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-20% 0px -70% 0px' });
-    sections.forEach(s => observer.observe(s));
-</script>
 
 </body>
 </html>

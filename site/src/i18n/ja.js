@@ -615,4 +615,10 @@ Host target
                 <div class="callout-label">// 省略可能なフィールド</div>
                 <code>label</code>、<code>hostname</code>、<code>username</code> 以外のフィールドはすべて省略可能です。省略されたフィールドはデフォルト値が使用されます。
             </div>`,
+
+  // ── changelog.html ─────────────────────────────────────────────────────────
+  nav_changelog:               '変更履歴',
+  page_title_changelog:        'SSHBorg – 変更履歴',
+  meta_description_changelog:  'SSHBorg（{PLATFORM}）のリリース履歴：各バージョンの変更点。',
+  changelog_subtitle:          '公開されたすべてのバージョン（新しい順）。',
 };
