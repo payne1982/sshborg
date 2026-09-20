@@ -34,8 +34,8 @@ const LANGUAGES = [
 const PAGES = ['index', 'docs', 'changelog', 'changelog-ios'];
 
 const CHANGELOG_PAGES = {
-  'changelog':     { template: 'changelog', platform: 'Android', other: 'changelog-ios.html', otherPlatform: 'iOS'     },
-  'changelog-ios': { template: 'changelog', platform: 'iOS',     other: 'changelog.html',     otherPlatform: 'Android' },
+  'changelog':     { template: 'changelog', platform: 'Android' },
+  'changelog-ios': { template: 'changelog', platform: 'iOS'     },
 };
 
 // Play/App Store metadata directory (and release-note tag) per site language.
@@ -182,6 +182,19 @@ function escapeHtml(s) {
   return s.replace(/&(?!(?:[a-zA-Z]+|#\d+);)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/**
+ * The two platform tabs, the current one marked as selected. A platform with no released
+ * version gets no tab, and a single platform gets no tabs at all — nothing to switch to.
+ */
+function platformTabs(current, releases) {
+  const tabs = Object.entries(CHANGELOG_PAGES)
+    .filter(([, cl]) => releases[cl.platform].length > 0)
+    .map(([page, cl]) => cl.platform === current
+      ? `        <span class="tab tab-active" aria-current="page">${cl.platform}</span>`
+      : `        <a class="tab" href="${page}.html">${cl.platform}</a>`);
+  return tabs.length > 1 ? tabs.join('\n') : '';
+}
+
 function renderReleases(releases, lang) {
   return releases.map(r => {
     const items = (r.notes[lang.code] || r.notes.en)
@@ -228,9 +241,8 @@ function build() {
         PLATFORM:        cl.platform,
         CHANGELOG_TITLE: `${tr.page_title_changelog} (${cl.platform})`,
         CHANGELOG_DESC:  tr.meta_description_changelog.split('{PLATFORM}').join(cl.platform),
-        CHANGELOG_H1:    `${tr.nav_changelog} — ${cl.platform}`,
-        OTHER_PAGE:      cl.other,
-        OTHER_LABEL:     `${tr.nav_changelog} — ${cl.otherPlatform}`,
+        CHANGELOG_H1:    tr.nav_changelog,
+        PLATFORM_TABS:   platformTabs(cl.platform, releases),
         RELEASES:        renderReleases(releases[cl.platform], lang),
       } : {};
 
