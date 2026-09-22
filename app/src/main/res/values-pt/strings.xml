@@ -262,6 +262,7 @@
     <string name="sftp_mkdir_folder_name">Nome da pasta</string>
 
     <string name="sftp_menu_open">Abrir</string>
+    <string name="sftp_menu_edit">Abrir no editor</string>
     <string name="sftp_menu_rename">Renomear</string>
     <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
     <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
@@ -466,4 +467,16 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Mover para cima</string>
     <string name="hosts_move_down">Mover para baixo</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Alterações não guardadas</string>
+    <string name="editor_unsaved_message">Fechar o editor e perder as alterações feitas?</string>
+    <string name="editor_discard">Descartar</string>
+    <string name="editor_unsaved">não guardado</string>
+    <string name="editor_saved">guardado</string>
+    <string name="editor_mixed_endings">fins de linha misturados</string>
+    <string name="editor_too_large">Este ficheiro tem %1$s, mais do que os %2$s que o editor consegue abrir.</string>
+    <string name="editor_binary">Este ficheiro não é texto, por isso não pode ser editado aqui.</string>
+    <string name="editor_use_terminal">Pode editá-lo no servidor a partir de uma sessão de terminal.</string>
 </resources>

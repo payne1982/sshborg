@@ -21,6 +21,9 @@ import com.sshborg.service.FileFailure
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.service.TransferTask
+import com.sshborg.ui.editor.EDITOR_MAX_BYTES
+import com.sshborg.ui.editor.EditorState
+import com.sshborg.ui.editor.TextFile
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -77,6 +80,76 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     val report: StateFlow<ErrorReport?> = _report
 
     fun dismissReport() { _report.value = null }
+
+    /** The file open in the editor, if any. See [openEditor]. */
+    private val _editor = MutableStateFlow<EditorState?>(null)
+    val editor: StateFlow<EditorState?> = _editor
+
+    /**
+     * Opens [remotePath] in the editor: reads it whole into memory, decides whether it can be
+     * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
+     * the bytes live in the process and go straight back to the server on save.
+     */
+    fun openEditor(remotePath: String) {
+        val session = sftpSession ?: return
+        _editor.value = EditorState.Loading(remotePath)
+        viewModelScope.launch(Dispatchers.IO) {
+            val bytes = try {
+                session.readFile(remotePath, EDITOR_MAX_BYTES)
+            } catch (e: FileTooLargeException) {
+                _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
+                return@launch
+            } catch (e: Exception) {
+                editorFailed(remotePath, e)
+                return@launch
+            }
+            _editor.value = if (TextFile.isBinary(bytes))
+                EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
+            else
+                EditorState.Ready(remotePath, TextFile.decode(bytes))
+        }
+    }
+
+    /** Writes [text] back to the open file, keeping its encoding, line endings and mode. */
+    fun saveEditor(text: String) {
+        val open = _editor.value as? EditorState.Ready ?: return
+        val session = sftpSession ?: return
+        if (open.saving) return
+        _editor.value = open.copy(saving = true)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                session.writeFile(open.path, TextFile.encode(text, open.decoded))
+            } catch (e: Exception) {
+                _editor.value = open.copy(saving = false)
+                editorFailed(open.path, e)
+                return@launch
+            }
+            // The text just written is the new baseline: the file on the server now matches it.
+            _editor.value = open.copy(
+                decoded = open.decoded.copy(text = text),
+                saving = false,
+                savedAt = System.currentTimeMillis(),
+            )
+            refreshListing()
+        }
+    }
+
+    /**
+     * Reports a failed read or write. A dead connection goes through [report], which takes the
+     * screen to the connection-lost error; anything else stays inside the editor, so the user
+     * keeps the text they were working on and can try again.
+     */
+    private fun editorFailed(remotePath: String, e: Exception) {
+        val failure = FileFailure.of(remotePath.substringAfterLast('/'), e)
+        if (sftpSession?.isConnected != true) {
+            _editor.value = null
+            report(ErrorReport(str(R.string.editor_failed), listOf(failure)), refresh = false)
+        } else {
+            _editor.value = EditorState.Failed(remotePath, failure)
+        }
+    }
+
+    fun closeEditor() { _editor.value = null }
 
     /** The last listing shown, to go back to when an operation fails without losing the connection. */
     @Volatile private var lastListing: State.Listing? = null

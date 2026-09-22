@@ -277,6 +277,7 @@
     <string name="sftp_mkdir_folder_name">Folder name</string>
 
     <string name="sftp_menu_open">Open</string>
+    <string name="sftp_menu_edit">Open in editor</string>
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>
@@ -477,4 +478,16 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Move up</string>
     <string name="hosts_move_down">Move down</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Unsaved changes</string>
+    <string name="editor_unsaved_message">Close the editor and lose the changes you made?</string>
+    <string name="editor_discard">Discard</string>
+    <string name="editor_unsaved">unsaved</string>
+    <string name="editor_saved">saved</string>
+    <string name="editor_mixed_endings">mixed line endings</string>
+    <string name="editor_too_large">This file is %1$s, more than the %2$s the editor can open.</string>
+    <string name="editor_binary">This file is not text, so it cannot be edited here.</string>
+    <string name="editor_use_terminal">You can edit it on the server from a terminal session.</string>
 </resources>

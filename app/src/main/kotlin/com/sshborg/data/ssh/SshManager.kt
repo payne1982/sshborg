@@ -686,6 +686,10 @@ data class SftpEntry(
     val modTimeSeconds: Int,   // Unix timestamp
 )
 
+/** Thrown by [SftpSession.readFile] when the file is larger than the caller is willing to hold. */
+class FileTooLargeException(val size: Long, val limit: Long) :
+    Exception("$size bytes exceeds the $limit byte limit")
+
 /** A live SFTP session. */
 class SftpSession(
     private val session: Session,
@@ -826,6 +830,53 @@ class SftpSession(
             override fun count(count: Long): Boolean { sent += count; onProgress(sent); return true }
             override fun end() {}
         }, com.jcraft.jsch.ChannelSftp.OVERWRITE) }
+    }
+
+    /**
+     * Reads [remotePath] whole into memory, for the editor. Checks the size first and refuses
+     * anything over [limit]: a file too big to edit is also too big to be worth downloading.
+     */
+    fun readFile(remotePath: String, limit: Long): ByteArray {
+        val size = op { it.stat(remotePath) }.size
+        if (size > limit) throw FileTooLargeException(size, limit)
+        val out = java.io.ByteArrayOutputStream(size.coerceIn(0L, limit).toInt())
+        downloadFile(remotePath, out)
+        return out.toByteArray()
+    }
+
+    /**
+     * Replaces [remotePath]'s contents with [bytes] without ever leaving it half-written: the
+     * new contents go to a hidden sibling first and take the original's place only once they
+     * are all there, so a connection lost mid-write costs the temporary file and nothing else.
+     *
+     * The swap is a plain rename, which JSch turns into posix-rename@openssh.com wherever the
+     * server offers it (OpenSSH always does) — one atomic step, and the original survives if it
+     * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there
+     * we write in place instead rather than delete the original and hope.
+     */
+    fun writeFile(remotePath: String, bytes: ByteArray) {
+        val slash = remotePath.lastIndexOf('/')
+        val dir = if (slash <= 0) "" else remotePath.substring(0, slash)
+        val name = remotePath.substring(slash + 1)
+        val temp = "$dir/.$name.sshborg-tmp"
+        val mode = runCatching { op { it.stat(remotePath) }.permissions }.getOrNull()
+
+        try {
+            uploadFile(java.io.ByteArrayInputStream(bytes), temp)
+        } catch (e: Exception) {
+            runCatching { op { it.rm(temp) } }
+            throw e
+        }
+        // The temporary file is created with the server's default mode; give it the original's
+        // before the swap, or saving would quietly clear an executable bit or widen a 0600 file.
+        if (mode != null) runCatching { op { it.chmod(mode, temp) } }
+        try {
+            op { it.rename(temp, remotePath) }
+        } catch (e: com.jcraft.jsch.SftpException) {
+            android.util.Log.w("SftpSession", "rename onto an existing name refused, writing in place", e)
+            uploadFile(java.io.ByteArrayInputStream(bytes), remotePath)
+            runCatching { op { it.rm(temp) } }
+        }
     }
 
     fun deleteFile(remotePath: String) = op { it.rm(remotePath) }

@@ -41,6 +41,10 @@ import androidx.compose.ui.platform.LocalContext
 import com.sshborg.R
 import com.sshborg.isTouchless
 import com.sshborg.ui.common.onMenuKey
+import com.sshborg.ui.editor.EditorLoading
+import com.sshborg.ui.editor.EditorScreen
+import com.sshborg.ui.editor.EditorState
+import com.sshborg.ui.editor.EditorUnsupportedDialog
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
 import com.sshborg.ui.common.ProblemContent
@@ -95,6 +99,19 @@ fun SftpScreen(
     }
 
     val listPositions = remember { ListPositions() }
+
+    // While a file is open the editor takes the whole screen: it brings its own top bar and its
+    // own back handling, and nothing underneath should be reachable. Files that cannot be edited
+    // (too big, not text) and failed reads stay as dialogs over the listing instead.
+    val editor by vm.editor.collectAsState()
+    when (val e = editor) {
+        is EditorState.Loading -> { EditorLoading(e.name); return }
+        is EditorState.Ready -> {
+            EditorScreen(state = e, onSave = vm::saveEditor, onClose = vm::closeEditor)
+            return
+        }
+        else -> Unit
+    }
 
     val atRoot    = currentPath == "/" || currentPath.isEmpty()
     val isListing = state is SftpViewModel.State.Listing
@@ -338,6 +355,9 @@ fun SftpScreen(
                                         onDownloadInBackground = if (!entry.isDir) {
                                             { vm.downloadFileInBackground(entry, s.path) }
                                         } else null,
+                                        onEdit = if (!entry.isDir) {
+                                            { vm.openEditor("${s.path.trimEnd('/')}/${entry.name}") }
+                                        } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
                                         showOverflow   = isTouchless,
@@ -443,6 +463,15 @@ fun SftpScreen(
     }
 
     vm.report.collectAsState().value?.let { ErrorReportDialog(it, onDismiss = vm::dismissReport) }
+
+    when (val e = editor) {
+        is EditorState.Unsupported -> EditorUnsupportedDialog(e, onDismiss = vm::closeEditor)
+        is EditorState.Failed -> ErrorReportDialog(
+            ErrorReport(stringResource(R.string.editor_failed), listOf(e.failure)),
+            onDismiss = vm::closeEditor,
+        )
+        else -> Unit
+    }
 
     // Bulk delete confirmation dialog
     pendingBulkDelete?.let { entries ->
@@ -698,6 +727,7 @@ private fun SftpEntryItem(
     onClick: () -> Unit,
     onDownloadFolder: () -> Unit,
     onDownloadInBackground: (() -> Unit)?,
+    onEdit: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
     showOverflow: Boolean = false,
@@ -826,6 +856,13 @@ private fun SftpEntryItem(
                     text = { Text(stringResource(R.string.sftp_menu_download_in_background)) },
                     leadingIcon = { Icon(Icons.Default.DownloadForOffline, null) },
                     onClick = { menuExpanded = false; onDownloadInBackground() },
+                )
+            }
+            if (onEdit != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.sftp_menu_edit)) },
+                    leadingIcon = { Icon(Icons.Default.EditNote, null) },
+                    onClick = { menuExpanded = false; onEdit() },
                 )
             }
             DropdownMenuItem(

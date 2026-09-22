@@ -276,6 +276,7 @@
     <string name="sftp_mkdir_folder_name">文件夹名称</string>
 
     <string name="sftp_menu_open">打开</string>
+    <string name="sftp_menu_edit">在编辑器中打开</string>
     <string name="sftp_menu_rename">重命名</string>
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>
@@ -471,4 +472,16 @@
     <string name="settings_host_sort_manual">手动</string>
     <string name="hosts_move_up">上移</string>
     <string name="hosts_move_down">下移</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">编辑器</string>
+    <string name="editor_unsaved_title">未保存的更改</string>
+    <string name="editor_unsaved_message">关闭编辑器并丢弃所做的更改？</string>
+    <string name="editor_discard">丢弃</string>
+    <string name="editor_unsaved">未保存</string>
+    <string name="editor_saved">已保存</string>
+    <string name="editor_mixed_endings">换行符混用</string>
+    <string name="editor_too_large">该文件为 %1$s，超过编辑器可打开的 %2$s。</string>
+    <string name="editor_binary">该文件不是文本，无法在此编辑。</string>
+    <string name="editor_use_terminal">可以在终端会话中于服务器上编辑它。</string>
 </resources>
