@@ -1,3 +1,1 @@
-• SFTP: Textdateien direkt auf dem Server bearbeiten; Kodierung, Zeilenenden und Rechte bleiben erhalten
-• SFTP: zu große Dateien öffnen schreibgeschützt, bis 4 MB
-• SFTP: Dateien, die kein Text sind, öffnen im Hex-Editor
+• SFTP: eingebauter Editor für die Dateien auf dem Server — Textdateien werden direkt dort bearbeitet und behalten Kodierung, Zeilenenden und Rechte, zu große Dateien öffnen schreibgeschützt bis 4 MB, und alles, was kein Text ist, öffnet im Hex-Editor

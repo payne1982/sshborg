@@ -1,3 +1,1 @@
-• SFTP: edite ficheiros de texto no servidor sem os transferir; codificação, fins de linha e permissões mantêm-se
-• SFTP: ficheiros demasiado grandes abrem em só leitura, até 4 MB
-• SFTP: ficheiros que não são texto abrem num editor hexadecimal
+• SFTP: editor integrado para os ficheiros no servidor — os de texto são editados no próprio servidor e mantêm codificação, fins de linha e permissões, os demasiado grandes abrem em só leitura até 4 MB, e o que não é texto abre num editor hexadecimal

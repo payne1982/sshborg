@@ -1,3 +1,1 @@
-• SFTP : modifiez les fichiers texte sur le serveur sans les télécharger ; encodage, fins de ligne et droits sont conservés
-• SFTP : les fichiers trop gros s'ouvrent en lecture seule, jusqu'à 4 Mo
-• SFTP : les fichiers qui ne sont pas du texte s'ouvrent dans un éditeur hexadécimal
+• SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage, fins de ligne et droits, les trop gros s'ouvrent en lecture seule jusqu'à 4 Mo, et ce qui n'est pas du texte s'ouvre dans un éditeur hexadécimal
