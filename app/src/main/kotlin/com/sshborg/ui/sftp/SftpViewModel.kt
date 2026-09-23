@@ -131,10 +131,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             }
             _editor.value = EditorState.Loading(remotePath, size ?: 0L)
             val bytes = read(session, remotePath, size) ?: return@launch
+            // The user may have walked away from the wait; the file they left is not reopened.
+            if (!stillLoading(remotePath)) return@launch
             hold(remotePath, bytes)
             decide(remotePath, bytes, force, readOnly, asText)
         }
     }
+
+    private fun stillLoading(remotePath: String) =
+        (_editor.value as? EditorState.Loading)?.path == remotePath
 
     /**
      * Reads the whole file, keeping [editor] posted on how far it has got, or leaves the right
@@ -235,6 +240,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
             _editor.value = EditorState.Loading(remotePath, size ?: 0L)
             val bytes = read(session, remotePath, size) ?: return@launch
+            if (!stillLoading(remotePath)) return@launch
             hold(remotePath, bytes)
             _editor.value = EditorState.Hex(remotePath, bytes.size)
         }

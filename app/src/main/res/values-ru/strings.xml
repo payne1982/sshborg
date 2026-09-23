@@ -495,6 +495,7 @@
     <string name="editor_binary">Это не текстовый файл, здесь его нельзя редактировать.</string>
     <string name="editor_use_terminal">Его можно отредактировать на сервере в сеансе терминала.</string>
     <string name="editor_read_only">Только чтение</string>
+    <string name="editor_loading">Чтение…</string>
     <string name="editor_open_as_text">Всё равно открыть как текст</string>
     <string name="action_undo">Отменить</string>
     <string name="editor_hex_subtitle">%1$d байт · замена</string>

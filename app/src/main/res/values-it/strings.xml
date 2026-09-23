@@ -482,6 +482,7 @@
     <string name="editor_binary">Questo file non è testo, quindi non si può modificare qui.</string>
     <string name="editor_use_terminal">Puoi modificarlo sul server da una sessione terminale.</string>
     <string name="editor_read_only">Sola lettura</string>
+    <string name="editor_loading">Lettura…</string>
     <string name="editor_open_as_text">Apri comunque come testo</string>
     <string name="action_undo">Annulla modifica</string>
     <string name="editor_hex_subtitle">%1$d byte · sovrascrittura</string>

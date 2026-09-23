@@ -108,7 +108,7 @@ fun SftpScreen(
     // (too big, not text) and failed reads stay as dialogs over the listing instead.
     val editor by vm.editor.collectAsState()
     when (val e = editor) {
-        is EditorState.Loading -> { EditorLoading(e); return }
+        is EditorState.Loading -> { EditorLoading(e, onCancel = vm::closeEditor); return }
         is EditorState.Hex -> {
             // The buffer is remembered against the file, so the edits survive a recomposition
             // but a different file starts clean.

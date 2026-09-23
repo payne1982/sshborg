@@ -481,6 +481,7 @@
     <string name="editor_binary">Diese Datei ist kein Text und kann hier nicht bearbeitet werden.</string>
     <string name="editor_use_terminal">Du kannst sie auf dem Server in einer Terminal-Sitzung bearbeiten.</string>
     <string name="editor_read_only">Nur lesen</string>
+    <string name="editor_loading">Wird gelesen…</string>
     <string name="editor_open_as_text">Trotzdem als Text öffnen</string>
     <string name="action_undo">Rückgängig</string>
     <string name="editor_hex_subtitle">%1$d Bytes · Überschreiben</string>

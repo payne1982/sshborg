@@ -486,6 +486,7 @@
     <string name="editor_binary">该文件不是文本，无法在此编辑。</string>
     <string name="editor_use_terminal">可以在终端会话中于服务器上编辑它。</string>
     <string name="editor_read_only">只读</string>
+    <string name="editor_loading">正在读取…</string>
     <string name="editor_open_as_text">仍以文本方式打开</string>
     <string name="action_undo">撤销</string>
     <string name="editor_hex_subtitle">%1$d 字节 · 覆盖</string>
