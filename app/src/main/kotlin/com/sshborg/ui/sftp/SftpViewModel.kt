@@ -92,14 +92,33 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * without going back to the server — and so saving always starts from the original.
      */
     @Volatile private var editorBytes: ByteArray? = null
+    @Volatile private var editorBytesPath: String? = null
+
+    private fun hold(path: String, bytes: ByteArray) {
+        editorBytes = bytes
+        editorBytesPath = path
+    }
+
+    private fun heldBytes(path: String): ByteArray? =
+        editorBytes?.takeIf { editorBytesPath == path }
 
     /**
      * Opens [remotePath] in the editor: reads it whole into memory, decides whether it can be
      * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
      * the bytes live in the process and go straight back to the server on save.
      */
+    /**
+     * Opens [remotePath]: reads it whole, then decides what to do with it.
+     *
+     * Reading first and asking afterwards, rather than the other way round, because every
+     * answer needs the bytes anyway — the hex editor, the read-only view and the editor all do
+     * — and because it is the only way to know what the file *is* without stopping a transfer
+     * halfway, which is how a channel ends up out of step with the server. The one question
+     * asked before reading is the one the size alone can answer: too big even to hold.
+     */
     fun openEditor(
         remotePath: String,
+        /** The user has answered the size question; open it. */
         force: Boolean = false,
         readOnly: Boolean = false,
         /** Set by "open as text anyway" on the not-text dialog. */
@@ -108,30 +127,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val session = sftpSession ?: return
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
-            // Asked before reading, not after: there is no point pulling a file down the wire
-            // only to tell the user it is too big to work with.
-            val limit = if (readOnly) EDITOR_VIEW_MAX_BYTES else EDITOR_MAX_BYTES
             val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
-            // A binary has nothing to do with the text editor's limits, so before asking about
-            // size we look at the head of the file and send it straight to the hex editor.
-            // Nobody should have to answer a question about an editor they are not going to get.
-            if (size != null && size > EDITOR_WARN_BYTES && !asText && !readOnly) {
-                val head = runCatching { session.peek(remotePath, 8 * 1024) }.getOrNull()
-                if (head != null && TextFile.isBinary(head)) {
-                    openHex(remotePath)
-                    return@launch
-                }
-            }
-            if (size != null && size > limit) {
+            if (size != null && size > EDITOR_VIEW_MAX_BYTES) {
                 _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
                 return@launch
             }
-            if (size != null && !readOnly && size > EDITOR_WARN_BYTES && !force) {
-                _editor.value = EditorState.Confirm(remotePath, size)
-                return@launch
-            }
             val bytes = try {
-                session.readFile(remotePath, limit)
+                session.readFile(remotePath, EDITOR_VIEW_MAX_BYTES)
             } catch (e: FileTooLargeException) {
                 _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
                 return@launch
@@ -139,11 +141,51 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 editorFailed(remotePath, e)
                 return@launch
             }
-            val decoded = TextFile.decode(bytes, allowBinary = asText)
-            editorBytes = if (decoded != null) bytes else null
-            _editor.value = decoded?.let { EditorState.Ready(remotePath, it, readOnly = readOnly) }
-                ?: EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
+            hold(remotePath, bytes)
+            decide(remotePath, bytes, force, readOnly, asText)
         }
+    }
+
+    /**
+     * Answers the one question the file has already been read for, so nothing is transferred
+     * twice: the dialogs that got here are choosing between editors, not asking for the file.
+     */
+    private fun decide(
+        remotePath: String,
+        bytes: ByteArray,
+        force: Boolean,
+        readOnly: Boolean,
+        asText: Boolean,
+    ) {
+        val decoded = TextFile.decode(bytes, allowBinary = asText)
+        if (decoded == null) {
+            _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
+            return
+        }
+        val size = bytes.size.toLong()
+        _editor.value = when {
+            readOnly || size <= EDITOR_WARN_BYTES ->
+                EditorState.Ready(remotePath, decoded, readOnly = readOnly)
+            // Past the editor's ceiling reading is all that is left, so the question loses its
+            // "open anyway" and becomes an offer.
+            size > EDITOR_MAX_BYTES -> EditorState.Confirm(remotePath, size, canEdit = false)
+            force -> EditorState.Ready(remotePath, decoded)
+            else -> EditorState.Confirm(remotePath, size, canEdit = true)
+        }
+    }
+
+    /** Picks up a decision on the file already in hand — see [decide]. */
+    fun continueEditor(readOnly: Boolean) {
+        val path = _editor.value?.path ?: return
+        val bytes = heldBytes(path) ?: run { openEditor(path, force = true, readOnly = readOnly); return }
+        decide(path, bytes, force = true, readOnly = readOnly, asText = false)
+    }
+
+    /** As [continueEditor], for the two ways out of the not-text dialog. */
+    fun continueAsText() {
+        val path = _editor.value?.path ?: return
+        val bytes = heldBytes(path) ?: run { openEditor(path, force = true, asText = true); return }
+        decide(path, bytes, force = true, readOnly = false, asText = true)
     }
 
     /**
@@ -163,6 +205,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * rows are drawn by us, so nothing here costs what a text field costs.
      */
     fun openHex(remotePath: String) {
+        heldBytes(remotePath)?.let {
+            _editor.value = EditorState.Hex(remotePath, it.size)
+            return
+        }
         val session = sftpSession ?: return
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
@@ -175,7 +221,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 editorFailed(remotePath, e)
                 return@launch
             }
-            editorBytes = bytes
+            hold(remotePath, bytes)
             _editor.value = EditorState.Hex(remotePath, bytes.size)
         }
     }
@@ -200,7 +246,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 return@launch
             }
-            editorBytes = bytes
+            hold(open.path, bytes)
             _editor.value = open.copy(saving = false, savedAt = System.currentTimeMillis())
             refreshListing()
         }
@@ -249,7 +295,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             // The text just written is the new baseline: the file on the server now matches it.
-            editorBytes = bytes
+            hold(open.path, bytes)
             _editor.value = open.copy(
                 decoded = open.decoded.copy(text = text),
                 saving = false,
@@ -277,6 +323,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     fun closeEditor() {
         _editor.value = null
         editorBytes = null
+        editorBytesPath = null
     }
 
     /** The last listing shown, to go back to when an operation fails without losing the connection. */

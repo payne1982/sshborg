@@ -487,6 +487,7 @@
     <string name="editor_open_hex">Abrir em hexadecimal</string>
     <string name="editor_hex">Hexadecimal</string>
     <string name="editor_large">Este ficheiro tem %1$s. O editor consegue abri-lo, mas escrever será lento.</string>
+    <string name="editor_too_large_to_edit">Este ficheiro tem %1$s, mais do que os %2$s que o editor consegue abrir. Ainda assim pode ser lido.</string>
     <string name="editor_charset">Codificação</string>
     <string name="editor_charset_discard">Ler o ficheiro de outra forma substitui o texto no ecrã. As alterações não guardadas serão perdidas.</string>
     <string name="editor_cannot_encode">O texto contém caracteres que %1$s não consegue escrever. Escolha outra codificação para o guardar.</string>

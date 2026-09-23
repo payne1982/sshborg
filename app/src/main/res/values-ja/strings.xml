@@ -492,6 +492,7 @@
     <string name="editor_open_hex">16進数で開く</string>
     <string name="editor_hex">16進数</string>
     <string name="editor_large">このファイルは %1$s です。エディタで開けますが、入力は遅くなります。</string>
+    <string name="editor_too_large_to_edit">このファイルは %1$s で、エディタで開ける %2$s を超えています。読むことはできます。</string>
     <string name="editor_charset">文字コード</string>
     <string name="editor_charset_discard">別の文字コードで読み直すと、画面のテキストが置き換わります。保存していない変更は失われます。</string>
     <string name="editor_cannot_encode">テキストに %1$s では書き出せない文字が含まれています。保存するには別の文字コードを選んでください。</string>

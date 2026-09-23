@@ -832,33 +832,6 @@ class SftpSession(
         }, com.jcraft.jsch.ChannelSftp.OVERWRITE) }
     }
 
-    /**
-     * The first [count] bytes of [remotePath], to tell text from binary before deciding what to
-     * do with the whole file.
-     *
-     * Read on a channel of its own, which is then thrown away. A transfer stopped halfway
-     * leaves acknowledgements in flight, and a channel that reads one of those as the answer to
-     * its next request is out of step for good — the failure this app spent a release chasing.
-     * A channel we are about to close cannot be out of step with anything.
-     */
-    fun peek(remotePath: String, count: Int): ByteArray {
-        val channel = openBackgroundChannel()
-        try {
-            val out = java.io.ByteArrayOutputStream(count)
-            channel.get(remotePath).use { input ->
-                val chunk = ByteArray(8 * 1024)
-                while (out.size() < count) {
-                    val read = input.read(chunk, 0, minOf(chunk.size, count - out.size()))
-                    if (read < 0) break
-                    out.write(chunk, 0, read)
-                }
-            }
-            return out.toByteArray()
-        } finally {
-            runCatching { channel.disconnect() }
-        }
-    }
-
     /** The size of [remotePath] in bytes. */
     fun sizeOf(remotePath: String): Long = op { it.stat(remotePath) }.size
 

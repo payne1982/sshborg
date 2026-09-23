@@ -491,6 +491,7 @@
     <string name="editor_open_hex">Відкрити в HEX</string>
     <string name="editor_hex">Шістнадцятковий</string>
     <string name="editor_large">Розмір файлу %1$s. Редактор його відкриє, але набір тексту буде повільним.</string>
+    <string name="editor_too_large_to_edit">Розмір файлу %1$s — більше, ніж %2$s, які може відкрити редактор. Прочитати його все одно можна.</string>
     <string name="editor_charset">Кодування</string>
     <string name="editor_charset_discard">Читання файлу в іншому кодуванні замінить текст на екрані. Незбережені зміни буде втрачено.</string>
     <string name="editor_cannot_encode">У тексті є символи, які %1$s не може записати. Виберіть інше кодування, щоб зберегти його.</string>

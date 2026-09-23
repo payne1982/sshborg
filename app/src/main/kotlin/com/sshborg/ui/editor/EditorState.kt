@@ -63,8 +63,16 @@ sealed interface EditorState {
         val problem: FileFailure? = null,
     ) : EditorState
 
-    /** Big enough to be slow: the user is asked before it is read. */
-    data class Confirm(override val path: String, val size: Long) : EditorState
+    /**
+     * Big enough that the editor will drag. The file is already in hand by now, so both ways
+     * out are immediate; [canEdit] is false past the editor's ceiling, where reading is all
+     * that is left.
+     */
+    data class Confirm(
+        override val path: String,
+        val size: Long,
+        val canEdit: Boolean = true,
+    ) : EditorState
 
     /** The file is readable but not editable as text — see [Reason]. */
     data class Unsupported(

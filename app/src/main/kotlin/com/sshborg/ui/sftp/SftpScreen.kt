@@ -497,15 +497,14 @@ fun SftpScreen(
     when (val e = editor) {
         is EditorState.Confirm -> EditorConfirmDialog(
             state = e,
-            onOpen = { vm.openEditor(e.path, force = true) },
-            onView = { vm.openEditor(e.path, readOnly = true) },
+            onOpen = { vm.continueEditor(readOnly = false) },
+            onView = { vm.continueEditor(readOnly = true) },
             onDismiss = vm::closeEditor,
         )
         is EditorState.Unsupported -> EditorUnsupportedDialog(
             state = e,
-            onView = { vm.openEditor(e.path, readOnly = true) },
             onHex = { vm.openHex(e.path) },
-            onAsText = { vm.openEditor(e.path, force = true, asText = true) },
+            onAsText = { vm.continueAsText() },
             onDismiss = vm::closeEditor,
         )
         is EditorState.Failed -> ErrorReportDialog(

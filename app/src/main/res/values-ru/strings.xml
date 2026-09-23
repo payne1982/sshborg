@@ -501,6 +501,7 @@
     <string name="editor_open_hex">Открыть в HEX</string>
     <string name="editor_hex">Шестнадцатеричный</string>
     <string name="editor_large">Размер файла %1$s. Редактор его откроет, но набор текста будет медленным.</string>
+    <string name="editor_too_large_to_edit">Размер файла %1$s — больше, чем %2$s, которые может открыть редактор. Прочитать его всё равно можно.</string>
     <string name="editor_charset">Кодировка</string>
     <string name="editor_charset_discard">Чтение файла в другой кодировке заменит текст на экране. Несохранённые изменения будут потеряны.</string>
     <string name="editor_cannot_encode">В тексте есть символы, которые %1$s не может записать. Выберите другую кодировку, чтобы сохранить его.</string>

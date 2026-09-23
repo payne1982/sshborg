@@ -291,13 +291,10 @@ private val DraftSaver: Saver<TextFieldState, Any> = Saver(
 @Composable
 fun EditorUnsupportedDialog(
     state: EditorState.Unsupported,
-    onView: () -> Unit,
     onHex: () -> Unit,
     onAsText: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    // Too big to edit is not too big to read, so the offer stands right up to the view ceiling.
-    val canView = state.reason == EditorState.Reason.TOO_LARGE && state.size <= EDITOR_VIEW_MAX_BYTES
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(state.name, maxLines = 1) },
@@ -308,7 +305,7 @@ fun EditorUnsupportedDialog(
                         EditorState.Reason.TOO_LARGE -> stringResource(
                             R.string.editor_too_large,
                             formatBytes(state.size),
-                            formatBytes(if (canView) EDITOR_MAX_BYTES else EDITOR_VIEW_MAX_BYTES),
+                            formatBytes(EDITOR_VIEW_MAX_BYTES),
                         )
                         EditorState.Reason.BINARY -> stringResource(R.string.editor_binary)
                     }
@@ -335,11 +332,6 @@ fun EditorUnsupportedDialog(
                     // safe whatever it really holds: the round trip has to be exact either way.
                     androidx.compose.material3.TextButton(onClick = onAsText) {
                         Text(stringResource(R.string.editor_open_as_text))
-                    }
-                }
-                if (canView) {
-                    androidx.compose.material3.TextButton(onClick = onView) {
-                        Text(stringResource(R.string.editor_read_only))
                     }
                 }
                 androidx.compose.material3.TextButton(onClick = onDismiss) {
@@ -409,7 +401,13 @@ fun EditorConfirmDialog(
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(state.name, maxLines = 1) },
-        text = { Text(stringResource(R.string.editor_large, formatBytes(state.size))) },
+        text = {
+            Text(stringResource(
+                if (state.canEdit) R.string.editor_large else R.string.editor_too_large_to_edit,
+                formatBytes(state.size),
+                formatBytes(EDITOR_MAX_BYTES),
+            ))
+        },
         // Two ways forward, so they share the confirm slot: reading a big file is fast whatever
         // its size, and it is what most people opening one actually want.
         confirmButton = {
@@ -417,8 +415,10 @@ fun EditorConfirmDialog(
                 androidx.compose.material3.TextButton(onClick = onView) {
                     Text(stringResource(R.string.editor_read_only))
                 }
-                androidx.compose.material3.TextButton(onClick = onOpen) {
-                    Text(stringResource(R.string.sftp_menu_open))
+                if (state.canEdit) {
+                    androidx.compose.material3.TextButton(onClick = onOpen) {
+                        Text(stringResource(R.string.sftp_menu_open))
+                    }
                 }
             }
         },

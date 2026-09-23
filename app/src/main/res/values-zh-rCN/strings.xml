@@ -492,6 +492,7 @@
     <string name="editor_open_hex">以十六进制打开</string>
     <string name="editor_hex">十六进制</string>
     <string name="editor_large">该文件为 %1$s。编辑器可以打开，但输入会很慢。</string>
+    <string name="editor_too_large_to_edit">该文件为 %1$s，超过编辑器可打开的 %2$s。仍然可以阅读。</string>
     <string name="editor_charset">编码</string>
     <string name="editor_charset_discard">以另一种编码重新读取文件会替换屏幕上的文本，未保存的更改将丢失。</string>
     <string name="editor_cannot_encode">文本中包含 %1$s 无法写出的字符。请选择其他编码后保存。</string>
