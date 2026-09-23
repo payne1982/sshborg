@@ -3,7 +3,10 @@ package com.sshborg.ui.common
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -35,28 +38,31 @@ fun ScrollingDialogBody(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val scroll = rememberScrollState()
-    Box(modifier) {
+    Column(modifier) {
+        Chevron(Icons.Filled.KeyboardArrowUp, scroll.canScrollBackward)
         Column(
             Modifier
-                .heightIn(max = maxHeight)
+                .heightIn(max = maxHeight - ARROW_ROW * 2)
                 .verticalScroll(scroll),
             content = content,
         )
-        if (scroll.canScrollBackward) {
+        Chevron(Icons.Filled.KeyboardArrowDown, scroll.canScrollForward)
+    }
+}
+
+/** Its row of space is held whether or not the arrow is in it, so nothing shifts when it is. */
+@Composable
+private fun Chevron(icon: androidx.compose.ui.graphics.vector.ImageVector, visible: Boolean) {
+    Box(Modifier.fillMaxWidth().height(ARROW_ROW), contentAlignment = Alignment.Center) {
+        if (visible) {
             Icon(
-                Icons.Filled.KeyboardArrowUp,
+                icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.TopCenter),
-            )
-        }
-        if (scroll.canScrollForward) {
-            Icon(
-                Icons.Filled.KeyboardArrowDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier.size(ARROW_ROW),
             )
         }
     }
 }
+
+private val ARROW_ROW = 16.dp
