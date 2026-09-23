@@ -70,6 +70,7 @@ module.exports = {
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Issues &amp; Feedback',
   footer_source:  'Source Code',
+  footer_licenses: 'Licenses',
   footer_powered: 'SSH connectivity powered by',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -116,7 +117,8 @@ module.exports = {
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
             <li><a href="#backup">Configuration Backup</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Open source licenses</a></li>`,
 
   doc_adding_host: `
             <h2>// ADDING A HOST</h2>
@@ -542,6 +544,17 @@ Host target
             <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical.</p>
             <h3>Locking the app on a TV</h3>
             <p>A TV usually has no fingerprint reader or screen lock, so protect the app with the built-in <strong>PIN or passphrase</strong> lock (Settings → Security) — it works entirely with the remote or a keyboard. See <a href="#security">App Security</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// OPEN SOURCE LICENSES</h2>
+            <p>SSHBorg is free software, released under the <strong>GNU General Public License v3</strong>. Its source code is on GitHub, for both the Android and the iOS app. It uses the following libraries, each under its own licence:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — the SSH protocol on Android — BSD-style licence</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — cryptography on Android — MIT-style licence</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — the text editor widget for editing files on the server — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — the SSH protocol on iOS — BSD licence</li>
+            </ul>
+            <p>None of them connects to anything on its own: the only addresses SSHBorg contacts are the servers you tell it about, and sshborg.com when you tap a link. There are no analytics libraries, no advertising libraries and no trackers of any kind.</p>`,
 
   doc_backup: `
             <h2>// CONFIGURATION BACKUP</h2>

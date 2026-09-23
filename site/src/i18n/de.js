@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Datenschutz',
   footer_issues:  'Fehler &amp; Feedback',
   footer_source:  'Quellcode',
+  footer_licenses: 'Lizenzen',
   footer_powered: 'SSH-Konnektivität bereitgestellt von',
 
   page_title_docs:       'SSHBorg – Benutzerhandbuch',
@@ -113,7 +114,8 @@ module.exports = {
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
             <li><a href="#security">App-Sicherheit</a></li>
             <li><a href="#backup">Konfiguration sichern</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Open-Source-Lizenzen</a></li>`,
 
   doc_adding_host: `
             <h2>// HOST HINZUFÜGEN</h2>
@@ -539,6 +541,17 @@ Host target
             <p>Ohne eine solche bewältigt die Bildschirmtastatur trotzdem kurze Eingaben: ein Feld fokussieren, OK drücken, um es zu öffnen, tippen und <strong>OK / Los</strong> auf der Tastatur drücken — bei der Passwortabfrage verbindet dies direkt. Shell-Befehle mit der Bildschirmtastatur einzugeben ist jedoch unpraktisch.</p>
             <h3>Die App auf einem TV sperren</h3>
             <p>Ein TV hat meist keinen Fingerabdrucksensor und keine Bildschirmsperre — schütze die App daher mit der integrierten <strong>PIN- oder Passphrase-Sperre</strong> (Einstellungen → Sicherheit); sie funktioniert vollständig mit der Fernbedienung oder einer Tastatur. Siehe <a href="#security">App-Sicherheit</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// OPEN-SOURCE-LIZENZEN</h2>
+            <p>SSHBorg ist freie Software unter der <strong>GNU General Public License v3</strong>. Der Quelltext liegt auf GitHub, für die Android- wie für die iOS-App. Verwendet werden die folgenden Bibliotheken, jede unter ihrer eigenen Lizenz:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — das SSH-Protokoll unter Android — Lizenz im BSD-Stil</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — die Kryptografie unter Android — Lizenz im MIT-Stil</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — das Textbearbeitungs-Widget zum Ändern von Dateien auf dem Server — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — das SSH-Protokoll unter iOS — BSD-Lizenz</li>
+            </ul>
+            <p>Keine davon verbindet sich von sich aus mit irgendetwas: SSHBorg kontaktiert nur die Server, die du angibst, und sshborg.com, wenn du einen Link antippst. Es gibt keine Analyse-Bibliotheken, keine Werbe-Bibliotheken und keinerlei Tracker.</p>`,
 
   doc_backup: `
             <h2>// KONFIGURATION SICHERN</h2>

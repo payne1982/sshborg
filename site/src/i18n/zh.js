@@ -69,6 +69,7 @@ module.exports = {
   footer_privacy: '隐私政策',
   footer_issues:  '问题与反馈',
   footer_source:  '源代码',
+  footer_licenses: '许可证',
   footer_powered: 'SSH 连接由以下驱动',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -115,7 +116,8 @@ module.exports = {
             <li><a href="#sessions">多会话</a></li>
             <li><a href="#security">应用安全</a></li>
             <li><a href="#backup">配置备份</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">开源许可证</a></li>`,
 
   doc_adding_host: `
             <h2>// 添加主机</h2>
@@ -541,6 +543,17 @@ Host target
             <p>没有键盘时，屏幕键盘仍可用于简短输入：聚焦一个输入框，按 OK 打开，输入后按键盘上的 <strong>OK / 前往</strong> 确认——在密码提示框中这会直接连接。但用屏幕键盘输入 shell 命令并不实用。</p>
             <h3>在 TV 上锁定应用</h3>
             <p>TV 通常没有指纹识别或屏幕锁，因此请用内置的 <strong>PIN 或密码短语</strong> 锁保护应用（设置 → 安全）——它完全可用遥控器或键盘操作。参见 <a href="#security">应用安全</a>。</p>`,
+
+  doc_licenses: `
+            <h2>// 开源许可证</h2>
+            <p>SSHBorg 是自由软件，以 <strong>GNU General Public License v3</strong> 发布。Android 版与 iOS 版的源代码都在 GitHub 上。它使用了以下库，各自遵循自己的许可证：</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android 上的 SSH 协议 —— BSD 风格许可证</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android 上的加密实现 —— MIT 风格许可证</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — 用于在服务器上修改文件的文本编辑控件 —— GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS 上的 SSH 协议 —— BSD 许可证</li>
+            </ul>
+            <p>它们都不会自行连接任何地方：SSHBorg 只会连接你指定的服务器，以及你点击链接时的 sshborg.com。没有任何统计库、广告库或追踪器。</p>`,
 
   doc_backup: `
             <h2>// 配置备份</h2>

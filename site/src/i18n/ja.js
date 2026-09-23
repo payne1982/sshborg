@@ -69,6 +69,7 @@ module.exports = {
   footer_privacy: 'プライバシーポリシー',
   footer_issues:  '問題・フィードバック',
   footer_source:  'ソースコード',
+  footer_licenses: 'ライセンス',
   footer_powered: 'SSH接続は以下で動作',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -115,7 +116,8 @@ module.exports = {
             <li><a href="#sessions">複数セッション</a></li>
             <li><a href="#security">アプリのセキュリティ</a></li>
             <li><a href="#backup">設定のバックアップ</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">オープンソースライセンス</a></li>`,
 
   doc_adding_host: `
             <h2>// ホストの追加</h2>
@@ -541,6 +543,17 @@ Host target
             <p>ない場合でも、画面キーボードで短い入力は可能です。入力欄にフォーカスし、OK で開いて入力し、キーボードの <strong>OK / 実行</strong> で確定します——パスワード入力では直接接続します。ただし画面キーボードでシェルコマンドを入力するのは現実的ではありません。</p>
             <h3>TV でのアプリロック</h3>
             <p>TV には通常、指紋認証や画面ロックがないため、内蔵の <strong>PIN またはパスフレーズ</strong> ロックでアプリを保護してください（設定 → セキュリティ）。リモコンやキーボードだけで完結します。<a href="#security">アプリのセキュリティ</a> を参照。</p>`,
+
+  doc_licenses: `
+            <h2>// オープンソースライセンス</h2>
+            <p>SSHBorg は <strong>GNU General Public License v3</strong> で公開されている自由ソフトウェアです。ソースコードは Android 版・iOS 版とも GitHub にあります。以下のライブラリを、それぞれのライセンスのもとで利用しています。</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android での SSH プロトコル — BSD 系ライセンス</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android での暗号処理 — MIT 系ライセンス</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — サーバー上のファイルを編集するためのテキスト編集ウィジェット — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS での SSH プロトコル — BSD ライセンス</li>
+            </ul>
+            <p>いずれも自分から何かに接続することはありません。SSHBorg が接続するのは、あなたが指定したサーバーと、リンクをタップしたときの sshborg.com だけです。解析ライブラリも広告ライブラリも、いかなるトラッカーもありません。</p>`,
 
   doc_backup: `
             <h2>// 設定のバックアップ</h2>

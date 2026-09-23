@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Конфіденційність',
   footer_issues:  'Помилки &amp; Відгуки',
   footer_source:  'Вихідний код',
+  footer_licenses: 'Ліцензії',
   footer_powered: 'SSH-з\'єднання реалізовано за допомогою',
 
   page_title_docs:       'SSHBorg – Посібник користувача',
@@ -113,7 +114,8 @@ module.exports = {
             <li><a href="#sessions">Кілька сесій</a></li>
             <li><a href="#security">Безпека застосунку</a></li>
             <li><a href="#backup">Резервне копіювання конфігурації</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Ліцензії відкритого коду</a></li>`,
 
   doc_adding_host: `
             <h2>// ДОДАВАННЯ ХОСТУ</h2>
@@ -539,6 +541,17 @@ Host target
             <p>Без неї екранна клавіатура все ж підходить для коротких введень: виділіть поле, натисніть OK, щоб відкрити його, введіть текст і натисніть <strong>OK / Go</strong> на клавіатурі для підтвердження — у запиті пароля це підключає напряму. Проте вводити команди оболонки екранною клавіатурою незручно.</p>
             <h3>Блокування застосунку на TV</h3>
             <p>TV зазвичай не має сканера відбитків чи блокування екрана, тож захистіть застосунок вбудованим блокуванням <strong>PIN або парольною фразою</strong> (Налаштування → Безпека) — воно повністю працює з пульта або клавіатури. Див. <a href="#security">Безпека застосунку</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// ЛІЦЕНЗІЇ ВІДКРИТОГО КОДУ</h2>
+            <p>SSHBorg — вільне програмне забезпечення під <strong>GNU General Public License v3</strong>. Вихідний код на GitHub, і для Android, і для iOS. Використано такі бібліотеки, кожну під власною ліцензією:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — протокол SSH в Android — ліцензія у стилі BSD</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — криптографія в Android — ліцензія у стилі MIT</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — компонент редагування тексту для зміни файлів на сервері — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — протокол SSH в iOS — ліцензія BSD</li>
+            </ul>
+            <p>Жодна з них не з'єднується ні з чим самостійно: SSHBorg звертається лише до серверів, які ви вказали, і до sshborg.com, коли ви торкаєтеся посилання. Жодних бібліотек аналітики, реклами чи трекерів.</p>`,
 
   doc_backup: `
             <h2>// РЕЗЕРВНЕ КОПІЮВАННЯ КОНФІГУРАЦІЇ</h2>
