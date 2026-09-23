@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -27,17 +31,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -56,7 +61,7 @@ import com.sshborg.ui.common.ScrollingDialogBody
  * while the user is in another app does not cost them their edits. Files too big for a Bundle
  * are not kept; see [EDITOR_MAX_DRAFT].
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun EditorScreen(
     state: EditorState.Ready,
@@ -68,11 +73,17 @@ fun EditorScreen(
 ) {
     // Keyed on the charset too: reading the file another way replaces the text, which is the
     // point of changing it — the user only does so because what they are looking at is wrong.
-    var draft by rememberSaveable(state.path, state.decoded.charset.name(), stateSaver = DraftSaver) {
-        mutableStateOf(state.decoded.text)
+    val text = rememberSaveable(state.path, state.decoded.charset.name(), saver = DraftSaver) {
+        TextFieldState(state.decoded.text)
     }
-    // A save makes the server's copy match the text, whatever the baseline was before.
-    val dirty = draft != state.decoded.text
+    // Carried rather than worked out: comparing the whole text against the original on every
+    // recomposition is one more pass over the file per keystroke, which is exactly what this
+    // screen cannot afford. The edit callback sets it, a landed save clears it.
+    var dirty by rememberSaveable(state.path, state.decoded.charset.name()) { mutableStateOf(false) }
+    // Guarded on the change count: this also runs when only the cursor moves, and a cursor
+    // moved is not a file edited.
+    val markDirty = remember { InputTransformation { if (changes.changeCount > 0) dirty = true } }
+    LaunchedEffect(state.savedAt) { if (state.savedAt > 0L) dirty = false }
     var confirmDiscard by rememberSaveable(state.path) { mutableStateOf(false) }
     var showCharsets by rememberSaveable(state.path) { mutableStateOf(false) }
     var confirmCharset by rememberSaveable(state.path) { mutableStateOf(false) }
@@ -103,7 +114,7 @@ fun EditorScreen(
                     if (state.saving) {
                         CircularProgressIndicator(Modifier.padding(horizontal = 16.dp).size(20.dp))
                     } else {
-                        IconButton(onClick = { onSave(draft) }, enabled = dirty) {
+                        IconButton(onClick = { onSave(text.text.toString()) }, enabled = dirty) {
                             Icon(Icons.Default.Check, stringResource(R.string.action_save))
                         }
                     }
@@ -117,19 +128,26 @@ fun EditorScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
-            TextField(
-                value = draft,
-                onValueChange = { draft = it },
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                textStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp),
+            // BasicTextField, not the Material one: this is a whole screen of monospace text,
+            // so the decoration, the indicator and the label are all things to switch off again.
+            BasicTextField(
+                state = text,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 12.dp),
+                textStyle = TextStyle(
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                lineLimits = TextFieldLineLimits.MultiLine(),
+                inputTransformation = markDirty,
                 // A configuration file is not prose: no capitals, no autocorrect, no spell check.
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
                     autoCorrectEnabled = false,
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
                 ),
             )
             StatusLine(
@@ -248,12 +266,13 @@ fun EditorLoading(name: String) {
 }
 
 /**
- * Drops a draft too big to travel in a Bundle instead of taking the app down with a
- * TransactionTooLargeException. Returning null from save means "do not keep this".
+ * Keeps the text across a process death, and drops a draft too big to travel in a Bundle
+ * instead of taking the app down with a TransactionTooLargeException — returning null from
+ * save means "do not keep this". The cursor is not kept; the text is what matters.
  */
-private val DraftSaver: Saver<String, Any> = Saver(
-    save = { if (it.length <= EDITOR_MAX_DRAFT) it else null },
-    restore = { it as String },
+private val DraftSaver: Saver<TextFieldState, Any> = Saver(
+    save = { it.text.takeIf { t -> t.length <= EDITOR_MAX_DRAFT }?.toString() },
+    restore = { TextFieldState(it as String) },
 )
 
 /**
