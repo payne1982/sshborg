@@ -484,4 +484,8 @@
     <string name="editor_too_large">このファイルは %1$s で、エディタで開ける %2$s を超えています。</string>
     <string name="editor_binary">このファイルはテキストではないため、ここでは編集できません。</string>
     <string name="editor_use_terminal">ターミナルのセッションからサーバー上で編集できます。</string>
+    <string name="editor_charset">文字コード</string>
+    <string name="editor_charset_discard">別の文字コードで読み直すと、画面のテキストが置き換わります。保存していない変更は失われます。</string>
+    <string name="editor_cannot_encode">テキストに %1$s では書き出せない文字が含まれています。保存するには別の文字コードを選んでください。</string>
+    <string name="editor_save_failed">保存できません</string>
 </resources>

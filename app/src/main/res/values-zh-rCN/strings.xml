@@ -484,4 +484,8 @@
     <string name="editor_too_large">该文件为 %1$s，超过编辑器可打开的 %2$s。</string>
     <string name="editor_binary">该文件不是文本，无法在此编辑。</string>
     <string name="editor_use_terminal">可以在终端会话中于服务器上编辑它。</string>
+    <string name="editor_charset">编码</string>
+    <string name="editor_charset_discard">以另一种编码重新读取文件会替换屏幕上的文本，未保存的更改将丢失。</string>
+    <string name="editor_cannot_encode">文本中包含 %1$s 无法写出的字符。请选择其他编码后保存。</string>
+    <string name="editor_save_failed">未保存</string>
 </resources>

@@ -31,6 +31,11 @@ sealed interface EditorState {
         val saving: Boolean = false,
         /** When the last save landed, so the screen can say so and drop the unsaved mark. */
         val savedAt: Long = 0L,
+        /**
+         * A failed save, shown over the editor. It deliberately does not replace this state:
+         * a file that could not be written is exactly when the user must keep their text.
+         */
+        val problem: FileFailure? = null,
     ) : EditorState
 
     /** The file is readable but not editable as text — see [Reason]. */

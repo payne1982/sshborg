@@ -479,4 +479,8 @@
     <string name="editor_too_large">Este ficheiro tem %1$s, mais do que os %2$s que o editor consegue abrir.</string>
     <string name="editor_binary">Este ficheiro não é texto, por isso não pode ser editado aqui.</string>
     <string name="editor_use_terminal">Pode editá-lo no servidor a partir de uma sessão de terminal.</string>
+    <string name="editor_charset">Codificação</string>
+    <string name="editor_charset_discard">Ler o ficheiro de outra forma substitui o texto no ecrã. As alterações não guardadas serão perdidas.</string>
+    <string name="editor_cannot_encode">O texto contém caracteres que %1$s não consegue escrever. Escolha outra codificação para o guardar.</string>
+    <string name="editor_save_failed">Não guardado</string>
 </resources>

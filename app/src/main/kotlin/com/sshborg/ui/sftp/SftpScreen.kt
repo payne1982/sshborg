@@ -107,7 +107,14 @@ fun SftpScreen(
     when (val e = editor) {
         is EditorState.Loading -> { EditorLoading(e.name); return }
         is EditorState.Ready -> {
-            EditorScreen(state = e, onSave = vm::saveEditor, onClose = vm::closeEditor)
+            EditorScreen(
+                state = e,
+                onSave = vm::saveEditor,
+                onClose = vm::closeEditor,
+                charsets = vm::editorCharsets,
+                onCharset = vm::setEditorCharset,
+                onDismissProblem = vm::dismissEditorProblem,
+            )
             return
         }
         else -> Unit

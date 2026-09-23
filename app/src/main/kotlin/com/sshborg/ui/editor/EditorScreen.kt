@@ -4,15 +4,22 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -54,13 +61,20 @@ fun EditorScreen(
     state: EditorState.Ready,
     onSave: (String) -> Unit,
     onClose: () -> Unit,
+    charsets: () -> List<java.nio.charset.Charset> = ::emptyList,
+    onCharset: (java.nio.charset.Charset) -> Unit = {},
+    onDismissProblem: () -> Unit = {},
 ) {
-    var draft by rememberSaveable(state.path, stateSaver = DraftSaver) {
+    // Keyed on the charset too: reading the file another way replaces the text, which is the
+    // point of changing it — the user only does so because what they are looking at is wrong.
+    var draft by rememberSaveable(state.path, state.decoded.charset.name(), stateSaver = DraftSaver) {
         mutableStateOf(state.decoded.text)
     }
     // A save makes the server's copy match the text, whatever the baseline was before.
     val dirty = draft != state.decoded.text
     var confirmDiscard by rememberSaveable(state.path) { mutableStateOf(false) }
+    var showCharsets by rememberSaveable(state.path) { mutableStateOf(false) }
+    var confirmCharset by rememberSaveable(state.path) { mutableStateOf(false) }
 
     val back = { if (dirty) confirmDiscard = true else onClose() }
     BackHandler(onBack = back)
@@ -117,8 +131,53 @@ fun EditorScreen(
                     unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
                 ),
             )
-            StatusLine(state, dirty)
+            StatusLine(
+                state = state,
+                dirty = dirty,
+                onPickCharset = { if (dirty) confirmCharset = true else showCharsets = true },
+            )
         }
+    }
+
+    if (showCharsets) {
+        CharsetDialog(
+            charsets = charsets(),
+            current = state.decoded.charset,
+            onPick = { showCharsets = false; onCharset(it) },
+            onDismiss = { showCharsets = false },
+        )
+    }
+
+    if (confirmCharset) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmCharset = false },
+            title = { Text(stringResource(R.string.editor_charset)) },
+            text = { Text(stringResource(R.string.editor_charset_discard)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = { confirmCharset = false; showCharsets = true }) {
+                    Text(stringResource(R.string.editor_discard))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { confirmCharset = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
+    state.problem?.let { problem ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = onDismissProblem,
+            icon = { Icon(Icons.Default.ErrorOutline, null, tint = MaterialTheme.colorScheme.error) },
+            title = { Text(stringResource(R.string.editor_save_failed)) },
+            text = { Text(problem.message) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = onDismissProblem) {
+                    Text(stringResource(R.string.action_close))
+                }
+            },
+        )
     }
 
     if (confirmDiscard) {
@@ -140,22 +199,37 @@ fun EditorScreen(
     }
 }
 
-/** What the file is made of, so saving never holds a surprise: charset, line ending, state. */
+/**
+ * What the file is made of, so saving never holds a surprise: charset, line ending, state.
+ * Tapping it picks another charset — the one judgement the machine cannot make, since the same
+ * bytes are legal Cyrillic and legal Greek and only the reader can tell which one is words.
+ */
 @Composable
-private fun StatusLine(state: EditorState.Ready, dirty: Boolean) {
+private fun StatusLine(state: EditorState.Ready, dirty: Boolean, onPickCharset: () -> Unit) {
     val parts = buildList {
-        add(if (state.decoded.encoding == TextFile.Encoding.UTF_8) "UTF-8" else "ISO-8859-1")
         add(state.decoded.lineEnding.name)
         if (state.decoded.mixedEndings) add(stringResource(R.string.editor_mixed_endings))
         if (dirty) add(stringResource(R.string.editor_unsaved))
         else if (state.savedAt > 0L) add(stringResource(R.string.editor_saved))
     }
-    Text(
-        parts.joinToString("  ·  "),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        androidx.compose.material3.TextButton(onClick = onPickCharset) {
+            Text(state.decoded.label, style = MaterialTheme.typography.bodySmall)
+            Icon(
+                Icons.Default.ArrowDropDown,
+                contentDescription = stringResource(R.string.editor_charset),
+                modifier = Modifier.size(18.dp),
+            )
+        }
+        Text(
+            parts.joinToString("  ·  "),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 /** While the file is being read. */
@@ -219,4 +293,51 @@ private fun formatBytes(bytes: Long): String = when {
     bytes < 1_024     -> "$bytes B"
     bytes < 1_048_576 -> "%.1f KB".format(bytes / 1_024.0)
     else              -> "%.1f MB".format(bytes / 1_048_576.0)
+}
+
+/**
+ * The charsets this file can be read as, best guess first. Only the ones whose round trip is
+ * exact are here: anything else could not be saved back without changing bytes the user never
+ * touched, so it is left out rather than offered as a trap.
+ */
+@Composable
+private fun CharsetDialog(
+    charsets: List<java.nio.charset.Charset>,
+    current: java.nio.charset.Charset,
+    onPick: (java.nio.charset.Charset) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val maxBody = (androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp * 0.5f).dp
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.editor_charset)) },
+        text = {
+            Column(
+                Modifier
+                    .heightIn(max = maxBody)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                charsets.forEach { charset ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onPick(charset) }
+                            .padding(vertical = 10.dp, horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        androidx.compose.material3.RadioButton(
+                            selected = charset == current,
+                            onClick = { onPick(charset) },
+                        )
+                        Text(charset.name(), style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        },
+    )
 }

@@ -493,4 +493,8 @@
     <string name="editor_too_large">Размер файла %1$s — больше, чем %2$s, которые может открыть редактор.</string>
     <string name="editor_binary">Это не текстовый файл, здесь его нельзя редактировать.</string>
     <string name="editor_use_terminal">Его можно отредактировать на сервере в сеансе терминала.</string>
+    <string name="editor_charset">Кодировка</string>
+    <string name="editor_charset_discard">Чтение файла в другой кодировке заменит текст на экране. Несохранённые изменения будут потеряны.</string>
+    <string name="editor_cannot_encode">В тексте есть символы, которые %1$s не может записать. Выберите другую кодировку, чтобы сохранить его.</string>
+    <string name="editor_save_failed">Не сохранено</string>
 </resources>

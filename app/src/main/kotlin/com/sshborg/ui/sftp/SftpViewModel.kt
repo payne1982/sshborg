@@ -86,6 +86,12 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     val editor: StateFlow<EditorState?> = _editor
 
     /**
+     * The open file's bytes, kept as they arrived so another charset can be tried against them
+     * without going back to the server — and so saving always starts from the original.
+     */
+    @Volatile private var editorBytes: ByteArray? = null
+
+    /**
      * Opens [remotePath] in the editor: reads it whole into memory, decides whether it can be
      * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
      * the bytes live in the process and go straight back to the server on save.
@@ -103,11 +109,31 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 editorFailed(remotePath, e)
                 return@launch
             }
-            _editor.value = if (TextFile.isBinary(bytes))
-                EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
-            else
-                EditorState.Ready(remotePath, TextFile.decode(bytes))
+            val decoded = TextFile.decode(bytes)
+            editorBytes = if (decoded != null) bytes else null
+            _editor.value = decoded?.let { EditorState.Ready(remotePath, it) }
+                ?: EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
         }
+    }
+
+    /**
+     * Reads the open file again as [charset] — the bytes are already here, so this only changes
+     * how they are read. The caller has already dealt with any unsaved text; a charset that
+     * cannot hold these bytes is not offered in the first place, so failing here is a bug.
+     */
+    fun setEditorCharset(charset: java.nio.charset.Charset) {
+        val open = _editor.value as? EditorState.Ready ?: return
+        val bytes = editorBytes ?: return
+        val decoded = TextFile.decodeWith(bytes, charset, open.decoded.bom) ?: return
+        _editor.value = open.copy(decoded = decoded, savedAt = 0L)
+    }
+
+    /** The charsets the open file can be read as, for the picker. */
+    fun editorCharsets(): List<java.nio.charset.Charset> =
+        editorBytes?.let { TextFile.readableAs(it) } ?: emptyList()
+
+    fun dismissEditorProblem() {
+        _editor.update { (it as? EditorState.Ready)?.copy(problem = null) ?: it }
     }
 
     /** Writes [text] back to the open file, keeping its encoding, line endings and mode. */
@@ -115,16 +141,31 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val open = _editor.value as? EditorState.Ready ?: return
         val session = sftpSession ?: return
         if (open.saving) return
-        _editor.value = open.copy(saving = true)
+        val bytes = TextFile.encode(text, open.decoded)
+        if (bytes == null) {
+            _editor.value = open.copy(problem = FileFailure(
+                name    = "",
+                message = str(R.string.editor_cannot_encode, open.decoded.charset.name()),
+                detail  = "",
+            ))
+            return
+        }
+        _editor.value = open.copy(saving = true, problem = null)
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                session.writeFile(open.path, TextFile.encode(text, open.decoded))
+                session.writeFile(open.path, bytes)
             } catch (e: Exception) {
-                _editor.value = open.copy(saving = false)
-                editorFailed(open.path, e)
+                // A failed save must never cost the user their text, so the editor stays open
+                // with the problem on top of it — unless the connection itself is gone.
+                if (sftpSession?.isConnected != true) {
+                    editorFailed(open.path, e)
+                } else {
+                    _editor.value = open.copy(saving = false, problem = FileFailure.of(open.name, e))
+                }
                 return@launch
             }
             // The text just written is the new baseline: the file on the server now matches it.
+            editorBytes = bytes
             _editor.value = open.copy(
                 decoded = open.decoded.copy(text = text),
                 saving = false,
@@ -149,7 +190,10 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun closeEditor() { _editor.value = null }
+    fun closeEditor() {
+        _editor.value = null
+        editorBytes = null
+    }
 
     /** The last listing shown, to go back to when an operation fails without losing the connection. */
     @Volatile private var lastListing: State.Listing? = null
