@@ -25,12 +25,22 @@ import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
  * It is a View, so everything Compose gave for free has to be handed to it: the font, the
  * colours of the current theme, and its own disposal.
  */
+private const val plainTextInput = android.text.InputType.TYPE_CLASS_TEXT or
+    android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+    android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+
+private const val proseInput = android.text.InputType.TYPE_CLASS_TEXT or
+    android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+    android.text.InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
+    android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+
 @Composable
 fun SoraEditor(
     text: String,
     /** Changes when [text] is a different file, or the same one read another way. */
     textKey: Any,
-    readOnly: Boolean,
+    /** Lets the keyboard correct and suggest again — and, with it, dictate. */
+    suggestions: Boolean,
     onDirty: () -> Unit,
     onEditor: (CodeEditor?) -> Unit,
     modifier: Modifier = Modifier,
@@ -66,9 +76,7 @@ fun SoraEditor(
                 // sora asks for plain multi-line text, which lets the keyboard capitalise and
                 // correct — in a configuration file that turns PermitRootLogin into Permit
                 // Root Login. The Compose field refused suggestions; so does this one.
-                inputType = android.text.InputType.TYPE_CLASS_TEXT or
-                    android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
-                    android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                inputType = plainTextInput
                 subscribeEvent(
                     ContentChangeEvent::class.java,
                     EventReceiver { event, _ ->
@@ -80,7 +88,12 @@ fun SoraEditor(
         },
         modifier = modifier,
         update = { view ->
-            view.isEditable = !readOnly
+            val wanted = if (suggestions) proseInput else plainTextInput
+            if (view.inputType != wanted) {
+                view.inputType = wanted
+                // The keyboard is told once, when it attaches; without this it keeps correcting.
+                view.restartInput()
+            }
             view.colorScheme = EditorColorScheme().apply {
                 setColor(EditorColorScheme.WHOLE_BACKGROUND, colors.surface.toArgb())
                 setColor(EditorColorScheme.LINE_NUMBER_BACKGROUND, colors.surface.toArgb())

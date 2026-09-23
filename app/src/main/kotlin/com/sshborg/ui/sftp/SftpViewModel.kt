@@ -22,8 +22,6 @@ import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.service.TransferTask
 import com.sshborg.ui.editor.EDITOR_MAX_BYTES
-import com.sshborg.ui.editor.EDITOR_VIEW_MAX_BYTES
-import com.sshborg.ui.editor.EDITOR_WARN_BYTES
 import com.sshborg.ui.editor.EditorState
 import com.sshborg.ui.editor.TextFile
 import kotlinx.coroutines.*
@@ -107,17 +105,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Opens [remotePath]: reads it whole, then decides what to do with it.
      *
-     * Reading first and asking afterwards, rather than the other way round, because every
-     * answer needs the bytes anyway — the hex editor, the read-only view and the editor all do
-     * — and because it is the only way to know what the file *is* without stopping a transfer
-     * halfway, which is how a channel ends up out of step with the server. The one question
-     * asked before reading is the one the size alone can answer: too big even to hold.
+     * Reading first and asking afterwards, rather than the other way round, because both
+     * answers need the bytes anyway — the editor and the hex editor — and because it is the
+     * only way to know what the file *is* without stopping a transfer halfway, which is how a
+     * channel ends up out of step with the server. The one question asked before reading is
+     * the one the size alone can answer: too big to hold.
      */
     fun openEditor(
         remotePath: String,
-        /** The user has answered the size question; open it. */
-        force: Boolean = false,
-        readOnly: Boolean = false,
         /** Set by "open as text anyway" on the not-text dialog. */
         asText: Boolean = false,
     ) {
@@ -125,7 +120,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
             val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
-            if (size != null && size > EDITOR_VIEW_MAX_BYTES) {
+            if (size != null && size > EDITOR_MAX_BYTES) {
                 _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
                 return@launch
             }
@@ -134,7 +129,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             // The user may have walked away from the wait; the file they left is not reopened.
             if (!stillLoading(remotePath)) return@launch
             hold(remotePath, bytes)
-            decide(remotePath, bytes, force, readOnly, asText)
+            decide(remotePath, bytes, asText)
         }
     }
 
@@ -149,7 +144,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     private suspend fun read(session: SftpSession, remotePath: String, size: Long?): ByteArray? {
         var announced = 0L
         return try {
-            session.readFile(remotePath, EDITOR_VIEW_MAX_BYTES) { received ->
+            session.readFile(remotePath, EDITOR_MAX_BYTES) { received ->
                 if (received - announced >= PROGRESS_STEP) {
                     announced = received
                     _editor.update { at ->
@@ -168,49 +163,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Answers the one question the file has already been read for, so nothing is transferred
-     * twice: the dialogs that got here are choosing between editors, not asking for the file.
+     * What to do with the bytes now they are here. There is nothing left to ask about size:
+     * anything small enough to hold is small enough to edit.
      */
-    private fun decide(
-        remotePath: String,
-        bytes: ByteArray,
-        force: Boolean,
-        readOnly: Boolean,
-        asText: Boolean,
-    ) {
+    private fun decide(remotePath: String, bytes: ByteArray, asText: Boolean) {
         val decoded = TextFile.decode(bytes, allowBinary = asText)
-        if (decoded == null) {
-            _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
-            return
-        }
-        val size = bytes.size.toLong()
-        _editor.value = when {
-            readOnly || size <= EDITOR_WARN_BYTES ->
-                EditorState.Ready(remotePath, decoded, readOnly = readOnly)
-            // Past the editor's ceiling reading is all that is left, so the question loses its
-            // "open anyway" and becomes an offer.
-            size > EDITOR_MAX_BYTES -> EditorState.Confirm(remotePath, size, canEdit = false)
-            force -> EditorState.Ready(remotePath, decoded)
-            else -> EditorState.Confirm(remotePath, size, canEdit = true)
-        }
+        _editor.value = decoded?.let { EditorState.Ready(remotePath, it) }
+            ?: EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
     }
 
-    /** Picks up a decision on the file already in hand — see [decide]. */
-    fun continueEditor(readOnly: Boolean) {
-        val path = _editor.value?.path ?: return
-        val bytes = heldBytes(path) ?: run { openEditor(path, force = true, readOnly = readOnly); return }
-        decide(path, bytes, force = true, readOnly = readOnly, asText = false)
-    }
-
-    /**
-     * As [continueEditor], for "open as text anyway". Past the editor's ceiling it goes straight
-     * to reading: the user has already answered one question about this file, and a second
-     * dialog saying it is also too big would only be in the way — reading is the one thing left.
-     */
+    /** Picks up "open as text anyway" on the file already in hand — see [decide]. */
     fun continueAsText() {
         val path = _editor.value?.path ?: return
-        val bytes = heldBytes(path) ?: run { openEditor(path, force = true, asText = true); return }
-        decide(path, bytes, force = true, readOnly = bytes.size > EDITOR_MAX_BYTES, asText = true)
+        val bytes = heldBytes(path) ?: run { openEditor(path, asText = true); return }
+        decide(path, bytes, asText = true)
     }
 
     /**
