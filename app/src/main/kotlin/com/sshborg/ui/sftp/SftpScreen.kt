@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.sshborg.R
 import com.sshborg.isTouchless
 import com.sshborg.ui.common.onMenuKey
+import com.sshborg.ui.editor.EditorConfirmDialog
 import com.sshborg.ui.editor.EditorLoading
 import com.sshborg.ui.editor.EditorScreen
 import com.sshborg.ui.editor.EditorState
@@ -472,6 +473,11 @@ fun SftpScreen(
     vm.report.collectAsState().value?.let { ErrorReportDialog(it, onDismiss = vm::dismissReport) }
 
     when (val e = editor) {
+        is EditorState.Confirm -> EditorConfirmDialog(
+            state = e,
+            onOpen = { vm.openEditor(e.path, force = true) },
+            onDismiss = vm::closeEditor,
+        )
         is EditorState.Unsupported -> EditorUnsupportedDialog(e, onDismiss = vm::closeEditor)
         is EditorState.Failed -> ErrorReportDialog(
             ErrorReport(stringResource(R.string.editor_failed), listOf(e.failure)),

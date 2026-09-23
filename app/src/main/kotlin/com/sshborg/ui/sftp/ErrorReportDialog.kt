@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import com.sshborg.service.FileFailure
 import com.sshborg.ui.common.FocusOutlinedButton
+import com.sshborg.ui.common.ScrollingDialogBody
 
 /**
  * What went wrong in one SFTP operation: a single file, a batch, or a background transfer.
@@ -82,12 +83,7 @@ fun ErrorReportDialog(report: ErrorReport, onDismiss: () -> Unit) {
         icon = { Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
         title = { Text(report.title) },
         text = {
-            Column(
-                modifier = Modifier
-                    .heightIn(max = maxBody)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
+            ScrollingDialogBody(maxHeight = maxBody) {
                 report.failures.forEach { FailureRow(it) }
                 if (report.notAttempted.isNotEmpty()) {
                     Text(

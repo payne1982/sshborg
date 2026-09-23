@@ -832,6 +832,9 @@ class SftpSession(
         }, com.jcraft.jsch.ChannelSftp.OVERWRITE) }
     }
 
+    /** The size of [remotePath] in bytes. */
+    fun sizeOf(remotePath: String): Long = op { it.stat(remotePath) }.size
+
     /**
      * Reads [remotePath] whole into memory, for the editor. Checks the size first and refuses
      * anything over [limit]: a file too big to edit is also too big to be worth downloading.

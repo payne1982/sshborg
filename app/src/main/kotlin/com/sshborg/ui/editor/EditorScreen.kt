@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.sshborg.R
+import com.sshborg.ui.common.ScrollingDialogBody
 
 /**
  * The text editor for one remote file, shown over the file list.
@@ -307,16 +308,11 @@ private fun CharsetDialog(
     onPick: (java.nio.charset.Charset) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val maxBody = (androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp * 0.5f).dp
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.editor_charset)) },
         text = {
-            Column(
-                Modifier
-                    .heightIn(max = maxBody)
-                    .verticalScroll(rememberScrollState()),
-            ) {
+            ScrollingDialogBody {
                 charsets.forEach { charset ->
                     Row(
                         modifier = Modifier
@@ -335,6 +331,26 @@ private fun CharsetDialog(
             }
         },
         confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        },
+    )
+}
+
+/** Asked before reading a file big enough that the editor will feel slow. */
+@Composable
+fun EditorConfirmDialog(state: EditorState.Confirm, onOpen: () -> Unit, onDismiss: () -> Unit) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(state.name, maxLines = 1) },
+        text = { Text(stringResource(R.string.editor_large, formatBytes(state.size))) },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onOpen) {
+                Text(stringResource(R.string.sftp_menu_open))
+            }
+        },
+        dismissButton = {
             androidx.compose.material3.TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.action_cancel))
             }

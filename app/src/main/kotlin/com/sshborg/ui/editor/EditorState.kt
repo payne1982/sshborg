@@ -3,11 +3,15 @@ package com.sshborg.ui.editor
 import com.sshborg.service.FileFailure
 
 /**
- * The largest file the editor will open. Provisional: the ceiling is Compose's text layout,
- * which remeasures the whole content on every keystroke, so it has to be measured on a real
- * phone before it is settled. Configuration files, the case this is for, are far below it.
+ * The largest file the editor will open at all, and the size above which it asks first.
+ *
+ * Measured on the test phone, not chosen: a single Compose text field lays out the whole file
+ * on every keystroke, so it stays comfortable to about 64 KB, drags noticeably at 128 KB and is
+ * unusable by 512 KB. Configuration files, the case this is for, sit far below all of it; past
+ * the ceiling the terminal is the honest answer, and it has no ceiling.
  */
-const val EDITOR_MAX_BYTES = 512L * 1024
+const val EDITOR_MAX_BYTES = 256L * 1024
+const val EDITOR_WARN_BYTES = 64L * 1024
 
 /**
  * The largest draft kept across a process death. Saved state travels in a Bundle, and a big one
@@ -37,6 +41,9 @@ sealed interface EditorState {
          */
         val problem: FileFailure? = null,
     ) : EditorState
+
+    /** Big enough to be slow: the user is asked before it is read. */
+    data class Confirm(override val path: String, val size: Long) : EditorState
 
     /** The file is readable but not editable as text — see [Reason]. */
     data class Unsupported(

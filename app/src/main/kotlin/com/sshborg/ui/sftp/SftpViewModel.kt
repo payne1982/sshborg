@@ -22,6 +22,7 @@ import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.service.TransferTask
 import com.sshborg.ui.editor.EDITOR_MAX_BYTES
+import com.sshborg.ui.editor.EDITOR_WARN_BYTES
 import com.sshborg.ui.editor.EditorState
 import com.sshborg.ui.editor.TextFile
 import kotlinx.coroutines.*
@@ -96,10 +97,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
      * the bytes live in the process and go straight back to the server on save.
      */
-    fun openEditor(remotePath: String) {
+    fun openEditor(remotePath: String, force: Boolean = false) {
         val session = sftpSession ?: return
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
+            // Asked before reading, not after: there is no point pulling a file down the wire
+            // only to tell the user it is too big to work with.
+            val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
+            if (size != null && size > EDITOR_WARN_BYTES && !force) {
+                _editor.value = if (size > EDITOR_MAX_BYTES)
+                    EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
+                else
+                    EditorState.Confirm(remotePath, size)
+                return@launch
+            }
             val bytes = try {
                 session.readFile(remotePath, EDITOR_MAX_BYTES)
             } catch (e: FileTooLargeException) {
