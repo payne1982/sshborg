@@ -277,6 +277,7 @@
 
     <string name="sftp_menu_open">打开</string>
     <string name="sftp_menu_edit">在编辑器中打开</string>
+    <string name="sftp_menu_hex">以十六进制打开</string>
     <string name="sftp_menu_rename">重命名</string>
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>
@@ -485,6 +486,7 @@
     <string name="editor_binary">该文件不是文本，无法在此编辑。</string>
     <string name="editor_use_terminal">可以在终端会话中于服务器上编辑它。</string>
     <string name="editor_read_only">只读</string>
+    <string name="editor_open_as_text">以文本方式打开</string>
     <string name="action_undo">撤销</string>
     <string name="editor_hex_subtitle">%1$d 字节 · 覆盖</string>
     <string name="editor_open_hex">以十六进制打开</string>

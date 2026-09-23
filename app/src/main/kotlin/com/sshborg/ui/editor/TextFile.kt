@@ -100,7 +100,16 @@ object TextFile {
      * phone's language is a better hint than anything the bytes can say, since the same bytes
      * are legal Cyrillic and legal Greek.
      */
-    fun decode(bytes: ByteArray, locale: Locale = Locale.getDefault()): Decoded? {
+    fun decode(
+        bytes: ByteArray,
+        locale: Locale = Locale.getDefault(),
+        /**
+         * Reads bytes the binary test rejects anyway. Safe, because the round trip still has to
+         * be exact — the Latin charsets map all 256 byte values, NUL included — so a file with
+         * a stray NUL in it can be opened, repaired and saved without losing the rest.
+         */
+        allowBinary: Boolean = false,
+    ): Decoded? {
         bomOf(bytes)?.let { bom ->
             val charset = charsetOrNull(bom.charsetName) ?: return@let
             return decodeWith(bytes, charset, bom)
@@ -108,7 +117,7 @@ object TextFile {
         // Unmarked UTF-16 is the one text format the control-character test would throw away,
         // so it is asked about first, on the evidence of its alternating NUL bytes.
         unmarkedUtf16(bytes)?.let { return it }
-        if (isBinary(bytes)) return null
+        if (!allowBinary && isBinary(bytes)) return null
         for (charset in candidates(locale, bytes)) {
             decodeWith(bytes, charset, null)?.let { return it }
         }

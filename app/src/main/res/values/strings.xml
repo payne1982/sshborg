@@ -278,6 +278,7 @@
 
     <string name="sftp_menu_open">Open</string>
     <string name="sftp_menu_edit">Open in editor</string>
+    <string name="sftp_menu_hex">Open in hex</string>
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>
@@ -491,6 +492,7 @@
     <string name="editor_binary">This file is not text, so it cannot be edited here.</string>
     <string name="editor_use_terminal">You can edit it on the server from a terminal session.</string>
     <string name="editor_read_only">Read only</string>
+    <string name="editor_open_as_text">Open as text</string>
     <string name="action_undo">Undo</string>
     <string name="editor_hex_subtitle">%1$d bytes · overwrite</string>
     <string name="editor_open_hex">Open in hex</string>

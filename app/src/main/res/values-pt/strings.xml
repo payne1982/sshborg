@@ -263,6 +263,7 @@
 
     <string name="sftp_menu_open">Abrir</string>
     <string name="sftp_menu_edit">Abrir no editor</string>
+    <string name="sftp_menu_hex">Abrir em hexadecimal</string>
     <string name="sftp_menu_rename">Renomear</string>
     <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
     <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
@@ -480,6 +481,7 @@
     <string name="editor_binary">Este ficheiro não é texto, por isso não pode ser editado aqui.</string>
     <string name="editor_use_terminal">Pode editá-lo no servidor a partir de uma sessão de terminal.</string>
     <string name="editor_read_only">Só leitura</string>
+    <string name="editor_open_as_text">Abrir como texto</string>
     <string name="action_undo">Desfazer</string>
     <string name="editor_hex_subtitle">%1$d bytes · substituição</string>
     <string name="editor_open_hex">Abrir em hexadecimal</string>

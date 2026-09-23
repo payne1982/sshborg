@@ -385,6 +385,9 @@ fun SftpScreen(
                                         onEdit = if (!entry.isDir) {
                                             { vm.openEditor("${s.path.trimEnd('/')}/${entry.name}") }
                                         } else null,
+                                        onHex = if (!entry.isDir) {
+                                            { vm.openHex("${s.path.trimEnd('/')}/${entry.name}") }
+                                        } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
                                         showOverflow   = isTouchless,
@@ -502,6 +505,7 @@ fun SftpScreen(
             state = e,
             onView = { vm.openEditor(e.path, readOnly = true) },
             onHex = { vm.openHex(e.path) },
+            onAsText = { vm.openEditor(e.path, force = true, asText = true) },
             onDismiss = vm::closeEditor,
         )
         is EditorState.Failed -> ErrorReportDialog(
@@ -766,6 +770,7 @@ private fun SftpEntryItem(
     onDownloadFolder: () -> Unit,
     onDownloadInBackground: (() -> Unit)?,
     onEdit: (() -> Unit)?,
+    onHex: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
     showOverflow: Boolean = false,
@@ -901,6 +906,13 @@ private fun SftpEntryItem(
                     text = { Text(stringResource(R.string.sftp_menu_edit)) },
                     leadingIcon = { Icon(Icons.Default.EditNote, null) },
                     onClick = { menuExpanded = false; onEdit() },
+                )
+            }
+            if (onHex != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.sftp_menu_hex)) },
+                    leadingIcon = { Icon(Icons.Default.DataArray, null) },
+                    onClick = { menuExpanded = false; onHex() },
                 )
             }
             DropdownMenuItem(

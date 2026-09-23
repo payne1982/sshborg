@@ -293,6 +293,7 @@ fun EditorUnsupportedDialog(
     state: EditorState.Unsupported,
     onView: () -> Unit,
     onHex: () -> Unit,
+    onAsText: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     // Too big to edit is not too big to read, so the offer stands right up to the view ceiling.
@@ -329,6 +330,11 @@ fun EditorUnsupportedDialog(
                 if (state.reason == EditorState.Reason.BINARY) {
                     androidx.compose.material3.TextButton(onClick = onHex) {
                         Text(stringResource(R.string.editor_open_hex))
+                    }
+                    // A text file with one stray NUL in it is still a text file. Opening it is
+                    // safe whatever it really holds: the round trip has to be exact either way.
+                    androidx.compose.material3.TextButton(onClick = onAsText) {
+                        Text(stringResource(R.string.editor_open_as_text))
                     }
                 }
                 if (canView) {

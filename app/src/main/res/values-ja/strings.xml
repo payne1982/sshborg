@@ -277,6 +277,7 @@
 
     <string name="sftp_menu_open">開く</string>
     <string name="sftp_menu_edit">エディタで開く</string>
+    <string name="sftp_menu_hex">16進数で開く</string>
     <string name="sftp_menu_rename">名前変更</string>
     <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
     <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>
@@ -485,6 +486,7 @@
     <string name="editor_binary">このファイルはテキストではないため、ここでは編集できません。</string>
     <string name="editor_use_terminal">ターミナルのセッションからサーバー上で編集できます。</string>
     <string name="editor_read_only">読み取り専用</string>
+    <string name="editor_open_as_text">テキストとして開く</string>
     <string name="action_undo">元に戻す</string>
     <string name="editor_hex_subtitle">%1$d バイト · 上書き</string>
     <string name="editor_open_hex">16進数で開く</string>

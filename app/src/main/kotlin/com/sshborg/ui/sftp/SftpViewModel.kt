@@ -98,7 +98,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
      * the bytes live in the process and go straight back to the server on save.
      */
-    fun openEditor(remotePath: String, force: Boolean = false, readOnly: Boolean = false) {
+    fun openEditor(
+        remotePath: String,
+        force: Boolean = false,
+        readOnly: Boolean = false,
+        /** Set by "open as text anyway" on the not-text dialog. */
+        asText: Boolean = false,
+    ) {
         val session = sftpSession ?: return
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
@@ -106,6 +112,16 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             // only to tell the user it is too big to work with.
             val limit = if (readOnly) EDITOR_VIEW_MAX_BYTES else EDITOR_MAX_BYTES
             val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
+            // A binary has nothing to do with the text editor's limits, so before asking about
+            // size we look at the head of the file and send it straight to the hex editor.
+            // Nobody should have to answer a question about an editor they are not going to get.
+            if (size != null && size > EDITOR_WARN_BYTES && !asText && !readOnly) {
+                val head = runCatching { session.peek(remotePath, 8 * 1024) }.getOrNull()
+                if (head != null && TextFile.isBinary(head)) {
+                    openHex(remotePath)
+                    return@launch
+                }
+            }
             if (size != null && size > limit) {
                 _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
                 return@launch
@@ -123,7 +139,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 editorFailed(remotePath, e)
                 return@launch
             }
-            val decoded = TextFile.decode(bytes)
+            val decoded = TextFile.decode(bytes, allowBinary = asText)
             editorBytes = if (decoded != null) bytes else null
             _editor.value = decoded?.let { EditorState.Ready(remotePath, it, readOnly = readOnly) }
                 ?: EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())

@@ -263,6 +263,7 @@
 
     <string name="sftp_menu_open">Відкрити</string>
     <string name="sftp_menu_edit">Відкрити в редакторі</string>
+    <string name="sftp_menu_hex">Відкрити в HEX</string>
     <string name="sftp_menu_rename">Перейменувати</string>
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
@@ -484,6 +485,7 @@
     <string name="editor_binary">Це не текстовий файл, тож тут його не можна редагувати.</string>
     <string name="editor_use_terminal">Його можна відредагувати на сервері в сеансі термінала.</string>
     <string name="editor_read_only">Лише читання</string>
+    <string name="editor_open_as_text">Відкрити як текст</string>
     <string name="action_undo">Скасувати</string>
     <string name="editor_hex_subtitle">%1$d байт · заміна</string>
     <string name="editor_open_hex">Відкрити в HEX</string>

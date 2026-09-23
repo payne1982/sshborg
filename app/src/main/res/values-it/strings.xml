@@ -263,6 +263,7 @@
 
     <string name="sftp_menu_open">Apri</string>
     <string name="sftp_menu_edit">Apri nell\'editor</string>
+    <string name="sftp_menu_hex">Apri in esadecimale</string>
     <string name="sftp_menu_rename">Rinomina</string>
     <string name="sftp_menu_download_in_background">Scarica in background</string>
     <string name="sftp_background_downloads_title">Download in background</string>
@@ -481,6 +482,7 @@
     <string name="editor_binary">Questo file non è testo, quindi non si può modificare qui.</string>
     <string name="editor_use_terminal">Puoi modificarlo sul server da una sessione terminale.</string>
     <string name="editor_read_only">Sola lettura</string>
+    <string name="editor_open_as_text">Apri come testo</string>
     <string name="action_undo">Annulla modifica</string>
     <string name="editor_hex_subtitle">%1$d byte · sovrascrittura</string>
     <string name="editor_open_hex">Apri in esadecimale</string>
