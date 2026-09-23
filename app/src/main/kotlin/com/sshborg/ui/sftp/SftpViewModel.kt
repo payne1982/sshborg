@@ -29,6 +29,8 @@ import com.sshborg.ui.editor.TextFile
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+private const val PROGRESS_STEP = 64L * 1024
+
 class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     sealed interface State {
@@ -127,17 +129,36 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
                 return@launch
             }
-            val bytes = try {
-                session.readFile(remotePath, EDITOR_VIEW_MAX_BYTES)
-            } catch (e: FileTooLargeException) {
-                _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
-                return@launch
-            } catch (e: Exception) {
-                editorFailed(remotePath, e)
-                return@launch
-            }
+            _editor.value = EditorState.Loading(remotePath, size ?: 0L)
+            val bytes = read(session, remotePath, size) ?: return@launch
             hold(remotePath, bytes)
             decide(remotePath, bytes, force, readOnly, asText)
+        }
+    }
+
+    /**
+     * Reads the whole file, keeping [editor] posted on how far it has got, or leaves the right
+     * failure there and returns null. Progress is only pushed every so often: a state flow
+     * updated per packet would repaint the screen far more than a moving number needs.
+     */
+    private suspend fun read(session: SftpSession, remotePath: String, size: Long?): ByteArray? {
+        var announced = 0L
+        return try {
+            session.readFile(remotePath, EDITOR_VIEW_MAX_BYTES) { received ->
+                if (received - announced >= PROGRESS_STEP) {
+                    announced = received
+                    _editor.update { at ->
+                        (at as? EditorState.Loading)?.takeIf { it.path == remotePath }
+                            ?.copy(received = received) ?: at
+                    }
+                }
+            }
+        } catch (e: FileTooLargeException) {
+            _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
+            null
+        } catch (e: Exception) {
+            editorFailed(remotePath, e)
+            null
         }
     }
 
@@ -211,15 +232,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val session = sftpSession ?: return
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
-            val bytes = try {
-                session.readFile(remotePath, EDITOR_VIEW_MAX_BYTES)
-            } catch (e: FileTooLargeException) {
-                _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
-                return@launch
-            } catch (e: Exception) {
-                editorFailed(remotePath, e)
-                return@launch
-            }
+            val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
+            _editor.value = EditorState.Loading(remotePath, size ?: 0L)
+            val bytes = read(session, remotePath, size) ?: return@launch
             hold(remotePath, bytes)
             _editor.value = EditorState.Hex(remotePath, bytes.size)
         }

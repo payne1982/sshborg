@@ -259,16 +259,34 @@ private fun StatusLine(state: EditorState.Ready, dirty: Boolean, onPickCharset: 
     }
 }
 
-/** While the file is being read. */
+/**
+ * While the file is being read. With a size to go by it says how far it has got: a few
+ * megabytes over a slow link take long enough that a spinner alone reads as a hung screen.
+ */
 @Composable
-fun EditorLoading(name: String) {
+fun EditorLoading(state: EditorState.Loading) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(horizontal = 32.dp),
         ) {
-            CircularProgressIndicator()
-            Text(name, style = MaterialTheme.typography.bodyMedium)
+            if (state.size > 0) {
+                androidx.compose.material3.LinearProgressIndicator(
+                    progress = { (state.received.toFloat() / state.size).coerceIn(0f, 1f) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else {
+                CircularProgressIndicator()
+            }
+            Text(state.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+            if (state.size > 0) {
+                Text(
+                    "${formatBytes(state.received)} / ${formatBytes(state.size)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

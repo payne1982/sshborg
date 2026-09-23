@@ -32,8 +32,15 @@ sealed interface EditorState {
     val path: String
     val name: String get() = path.substringAfterLast('/')
 
-    /** Reading the file off the server. */
-    data class Loading(override val path: String) : EditorState
+    /**
+     * Reading the file off the server. [size] is what the server said it is, [received] how
+     * much has arrived — a file of megabytes over a slow link needs to show it is moving.
+     */
+    data class Loading(
+        override val path: String,
+        val size: Long = 0L,
+        val received: Long = 0L,
+    ) : EditorState
 
     /** The file is open. [decoded] holds what is needed to write the bytes back unchanged. */
     data class Ready(

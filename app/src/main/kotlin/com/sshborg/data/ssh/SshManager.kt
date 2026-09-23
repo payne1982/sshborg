@@ -839,11 +839,15 @@ class SftpSession(
      * Reads [remotePath] whole into memory, for the editor. Checks the size first and refuses
      * anything over [limit]: a file too big to edit is also too big to be worth downloading.
      */
-    fun readFile(remotePath: String, limit: Long): ByteArray {
+    fun readFile(
+        remotePath: String,
+        limit: Long,
+        onProgress: (bytesReceived: Long) -> Unit = {},
+    ): ByteArray {
         val size = op { it.stat(remotePath) }.size
         if (size > limit) throw FileTooLargeException(size, limit)
         val out = java.io.ByteArrayOutputStream(size.coerceIn(0L, limit).toInt())
-        downloadFile(remotePath, out)
+        downloadFile(remotePath, out, onProgress)
         return out.toByteArray()
     }
 
