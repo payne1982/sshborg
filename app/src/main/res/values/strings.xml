@@ -492,7 +492,7 @@
     <string name="editor_binary">This file is not text, so it cannot be edited here.</string>
     <string name="editor_use_terminal">You can edit it on the server from a terminal session.</string>
     <string name="editor_read_only">Read only</string>
-    <string name="editor_open_as_text">Open as text</string>
+    <string name="editor_open_as_text">Open as text anyway</string>
     <string name="action_undo">Undo</string>
     <string name="editor_hex_subtitle">%1$d bytes · overwrite</string>
     <string name="editor_open_hex">Open in hex</string>

@@ -481,7 +481,7 @@
     <string name="editor_binary">Ce fichier n\'est pas du texte, il ne peut pas être modifié ici.</string>
     <string name="editor_use_terminal">Vous pouvez le modifier sur le serveur depuis une session terminal.</string>
     <string name="editor_read_only">Lecture seule</string>
-    <string name="editor_open_as_text">Ouvrir comme texte</string>
+    <string name="editor_open_as_text">Ouvrir quand même comme texte</string>
     <string name="action_undo">Annuler</string>
     <string name="editor_hex_subtitle">%1$d octets · écrasement</string>
     <string name="editor_open_hex">Ouvrir en hexadécimal</string>

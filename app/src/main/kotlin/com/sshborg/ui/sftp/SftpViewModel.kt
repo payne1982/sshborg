@@ -103,11 +103,6 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         editorBytes?.takeIf { editorBytesPath == path }
 
     /**
-     * Opens [remotePath] in the editor: reads it whole into memory, decides whether it can be
-     * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
-     * the bytes live in the process and go straight back to the server on save.
-     */
-    /**
      * Opens [remotePath]: reads it whole, then decides what to do with it.
      *
      * Reading first and asking afterwards, rather than the other way round, because every
@@ -181,11 +176,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         decide(path, bytes, force = true, readOnly = readOnly, asText = false)
     }
 
-    /** As [continueEditor], for the two ways out of the not-text dialog. */
+    /**
+     * As [continueEditor], for "open as text anyway". Past the editor's ceiling it goes straight
+     * to reading: the user has already answered one question about this file, and a second
+     * dialog saying it is also too big would only be in the way — reading is the one thing left.
+     */
     fun continueAsText() {
         val path = _editor.value?.path ?: return
         val bytes = heldBytes(path) ?: run { openEditor(path, force = true, asText = true); return }
-        decide(path, bytes, force = true, readOnly = false, asText = true)
+        decide(path, bytes, force = true, readOnly = bytes.size > EDITOR_MAX_BYTES, asText = true)
     }
 
     /**

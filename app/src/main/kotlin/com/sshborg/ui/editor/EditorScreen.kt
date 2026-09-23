@@ -322,7 +322,7 @@ fun EditorUnsupportedDialog(
             }
         },
         confirmButton = {
-            Row {
+            Column(horizontalAlignment = Alignment.End) {
                 // Not text is not the end of the road any more: the bytes can still be opened.
                 if (state.reason == EditorState.Reason.BINARY) {
                     androidx.compose.material3.TextButton(onClick = onHex) {
@@ -410,15 +410,17 @@ fun EditorConfirmDialog(
         },
         // Two ways forward, so they share the confirm slot: reading a big file is fast whatever
         // its size, and it is what most people opening one actually want.
+        // One per line: side by side they are long enough to wrap, and a wrapped button
+        // label is the sort of thing that makes a dialog look broken.
         confirmButton = {
-            Row {
-                androidx.compose.material3.TextButton(onClick = onView) {
-                    Text(stringResource(R.string.editor_read_only))
-                }
+            Column(horizontalAlignment = Alignment.End) {
                 if (state.canEdit) {
                     androidx.compose.material3.TextButton(onClick = onOpen) {
                         Text(stringResource(R.string.sftp_menu_open))
                     }
+                }
+                androidx.compose.material3.TextButton(onClick = onView) {
+                    Text(stringResource(R.string.editor_read_only))
                 }
             }
         },
