@@ -11,8 +11,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -138,6 +138,11 @@ fun EditorScreen(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
+                // The Scaffold already reserved the navigation bar, and the keyboard's inset
+                // measures from the screen edge, so it counts that bar a second time: a black
+                // band of exactly its height, above the keyboard. Saying the padding is spent
+                // leaves imePadding() adding only what is left.
+                .consumeWindowInsets(padding)
                 .imePadding(),
         ) {
             SoraEditor(
@@ -229,32 +234,22 @@ private fun StatusLine(state: EditorState.Ready, dirty: Boolean, onPickCharset: 
         if (dirty) add(stringResource(R.string.editor_unsaved))
         else if (state.savedAt > 0L) add(stringResource(R.string.editor_saved))
     }
-    // A plain clickable row, not a TextButton: that one reserves a 40dp touch target around a
-    // 13sp label, which under the editor reads as a band of empty space.
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(32.dp)
-            .clickable(onClick = onPickCharset)
-            .padding(horizontal = 12.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            state.decoded.label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Icon(
-            Icons.Default.ArrowDropDown,
-            contentDescription = stringResource(R.string.editor_charset),
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(16.dp),
-        )
+        androidx.compose.material3.TextButton(onClick = onPickCharset) {
+            Text(state.decoded.label, style = MaterialTheme.typography.bodySmall)
+            Icon(
+                Icons.Default.ArrowDropDown,
+                contentDescription = stringResource(R.string.editor_charset),
+                modifier = Modifier.size(18.dp),
+            )
+        }
         Text(
             parts.joinToString("  ·  "),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 8.dp),
         )
     }
 }
