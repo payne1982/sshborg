@@ -38,7 +38,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.res.stringResource
@@ -46,7 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sshborg.R
 
-private val HEX_STYLE = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+/** The dump's text style. A composable because the font is loaded from the app's own assets. */
+@Composable
+private fun hexStyle() = TextStyle(fontFamily = com.sshborg.ui.common.monoFont(), fontSize = 13.sp)
 
 /**
  * The hex editor: offsets down the left, the bytes in the middle, the printable characters on
@@ -119,8 +120,9 @@ fun HexEditorScreen(
                 // As many bytes per row as the width honestly fits: a row is 10 characters of
                 // offset, three per byte in hex and one more per byte in the text column.
                 val measurer = rememberTextMeasurer()
-                val charWidth = remember(measurer, maxWidth) {
-                    measurer.measure(AnnotatedString("0"), HEX_STYLE).size.width
+                val style = hexStyle()
+                val charWidth = remember(measurer, style, maxWidth) {
+                    measurer.measure(AnnotatedString("0"), style).size.width
                 }
                 val perRow = remember(charWidth, constraints.maxWidth) {
                     val fits = ((constraints.maxWidth / charWidth.toFloat()) - 11) / 4
@@ -238,7 +240,7 @@ private fun HexRow(
     var layout by remember { androidx.compose.runtime.mutableStateOf<androidx.compose.ui.text.TextLayoutResult?>(null) }
     Text(
         line,
-        style = HEX_STYLE,
+        style = hexStyle(),
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = 1,
         softWrap = false,
@@ -280,17 +282,17 @@ private fun HexKeypad(onDigit: (Int) -> Unit, onLeft: () -> Unit, onRight: () ->
                         onClick = { onDigit(digit) },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text("%X".format(digit), style = HEX_STYLE)
+                        Text("%X".format(digit), style = hexStyle())
                     }
                 }
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             com.sshborg.ui.common.FocusOutlinedButton(onClick = onLeft, modifier = Modifier.weight(1f)) {
-                Text("◀", style = HEX_STYLE)
+                Text("◀", style = hexStyle())
             }
             com.sshborg.ui.common.FocusOutlinedButton(onClick = onRight, modifier = Modifier.weight(1f)) {
-                Text("▶", style = HEX_STYLE)
+                Text("▶", style = hexStyle())
             }
         }
     }

@@ -70,20 +70,12 @@ private val ExtraKeyFont = FontFamily(
     Font(R.font.roboto_condensed_bold, FontWeight.Bold),
 )
 /**
- * Arrow glyphs in the terminal's own font, loaded from the assets the [com.sshborg.terminal
- * .TerminalView] already ships. The Nerd Font is a superset of plain JetBrains Mono, so the
- * plain pair in res/font was 544 KB of duplicate outlines for four arrows.
+ * Arrow glyphs in the terminal's own font, which the app already ships — the Nerd Font is a
+ * superset of plain JetBrains Mono, so a second copy in res/font would have been half a
+ * megabyte of duplicate outlines for four arrows.
  */
 @Composable
-private fun arrowKeyFont(): FontFamily {
-    val assets = LocalContext.current.assets
-    return remember(assets) {
-        FontFamily(
-            Font("fonts/JetBrainsMonoNerdFontMono-Regular.ttf", assets),
-            Font("fonts/JetBrainsMonoNerdFontMono-Bold.ttf", assets, FontWeight.Bold),
-        )
-    }
-}
+private fun arrowKeyFont(): FontFamily = com.sshborg.ui.common.monoFont()
 
 /** Toggle states the bar reflects and the callbacks it drives; owned by the terminal screen. */
 class ExtraBarState(

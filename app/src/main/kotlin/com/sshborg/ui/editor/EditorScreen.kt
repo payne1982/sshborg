@@ -143,7 +143,7 @@ fun EditorScreen(
                         .weight(1f)
                         .padding(horizontal = 12.dp),
                     textStyle = TextStyle(
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = com.sshborg.ui.common.monoFont(),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                     ),
@@ -483,6 +483,7 @@ fun EditorConfirmDialog(
 @Composable
 private fun ReadOnlyText(text: String, modifier: Modifier = Modifier) {
     val lines = remember(text) { text.split("\n") }
+    val font = com.sshborg.ui.common.monoFont()
     val touchless = com.sshborg.isTouchless(androidx.compose.ui.platform.LocalContext.current)
     androidx.compose.foundation.text.selection.SelectionContainer(modifier) {
         androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth()) {
@@ -493,7 +494,7 @@ private fun ReadOnlyText(text: String, modifier: Modifier = Modifier) {
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
                         .then(if (touchless) Modifier.focusable() else Modifier),
-                    style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp),
+                    style = TextStyle(fontFamily = font, fontSize = 13.sp),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             }
