@@ -494,6 +494,10 @@
     <string name="editor_binary">Это не текстовый файл, здесь его нельзя редактировать.</string>
     <string name="editor_use_terminal">Его можно отредактировать на сервере в сеансе терминала.</string>
     <string name="editor_read_only">Только чтение</string>
+    <string name="action_undo">Отменить</string>
+    <string name="editor_hex_subtitle">%1$d байт · замена</string>
+    <string name="editor_open_hex">Открыть в HEX</string>
+    <string name="editor_hex">Шестнадцатеричный</string>
     <string name="editor_large">Размер файла %1$s. Редактор его откроет, но набор текста будет медленным.</string>
     <string name="editor_charset">Кодировка</string>
     <string name="editor_charset_discard">Чтение файла в другой кодировке заменит текст на экране. Несохранённые изменения будут потеряны.</string>

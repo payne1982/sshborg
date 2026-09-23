@@ -481,6 +481,10 @@
     <string name="editor_binary">Questo file non è testo, quindi non si può modificare qui.</string>
     <string name="editor_use_terminal">Puoi modificarlo sul server da una sessione terminale.</string>
     <string name="editor_read_only">Sola lettura</string>
+    <string name="action_undo">Annulla modifica</string>
+    <string name="editor_hex_subtitle">%1$d byte · sovrascrittura</string>
+    <string name="editor_open_hex">Apri in esadecimale</string>
+    <string name="editor_hex">Esadecimale</string>
     <string name="editor_large">Questo file è di %1$s. L\'editor può aprirlo, ma la digitazione risulterà lenta.</string>
     <string name="editor_charset">Codifica</string>
     <string name="editor_charset_discard">Rileggere il file in un altro modo sostituisce il testo a schermo. Le modifiche non salvate andranno perse.</string>

@@ -51,6 +51,18 @@ sealed interface EditorState {
         val readOnly: Boolean = false,
     ) : EditorState
 
+    /**
+     * The file is open in the hex editor. Its bytes live in the ViewModel, not here: they are
+     * megabytes and they are mutated in place, neither of which belongs in a state object.
+     */
+    data class Hex(
+        override val path: String,
+        val size: Int,
+        val saving: Boolean = false,
+        val savedAt: Long = 0L,
+        val problem: FileFailure? = null,
+    ) : EditorState
+
     /** Big enough to be slow: the user is asked before it is read. */
     data class Confirm(override val path: String, val size: Long) : EditorState
 

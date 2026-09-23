@@ -485,6 +485,10 @@
     <string name="editor_binary">このファイルはテキストではないため、ここでは編集できません。</string>
     <string name="editor_use_terminal">ターミナルのセッションからサーバー上で編集できます。</string>
     <string name="editor_read_only">読み取り専用</string>
+    <string name="action_undo">元に戻す</string>
+    <string name="editor_hex_subtitle">%1$d バイト · 上書き</string>
+    <string name="editor_open_hex">16進数で開く</string>
+    <string name="editor_hex">16進数</string>
     <string name="editor_large">このファイルは %1$s です。エディタで開けますが、入力は遅くなります。</string>
     <string name="editor_charset">文字コード</string>
     <string name="editor_charset_discard">別の文字コードで読み直すと、画面のテキストが置き換わります。保存していない変更は失われます。</string>

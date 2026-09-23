@@ -142,12 +142,66 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         _editor.value = open.copy(decoded = decoded, savedAt = 0L)
     }
 
+    /**
+     * Opens [remotePath] in the hex editor. It reaches as far as the read-only view does: the
+     * rows are drawn by us, so nothing here costs what a text field costs.
+     */
+    fun openHex(remotePath: String) {
+        val session = sftpSession ?: return
+        _editor.value = EditorState.Loading(remotePath)
+        viewModelScope.launch(Dispatchers.IO) {
+            val bytes = try {
+                session.readFile(remotePath, EDITOR_VIEW_MAX_BYTES)
+            } catch (e: FileTooLargeException) {
+                _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
+                return@launch
+            } catch (e: Exception) {
+                editorFailed(remotePath, e)
+                return@launch
+            }
+            editorBytes = bytes
+            _editor.value = EditorState.Hex(remotePath, bytes.size)
+        }
+    }
+
+    /** The bytes the hex editor starts from; null once the editor is closed. */
+    fun hexBytes(): ByteArray? = editorBytes
+
+    /** Writes [bytes] back. The length never changes, so this replaces the file as it stands. */
+    fun saveHex(bytes: ByteArray) {
+        val open = _editor.value as? EditorState.Hex ?: return
+        val session = sftpSession ?: return
+        if (open.saving) return
+        _editor.value = open.copy(saving = true, problem = null)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                session.writeFile(open.path, bytes)
+            } catch (e: Exception) {
+                if (sftpSession?.isConnected != true) {
+                    editorFailed(open.path, e)
+                } else {
+                    _editor.value = open.copy(saving = false, problem = FileFailure.of(open.name, e))
+                }
+                return@launch
+            }
+            editorBytes = bytes
+            _editor.value = open.copy(saving = false, savedAt = System.currentTimeMillis())
+            refreshListing()
+        }
+    }
+
     /** The charsets the open file can be read as, for the picker. */
     fun editorCharsets(): List<java.nio.charset.Charset> =
         editorBytes?.let { TextFile.readableAs(it) } ?: emptyList()
 
     fun dismissEditorProblem() {
-        _editor.update { (it as? EditorState.Ready)?.copy(problem = null) ?: it }
+        _editor.update {
+            when (it) {
+                is EditorState.Ready -> it.copy(problem = null)
+                is EditorState.Hex -> it.copy(problem = null)
+                else -> it
+            }
+        }
     }
 
     /** Writes [text] back to the open file, keeping its encoding, line endings and mode. */

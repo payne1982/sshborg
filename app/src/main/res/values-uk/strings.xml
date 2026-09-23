@@ -484,6 +484,10 @@
     <string name="editor_binary">Це не текстовий файл, тож тут його не можна редагувати.</string>
     <string name="editor_use_terminal">Його можна відредагувати на сервері в сеансі термінала.</string>
     <string name="editor_read_only">Лише читання</string>
+    <string name="action_undo">Скасувати</string>
+    <string name="editor_hex_subtitle">%1$d байт · заміна</string>
+    <string name="editor_open_hex">Відкрити в HEX</string>
+    <string name="editor_hex">Шістнадцятковий</string>
     <string name="editor_large">Розмір файлу %1$s. Редактор його відкриє, але набір тексту буде повільним.</string>
     <string name="editor_charset">Кодування</string>
     <string name="editor_charset_discard">Читання файлу в іншому кодуванні замінить текст на екрані. Незбережені зміни буде втрачено.</string>

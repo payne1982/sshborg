@@ -45,6 +45,8 @@ import com.sshborg.ui.editor.EditorConfirmDialog
 import com.sshborg.ui.editor.EditorLoading
 import com.sshborg.ui.editor.EditorScreen
 import com.sshborg.ui.editor.EditorState
+import com.sshborg.ui.editor.HexBuffer
+import com.sshborg.ui.editor.HexEditorScreen
 import com.sshborg.ui.editor.EditorUnsupportedDialog
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
@@ -107,6 +109,23 @@ fun SftpScreen(
     val editor by vm.editor.collectAsState()
     when (val e = editor) {
         is EditorState.Loading -> { EditorLoading(e.name); return }
+        is EditorState.Hex -> {
+            // The buffer is remembered against the file, so the edits survive a recomposition
+            // but a different file starts clean.
+            val bytes = vm.hexBytes()
+            if (bytes != null) {
+                val buffer = remember(e.path, bytes) { HexBuffer(bytes) }
+                LaunchedEffect(e.savedAt) { if (e.savedAt > 0L) buffer.markSaved() }
+                HexEditorScreen(
+                    state = e,
+                    buffer = buffer,
+                    onSave = vm::saveHex,
+                    onClose = vm::closeEditor,
+                    onDismissProblem = vm::dismissEditorProblem,
+                )
+            }
+            return
+        }
         is EditorState.Ready -> {
             EditorScreen(
                 state = e,
@@ -482,6 +501,7 @@ fun SftpScreen(
         is EditorState.Unsupported -> EditorUnsupportedDialog(
             state = e,
             onView = { vm.openEditor(e.path, readOnly = true) },
+            onHex = { vm.openHex(e.path) },
             onDismiss = vm::closeEditor,
         )
         is EditorState.Failed -> ErrorReportDialog(

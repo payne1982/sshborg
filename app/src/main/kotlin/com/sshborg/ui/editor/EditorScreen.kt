@@ -292,6 +292,7 @@ private val DraftSaver: Saver<TextFieldState, Any> = Saver(
 fun EditorUnsupportedDialog(
     state: EditorState.Unsupported,
     onView: () -> Unit,
+    onHex: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     // Too big to edit is not too big to read, so the offer stands right up to the view ceiling.
@@ -311,15 +312,25 @@ fun EditorUnsupportedDialog(
                         EditorState.Reason.BINARY -> stringResource(R.string.editor_binary)
                     }
                 )
-                Text(
-                    stringResource(R.string.editor_use_terminal),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                // The terminal is the answer for a file too big for us, not for a binary:
+                // that one has the hex editor now.
+                if (state.reason == EditorState.Reason.TOO_LARGE) {
+                    Text(
+                        stringResource(R.string.editor_use_terminal),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
         confirmButton = {
             Row {
+                // Not text is not the end of the road any more: the bytes can still be opened.
+                if (state.reason == EditorState.Reason.BINARY) {
+                    androidx.compose.material3.TextButton(onClick = onHex) {
+                        Text(stringResource(R.string.editor_open_hex))
+                    }
+                }
                 if (canView) {
                     androidx.compose.material3.TextButton(onClick = onView) {
                         Text(stringResource(R.string.editor_read_only))
