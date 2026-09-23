@@ -72,18 +72,15 @@ fun EditorScreen(
     onCharset: (java.nio.charset.Charset) -> Unit = {},
     onDismissProblem: () -> Unit = {},
 ) {
-    // Keyed on the charset too: reading the file another way replaces the text, which is the
-    // point of changing it — the user only does so because what they are looking at is wrong.
-    val text = rememberSaveable(state.path, state.decoded.charset.name(), saver = DraftSaver) {
-        TextFieldState(state.decoded.text)
-    }
-    // Carried rather than worked out: comparing the whole text against the original on every
-    // recomposition is one more pass over the file per keystroke, which is exactly what this
-    // screen cannot afford. The edit callback sets it, a landed save clears it.
-    var dirty by rememberSaveable(state.path, state.decoded.charset.name()) { mutableStateOf(false) }
-    // Guarded on the change count: this also runs when only the cursor moves, and a cursor
-    // moved is not a file edited.
-    val markDirty = remember { InputTransformation { if (changes.changeCount > 0) dirty = true } }
+    // The draft is not held here any more — the widget owns the text. It is pulled out of it at
+    // the moment Android asks for the saved state, which is the only moment it is needed, and
+    // dropped when it is too big to travel in a Bundle. See [EDITOR_MAX_DRAFT].
+    var codeEditor by remember { mutableStateOf<io.github.rosemoe.sora.widget.CodeEditor?>(null) }
+    val key = state.path to state.decoded.charset.name()
+    val draft = rememberSaveable(key, saver = DraftSaver) { Draft(null) }
+    val shown = draft.restored ?: state.decoded.text
+
+    var dirty by rememberSaveable(key) { mutableStateOf(draft.restored != null) }
     LaunchedEffect(state.savedAt) { if (state.savedAt > 0L) dirty = false }
     var confirmDiscard by rememberSaveable(state.path) { mutableStateOf(false) }
     var showCharsets by rememberSaveable(state.path) { mutableStateOf(false) }
@@ -116,7 +113,7 @@ fun EditorScreen(
                     else if (state.saving) {
                         CircularProgressIndicator(Modifier.padding(horizontal = 16.dp).size(20.dp))
                     } else {
-                        IconButton(onClick = { onSave(text.text.toString()) }, enabled = dirty) {
+                        IconButton(onClick = { codeEditor?.let { onSave(it.text.toString()) } }, enabled = dirty) {
                             Icon(Icons.Default.Check, stringResource(R.string.action_save))
                         }
                     }
@@ -130,33 +127,14 @@ fun EditorScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
-            if (state.readOnly) {
-                ReadOnlyText(state.decoded.text, Modifier.weight(1f))
-            } else {
-                // BasicTextField, not the Material one: this is a whole screen of monospace
-                // text, so the decoration, the indicator and the label are all things to
-                // switch off again.
-                BasicTextField(
-                    state = text,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = 12.dp),
-                    textStyle = TextStyle(
-                        fontFamily = com.sshborg.ui.common.monoFont(),
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    lineLimits = TextFieldLineLimits.MultiLine(),
-                    inputTransformation = markDirty,
-                    // A configuration file is not prose: no capitals, no autocorrect, no spell check.
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrectEnabled = false,
-                    ),
-                )
-            }
+            SoraEditor(
+                text = shown,
+                textKey = key,
+                readOnly = state.readOnly,
+                onDirty = { dirty = true },
+                onEditor = { codeEditor = it; draft.editor = it },
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            )
             StatusLine(
                 state = state,
                 dirty = dirty,
@@ -313,14 +291,19 @@ fun EditorLoading(state: EditorState.Loading, onCancel: () -> Unit) {
     }
 }
 
+/** Holds the live widget, so the saved state can be taken from it, and what came back. */
+private class Draft(val restored: String?) {
+    var editor: io.github.rosemoe.sora.widget.CodeEditor? = null
+}
+
 /**
  * Keeps the text across a process death, and drops a draft too big to travel in a Bundle
  * instead of taking the app down with a TransactionTooLargeException — returning null from
  * save means "do not keep this". The cursor is not kept; the text is what matters.
  */
-private val DraftSaver: Saver<TextFieldState, Any> = Saver(
-    save = { it.text.takeIf { t -> t.length <= EDITOR_MAX_DRAFT }?.toString() },
-    restore = { TextFieldState(it as String) },
+private val DraftSaver: Saver<Draft, Any> = Saver(
+    save = { it.editor?.text?.toString()?.takeIf { t -> t.length <= EDITOR_MAX_DRAFT } },
+    restore = { Draft(it as String) },
 )
 
 /**

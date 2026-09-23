@@ -92,5 +92,6 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.sora.editor)
     debugImplementation(libs.androidx.ui.tooling)
 }
