@@ -476,9 +476,14 @@ fun SftpScreen(
         is EditorState.Confirm -> EditorConfirmDialog(
             state = e,
             onOpen = { vm.openEditor(e.path, force = true) },
+            onView = { vm.openEditor(e.path, readOnly = true) },
             onDismiss = vm::closeEditor,
         )
-        is EditorState.Unsupported -> EditorUnsupportedDialog(e, onDismiss = vm::closeEditor)
+        is EditorState.Unsupported -> EditorUnsupportedDialog(
+            state = e,
+            onView = { vm.openEditor(e.path, readOnly = true) },
+            onDismiss = vm::closeEditor,
+        )
         is EditorState.Failed -> ErrorReportDialog(
             ErrorReport(stringResource(R.string.editor_failed), listOf(e.failure)),
             onDismiss = vm::closeEditor,

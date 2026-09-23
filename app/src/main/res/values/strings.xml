@@ -490,6 +490,7 @@
     <string name="editor_too_large">This file is %1$s, more than the %2$s the editor can open.</string>
     <string name="editor_binary">This file is not text, so it cannot be edited here.</string>
     <string name="editor_use_terminal">You can edit it on the server from a terminal session.</string>
+    <string name="editor_read_only">Read only</string>
     <string name="editor_large">This file is %1$s. The editor can open it, but typing in it will feel slow.</string>
     <string name="editor_charset">Encoding</string>
     <string name="editor_charset_discard">Reading the file another way replaces the text on screen. The changes you have not saved will be lost.</string>

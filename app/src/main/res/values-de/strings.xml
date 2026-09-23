@@ -479,6 +479,7 @@
     <string name="editor_too_large">Diese Datei ist %1$s groß, mehr als die %2$s, die der Editor öffnen kann.</string>
     <string name="editor_binary">Diese Datei ist kein Text und kann hier nicht bearbeitet werden.</string>
     <string name="editor_use_terminal">Du kannst sie auf dem Server in einer Terminal-Sitzung bearbeiten.</string>
+    <string name="editor_read_only">Nur lesen</string>
     <string name="editor_large">Diese Datei ist %1$s groß. Der Editor kann sie öffnen, aber das Tippen wird zäh.</string>
     <string name="editor_charset">Kodierung</string>
     <string name="editor_charset_discard">Die Datei anders zu lesen ersetzt den Text auf dem Bildschirm. Nicht gespeicherte Änderungen gehen verloren.</string>

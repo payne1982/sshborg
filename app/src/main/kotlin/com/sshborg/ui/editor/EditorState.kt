@@ -14,6 +14,13 @@ const val EDITOR_MAX_BYTES = 256L * 1024
 const val EDITOR_WARN_BYTES = 64L * 1024
 
 /**
+ * The ceiling for read-only viewing, which is far higher because none of the cost above
+ * applies: with nothing to type into, the lines are an ordinary lazy list and only the ones on
+ * screen exist. What limits it is holding the file in memory, not drawing it.
+ */
+const val EDITOR_VIEW_MAX_BYTES = 4L * 1024 * 1024
+
+/**
  * The largest draft kept across a process death. Saved state travels in a Bundle, and a big one
  * takes the whole app down with a TransactionTooLargeException, so past this the text simply is
  * not kept — the file is small enough to edit, not small enough to carry around.
@@ -40,6 +47,8 @@ sealed interface EditorState {
          * a file that could not be written is exactly when the user must keep their text.
          */
         val problem: FileFailure? = null,
+        /** Shown as a lazy list of lines, with no field to type in — see [EDITOR_VIEW_MAX_BYTES]. */
+        val readOnly: Boolean = false,
     ) : EditorState
 
     /** Big enough to be slow: the user is asked before it is read. */

@@ -22,6 +22,7 @@ import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.service.TransferTask
 import com.sshborg.ui.editor.EDITOR_MAX_BYTES
+import com.sshborg.ui.editor.EDITOR_VIEW_MAX_BYTES
 import com.sshborg.ui.editor.EDITOR_WARN_BYTES
 import com.sshborg.ui.editor.EditorState
 import com.sshborg.ui.editor.TextFile
@@ -97,22 +98,24 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * edited as text, and leaves the result in [editor]. Nothing is written to the phone —
      * the bytes live in the process and go straight back to the server on save.
      */
-    fun openEditor(remotePath: String, force: Boolean = false) {
+    fun openEditor(remotePath: String, force: Boolean = false, readOnly: Boolean = false) {
         val session = sftpSession ?: return
         _editor.value = EditorState.Loading(remotePath)
         viewModelScope.launch(Dispatchers.IO) {
             // Asked before reading, not after: there is no point pulling a file down the wire
             // only to tell the user it is too big to work with.
+            val limit = if (readOnly) EDITOR_VIEW_MAX_BYTES else EDITOR_MAX_BYTES
             val size = runCatching { session.sizeOf(remotePath) }.getOrNull()
-            if (size != null && size > EDITOR_WARN_BYTES && !force) {
-                _editor.value = if (size > EDITOR_MAX_BYTES)
-                    EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
-                else
-                    EditorState.Confirm(remotePath, size)
+            if (size != null && size > limit) {
+                _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, size)
+                return@launch
+            }
+            if (size != null && !readOnly && size > EDITOR_WARN_BYTES && !force) {
+                _editor.value = EditorState.Confirm(remotePath, size)
                 return@launch
             }
             val bytes = try {
-                session.readFile(remotePath, EDITOR_MAX_BYTES)
+                session.readFile(remotePath, limit)
             } catch (e: FileTooLargeException) {
                 _editor.value = EditorState.Unsupported(remotePath, EditorState.Reason.TOO_LARGE, e.size)
                 return@launch
@@ -122,7 +125,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             }
             val decoded = TextFile.decode(bytes)
             editorBytes = if (decoded != null) bytes else null
-            _editor.value = decoded?.let { EditorState.Ready(remotePath, it) }
+            _editor.value = decoded?.let { EditorState.Ready(remotePath, it, readOnly = readOnly) }
                 ?: EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
         }
     }

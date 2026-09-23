@@ -483,6 +483,7 @@
     <string name="editor_too_large">Розмір файлу %1$s — більше, ніж %2$s, які може відкрити редактор.</string>
     <string name="editor_binary">Це не текстовий файл, тож тут його не можна редагувати.</string>
     <string name="editor_use_terminal">Його можна відредагувати на сервері в сеансі термінала.</string>
+    <string name="editor_read_only">Лише читання</string>
     <string name="editor_large">Розмір файлу %1$s. Редактор його відкриє, але набір тексту буде повільним.</string>
     <string name="editor_charset">Кодування</string>
     <string name="editor_charset_discard">Читання файлу в іншому кодуванні замінить текст на екрані. Незбережені зміни буде втрачено.</string>
