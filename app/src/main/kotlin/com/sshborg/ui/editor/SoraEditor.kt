@@ -63,6 +63,12 @@ fun SoraEditor(
                 setTextSize(13f)
                 isWordwrap = true
                 setLineNumberEnabled(true)
+                // sora asks for plain multi-line text, which lets the keyboard capitalise and
+                // correct — in a configuration file that turns PermitRootLogin into Permit
+                // Root Login. The Compose field refused suggestions; so does this one.
+                inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                    android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+                    android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
                 subscribeEvent(
                     ContentChangeEvent::class.java,
                     EventReceiver { event, _ ->
