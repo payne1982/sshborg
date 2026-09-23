@@ -525,6 +525,8 @@
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Hoch- &amp; Herunterladen</a></li>
             <li class="sub"><a href="#sftp">Mehrfachauswahl</a></li>
+            <li class="sub"><a href="#sftp">Dateien bearbeiten</a></li>
+            <li class="sub"><a href="#sftp">Hex-Editor</a></li>
             <li><a href="#ssh-keys">SSH-Schlüssel</a></li>
             <li class="sub"><a href="#ssh-keys">Schlüssel generieren</a></li>
             <li class="sub"><a href="#ssh-keys">Auf Server autorisieren</a></li>
@@ -626,6 +628,13 @@
                 <li><strong>Herunterladen</strong> — lädt alle ausgewählten Dateien und Ordner auf einmal herunter, mit Fortschrittsdialog und Abbruchmöglichkeit.</li>
                 <li><strong>Löschen</strong> — löscht alle ausgewählten Elemente. Das Löschen eines nicht leeren Ordners entfernt alle Inhalte rekursiv. <em>Dies kann nicht rückgängig gemacht werden.</em></li>
             </ul>
+            <h3>Dateien bearbeiten</h3>
+            <p>Öffne das Menü einer Datei — langer Druck oder die Schaltfläche <strong>⋮</strong> — und wähle <strong>Im Editor öffnen</strong>, um sie direkt auf dem Server zu ändern. Auf dem Telefon bleibt nichts: Die Datei wird in den Speicher gelesen, bearbeitet und direkt zurückgeschrieben.</p>
+            <p>Die Datei geht zurück, wie sie kam. Die Zeichenkodierung wird erkannt und beim Speichern wieder verwendet, Zeilenenden (LF oder CRLF) bleiben erhalten, eine Datei ohne abschließenden Zeilenumbruch behält das, und die Rechte bleiben unverändert. Wurde die Kodierung falsch gelesen, tippe sie in der Leiste am unteren Rand an und wähle eine andere — die Liste bietet nur Kodierungen an, die die Bytes dieser Datei exakt wiedergeben können, eine falsche Wahl kann also falsch aussehen, die Datei aber nicht beschädigen.</p>
+            <p>Beim Speichern wird zuerst eine temporäre Datei neben dem Original geschrieben und dann an dessen Stelle umbenannt, damit eine auf halbem Weg verlorene Verbindung keine halb geschriebene Datei zurücklässt.</p>
+            <p>Dateien über 64 KB fragen vor dem Öffnen, weil das Tippen in großen Dateien langsam wird; über 256 KB bietet der Editor stattdessen <strong>Nur lesen</strong> an, was bis 4 MB schnell bleibt. Alles darüber bearbeitest du in einer Terminal-Sitzung mit <code>nano</code> oder <code>vi</code>.</p>
+            <h3>Hex-Editor</h3>
+            <p>Eine Datei, die kein Text ist, öffnet im Hex-Editor: links die Offsets, in der Mitte die Bytes, rechts die druckbaren Zeichen und unten ein Tastenfeld für die Hex-Ziffern. Tippe ein Byte an und gib zwei Ziffern ein, um es zu ersetzen. Werte ändern sich, die Länge nie — jedes Offset bleibt, wo es war. <strong>Hexadezimal öffnen</strong> im Menü einer Datei öffnet jede Datei so, und eine fälschlich für binär gehaltene Textdatei — etwa mit einem versehentlichen NUL-Byte — lässt sich im selben Dialog trotzdem als Text öffnen.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -634,6 +643,7 @@
                     <li><strong>Ordner</strong> — drücke lange auf eine Datei oder einen Ordner, um das Menü zu öffnen: <em>Herunterladen</em>, <em>Umbenennen</em>, <em>Löschen</em>.</li>
                     <li><strong>Mehrfachauswahl</strong> — wähle <em>Elemente auswählen</em> im Menü Aktionen und hake dann die Elemente an. Ein langer Druck öffnet stattdessen das Menü des Elements.</li>
                     <li><strong>Konflikte beim Hochladen</strong> — der Dialog bietet <em>Überschreiben</em>, <em>Beide behalten</em> (die hochgeladene Datei bekommt einen neuen Namen) oder <em>Abbrechen</em>.</li>
+                    <li><strong>Bearbeiten</strong> — der Datei-Editor und der Hex-Editor gibt es vorerst nur unter Android.</li>
                 </ul>
             </div>
         </div>

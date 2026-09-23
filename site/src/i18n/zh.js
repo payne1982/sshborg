@@ -94,6 +94,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">浏览</a></li>
             <li class="sub"><a href="#sftp">上传与下载</a></li>
             <li class="sub"><a href="#sftp">批量选择</a></li>
+            <li class="sub"><a href="#sftp">编辑文件</a></li>
+            <li class="sub"><a href="#sftp">十六进制编辑器</a></li>
             <li><a href="#ssh-keys">SSH 密钥</a></li>
             <li class="sub"><a href="#ssh-keys">生成密钥</a></li>
             <li class="sub"><a href="#ssh-keys">在服务器授权</a></li>
@@ -185,6 +187,13 @@ module.exports = {
                 <li><strong>下载</strong> — 一次性下载所有选中的文件和文件夹，带进度对话框和取消支持。</li>
                 <li><strong>删除</strong> — 删除所有选中的项目。删除非空文件夹会递归删除其所有内容。<em>此操作不可撤销。</em></li>
             </ul>
+            <h3>编辑文件</h3>
+            <p>打开文件菜单（长按，或 <strong>⋮</strong> 按钮），选择<strong>在编辑器中打开</strong>，即可直接在服务器上修改。手机上不留任何文件：内容读入内存、编辑后直接写回服务器。</p>
+            <p>文件原样返回。字符编码会被识别并在保存时沿用，LF 或 CRLF 换行符保持不变，原本结尾没有换行的文件依旧没有，权限也不变。如果编码判断有误，点一下编辑器底部那一行换一个即可——列表里只有能够原样还原该文件字节的编码，所以选错只会显示错乱，不会损坏文件。</p>
+            <p>保存时先在原文件旁写入临时文件，再改名顶替，因此连接中途断开也不会在服务器上留下写了一半的文件。</p>
+            <p>超过 64 KB 的文件会先询问，因为在大文件里输入会变慢；超过 256 KB 则改为提供<strong>只读</strong>，只读方式直到 4 MB 都很流畅。再大的文件，请在终端会话中用 <code>nano</code> 或 <code>vi</code> 编辑。</p>
+            <h3>十六进制编辑器</h3>
+            <p>非文本文件会在十六进制编辑器中打开：左侧是偏移量，中间是字节，右侧是可打印字符，底部是十六进制数字键盘。点选一个字节并输入两位数字即可替换。数值会变，长度不变，因此文件中每个偏移量都保持原位。文件菜单中的<strong>以十六进制打开</strong>可以用这种方式打开任何文件；被误判为二进制的文本文件（例如混入了一个 NUL 字节）仍可从同一个对话框以文本方式打开。</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -193,6 +202,7 @@ module.exports = {
                     <li><strong>文件夹</strong> — 长按文件或文件夹打开其菜单：<em>下载</em>、<em>重命名</em>、<em>删除</em>。</li>
                     <li><strong>多选</strong> — 在“操作”菜单中选择<em>选择项目</em>，然后勾选项目。长按则会打开该项目的菜单。</li>
                     <li><strong>上传冲突</strong> — 对话框提供<em>覆盖</em>、<em>保留两者</em>（上传的文件会获得新名称）或<em>取消</em>。</li>
+                    <li><strong>编辑</strong> — 文件编辑器和十六进制编辑器目前仅在 Android 上提供。</li>
                 </ul>
             </div>`,
 

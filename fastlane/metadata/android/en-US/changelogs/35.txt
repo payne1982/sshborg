@@ -1,0 +1,3 @@
+• SFTP: edit text files on the server without downloading them; encoding, line endings and permissions are kept
+• SFTP: files too big to edit open read-only, up to 4 MB
+• SFTP: files that are not text open in a hex editor

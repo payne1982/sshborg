@@ -525,6 +525,8 @@
             <li class="sub"><a href="#sftp">Navegação</a></li>
             <li class="sub"><a href="#sftp">Carregar e transferir</a></li>
             <li class="sub"><a href="#sftp">Seleção múltipla</a></li>
+            <li class="sub"><a href="#sftp">Editar ficheiros</a></li>
+            <li class="sub"><a href="#sftp">Editor hexadecimal</a></li>
             <li><a href="#ssh-keys">Chaves SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Gerar uma chave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizar no servidor</a></li>
@@ -626,6 +628,13 @@
                 <li><strong>Transferir</strong> — transfere todos os ficheiros e pastas selecionados de uma só vez, com uma caixa de diálogo de progresso e possibilidade de cancelamento.</li>
                 <li><strong>Eliminar</strong> — elimina todos os itens selecionados. Eliminar uma pasta não vazia remove todo o seu conteúdo de forma recursiva. <em>Esta ação não pode ser desfeita.</em></li>
             </ul>
+            <h3>Editar ficheiros</h3>
+            <p>Abra o menu de um ficheiro — toque longo, ou o botão <strong>⋮</strong> — e escolha <strong>Abrir no editor</strong> para o alterar diretamente no servidor. No telemóvel não fica nada: o ficheiro é lido para memória, editado e escrito de volta.</p>
+            <p>O ficheiro volta como chegou. A codificação é detetada e reutilizada ao guardar, os fins de linha LF ou CRLF mantêm-se, um ficheiro que acabava sem mudança de linha continua assim, e as permissões ficam iguais. Se a codificação foi lida mal, toque nela na barra ao fundo do editor e escolha outra — a lista só oferece codificações capazes de reproduzir exatamente os bytes daquele ficheiro, por isso uma escolha errada pode parecer errada no ecrã mas não danifica nada.</p>
+            <p>Ao guardar, é escrito um ficheiro temporário ao lado do original e depois renomeado para o lugar dele, de modo que uma ligação perdida a meio não deixa um ficheiro escrito pela metade no servidor.</p>
+            <p>Ficheiros acima de 64 KB perguntam antes de abrir, porque escrever num ficheiro grande fica lento; acima de 256 KB o editor oferece <strong>só leitura</strong>, que continua rápida até 4 MB. Acima disso, edite o ficheiro numa sessão de terminal com <code>nano</code> ou <code>vi</code>.</p>
+            <h3>Editor hexadecimal</h3>
+            <p>Um ficheiro que não é texto abre no editor hexadecimal: os deslocamentos à esquerda, os bytes ao centro, os caracteres imprimíveis à direita e um teclado para os dígitos hexadecimais. Toque num byte e escreva dois dígitos para o substituir. Os valores mudam mas o tamanho nunca, por isso cada posição do ficheiro fica onde estava. <strong>Abrir em hexadecimal</strong> no menu de um ficheiro abre assim qualquer ficheiro, e um ficheiro de texto tomado por binário — com um byte NUL perdido lá dentro — ainda pode ser aberto como texto na mesma caixa.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -634,6 +643,7 @@
                     <li><strong>Pastas</strong> — toque longamente num ficheiro ou numa pasta para abrir o respetivo menu: <em>Transferir</em>, <em>Renomear</em>, <em>Eliminar</em>.</li>
                     <li><strong>Seleção múltipla</strong> — escolha <em>Selecionar itens</em> no menu Ações e depois marque os itens. Um toque longo abre antes o menu do item.</li>
                     <li><strong>Conflitos ao enviar</strong> — a caixa de diálogo oferece <em>Substituir</em>, <em>Manter ambos</em> (o ficheiro enviado recebe um novo nome) ou <em>Cancelar</em>.</li>
+                    <li><strong>Edição</strong> — o editor de ficheiros e o hexadecimal existem, para já, só no Android.</li>
                 </ul>
             </div>
         </div>

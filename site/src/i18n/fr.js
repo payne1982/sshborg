@@ -92,6 +92,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Envoyer et télécharger</a></li>
             <li class="sub"><a href="#sftp">Sélection multiple</a></li>
+            <li class="sub"><a href="#sftp">Modifier les fichiers</a></li>
+            <li class="sub"><a href="#sftp">Éditeur hexadécimal</a></li>
             <li><a href="#ssh-keys">Clés SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Générer une clé</a></li>
             <li class="sub"><a href="#ssh-keys">Autoriser sur le serveur</a></li>
@@ -183,6 +185,13 @@ module.exports = {
                 <li><strong>Télécharger</strong> — télécharge tous les fichiers et dossiers sélectionnés en une seule fois, avec une boîte de dialogue de progression et la possibilité d'annuler.</li>
                 <li><strong>Supprimer</strong> — supprime tous les éléments sélectionnés. La suppression d'un dossier non vide efface tout son contenu de manière récursive. <em>Cette action est irréversible.</em></li>
             </ul>
+            <h3>Modifier les fichiers</h3>
+            <p>Ouvrez le menu d'un fichier — appui long, ou le bouton <strong>⋮</strong> — et choisissez <strong>Ouvrir dans l'éditeur</strong> pour le modifier directement sur le serveur. Rien n'est conservé sur le téléphone : le fichier est lu en mémoire, modifié, puis réécrit sur le serveur.</p>
+            <p>Le fichier repart tel qu'il est arrivé. Son encodage est détecté et réutilisé à l'enregistrement, les fins de ligne LF ou CRLF sont préservées, un fichier qui se terminait sans retour à la ligne le reste, et les droits ne changent pas. Si l'encodage a été mal lu, touchez-le dans la barre en bas de l'éditeur et choisissez-en un autre — la liste ne propose que des encodages capables de reproduire exactement les octets de ce fichier : un mauvais choix peut s'afficher de travers, il ne peut pas abîmer le fichier.</p>
+            <p>L'enregistrement écrit un fichier temporaire à côté de l'original puis le renomme à sa place, de sorte qu'une connexion perdue en cours de route ne laisse jamais un fichier à moitié écrit sur le serveur.</p>
+            <p>Au-delà de 64 Ko, l'ouverture demande confirmation, car la saisie devient lente dans un gros fichier ; au-delà de 256 Ko l'éditeur propose la <strong>lecture seule</strong>, qui reste rapide jusqu'à 4 Mo. Plus gros que cela, modifiez le fichier depuis une session terminal avec <code>nano</code> ou <code>vi</code>.</p>
+            <h3>Éditeur hexadécimal</h3>
+            <p>Un fichier qui n'est pas du texte s'ouvre dans l'éditeur hexadécimal : les décalages à gauche, les octets au milieu, les caractères imprimables à droite, et un pavé pour les chiffres hexadécimaux. Touchez un octet et tapez deux chiffres pour le remplacer. Les valeurs changent, jamais la longueur : chaque position du fichier reste où elle était. <strong>Ouvrir en hexadécimal</strong> dans le menu d'un fichier ouvre ainsi n'importe quel fichier, et un fichier texte pris pour un binaire — avec un octet NUL égaré — peut tout de même être ouvert comme texte depuis la même boîte de dialogue.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -191,6 +200,7 @@ module.exports = {
                     <li><strong>Dossiers</strong> — appuyez longuement sur un fichier ou un dossier pour ouvrir son menu : <em>Télécharger</em>, <em>Renommer</em>, <em>Supprimer</em>.</li>
                     <li><strong>Sélection multiple</strong> — choisissez <em>Sélectionner des éléments</em> dans le menu Actions, puis cochez les éléments. Un appui long ouvre plutôt le menu de l'élément.</li>
                     <li><strong>Conflits à l'envoi</strong> — la boîte de dialogue propose <em>Écraser</em>, <em>Conserver les deux</em> (le fichier envoyé reçoit un nouveau nom) ou <em>Annuler</em>.</li>
+                    <li><strong>Édition</strong> — l'éditeur de fichiers et l'éditeur hexadécimal sont pour l'instant réservés à Android.</li>
                 </ul>
             </div>`,
 

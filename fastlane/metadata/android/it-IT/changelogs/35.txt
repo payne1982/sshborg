@@ -1,0 +1,3 @@
+• SFTP: modifica i file di testo sul server senza scaricarli; codifica, fine riga e permessi restano invariati
+• SFTP: i file troppo grandi per l'editor si aprono in sola lettura, fino a 4 MB
+• SFTP: i file che non sono testo si aprono in un editor esadecimale
