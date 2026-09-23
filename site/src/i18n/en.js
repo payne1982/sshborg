@@ -95,6 +95,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Upload &amp; download</a></li>
             <li class="sub"><a href="#sftp">Multi-select</a></li>
+            <li class="sub"><a href="#sftp">Editing files</a></li>
+            <li class="sub"><a href="#sftp">Hex editor</a></li>
             <li><a href="#ssh-keys">SSH Keys</a></li>
             <li class="sub"><a href="#ssh-keys">Generating a key</a></li>
             <li class="sub"><a href="#ssh-keys">Authorizing on server</a></li>
@@ -186,6 +188,13 @@ module.exports = {
                 <li><strong>Download</strong> — downloads all selected files and folders at once, with a progress dialog and cancellation support.</li>
                 <li><strong>Delete</strong> — deletes all selected items. Deleting a non-empty folder removes all its contents recursively. <em>There is no undo.</em></li>
             </ul>
+            <h3>Editing files</h3>
+            <p>Open a file's menu — a long press, or the <strong>⋮</strong> button — and choose <strong>Open in editor</strong> to change it directly on the server. Nothing is stored on the phone: the file is read into memory, edited, and written straight back.</p>
+            <p>The file goes back as it came. Its character encoding is detected and used again when saving, LF or CRLF line endings are preserved, a file that ended without a newline still does, and the permissions stay as they were. If the encoding was read wrong, tap it in the bar at the bottom of the editor and choose another — the list only offers encodings that can reproduce this file's bytes exactly, so a wrong choice can look wrong on screen but cannot damage the file.</p>
+            <p>Saving writes to a temporary file beside the original and renames it into place, so a connection lost halfway cannot leave a half-written file on the server.</p>
+            <p>Files over 64 KB ask before opening, because typing in a large file gets slow; over 256 KB the editor offers <strong>read only</strong> instead, which stays fast up to 4 MB. For anything larger, edit the file from a terminal session with <code>nano</code> or <code>vi</code>.</p>
+            <h3>Hex editor</h3>
+            <p>A file that is not text opens in the hex editor: offsets on the left, the bytes in the middle, the printable characters on the right, and a keypad for the hex digits. Tap a byte and type two digits to replace it. Values change but the length never does, so every offset in the file stays where it was. <strong>Open in hex</strong> in a file's menu opens any file this way, and a text file mistaken for binary — one with a stray NUL byte in it — can still be opened as text from the same dialog.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -194,6 +203,7 @@ module.exports = {
                     <li><strong>Folders</strong> — long-press a file or folder for its menu: <em>Download</em>, <em>Rename</em>, <em>Delete</em>.</li>
                     <li><strong>Multi-select</strong> — choose <em>Select items</em> in the Actions menu, then tick the items. A long press opens the item's menu instead.</li>
                     <li><strong>Upload conflicts</strong> — the dialog offers <em>Overwrite</em>, <em>Keep both</em> (the upload gets a new name) or <em>Cancel</em>.</li>
+                    <li><strong>Editing</strong> — the file editor and the hex editor are on Android only for now.</li>
                 </ul>
             </div>`,
 

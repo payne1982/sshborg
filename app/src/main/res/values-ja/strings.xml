@@ -276,6 +276,8 @@
     <string name="sftp_mkdir_folder_name">フォルダ名</string>
 
     <string name="sftp_menu_open">開く</string>
+    <string name="sftp_menu_edit">エディタで開く</string>
+    <string name="sftp_menu_hex">16進数で開く</string>
     <string name="sftp_menu_rename">名前変更</string>
     <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
     <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>
@@ -471,4 +473,29 @@
     <string name="settings_host_sort_manual">手動</string>
     <string name="hosts_move_up">上へ移動</string>
     <string name="hosts_move_down">下へ移動</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">エディタ</string>
+    <string name="editor_unsaved_title">未保存の変更</string>
+    <string name="editor_unsaved_message">エディタを閉じて、変更を破棄しますか？</string>
+    <string name="editor_discard">破棄</string>
+    <string name="editor_unsaved">未保存</string>
+    <string name="editor_saved">保存済み</string>
+    <string name="editor_mixed_endings">改行コード混在</string>
+    <string name="editor_too_large">このファイルは %1$s で、エディタで開ける %2$s を超えています。</string>
+    <string name="editor_binary">このファイルはテキストではないため、ここでは編集できません。</string>
+    <string name="editor_use_terminal">ターミナルのセッションからサーバー上で編集できます。</string>
+    <string name="editor_read_only">読み取り専用</string>
+    <string name="editor_loading">読み込み中…</string>
+    <string name="editor_open_as_text">それでもテキストとして開く</string>
+    <string name="action_undo">元に戻す</string>
+    <string name="editor_hex_subtitle">%1$d バイト · 上書き</string>
+    <string name="editor_open_hex">16進数で開く</string>
+    <string name="editor_hex">16進数</string>
+    <string name="editor_large">このファイルは %1$s です。エディタで開けますが、入力は遅くなります。</string>
+    <string name="editor_too_large_to_edit">このファイルは %1$s で、エディタで開ける %2$s を超えています。読むことはできます。</string>
+    <string name="editor_charset">文字コード</string>
+    <string name="editor_charset_discard">別の文字コードで読み直すと、画面のテキストが置き換わります。保存していない変更は失われます。</string>
+    <string name="editor_cannot_encode">テキストに %1$s では書き出せない文字が含まれています。保存するには別の文字コードを選んでください。</string>
+    <string name="editor_save_failed">保存できません</string>
 </resources>

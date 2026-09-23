@@ -1,0 +1,39 @@
+<en-US>
+• SFTP: a built-in editor for the files on your server — text files are edited in place and keep their encoding, line endings and permissions, files too big to edit open read-only up to 4 MB, and anything that is not text opens in a hex editor
+</en-US>
+
+<it-IT>
+• SFTP: editor integrato per i file sul server — i file di testo si modificano sul posto e mantengono codifica, fine riga e permessi, quelli troppo grandi si aprono in sola lettura fino a 4 MB, e ciò che non è testo si apre in un editor esadecimale
+</it-IT>
+
+<de-DE>
+• SFTP: eingebauter Editor für die Dateien auf dem Server — Textdateien werden direkt dort bearbeitet und behalten Kodierung, Zeilenenden und Rechte, zu große Dateien öffnen schreibgeschützt bis 4 MB, und alles, was kein Text ist, öffnet im Hex-Editor
+</de-DE>
+
+<es-ES>
+• SFTP: editor integrado para los archivos del servidor — los de texto se editan allí mismo y conservan codificación, fin de línea y permisos, los demasiado grandes se abren en solo lectura hasta 4 MB, y lo que no es texto se abre en un editor hexadecimal
+</es-ES>
+
+<fr-FR>
+• SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage, fins de ligne et droits, les trop gros s'ouvrent en lecture seule jusqu'à 4 Mo, et ce qui n'est pas du texte s'ouvre dans un éditeur hexadécimal
+</fr-FR>
+
+<pt-PT>
+• SFTP: editor integrado para os ficheiros no servidor — os de texto são editados no próprio servidor e mantêm codificação, fins de linha e permissões, os demasiado grandes abrem em só leitura até 4 MB, e o que não é texto abre num editor hexadecimal
+</pt-PT>
+
+<uk>
+• SFTP: вбудований редактор для файлів на сервері — текстові файли редагуються на місці й зберігають кодування, кінці рядків і права, завеликі відкриваються лише для читання до 4 МБ, а все, що не є текстом, відкривається в шістнадцятковому редакторі
+</uk>
+
+<ru-RU>
+• SFTP: встроенный редактор для файлов на сервере — текстовые файлы правятся прямо там и сохраняют кодировку, переводы строк и права, слишком большие открываются только для чтения до 4 МБ, а всё нетекстовое — в шестнадцатеричном редакторе
+</ru-RU>
+
+<zh-CN>
+• SFTP：内置编辑器，可直接编辑服务器上的文件——文本文件就地修改，编码、换行符和权限保持不变；过大的文件以只读方式打开，最大 4 MB；非文本文件在十六进制编辑器中打开
+</zh-CN>
+
+<ja-JP>
+• SFTP: サーバー上のファイルを直接編集できるエディタを内蔵しました。テキストファイルは文字コード・改行コード・権限をそのままに編集でき、編集には大きすぎるファイルは 4 MB まで読み取り専用で開け、テキストでないファイルは16進エディタで開きます
+</ja-JP>

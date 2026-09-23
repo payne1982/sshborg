@@ -93,6 +93,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navigazione</a></li>
             <li class="sub"><a href="#sftp">Carica e scarica</a></li>
             <li class="sub"><a href="#sftp">Selezione multipla</a></li>
+            <li class="sub"><a href="#sftp">Modificare i file</a></li>
+            <li class="sub"><a href="#sftp">Editor esadecimale</a></li>
             <li><a href="#ssh-keys">Chiavi SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Generare una chiave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizzare sul server</a></li>
@@ -184,6 +186,13 @@ module.exports = {
                 <li><strong>Scarica</strong> — scarica tutti i file e le cartelle selezionati in una volta, con un dialogo di avanzamento e supporto all'annullamento.</li>
                 <li><strong>Elimina</strong> — elimina tutti gli elementi selezionati. L'eliminazione di una cartella non vuota rimuove tutto il suo contenuto ricorsivamente. <em>Non è possibile annullare l'operazione.</em></li>
             </ul>
+            <h3>Modificare i file</h3>
+            <p>Apri il menu di un file — pressione prolungata, oppure il pulsante <strong>⋮</strong> — e scegli <strong>Apri nell'editor</strong> per modificarlo direttamente sul server. Sul telefono non resta niente: il file viene letto in memoria, modificato e riscritto sul server.</p>
+            <p>Il file torna com'era arrivato. La codifica dei caratteri viene riconosciuta e riusata al salvataggio, la fine riga LF o CRLF viene mantenuta, un file che finiva senza a capo continua a finire senza, e i permessi restano quelli. Se la codifica è stata letta male, toccala nella barra in fondo all'editor e scegline un'altra — l'elenco propone solo codifiche in grado di riprodurre esattamente i byte di quel file, quindi una scelta sbagliata può sembrare sbagliata a schermo ma non può rovinare il file.</p>
+            <p>Il salvataggio scrive su un file temporaneo affianco all'originale e poi lo rinomina al suo posto, così una connessione caduta a metà non può lasciare un file scritto a metà sul server.</p>
+            <p>I file oltre 64 KB chiedono conferma prima di aprirsi, perché scrivere in un file grande diventa lento; oltre 256 KB l'editor propone la <strong>sola lettura</strong>, che resta veloce fino a 4 MB. Per file ancora più grandi, modificali da una sessione terminale con <code>nano</code> o <code>vi</code>.</p>
+            <h3>Editor esadecimale</h3>
+            <p>Un file che non è testo si apre nell'editor esadecimale: gli scostamenti a sinistra, i byte al centro, i caratteri stampabili a destra e un tastierino per le cifre esadecimali. Tocca un byte e digita due cifre per sostituirlo. I valori cambiano ma la lunghezza no, quindi ogni posizione nel file resta dov'era. <strong>Apri in esadecimale</strong> nel menu di un file apre così qualunque file, e un file di testo scambiato per binario — per esempio con un byte NUL finito lì per sbaglio — si può comunque aprire come testo dallo stesso dialogo.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -192,6 +201,7 @@ module.exports = {
                     <li><strong>Cartelle</strong> — tieni premuto un file o una cartella per il suo menu: <em>Scarica</em>, <em>Rinomina</em>, <em>Elimina</em>.</li>
                     <li><strong>Selezione multipla</strong> — scegli <em>Seleziona elementi</em> nel menu Azioni, poi spunta gli elementi. Una pressione prolungata apre invece il menu dell'elemento.</li>
                     <li><strong>Conflitti in caricamento</strong> — la finestra offre <em>Sovrascrivi</em>, <em>Mantieni entrambi</em> (il file caricato riceve un nuovo nome) o <em>Annulla</em>.</li>
+                    <li><strong>Modifica</strong> — l'editor dei file e quello esadecimale per ora sono solo su Android.</li>
                 </ul>
             </div>`,
 

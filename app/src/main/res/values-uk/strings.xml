@@ -262,6 +262,8 @@
     <string name="sftp_mkdir_folder_name">Назва папки</string>
 
     <string name="sftp_menu_open">Відкрити</string>
+    <string name="sftp_menu_edit">Відкрити в редакторі</string>
+    <string name="sftp_menu_hex">Відкрити в HEX</string>
     <string name="sftp_menu_rename">Перейменувати</string>
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
@@ -470,4 +472,29 @@
     <string name="settings_host_sort_manual">Вручну</string>
     <string name="hosts_move_up">Перемістити вгору</string>
     <string name="hosts_move_down">Перемістити вниз</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Редактор</string>
+    <string name="editor_unsaved_title">Незбережені зміни</string>
+    <string name="editor_unsaved_message">Закрити редактор і втратити зроблені зміни?</string>
+    <string name="editor_discard">Відкинути</string>
+    <string name="editor_unsaved">не збережено</string>
+    <string name="editor_saved">збережено</string>
+    <string name="editor_mixed_endings">мішані кінці рядків</string>
+    <string name="editor_too_large">Розмір файлу %1$s — більше, ніж %2$s, які може відкрити редактор.</string>
+    <string name="editor_binary">Це не текстовий файл, тож тут його не можна редагувати.</string>
+    <string name="editor_use_terminal">Його можна відредагувати на сервері в сеансі термінала.</string>
+    <string name="editor_read_only">Лише читання</string>
+    <string name="editor_loading">Читання…</string>
+    <string name="editor_open_as_text">Усе одно відкрити як текст</string>
+    <string name="action_undo">Скасувати</string>
+    <string name="editor_hex_subtitle">%1$d байт · заміна</string>
+    <string name="editor_open_hex">Відкрити в HEX</string>
+    <string name="editor_hex">Шістнадцятковий</string>
+    <string name="editor_large">Розмір файлу %1$s. Редактор його відкриє, але набір тексту буде повільним.</string>
+    <string name="editor_too_large_to_edit">Розмір файлу %1$s — більше, ніж %2$s, які може відкрити редактор. Прочитати його все одно можна.</string>
+    <string name="editor_charset">Кодування</string>
+    <string name="editor_charset_discard">Читання файлу в іншому кодуванні замінить текст на екрані. Незбережені зміни буде втрачено.</string>
+    <string name="editor_cannot_encode">У тексті є символи, які %1$s не може записати. Виберіть інше кодування, щоб зберегти його.</string>
+    <string name="editor_save_failed">Не збережено</string>
 </resources>

@@ -197,32 +197,9 @@ fun TvSelectField(
             text = {
                 // Capped so a long list (e.g. all languages) stays compact on a short
                 // landscape TV screen — about four rows show, the rest scrolls with the
-                // D-pad as focus moves down. Chevrons at the edges signal hidden rows.
-                val scroll = rememberScrollState()
-                Box {
-                    Column(
-                        Modifier
-                            .heightIn(max = 216.dp)
-                            .verticalScroll(scroll)
-                    ) {
-                        menuItems { open = false }
-                    }
-                    if (scroll.canScrollBackward) {
-                        Icon(
-                            Icons.Filled.KeyboardArrowUp,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.align(Alignment.TopCenter),
-                        )
-                    }
-                    if (scroll.canScrollForward) {
-                        Icon(
-                            Icons.Filled.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
-                    }
+                // D-pad as focus moves down.
+                ScrollingDialogBody(maxHeight = 216.dp) {
+                    menuItems { open = false }
                 }
             },
             confirmButton = {

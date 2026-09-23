@@ -92,6 +92,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navegación</a></li>
             <li class="sub"><a href="#sftp">Subir y descargar</a></li>
             <li class="sub"><a href="#sftp">Selección múltiple</a></li>
+            <li class="sub"><a href="#sftp">Editar archivos</a></li>
+            <li class="sub"><a href="#sftp">Editor hexadecimal</a></li>
             <li><a href="#ssh-keys">Claves SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Generar una clave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizar en el servidor</a></li>
@@ -183,6 +185,13 @@ module.exports = {
                 <li><strong>Descargar</strong> — descarga todos los archivos y carpetas seleccionados de una vez, con un diálogo de progreso y opción de cancelación.</li>
                 <li><strong>Eliminar</strong> — elimina todos los elementos seleccionados. Eliminar una carpeta no vacía borra todo su contenido de forma recursiva. <em>Esta acción no se puede deshacer.</em></li>
             </ul>
+            <h3>Editar archivos</h3>
+            <p>Abre el menú de un archivo — pulsación larga o el botón <strong>⋮</strong> — y elige <strong>Abrir en el editor</strong> para modificarlo directamente en el servidor. En el teléfono no queda nada: el archivo se lee en memoria, se edita y se escribe de vuelta.</p>
+            <p>El archivo vuelve tal como llegó. Su codificación se detecta y se usa de nuevo al guardar, los finales de línea LF o CRLF se conservan, un archivo que terminaba sin salto de línea sigue igual, y los permisos no cambian. Si la codificación se leyó mal, tócala en la barra inferior del editor y elige otra — la lista solo ofrece codificaciones capaces de reproducir exactamente los bytes de ese archivo, así que una elección equivocada puede verse mal pero no puede dañarlo.</p>
+            <p>Al guardar se escribe un archivo temporal junto al original y luego se renombra en su lugar, de modo que una conexión cortada a medias no puede dejar un archivo escrito a medias en el servidor.</p>
+            <p>Los archivos de más de 64 KB preguntan antes de abrirse, porque escribir en un archivo grande se vuelve lento; por encima de 256 KB el editor ofrece <strong>solo lectura</strong>, que sigue siendo rápida hasta 4 MB. Para tamaños mayores, edítalos desde una sesión de terminal con <code>nano</code> o <code>vi</code>.</p>
+            <h3>Editor hexadecimal</h3>
+            <p>Un archivo que no es texto se abre en el editor hexadecimal: los desplazamientos a la izquierda, los bytes en el centro, los caracteres imprimibles a la derecha y un teclado para los dígitos hexadecimales. Toca un byte y escribe dos dígitos para sustituirlo. Los valores cambian pero la longitud nunca, así que cada posición del archivo sigue donde estaba. <strong>Abrir en hexadecimal</strong> en el menú de un archivo abre así cualquier archivo, y un archivo de texto tomado por binario — con un byte NUL perdido dentro — todavía puede abrirse como texto desde el mismo diálogo.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -191,6 +200,7 @@ module.exports = {
                     <li><strong>Carpetas</strong> — mantén pulsado un archivo o una carpeta para ver su menú: <em>Descargar</em>, <em>Renombrar</em>, <em>Eliminar</em>.</li>
                     <li><strong>Selección múltiple</strong> — elige <em>Seleccionar elementos</em> en el menú Acciones y marca los elementos. Una pulsación larga abre en cambio el menú del elemento.</li>
                     <li><strong>Conflictos al subir</strong> — el diálogo ofrece <em>Sobrescribir</em>, <em>Guardar ambos</em> (el archivo subido recibe un nombre nuevo) o <em>Cancelar</em>.</li>
+                    <li><strong>Edición</strong> — el editor de archivos y el hexadecimal están solo en Android por ahora.</li>
                 </ul>
             </div>`,
 

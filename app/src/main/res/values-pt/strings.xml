@@ -262,6 +262,8 @@
     <string name="sftp_mkdir_folder_name">Nome da pasta</string>
 
     <string name="sftp_menu_open">Abrir</string>
+    <string name="sftp_menu_edit">Abrir no editor</string>
+    <string name="sftp_menu_hex">Abrir em hexadecimal</string>
     <string name="sftp_menu_rename">Renomear</string>
     <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
     <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
@@ -466,4 +468,29 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Mover para cima</string>
     <string name="hosts_move_down">Mover para baixo</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Alterações não guardadas</string>
+    <string name="editor_unsaved_message">Fechar o editor e perder as alterações feitas?</string>
+    <string name="editor_discard">Descartar</string>
+    <string name="editor_unsaved">não guardado</string>
+    <string name="editor_saved">guardado</string>
+    <string name="editor_mixed_endings">fins de linha misturados</string>
+    <string name="editor_too_large">Este ficheiro tem %1$s, mais do que os %2$s que o editor consegue abrir.</string>
+    <string name="editor_binary">Este ficheiro não é texto, por isso não pode ser editado aqui.</string>
+    <string name="editor_use_terminal">Pode editá-lo no servidor a partir de uma sessão de terminal.</string>
+    <string name="editor_read_only">Só leitura</string>
+    <string name="editor_loading">A ler…</string>
+    <string name="editor_open_as_text">Abrir como texto mesmo assim</string>
+    <string name="action_undo">Desfazer</string>
+    <string name="editor_hex_subtitle">%1$d bytes · substituição</string>
+    <string name="editor_open_hex">Abrir em hexadecimal</string>
+    <string name="editor_hex">Hexadecimal</string>
+    <string name="editor_large">Este ficheiro tem %1$s. O editor consegue abri-lo, mas escrever será lento.</string>
+    <string name="editor_too_large_to_edit">Este ficheiro tem %1$s, mais do que os %2$s que o editor consegue abrir. Ainda assim pode ser lido.</string>
+    <string name="editor_charset">Codificação</string>
+    <string name="editor_charset_discard">Ler o ficheiro de outra forma substitui o texto no ecrã. As alterações não guardadas serão perdidas.</string>
+    <string name="editor_cannot_encode">O texto contém caracteres que %1$s não consegue escrever. Escolha outra codificação para o guardar.</string>
+    <string name="editor_save_failed">Não guardado</string>
 </resources>

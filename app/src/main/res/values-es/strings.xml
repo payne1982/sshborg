@@ -262,6 +262,8 @@
     <string name="sftp_mkdir_folder_name">Nombre de carpeta</string>
 
     <string name="sftp_menu_open">Abrir</string>
+    <string name="sftp_menu_edit">Abrir en el editor</string>
+    <string name="sftp_menu_hex">Abrir en hexadecimal</string>
     <string name="sftp_menu_rename">Renombrar</string>
     <string name="sftp_menu_download_in_background">Descargar en segundo plano</string>
     <string name="sftp_background_downloads_title">Descargas en segundo plano</string>
@@ -466,4 +468,29 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Subir</string>
     <string name="hosts_move_down">Bajar</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Cambios sin guardar</string>
+    <string name="editor_unsaved_message">¿Cerrar el editor y perder los cambios hechos?</string>
+    <string name="editor_discard">Descartar</string>
+    <string name="editor_unsaved">sin guardar</string>
+    <string name="editor_saved">guardado</string>
+    <string name="editor_mixed_endings">fin de línea mixto</string>
+    <string name="editor_too_large">Este archivo ocupa %1$s, más de los %2$s que el editor puede abrir.</string>
+    <string name="editor_binary">Este archivo no es texto, así que no se puede editar aquí.</string>
+    <string name="editor_use_terminal">Puedes editarlo en el servidor desde una sesión de terminal.</string>
+    <string name="editor_read_only">Solo lectura</string>
+    <string name="editor_loading">Leyendo…</string>
+    <string name="editor_open_as_text">Abrir como texto igualmente</string>
+    <string name="action_undo">Deshacer</string>
+    <string name="editor_hex_subtitle">%1$d bytes · sobrescritura</string>
+    <string name="editor_open_hex">Abrir en hexadecimal</string>
+    <string name="editor_hex">Hexadecimal</string>
+    <string name="editor_large">Este archivo ocupa %1$s. El editor puede abrirlo, pero escribir será lento.</string>
+    <string name="editor_too_large_to_edit">Este archivo ocupa %1$s, más de los %2$s que el editor puede abrir. Aun así se puede leer.</string>
+    <string name="editor_charset">Codificación</string>
+    <string name="editor_charset_discard">Leer el archivo de otra forma sustituye el texto en pantalla. Se perderán los cambios sin guardar.</string>
+    <string name="editor_cannot_encode">El texto contiene caracteres que %1$s no puede escribir. Elige otra codificación para guardarlo.</string>
+    <string name="editor_save_failed">Sin guardar</string>
 </resources>

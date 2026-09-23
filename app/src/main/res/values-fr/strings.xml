@@ -262,6 +262,8 @@
     <string name="sftp_mkdir_folder_name">Nom du dossier</string>
 
     <string name="sftp_menu_open">Ouvrir</string>
+    <string name="sftp_menu_edit">Ouvrir dans l\'éditeur</string>
+    <string name="sftp_menu_hex">Ouvrir en hexadécimal</string>
     <string name="sftp_menu_rename">Renommer</string>
     <string name="sftp_menu_download_in_background">Télécharger en arrière-plan</string>
     <string name="sftp_background_downloads_title">Téléchargements en arrière-plan</string>
@@ -466,4 +468,29 @@
     <string name="settings_host_sort_manual">Manuel</string>
     <string name="hosts_move_up">Monter</string>
     <string name="hosts_move_down">Descendre</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Éditeur</string>
+    <string name="editor_unsaved_title">Modifications non enregistrées</string>
+    <string name="editor_unsaved_message">Fermer l\'éditeur et perdre les modifications ?</string>
+    <string name="editor_discard">Abandonner</string>
+    <string name="editor_unsaved">non enregistré</string>
+    <string name="editor_saved">enregistré</string>
+    <string name="editor_mixed_endings">fins de ligne mélangées</string>
+    <string name="editor_too_large">Ce fichier fait %1$s, plus que les %2$s que l\'éditeur peut ouvrir.</string>
+    <string name="editor_binary">Ce fichier n\'est pas du texte, il ne peut pas être modifié ici.</string>
+    <string name="editor_use_terminal">Vous pouvez le modifier sur le serveur depuis une session terminal.</string>
+    <string name="editor_read_only">Lecture seule</string>
+    <string name="editor_loading">Lecture…</string>
+    <string name="editor_open_as_text">Ouvrir quand même comme texte</string>
+    <string name="action_undo">Annuler</string>
+    <string name="editor_hex_subtitle">%1$d octets · écrasement</string>
+    <string name="editor_open_hex">Ouvrir en hexadécimal</string>
+    <string name="editor_hex">Hexadécimal</string>
+    <string name="editor_large">Ce fichier fait %1$s. L\'éditeur peut l\'ouvrir, mais la saisie sera lente.</string>
+    <string name="editor_too_large_to_edit">Ce fichier fait %1$s, plus que les %2$s que l\'éditeur peut ouvrir. Il reste lisible.</string>
+    <string name="editor_charset">Encodage</string>
+    <string name="editor_charset_discard">Relire le fichier autrement remplace le texte à l\'écran. Les modifications non enregistrées seront perdues.</string>
+    <string name="editor_cannot_encode">Le texte contient des caractères que %1$s ne peut pas écrire. Choisissez un autre encodage pour l\'enregistrer.</string>
+    <string name="editor_save_failed">Non enregistré</string>
 </resources>

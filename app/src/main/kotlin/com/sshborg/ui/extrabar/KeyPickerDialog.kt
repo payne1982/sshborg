@@ -30,6 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.sshborg.R
+import com.sshborg.ui.common.ScrollingDialogBody
+import androidx.compose.ui.unit.Dp
 import com.sshborg.data.BarAction
 import com.sshborg.data.ExtraKeyDef
 import com.sshborg.data.ModKey
@@ -79,7 +81,9 @@ fun KeyPickerDialog(
         properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.extra_key_picker_title)) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState()).imePadding()) {
+            // No height cap: the dialog window already bounds it, and with the keyboard up the
+            // list needs every row it can keep. imePadding() lifts it above the keyboard.
+            ScrollingDialogBody(modifier = Modifier.imePadding(), maxHeight = Dp.Infinity) {
                 Group(stringResource(R.string.extra_key_group_navigation)) {
                     navigation.forEach { k -> Chip(k.label) { onPick(ExtraKeyDef.Special(k)) } }
                 }
