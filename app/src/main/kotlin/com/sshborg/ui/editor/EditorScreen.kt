@@ -81,6 +81,7 @@ fun EditorScreen(
     val key = state.path to state.decoded.charset.name()
     val draft = rememberSaveable(key, saver = DraftSaver) { Draft(null) }
     val shown = draft.restored ?: state.decoded.text
+    val family = remember(key) { ConfigSyntax.familyOf(state.name, state.decoded.text) }
 
     var dirty by rememberSaveable(key) { mutableStateOf(draft.restored != null) }
     LaunchedEffect(state.savedAt) { if (state.savedAt > 0L) dirty = false }
@@ -149,6 +150,7 @@ fun EditorScreen(
                 text = shown,
                 textKey = key,
                 suggestions = suggestions,
+                family = family,
                 onDirty = { dirty = true },
                 onEditor = { codeEditor = it; draft.editor = it },
                 modifier = Modifier.fillMaxWidth().weight(1f),

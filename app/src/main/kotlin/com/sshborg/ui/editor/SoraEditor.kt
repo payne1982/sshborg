@@ -41,6 +41,8 @@ fun SoraEditor(
     textKey: Any,
     /** Lets the keyboard correct and suggest again — and, with it, dictate. */
     suggestions: Boolean,
+    /** What the file looks like, which decides how it is coloured. */
+    family: ConfigSyntax.Family,
     onDirty: () -> Unit,
     onEditor: (CodeEditor?) -> Unit,
     modifier: Modifier = Modifier,
@@ -60,6 +62,8 @@ fun SoraEditor(
             editor.release()
         }
     }
+
+    LaunchedEffect(editor, family) { editor.setEditorLanguage(ConfigLanguage(family)) }
 
     // Only when the file changes: comparing the widget's content against the string would be a
     // pass over the whole file on every recomposition, which is the cost we are here to avoid.
@@ -107,6 +111,15 @@ fun SoraEditor(
                 setColor(EditorColorScheme.LINE_DIVIDER, colors.outlineVariant.toArgb())
                 setColor(EditorColorScheme.BLOCK_LINE, colors.outlineVariant.toArgb())
                 setColor(EditorColorScheme.SCROLL_BAR_THUMB, colors.outline.toArgb())
+                // Syntax colours. Kept to the theme's own palette so the editor still looks
+                // like the rest of the app, and so they follow the light and dark themes.
+                setColor(EditorColorScheme.COMMENT, colors.onSurfaceVariant.toArgb())
+                setColor(EditorColorScheme.KEYWORD, colors.primary.toArgb())
+                setColor(EditorColorScheme.LITERAL, colors.tertiary.toArgb())
+                setColor(EditorColorScheme.ATTRIBUTE_NAME, colors.secondary.toArgb())
+                setColor(EditorColorScheme.ATTRIBUTE_VALUE, colors.tertiary.toArgb())
+                setColor(EditorColorScheme.HTML_TAG, colors.primary.toArgb())
+                setColor(EditorColorScheme.IDENTIFIER_VAR, colors.secondary.toArgb())
             }
         },
     )
