@@ -69,6 +69,7 @@ module.exports = {
   footer_privacy: '隐私政策',
   footer_issues:  '问题与反馈',
   footer_source:  '源代码',
+  footer_licenses: '许可证',
   footer_powered: 'SSH 连接由以下驱动',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -115,7 +116,8 @@ module.exports = {
             <li><a href="#sessions">多会话</a></li>
             <li><a href="#security">应用安全</a></li>
             <li><a href="#backup">配置备份</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">开源许可证</a></li>`,
 
   doc_adding_host: `
             <h2>// 添加主机</h2>
@@ -191,7 +193,8 @@ module.exports = {
             <p>打开文件菜单（长按，或 <strong>⋮</strong> 按钮），选择<strong>在编辑器中打开</strong>，即可直接在服务器上修改。手机上不留任何文件：内容读入内存、编辑后直接写回服务器。</p>
             <p>文件原样返回。字符编码会被识别并在保存时沿用，LF 或 CRLF 换行符保持不变，原本结尾没有换行的文件依旧没有，权限也不变。如果编码判断有误，点一下编辑器底部那一行换一个即可——列表里只有能够原样还原该文件字节的编码，所以选错只会显示错乱，不会损坏文件。</p>
             <p>保存时先在原文件旁写入临时文件，再改名顶替，因此连接中途断开也不会在服务器上留下写了一半的文件。</p>
-            <p>超过 64 KB 的文件会先询问，因为在大文件里输入会变慢；超过 256 KB 则改为提供<strong>只读</strong>，只读方式直到 4 MB 都很流畅。再大的文件，请在终端会话中用 <code>nano</code> 或 <code>vi</code> 编辑。</p>
+            <p>文件最大可打开 4 MB，无论多长：只绘制屏幕上的行，因此几兆字节的文件与短文件滚动起来一样顺畅。再大的文件请用终端里的 <code>nano</code> 或 <code>vi</code>，那边没有任何上限。</p>
+            <p>配置文件会着色——注释、字符串、数字、键、节标题、shell 变量和 XML 标签——依据文件名判断，文件名看不出时则依据内容的形态：shell 脚本、nginx 与 sshd 风格的配置、INI、YAML、JSON 和 XML。普通文章、笔记和日志则刻意不着色，那里的颜色只会变成干扰。着色只是外观，不会改变任何一个字节。</p>
             <h3>十六进制编辑器</h3>
             <p>非文本文件会在十六进制编辑器中打开：左侧是偏移量，中间是字节，右侧是可打印字符，底部是十六进制数字键盘。点选一个字节并输入两位数字即可替换。数值会变，长度不变，因此文件中每个偏移量都保持原位。文件菜单中的<strong>以十六进制打开</strong>可以用这种方式打开任何文件；被误判为二进制的文本文件（例如混入了一个 NUL 字节）仍可从同一个对话框以文本方式打开。</p>
             <div class="callout callout-ios">
@@ -541,6 +544,17 @@ Host target
             <p>没有键盘时，屏幕键盘仍可用于简短输入：聚焦一个输入框，按 OK 打开，输入后按键盘上的 <strong>OK / 前往</strong> 确认——在密码提示框中这会直接连接。但用屏幕键盘输入 shell 命令并不实用。</p>
             <h3>在 TV 上锁定应用</h3>
             <p>TV 通常没有指纹识别或屏幕锁，因此请用内置的 <strong>PIN 或密码短语</strong> 锁保护应用（设置 → 安全）——它完全可用遥控器或键盘操作。参见 <a href="#security">应用安全</a>。</p>`,
+
+  doc_licenses: `
+            <h2>// 开源许可证</h2>
+            <p>SSHBorg 是自由软件，以 <strong>GNU General Public License v3</strong> 发布。Android 版与 iOS 版的源代码都在 GitHub 上。它使用了以下库，各自遵循自己的许可证：</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android 上的 SSH 协议 —— BSD 风格许可证</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android 上的加密实现 —— MIT 风格许可证</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — 用于在服务器上修改文件的文本编辑控件 —— GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS 上的 SSH 协议 —— BSD 许可证</li>
+            </ul>
+            <p>它们都不会自行连接任何地方：SSHBorg 只会连接你指定的服务器，以及你点击链接时的 sshborg.com。没有任何统计库、广告库或追踪器。</p>`,
 
   doc_backup: `
             <h2>// 配置备份</h2>

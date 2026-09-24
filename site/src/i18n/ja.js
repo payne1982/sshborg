@@ -69,6 +69,7 @@ module.exports = {
   footer_privacy: 'プライバシーポリシー',
   footer_issues:  '問題・フィードバック',
   footer_source:  'ソースコード',
+  footer_licenses: 'ライセンス',
   footer_powered: 'SSH接続は以下で動作',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -115,7 +116,8 @@ module.exports = {
             <li><a href="#sessions">複数セッション</a></li>
             <li><a href="#security">アプリのセキュリティ</a></li>
             <li><a href="#backup">設定のバックアップ</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">オープンソースライセンス</a></li>`,
 
   doc_adding_host: `
             <h2>// ホストの追加</h2>
@@ -191,7 +193,8 @@ module.exports = {
             <p>ファイルのメニュー（長押し、または <strong>⋮</strong> ボタン）から <strong>エディタで開く</strong> を選ぶと、サーバー上のファイルを直接編集できます。端末には何も残りません。ファイルはメモリに読み込まれ、編集され、そのままサーバーへ書き戻されます。</p>
             <p>ファイルは来たときの姿のまま戻ります。文字コードは判別され保存時にも使われ、改行コード（LF または CRLF）は保たれ、末尾に改行がなかったファイルは改行なしのまま、権限も変わりません。文字コードの判別が外れていたら、エディタ下部のバーをタップして選び直せます。一覧にはそのファイルのバイト列をそのまま再現できる文字コードだけが並ぶので、選び間違えても表示が乱れるだけで、ファイルが壊れることはありません。</p>
             <p>保存は元のファイルの隣に一時ファイルを書いてから置き換えるので、途中で接続が切れてもサーバーに書きかけのファイルは残りません。</p>
-            <p>64 KB を超えるファイルは開く前に確認します。大きなファイルでは入力が重くなるためです。256 KB を超えると<strong>読み取り専用</strong>を提案します。こちらは 4 MB まで軽快です。それ以上は、ターミナルのセッションで <code>nano</code> や <code>vi</code> を使って編集してください。</p>
+            <p>ファイルは長さにかかわらず 4 MB まで開けます。画面にある行だけを描くので、数メガバイトのファイルでも短いファイルと同じようにスクロールします。それを超える場合はターミナルの <code>nano</code> や <code>vi</code> が答えで、そちらに上限はありません。</p>
+            <p>設定ファイルには色が付きます。コメント、文字列、数値、キー、セクション見出し、シェル変数、XML タグを、ファイル名から、名前で分からないときは中身の形から判断します。対象はシェルスクリプト、nginx や sshd 形式の設定、INI、YAML、JSON、XML です。普通の文章やメモ、ログは色が邪魔になるだけなので、あえて色を付けません。色は見た目だけのもので、1 バイトも変えません。</p>
             <h3>16進エディタ</h3>
             <p>テキストでないファイルは16進エディタで開きます。左にオフセット、中央にバイト、右に印字可能な文字、下に16進数のキーパッドがあります。バイトをタップして2桁入力すると置き換わります。値は変わりますが長さは変わらないので、ファイル内のすべての位置はそのままです。ファイルのメニューの <strong>16進数で開く</strong> はどんなファイルでもこの方法で開き、バイナリと誤判定されたテキストファイル（NUL バイトが紛れ込んだものなど）は同じダイアログからテキストとして開けます。</p>
             <div class="callout callout-ios">
@@ -541,6 +544,17 @@ Host target
             <p>ない場合でも、画面キーボードで短い入力は可能です。入力欄にフォーカスし、OK で開いて入力し、キーボードの <strong>OK / 実行</strong> で確定します——パスワード入力では直接接続します。ただし画面キーボードでシェルコマンドを入力するのは現実的ではありません。</p>
             <h3>TV でのアプリロック</h3>
             <p>TV には通常、指紋認証や画面ロックがないため、内蔵の <strong>PIN またはパスフレーズ</strong> ロックでアプリを保護してください（設定 → セキュリティ）。リモコンやキーボードだけで完結します。<a href="#security">アプリのセキュリティ</a> を参照。</p>`,
+
+  doc_licenses: `
+            <h2>// オープンソースライセンス</h2>
+            <p>SSHBorg は <strong>GNU General Public License v3</strong> で公開されている自由ソフトウェアです。ソースコードは Android 版・iOS 版とも GitHub にあります。以下のライブラリを、それぞれのライセンスのもとで利用しています。</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android での SSH プロトコル — BSD 系ライセンス</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android での暗号処理 — MIT 系ライセンス</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — サーバー上のファイルを編集するためのテキスト編集ウィジェット — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS での SSH プロトコル — BSD ライセンス</li>
+            </ul>
+            <p>いずれも自分から何かに接続することはありません。SSHBorg が接続するのは、あなたが指定したサーバーと、リンクをタップしたときの sshborg.com だけです。解析ライブラリも広告ライブラリも、いかなるトラッカーもありません。</p>`,
 
   doc_backup: `
             <h2>// 設定のバックアップ</h2>

@@ -12,6 +12,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,24 +74,26 @@ fun EditorScreen(
     onCharset: (java.nio.charset.Charset) -> Unit = {},
     onDismissProblem: () -> Unit = {},
 ) {
-    // Keyed on the charset too: reading the file another way replaces the text, which is the
-    // point of changing it — the user only does so because what they are looking at is wrong.
-    val text = rememberSaveable(state.path, state.decoded.charset.name(), saver = DraftSaver) {
-        TextFieldState(state.decoded.text)
-    }
-    // Carried rather than worked out: comparing the whole text against the original on every
-    // recomposition is one more pass over the file per keystroke, which is exactly what this
-    // screen cannot afford. The edit callback sets it, a landed save clears it.
-    var dirty by rememberSaveable(state.path, state.decoded.charset.name()) { mutableStateOf(false) }
-    // Guarded on the change count: this also runs when only the cursor moves, and a cursor
-    // moved is not a file edited.
-    val markDirty = remember { InputTransformation { if (changes.changeCount > 0) dirty = true } }
+    // The draft is not held here any more — the widget owns the text. It is pulled out of it at
+    // the moment Android asks for the saved state, which is the only moment it is needed, and
+    // dropped when it is too big to travel in a Bundle. See [EDITOR_MAX_DRAFT].
+    var codeEditor by remember { mutableStateOf<io.github.rosemoe.sora.widget.CodeEditor?>(null) }
+    val key = state.path to state.decoded.charset.name()
+    val draft = rememberSaveable(key, saver = DraftSaver) { Draft(null) }
+    val shown = draft.restored ?: state.decoded.text
+    val family = remember(key) { ConfigSyntax.familyOf(state.name, state.decoded.text) }
+
+    var dirty by rememberSaveable(key) { mutableStateOf(draft.restored != null) }
     LaunchedEffect(state.savedAt) { if (state.savedAt > 0L) dirty = false }
+    // Off by default: a configuration file is not prose, and the keyboard's corrections are
+    // wrong in it. Turned on they come back, and with them dictation, which needs a field that
+    // declares itself as text — the same fight as the terminal's, in docs/spellcheck-notes.md.
+    var suggestions by rememberSaveable { mutableStateOf(false) }
     var confirmDiscard by rememberSaveable(state.path) { mutableStateOf(false) }
     var showCharsets by rememberSaveable(state.path) { mutableStateOf(false) }
     var confirmCharset by rememberSaveable(state.path) { mutableStateOf(false) }
 
-    val back = { if (dirty && !state.readOnly) confirmDiscard = true else onClose() }
+    val back = { if (dirty) confirmDiscard = true else onClose() }
     BackHandler(onBack = back)
 
     Scaffold(
@@ -112,11 +116,18 @@ fun EditorScreen(
                     }
                 },
                 actions = {
-                    if (state.readOnly) Unit
-                    else if (state.saving) {
+                    IconButton(onClick = { suggestions = !suggestions }) {
+                        Icon(
+                            Icons.Default.Spellcheck,
+                            contentDescription = stringResource(R.string.editor_suggestions),
+                            tint = if (suggestions) MaterialTheme.colorScheme.primary
+                                   else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (state.saving) {
                         CircularProgressIndicator(Modifier.padding(horizontal = 16.dp).size(20.dp))
                     } else {
-                        IconButton(onClick = { onSave(text.text.toString()) }, enabled = dirty) {
+                        IconButton(onClick = { codeEditor?.let { onSave(it.text.toString()) } }, enabled = dirty) {
                             Icon(Icons.Default.Check, stringResource(R.string.action_save))
                         }
                     }
@@ -128,35 +139,22 @@ fun EditorScreen(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
+                // The Scaffold already reserved the navigation bar, and the keyboard's inset
+                // measures from the screen edge, so it counts that bar a second time: a black
+                // band of exactly its height, above the keyboard. Saying the padding is spent
+                // leaves imePadding() adding only what is left.
+                .consumeWindowInsets(padding)
                 .imePadding(),
         ) {
-            if (state.readOnly) {
-                ReadOnlyText(state.decoded.text, Modifier.weight(1f))
-            } else {
-                // BasicTextField, not the Material one: this is a whole screen of monospace
-                // text, so the decoration, the indicator and the label are all things to
-                // switch off again.
-                BasicTextField(
-                    state = text,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = 12.dp),
-                    textStyle = TextStyle(
-                        fontFamily = com.sshborg.ui.common.monoFont(),
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    lineLimits = TextFieldLineLimits.MultiLine(),
-                    inputTransformation = markDirty,
-                    // A configuration file is not prose: no capitals, no autocorrect, no spell check.
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrectEnabled = false,
-                    ),
-                )
-            }
+            SoraEditor(
+                text = shown,
+                textKey = key,
+                suggestions = suggestions,
+                family = family,
+                onDirty = { dirty = true },
+                onEditor = { codeEditor = it; draft.editor = it },
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            )
             StatusLine(
                 state = state,
                 dirty = dirty,
@@ -235,8 +233,7 @@ private fun StatusLine(state: EditorState.Ready, dirty: Boolean, onPickCharset: 
     val parts = buildList {
         add(state.decoded.lineEnding.name)
         if (state.decoded.mixedEndings) add(stringResource(R.string.editor_mixed_endings))
-        if (state.readOnly) add(stringResource(R.string.editor_read_only))
-        else if (dirty) add(stringResource(R.string.editor_unsaved))
+        if (dirty) add(stringResource(R.string.editor_unsaved))
         else if (state.savedAt > 0L) add(stringResource(R.string.editor_saved))
     }
     Row(
@@ -313,14 +310,19 @@ fun EditorLoading(state: EditorState.Loading, onCancel: () -> Unit) {
     }
 }
 
+/** Holds the live widget, so the saved state can be taken from it, and what came back. */
+private class Draft(val restored: String?) {
+    var editor: io.github.rosemoe.sora.widget.CodeEditor? = null
+}
+
 /**
  * Keeps the text across a process death, and drops a draft too big to travel in a Bundle
  * instead of taking the app down with a TransactionTooLargeException — returning null from
  * save means "do not keep this". The cursor is not kept; the text is what matters.
  */
-private val DraftSaver: Saver<TextFieldState, Any> = Saver(
-    save = { it.text.takeIf { t -> t.length <= EDITOR_MAX_DRAFT }?.toString() },
-    restore = { TextFieldState(it as String) },
+private val DraftSaver: Saver<Draft, Any> = Saver(
+    save = { it.editor?.text?.toString()?.takeIf { t -> t.length <= EDITOR_MAX_DRAFT } },
+    restore = { Draft(it as String) },
 )
 
 /**
@@ -345,7 +347,7 @@ fun EditorUnsupportedDialog(
                         EditorState.Reason.TOO_LARGE -> stringResource(
                             R.string.editor_too_large,
                             formatBytes(state.size),
-                            formatBytes(EDITOR_VIEW_MAX_BYTES),
+                            formatBytes(EDITOR_MAX_BYTES),
                         )
                         EditorState.Reason.BINARY -> stringResource(R.string.editor_binary)
                     }
@@ -404,6 +406,12 @@ private fun CharsetDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.editor_charset)) },
         text = {
+            // Still being worked out in the background on a large file; it lands in a moment.
+            if (charsets.isEmpty()) {
+                Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
             ScrollingDialogBody {
                 charsets.forEach { charset ->
                     Row(
@@ -428,76 +436,4 @@ private fun CharsetDialog(
             }
         },
     )
-}
-
-/** Asked before reading a file big enough that the editor will feel slow. */
-@Composable
-fun EditorConfirmDialog(
-    state: EditorState.Confirm,
-    onOpen: () -> Unit,
-    onView: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(state.name, maxLines = 1) },
-        text = {
-            Text(stringResource(
-                if (state.canEdit) R.string.editor_large else R.string.editor_too_large_to_edit,
-                formatBytes(state.size),
-                formatBytes(EDITOR_MAX_BYTES),
-            ))
-        },
-        // Two ways forward, so they share the confirm slot: reading a big file is fast whatever
-        // its size, and it is what most people opening one actually want.
-        // One per line: side by side they are long enough to wrap, and a wrapped button
-        // label is the sort of thing that makes a dialog look broken.
-        confirmButton = {
-            Column(horizontalAlignment = Alignment.End) {
-                if (state.canEdit) {
-                    androidx.compose.material3.TextButton(onClick = onOpen) {
-                        Text(stringResource(R.string.sftp_menu_open))
-                    }
-                }
-                androidx.compose.material3.TextButton(onClick = onView) {
-                    Text(stringResource(R.string.editor_read_only))
-                }
-            }
-        },
-        dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.action_cancel))
-            }
-        },
-    )
-}
-
-/**
- * A big file with nothing to type into: one line per row in a lazy list, so only the rows on
- * screen exist and a file of megabytes scrolls as smoothly as a short one. This is the whole
- * difference from the editor — a text field has to measure every line it holds, visible or not.
- *
- * Wrapped in a SelectionContainer so it can still be read out and copied, and the rows are
- * focusable on a touchless device, which is how a D-pad scrolls a list.
- */
-@Composable
-private fun ReadOnlyText(text: String, modifier: Modifier = Modifier) {
-    val lines = remember(text) { text.split("\n") }
-    val font = com.sshborg.ui.common.monoFont()
-    val touchless = com.sshborg.isTouchless(androidx.compose.ui.platform.LocalContext.current)
-    androidx.compose.foundation.text.selection.SelectionContainer(modifier) {
-        androidx.compose.foundation.lazy.LazyColumn(Modifier.fillMaxWidth()) {
-            items(lines.size) { i ->
-                Text(
-                    lines[i],
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
-                        .then(if (touchless) Modifier.focusable() else Modifier),
-                    style = TextStyle(fontFamily = font, fontSize = 13.sp),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        }
-    }
 }

@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Segnalazioni &amp; Feedback',
   footer_source:  'Codice sorgente',
+  footer_licenses: 'Licenze',
   footer_powered: 'Connettività SSH realizzata con',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -114,7 +115,8 @@ module.exports = {
             <li><a href="#sessions">Sessioni multiple</a></li>
             <li><a href="#security">Sicurezza dell'app</a></li>
             <li><a href="#backup">Backup configurazione</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Licenze open source</a></li>`,
 
   doc_adding_host: `
             <h2>// AGGIUNGERE UN HOST</h2>
@@ -190,7 +192,8 @@ module.exports = {
             <p>Apri il menu di un file — pressione prolungata, oppure il pulsante <strong>⋮</strong> — e scegli <strong>Apri nell'editor</strong> per modificarlo direttamente sul server. Sul telefono non resta niente: il file viene letto in memoria, modificato e riscritto sul server.</p>
             <p>Il file torna com'era arrivato. La codifica dei caratteri viene riconosciuta e riusata al salvataggio, la fine riga LF o CRLF viene mantenuta, un file che finiva senza a capo continua a finire senza, e i permessi restano quelli. Se la codifica è stata letta male, toccala nella barra in fondo all'editor e scegline un'altra — l'elenco propone solo codifiche in grado di riprodurre esattamente i byte di quel file, quindi una scelta sbagliata può sembrare sbagliata a schermo ma non può rovinare il file.</p>
             <p>Il salvataggio scrive su un file temporaneo affianco all'originale e poi lo rinomina al suo posto, così una connessione caduta a metà non può lasciare un file scritto a metà sul server.</p>
-            <p>I file oltre 64 KB chiedono conferma prima di aprirsi, perché scrivere in un file grande diventa lento; oltre 256 KB l'editor propone la <strong>sola lettura</strong>, che resta veloce fino a 4 MB. Per file ancora più grandi, modificali da una sessione terminale con <code>nano</code> o <code>vi</code>.</p>
+            <p>I file si aprono fino a 4 MB, qualunque sia la loro lunghezza: vengono disegnate solo le righe a schermo, quindi un file di megabyte scorre come uno corto. Oltre quella soglia la risposta è il terminale, con <code>nano</code> o <code>vi</code>, che non ha nessun limite.</p>
+            <p>I file di configurazione vengono colorati — commenti, stringhe, numeri, chiavi, intestazioni di sezione, variabili di shell e tag XML — in base al nome del file oppure, quando il nome non dice niente, alla forma del contenuto: script di shell, direttive in stile nginx e sshd, INI, YAML, JSON e XML. Il testo libero, le note e i log restano volutamente senza colore, dove sarebbe solo rumore. La colorazione è solo aspetto e non cambia un byte.</p>
             <h3>Editor esadecimale</h3>
             <p>Un file che non è testo si apre nell'editor esadecimale: gli scostamenti a sinistra, i byte al centro, i caratteri stampabili a destra e un tastierino per le cifre esadecimali. Tocca un byte e digita due cifre per sostituirlo. I valori cambiano ma la lunghezza no, quindi ogni posizione nel file resta dov'era. <strong>Apri in esadecimale</strong> nel menu di un file apre così qualunque file, e un file di testo scambiato per binario — per esempio con un byte NUL finito lì per sbaglio — si può comunque aprire come testo dallo stesso dialogo.</p>
             <div class="callout callout-ios">
@@ -540,6 +543,17 @@ Host target
             <p>Senza, la tastiera a schermo gestisce comunque inserimenti brevi: metti il focus su un campo, premi OK per aprirlo, digita e premi <strong>OK / Vai</strong> sulla tastiera per confermare — nel prompt della password questo connette direttamente. Inserire comandi shell con la tastiera a schermo, però, è poco pratico.</p>
             <h3>Bloccare l'app su una TV</h3>
             <p>Una TV di solito non ha lettore di impronte né blocco schermo, quindi proteggi l'app con il blocco integrato con <strong>PIN o passphrase</strong> (Impostazioni → Sicurezza) — funziona interamente col telecomando o una tastiera. Vedi <a href="#security">Sicurezza dell'app</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// LICENZE OPEN SOURCE</h2>
+            <p>SSHBorg è software libero, rilasciato sotto <strong>GNU General Public License v3</strong>. Il codice sorgente è su GitHub, sia per l'app Android sia per quella iOS. Usa le librerie seguenti, ciascuna con la sua licenza:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — il protocollo SSH su Android — licenza di tipo BSD</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — la crittografia su Android — licenza di tipo MIT</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — il componente di modifica testo usato per modificare i file sul server — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — il protocollo SSH su iOS — licenza BSD</li>
+            </ul>
+            <p>Nessuna di esse si collega a niente per conto suo: gli unici indirizzi che SSHBorg contatta sono i server che gli indichi tu, e sshborg.com quando tocchi un collegamento. Non ci sono librerie di statistiche, di pubblicità né tracciatori di alcun tipo.</p>`,
 
   doc_backup: `
             <h2>// BACKUP CONFIGURAZIONE</h2>

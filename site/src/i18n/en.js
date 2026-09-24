@@ -70,6 +70,7 @@ module.exports = {
   footer_privacy: 'Privacy Policy',
   footer_issues:  'Issues &amp; Feedback',
   footer_source:  'Source Code',
+  footer_licenses: 'Licenses',
   footer_powered: 'SSH connectivity powered by',
 
   // ── docs.html ──────────────────────────────────────────────────────────────
@@ -116,7 +117,8 @@ module.exports = {
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
             <li><a href="#backup">Configuration Backup</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Open source licenses</a></li>`,
 
   doc_adding_host: `
             <h2>// ADDING A HOST</h2>
@@ -192,7 +194,8 @@ module.exports = {
             <p>Open a file's menu — a long press, or the <strong>⋮</strong> button — and choose <strong>Open in editor</strong> to change it directly on the server. Nothing is stored on the phone: the file is read into memory, edited, and written straight back.</p>
             <p>The file goes back as it came. Its character encoding is detected and used again when saving, LF or CRLF line endings are preserved, a file that ended without a newline still does, and the permissions stay as they were. If the encoding was read wrong, tap it in the bar at the bottom of the editor and choose another — the list only offers encodings that can reproduce this file's bytes exactly, so a wrong choice can look wrong on screen but cannot damage the file.</p>
             <p>Saving writes to a temporary file beside the original and renames it into place, so a connection lost halfway cannot leave a half-written file on the server.</p>
-            <p>Files over 64 KB ask before opening, because typing in a large file gets slow; over 256 KB the editor offers <strong>read only</strong> instead, which stays fast up to 4 MB. For anything larger, edit the file from a terminal session with <code>nano</code> or <code>vi</code>.</p>
+            <p>Files open up to 4 MB, whatever their length: only the lines on screen are drawn, so a file of megabytes scrolls like a short one. Above that the terminal is the answer, with <code>nano</code> or <code>vi</code>, and it has no limit at all.</p>
+            <p>Configuration files are coloured — comments, strings, numbers, keys, section headers, shell variables and XML tags — from the file's name or, when the name says nothing, from the shape of its contents: shell scripts, nginx and sshd style directives, INI, YAML, JSON and XML. Prose, notes and logs are deliberately left plain, where colour would only be noise. Colouring is appearance alone and never changes a byte.</p>
             <h3>Hex editor</h3>
             <p>A file that is not text opens in the hex editor: offsets on the left, the bytes in the middle, the printable characters on the right, and a keypad for the hex digits. Tap a byte and type two digits to replace it. Values change but the length never does, so every offset in the file stays where it was. <strong>Open in hex</strong> in a file's menu opens any file this way, and a text file mistaken for binary — one with a stray NUL byte in it — can still be opened as text from the same dialog.</p>
             <div class="callout callout-ios">
@@ -542,6 +545,17 @@ Host target
             <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical.</p>
             <h3>Locking the app on a TV</h3>
             <p>A TV usually has no fingerprint reader or screen lock, so protect the app with the built-in <strong>PIN or passphrase</strong> lock (Settings → Security) — it works entirely with the remote or a keyboard. See <a href="#security">App Security</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// OPEN SOURCE LICENSES</h2>
+            <p>SSHBorg is free software, released under the <strong>GNU General Public License v3</strong>. Its source code is on GitHub, for both the Android and the iOS app. It uses the following libraries, each under its own licence:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — the SSH protocol on Android — BSD-style licence</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — cryptography on Android — MIT-style licence</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — the text editor widget for editing files on the server — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — the SSH protocol on iOS — BSD licence</li>
+            </ul>
+            <p>None of them connects to anything on its own: the only addresses SSHBorg contacts are the servers you tell it about, and sshborg.com when you tap a link. There are no analytics libraries, no advertising libraries and no trackers of any kind.</p>`,
 
   doc_backup: `
             <h2>// CONFIGURATION BACKUP</h2>

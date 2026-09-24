@@ -1,1 +1,1 @@
-• SFTP: editor integrato per i file sul server — i file di testo si modificano sul posto e mantengono codifica, fine riga e permessi, quelli troppo grandi si aprono in sola lettura fino a 4 MB, e ciò che non è testo si apre in un editor esadecimale
+• SFTP: editor integrato per i file sul server — i file di testo si modificano sul posto e mantengono codifica, fine riga e permessi, i file di configurazione vengono colorati, e ciò che non è testo si apre in un editor esadecimale

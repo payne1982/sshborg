@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Privacidade',
   footer_issues:  'Erros &amp; Feedback',
   footer_source:  'Código fonte',
+  footer_licenses: 'Licenças',
   footer_powered: 'Conectividade SSH fornecida por',
 
   page_title_docs:       'SSHBorg – Guia do utilizador',
@@ -113,7 +114,8 @@ module.exports = {
             <li><a href="#sessions">Sessões múltiplas</a></li>
             <li><a href="#security">Segurança da app</a></li>
             <li><a href="#backup">Backup de configuração</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Licenças open source</a></li>`,
 
   doc_adding_host: `
             <h2>// ADICIONAR UM HOST</h2>
@@ -189,7 +191,8 @@ module.exports = {
             <p>Abra o menu de um ficheiro — toque longo, ou o botão <strong>⋮</strong> — e escolha <strong>Abrir no editor</strong> para o alterar diretamente no servidor. No telemóvel não fica nada: o ficheiro é lido para memória, editado e escrito de volta.</p>
             <p>O ficheiro volta como chegou. A codificação é detetada e reutilizada ao guardar, os fins de linha LF ou CRLF mantêm-se, um ficheiro que acabava sem mudança de linha continua assim, e as permissões ficam iguais. Se a codificação foi lida mal, toque nela na barra ao fundo do editor e escolha outra — a lista só oferece codificações capazes de reproduzir exatamente os bytes daquele ficheiro, por isso uma escolha errada pode parecer errada no ecrã mas não danifica nada.</p>
             <p>Ao guardar, é escrito um ficheiro temporário ao lado do original e depois renomeado para o lugar dele, de modo que uma ligação perdida a meio não deixa um ficheiro escrito pela metade no servidor.</p>
-            <p>Ficheiros acima de 64 KB perguntam antes de abrir, porque escrever num ficheiro grande fica lento; acima de 256 KB o editor oferece <strong>só leitura</strong>, que continua rápida até 4 MB. Acima disso, edite o ficheiro numa sessão de terminal com <code>nano</code> ou <code>vi</code>.</p>
+            <p>Os ficheiros abrem até 4 MB, seja qual for o seu tamanho: só são desenhadas as linhas no ecrã, por isso um ficheiro de megabytes desliza como um curto. Acima disso a resposta é o terminal, com <code>nano</code> ou <code>vi</code>, que não tem limite nenhum.</p>
+            <p>Os ficheiros de configuração são coloridos — comentários, cadeias, números, chaves, cabeçalhos de secção, variáveis de shell e etiquetas XML — a partir do nome do ficheiro ou, quando o nome nada diz, da forma do conteúdo: scripts de shell, diretivas ao estilo do nginx e do sshd, INI, YAML, JSON e XML. O texto livre, as notas e os registos ficam de propósito sem cor, onde seria apenas ruído. A coloração é só aparência e nunca muda um byte.</p>
             <h3>Editor hexadecimal</h3>
             <p>Um ficheiro que não é texto abre no editor hexadecimal: os deslocamentos à esquerda, os bytes ao centro, os caracteres imprimíveis à direita e um teclado para os dígitos hexadecimais. Toque num byte e escreva dois dígitos para o substituir. Os valores mudam mas o tamanho nunca, por isso cada posição do ficheiro fica onde estava. <strong>Abrir em hexadecimal</strong> no menu de um ficheiro abre assim qualquer ficheiro, e um ficheiro de texto tomado por binário — com um byte NUL perdido lá dentro — ainda pode ser aberto como texto na mesma caixa.</p>
             <div class="callout callout-ios">
@@ -539,6 +542,17 @@ Host target
             <p>Sem um, o teclado no ecrã ainda serve para entradas curtas: foque um campo, prima OK para o abrir, escreva e prima <strong>OK / Ir</strong> no teclado para confirmar — no pedido de palavra-passe isto liga diretamente. Introduzir comandos da shell com o teclado no ecrã é, no entanto, pouco prático.</p>
             <h3>Bloquear a app numa TV</h3>
             <p>Uma TV normalmente não tem leitor de impressões nem bloqueio de ecrã, por isso proteja a app com o bloqueio integrado por <strong>PIN ou frase-passe</strong> (Definições → Segurança) — funciona totalmente com o comando ou um teclado. Ver <a href="#security">Segurança da app</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// LICENÇAS OPEN SOURCE</h2>
+            <p>O SSHBorg é software livre, publicado sob a <strong>GNU General Public License v3</strong>. O código-fonte está no GitHub, tanto para a app Android como para a de iOS. Usa as seguintes bibliotecas, cada uma com a sua licença:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — o protocolo SSH no Android — licença ao estilo BSD</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — a criptografia no Android — licença ao estilo MIT</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — o componente de edição de texto usado para alterar ficheiros no servidor — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — o protocolo SSH no iOS — licença BSD</li>
+            </ul>
+            <p>Nenhuma delas se liga a nada por conta própria: os únicos endereços que o SSHBorg contacta são os servidores que lhe indicar, e sshborg.com quando toca num link. Não há bibliotecas de estatísticas, de publicidade nem rastreadores de qualquer tipo.</p>`,
 
   doc_backup: `
             <h2>// BACKUP DE CONFIGURAÇÃO</h2>

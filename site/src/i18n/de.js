@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Datenschutz',
   footer_issues:  'Fehler &amp; Feedback',
   footer_source:  'Quellcode',
+  footer_licenses: 'Lizenzen',
   footer_powered: 'SSH-Konnektivität bereitgestellt von',
 
   page_title_docs:       'SSHBorg – Benutzerhandbuch',
@@ -113,7 +114,8 @@ module.exports = {
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
             <li><a href="#security">App-Sicherheit</a></li>
             <li><a href="#backup">Konfiguration sichern</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Open-Source-Lizenzen</a></li>`,
 
   doc_adding_host: `
             <h2>// HOST HINZUFÜGEN</h2>
@@ -189,7 +191,8 @@ module.exports = {
             <p>Öffne das Menü einer Datei — langer Druck oder die Schaltfläche <strong>⋮</strong> — und wähle <strong>Im Editor öffnen</strong>, um sie direkt auf dem Server zu ändern. Auf dem Telefon bleibt nichts: Die Datei wird in den Speicher gelesen, bearbeitet und direkt zurückgeschrieben.</p>
             <p>Die Datei geht zurück, wie sie kam. Die Zeichenkodierung wird erkannt und beim Speichern wieder verwendet, Zeilenenden (LF oder CRLF) bleiben erhalten, eine Datei ohne abschließenden Zeilenumbruch behält das, und die Rechte bleiben unverändert. Wurde die Kodierung falsch gelesen, tippe sie in der Leiste am unteren Rand an und wähle eine andere — die Liste bietet nur Kodierungen an, die die Bytes dieser Datei exakt wiedergeben können, eine falsche Wahl kann also falsch aussehen, die Datei aber nicht beschädigen.</p>
             <p>Beim Speichern wird zuerst eine temporäre Datei neben dem Original geschrieben und dann an dessen Stelle umbenannt, damit eine auf halbem Weg verlorene Verbindung keine halb geschriebene Datei zurücklässt.</p>
-            <p>Dateien über 64 KB fragen vor dem Öffnen, weil das Tippen in großen Dateien langsam wird; über 256 KB bietet der Editor stattdessen <strong>Nur lesen</strong> an, was bis 4 MB schnell bleibt. Alles darüber bearbeitest du in einer Terminal-Sitzung mit <code>nano</code> oder <code>vi</code>.</p>
+            <p>Dateien öffnen bis 4 MB, gleich welcher Länge: gezeichnet werden nur die Zeilen auf dem Bildschirm, also scrollt eine Datei von Megabyte wie eine kurze. Darüber ist das Terminal die Antwort, mit <code>nano</code> oder <code>vi</code>, und das kennt gar keine Grenze.</p>
+            <p>Konfigurationsdateien werden eingefärbt — Kommentare, Zeichenketten, Zahlen, Schlüssel, Abschnittsüberschriften, Shell-Variablen und XML-Tags — anhand des Dateinamens oder, wenn der nichts sagt, anhand der Form des Inhalts: Shell-Skripte, Direktiven im Stil von nginx und sshd, INI, YAML, JSON und XML. Fließtext, Notizen und Logs bleiben bewusst ohne Farbe, wo sie nur Lärm wäre. Das Einfärben ist reine Darstellung und ändert kein einziges Byte.</p>
             <h3>Hex-Editor</h3>
             <p>Eine Datei, die kein Text ist, öffnet im Hex-Editor: links die Offsets, in der Mitte die Bytes, rechts die druckbaren Zeichen und unten ein Tastenfeld für die Hex-Ziffern. Tippe ein Byte an und gib zwei Ziffern ein, um es zu ersetzen. Werte ändern sich, die Länge nie — jedes Offset bleibt, wo es war. <strong>Hexadezimal öffnen</strong> im Menü einer Datei öffnet jede Datei so, und eine fälschlich für binär gehaltene Textdatei — etwa mit einem versehentlichen NUL-Byte — lässt sich im selben Dialog trotzdem als Text öffnen.</p>
             <div class="callout callout-ios">
@@ -539,6 +542,17 @@ Host target
             <p>Ohne eine solche bewältigt die Bildschirmtastatur trotzdem kurze Eingaben: ein Feld fokussieren, OK drücken, um es zu öffnen, tippen und <strong>OK / Los</strong> auf der Tastatur drücken — bei der Passwortabfrage verbindet dies direkt. Shell-Befehle mit der Bildschirmtastatur einzugeben ist jedoch unpraktisch.</p>
             <h3>Die App auf einem TV sperren</h3>
             <p>Ein TV hat meist keinen Fingerabdrucksensor und keine Bildschirmsperre — schütze die App daher mit der integrierten <strong>PIN- oder Passphrase-Sperre</strong> (Einstellungen → Sicherheit); sie funktioniert vollständig mit der Fernbedienung oder einer Tastatur. Siehe <a href="#security">App-Sicherheit</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// OPEN-SOURCE-LIZENZEN</h2>
+            <p>SSHBorg ist freie Software unter der <strong>GNU General Public License v3</strong>. Der Quelltext liegt auf GitHub, für die Android- wie für die iOS-App. Verwendet werden die folgenden Bibliotheken, jede unter ihrer eigenen Lizenz:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — das SSH-Protokoll unter Android — Lizenz im BSD-Stil</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — die Kryptografie unter Android — Lizenz im MIT-Stil</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — das Textbearbeitungs-Widget zum Ändern von Dateien auf dem Server — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — das SSH-Protokoll unter iOS — BSD-Lizenz</li>
+            </ul>
+            <p>Keine davon verbindet sich von sich aus mit irgendetwas: SSHBorg kontaktiert nur die Server, die du angibst, und sshborg.com, wenn du einen Link antippst. Es gibt keine Analyse-Bibliotheken, keine Werbe-Bibliotheken und keinerlei Tracker.</p>`,
 
   doc_backup: `
             <h2>// KONFIGURATION SICHERN</h2>
