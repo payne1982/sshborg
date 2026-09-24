@@ -318,7 +318,12 @@ private fun ImportKeyDialog(
     var label by remember { mutableStateOf("") }
     var passphrase by remember { mutableStateOf("") }
     var passphraseVisible by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    // One message at a time, kept against the field it is about: a bad passphrase is not the
+    // key text's fault, and a message at the foot of a dialog that scrolls is a message nobody
+    // sees. Whichever is set also turns its own field red.
+    var pemError by remember { mutableStateOf("") }
+    var passphraseError by remember { mutableStateOf("") }
+    val clearErrors = { pemError = ""; passphraseError = "" }
     val importContext = LocalContext.current
     val touchless = remember { isTouchless(importContext) }
     val errorEncrypted   = stringResource(R.string.keys_import_error_encrypted)
@@ -344,14 +349,14 @@ private fun ImportKeyDialog(
                 if (touchless) {
                     TvTapField(
                         value = label,
-                        onValueChange = { label = it; errorMessage = "" },
+                        onValueChange = { label = it; clearErrors() },
                         label = stringResource(R.string.keygen_field_label),
                         modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
                     OutlinedTextField(
                         value = label,
-                        onValueChange = { label = it; errorMessage = "" },
+                        onValueChange = { label = it; clearErrors() },
                         label = { Text(stringResource(R.string.keygen_field_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -368,39 +373,51 @@ private fun ImportKeyDialog(
                 if (touchless) {
                     TvTapField(
                         value = pem,
-                        onValueChange = { onPemChange(it); errorMessage = "" },
+                        onValueChange = { onPemChange(it); clearErrors() },
                         label = stringResource(R.string.keys_import_pem_label),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = false,
+                        supporting = pemError.takeIf { it.isNotEmpty() },
+                        isError = pemError.isNotEmpty(),
                     )
                 } else {
                     OutlinedTextField(
                         value = pem,
-                        onValueChange = { onPemChange(it); errorMessage = "" },
+                        onValueChange = { onPemChange(it); clearErrors() },
                         label = { Text(stringResource(R.string.keys_import_pem_label)) },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
                         textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace),
                         maxLines = 8,
+                        isError = pemError.isNotEmpty(),
+                        supportingText = if (pemError.isEmpty()) null else {
+                            { Text(pemError) }
+                        },
                     )
                 }
                 if (touchless) {
                     TvTapField(
                         value = passphrase,
-                        onValueChange = { passphrase = it; errorMessage = "" },
+                        onValueChange = { passphrase = it; clearErrors() },
                         label = stringResource(R.string.keys_import_passphrase_label),
                         modifier = Modifier.fillMaxWidth(),
                         keyboardType = KeyboardType.Password,
                         isPassword = true,
+                        supporting = passphraseError.takeIf { it.isNotEmpty() },
+                        isError = passphraseError.isNotEmpty(),
                     )
                 } else {
                     OutlinedTextField(
                         value = passphrase,
-                        onValueChange = { passphrase = it; errorMessage = "" },
+                        onValueChange = { passphrase = it; clearErrors() },
                         label = { Text(stringResource(R.string.keys_import_passphrase_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        isError = passphraseError.isNotEmpty(),
+                        supportingText = if (passphraseError.isEmpty()) null else {
+                            { Text(passphraseError) }
+                        },
                         trailingIcon = {
                             TextButton(onClick = { passphraseVisible = !passphraseVisible }) {
                                 Text(
@@ -416,13 +433,6 @@ private fun ImportKeyDialog(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
             }
         },
         confirmButton = {
@@ -433,10 +443,11 @@ private fun ImportKeyDialog(
                         pem,
                         passphrase.takeIf { it.isNotEmpty() },
                     ) { rawError ->
-                        errorMessage = when (rawError) {
-                            "encrypted"       -> errorEncrypted
-                            "wrong_passphrase" -> errorWrongPass
-                            else              -> errorInvalid
+                        clearErrors()
+                        when (rawError) {
+                            "encrypted"        -> passphraseError = errorEncrypted
+                            "wrong_passphrase" -> passphraseError = errorWrongPass
+                            else               -> pemError = errorInvalid
                         }
                     }
                 },
