@@ -138,10 +138,11 @@
     <string name="keys_import_error_encrypted">此密钥已加密 — 请输入密码短语</string>
     <string name="keys_import_error_wrong_passphrase">密码短语错误</string>
     <string name="keys_import_error_invalid">无效或不支持的密钥格式</string>
+    <string name="keys_import_error_encryption">此密钥的加密格式应用无法打开。请用创建它的工具解密后重新导入。</string>
 
     <!-- Passphrase of an imported key -->
     <string name="keys_needs_passphrase">缺少密码短语 — 请重新导入此密钥</string>
-    <string name="keys_passphrase_note">会与密钥一起保存，这样每次连接时就不再询问。如果在设置中启用了硬件加密，设备会对其加密。</string>
+    <string name="keys_passphrase_note">仅用于打开密钥，不会被保存。打开后的密钥与其他密钥一样保管。</string>
 
     <!-- Generate key dialog -->
     <string name="keygen_title">生成 SSH 密钥</string>

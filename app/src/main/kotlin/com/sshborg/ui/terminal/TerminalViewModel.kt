@@ -357,14 +357,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Public-key auth for [host], carrying the key's passphrase when it has one: the key is kept
-     * exactly as it was imported, so an encrypted one opens only with the passphrase stored
-     * beside it. Null when the host has no key, or its key cannot be read.
+     * Public-key auth for [host]. A stored key is always unlocked — an encrypted one is unlocked
+     * at import — so nothing has to be asked for here. Null when the host has no key, or its key
+     * cannot be read.
      */
     private suspend fun keyAuthFor(host: HostEntity): SshAuth.PublicKey? {
         val key = host.keyId?.let { keyDao.getById(it) } ?: return null
         val pem = KeystoreManager.getPrivateKeyPem(key) ?: return null
-        return SshAuth.PublicKey(pem, KeystoreManager.getPassphrase(key))
+        return SshAuth.PublicKey(pem)
     }
 
     /** Non-interactive auth for jump hosts — password must already be saved. */

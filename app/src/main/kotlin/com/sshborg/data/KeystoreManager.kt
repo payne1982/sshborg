@@ -93,16 +93,4 @@ object KeystoreManager {
             else -> null
         }
     }
-
-    /**
-     * Returns the passphrase that unlocks [entity]'s private key, from [encryptedPassphrase] if
-     * present or from the plain column otherwise, and null for a key that needs none.
-     */
-    fun getPassphrase(entity: SshKeyEntity): String? {
-        val blob = entity.encryptedPassphrase
-        return when {
-            blob != null -> runCatching { decrypt(blob) }.getOrNull()
-            else -> entity.passphrase?.takeIf { it.isNotEmpty() }
-        }
-    }
 }

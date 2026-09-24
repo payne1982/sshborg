@@ -135,10 +135,11 @@
     <string name="keys_import_error_encrypted">Cette clé est chiffrée — entrez la phrase secrète</string>
     <string name="keys_import_error_wrong_passphrase">Phrase secrète incorrecte</string>
     <string name="keys_import_error_invalid">Format de clé invalide ou non pris en charge</string>
+    <string name="keys_import_error_encryption">Cette clé est chiffrée dans un format que l\'app ne sait pas ouvrir. Déchiffrez-la avec l\'outil qui l\'a créée, puis réimportez-la.</string>
 
     <!-- Passphrase of an imported key -->
     <string name="keys_needs_passphrase">Phrase secrète manquante — réimportez cette clé</string>
-    <string name="keys_passphrase_note">Elle est enregistrée avec la clé, pour ne pas être demandée à chaque connexion. Si le chiffrement matériel est activé dans les réglages, l\'appareil la chiffre.</string>
+    <string name="keys_passphrase_note">Elle sert seulement à ouvrir la clé et n\'est pas conservée. La clé, ouverte, est gardée comme toutes les autres.</string>
 
     <string name="keygen_title">Générer une clé SSH</string>
     <string name="keygen_field_label">Étiquette</string>

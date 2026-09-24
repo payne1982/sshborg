@@ -199,26 +199,16 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setExtraKeysBarPinned(enabled) }
     }
 
-    /**
-     * Encrypts all existing plain-text SSH keys, their passphrases and host passwords with
-     * Android Keystore.
-     */
+    /** Encrypts all existing plain-text SSH keys and host passwords with Android Keystore. */
     fun enableKeystoreEncryption() {
         _isMigrating.value = true
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 keyDao.getAllOnce().forEach { key ->
-                    // A key's passphrase is a credential of its own and moves with the key: they
-                    // are stored in separate columns, and either one may already be encrypted.
-                    val pem = key.privateKeyPem.takeIf { key.encryptedBlob == null && it.isNotBlank() }
-                    val phrase = key.passphrase?.takeIf { key.encryptedPassphrase == null && it.isNotEmpty() }
-                    if (pem == null && phrase == null) return@forEach
-                    keyDao.upsert(key.copy(
-                        privateKeyPem       = if (pem != null) "" else key.privateKeyPem,
-                        encryptedBlob       = if (pem != null) KeystoreManager.encrypt(pem) else key.encryptedBlob,
-                        passphrase          = if (phrase != null) null else key.passphrase,
-                        encryptedPassphrase = if (phrase != null) KeystoreManager.encrypt(phrase) else key.encryptedPassphrase,
-                    ))
+                    if (key.encryptedBlob == null && key.privateKeyPem.isNotBlank()) {
+                        val blob = KeystoreManager.encrypt(key.privateKeyPem)
+                        keyDao.upsert(key.copy(privateKeyPem = "", encryptedBlob = blob))
+                    }
                 }
                 hostDao.getAllOnce().forEach { host ->
                     if (host.encryptedPassword == null && !host.password.isNullOrEmpty()) {
@@ -415,23 +405,16 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /**
-     * Decrypts all SSH keys, their passphrases and host passwords back to plain text and removes
-     * the Keystore key.
-     */
+    /** Decrypts all SSH keys and host passwords back to plain-text and removes the Keystore key. */
     fun disableKeystoreEncryption() {
         _isMigrating.value = true
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 keyDao.getAllOnce().forEach { key ->
-                    if (key.encryptedBlob == null && key.encryptedPassphrase == null) return@forEach
-                    // Both are read before the Keystore key is deleted at the end of this block.
-                    keyDao.upsert(key.copy(
-                        privateKeyPem       = key.encryptedBlob?.let { KeystoreManager.decrypt(it) } ?: key.privateKeyPem,
-                        encryptedBlob       = null,
-                        passphrase          = key.encryptedPassphrase?.let { KeystoreManager.decrypt(it) } ?: key.passphrase,
-                        encryptedPassphrase = null,
-                    ))
+                    if (key.encryptedBlob != null) {
+                        val pem = KeystoreManager.decrypt(key.encryptedBlob)
+                        keyDao.upsert(key.copy(privateKeyPem = pem, encryptedBlob = null))
+                    }
                 }
                 hostDao.getAllOnce().forEach { host ->
                     if (host.encryptedPassword != null) {

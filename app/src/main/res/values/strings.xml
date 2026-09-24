@@ -139,10 +139,11 @@
     <string name="keys_import_error_encrypted">This key is encrypted — enter the passphrase</string>
     <string name="keys_import_error_wrong_passphrase">Wrong passphrase</string>
     <string name="keys_import_error_invalid">Invalid or unsupported key format</string>
+    <string name="keys_import_error_encryption">This key is encrypted in a format the app cannot unlock. Decrypt it with the tool that created it, then import it again.</string>
 
     <!-- Passphrase of an imported key -->
     <string name="keys_needs_passphrase">Passphrase missing — import this key again</string>
-    <string name="keys_passphrase_note">Saved with the key, so it is not asked at every connection. When hardware encryption is on in Settings, the device encrypts it.</string>
+    <string name="keys_passphrase_note">Used once to unlock the key and then dropped — the passphrase itself is never stored. The unlocked key is kept like any other key.</string>
 
     <!-- Generate key dialog -->
     <string name="keygen_title">Generate SSH Key</string>

@@ -135,10 +135,11 @@
     <string name="keys_import_error_encrypted">Цей ключ зашифровано — введіть парольну фразу</string>
     <string name="keys_import_error_wrong_passphrase">Неправильна парольна фраза</string>
     <string name="keys_import_error_invalid">Недійсний або непідтримуваний формат ключа</string>
+    <string name="keys_import_error_encryption">Цей ключ зашифровано у форматі, який застосунок не може відкрити. Розшифруйте його засобом, яким він створений, і імпортуйте знову.</string>
 
     <!-- Passphrase of an imported key -->
     <string name="keys_needs_passphrase">Немає парольної фрази — імпортуйте ключ знову</string>
-    <string name="keys_passphrase_note">Зберігається разом із ключем, щоб її не запитували під час кожного з\'єднання. Якщо в налаштуваннях увімкнено апаратне шифрування, пристрій її шифрує.</string>
+    <string name="keys_passphrase_note">Використовується лише для відкриття ключа й не зберігається. Відкритий ключ зберігається так само, як усі інші.</string>
 
     <string name="keygen_title">Згенерувати SSH-ключ</string>
     <string name="keygen_field_label">Мітка</string>

@@ -135,10 +135,11 @@
     <string name="keys_import_error_encrypted">Esta chave está cifrada — introduza a frase-passe</string>
     <string name="keys_import_error_wrong_passphrase">Frase-passe incorreta</string>
     <string name="keys_import_error_invalid">Formato de chave inválido ou não suportado</string>
+    <string name="keys_import_error_encryption">Esta chave está cifrada num formato que a app não consegue abrir. Decifre-a com a ferramenta que a criou e importe-a de novo.</string>
 
     <!-- Passphrase of an imported key -->
     <string name="keys_needs_passphrase">Falta a frase-passe — importe esta chave novamente</string>
-    <string name="keys_passphrase_note">É guardada com a chave, para não ser pedida em cada ligação. Se a cifragem por hardware estiver ativa nas definições, o dispositivo cifra-a.</string>
+    <string name="keys_passphrase_note">Serve apenas para abrir a chave e não é guardada. A chave, aberta, é guardada como qualquer outra.</string>
 
     <string name="keygen_title">Gerar Chave SSH</string>
     <string name="keygen_field_label">Etiqueta</string>

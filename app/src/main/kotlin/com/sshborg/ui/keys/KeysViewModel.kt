@@ -50,10 +50,8 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
         }
         val imported = result.getOrElse { onError(it.message ?: ""); return@launch }
         val pubKey = withComment(imported.publicKey, commentFor(label))   // comment matches the chosen label
-        // The key is stored exactly as it arrived, so an encrypted one is only usable if its
-        // passphrase is kept too: at connection time there is nobody to ask. A passphrase typed
-        // for a key that turns out not to need one is dropped.
-        val keyPassphrase = typed.takeIf { imported.encrypted }
+        // The key comes back unlocked, so there is no passphrase to keep: what the user typed
+        // was needed to open it and is dropped here with the rest of this call's locals.
         val encEnabled = prefs.keystoreEncryption.first()
         val entity = withContext(Dispatchers.IO) {
             if (encEnabled) {
@@ -62,8 +60,6 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
                     keyType = imported.keyType,
                     privateKeyPem = "",
                     encryptedBlob = KeystoreManager.encrypt(imported.pem),
-                    passphrase = null,
-                    encryptedPassphrase = keyPassphrase?.let { KeystoreManager.encrypt(it) },
                     publicKey = pubKey,
                 )
             } else {
@@ -71,7 +67,6 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
                     label = label,
                     keyType = imported.keyType,
                     privateKeyPem = imported.pem,
-                    passphrase = keyPassphrase,
                     publicKey = pubKey,
                 )
             }
@@ -81,13 +76,13 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Whether [key] cannot be used as it stands: an encrypted key with no passphrase stored,
-     * which is every encrypted key imported before the app kept one. Reading and parsing the key
-     * is cheap next to a connection, and this is what the list warns about — the passphrase is
-     * only ever taken at import, so such a key has to be imported again.
+     * Whether [key] is stored still encrypted, which no import produces any more but every
+     * encrypted key imported by a released version does — those were kept as they arrived and
+     * their passphrase was thrown away, so they can never authenticate. Reading and parsing the
+     * key is cheap next to a connection, and this is what the list warns about: such a key has
+     * to be imported again.
      */
-    suspend fun needsPassphrase(key: SshKeyEntity): Boolean = withContext(Dispatchers.IO) {
-        if (KeystoreManager.getPassphrase(key) != null) return@withContext false
+    suspend fun needsReimport(key: SshKeyEntity): Boolean = withContext(Dispatchers.IO) {
         val pem = KeystoreManager.getPrivateKeyPem(key) ?: return@withContext false
         SshManager.isKeyEncrypted(pem)
     }

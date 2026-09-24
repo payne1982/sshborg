@@ -566,13 +566,18 @@ object SshManager {
     }
 
     /**
-     * Loads a PEM or OpenSSH private key and derives its public key.
+     * Loads a PEM or OpenSSH private key, unlocks it if it is encrypted, and returns it in a
+     * form that needs no passphrase again.
      *
-     * The key text is returned as it came in, **still encrypted** when it was: only the public
-     * key is derived from the decrypted copy, which is discarded. The caller is expected to keep
-     * the passphrase (see [com.sshborg.data.db.SshKeyEntity.passphrase]) and hand it back at
-     * connection time, because a decrypted key cannot be written out again for every key type —
-     * JSch refuses to serialise ed25519.
+     * The passphrase is used here and **nowhere else**: it is never stored. A passphrase is a
+     * secret people reuse — on other keys, on other machines — while a private key is worth only
+     * itself, so keeping the key unlocked beside its own passphrase, which is what a stored
+     * passphrase amounts to, would give away the second secret for nothing. What the app keeps
+     * is the unlocked key, protected exactly like a key that never had a passphrase: the app's
+     * private storage, and the Keystore blob when that setting is on.
+     *
+     * Not every encrypted key can be written back out — see [unlockedText] — and one that cannot
+     * is refused rather than stored half-way, with `unsupported_encryption`.
      *
      * @param pem  private key text (PEM / OpenSSH format)
      * @param passphrase  only needed if the key is encrypted
@@ -599,9 +604,87 @@ object SshManager {
                 algToken.startsWith("ecdsa") -> "ecdsa"
                 else                         -> algToken
             }
-            return ImportedKey(normalizedPem, pub, keyType, encrypted = wasEncrypted)
+            // An unencrypted key is stored as it arrived, byte for byte.
+            val stored =
+                if (!wasEncrypted) normalizedPem
+                else unlockedText(kp, pub) ?: throw JSchException("unsupported_encryption")
+            return ImportedKey(stored, pub, keyType)
         } finally {
             kp.dispose()
+        }
+    }
+
+    /**
+     * The text of an unlocked [kp], or null when it cannot be produced.
+     *
+     * Two routes, because JSch has no single one. `writePrivateKey` covers RSA, ECDSA and the
+     * old PEM form, and throws for the rest — `UnsupportedOperationException` for ed25519, whose
+     * private half it refuses to serialise, and a `NullPointerException` for a key that came out
+     * of a PKCS#8 container. What those have in common is `forSSHAgent`, which is public and has
+     * to contain the private material, since that is what an agent is handed; from an ed25519
+     * blob the 32-byte seed is enough to write the file with the same BouncyCastle encoder
+     * [generateEd25519WithBc] already uses.
+     *
+     * Whatever comes out is verified before it is trusted: it is loaded back, and its public key
+     * must match [expectedPublicKey] exactly, with nothing left encrypted. So a mistake here
+     * cannot produce a key that looks imported and is in fact something else — it produces null,
+     * and the import is refused.
+     */
+    private fun unlockedText(kp: KeyPair, expectedPublicKey: String): String? {
+        val candidate = writtenOut(kp) ?: fromAgentBlob(kp) ?: return null
+        val reloaded = runCatching {
+            KeyPair.load(JSch(), candidate.toByteArray(Charsets.UTF_8), null)
+        }.getOrNull() ?: return null
+        return try {
+            if (reloaded.isEncrypted) return null
+            val out = java.io.ByteArrayOutputStream()
+            reloaded.writePublicKey(out, "")
+            candidate.takeIf { out.toString(Charsets.UTF_8.name()).trim() == expectedPublicKey }
+        } catch (_: Exception) {
+            null
+        } finally {
+            reloaded.dispose()
+        }
+    }
+
+    /** JSch's own serialisation, which works for some key types and throws for others. */
+    private fun writtenOut(kp: KeyPair): String? = runCatching {
+        val out = java.io.ByteArrayOutputStream()
+        kp.writePrivateKey(out)
+        out.toString(Charsets.UTF_8.name()).takeIf { it.isNotBlank() }
+    }.getOrNull()
+
+    /**
+     * An ed25519 key rebuilt from the blob JSch would hand to an SSH agent, which is
+     * `string type, string publicKey, string privateKey, string comment` — the private string
+     * being the 32-byte seed followed by the public key.
+     */
+    private fun fromAgentBlob(kp: KeyPair): String? = runCatching {
+        val blob = kp.forSSHAgent()
+        val reader = SshStringReader(blob)
+        if (reader.next()?.toString(Charsets.UTF_8) != "ssh-ed25519") return@runCatching null
+        val publicKey = reader.next() ?: return@runCatching null
+        val privateKey = reader.next() ?: return@runCatching null
+        if (privateKey.size < 32) return@runCatching null
+        val seed = privateKey.copyOfRange(0, 32)
+        val params = org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters(seed, 0)
+        // Cheap self-check before the caller's: the seed has to belong to this key.
+        if (!params.generatePublicKey().encoded.contentEquals(publicKey)) return@runCatching null
+        val encoded = org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil.encodePrivateKey(params)
+        val base64 = java.util.Base64.getMimeEncoder(64, "\n".toByteArray()).encodeToString(encoded)
+        "-----BEGIN OPENSSH PRIVATE KEY-----\n$base64\n-----END OPENSSH PRIVATE KEY-----\n"
+    }.getOrNull()
+
+    /** Walks the `uint32 length, bytes` strings an SSH blob is made of. */
+    private class SshStringReader(private val blob: ByteArray) {
+        private var at = 0
+
+        fun next(): ByteArray? {
+            if (at + 4 > blob.size) return null
+            var length = 0
+            repeat(4) { length = (length shl 8) or (blob[at++].toInt() and 0xff) }
+            if (length < 0 || at + length > blob.size) return null
+            return blob.copyOfRange(at, at + length).also { at += length }
         }
     }
 
@@ -631,15 +714,13 @@ object SshManager {
 }
 
 /**
- * The outcome of [SshManager.importPrivateKey]: the key text as it will be stored — still
- * encrypted when [encrypted] is true — its public half, and its type.
+ * The outcome of [SshManager.importPrivateKey]: the key text to store, which never needs a
+ * passphrase, its public half, and its type.
  */
 data class ImportedKey(
     val pem: String,
     val publicKey: String,
     val keyType: String,
-    /** True when the key needs a passphrase, which the caller must keep to be able to use it. */
-    val encrypted: Boolean,
 )
 
 /** A live interactive SSH shell. */

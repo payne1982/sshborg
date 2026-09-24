@@ -49,9 +49,9 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
     // them apart from a working key, so the list says so rather than letting the next connection
     // fail for no visible reason. Recomputed whenever the list changes, which is how the warning
     // goes away once the key is imported again.
-    val needsPassphrase = remember { mutableStateMapOf<Long, Boolean>() }
+    val needsReimport = remember { mutableStateMapOf<Long, Boolean>() }
     LaunchedEffect(keys) {
-        keys.forEach { key -> needsPassphrase[key.id] = vm.needsPassphrase(key) }
+        keys.forEach { key -> needsReimport[key.id] = vm.needsReimport(key) }
     }
 
     val context = LocalContext.current
@@ -97,7 +97,7 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
                     KeyItem(
                         key = key,
                         expanded = expandedKeyId == key.id,
-                        needsPassphrase = needsPassphrase[key.id] == true,
+                        needsReimport = needsReimport[key.id] == true,
                         onExpand = { expandedKeyId = if (expandedKeyId == key.id) null else key.id },
                         onRename = { keyToRename = key },
                         onDelete = { keyToDelete = key },
@@ -165,7 +165,7 @@ private fun KeyItem(
     key: SshKeyEntity,
     expanded: Boolean,
     /** The key is encrypted and its passphrase is not stored, so it cannot authenticate. */
-    needsPassphrase: Boolean,
+    needsReimport: Boolean,
     onExpand: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
@@ -186,7 +186,7 @@ private fun KeyItem(
                     )
                     // Nothing can be done about it from here — the passphrase is only ever
                     // taken at import — so this says what to do rather than offering a fix.
-                    if (needsPassphrase) {
+                    if (needsReimport) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.Warning,
@@ -329,6 +329,7 @@ private fun ImportKeyDialog(
     val errorEncrypted   = stringResource(R.string.keys_import_error_encrypted)
     val errorWrongPass   = stringResource(R.string.keys_import_error_wrong_passphrase)
     val errorInvalid     = stringResource(R.string.keys_import_error_invalid)
+    val errorEncryption  = stringResource(R.string.keys_import_error_encryption)
     val defaultLabel     = stringResource(R.string.keys_import_default_label)
 
     AlertDialog(
@@ -447,6 +448,9 @@ private fun ImportKeyDialog(
                         when (rawError) {
                             "encrypted"        -> passphraseError = errorEncrypted
                             "wrong_passphrase" -> passphraseError = errorWrongPass
+                            // The passphrase was right; it is the key's own encryption we
+                            // cannot undo, so this belongs to the key, not to what was typed.
+                            "unsupported_encryption" -> pemError = errorEncryption
                             else               -> pemError = errorInvalid
                         }
                     }
