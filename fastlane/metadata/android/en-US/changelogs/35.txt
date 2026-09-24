@@ -1,1 +1,1 @@
-• SFTP: a built-in editor for the files on your server — text files are edited in place and keep their encoding, line endings and permissions, files too big to edit open read-only up to 4 MB, and anything that is not text opens in a hex editor
+• SFTP: a built-in editor for the files on your server — text files are edited in place and keep their encoding, line endings and permissions, configuration files are syntax coloured, and anything that is not text opens in a hex editor

@@ -1,1 +1,1 @@
-• SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage, fins de ligne et droits, les trop gros s'ouvrent en lecture seule jusqu'à 4 Mo, et ce qui n'est pas du texte s'ouvre dans un éditeur hexadécimal
+• SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage, fins de ligne et droits, les fichiers de configuration sont colorés, et ce qui n'est pas du texte s'ouvre dans un éditeur hexadécimal
