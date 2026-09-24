@@ -126,11 +126,12 @@ fun SftpScreen(
             return
         }
         is EditorState.Ready -> {
+            val charsets by vm.editorCharsets.collectAsState()
             EditorScreen(
                 state = e,
                 onSave = vm::saveEditor,
                 onClose = vm::closeEditor,
-                charsets = vm::editorCharsets,
+                charsets = { charsets },
                 onCharset = vm::setEditorCharset,
                 onDismissProblem = vm::dismissEditorProblem,
             )

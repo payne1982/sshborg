@@ -406,6 +406,12 @@ private fun CharsetDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.editor_charset)) },
         text = {
+            // Still being worked out in the background on a large file; it lands in a moment.
+            if (charsets.isEmpty()) {
+                Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
             ScrollingDialogBody {
                 charsets.forEach { charset ->
                     Row(

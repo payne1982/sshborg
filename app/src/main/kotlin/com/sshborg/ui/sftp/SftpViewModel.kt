@@ -170,6 +170,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val decoded = TextFile.decode(bytes, allowBinary = asText)
         _editor.value = decoded?.let { EditorState.Ready(remotePath, it) }
             ?: EditorState.Unsupported(remotePath, EditorState.Reason.BINARY, bytes.size.toLong())
+        if (decoded != null) findCharsets(remotePath, bytes)
     }
 
     /** Picks up "open as text anyway" on the file already in hand — see [decide]. */
@@ -183,12 +184,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * Reads the open file again as [charset] — the bytes are already here, so this only changes
      * how they are read. The caller has already dealt with any unsaved text; a charset that
      * cannot hold these bytes is not offered in the first place, so failing here is a bug.
+     *
+     * On a background thread because decoding megabytes is not something to do while the
+     * screen waits for a tap to finish.
      */
     fun setEditorCharset(charset: java.nio.charset.Charset) {
         val open = _editor.value as? EditorState.Ready ?: return
         val bytes = editorBytes ?: return
-        val decoded = TextFile.decodeWith(bytes, charset, open.decoded.bom) ?: return
-        _editor.value = open.copy(decoded = decoded, savedAt = 0L)
+        viewModelScope.launch(Dispatchers.IO) {
+            val decoded = TextFile.decodeWith(bytes, charset, open.decoded.bom) ?: return@launch
+            _editor.update { at ->
+                (at as? EditorState.Ready)?.takeIf { it.path == open.path }
+                    ?.copy(decoded = decoded, savedAt = 0L) ?: at
+            }
+        }
     }
 
     /**
@@ -238,9 +247,24 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** The charsets the open file can be read as, for the picker. */
-    fun editorCharsets(): List<java.nio.charset.Charset> =
-        editorBytes?.let { TextFile.readableAs(it) } ?: emptyList()
+    /**
+     * The charsets the open file can be read as, worked out once in the background while the
+     * user is already reading the file.
+     *
+     * Every candidate is decoded and re-encoded whole to prove the round trip, so on a file of
+     * megabytes this is seconds of work — done when the picker is tapped, it was a frozen
+     * screen; done here, it is ready before anyone looks for it.
+     */
+    private val _editorCharsets = MutableStateFlow<List<java.nio.charset.Charset>>(emptyList())
+    val editorCharsets: StateFlow<List<java.nio.charset.Charset>> = _editorCharsets
+
+    private fun findCharsets(remotePath: String, bytes: ByteArray) {
+        _editorCharsets.value = emptyList()
+        viewModelScope.launch(Dispatchers.Default) {
+            val found = TextFile.readableAs(bytes)
+            if (_editor.value?.path == remotePath) _editorCharsets.value = found
+        }
+    }
 
     fun dismissEditorProblem() {
         _editor.update {
@@ -308,6 +332,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun closeEditor() {
         _editor.value = null
+        _editorCharsets.value = emptyList()
         editorBytes = null
         editorBytesPath = null
     }
