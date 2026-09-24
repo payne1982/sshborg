@@ -1,5 +1,6 @@
 package com.sshborg.ui.common
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 fun ScrollingDialogBody(
     modifier: Modifier = Modifier,
     maxHeight: Dp = (LocalConfiguration.current.screenHeightDp * 0.5f).dp,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val scroll = rememberScrollState()
@@ -44,6 +46,7 @@ fun ScrollingDialogBody(
             Modifier
                 .heightIn(max = maxHeight - ARROW_ROW * 2)
                 .verticalScroll(scroll),
+            verticalArrangement = verticalArrangement,
             content = content,
         )
         Chevron(Icons.Filled.KeyboardArrowDown, scroll.canScrollForward)

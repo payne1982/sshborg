@@ -5,9 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -19,17 +17,20 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
 import android.content.ClipData
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.db.SshKeyEntity
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.ScrollingDialogBody
 import com.sshborg.ui.common.TvTapField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -273,6 +274,10 @@ private fun RenameKeyDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        // Short, but centred in the window it would still meet the keyboard; see the import
+        // dialog for why the padding goes on the dialog and not on its content.
+        modifier = Modifier.imePadding(),
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.keys_rename_title)) },
         text = {
             OutlinedTextField(
@@ -323,10 +328,17 @@ private fun ImportKeyDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        // With the keyboard up, this dialog is taller than the room left for it. The window must
+        // not try to fit the IME itself — it keeps its full height and leaves the buttons behind
+        // the keyboard. Padding the dialog's own content instead shrinks the space it is measured
+        // in, so all of it, buttons included, is laid out above the keyboard and the body scrolls
+        // for the rest. Hence no height cap on the body: the space left is the cap.
+        modifier = Modifier.imePadding(),
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.keys_import_title)) },
         text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+            ScrollingDialogBody(
+                maxHeight = Dp.Infinity,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (touchless) {
@@ -451,9 +463,14 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.imePadding(),
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.keygen_title)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            ScrollingDialogBody(
+                maxHeight = Dp.Infinity,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 if (touchless) {
                     TvTapField(
                         value = label,
