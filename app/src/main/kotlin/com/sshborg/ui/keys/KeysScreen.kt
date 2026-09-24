@@ -43,6 +43,16 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
     var keyToRename by remember { mutableStateOf<SshKeyEntity?>(null) }
     var expandedKeyId by remember { mutableStateOf<Long?>(null) }
 
+    // Which keys cannot be used as they stand: encrypted, with no passphrase stored. Keys
+    // imported before the app kept the passphrase are all in here, and nothing else would tell
+    // them apart from a working key, so the list says so rather than letting the next connection
+    // fail for no visible reason. Recomputed whenever the list changes, which is how the warning
+    // goes away once the key is imported again.
+    val needsPassphrase = remember { mutableStateMapOf<Long, Boolean>() }
+    LaunchedEffect(keys) {
+        keys.forEach { key -> needsPassphrase[key.id] = vm.needsPassphrase(key) }
+    }
+
     val context = LocalContext.current
     val importFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
@@ -86,6 +96,7 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
                     KeyItem(
                         key = key,
                         expanded = expandedKeyId == key.id,
+                        needsPassphrase = needsPassphrase[key.id] == true,
                         onExpand = { expandedKeyId = if (expandedKeyId == key.id) null else key.id },
                         onRename = { keyToRename = key },
                         onDelete = { keyToDelete = key },
@@ -152,6 +163,8 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
 private fun KeyItem(
     key: SshKeyEntity,
     expanded: Boolean,
+    /** The key is encrypted and its passphrase is not stored, so it cannot authenticate. */
+    needsPassphrase: Boolean,
     onExpand: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
@@ -164,11 +177,31 @@ private fun KeyItem(
         ListItem(
             headlineContent = { Text(key.label) },
             supportingContent = {
-                Text(
-                    key.keyType,
-                    fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Column {
+                    Text(
+                        key.keyType,
+                        fontFamily = FontFamily.Monospace,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    // Nothing can be done about it from here — the passphrase is only ever
+                    // taken at import — so this says what to do rather than offering a fix.
+                    if (needsPassphrase) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Warning,
+                                null,
+                                Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.error,
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                stringResource(R.string.keys_needs_passphrase),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
+                }
             },
             leadingContent = { Icon(Icons.Default.Key, null) },
             trailingContent = {
@@ -366,6 +399,11 @@ private fun ImportKeyDialog(
                         },
                     )
                 }
+                Text(
+                    stringResource(R.string.keys_passphrase_note),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,

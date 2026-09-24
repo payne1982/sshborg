@@ -1190,10 +1190,21 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             .mapNotNull { hostDao.getById(it) }
     }
 
+    /**
+     * Public-key auth for [host], carrying the key's passphrase when it has one: the key is kept
+     * exactly as it was imported, so an encrypted one opens only with the passphrase stored
+     * beside it. Null when the host has no key, or its key cannot be read.
+     */
+    private suspend fun keyAuthFor(host: HostEntity): SshAuth.PublicKey? {
+        val key = host.keyId?.let { keyDao.getById(it) } ?: return null
+        val pem = KeystoreManager.getPrivateKeyPem(key) ?: return null
+        return SshAuth.PublicKey(pem, KeystoreManager.getPassphrase(key))
+    }
+
     private suspend fun buildJumpAuth(host: HostEntity): SshAuth? {
-        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
+        val keyAuth = keyAuthFor(host)
         return when {
-            host.keyId != null && keyPem != null -> SshAuth.PublicKey(keyPem)
+            keyAuth != null -> keyAuth
             !host.encryptedPassword.isNullOrEmpty() ->
                 runCatching { SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword)) }.getOrNull()
             !host.password.isNullOrEmpty() -> SshAuth.Password(host.password)
@@ -1202,9 +1213,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private suspend fun buildAuth(host: HostEntity): SshAuth? {
-        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
-        return if (host.keyId != null && keyPem != null) {
-            SshAuth.PublicKey(keyPem)
+        val keyAuth = keyAuthFor(host)
+        return if (keyAuth != null) {
+            keyAuth
         } else if (!host.encryptedPassword.isNullOrEmpty()) {
             SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword))
         } else if (!host.password.isNullOrEmpty()) {

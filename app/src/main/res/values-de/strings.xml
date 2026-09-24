@@ -136,6 +136,10 @@
     <string name="keys_import_error_wrong_passphrase">Falsche Passphrase</string>
     <string name="keys_import_error_invalid">Ungültiges oder nicht unterstütztes Schlüsselformat</string>
 
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Passphrase fehlt — Schlüssel erneut importieren</string>
+    <string name="keys_passphrase_note">Wird mit dem Schlüssel gespeichert, damit sie nicht bei jeder Verbindung verlangt wird. Ist in den Einstellungen die Hardware-Verschlüsselung aktiv, verschlüsselt das Gerät sie.</string>
+
     <string name="keygen_title">SSH-Schlüssel generieren</string>
     <string name="keygen_field_label">Bezeichnung</string>
     <string name="keygen_key_type">Schlüsseltyp</string>

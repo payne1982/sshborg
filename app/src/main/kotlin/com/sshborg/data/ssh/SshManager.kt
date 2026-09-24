@@ -567,16 +567,25 @@ object SshManager {
 
     /**
      * Loads a PEM or OpenSSH private key and derives its public key.
+     *
+     * The key text is returned as it came in, **still encrypted** when it was: only the public
+     * key is derived from the decrypted copy, which is discarded. The caller is expected to keep
+     * the passphrase (see [com.sshborg.data.db.SshKeyEntity.passphrase]) and hand it back at
+     * connection time, because a decrypted key cannot be written out again for every key type —
+     * JSch refuses to serialise ed25519.
+     *
      * @param pem  private key text (PEM / OpenSSH format)
      * @param passphrase  only needed if the key is encrypted
-     * @return Triple(normalizedPem, publicKeyAuthorizedKeys, keyTypeShort)
      */
-    fun importPrivateKey(pem: String, passphrase: String? = null): Triple<String, String, String> {
+    fun importPrivateKey(pem: String, passphrase: String? = null): ImportedKey {
         val jsch = JSch()
         val normalizedPem = pem.replace("\r\n", "\n").trim()
         val kp = KeyPair.load(jsch, normalizedPem.toByteArray(Charsets.UTF_8), null)
         try {
-            if (kp.isEncrypted) {
+            // Read before decrypting: a successful decrypt clears JSch's own flag, so asking
+            // afterwards reports every key as unencrypted.
+            val wasEncrypted = kp.isEncrypted
+            if (wasEncrypted) {
                 if (passphrase.isNullOrEmpty()) throw JSchException("encrypted")
                 if (!kp.decrypt(passphrase.toByteArray(Charsets.UTF_8))) throw JSchException("wrong_passphrase")
             }
@@ -590,11 +599,21 @@ object SshManager {
                 algToken.startsWith("ecdsa") -> "ecdsa"
                 else                         -> algToken
             }
-            return Triple(normalizedPem, pub, keyType)
+            return ImportedKey(normalizedPem, pub, keyType, encrypted = wasEncrypted)
         } finally {
             kp.dispose()
         }
     }
+
+    /**
+     * Whether [pem] is an encrypted private key, and therefore useless without its passphrase.
+     * A key this cannot parse at all counts as not encrypted: the failure to report then is
+     * "unreadable key", which the import path already words for itself.
+     */
+    fun isKeyEncrypted(pem: String): Boolean = runCatching {
+        val kp = KeyPair.load(JSch(), pem.replace("\r\n", "\n").trim().toByteArray(Charsets.UTF_8), null)
+        try { kp.isEncrypted } finally { kp.dispose() }
+    }.getOrDefault(false)
 
     /** Builds a known_hosts line from a JSch HostKey. */
     fun buildKnownHostsLine(hostKey: HostKey): String =
@@ -610,6 +629,18 @@ object SshManager {
         config.setProperty("server_host_key",  "${JSch.getConfig("server_host_key")},$legacyHostKey")
     }
 }
+
+/**
+ * The outcome of [SshManager.importPrivateKey]: the key text as it will be stored — still
+ * encrypted when [encrypted] is true — its public half, and its type.
+ */
+data class ImportedKey(
+    val pem: String,
+    val publicKey: String,
+    val keyType: String,
+    /** True when the key needs a passphrase, which the caller must keep to be able to use it. */
+    val encrypted: Boolean,
+)
 
 /** A live interactive SSH shell. */
 class ShellSession(

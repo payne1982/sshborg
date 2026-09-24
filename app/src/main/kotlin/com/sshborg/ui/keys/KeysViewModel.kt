@@ -44,22 +44,52 @@ class KeysViewModel(app: Application) : AndroidViewModel(app) {
         onError: (String) -> Unit,
         onDone: () -> Unit,
     ) = viewModelScope.launch {
+        val typed = passphrase.takeIf { !it.isNullOrEmpty() }
         val result = runCatching {
-            withContext(Dispatchers.IO) {
-                SshManager.importPrivateKey(pem, passphrase.takeIf { !it.isNullOrEmpty() })
-            }
+            withContext(Dispatchers.IO) { SshManager.importPrivateKey(pem, typed) }
         }
-        val (privPem, pub, keyType) = result.getOrElse { onError(it.message ?: ""); return@launch }
-        val pubKey = withComment(pub, commentFor(label))   // comment matches the chosen label
+        val imported = result.getOrElse { onError(it.message ?: ""); return@launch }
+        val pubKey = withComment(imported.publicKey, commentFor(label))   // comment matches the chosen label
+        // The key is stored exactly as it arrived, so an encrypted one is only usable if its
+        // passphrase is kept too: at connection time there is nobody to ask. A passphrase typed
+        // for a key that turns out not to need one is dropped.
+        val keyPassphrase = typed.takeIf { imported.encrypted }
         val encEnabled = prefs.keystoreEncryption.first()
-        val entity = if (encEnabled) {
-            val blob = withContext(Dispatchers.IO) { KeystoreManager.encrypt(privPem) }
-            SshKeyEntity(label = label, keyType = keyType, privateKeyPem = "", encryptedBlob = blob, publicKey = pubKey)
-        } else {
-            SshKeyEntity(label = label, keyType = keyType, privateKeyPem = privPem, publicKey = pubKey)
+        val entity = withContext(Dispatchers.IO) {
+            if (encEnabled) {
+                SshKeyEntity(
+                    label = label,
+                    keyType = imported.keyType,
+                    privateKeyPem = "",
+                    encryptedBlob = KeystoreManager.encrypt(imported.pem),
+                    passphrase = null,
+                    encryptedPassphrase = keyPassphrase?.let { KeystoreManager.encrypt(it) },
+                    publicKey = pubKey,
+                )
+            } else {
+                SshKeyEntity(
+                    label = label,
+                    keyType = imported.keyType,
+                    privateKeyPem = imported.pem,
+                    passphrase = keyPassphrase,
+                    publicKey = pubKey,
+                )
+            }
         }
         dao.upsert(entity)
         onDone()
+    }
+
+    /**
+     * Whether [key] cannot be used as it stands: an encrypted key with no passphrase stored,
+     * which is every encrypted key imported before the app kept one. Reading and parsing the key
+     * is cheap next to a connection, and this is what the list warns about — the passphrase is
+     * only ever taken at import, so such a key has to be imported again.
+     */
+    suspend fun needsPassphrase(key: SshKeyEntity): Boolean = withContext(Dispatchers.IO) {
+        if (KeystoreManager.getPassphrase(key) != null) return@withContext false
+        val pem = KeystoreManager.getPrivateKeyPem(key) ?: return@withContext false
+        SshManager.isKeyEncrypted(pem)
     }
 
     fun renameKey(key: SshKeyEntity, newLabel: String) = viewModelScope.launch {

@@ -136,6 +136,10 @@
     <string name="keys_import_error_wrong_passphrase">Frase-passe incorreta</string>
     <string name="keys_import_error_invalid">Formato de chave inválido ou não suportado</string>
 
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Falta a frase-passe — importe esta chave novamente</string>
+    <string name="keys_passphrase_note">É guardada com a chave, para não ser pedida em cada ligação. Se a cifragem por hardware estiver ativa nas definições, o dispositivo cifra-a.</string>
+
     <string name="keygen_title">Gerar Chave SSH</string>
     <string name="keygen_field_label">Etiqueta</string>
     <string name="keygen_key_type">Tipo de chave</string>

@@ -139,6 +139,10 @@
     <string name="keys_import_error_wrong_passphrase">パスフレーズが正しくありません</string>
     <string name="keys_import_error_invalid">無効またはサポートされていない鍵の形式です</string>
 
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">パスフレーズがありません — この鍵を再度インポートしてください</string>
+    <string name="keys_passphrase_note">鍵と一緒に保存されるため、接続ごとに尋ねられません。設定でハードウェア暗号化を有効にしていると、端末が暗号化します。</string>
+
     <!-- Generate key dialog -->
     <string name="keygen_title">SSH 鍵を生成</string>
     <string name="keygen_field_label">ラベル</string>

@@ -140,6 +140,10 @@
     <string name="keys_import_error_wrong_passphrase">Неверный пароль</string>
     <string name="keys_import_error_invalid">Неверный или неподдерживаемый формат ключа</string>
 
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Нет пароля ключа — импортируйте ключ заново</string>
+    <string name="keys_passphrase_note">Сохраняется вместе с ключом, чтобы его не запрашивали при каждом подключении. Если в настройках включено аппаратное шифрование, устройство его шифрует.</string>
+
     <!-- Generate key dialog -->
     <string name="keygen_title">Генерация SSH-ключа</string>
     <string name="keygen_field_label">Название</string>

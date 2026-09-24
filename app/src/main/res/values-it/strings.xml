@@ -136,6 +136,10 @@
     <string name="keys_import_error_wrong_passphrase">Passphrase errata</string>
     <string name="keys_import_error_invalid">Formato chiave non valido o non supportato</string>
 
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Manca la passphrase — reimporta questa chiave</string>
+    <string name="keys_passphrase_note">Viene salvata con la chiave, così non è richiesta a ogni collegamento. Se nelle impostazioni è attiva la cifratura hardware, la cifra il dispositivo.</string>
+
     <string name="keygen_title">Genera Chiave SSH</string>
     <string name="keygen_field_label">Etichetta</string>
     <string name="keygen_key_type">Tipo di chiave</string>

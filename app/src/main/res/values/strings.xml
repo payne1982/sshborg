@@ -140,6 +140,10 @@
     <string name="keys_import_error_wrong_passphrase">Wrong passphrase</string>
     <string name="keys_import_error_invalid">Invalid or unsupported key format</string>
 
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Passphrase missing — import this key again</string>
+    <string name="keys_passphrase_note">Saved with the key, so it is not asked at every connection. When hardware encryption is on in Settings, the device encrypts it.</string>
+
     <!-- Generate key dialog -->
     <string name="keygen_title">Generate SSH Key</string>
     <string name="keygen_field_label">Label</string>
