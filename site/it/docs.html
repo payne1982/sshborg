@@ -686,7 +686,11 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Cifrare chiavi e password salvate</h3>
             <p>Attiva <strong>Impostazioni → Sicurezza → Cifra dati sensibili</strong> per conservare le chiavi private e le password degli host cifrate con una chiave custodita nell'hardware sicuro del dispositivo — l'Android Keystore, o il Portachiavi su iOS. Resta disattivata finché non la abiliti; il consiglio di sicurezza mostrato al primo avvio la segnala.</p>
             <p>I dati cifrati sono legati al dispositivo e a questa installazione dell'app: dopo la disinstallazione le chiavi salvate non si possono recuperare, e dovresti generarne di nuove e autorizzarle di nuovo sui server. Insieme a un blocco app, è fortemente consigliata se conservi sul telefono credenziali sensibili.</p>
-            <p>Una chiave importata protetta da passphrase viene sbloccata una sola volta, al momento dell'importazione.</p>
+            <p>Una chiave protetta da passphrase la chiede una volta sola, al momento dell'importazione: da lì in poi la passphrase resta conservata insieme alla chiave, così nessun collegamento la richiede di nuovo, ed è cifrata insieme alla chiave quando <strong>Cifra dati sensibili</strong> è attiva. Una chiave importata prima che funzionasse così va reimportata — nella lista delle chiavi sono segnalate quelle a cui manca la passphrase.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                Su iOS una chiave protetta da passphrase non è ancora utilizzabile: la passphrase viene verificata all'importazione ma non conservata, quindi il collegamento con quella chiave fallisce. Usa una chiave senza passphrase, o generane una nell'app.
+            </div>
         </div>
 
         <div class="doc-section" id="suggestions">

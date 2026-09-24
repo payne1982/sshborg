@@ -1,1 +1,2 @@
 • SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage, fins de ligne et droits, les fichiers de configuration sont colorés, et ce qui n'est pas du texte s'ouvre dans un éditeur hexadécimal
+• Clés SSH : une clé avec phrase secrète fonctionne enfin — la phrase est enregistrée avec la clé, chiffrée par l'appareil si l'option est active. Les clés importées avant doivent être réimportées ; la liste les signale.

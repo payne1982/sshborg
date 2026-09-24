@@ -1,1 +1,2 @@
 • SFTP: editor integrato per i file sul server — i file di testo si modificano sul posto e mantengono codifica, fine riga e permessi, i file di configurazione vengono colorati, e ciò che non è testo si apre in un editor esadecimale
+• Chiavi SSH: una chiave con passphrase ora funziona — la passphrase viene salvata con la chiave e cifrata dal dispositivo se l'opzione è attiva. Le chiavi importate prima vanno reimportate; la lista le segnala.

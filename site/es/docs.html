@@ -686,7 +686,11 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Cifrar claves y contraseñas guardadas</h3>
             <p>Activa <strong>Ajustes → Seguridad → Cifrar datos sensibles</strong> para guardar las claves privadas y las contraseñas de los hosts cifradas con una clave protegida por el hardware seguro del dispositivo — el Android Keystore o, en iOS, el Llavero. Permanece desactivado hasta que lo actives; el consejo de seguridad del primer inicio lo recuerda.</p>
             <p>Los datos cifrados quedan ligados al dispositivo y a esta instalación de la app: tras desinstalarla, las claves guardadas no se pueden recuperar y tendrías que generar otras nuevas y autorizarlas de nuevo en tus servidores. Junto con un bloqueo de la app, es muy recomendable si guardas credenciales sensibles en el teléfono.</p>
-            <p>Una clave importada protegida con frase de contraseña se desbloquea con ella una sola vez, al importarla.</p>
+            <p>Una clave protegida con frase de contraseña la pide una sola vez, al importarla: a partir de ahí la frase se guarda con la clave, así que ninguna conexión vuelve a pedirla, y se cifra junto con la clave cuando <strong>Cifrar datos sensibles</strong> está activado. Una clave importada antes de que fuera así hay que importarla de nuevo — la lista de claves señala aquellas a las que les falta la frase.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                En iOS una clave protegida con frase de contraseña aún no se puede usar: la frase se comprueba al importar la clave pero no se guarda, así que la conexión con esa clave falla. Usa una clave sin frase de contraseña, o genera una en la app.
+            </div>
         </div>
 
         <div class="doc-section" id="suggestions">

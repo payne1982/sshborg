@@ -1,1 +1,2 @@
 • SFTP: eingebauter Editor für die Dateien auf dem Server — Textdateien werden direkt dort bearbeitet und behalten Kodierung, Zeilenenden und Rechte, Konfigurationsdateien werden farbig hervorgehoben, und alles, was kein Text ist, öffnet im Hex-Editor
+• SSH-Schlüssel: ein Schlüssel mit Passphrase funktioniert jetzt — sie wird beim Schlüssel gespeichert und, wenn die Option aktiv ist, vom Gerät verschlüsselt. Früher importierte Schlüssel neu importieren; die Liste zeigt sie.

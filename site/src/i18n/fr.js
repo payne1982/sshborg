@@ -242,7 +242,11 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Chiffrer les clés et mots de passe enregistrés</h3>
             <p>Activez <strong>Paramètres → Sécurité → Chiffrer les données sensibles</strong> pour stocker les clés privées et les mots de passe des hôtes chiffrés avec une clé conservée dans le matériel sécurisé de l'appareil — l'Android Keystore, ou le Trousseau sur iOS. L'option reste désactivée tant que vous ne l'activez pas ; le conseil de sécurité affiché au premier lancement la signale.</p>
             <p>Les données chiffrées sont liées à l'appareil et à cette installation de l'app : après désinstallation, les clés enregistrées ne peuvent pas être récupérées, et il faudrait en générer de nouvelles et les autoriser à nouveau sur vos serveurs. Avec un verrouillage de l'app, c'est fortement recommandé si vous gardez des identifiants sensibles sur votre téléphone.</p>
-            <p>Une clé importée protégée par une phrase secrète est déverrouillée avec celle-ci une seule fois, lors de l'import.</p>`,
+            <p>Une clé protégée par une phrase secrète la demande une seule fois, à l'import : ensuite la phrase est conservée avec la clé, aucune connexion ne la redemande, et elle est chiffrée avec la clé lorsque <strong>Chiffrer les données sensibles</strong> est actif. Une clé importée avant que ce soit le cas doit être réimportée — la liste des clés signale celles dont la phrase manque.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                Sur iOS une clé protégée par une phrase secrète n'est pas encore utilisable : la phrase est vérifiée à l'import mais pas conservée, la connexion avec cette clé échoue donc. Utilisez une clé sans phrase secrète, ou générez-en une dans l'app.
+            </div>`,
 
   doc_suggestions: `
             <h2>// SUGGESTIONS DE COMMANDES</h2>

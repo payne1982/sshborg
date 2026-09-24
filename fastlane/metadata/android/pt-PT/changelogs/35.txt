@@ -1,1 +1,2 @@
 • SFTP: editor integrado para os ficheiros no servidor — os de texto são editados no próprio servidor e mantêm codificação, fins de linha e permissões, os de configuração são coloridos, e o que não é texto abre num editor hexadecimal
+• Chaves SSH: uma chave com frase-passe já funciona — a frase-passe é guardada com a chave e cifrada pelo dispositivo se a opção estiver ativa. As chaves importadas antes têm de ser importadas de novo; a lista assinala-as.
