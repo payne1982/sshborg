@@ -545,6 +545,7 @@
             <li class="sub"><a href="#jump-hosts">Chaînes multi-sauts</a></li>
             <li><a href="#sessions">Sessions multiples</a></li>
             <li><a href="#security">Sécurité de l'app</a></li>
+            <li class="sub"><a href="#security">La configuration la plus sûre</a></li>
             <li><a href="#backup">Sauvegarde de la configuration</a></li>
             <li><a href="#android-tv">Android TV</a></li>
             <li><a href="#licenses">Licences open source</a></li>
@@ -998,6 +999,17 @@ Host target
                 <div class="callout-label">// NOTE SUR LES SAUVEGARDES</div>
                 Comme la clé de chiffrement ne quitte jamais le matériel sécurisé de l'appareil, les clés <strong>ne peuvent pas être restaurées</strong> depuis une sauvegarde cloud ou de l'appareil et ne seront pas transférées automatiquement vers un nouveau téléphone. Avant de changer d'appareil, assurez-vous d'autoriser une nouvelle clé générée sur le nouvel appareil sur tous vos serveurs.
             </div>
+            <h3>La configuration la plus sûre</h3>
+            <p>Chaque élément ci-dessus est utile en soi. Ensemble, ils constituent le maximum que l'app puisse offrir, et cela prend deux minutes :</p>
+            <ol>
+                <li>Activez <strong>Réglages → Sécurité → Chiffrer les données sensibles</strong>.</li>
+                <li>Mettez le verrou de l'app sur <strong>Biométrie seule</strong> — ou sur <strong>Code ou phrase secrète</strong> si vous préférez ne pas dépendre de la biométrie du téléphone.</li>
+                <li>Mettez le délai de verrouillage sur <strong>Immédiatement</strong>, au plus <strong>30 secondes</strong>.</li>
+                <li>Générez une nouvelle clé dans l'app, avec un nom qui dise de quel appareil il s'agit.</li>
+                <li>Autorisez cette clé sur vos serveurs et utilisez-la à la place du mot de passe.</li>
+            </ol>
+            <p>Une clé générée sur le téléphone n'a jamais existé ailleurs : pas de copie plus ancienne qui aurait pu fuiter, rien à nettoyer sur une autre machine. Une clé par appareil signifie aussi qu'un téléphone perdu coûte une ligne dans <code>authorized_keys</code> — vous la retirez et vos autres appareils continuent de fonctionner, et c'est pourquoi le nom mérite d'être bien choisi.</p>
+            <p>Ce que rien de tout cela ne peut faire : si le téléphone lui-même est compromis, cette clé l'est avec lui, quoi qu'il la protège sur le disque. Une phrase secrète ne la sauverait pas non plus — ce qui peut lire le stockage de l'app peut aussi lire ce que vous tapez. C'est pourquoi SSHBorg demande la phrase secrète d'une clé une seule fois, à l'import, et conserve la clé déverrouillée plutôt que la phrase (voir <a href="#ssh-keys">Clés SSH</a>).</p>
         </div>
 
         <div class="doc-section" id="backup">

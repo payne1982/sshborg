@@ -545,6 +545,7 @@
             <li class="sub"><a href="#jump-hosts">Multi-Hop-Ketten</a></li>
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
             <li><a href="#security">App-Sicherheit</a></li>
+            <li class="sub"><a href="#security">Die sicherste Einrichtung</a></li>
             <li><a href="#backup">Konfiguration sichern</a></li>
             <li><a href="#android-tv">Android TV</a></li>
             <li><a href="#licenses">Open-Source-Lizenzen</a></li>
@@ -998,6 +999,17 @@ Host target
                 <div class="callout-label">// HINWEIS ZUM BACKUP</div>
                 Da der Verschlüsselungsschlüssel die sichere Hardware des Geräts nie verlässt, lassen sich Schlüssel <strong>nicht aus einem Cloud- oder Geräte-Backup wiederherstellen</strong> und werden nicht automatisch auf ein neues Gerät übertragen. Stelle vor einem Gerätewechsel sicher, dass du einen auf dem neuen Gerät generierten Schlüssel auf allen deinen Servern autorisierst.
             </div>
+            <h3>Die sicherste Einrichtung</h3>
+            <p>Jeder Baustein oben hilft schon allein. Zusammen sind sie das Sicherste, was die App bietet, und es kostet zwei Minuten:</p>
+            <ol>
+                <li>Schalte <strong>Einstellungen → Sicherheit → Sensible Daten verschlüsseln</strong> ein.</li>
+                <li>Setze die App-Sperre auf <strong>Nur biometrisch</strong> — oder auf <strong>PIN oder Passphrase</strong>, wenn du der Biometrie des Telefons nicht vertrauen willst.</li>
+                <li>Setze die Zeitsperre auf <strong>Sofort</strong>, höchstens auf <strong>30 Sekunden</strong>.</li>
+                <li>Erzeuge einen neuen Schlüssel in der App, mit einem Namen, der das Gerät benennt.</li>
+                <li>Autorisiere diesen Schlüssel auf deinen Servern und nutze ihn statt eines Passworts.</li>
+            </ol>
+            <p>Ein auf dem Telefon erzeugter Schlüssel hat nie woanders existiert: es gibt keine ältere Kopie, die schon entwichen sein könnte, und nichts, was auf einem anderen Rechner aufzuräumen wäre. Ein Schlüssel pro Gerät heißt auch: ein verlorenes Telefon kostet eine Zeile in <code>authorized_keys</code> — entfernen, und die anderen Geräte laufen weiter. Darum lohnt sich ein guter Name.</p>
+            <p>Was nichts davon kann: ist das Telefon selbst kompromittiert, ist dieser Schlüssel es mit ihm, was ihn auf der Platte auch schützt. Auch eine Passphrase würde ihn nicht retten — wer den Speicher der App lesen kann, liest auch mit, was du tippst. Darum verlangt SSHBorg die Passphrase eines Schlüssels einmal, beim Import, und speichert den Schlüssel entsperrt, statt die Passphrase zu behalten (siehe <a href="#ssh-keys">SSH-Schlüssel</a>).</p>
         </div>
 
         <div class="doc-section" id="backup">

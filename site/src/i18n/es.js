@@ -113,6 +113,7 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Cadenas multi-salto</a></li>
             <li><a href="#sessions">Sesiones múltiples</a></li>
             <li><a href="#security">Seguridad de la app</a></li>
+            <li class="sub"><a href="#security">La configuración más segura</a></li>
             <li><a href="#backup">Copia de seguridad</a></li>
             <li><a href="#android-tv">Android TV</a></li>
             <li><a href="#licenses">Licencias de código abierto</a></li>`,
@@ -533,7 +534,18 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA SOBRE COPIAS DE SEGURIDAD</div>
                 Como la clave de cifrado nunca sale del hardware seguro del dispositivo, las claves <strong>no se pueden restaurar</strong> desde una copia de seguridad en la nube o del dispositivo y no se transferirán automáticamente a un nuevo teléfono. Antes de cambiar de dispositivo, asegúrate de autorizar una nueva clave generada en el nuevo dispositivo en todos tus servidores.
-            </div>`,
+            </div>
+            <h3>La configuración más segura</h3>
+            <p>Cada pieza anterior sirve por sí sola. Juntas son lo más seguro que ofrece la app, y son dos minutos:</p>
+            <ol>
+                <li>Activa <strong>Ajustes → Seguridad → Cifrar datos sensibles</strong>.</li>
+                <li>Pon el bloqueo de la app en <strong>Solo biométrico</strong> — o en <strong>PIN o contraseña</strong> si prefieres no depender de la biometría del teléfono.</li>
+                <li>Pon el tiempo de espera del bloqueo en <strong>Inmediatamente</strong>, o como máximo <strong>30 segundos</strong>.</li>
+                <li>Genera una clave nueva en la app, con un nombre que diga de qué dispositivo es.</li>
+                <li>Autoriza esa clave en tus servidores y úsala en lugar de la contraseña.</li>
+            </ol>
+            <p>Una clave generada en el teléfono nunca ha existido en otro sitio: no hay una copia más antigua que pudiera haberse filtrado, ni nada que limpiar en otra máquina. Una clave por dispositivo también significa que perder el teléfono cuesta una línea en <code>authorized_keys</code> — la quitas y los demás dispositivos siguen funcionando, y por eso conviene elegir bien el nombre.</p>
+            <p>Lo que nada de esto puede hacer: si el teléfono está comprometido, esa clave lo está con él, sea lo que sea lo que la proteja en el disco. Tampoco la salvaría una frase de contraseña — quien puede leer el almacenamiento de la app también puede leer lo que escribes. Por eso SSHBorg pide la frase de una clave una sola vez, al importarla, y guarda la clave abierta en lugar de conservar la frase (véase <a href="#ssh-keys">Claves SSH</a>).</p>`,
 
   doc_android_tv: `
             <h2>// ANDROID TV</h2>

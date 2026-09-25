@@ -545,6 +545,7 @@
             <li class="sub"><a href="#jump-hosts">Catene multi-hop</a></li>
             <li><a href="#sessions">Sessioni multiple</a></li>
             <li><a href="#security">Sicurezza dell'app</a></li>
+            <li class="sub"><a href="#security">L'impostazione più sicura</a></li>
             <li><a href="#backup">Backup configurazione</a></li>
             <li><a href="#android-tv">Android TV</a></li>
             <li><a href="#licenses">Licenze open source</a></li>
@@ -998,6 +999,17 @@ Host target
                 <div class="callout-label">// NOTA SUL BACKUP</div>
                 Poiché la chiave di cifratura non lascia mai l'hardware sicuro del dispositivo, le chiavi <strong>non possono essere ripristinate</strong> da un backup cloud o del dispositivo e non si trasferiranno automaticamente su un nuovo telefono. Prima di cambiare dispositivo, assicurati di autorizzare una nuova chiave generata sul nuovo dispositivo su tutti i tuoi server.
             </div>
+            <h3>L'impostazione più sicura</h3>
+            <p>Ognuno dei pezzi qui sopra serve già da solo. Messi insieme sono il massimo che l'app può offrire, e sono due minuti di lavoro:</p>
+            <ol>
+                <li>Attiva <strong>Impostazioni → Sicurezza → Cifra dati sensibili</strong>.</li>
+                <li>Imposta il blocco dell'app su <strong>Solo biometrico</strong> — oppure su <strong>PIN o passphrase</strong> se preferisci non affidarti alla biometria del telefono.</li>
+                <li>Imposta il timeout del blocco su <strong>Immediatamente</strong>, o al massimo <strong>30 secondi</strong>.</li>
+                <li>Genera una nuova chiave nell'app, con un nome che dica di quale dispositivo è.</li>
+                <li>Autorizza quella chiave sui tuoi server e usala invece della password.</li>
+            </ol>
+            <p>Una chiave generata sul telefono non è mai esistita altrove: non c'è una copia più vecchia che possa già essere sfuggita, e non c'è niente da ripulire su un'altra macchina. Una chiave per dispositivo significa anche che perdere il telefono costa una riga in <code>authorized_keys</code> — la togli e gli altri dispositivi continuano a funzionare, ed è per questo che vale la pena scegliere bene il nome.</p>
+            <p>Quello che niente di tutto questo può fare: se il telefono stesso è compromesso, quella chiave è compromessa con lui, qualunque cosa la protegga su disco. Nemmeno una passphrase sulla chiave la salverebbe — chi riesce a leggere lo spazio dell'app riesce anche a leggere quello che digiti. È per questo che SSHBorg chiede la passphrase di una chiave una volta sola, all'importazione, e conserva la chiave aperta invece di tenere la passphrase (vedi <a href="#ssh-keys">Chiavi SSH</a>).</p>
         </div>
 
         <div class="doc-section" id="backup">

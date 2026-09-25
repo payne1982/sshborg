@@ -545,6 +545,7 @@
             <li class="sub"><a href="#jump-hosts">多跳链</a></li>
             <li><a href="#sessions">多会话</a></li>
             <li><a href="#security">应用安全</a></li>
+            <li class="sub"><a href="#security">最安全的设置</a></li>
             <li><a href="#backup">配置备份</a></li>
             <li><a href="#android-tv">Android TV</a></li>
             <li><a href="#licenses">开源许可证</a></li>
@@ -998,6 +999,17 @@ Host target
                 <div class="callout-label">// 备份说明</div>
                 由于加密密钥永远不会离开设备的安全硬件，密钥<strong>无法</strong>从云备份或设备备份中恢复，也不会自动迁移到新手机。更换设备前，请确保在新设备上生成新密钥并在所有服务器上授权。
             </div>
+            <h3>最安全的设置</h3>
+            <p>上面每一项单独都有用。合在一起，就是这个应用能做到的最严密的配置，只需两分钟：</p>
+            <ol>
+                <li>打开<strong>设置 → 安全 → 加密敏感数据</strong>。</li>
+                <li>把应用锁设为<strong>仅生物识别</strong>——若不愿依赖手机的生物识别，则设为<strong>PIN 或密码短语</strong>。</li>
+                <li>把锁定超时设为<strong>立即</strong>，最多 <strong>30 秒</strong>。</li>
+                <li>在应用内生成一把新密钥，名字要能看出它属于哪台设备。</li>
+                <li>把该密钥授权到你的服务器，用它代替密码。</li>
+            </ol>
+            <p>在手机上生成的密钥从未在别处存在过：没有更早的副本可能已经泄露，也没有别的机器需要清理。一台设备一把密钥还意味着，丢了手机只不过是 <code>authorized_keys</code> 里的一行——删掉它，其他设备照常可用。这也正是名字值得好好取的原因。</p>
+            <p>这些措施都做不到的一点：如果手机本身被攻破，那把密钥也随之失守，无论它在磁盘上受什么保护。给密钥加密码短语同样救不了它——能读取应用存储的东西，也能读取你键入的内容。这正是 SSHBorg 只在导入时询问一次密钥的密码短语、并以解锁状态保存密钥而不保存密码短语的原因（见<a href="#ssh-keys">SSH 密钥</a>）。</p>
         </div>
 
         <div class="doc-section" id="backup">

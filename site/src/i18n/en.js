@@ -116,6 +116,7 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
+            <li class="sub"><a href="#security">The strongest setup</a></li>
             <li><a href="#backup">Configuration Backup</a></li>
             <li><a href="#android-tv">Android TV</a></li>
             <li><a href="#licenses">Open source licenses</a></li>`,
@@ -536,7 +537,18 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// BACKUP NOTE</div>
                 Because the encryption key never leaves the device's secure hardware, keys <strong>cannot be restored</strong> from a cloud or device backup and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
-            </div>`,
+            </div>
+            <h3>The strongest setup</h3>
+            <p>Each piece above is useful on its own. Together they are as tight as the app gets, and it takes a couple of minutes:</p>
+            <ol>
+                <li>Turn on <strong>Settings → Security → Encrypt sensitive data</strong>.</li>
+                <li>Set the app lock to <strong>Biometric only</strong> — or to <strong>PIN or passphrase</strong> if you would rather not rely on the phone's biometrics.</li>
+                <li>Set the lock timeout to <strong>Immediately</strong>, or at most <strong>30 seconds</strong>.</li>
+                <li>Generate a new key in the app, with a name that tells you which device it is.</li>
+                <li>Authorize that key on your servers, and use it instead of a password.</li>
+            </ol>
+            <p>A key generated on the phone has never existed anywhere else: there is no older copy of it that might already have leaked, and nothing to clean up on another machine. One key per device also means that losing the phone costs you one line in <code>authorized_keys</code> — remove it and your other devices keep working, which is why the name is worth choosing well.</p>
+            <p>What none of this can do: if the phone itself is compromised, that key is compromised with it, whatever protects it on disk. A passphrase on the key would not save it either — anything able to read the app's storage can also read what you type. That is why SSHBorg asks for a key's passphrase once, when importing it, and stores the key unlocked instead of keeping the passphrase (see <a href="#ssh-keys">SSH Keys</a>).</p>`,
 
   doc_android_tv: `
             <h2>// ANDROID TV</h2>
