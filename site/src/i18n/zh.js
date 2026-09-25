@@ -205,7 +205,8 @@ module.exports = {
                     <li><strong>文件夹</strong> — 长按文件或文件夹打开其菜单：<em>下载</em>、<em>重命名</em>、<em>删除</em>。</li>
                     <li><strong>多选</strong> — 在“操作”菜单中选择<em>选择项目</em>，然后勾选项目。长按则会打开该项目的菜单。</li>
                     <li><strong>上传冲突</strong> — 对话框提供<em>覆盖</em>、<em>保留两者</em>（上传的文件会获得新名称）或<em>取消</em>。</li>
-                    <li><strong>编辑</strong> — 文件编辑器和十六进制编辑器目前仅在 Android 上提供。</li>
+                    <li><strong>编辑</strong> — 编辑器和十六进制编辑器在这里也有：长按文件打开菜单，可选择<em>在编辑器中打开</em>和<em>以十六进制打开</em>。加载时文件会经过应用的临时目录，读取完毕后立即删除。</li>
+                    <li><strong>保存</strong> — 文件直接写回原文件，而不是先写到旁边的临时文件再重命名覆盖，因此保存中途断线可能留下只写了一半的文件。</li>
                 </ul>
             </div>`,
 
@@ -251,7 +252,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>PuTTYgen 可通过 <em>Conversions → Export OpenSSH key</em> 转换 <code>.ppk</code>。</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                在 iOS 上，受密码短语保护的密钥暂时无法使用：导入时会校验密码短语，但不会保存，因此用该密钥连接会失败。请使用没有密码短语的密钥，或在应用内生成一个。
+                iOS 的做法相同：导入时只询问一次密码短语，密钥以解锁状态保存，密码短语不写入任何地方。iOS 比 Android 多拒绝一种格式：除了 OpenSSL 容器和 PuTTY 的 <code>.ppk</code>，还有旧式 PEM 加密（<code>Proc-Type: 4,ENCRYPTED</code>），即 <code>ssh-keygen -m PEM</code> 带密码短语时写出的格式。请先解密这类密钥再重新导入。
             </div>`,
 
   doc_suggestions: `
@@ -559,7 +560,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android 上的 SSH 协议 —— BSD 风格许可证</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android 上的加密实现 —— MIT 风格许可证</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — 用于在服务器上修改文件的文本编辑控件 —— GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — 用于在服务器上修改文件的文本编辑控件（Android） —— GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS 上的 SSH 协议 —— BSD 许可证</li>
             </ul>
             <p>它们都不会自行连接任何地方：SSHBorg 只会连接你指定的服务器，以及你点击链接时的 sshborg.com。没有任何统计库、广告库或追踪器。</p>`,

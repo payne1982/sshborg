@@ -205,7 +205,8 @@ module.exports = {
                     <li><strong>Папки</strong> — нажмите и удерживайте файл или папку, чтобы открыть меню: <em>Скачать</em>, <em>Переименовать</em>, <em>Удалить</em>.</li>
                     <li><strong>Множественный выбор</strong> — выберите <em>Выбрать элементы</em> в меню «Действия», затем отметьте элементы. Долгое нажатие вместо этого открывает меню элемента.</li>
                     <li><strong>Конфликты при отправке</strong> — диалог предлагает <em>Заменить</em>, <em>Оставить оба</em> (отправленный файл получает новое имя) или <em>Отмена</em>.</li>
-                    <li><strong>Правка</strong> — редактор файлов и шестнадцатеричный редактор пока есть только в Android.</li>
+                    <li><strong>Правка</strong> — редактор и шестнадцатеричный редактор есть и здесь: меню файла (долгое нажатие) предлагает <em>Открыть в редакторе</em> и <em>Открыть в HEX</em>. Пока файл загружается, он проходит через временную папку приложения и удаляется сразу после чтения.</li>
+                    <li><strong>Сохранение</strong> — файл пишется прямо поверх оригинала, а не во временный файл рядом, который затем переименовывается на его место, поэтому связь, потерянная посреди сохранения, может оставить его записанным наполовину.</li>
                 </ul>
             </div>`,
 
@@ -251,7 +252,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>PuTTYgen преобразует <code>.ppk</code> через <em>Conversions → Export OpenSSH key</em>.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                На iOS ключ, защищённый паролем, пока использовать нельзя: пароль проверяется при импорте, но не сохраняется, поэтому подключение с таким ключом не удаётся. Используйте ключ без пароля или создайте его в приложении.
+                На iOS всё так же: пароль запрашивают один раз, при импорте, ключ хранится открытым, а пароль нигде не записывается. Один формат iOS отклоняет дополнительно: помимо контейнера OpenSSL и <code>.ppk</code> от PuTTY, ещё и старое шифрование PEM (<code>Proc-Type: 4,ENCRYPTED</code>), которое пишет <code>ssh-keygen -m PEM</code> с паролем. Расшифруйте такой ключ и импортируйте заново.
             </div>`,
 
   doc_suggestions: `
@@ -559,7 +560,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — протокол SSH в Android — лицензия в стиле BSD</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — криптография в Android — лицензия в стиле MIT</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — компонент редактирования текста для правки файлов на сервере — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — компонент редактирования текста для правки файлов на сервере, в Android — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — протокол SSH в iOS — лицензия BSD</li>
             </ul>
             <p>Ни одна из них не соединяется ни с чем самостоятельно: SSHBorg обращается только к серверам, которые вы указали, и к sshborg.com, когда вы нажимаете ссылку. Никаких библиотек аналитики, рекламы или трекеров.</p>`,

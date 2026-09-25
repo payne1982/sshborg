@@ -203,7 +203,8 @@ module.exports = {
                     <li><strong>Dossiers</strong> — appuyez longuement sur un fichier ou un dossier pour ouvrir son menu : <em>Télécharger</em>, <em>Renommer</em>, <em>Supprimer</em>.</li>
                     <li><strong>Sélection multiple</strong> — choisissez <em>Sélectionner des éléments</em> dans le menu Actions, puis cochez les éléments. Un appui long ouvre plutôt le menu de l'élément.</li>
                     <li><strong>Conflits à l'envoi</strong> — la boîte de dialogue propose <em>Écraser</em>, <em>Conserver les deux</em> (le fichier envoyé reçoit un nouveau nom) ou <em>Annuler</em>.</li>
-                    <li><strong>Édition</strong> — l'éditeur de fichiers et l'éditeur hexadécimal sont pour l'instant réservés à Android.</li>
+                    <li><strong>Édition</strong> — l'éditeur et l'éditeur hexadécimal sont là aussi : le menu d'un fichier, par appui long, propose <em>Ouvrir dans l'éditeur</em> et <em>Ouvrir en hexadécimal</em>. Pendant le chargement, le fichier passe par le dossier temporaire de l'app et en est retiré dès qu'il est lu.</li>
+                    <li><strong>Enregistrement</strong> — le fichier est écrit directement par-dessus l'original, et non dans un fichier temporaire à côté qui serait ensuite renommé à sa place : une connexion perdue au milieu d'un enregistrement peut donc le laisser à moitié écrit.</li>
                 </ul>
             </div>`,
 
@@ -249,7 +250,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>PuTTYgen convertit un <code>.ppk</code> via <em>Conversions → Export OpenSSH key</em>.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                Sur iOS une clé protégée par une phrase secrète n'est pas encore utilisable : la phrase est vérifiée à l'import mais pas conservée, la connexion avec cette clé échoue donc. Utilisez une clé sans phrase secrète, ou générez-en une dans l'app.
+                Sur iOS, c'est identique : la phrase secrète est demandée une fois, à l'import, la clé est conservée déverrouillée et la phrase n'est écrite nulle part. iOS refuse un format de plus qu'Android : outre le conteneur OpenSSL et le <code>.ppk</code> de PuTTY, aussi l'ancien chiffrement PEM (<code>Proc-Type: 4,ENCRYPTED</code>), celui que <code>ssh-keygen -m PEM</code> écrit quand on lui donne une phrase secrète. Déchiffrez une telle clé et réimportez-la.
             </div>`,
 
   doc_suggestions: `
@@ -557,7 +558,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — le protocole SSH sur Android — licence de type BSD</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — la cryptographie sur Android — licence de type MIT</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — le composant d'édition de texte utilisé pour modifier les fichiers sur le serveur — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — le composant d'édition de texte utilisé pour modifier les fichiers sur le serveur, sur Android — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — le protocole SSH sur iOS — licence BSD</li>
             </ul>
             <p>Aucune ne se connecte à quoi que ce soit d'elle-même : les seules adresses contactées par SSHBorg sont les serveurs que vous lui indiquez, et sshborg.com lorsque vous touchez un lien. Il n'y a aucune bibliothèque d'analyse, aucune régie publicitaire et aucun traceur.</p>`,

@@ -645,7 +645,8 @@
                     <li><strong>Folders</strong> — long-press a file or folder for its menu: <em>Download</em>, <em>Rename</em>, <em>Delete</em>.</li>
                     <li><strong>Multi-select</strong> — choose <em>Select items</em> in the Actions menu, then tick the items. A long press opens the item's menu instead.</li>
                     <li><strong>Upload conflicts</strong> — the dialog offers <em>Overwrite</em>, <em>Keep both</em> (the upload gets a new name) or <em>Cancel</em>.</li>
-                    <li><strong>Editing</strong> — the file editor and the hex editor are on Android only for now.</li>
+                    <li><strong>Editing</strong> — the editor and the hex editor are here too: a file's long-press menu offers <em>Open in editor</em> and <em>Open in hex</em>. While it loads, the file passes through the app's temporary folder and is removed as soon as it has been read.</li>
+                    <li><strong>Saving</strong> — the file is written straight over the original, not to a temporary file beside it that is then renamed into place, so a connection lost halfway through a save can leave it half written.</li>
                 </ul>
             </div>
         </div>
@@ -693,7 +694,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>PuTTYgen converts a <code>.ppk</code> from <em>Conversions → Export OpenSSH key</em>.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                On iOS a passphrase-protected key cannot be used yet: the passphrase is checked when the key is imported but is not kept, so connecting with that key fails. Use a key without a passphrase, or generate one in the app.
+                iOS works the same way: the passphrase is asked once, at import, the key is stored unlocked, and the passphrase is written nowhere. It refuses one format more than Android — besides the OpenSSL container and the PuTTY <code>.ppk</code>, also the older PEM encryption (<code>Proc-Type: 4,ENCRYPTED</code>), which <code>ssh-keygen -m PEM</code> writes when given a passphrase. Decrypt such a key and import it again.
             </div>
         </div>
 
@@ -1111,7 +1112,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — the SSH protocol on Android — BSD-style licence</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — cryptography on Android — MIT-style licence</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — the text editor widget for editing files on the server — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — the text editor widget for editing files on the server, on Android — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — the SSH protocol on iOS — BSD licence</li>
             </ul>
             <p>None of them connects to anything on its own: the only addresses SSHBorg contacts are the servers you tell it about, and sshborg.com when you tap a link. There are no analytics libraries, no advertising libraries and no trackers of any kind.</p>

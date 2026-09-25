@@ -204,7 +204,8 @@ module.exports = {
                     <li><strong>Cartelle</strong> — tieni premuto un file o una cartella per il suo menu: <em>Scarica</em>, <em>Rinomina</em>, <em>Elimina</em>.</li>
                     <li><strong>Selezione multipla</strong> — scegli <em>Seleziona elementi</em> nel menu Azioni, poi spunta gli elementi. Una pressione prolungata apre invece il menu dell'elemento.</li>
                     <li><strong>Conflitti in caricamento</strong> — la finestra offre <em>Sovrascrivi</em>, <em>Mantieni entrambi</em> (il file caricato riceve un nuovo nome) o <em>Annulla</em>.</li>
-                    <li><strong>Modifica</strong> — l'editor dei file e quello esadecimale per ora sono solo su Android.</li>
+                    <li><strong>Modifica</strong> — ci sono anche qui l'editor e quello esadecimale: il menù di un file, con la pressione lunga, offre <em>Apri nell'editor</em> e <em>Apri in esadecimale</em>. Mentre viene caricato, il file passa dalla cartella temporanea dell'app e viene rimosso appena è stato letto.</li>
+                    <li><strong>Salvataggio</strong> — il file viene scritto direttamente sull'originale, non su un file temporaneo accanto che poi viene rinominato al suo posto: una connessione che cade a metà salvataggio può quindi lasciarlo scritto a metà.</li>
                 </ul>
             </div>`,
 
@@ -250,7 +251,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>PuTTYgen converte un <code>.ppk</code> da <em>Conversions → Export OpenSSH key</em>.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                Su iOS una chiave protetta da passphrase non è ancora utilizzabile: la passphrase viene verificata all'importazione ma non conservata, quindi il collegamento con quella chiave fallisce. Usa una chiave senza passphrase, o generane una nell'app.
+                Su iOS funziona allo stesso modo: la passphrase viene chiesta una volta sola, all'importazione, la chiave è conservata aperta e la passphrase non viene scritta da nessuna parte. Rifiuta un formato in più rispetto ad Android: oltre al contenitore di OpenSSL e al <code>.ppk</code> di PuTTY, anche la vecchia cifratura PEM (<code>Proc-Type: 4,ENCRYPTED</code>), quella che <code>ssh-keygen -m PEM</code> scrive quando gli si dà una passphrase. Decifra una chiave così e importala di nuovo.
             </div>`,
 
   doc_suggestions: `
@@ -558,7 +559,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — il protocollo SSH su Android — licenza di tipo BSD</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — la crittografia su Android — licenza di tipo MIT</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — il componente di modifica testo usato per modificare i file sul server — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — il componente di modifica testo usato per modificare i file sul server, su Android — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — il protocollo SSH su iOS — licenza BSD</li>
             </ul>
             <p>Nessuna di esse si collega a niente per conto suo: gli unici indirizzi che SSHBorg contatta sono i server che gli indichi tu, e sshborg.com quando tocchi un collegamento. Non ci sono librerie di statistiche, di pubblicità né tracciatori di alcun tipo.</p>`,

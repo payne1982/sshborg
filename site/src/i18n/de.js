@@ -203,7 +203,8 @@ module.exports = {
                     <li><strong>Ordner</strong> — drücke lange auf eine Datei oder einen Ordner, um das Menü zu öffnen: <em>Herunterladen</em>, <em>Umbenennen</em>, <em>Löschen</em>.</li>
                     <li><strong>Mehrfachauswahl</strong> — wähle <em>Elemente auswählen</em> im Menü Aktionen und hake dann die Elemente an. Ein langer Druck öffnet stattdessen das Menü des Elements.</li>
                     <li><strong>Konflikte beim Hochladen</strong> — der Dialog bietet <em>Überschreiben</em>, <em>Beide behalten</em> (die hochgeladene Datei bekommt einen neuen Namen) oder <em>Abbrechen</em>.</li>
-                    <li><strong>Bearbeiten</strong> — der Datei-Editor und der Hex-Editor gibt es vorerst nur unter Android.</li>
+                    <li><strong>Bearbeiten</strong> — den Editor und den Hex-Editor gibt es auch hier: das Menü einer Datei (langer Druck) bietet <em>Im Editor öffnen</em> und <em>Hexadezimal öffnen</em>. Während sie lädt, liegt die Datei kurz im temporären Ordner der App und wird entfernt, sobald sie gelesen ist.</li>
+                    <li><strong>Speichern</strong> — die Datei wird direkt über das Original geschrieben, nicht in eine temporäre Datei daneben, die dann an ihre Stelle umbenannt wird; eine mitten im Speichern abgebrochene Verbindung kann sie also halb geschrieben zurücklassen.</li>
                 </ul>
             </div>`,
 
@@ -249,7 +250,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>PuTTYgen wandelt ein <code>.ppk</code> über <em>Conversions → Export OpenSSH key</em> um.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                Auf iOS ist ein mit einer Passphrase geschützter Schlüssel noch nicht nutzbar: die Passphrase wird beim Import geprüft, aber nicht gespeichert, sodass eine Verbindung mit diesem Schlüssel fehlschlägt. Verwende einen Schlüssel ohne Passphrase oder erzeuge einen in der App.
+                Auf iOS läuft es genauso: die Passphrase wird einmal beim Import verlangt, der Schlüssel entsperrt gespeichert, die Passphrase nirgends geschrieben. Ein Format lehnt iOS zusätzlich ab: neben dem OpenSSL-Container und PuTTYs <code>.ppk</code> auch die alte PEM-Verschlüsselung (<code>Proc-Type: 4,ENCRYPTED</code>), die <code>ssh-keygen -m PEM</code> mit Passphrase schreibt. Entschlüssle einen solchen Schlüssel und importiere ihn erneut.
             </div>`,
 
   doc_suggestions: `
@@ -557,7 +558,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — das SSH-Protokoll unter Android — Lizenz im BSD-Stil</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — die Kryptografie unter Android — Lizenz im MIT-Stil</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — das Textbearbeitungs-Widget zum Ändern von Dateien auf dem Server — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — das Textbearbeitungs-Widget zum Ändern von Dateien auf dem Server, unter Android — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — das SSH-Protokoll unter iOS — BSD-Lizenz</li>
             </ul>
             <p>Keine davon verbindet sich von sich aus mit irgendetwas: SSHBorg kontaktiert nur die Server, die du angibst, und sshborg.com, wenn du einen Link antippst. Es gibt keine Analyse-Bibliotheken, keine Werbe-Bibliotheken und keinerlei Tracker.</p>`,

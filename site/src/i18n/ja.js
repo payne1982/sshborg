@@ -205,7 +205,8 @@ module.exports = {
                     <li><strong>フォルダ</strong> — ファイルやフォルダを長押しするとメニューが開きます：<em>ダウンロード</em>、<em>名前変更</em>、<em>削除</em>。</li>
                     <li><strong>複数選択</strong> — 操作メニューで<em>項目を選択</em>を選び、項目にチェックを付けます。長押しすると代わりにその項目のメニューが開きます。</li>
                     <li><strong>アップロード時の競合</strong> — ダイアログで<em>上書き</em>、<em>両方保持</em>（アップロードしたファイルに新しい名前が付きます）、<em>キャンセル</em>を選べます。</li>
-                    <li><strong>編集</strong> — ファイルエディタと16進エディタは今のところ Android のみです。</li>
+                    <li><strong>編集</strong> — エディタと16進エディタもあります。ファイルを長押しすると出るメニューに<em>エディタで開く</em>と<em>16進数で開く</em>があります。読み込みのあいだ、ファイルはアプリの一時フォルダを通り、読み終えるとすぐに削除されます。</li>
+                    <li><strong>保存</strong> — ファイルは元のファイルに直接書き込まれます。隣に一時ファイルを作ってから名前を変えて置き換える方式ではないため、保存の途中で接続が切れると中途半端に書き込まれた状態で残ることがあります。</li>
                 </ul>
             </div>`,
 
@@ -251,7 +252,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p><code>.ppk</code> は PuTTYgen の <em>Conversions → Export OpenSSH key</em> で変換できます。</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                iOS では、パスフレーズで保護された鍵はまだ使えません。パスフレーズはインポート時に検証されますが保存されないため、その鍵での接続は失敗します。パスフレーズのない鍵を使うか、アプリで鍵を生成してください。
+                iOS も同じ仕組みです。パスフレーズはインポート時に一度だけ尋ね、鍵は解除された状態で保存され、パスフレーズはどこにも書き込まれません。Android より一つ多く断る形式があります。OpenSSL のコンテナと PuTTY の <code>.ppk</code> に加えて、古い PEM 暗号化（<code>Proc-Type: 4,ENCRYPTED</code>）— <code>ssh-keygen -m PEM</code> にパスフレーズを与えたときに書かれる形式です。その種の鍵は復号してから、もう一度インポートしてください。
             </div>`,
 
   doc_suggestions: `
@@ -559,7 +560,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android での SSH プロトコル — BSD 系ライセンス</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android での暗号処理 — MIT 系ライセンス</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — サーバー上のファイルを編集するためのテキスト編集ウィジェット — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — サーバー上のファイルを編集するためのテキスト編集ウィジェット（Android） — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS での SSH プロトコル — BSD ライセンス</li>
             </ul>
             <p>いずれも自分から何かに接続することはありません。SSHBorg が接続するのは、あなたが指定したサーバーと、リンクをタップしたときの sshborg.com だけです。解析ライブラリも広告ライブラリも、いかなるトラッカーもありません。</p>`,

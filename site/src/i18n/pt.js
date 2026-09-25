@@ -203,7 +203,8 @@ module.exports = {
                     <li><strong>Pastas</strong> — toque longamente num ficheiro ou numa pasta para abrir o respetivo menu: <em>Transferir</em>, <em>Renomear</em>, <em>Eliminar</em>.</li>
                     <li><strong>Seleção múltipla</strong> — escolha <em>Selecionar itens</em> no menu Ações e depois marque os itens. Um toque longo abre antes o menu do item.</li>
                     <li><strong>Conflitos ao enviar</strong> — a caixa de diálogo oferece <em>Substituir</em>, <em>Manter ambos</em> (o ficheiro enviado recebe um novo nome) ou <em>Cancelar</em>.</li>
-                    <li><strong>Edição</strong> — o editor de ficheiros e o hexadecimal existem, para já, só no Android.</li>
+                    <li><strong>Edição</strong> — o editor e o hexadecimal também existem aqui: o menu de um ficheiro, com uma pressão longa, oferece <em>Abrir no editor</em> e <em>Abrir em hexadecimal</em>. Enquanto carrega, o ficheiro passa pela pasta temporária da app e é removido assim que é lido.</li>
+                    <li><strong>Gravação</strong> — o ficheiro é escrito diretamente sobre o original, não num ficheiro temporário ao lado que depois é renomeado para o seu lugar, pelo que uma ligação perdida a meio da gravação pode deixá-lo escrito a meio.</li>
                 </ul>
             </div>`,
 
@@ -249,7 +250,7 @@ openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
             <p>O PuTTYgen converte um <code>.ppk</code> em <em>Conversions → Export OpenSSH key</em>.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
-                No iOS uma chave protegida por frase-passe ainda não pode ser usada: a frase-passe é verificada ao importar a chave mas não é guardada, por isso a ligação com essa chave falha. Use uma chave sem frase-passe, ou gere uma na app.
+                No iOS funciona da mesma forma: a frase-passe é pedida uma única vez, ao importar, a chave fica guardada aberta e a frase-passe não é escrita em lado nenhum. Recusa um formato a mais do que o Android: além do contentor do OpenSSL e do <code>.ppk</code> do PuTTY, também a cifragem PEM antiga (<code>Proc-Type: 4,ENCRYPTED</code>), a que o <code>ssh-keygen -m PEM</code> escreve quando lhe damos uma frase-passe. Decifre uma chave dessas e importe-a de novo.
             </div>`,
 
   doc_suggestions: `
@@ -557,7 +558,7 @@ Host target
             <ul>
                 <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — o protocolo SSH no Android — licença ao estilo BSD</li>
                 <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — a criptografia no Android — licença ao estilo MIT</li>
-                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — o componente de edição de texto usado para alterar ficheiros no servidor — GNU LGPL v2.1</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — o componente de edição de texto usado para alterar ficheiros no servidor, no Android — GNU LGPL v2.1</li>
                 <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — o protocolo SSH no iOS — licença BSD</li>
             </ul>
             <p>Nenhuma delas se liga a nada por conta própria: os únicos endereços que o SSHBorg contacta são os servidores que lhe indicar, e sshborg.com quando toca num link. Não há bibliotecas de estatísticas, de publicidade nem rastreadores de qualquer tipo.</p>`,
