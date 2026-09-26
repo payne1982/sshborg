@@ -94,4 +94,19 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.sora.editor)
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation(libs.junit)
+}
+
+// Unit tests run on the JVM: no device, no emulator. The ones driven by a corpus of real files
+// (throwaway keys, sample files too big to commit) skip themselves unless told where it is —
+// either through the environment, or with `./gradlew test -PkeyCorpus=… -PeditorCorpus=…`.
+tasks.withType<Test>().configureEach {
+    mapOf(
+        "SSHBORG_KEY_CORPUS" to "keyCorpus",
+        "SSHBORG_EDITOR_CORPUS" to "editorCorpus",
+    ).forEach { (variable, property) ->
+        val value = project.findProperty(property) as String? ?: System.getenv(variable)
+        if (value != null) environment(variable, value)
+    }
+    testLogging { events("passed", "skipped", "failed") }
 }
