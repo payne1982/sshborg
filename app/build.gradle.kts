@@ -16,6 +16,7 @@ android {
         targetSdk = 36
         versionCode = 35
         versionName = "1.18.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     val localProps = Properties()
@@ -47,6 +48,10 @@ android {
             manifestPlaceholders["appLabel"] = "SSHBorg"
         }
     }
+
+    // The exported schemas ride along in the test APK's assets, which is where
+    // MigrationTestHelper looks for them.
+    sourceSets["androidTest"].assets.srcDir("$projectDir/schemas")
 
     testOptions {
         unitTests {
@@ -104,6 +109,17 @@ dependencies {
     implementation(libs.sora.editor)
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.room.testing)
+}
+
+// Room writes the schema of every version here, and the files are committed: a migration test
+// has nothing to validate against without them, and a schema that changed without a migration
+// shows up as a diff instead of as a crash on someone's phone.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 // Unit tests run on the JVM: no device, no emulator. The ones that need a corpus of real files
