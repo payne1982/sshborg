@@ -48,6 +48,15 @@ android {
         }
     }
 
+    testOptions {
+        unitTests {
+            // The SSH layer logs through android.util.Log on a couple of fallback paths, and an
+            // android.jar stub throws when called. Returning defaults instead keeps a real code
+            // path from dying on a log line it only reaches when something unusual happened.
+            isReturnDefaultValues = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -97,16 +106,32 @@ dependencies {
     testImplementation(libs.junit)
 }
 
-// Unit tests run on the JVM: no device, no emulator. The ones driven by a corpus of real files
-// (throwaway keys, sample files too big to commit) skip themselves unless told where it is —
-// either through the environment, or with `./gradlew test -PkeyCorpus=… -PeditorCorpus=…`.
+// Unit tests run on the JVM: no device, no emulator. The ones that need a corpus of real files
+// or a real server are told where to find them by test.properties, which is not in the repo —
+// see test.properties.example. Each entry becomes an environment variable (keyCorpus ->
+// SSHBORG_KEY_CORPUS); a test whose settings are missing skips itself. A -P property of the same
+// name wins over the file, which is how a CI run passes them in.
 tasks.withType<Test>().configureEach {
-    mapOf(
-        "SSHBORG_KEY_CORPUS" to "keyCorpus",
-        "SSHBORG_EDITOR_CORPUS" to "editorCorpus",
-    ).forEach { (variable, property) ->
-        val value = project.findProperty(property) as String? ?: System.getenv(variable)
-        if (value != null) environment(variable, value)
+    fun variableFor(name: String) =
+        "SSHBORG_" + name.replace(Regex("([a-z0-9])([A-Z])"), "$1_$2").uppercase()
+
+    val settings = linkedMapOf<String, String>()
+    val file = rootProject.file("test.properties")
+    if (file.exists()) {
+        // Read as UTF-8, not the ISO-8859-1 a .properties file defaults to: a passphrase may
+        // well have an accent or an emoji in it, and that is exactly what one of them tests.
+        val loaded = Properties()
+        file.reader(Charsets.UTF_8).use { loaded.load(it) }
+        loaded.forEach { (key, value) -> settings[key.toString()] = value.toString() }
     }
+    settings.keys.toList().forEach { name ->
+        (project.findProperty(name) as String?)?.let { settings[name] = it }
+    }
+    listOf("keyCorpus", "keyCorpusPassphrase", "keyCorpusUtf8Passphrase", "editorCorpus",
+           "sshHost", "sshPort", "sshUser", "sshKeyDir", "sshKeyPassphrase").forEach { name ->
+        if (name !in settings) (project.findProperty(name) as String?)?.let { settings[name] = it }
+    }
+    settings.forEach { (name, value) -> environment(variableFor(name), value) }
+
     testLogging { events("passed", "skipped", "failed") }
 }

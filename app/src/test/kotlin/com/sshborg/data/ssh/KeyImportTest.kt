@@ -1,6 +1,7 @@
 package com.sshborg.data.ssh
 
 import com.jcraft.jsch.JSchException
+import com.sshborg.TestConfig
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -23,11 +24,10 @@ import org.junit.Test
  */
 class KeyImportTest {
 
-    private val corpus: File? =
-        System.getenv("SSHBORG_KEY_CORPUS")?.let(::File)?.takeIf { it.isDirectory }
+    private val corpus: File? = TestConfig.directory("KEY_CORPUS")
 
     private fun key(name: String): String {
-        assumeTrue("SSHBORG_KEY_CORPUS is not set", corpus != null)
+        assumeTrue(TestConfig.NO_KEY_CORPUS, corpus != null)
         val file = File(corpus, name)
         assumeTrue("$name is missing from the corpus", file.isFile)
         return file.readText()
@@ -54,13 +54,14 @@ class KeyImportTest {
         assertEquals(publicHalf(imported.publicKey), publicHalf(again.publicKey))
     }
 
-    @Test fun `ed25519 unlocks`() = checkUnlocks("k_ed25519", PASSPHRASE, "ed25519")
-    @Test fun `rsa unlocks`() = checkUnlocks("k_rsa", PASSPHRASE, "rsa")
-    @Test fun `ecdsa unlocks`() = checkUnlocks("k_ecdsa", PASSPHRASE, "ecdsa")
-    @Test fun `old pem unlocks`() = checkUnlocks("k_rsa_pem", PASSPHRASE, "rsa")
+    @Test fun `ed25519 unlocks`() = checkUnlocks("k_ed25519", passphrase(), "ed25519")
+    @Test fun `rsa unlocks`() = checkUnlocks("k_rsa", passphrase(), "rsa")
+    @Test fun `ecdsa unlocks`() = checkUnlocks("k_ecdsa", passphrase(), "ecdsa")
+    @Test fun `old pem unlocks`() = checkUnlocks("k_rsa_pem", passphrase(), "rsa")
 
     /** Accents and an emoji in the passphrase must reach JSch intact. */
-    @Test fun `a non ascii passphrase works`() = checkUnlocks("k_utf8", "pässwörd☕ 1", "ed25519")
+    @Test fun `a non ascii passphrase works`() =
+        checkUnlocks("k_utf8", passphrase("KEY_CORPUS_UTF8_PASSPHRASE"), "ed25519")
 
     @Test fun `an unencrypted key is stored exactly as it arrived`() {
         val pem = key("k_plain")
@@ -83,7 +84,7 @@ class KeyImportTest {
      * which is a rarely taken branch holding a secret.
      */
     @Test fun `a pkcs8 container is refused`() =
-        assertFails("unsupported_encryption") { SshManager.importPrivateKey(key("k_pkcs8"), PASSPHRASE) }
+        assertFails("unsupported_encryption") { SshManager.importPrivateKey(key("k_pkcs8"), passphrase()) }
 
     private fun assertFails(reason: String, block: () -> Unit) {
         try {
@@ -94,8 +95,13 @@ class KeyImportTest {
         }
     }
 
-    private companion object {
-        /** The corpus README's passphrase for the keys that are not the odd one out. */
-        const val PASSPHRASE = "segreto frase"
+    /**
+     * The passphrase the corpus keys were made with. It lives in test.properties on the machine
+     * that has the corpus, never here: a passphrase in the repository is a passphrase published.
+     */
+    private fun passphrase(name: String = "KEY_CORPUS_PASSPHRASE"): String {
+        val value = TestConfig.value(name)
+        assumeTrue("$name is not set in test.properties", value != null)
+        return value!!
     }
 }
