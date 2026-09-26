@@ -515,9 +515,9 @@ Host target
   doc_security: `
             <h2>// SEGURANÇA DA APP</h2>
             <h3>Bloqueio da app</h3>
-            <p>Escolha como a app é protegida em <strong>Definições → Segurança → Bloqueio da app</strong>: <strong>Nenhum</strong> (predefinido), <strong>Apenas biométrico</strong> (impressão digital ou reconhecimento facial), <strong>Bloqueio do dispositivo</strong> (o PIN, o padrão ou a palavra-passe do dispositivo, além da biometria) ou um <strong>PIN ou frase-passe</strong> na app. Quando um bloqueio está ativo, o SSHBorg exige autenticação antes de mostrar qualquer host, credencial ou dados de sessão.</p>
+            <p>Escolha como a app é protegida em <strong>Definições → Segurança → Bloqueio da app</strong>: <strong>Nenhum</strong> (predefinido), <strong>Apenas biométrico</strong> (impressão digital ou reconhecimento facial), <strong>Bloqueio do dispositivo</strong> (o PIN, o padrão ou a palavra-passe do dispositivo, além da biometria) ou um <strong>PIN ou frase-passe</strong> na app. Quando um bloqueio está ativo, o SSHBorg exige autenticação antes de mostrar qualquer host, credencial ou dados de sessão. Se a autenticação for recusada, ou se a cancelar, a app permanece no seu próprio ecrã de bloqueio com um botão para tentar de novo: não fecha, pelo que as sessões que tinha abertas continuam lá quando desbloquear.</p>
             <p>O <strong>PIN ou frase-passe</strong> na app funciona em qualquer dispositivo, mesmo sem hardware biométrico ou um bloqueio de ecrã do sistema — o que o torna a escolha certa numa Android TV. Alterá-lo ou removê-lo pede primeiro o atual. Não é recuperável se for esquecido: teria de limpar os dados da app ou reinstalá-la, por isso mantenha uma cópia de segurança dos seus hosts.</p>
-            <p>Pode definir um tempo limite de inatividade — após esse número de minutos em segundo plano, a app bloqueia automaticamente.</p>
+            <p>Pode definir um tempo limite de inatividade — após esse tempo em segundo plano, a app bloqueia automaticamente.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 O bloqueio oferece <strong>Nenhum</strong>, <strong>Apenas biométrico</strong> (Face ID ou Touch ID) e <strong>Bloqueio do dispositivo</strong> (o código do dispositivo ou a biometria). Não há PIN nem frase-passe na app.

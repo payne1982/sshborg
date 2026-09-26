@@ -518,9 +518,9 @@ Host target
   doc_security: `
             <h2>// APP SECURITY</h2>
             <h3>App lock</h3>
-            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), <strong>Device lock</strong> (the device PIN, pattern, or password, alongside biometrics), or an in-app <strong>PIN or passphrase</strong>. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
+            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), <strong>Device lock</strong> (the device PIN, pattern, or password, alongside biometrics), or an in-app <strong>PIN or passphrase</strong>. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data. If authentication is refused, or you cancel it, the app stays on its own lock screen with a button to try again — it does not close, so the sessions you had open are still there when you unlock.</p>
             <p>The in-app <strong>PIN or passphrase</strong> works on any device, even without biometric hardware or a system screen lock — which makes it the right choice on an Android TV. Changing or removing it asks for the current one first. There is no way to recover it if forgotten: you would have to clear the app's data or reinstall, so keep a backup of your hosts.</p>
-            <p>You can set an inactivity timeout — after that many minutes in the background the app locks automatically.</p>
+            <p>You can set an inactivity timeout — after that long in the background the app locks automatically.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 The lock offers <strong>None</strong>, <strong>Biometric only</strong> (Face ID or Touch ID) and <strong>Device lock</strong> (the device passcode or biometrics). There is no in-app PIN or passphrase.

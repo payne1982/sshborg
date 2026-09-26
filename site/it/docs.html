@@ -979,9 +979,9 @@ Host target
 
             <h2>// SICUREZZA DELL'APP</h2>
             <h3>Blocco app</h3>
-            <p>Scegli come proteggere l'app in <strong>Impostazioni → Sicurezza → Blocco app</strong>: <strong>Nessuno</strong> (predefinito), <strong>Solo biometrico</strong> (impronta digitale o riconoscimento facciale), <strong>Blocco del dispositivo</strong> (il PIN, la sequenza o la password del dispositivo, oltre alla biometria) o un <strong>PIN o passphrase</strong> in-app. Quando un blocco è attivo, SSHBorg richiede l'autenticazione prima di mostrare qualsiasi host, credenziale o dato di sessione.</p>
+            <p>Scegli come proteggere l'app in <strong>Impostazioni → Sicurezza → Blocco app</strong>: <strong>Nessuno</strong> (predefinito), <strong>Solo biometrico</strong> (impronta digitale o riconoscimento facciale), <strong>Blocco del dispositivo</strong> (il PIN, la sequenza o la password del dispositivo, oltre alla biometria) o un <strong>PIN o passphrase</strong> in-app. Quando un blocco è attivo, SSHBorg richiede l'autenticazione prima di mostrare qualsiasi host, credenziale o dato di sessione. Se l'autenticazione viene rifiutata, o la annulli, l'app resta sulla propria schermata di blocco con un pulsante per riprovare: non si chiude, quindi le sessioni che avevi aperte sono ancora lì quando sblocchi.</p>
             <p>Il <strong>PIN o passphrase</strong> in-app funziona su qualsiasi dispositivo, anche senza hardware biometrico o un blocco schermo di sistema — per questo è la scelta giusta su una Android TV. Per cambiarlo o rimuoverlo viene chiesto prima quello attuale. Non è recuperabile se dimenticato: dovresti cancellare i dati dell'app o reinstallarla, quindi tieni un backup dei tuoi host.</p>
-            <p>Puoi impostare un timeout di inattività — dopo quel numero di minuti in background l'app si blocca automaticamente.</p>
+            <p>Puoi impostare un timeout di inattività — dopo quel tempo in background l'app si blocca automaticamente.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 Il blocco offre <strong>Nessuno</strong>, <strong>Solo biometrico</strong> (Face ID o Touch ID) e <strong>Blocco del dispositivo</strong> (il codice del dispositivo o la biometria). Non esiste un PIN o una passphrase in-app.
