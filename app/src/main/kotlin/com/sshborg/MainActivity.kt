@@ -146,14 +146,17 @@ class MainActivity : AppCompatActivity() {
         (gate.value as? Gate.System)?.let {
             if (!promptedForGate) requestSystemUnlock(it.allowDeviceCredential)
         }
-        if (!BuildConfig.DEBUG) {
-            lifecycleScope.launch {
-                val allow = (application as SshBorgApp).appPreferences.allowScreenshots.first()
-                if (allow) {
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                } else {
-                    window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                }
+        // In every build, not only release: FLAG_SECURE also decides whether Android keeps a
+        // picture of the app for the switcher, which is what shows on the way back before the
+        // lock gate is drawn — so a debug build without it is not the app we ship, and this is
+        // the one place where that difference hides. Screenshots are still available when they
+        // are wanted, through the setting this reads.
+        lifecycleScope.launch {
+            val allow = (application as SshBorgApp).appPreferences.allowScreenshots.first()
+            if (allow) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
             }
         }
     }
