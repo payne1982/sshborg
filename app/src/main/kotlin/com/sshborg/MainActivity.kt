@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.sshborg.data.AppLockManager
 import com.sshborg.data.AppPreferences
@@ -229,6 +230,16 @@ class MainActivity : AppCompatActivity() {
         // lockout; the real value follows from disk a moment later.
         initialLockoutSeconds.value = 0L
         gate.value = g
+        if (g is Gate.System) {
+            // Normally the prompt is opened by onResume, which runs after the gate is up. When
+            // the gate arrives later than that — the asynchronous decision, on the first start
+            // after an update, with no mirror to read — this is what opens it, or the user would
+            // be left looking at the gate's button with no prompt ever having appeared.
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                requestSystemUnlock(g.allowDeviceCredential)
+            }
+            return
+        }
         if (g is Gate.Secret) {
             // Read after the gate is up: the countdown is worth a frame's delay, an unlocked
             // screen behind an unread preference is not.

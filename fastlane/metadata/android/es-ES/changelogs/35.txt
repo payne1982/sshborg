@@ -1,2 +1,3 @@
-• SFTP: editor integrado para los archivos del servidor — los de texto se editan allí mismo y conservan codificación, fin de línea y permisos, los de configuración se colorean, y lo que no es texto se abre en un editor hexadecimal
-• Claves SSH: una clave con contraseña ya funciona — la contraseña se pide una sola vez al importarla y no se guarda en ningún sitio. Las claves importadas antes hay que importarlas de nuevo; la lista las marca.
+• SFTP: editor integrado para los archivos del servidor — los de texto se editan allí mismo y conservan codificación, fin de línea y permisos, los de configuración se colorean, y el resto se abre en un editor hexadecimal
+• Claves SSH: una clave con contraseña ya funciona — la contraseña se pide una sola vez al importarla y no se guarda en ningún sitio. Las importadas antes hay que importarlas de nuevo; la lista las marca.
+• Corregido: la app podía quedarse cubierta por una pantalla vacía.

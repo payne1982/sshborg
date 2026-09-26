@@ -1,2 +1,3 @@
 • SFTP: a built-in editor for the files on your server — text files are edited in place and keep their encoding, line endings and permissions, configuration files are syntax coloured, and anything that is not text opens in a hex editor
 • SSH keys: a key with a passphrase now works — the passphrase is asked once when you import the key and is not stored anywhere. Keys imported earlier must be imported again; the list marks them.
+• Fixed: the app could stay covered by a blank screen.

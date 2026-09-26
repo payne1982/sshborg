@@ -1,2 +1,3 @@
-• SFTP: eingebauter Editor für die Dateien auf dem Server — Textdateien werden direkt dort bearbeitet und behalten Kodierung, Zeilenenden und Rechte, Konfigurationsdateien werden farbig hervorgehoben, und alles, was kein Text ist, öffnet im Hex-Editor
-• SSH-Schlüssel: ein Schlüssel mit Passphrase funktioniert jetzt — die Passphrase wird beim Import einmal verlangt und nirgends gespeichert. Früher importierte Schlüssel neu importieren; die Liste zeigt sie.
+• SFTP: eingebauter Editor für die Dateien auf dem Server — Textdateien werden dort bearbeitet und behalten Kodierung, Zeilenenden und Rechte, Konfigurationsdateien werden farbig hervorgehoben, alles andere öffnet im Hex-Editor
+• SSH-Schlüssel: ein Schlüssel mit Passphrase funktioniert jetzt — die Passphrase wird beim Import einmal verlangt und nirgends gespeichert. Früher importierte neu importieren; die Liste zeigt sie.
+• Behoben: die App konnte hinter einem leeren Bild hängen bleiben.

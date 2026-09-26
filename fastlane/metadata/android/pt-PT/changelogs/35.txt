@@ -1,2 +1,3 @@
-• SFTP: editor integrado para os ficheiros no servidor — os de texto são editados no próprio servidor e mantêm codificação, fins de linha e permissões, os de configuração são coloridos, e o que não é texto abre num editor hexadecimal
+• SFTP: editor integrado para os ficheiros no servidor — os de texto são editados no servidor e mantêm codificação, fins de linha e permissões, os de configuração são coloridos, e o resto abre num editor hexadecimal
 • Chaves SSH: uma chave com frase-passe já funciona — a frase-passe é pedida uma vez ao importar e não é guardada em lado nenhum. As chaves importadas antes têm de ser importadas de novo; a lista assinala-as.
+• Corrigido: a app podia ficar coberta por um ecrã vazio.
