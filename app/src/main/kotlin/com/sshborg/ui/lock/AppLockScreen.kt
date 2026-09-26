@@ -62,6 +62,14 @@ fun AppLockScreen(
     }
     var remaining by remember { mutableStateOf(initialLockoutSeconds) }
 
+    // The remaining lockout is read from disk, so on a gate that went up in the same frame as
+    // the app it arrives a moment later, when this composable is already running.
+    LaunchedEffect(initialLockoutSeconds) {
+        if (initialLockoutSeconds > 0) {
+            lockoutUntil = System.currentTimeMillis() + initialLockoutSeconds * 1000
+        }
+    }
+
     // Live countdown while locked out.
     LaunchedEffect(lockoutUntil) {
         while (lockoutUntil > System.currentTimeMillis()) {

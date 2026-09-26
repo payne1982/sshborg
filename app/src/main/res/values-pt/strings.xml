@@ -135,6 +135,11 @@
     <string name="keys_import_error_encrypted">Esta chave está cifrada — introduza a frase-passe</string>
     <string name="keys_import_error_wrong_passphrase">Frase-passe incorreta</string>
     <string name="keys_import_error_invalid">Formato de chave inválido ou não suportado</string>
+    <string name="keys_import_error_encryption">Esta chave está cifrada num formato que a app não consegue abrir. Decifre-a com a ferramenta que a criou e importe-a de novo.</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Falta a frase-passe — importe esta chave novamente</string>
+    <string name="keys_passphrase_note">Serve apenas para abrir a chave e não é guardada. A chave, aberta, é guardada como qualquer outra.</string>
 
     <string name="keygen_title">Gerar Chave SSH</string>
     <string name="keygen_field_label">Etiqueta</string>
@@ -262,6 +267,8 @@
     <string name="sftp_mkdir_folder_name">Nome da pasta</string>
 
     <string name="sftp_menu_open">Abrir</string>
+    <string name="sftp_menu_edit">Abrir no editor</string>
+    <string name="sftp_menu_hex">Abrir em hexadecimal</string>
     <string name="sftp_menu_rename">Renomear</string>
     <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
     <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
@@ -377,6 +384,7 @@
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de ecrã e gravação de ecrã. Manter desativado para proteger conteúdo sensível.</string>
     <string name="lock_title">Desbloquear o SSHBorg</string>
+    <string name="lock_unlock_action">Desbloquear</string>
     <string name="lock_enter_pin">Introduza o PIN</string>
     <string name="lock_enter_passphrase">Introduza a frase-passe</string>
     <string name="lock_incorrect">Incorreto — tente novamente</string>
@@ -466,4 +474,27 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Mover para cima</string>
     <string name="hosts_move_down">Mover para baixo</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Alterações não guardadas</string>
+    <string name="editor_unsaved_message">Fechar o editor e perder as alterações feitas?</string>
+    <string name="editor_discard">Descartar</string>
+    <string name="editor_unsaved">não guardado</string>
+    <string name="editor_saved">guardado</string>
+    <string name="editor_mixed_endings">fins de linha misturados</string>
+    <string name="editor_too_large">Este ficheiro tem %1$s, mais do que os %2$s que o editor consegue abrir.</string>
+    <string name="editor_binary">Este ficheiro não é texto, por isso não pode ser editado aqui.</string>
+    <string name="editor_use_terminal">Pode editá-lo no servidor a partir de uma sessão de terminal.</string>
+    <string name="editor_loading">A ler…</string>
+    <string name="editor_suggestions">Sugestões do teclado</string>
+    <string name="editor_open_as_text">Abrir como texto mesmo assim</string>
+    <string name="action_undo">Desfazer</string>
+    <string name="editor_hex_subtitle">%1$d bytes · substituição</string>
+    <string name="editor_open_hex">Abrir em hexadecimal</string>
+    <string name="editor_hex">Hexadecimal</string>
+    <string name="editor_charset">Codificação</string>
+    <string name="editor_charset_discard">Ler o ficheiro de outra forma substitui o texto no ecrã. As alterações não guardadas serão perdidas.</string>
+    <string name="editor_cannot_encode">O texto contém caracteres que %1$s não consegue escrever. Escolha outra codificação para o guardar.</string>
+    <string name="editor_save_failed">Não guardado</string>
 </resources>

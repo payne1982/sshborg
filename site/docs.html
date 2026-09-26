@@ -525,6 +525,8 @@
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Upload &amp; download</a></li>
             <li class="sub"><a href="#sftp">Multi-select</a></li>
+            <li class="sub"><a href="#sftp">Editing files</a></li>
+            <li class="sub"><a href="#sftp">Hex editor</a></li>
             <li><a href="#ssh-keys">SSH Keys</a></li>
             <li class="sub"><a href="#ssh-keys">Generating a key</a></li>
             <li class="sub"><a href="#ssh-keys">Authorizing on server</a></li>
@@ -543,8 +545,10 @@
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
             <li><a href="#security">App Security</a></li>
+            <li class="sub"><a href="#security">The strongest setup</a></li>
             <li><a href="#backup">Configuration Backup</a></li>
             <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Open source licenses</a></li>
         </ul>
     </nav>
 
@@ -626,6 +630,14 @@
                 <li><strong>Download</strong> — downloads all selected files and folders at once, with a progress dialog and cancellation support.</li>
                 <li><strong>Delete</strong> — deletes all selected items. Deleting a non-empty folder removes all its contents recursively. <em>There is no undo.</em></li>
             </ul>
+            <h3>Editing files</h3>
+            <p>Open a file's menu — a long press, or the <strong>⋮</strong> button — and choose <strong>Open in editor</strong> to change it directly on the server. Nothing is stored on the phone: the file is read into memory, edited, and written straight back.</p>
+            <p>The file goes back as it came. Its character encoding is detected and used again when saving, LF or CRLF line endings are preserved, a file that ended without a newline still does, and the permissions stay as they were. If the encoding was read wrong, tap it in the bar at the bottom of the editor and choose another — the list only offers encodings that can reproduce this file's bytes exactly, so a wrong choice can look wrong on screen but cannot damage the file.</p>
+            <p>Saving writes to a temporary file beside the original and renames it into place, so a connection lost halfway cannot leave a half-written file on the server.</p>
+            <p>Files open up to 4 MB, whatever their length: only the lines on screen are drawn, so a file of megabytes scrolls like a short one. Above that the terminal is the answer, with <code>nano</code> or <code>vi</code>, and it has no limit at all.</p>
+            <p>Configuration files are coloured — comments, strings, numbers, keys, section headers, shell variables and XML tags — from the file's name or, when the name says nothing, from the shape of its contents: shell scripts, nginx and sshd style directives, INI, YAML, JSON and XML. Prose, notes and logs are deliberately left plain, where colour would only be noise. Colouring is appearance alone and never changes a byte.</p>
+            <h3>Hex editor</h3>
+            <p>A file that is not text opens in the hex editor: offsets on the left, the bytes in the middle, the printable characters on the right, and a keypad for the hex digits. Tap a byte and type two digits to replace it. Values change but the length never does, so every offset in the file stays where it was. <strong>Open in hex</strong> in a file's menu opens any file this way, and a text file mistaken for binary — one with a stray NUL byte in it — can still be opened as text from the same dialog.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -634,6 +646,8 @@
                     <li><strong>Folders</strong> — long-press a file or folder for its menu: <em>Download</em>, <em>Rename</em>, <em>Delete</em>.</li>
                     <li><strong>Multi-select</strong> — choose <em>Select items</em> in the Actions menu, then tick the items. A long press opens the item's menu instead.</li>
                     <li><strong>Upload conflicts</strong> — the dialog offers <em>Overwrite</em>, <em>Keep both</em> (the upload gets a new name) or <em>Cancel</em>.</li>
+                    <li><strong>Editing</strong> — the editor and the hex editor are here too: a file's long-press menu offers <em>Open in editor</em> and <em>Open in hex</em>. While it loads, the file passes through the app's temporary folder and is removed as soon as it has been read.</li>
+                    <li><strong>Saving</strong> — the file is written straight over the original, not to a temporary file beside it that is then renamed into place, so a connection lost halfway through a save can leave it half written.</li>
                 </ul>
             </div>
         </div>
@@ -674,7 +688,15 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Encrypting stored keys and passwords</h3>
             <p>Turn on <strong>Settings → Security → Encrypt sensitive data</strong> to store private keys and saved host passwords encrypted with a key held in the device's secure hardware — the Android Keystore, or the Keychain on iOS. It stays off until you enable it; the security tip shown at first launch points to it.</p>
             <p>Encrypted data is bound to the device and to this installation of the app: after uninstalling, the stored keys cannot be recovered, and you would generate new ones and authorize them on your servers again. Together with an app lock, this is strongly recommended if you keep sensitive server credentials on your phone.</p>
-            <p>A key you import that is protected by a passphrase is unlocked with it once, when you import it.</p>
+            <p>A key protected by a passphrase asks for it once, when you import it, and is then stored unlocked: the passphrase itself is never written to the device. A passphrase is usually reused somewhere else, while a private key is worth only itself — and a key stored next to its own passphrase would not be protected by it anyway. What protects it here is the app's private storage, <strong>Encrypt sensitive data</strong>, and the app lock. A key imported by an earlier version was stored still encrypted and cannot authenticate; the key list marks those, and they have to be imported again.</p>
+            <p>Two encrypted formats the app cannot open: an OpenSSL container (<code>BEGIN ENCRYPTED PRIVATE KEY</code>) and PuTTY's <code>.ppk</code>. The import says so rather than taking the key half-way. Decrypt it with the tool that created it and import it again — working on a copy, never on your only file:</p>
+            <pre><code>ssh-keygen -p -N "" -f id_ed25519_copy
+openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
+            <p>PuTTYgen converts a <code>.ppk</code> from <em>Conversions → Export OpenSSH key</em>.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                iOS works the same way: the passphrase is asked once, at import, the key is stored unlocked, and the passphrase is written nowhere. It refuses one format more than Android — besides the OpenSSL container and the PuTTY <code>.ppk</code>, also the older PEM encryption (<code>Proc-Type: 4,ENCRYPTED</code>), which <code>ssh-keygen -m PEM</code> writes when given a passphrase. Decrypt such a key and import it again.
+            </div>
         </div>
 
         <div class="doc-section" id="suggestions">
@@ -957,9 +979,9 @@ Host target
 
             <h2>// APP SECURITY</h2>
             <h3>App lock</h3>
-            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), <strong>Device lock</strong> (the device PIN, pattern, or password, alongside biometrics), or an in-app <strong>PIN or passphrase</strong>. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data.</p>
+            <p>Choose how the app is protected in <strong>Settings → Security → App lock</strong>: <strong>None</strong> (default), <strong>Biometric only</strong> (fingerprint or face unlock), <strong>Device lock</strong> (the device PIN, pattern, or password, alongside biometrics), or an in-app <strong>PIN or passphrase</strong>. When a lock is active, SSHBorg requires authentication before showing any host, credential, or session data. If authentication is refused, or you cancel it, the app stays on its own lock screen with a button to try again — it does not close, so the sessions you had open are still there when you unlock.</p>
             <p>The in-app <strong>PIN or passphrase</strong> works on any device, even without biometric hardware or a system screen lock — which makes it the right choice on an Android TV. Changing or removing it asks for the current one first. There is no way to recover it if forgotten: you would have to clear the app's data or reinstall, so keep a backup of your hosts.</p>
-            <p>You can set an inactivity timeout — after that many minutes in the background the app locks automatically.</p>
+            <p>You can set an inactivity timeout — after that long in the background the app locks automatically.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 The lock offers <strong>None</strong>, <strong>Biometric only</strong> (Face ID or Touch ID) and <strong>Device lock</strong> (the device passcode or biometrics). There is no in-app PIN or passphrase.
@@ -977,6 +999,17 @@ Host target
                 <div class="callout-label">// BACKUP NOTE</div>
                 Because the encryption key never leaves the device's secure hardware, keys <strong>cannot be restored</strong> from a cloud or device backup and will not transfer to a new phone automatically. Before switching devices, make sure to authorize a new key generated on the new device on all your servers.
             </div>
+            <h3>The strongest setup</h3>
+            <p>Each piece above is useful on its own. Together they are as tight as the app gets, and it takes a couple of minutes:</p>
+            <ol>
+                <li>Turn on <strong>Settings → Security → Encrypt sensitive data</strong>.</li>
+                <li>Set the app lock to <strong>Biometric only</strong> — or to <strong>PIN or passphrase</strong> if you would rather not rely on the phone's biometrics.</li>
+                <li>Set the lock timeout to <strong>Immediately</strong>, or at most <strong>30 seconds</strong>.</li>
+                <li>Generate a new key in the app, with a name that tells you which device it is.</li>
+                <li>Authorize that key on your servers, and use it instead of a password.</li>
+            </ol>
+            <p>A key generated on the phone has never existed anywhere else: there is no older copy of it that might already have leaked, and nothing to clean up on another machine. One key per device also means that losing the phone costs you one line in <code>authorized_keys</code> — remove it and your other devices keep working, which is why the name is worth choosing well.</p>
+            <p>What none of this can do: if the phone itself is compromised, that key is compromised with it, whatever protects it on disk. A passphrase on the key would not save it either — anything able to read the app's storage can also read what you type. That is why SSHBorg asks for a key's passphrase once, when importing it, and stores the key unlocked instead of keeping the passphrase (see <a href="#ssh-keys">SSH Keys</a>).</p>
         </div>
 
         <div class="doc-section" id="backup">
@@ -1084,6 +1117,19 @@ Host target
             <p>A TV usually has no fingerprint reader or screen lock, so protect the app with the built-in <strong>PIN or passphrase</strong> lock (Settings → Security) — it works entirely with the remote or a keyboard. See <a href="#security">App Security</a>.</p>
         </div>
 
+        <div class="doc-section" id="licenses">
+
+            <h2>// OPEN SOURCE LICENSES</h2>
+            <p>SSHBorg is free software, released under the <strong>GNU General Public License v3</strong>. Its source code is on GitHub, for both the Android and the iOS app. It uses the following libraries, each under its own licence:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — the SSH protocol on Android — BSD-style licence</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — cryptography on Android — MIT-style licence</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — the text editor widget for editing files on the server, on Android — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — the SSH protocol on iOS — BSD licence</li>
+            </ul>
+            <p>None of them connects to anything on its own: the only addresses SSHBorg contacts are the servers you tell it about, and sshborg.com when you tap a link. There are no analytics libraries, no advertising libraries and no trackers of any kind.</p>
+        </div>
+
     </div><!-- /doc-content -->
 </div><!-- /docs-layout -->
 
@@ -1096,6 +1142,7 @@ Host target
         <a href="privacy_policy.html" target="_blank" rel="noopener">Privacy Policy</a> &nbsp;&#9135;&nbsp;
         <a href="index.html#support">Issues &amp; Feedback</a> &nbsp;&#9135;&nbsp;
         Source Code: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot; <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
+        <a href="docs.html#licenses">Licenses</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">

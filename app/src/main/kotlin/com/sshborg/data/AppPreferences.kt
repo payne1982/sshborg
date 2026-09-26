@@ -72,7 +72,7 @@ class AppPreferences(private val context: Context) {
 
     /** Lock timeout in seconds. 0 = lock immediately on every app switch. Default 60 (1 minute). */
     val lockTimeoutSeconds: Flow<Int> =
-        context.dataStore.data.map { it[Keys.LOCK_TIMEOUT_SECONDS] ?: 60 }
+        context.dataStore.data.map { it[Keys.LOCK_TIMEOUT_SECONDS] ?: DEFAULT_LOCK_TIMEOUT_SECONDS }
 
     val rootWarningAcknowledged: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.ROOT_WARNING_ACKNOWLEDGED] ?: false }
@@ -85,6 +85,7 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setLockMode(mode: Int) {
         context.dataStore.edit { it[Keys.LOCK_MODE] = mode }
+        lockSnapshot()
     }
 
     suspend fun setKeystoreEncryption(enabled: Boolean) {
@@ -97,6 +98,7 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setLockTimeoutSeconds(seconds: Int) {
         context.dataStore.edit { it[Keys.LOCK_TIMEOUT_SECONDS] = seconds }
+        lockSnapshot()
     }
 
     suspend fun setRootWarningAcknowledged() {
@@ -168,6 +170,12 @@ class AppPreferences(private val context: Context) {
 
     companion object {
         const val DEFAULT_TERMINAL_FONT_SIZE = 13
+        const val DEFAULT_LOCK_TIMEOUT_SECONDS = 60
+
+        // Keys of the synchronous mirror (see [lockSnapshot]).
+        private const val MIRROR_MODE    = "mode"
+        private const val MIRROR_TIMEOUT = "timeout_seconds"
+        private const val MIRROR_KIND    = "secret_kind"
         const val MIN_TERMINAL_FONT_SIZE = 8
         const val MAX_TERMINAL_FONT_SIZE = 32
 
@@ -268,6 +276,48 @@ class AppPreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.PRIVACY_POLICY_ACCEPTED] = true }
     }
 
+    // ── Lock state, readable without suspending ──────────────────────────────
+    // MainActivity has to know whether to put the lock gate up in the *same frame* it starts:
+    // an asynchronous read leaves a gap, and the opaque cover that used to hide that gap is
+    // precisely what could stay on screen for good (see MainActivity). DataStore is
+    // asynchronous by design, so every write that changes the lock also mirrors it into a
+    // small SharedPreferences file, which can be read on the main thread.
+
+    private val lockMirror by lazy {
+        context.getSharedPreferences("lock_snapshot", Context.MODE_PRIVATE)
+    }
+
+    /** Everything needed to decide about the lock, with no suspension. */
+    data class LockSnapshot(val mode: Int, val timeoutSeconds: Int, val secretKind: String?)
+
+    /** The mirrored lock state, or null on the first start after the update: nothing mirrored yet. */
+    fun lockSnapshotOrNull(): LockSnapshot? {
+        if (!lockMirror.contains(MIRROR_MODE)) return null
+        return LockSnapshot(
+            mode = lockMirror.getInt(MIRROR_MODE, LOCK_NONE),
+            timeoutSeconds = lockMirror.getInt(MIRROR_TIMEOUT, DEFAULT_LOCK_TIMEOUT_SECONDS),
+            secretKind = lockMirror.getString(MIRROR_KIND, null),
+        )
+    }
+
+    /** Reads the real lock state and refreshes the mirror [lockSnapshotOrNull] reads. */
+    suspend fun lockSnapshot(): LockSnapshot {
+        val p = context.dataStore.data.first()
+        val snapshot = LockSnapshot(
+            mode = p[Keys.LOCK_MODE]
+                ?: if (p[Keys.BIOMETRIC_LOCK] == true) LOCK_BIOMETRIC else LOCK_NONE,
+            timeoutSeconds = p[Keys.LOCK_TIMEOUT_SECONDS] ?: DEFAULT_LOCK_TIMEOUT_SECONDS,
+            secretKind = p[Keys.LOCK_SECRET_KIND],
+        )
+        val e = lockMirror.edit()
+        e.putInt(MIRROR_MODE, snapshot.mode)
+        e.putInt(MIRROR_TIMEOUT, snapshot.timeoutSeconds)
+        if (snapshot.secretKind == null) e.remove(MIRROR_KIND)
+        else e.putString(MIRROR_KIND, snapshot.secretKind)
+        e.apply()
+        return snapshot
+    }
+
     // ── In-app lock secret (PIN / passphrase) ─────────────────────────────────
     // Persisted only as a salted PBKDF2 hash (see AppLockManager). Deliberately NOT
     // part of the settings backup, like lock_mode — a security gate tied to this
@@ -292,6 +342,7 @@ class AppPreferences(private val context: Context) {
             it[Keys.LOCK_SECRET_HASH] = secret.hashB64
             it[Keys.LOCK_SECRET_ITER] = secret.iterations
         }
+        lockSnapshot()
     }
 
     /** Removes the stored secret and resets the throttling counters. */
@@ -301,6 +352,7 @@ class AppPreferences(private val context: Context) {
             it.remove(Keys.LOCK_SECRET_HASH); it.remove(Keys.LOCK_SECRET_ITER)
             it.remove(Keys.LOCK_FAILED_ATTEMPTS); it.remove(Keys.LOCK_LOCKOUT_UNTIL)
         }
+        lockSnapshot()
     }
 
     /** (failedAttempts, lockoutUntilEpochMillis). */

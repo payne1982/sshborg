@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Datenschutz',
   footer_issues:  'Fehler &amp; Feedback',
   footer_source:  'Quellcode',
+  footer_licenses: 'Lizenzen',
   footer_powered: 'SSH-Konnektivität bereitgestellt von',
 
   page_title_docs:       'SSHBorg – Benutzerhandbuch',
@@ -92,6 +93,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Hoch- &amp; Herunterladen</a></li>
             <li class="sub"><a href="#sftp">Mehrfachauswahl</a></li>
+            <li class="sub"><a href="#sftp">Dateien bearbeiten</a></li>
+            <li class="sub"><a href="#sftp">Hex-Editor</a></li>
             <li><a href="#ssh-keys">SSH-Schlüssel</a></li>
             <li class="sub"><a href="#ssh-keys">Schlüssel generieren</a></li>
             <li class="sub"><a href="#ssh-keys">Auf Server autorisieren</a></li>
@@ -110,8 +113,10 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Multi-Hop-Ketten</a></li>
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
             <li><a href="#security">App-Sicherheit</a></li>
+            <li class="sub"><a href="#security">Die sicherste Einrichtung</a></li>
             <li><a href="#backup">Konfiguration sichern</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Open-Source-Lizenzen</a></li>`,
 
   doc_adding_host: `
             <h2>// HOST HINZUFÜGEN</h2>
@@ -183,6 +188,14 @@ module.exports = {
                 <li><strong>Herunterladen</strong> — lädt alle ausgewählten Dateien und Ordner auf einmal herunter, mit Fortschrittsdialog und Abbruchmöglichkeit.</li>
                 <li><strong>Löschen</strong> — löscht alle ausgewählten Elemente. Das Löschen eines nicht leeren Ordners entfernt alle Inhalte rekursiv. <em>Dies kann nicht rückgängig gemacht werden.</em></li>
             </ul>
+            <h3>Dateien bearbeiten</h3>
+            <p>Öffne das Menü einer Datei — langer Druck oder die Schaltfläche <strong>⋮</strong> — und wähle <strong>Im Editor öffnen</strong>, um sie direkt auf dem Server zu ändern. Auf dem Telefon bleibt nichts: Die Datei wird in den Speicher gelesen, bearbeitet und direkt zurückgeschrieben.</p>
+            <p>Die Datei geht zurück, wie sie kam. Die Zeichenkodierung wird erkannt und beim Speichern wieder verwendet, Zeilenenden (LF oder CRLF) bleiben erhalten, eine Datei ohne abschließenden Zeilenumbruch behält das, und die Rechte bleiben unverändert. Wurde die Kodierung falsch gelesen, tippe sie in der Leiste am unteren Rand an und wähle eine andere — die Liste bietet nur Kodierungen an, die die Bytes dieser Datei exakt wiedergeben können, eine falsche Wahl kann also falsch aussehen, die Datei aber nicht beschädigen.</p>
+            <p>Beim Speichern wird zuerst eine temporäre Datei neben dem Original geschrieben und dann an dessen Stelle umbenannt, damit eine auf halbem Weg verlorene Verbindung keine halb geschriebene Datei zurücklässt.</p>
+            <p>Dateien öffnen bis 4 MB, gleich welcher Länge: gezeichnet werden nur die Zeilen auf dem Bildschirm, also scrollt eine Datei von Megabyte wie eine kurze. Darüber ist das Terminal die Antwort, mit <code>nano</code> oder <code>vi</code>, und das kennt gar keine Grenze.</p>
+            <p>Konfigurationsdateien werden eingefärbt — Kommentare, Zeichenketten, Zahlen, Schlüssel, Abschnittsüberschriften, Shell-Variablen und XML-Tags — anhand des Dateinamens oder, wenn der nichts sagt, anhand der Form des Inhalts: Shell-Skripte, Direktiven im Stil von nginx und sshd, INI, YAML, JSON und XML. Fließtext, Notizen und Logs bleiben bewusst ohne Farbe, wo sie nur Lärm wäre. Das Einfärben ist reine Darstellung und ändert kein einziges Byte.</p>
+            <h3>Hex-Editor</h3>
+            <p>Eine Datei, die kein Text ist, öffnet im Hex-Editor: links die Offsets, in der Mitte die Bytes, rechts die druckbaren Zeichen und unten ein Tastenfeld für die Hex-Ziffern. Tippe ein Byte an und gib zwei Ziffern ein, um es zu ersetzen. Werte ändern sich, die Länge nie — jedes Offset bleibt, wo es war. <strong>Hexadezimal öffnen</strong> im Menü einer Datei öffnet jede Datei so, und eine fälschlich für binär gehaltene Textdatei — etwa mit einem versehentlichen NUL-Byte — lässt sich im selben Dialog trotzdem als Text öffnen.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -191,6 +204,8 @@ module.exports = {
                     <li><strong>Ordner</strong> — drücke lange auf eine Datei oder einen Ordner, um das Menü zu öffnen: <em>Herunterladen</em>, <em>Umbenennen</em>, <em>Löschen</em>.</li>
                     <li><strong>Mehrfachauswahl</strong> — wähle <em>Elemente auswählen</em> im Menü Aktionen und hake dann die Elemente an. Ein langer Druck öffnet stattdessen das Menü des Elements.</li>
                     <li><strong>Konflikte beim Hochladen</strong> — der Dialog bietet <em>Überschreiben</em>, <em>Beide behalten</em> (die hochgeladene Datei bekommt einen neuen Namen) oder <em>Abbrechen</em>.</li>
+                    <li><strong>Bearbeiten</strong> — den Editor und den Hex-Editor gibt es auch hier: das Menü einer Datei (langer Druck) bietet <em>Im Editor öffnen</em> und <em>Hexadezimal öffnen</em>. Während sie lädt, liegt die Datei kurz im temporären Ordner der App und wird entfernt, sobald sie gelesen ist.</li>
+                    <li><strong>Speichern</strong> — die Datei wird direkt über das Original geschrieben, nicht in eine temporäre Datei daneben, die dann an ihre Stelle umbenannt wird; eine mitten im Speichern abgebrochene Verbindung kann sie also halb geschrieben zurücklassen.</li>
                 </ul>
             </div>`,
 
@@ -229,7 +244,15 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Gespeicherte Schlüssel und Passwörter verschlüsseln</h3>
             <p>Aktiviere <strong>Einstellungen → Sicherheit → Sensible Daten verschlüsseln</strong>, um private Schlüssel und gespeicherte Host-Passwörter verschlüsselt abzulegen, mit einem Schlüssel in der sicheren Hardware des Geräts — dem Android Keystore bzw. unter iOS dem Schlüsselbund. Die Option bleibt aus, bis du sie einschaltest; der Sicherheitstipp beim ersten Start weist darauf hin.</p>
             <p>Verschlüsselte Daten sind an das Gerät und an diese Installation der App gebunden: Nach dem Deinstallieren lassen sich die gespeicherten Schlüssel nicht wiederherstellen, und du müsstest neue generieren und erneut auf deinen Servern autorisieren. Zusammen mit einer App-Sperre wird das dringend empfohlen, wenn du sensible Server-Zugangsdaten auf dem Smartphone hast.</p>
-            <p>Ein importierter Schlüssel, der mit einer Passphrase geschützt ist, wird beim Import einmal damit entsperrt.</p>`,
+            <p>Ein mit einer Passphrase geschützter Schlüssel verlangt sie einmal, beim Import, und wird danach entsperrt gespeichert: die Passphrase selbst landet nie auf dem Gerät. Eine Passphrase wird meist noch woanders verwendet, ein privater Schlüssel gilt nur für sich — und ein Schlüssel, der neben seiner eigenen Passphrase liegt, wäre von ihr ohnehin nicht geschützt. Hier schützen ihn der private Speicher der App, <strong>Sensible Daten verschlüsseln</strong> und die App-Sperre. Ein von einer früheren Version importierter Schlüssel blieb verschlüsselt und kann sich nicht anmelden; die Liste zeigt sie, und sie müssen neu importiert werden.</p>
+            <p>Zwei verschlüsselte Formate, die die App nicht öffnen kann: der OpenSSL-Container (<code>BEGIN ENCRYPTED PRIVATE KEY</code>) und PuTTYs <code>.ppk</code>. Der Import sagt das, anstatt den Schlüssel halb zu übernehmen. Entschlüssle ihn mit dem Werkzeug, das ihn erstellt hat, und importiere ihn erneut — an einer Kopie, nie an der einzigen Datei, die du hast:</p>
+            <pre><code>ssh-keygen -p -N "" -f id_ed25519_copy
+openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
+            <p>PuTTYgen wandelt ein <code>.ppk</code> über <em>Conversions → Export OpenSSH key</em> um.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                Auf iOS läuft es genauso: die Passphrase wird einmal beim Import verlangt, der Schlüssel entsperrt gespeichert, die Passphrase nirgends geschrieben. Ein Format lehnt iOS zusätzlich ab: neben dem OpenSSL-Container und PuTTYs <code>.ppk</code> auch die alte PEM-Verschlüsselung (<code>Proc-Type: 4,ENCRYPTED</code>), die <code>ssh-keygen -m PEM</code> mit Passphrase schreibt. Entschlüssle einen solchen Schlüssel und importiere ihn erneut.
+            </div>`,
 
   doc_suggestions: `
             <h2>// BEFEHLSVORSCHLÄGE</h2>
@@ -492,9 +515,9 @@ Host target
   doc_security: `
             <h2>// APP-SICHERHEIT</h2>
             <h3>App-Sperre</h3>
-            <p>Wähle unter <strong>Einstellungen → Sicherheit → App-Sperre</strong>, wie die App geschützt wird: <strong>Keine</strong> (Standard), <strong>Nur biometrisch</strong> (Fingerabdruck oder Gesichtserkennung), <strong>Gerätesperre</strong> (die PIN, das Muster oder das Passwort des Geräts, zusätzlich zur Biometrie) oder ein <strong>In-App-PIN oder eine Passphrase</strong>. Wenn eine Sperre aktiv ist, erfordert SSHBorg eine Authentifizierung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden.</p>
+            <p>Wähle unter <strong>Einstellungen → Sicherheit → App-Sperre</strong>, wie die App geschützt wird: <strong>Keine</strong> (Standard), <strong>Nur biometrisch</strong> (Fingerabdruck oder Gesichtserkennung), <strong>Gerätesperre</strong> (die PIN, das Muster oder das Passwort des Geräts, zusätzlich zur Biometrie) oder ein <strong>In-App-PIN oder eine Passphrase</strong>. Wenn eine Sperre aktiv ist, erfordert SSHBorg eine Authentifizierung, bevor Host-, Anmelde- oder Sitzungsdaten angezeigt werden. Wird die Authentifizierung abgelehnt oder abgebrochen, bleibt die App auf ihrem eigenen Sperrbildschirm, mit einer Schaltfläche für einen neuen Versuch — sie schließt sich nicht, die offenen Sitzungen sind nach dem Entsperren also noch da.</p>
             <p>Der <strong>In-App-PIN bzw. die Passphrase</strong> funktioniert auf jedem Gerät, auch ohne biometrische Hardware oder eine System-Bildschirmsperre — das macht ihn zur richtigen Wahl auf einem Android TV. Zum Ändern oder Entfernen wird zuerst der aktuelle abgefragt. Bei Verlust gibt es keine Wiederherstellung: Du müsstest die App-Daten löschen oder die App neu installieren — halte also ein Backup deiner Hosts bereit.</p>
-            <p>Du kannst ein Inaktivitäts-Timeout festlegen — nach dieser Anzahl von Minuten im Hintergrund sperrt sich die App automatisch.</p>
+            <p>Du kannst ein Inaktivitäts-Timeout festlegen — nach dieser Zeit im Hintergrund sperrt sich die App automatisch.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 Die Sperre bietet <strong>Keine</strong>, <strong>Nur biometrisch</strong> (Face ID oder Touch ID) und <strong>Gerätesperre</strong> (Gerätecode oder Biometrie). Einen In-App-PIN oder eine Passphrase gibt es nicht.
@@ -511,7 +534,18 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// HINWEIS ZUM BACKUP</div>
                 Da der Verschlüsselungsschlüssel die sichere Hardware des Geräts nie verlässt, lassen sich Schlüssel <strong>nicht aus einem Cloud- oder Geräte-Backup wiederherstellen</strong> und werden nicht automatisch auf ein neues Gerät übertragen. Stelle vor einem Gerätewechsel sicher, dass du einen auf dem neuen Gerät generierten Schlüssel auf allen deinen Servern autorisierst.
-            </div>`,
+            </div>
+            <h3>Die sicherste Einrichtung</h3>
+            <p>Jeder Baustein oben hilft schon allein. Zusammen sind sie das Sicherste, was die App bietet, und es kostet zwei Minuten:</p>
+            <ol>
+                <li>Schalte <strong>Einstellungen → Sicherheit → Sensible Daten verschlüsseln</strong> ein.</li>
+                <li>Setze die App-Sperre auf <strong>Nur biometrisch</strong> — oder auf <strong>PIN oder Passphrase</strong>, wenn du der Biometrie des Telefons nicht vertrauen willst.</li>
+                <li>Setze die Zeitsperre auf <strong>Sofort</strong>, höchstens auf <strong>30 Sekunden</strong>.</li>
+                <li>Erzeuge einen neuen Schlüssel in der App, mit einem Namen, der das Gerät benennt.</li>
+                <li>Autorisiere diesen Schlüssel auf deinen Servern und nutze ihn statt eines Passworts.</li>
+            </ol>
+            <p>Ein auf dem Telefon erzeugter Schlüssel hat nie woanders existiert: es gibt keine ältere Kopie, die schon entwichen sein könnte, und nichts, was auf einem anderen Rechner aufzuräumen wäre. Ein Schlüssel pro Gerät heißt auch: ein verlorenes Telefon kostet eine Zeile in <code>authorized_keys</code> — entfernen, und die anderen Geräte laufen weiter. Darum lohnt sich ein guter Name.</p>
+            <p>Was nichts davon kann: ist das Telefon selbst kompromittiert, ist dieser Schlüssel es mit ihm, was ihn auf der Platte auch schützt. Auch eine Passphrase würde ihn nicht retten — wer den Speicher der App lesen kann, liest auch mit, was du tippst. Darum verlangt SSHBorg die Passphrase eines Schlüssels einmal, beim Import, und speichert den Schlüssel entsperrt, statt die Passphrase zu behalten (siehe <a href="#ssh-keys">SSH-Schlüssel</a>).</p>`,
 
   doc_android_tv: `
             <h2>// ANDROID TV</h2>
@@ -529,6 +563,17 @@ Host target
             <p>Ohne eine solche bewältigt die Bildschirmtastatur trotzdem kurze Eingaben: ein Feld fokussieren, OK drücken, um es zu öffnen, tippen und <strong>OK / Los</strong> auf der Tastatur drücken — bei der Passwortabfrage verbindet dies direkt. Shell-Befehle mit der Bildschirmtastatur einzugeben ist jedoch unpraktisch.</p>
             <h3>Die App auf einem TV sperren</h3>
             <p>Ein TV hat meist keinen Fingerabdrucksensor und keine Bildschirmsperre — schütze die App daher mit der integrierten <strong>PIN- oder Passphrase-Sperre</strong> (Einstellungen → Sicherheit); sie funktioniert vollständig mit der Fernbedienung oder einer Tastatur. Siehe <a href="#security">App-Sicherheit</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// OPEN-SOURCE-LIZENZEN</h2>
+            <p>SSHBorg ist freie Software unter der <strong>GNU General Public License v3</strong>. Der Quelltext liegt auf GitHub, für die Android- wie für die iOS-App. Verwendet werden die folgenden Bibliotheken, jede unter ihrer eigenen Lizenz:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — das SSH-Protokoll unter Android — Lizenz im BSD-Stil</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — die Kryptografie unter Android — Lizenz im MIT-Stil</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — das Textbearbeitungs-Widget zum Ändern von Dateien auf dem Server, unter Android — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — das SSH-Protokoll unter iOS — BSD-Lizenz</li>
+            </ul>
+            <p>Keine davon verbindet sich von sich aus mit irgendetwas: SSHBorg kontaktiert nur die Server, die du angibst, und sshborg.com, wenn du einen Link antippst. Es gibt keine Analyse-Bibliotheken, keine Werbe-Bibliotheken und keinerlei Tracker.</p>`,
 
   doc_backup: `
             <h2>// KONFIGURATION SICHERN</h2>

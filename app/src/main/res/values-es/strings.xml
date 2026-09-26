@@ -135,6 +135,11 @@
     <string name="keys_import_error_encrypted">Esta clave está cifrada — introduzca la contraseña</string>
     <string name="keys_import_error_wrong_passphrase">Contraseña incorrecta</string>
     <string name="keys_import_error_invalid">Formato de clave no válido o no compatible</string>
+    <string name="keys_import_error_encryption">Esta clave está cifrada en un formato que la app no puede abrir. Descífrala con la herramienta que la creó e impórtala de nuevo.</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Falta la contraseña — importa esta clave de nuevo</string>
+    <string name="keys_passphrase_note">Solo se usa para abrir la clave y no se guarda. La clave abierta se conserva como cualquier otra.</string>
 
     <string name="keygen_title">Generar Clave SSH</string>
     <string name="keygen_field_label">Etiqueta</string>
@@ -262,6 +267,8 @@
     <string name="sftp_mkdir_folder_name">Nombre de carpeta</string>
 
     <string name="sftp_menu_open">Abrir</string>
+    <string name="sftp_menu_edit">Abrir en el editor</string>
+    <string name="sftp_menu_hex">Abrir en hexadecimal</string>
     <string name="sftp_menu_rename">Renombrar</string>
     <string name="sftp_menu_download_in_background">Descargar en segundo plano</string>
     <string name="sftp_background_downloads_title">Descargas en segundo plano</string>
@@ -377,6 +384,7 @@
     <string name="settings_allow_screenshots_title">Permitir capturas de pantalla</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de pantalla y grabación de pantalla. Déjalo desactivado para proteger el contenido sensible.</string>
     <string name="lock_title">Desbloquear SSHBorg</string>
+    <string name="lock_unlock_action">Desbloquear</string>
     <string name="lock_enter_pin">Introduce el PIN</string>
     <string name="lock_enter_passphrase">Introduce la frase de contraseña</string>
     <string name="lock_incorrect">Incorrecto: inténtalo de nuevo</string>
@@ -466,4 +474,27 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Subir</string>
     <string name="hosts_move_down">Bajar</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Cambios sin guardar</string>
+    <string name="editor_unsaved_message">¿Cerrar el editor y perder los cambios hechos?</string>
+    <string name="editor_discard">Descartar</string>
+    <string name="editor_unsaved">sin guardar</string>
+    <string name="editor_saved">guardado</string>
+    <string name="editor_mixed_endings">fin de línea mixto</string>
+    <string name="editor_too_large">Este archivo ocupa %1$s, más de los %2$s que el editor puede abrir.</string>
+    <string name="editor_binary">Este archivo no es texto, así que no se puede editar aquí.</string>
+    <string name="editor_use_terminal">Puedes editarlo en el servidor desde una sesión de terminal.</string>
+    <string name="editor_loading">Leyendo…</string>
+    <string name="editor_suggestions">Sugerencias del teclado</string>
+    <string name="editor_open_as_text">Abrir como texto igualmente</string>
+    <string name="action_undo">Deshacer</string>
+    <string name="editor_hex_subtitle">%1$d bytes · sobrescritura</string>
+    <string name="editor_open_hex">Abrir en hexadecimal</string>
+    <string name="editor_hex">Hexadecimal</string>
+    <string name="editor_charset">Codificación</string>
+    <string name="editor_charset_discard">Leer el archivo de otra forma sustituye el texto en pantalla. Se perderán los cambios sin guardar.</string>
+    <string name="editor_cannot_encode">El texto contiene caracteres que %1$s no puede escribir. Elige otra codificación para guardarlo.</string>
+    <string name="editor_save_failed">Sin guardar</string>
 </resources>

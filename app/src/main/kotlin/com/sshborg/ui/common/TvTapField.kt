@@ -51,6 +51,8 @@ fun TvTapField(
     singleLine: Boolean = true,
     placeholder: String? = null,
     supporting: String? = null,
+    /** Draws the field and its [supporting] line in the error colour, like a text field does. */
+    isError: Boolean = false,
     onDone: () -> Unit = {},
 ) {
     var editing by remember { mutableStateOf(false) }
@@ -65,7 +67,10 @@ fun TvTapField(
             onClick = { editing = true },
             shape = RoundedCornerShape(4.dp),
             color = Color.Transparent,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            border = BorderStroke(
+                if (isError) 2.dp else 1.dp,
+                if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+            ),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
@@ -73,7 +78,8 @@ fun TvTapField(
                     Text(
                         label,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (isError) MaterialTheme.colorScheme.error
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Text(
@@ -89,7 +95,8 @@ fun TvTapField(
             Text(
                 supporting,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (isError) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp),
             )
         }
@@ -197,32 +204,9 @@ fun TvSelectField(
             text = {
                 // Capped so a long list (e.g. all languages) stays compact on a short
                 // landscape TV screen — about four rows show, the rest scrolls with the
-                // D-pad as focus moves down. Chevrons at the edges signal hidden rows.
-                val scroll = rememberScrollState()
-                Box {
-                    Column(
-                        Modifier
-                            .heightIn(max = 216.dp)
-                            .verticalScroll(scroll)
-                    ) {
-                        menuItems { open = false }
-                    }
-                    if (scroll.canScrollBackward) {
-                        Icon(
-                            Icons.Filled.KeyboardArrowUp,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.align(Alignment.TopCenter),
-                        )
-                    }
-                    if (scroll.canScrollForward) {
-                        Icon(
-                            Icons.Filled.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
-                    }
+                // D-pad as focus moves down.
+                ScrollingDialogBody(maxHeight = 216.dp) {
+                    menuItems { open = false }
                 }
             },
             confirmButton = {

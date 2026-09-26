@@ -356,11 +356,22 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             .mapNotNull { hostDao.getById(it) }
     }
 
+    /**
+     * Public-key auth for [host]. A stored key is always unlocked — an encrypted one is unlocked
+     * at import — so nothing has to be asked for here. Null when the host has no key, or its key
+     * cannot be read.
+     */
+    private suspend fun keyAuthFor(host: HostEntity): SshAuth.PublicKey? {
+        val key = host.keyId?.let { keyDao.getById(it) } ?: return null
+        val pem = KeystoreManager.getPrivateKeyPem(key) ?: return null
+        return SshAuth.PublicKey(pem)
+    }
+
     /** Non-interactive auth for jump hosts — password must already be saved. */
     private suspend fun buildJumpAuth(host: HostEntity): SshAuth? {
-        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
+        val keyAuth = keyAuthFor(host)
         return when {
-            host.keyId != null && keyPem != null -> SshAuth.PublicKey(keyPem)
+            keyAuth != null -> keyAuth
             !host.encryptedPassword.isNullOrEmpty() ->
                 runCatching { SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword)) }.getOrNull()
             !host.password.isNullOrEmpty() -> SshAuth.Password(host.password)
@@ -369,9 +380,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private suspend fun buildAuth(host: HostEntity): SshAuth? {
-        val keyPem = host.keyId?.let { id -> keyDao.getById(id)?.let { KeystoreManager.getPrivateKeyPem(it) } }
-        return if (host.keyId != null && keyPem != null) {
-            SshAuth.PublicKey(keyPem)
+        val keyAuth = keyAuthFor(host)
+        return if (keyAuth != null) {
+            keyAuth
         } else if (!host.encryptedPassword.isNullOrEmpty()) {
             SshAuth.Password(KeystoreManager.decrypt(host.encryptedPassword))
         } else if (!host.password.isNullOrEmpty()) {

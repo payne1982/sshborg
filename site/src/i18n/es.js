@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Privacidad',
   footer_issues:  'Errores &amp; Comentarios',
   footer_source:  'Código fuente',
+  footer_licenses: 'Licencias',
   footer_powered: 'Conectividad SSH proporcionada por',
 
   page_title_docs:       'SSHBorg – Guía de usuario',
@@ -92,6 +93,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navegación</a></li>
             <li class="sub"><a href="#sftp">Subir y descargar</a></li>
             <li class="sub"><a href="#sftp">Selección múltiple</a></li>
+            <li class="sub"><a href="#sftp">Editar archivos</a></li>
+            <li class="sub"><a href="#sftp">Editor hexadecimal</a></li>
             <li><a href="#ssh-keys">Claves SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Generar una clave</a></li>
             <li class="sub"><a href="#ssh-keys">Autorizar en el servidor</a></li>
@@ -110,8 +113,10 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Cadenas multi-salto</a></li>
             <li><a href="#sessions">Sesiones múltiples</a></li>
             <li><a href="#security">Seguridad de la app</a></li>
+            <li class="sub"><a href="#security">La configuración más segura</a></li>
             <li><a href="#backup">Copia de seguridad</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Licencias de código abierto</a></li>`,
 
   doc_adding_host: `
             <h2>// AÑADIR UN HOST</h2>
@@ -183,6 +188,14 @@ module.exports = {
                 <li><strong>Descargar</strong> — descarga todos los archivos y carpetas seleccionados de una vez, con un diálogo de progreso y opción de cancelación.</li>
                 <li><strong>Eliminar</strong> — elimina todos los elementos seleccionados. Eliminar una carpeta no vacía borra todo su contenido de forma recursiva. <em>Esta acción no se puede deshacer.</em></li>
             </ul>
+            <h3>Editar archivos</h3>
+            <p>Abre el menú de un archivo — pulsación larga o el botón <strong>⋮</strong> — y elige <strong>Abrir en el editor</strong> para modificarlo directamente en el servidor. En el teléfono no queda nada: el archivo se lee en memoria, se edita y se escribe de vuelta.</p>
+            <p>El archivo vuelve tal como llegó. Su codificación se detecta y se usa de nuevo al guardar, los finales de línea LF o CRLF se conservan, un archivo que terminaba sin salto de línea sigue igual, y los permisos no cambian. Si la codificación se leyó mal, tócala en la barra inferior del editor y elige otra — la lista solo ofrece codificaciones capaces de reproducir exactamente los bytes de ese archivo, así que una elección equivocada puede verse mal pero no puede dañarlo.</p>
+            <p>Al guardar se escribe un archivo temporal junto al original y luego se renombra en su lugar, de modo que una conexión cortada a medias no puede dejar un archivo escrito a medias en el servidor.</p>
+            <p>Los archivos se abren hasta 4 MB, sea cual sea su longitud: solo se dibujan las líneas en pantalla, así que un archivo de megabytes se desplaza como uno corto. Por encima de eso la respuesta es el terminal, con <code>nano</code> o <code>vi</code>, que no tiene límite alguno.</p>
+            <p>Los archivos de configuración se colorean — comentarios, cadenas, números, claves, encabezados de sección, variables de shell y etiquetas XML — según el nombre del archivo o, cuando el nombre no dice nada, según la forma del contenido: guiones de shell, directivas al estilo de nginx y sshd, INI, YAML, JSON y XML. El texto libre, las notas y los registros se dejan a propósito sin color, donde solo sería ruido. El coloreado es solo apariencia y nunca cambia un byte.</p>
+            <h3>Editor hexadecimal</h3>
+            <p>Un archivo que no es texto se abre en el editor hexadecimal: los desplazamientos a la izquierda, los bytes en el centro, los caracteres imprimibles a la derecha y un teclado para los dígitos hexadecimales. Toca un byte y escribe dos dígitos para sustituirlo. Los valores cambian pero la longitud nunca, así que cada posición del archivo sigue donde estaba. <strong>Abrir en hexadecimal</strong> en el menú de un archivo abre así cualquier archivo, y un archivo de texto tomado por binario — con un byte NUL perdido dentro — todavía puede abrirse como texto desde el mismo diálogo.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -191,6 +204,8 @@ module.exports = {
                     <li><strong>Carpetas</strong> — mantén pulsado un archivo o una carpeta para ver su menú: <em>Descargar</em>, <em>Renombrar</em>, <em>Eliminar</em>.</li>
                     <li><strong>Selección múltiple</strong> — elige <em>Seleccionar elementos</em> en el menú Acciones y marca los elementos. Una pulsación larga abre en cambio el menú del elemento.</li>
                     <li><strong>Conflictos al subir</strong> — el diálogo ofrece <em>Sobrescribir</em>, <em>Guardar ambos</em> (el archivo subido recibe un nombre nuevo) o <em>Cancelar</em>.</li>
+                    <li><strong>Edición</strong> — el editor y el hexadecimal también están aquí: el menú de un archivo, con una pulsación larga, ofrece <em>Abrir en el editor</em> y <em>Abrir en hexadecimal</em>. Mientras se carga, el archivo pasa por la carpeta temporal de la app y se elimina en cuanto se ha leído.</li>
+                    <li><strong>Guardado</strong> — el archivo se escribe directamente sobre el original, no en un archivo temporal al lado que luego se renombra en su lugar, así que una conexión perdida a mitad del guardado puede dejarlo escrito a medias.</li>
                 </ul>
             </div>`,
 
@@ -229,7 +244,15 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Cifrar claves y contraseñas guardadas</h3>
             <p>Activa <strong>Ajustes → Seguridad → Cifrar datos sensibles</strong> para guardar las claves privadas y las contraseñas de los hosts cifradas con una clave protegida por el hardware seguro del dispositivo — el Android Keystore o, en iOS, el Llavero. Permanece desactivado hasta que lo actives; el consejo de seguridad del primer inicio lo recuerda.</p>
             <p>Los datos cifrados quedan ligados al dispositivo y a esta instalación de la app: tras desinstalarla, las claves guardadas no se pueden recuperar y tendrías que generar otras nuevas y autorizarlas de nuevo en tus servidores. Junto con un bloqueo de la app, es muy recomendable si guardas credenciales sensibles en el teléfono.</p>
-            <p>Una clave importada protegida con frase de contraseña se desbloquea con ella una sola vez, al importarla.</p>`,
+            <p>Una clave protegida con frase de contraseña la pide una sola vez, al importarla, y luego se guarda abierta: la frase nunca se escribe en el dispositivo. Una frase de contraseña suele reutilizarse en otros sitios, mientras que una clave privada solo vale para sí misma — y una clave guardada junto a su propia frase no estaría protegida por ella de todos modos. Aquí la protegen el almacenamiento privado de la app, <strong>Cifrar datos sensibles</strong> y el bloqueo de la app. Una clave importada con una versión anterior quedó cifrada y no puede autenticarse; la lista las señala y hay que importarlas de nuevo.</p>
+            <p>Dos formatos cifrados que la app no puede abrir: el contenedor de OpenSSL (<code>BEGIN ENCRYPTED PRIVATE KEY</code>) y el <code>.ppk</code> de PuTTY. La importación lo dice, en vez de tomar la clave a medias. Descífrala con la herramienta que la creó e impórtala de nuevo, trabajando sobre una copia y no sobre tu único archivo:</p>
+            <pre><code>ssh-keygen -p -N "" -f id_ed25519_copy
+openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
+            <p>PuTTYgen convierte un <code>.ppk</code> desde <em>Conversions → Export OpenSSH key</em>.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                En iOS funciona igual: la frase de contraseña se pide una sola vez, al importar, la clave se guarda abierta y la frase no se escribe en ningún sitio. Rechaza un formato más que Android: además del contenedor de OpenSSL y del <code>.ppk</code> de PuTTY, también el cifrado PEM antiguo (<code>Proc-Type: 4,ENCRYPTED</code>), el que escribe <code>ssh-keygen -m PEM</code> con una frase de contraseña. Descifra una clave así e impórtala de nuevo.
+            </div>`,
 
   doc_suggestions: `
             <h2>// SUGERENCIAS DE COMANDOS</h2>
@@ -492,9 +515,9 @@ Host target
   doc_security: `
             <h2>// SEGURIDAD DE LA APP</h2>
             <h3>Bloqueo de la app</h3>
-            <p>Elige cómo se protege la app en <strong>Ajustes → Seguridad → Bloqueo de la app</strong>: <strong>Ninguno</strong> (predeterminado), <strong>Solo biométrico</strong> (huella dactilar o reconocimiento facial), <strong>Bloqueo del dispositivo</strong> (el PIN, el patrón o la contraseña del dispositivo, además de la biometría) o un <strong>PIN o frase de contraseña</strong> en la app. Cuando hay un bloqueo activo, SSHBorg requiere autenticación antes de mostrar cualquier host, credencial o dato de sesión.</p>
+            <p>Elige cómo se protege la app en <strong>Ajustes → Seguridad → Bloqueo de la app</strong>: <strong>Ninguno</strong> (predeterminado), <strong>Solo biométrico</strong> (huella dactilar o reconocimiento facial), <strong>Bloqueo del dispositivo</strong> (el PIN, el patrón o la contraseña del dispositivo, además de la biometría) o un <strong>PIN o frase de contraseña</strong> en la app. Cuando hay un bloqueo activo, SSHBorg requiere autenticación antes de mostrar cualquier host, credencial o dato de sesión. Si la autenticación se rechaza, o la cancelas, la app permanece en su propia pantalla de bloqueo con un botón para volver a intentarlo: no se cierra, así que las sesiones que tenías abiertas siguen ahí al desbloquear.</p>
             <p>El <strong>PIN o frase de contraseña</strong> en la app funciona en cualquier dispositivo, incluso sin hardware biométrico ni un bloqueo de pantalla del sistema, por lo que es la opción adecuada en una Android TV. Para cambiarlo o quitarlo se pide primero el actual. No se puede recuperar si se olvida: tendrías que borrar los datos de la app o reinstalarla, así que guarda una copia de seguridad de tus hosts.</p>
-            <p>Puedes establecer un tiempo de espera por inactividad — tras ese número de minutos en segundo plano, la app se bloquea automáticamente.</p>
+            <p>Puedes establecer un tiempo de espera por inactividad — tras ese tiempo en segundo plano, la app se bloquea automáticamente.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 El bloqueo ofrece <strong>Ninguno</strong>, <strong>Solo biométrico</strong> (Face ID o Touch ID) y <strong>Bloqueo del dispositivo</strong> (el código del dispositivo o la biometría). No hay PIN ni frase de contraseña en la app.
@@ -511,7 +534,18 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTA SOBRE COPIAS DE SEGURIDAD</div>
                 Como la clave de cifrado nunca sale del hardware seguro del dispositivo, las claves <strong>no se pueden restaurar</strong> desde una copia de seguridad en la nube o del dispositivo y no se transferirán automáticamente a un nuevo teléfono. Antes de cambiar de dispositivo, asegúrate de autorizar una nueva clave generada en el nuevo dispositivo en todos tus servidores.
-            </div>`,
+            </div>
+            <h3>La configuración más segura</h3>
+            <p>Cada pieza anterior sirve por sí sola. Juntas son lo más seguro que ofrece la app, y son dos minutos:</p>
+            <ol>
+                <li>Activa <strong>Ajustes → Seguridad → Cifrar datos sensibles</strong>.</li>
+                <li>Pon el bloqueo de la app en <strong>Solo biométrico</strong> — o en <strong>PIN o contraseña</strong> si prefieres no depender de la biometría del teléfono.</li>
+                <li>Pon el tiempo de espera del bloqueo en <strong>Inmediatamente</strong>, o como máximo <strong>30 segundos</strong>.</li>
+                <li>Genera una clave nueva en la app, con un nombre que diga de qué dispositivo es.</li>
+                <li>Autoriza esa clave en tus servidores y úsala en lugar de la contraseña.</li>
+            </ol>
+            <p>Una clave generada en el teléfono nunca ha existido en otro sitio: no hay una copia más antigua que pudiera haberse filtrado, ni nada que limpiar en otra máquina. Una clave por dispositivo también significa que perder el teléfono cuesta una línea en <code>authorized_keys</code> — la quitas y los demás dispositivos siguen funcionando, y por eso conviene elegir bien el nombre.</p>
+            <p>Lo que nada de esto puede hacer: si el teléfono está comprometido, esa clave lo está con él, sea lo que sea lo que la proteja en el disco. Tampoco la salvaría una frase de contraseña — quien puede leer el almacenamiento de la app también puede leer lo que escribes. Por eso SSHBorg pide la frase de una clave una sola vez, al importarla, y guarda la clave abierta en lugar de conservar la frase (véase <a href="#ssh-keys">Claves SSH</a>).</p>`,
 
   doc_android_tv: `
             <h2>// ANDROID TV</h2>
@@ -529,6 +563,17 @@ Host target
             <p>Sin él, el teclado en pantalla sirve para entradas cortas: enfoca un campo, pulsa OK para abrirlo, escribe y pulsa <strong>OK / Ir</strong> en el teclado para confirmar — en la solicitud de contraseña esto conecta directamente. Escribir comandos de shell con el teclado en pantalla, sin embargo, es poco práctico.</p>
             <h3>Bloquear la app en un TV</h3>
             <p>Un TV normalmente no tiene lector de huellas ni bloqueo de pantalla, así que protege la app con el bloqueo integrado por <strong>PIN o frase de contraseña</strong> (Ajustes → Seguridad) — funciona por completo con el mando o un teclado. Consulta <a href="#security">Seguridad de la app</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// LICENCIAS DE CÓDIGO ABIERTO</h2>
+            <p>SSHBorg es software libre, publicado bajo la <strong>GNU General Public License v3</strong>. Su código fuente está en GitHub, tanto para la app de Android como para la de iOS. Utiliza las siguientes bibliotecas, cada una con su propia licencia:</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — el protocolo SSH en Android — licencia tipo BSD</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — la criptografía en Android — licencia tipo MIT</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — el componente de edición de texto para modificar archivos en el servidor, en Android — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — el protocolo SSH en iOS — licencia BSD</li>
+            </ul>
+            <p>Ninguna se conecta a nada por su cuenta: las únicas direcciones que contacta SSHBorg son los servidores que tú le indicas, y sshborg.com cuando pulsas un enlace. No hay bibliotecas de analítica, ni de publicidad, ni rastreadores de ningún tipo.</p>`,
 
   doc_backup: `
             <h2>// COPIA DE SEGURIDAD DE LA CONFIGURACIÓN</h2>

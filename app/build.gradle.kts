@@ -14,8 +14,8 @@ android {
         applicationId = "com.sshborg"
         minSdk = 29
         targetSdk = 36
-        versionCode = 34
-        versionName = "1.17.1"
+        versionCode = 35
+        versionName = "1.18.0"
     }
 
     val localProps = Properties()
@@ -92,5 +92,6 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.sora.editor)
     debugImplementation(libs.androidx.ui.tooling)
 }

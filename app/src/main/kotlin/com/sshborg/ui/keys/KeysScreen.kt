@@ -5,9 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -19,17 +17,20 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
 import android.content.ClipData
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.db.SshKeyEntity
 import com.sshborg.isTouchless
+import com.sshborg.ui.common.ScrollingDialogBody
 import com.sshborg.ui.common.TvTapField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,6 +43,16 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
     var keyToDelete by remember { mutableStateOf<SshKeyEntity?>(null) }
     var keyToRename by remember { mutableStateOf<SshKeyEntity?>(null) }
     var expandedKeyId by remember { mutableStateOf<Long?>(null) }
+
+    // Which keys cannot be used as they stand: encrypted, with no passphrase stored. Keys
+    // imported before the app kept the passphrase are all in here, and nothing else would tell
+    // them apart from a working key, so the list says so rather than letting the next connection
+    // fail for no visible reason. Recomputed whenever the list changes, which is how the warning
+    // goes away once the key is imported again.
+    val needsReimport = remember { mutableStateMapOf<Long, Boolean>() }
+    LaunchedEffect(keys) {
+        keys.forEach { key -> needsReimport[key.id] = vm.needsReimport(key) }
+    }
 
     val context = LocalContext.current
     val importFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -86,6 +97,7 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
                     KeyItem(
                         key = key,
                         expanded = expandedKeyId == key.id,
+                        needsReimport = needsReimport[key.id] == true,
                         onExpand = { expandedKeyId = if (expandedKeyId == key.id) null else key.id },
                         onRename = { keyToRename = key },
                         onDelete = { keyToDelete = key },
@@ -152,6 +164,8 @@ fun KeysScreen(onBack: () -> Unit, vm: KeysViewModel = viewModel()) {
 private fun KeyItem(
     key: SshKeyEntity,
     expanded: Boolean,
+    /** The key is encrypted and its passphrase is not stored, so it cannot authenticate. */
+    needsReimport: Boolean,
     onExpand: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
@@ -164,11 +178,31 @@ private fun KeyItem(
         ListItem(
             headlineContent = { Text(key.label) },
             supportingContent = {
-                Text(
-                    key.keyType,
-                    fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Column {
+                    Text(
+                        key.keyType,
+                        fontFamily = FontFamily.Monospace,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    // Nothing can be done about it from here — the passphrase is only ever
+                    // taken at import — so this says what to do rather than offering a fix.
+                    if (needsReimport) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Warning,
+                                null,
+                                Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.error,
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                stringResource(R.string.keys_needs_passphrase),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
+                }
             },
             leadingContent = { Icon(Icons.Default.Key, null) },
             trailingContent = {
@@ -240,6 +274,10 @@ private fun RenameKeyDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        // Short, but centred in the window it would still meet the keyboard; see the import
+        // dialog for why the padding goes on the dialog and not on its content.
+        modifier = Modifier.imePadding(),
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.keys_rename_title)) },
         text = {
             OutlinedTextField(
@@ -280,33 +318,46 @@ private fun ImportKeyDialog(
     var label by remember { mutableStateOf("") }
     var passphrase by remember { mutableStateOf("") }
     var passphraseVisible by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    // One message at a time, kept against the field it is about: a bad passphrase is not the
+    // key text's fault, and a message at the foot of a dialog that scrolls is a message nobody
+    // sees. Whichever is set also turns its own field red.
+    var pemError by remember { mutableStateOf("") }
+    var passphraseError by remember { mutableStateOf("") }
+    val clearErrors = { pemError = ""; passphraseError = "" }
     val importContext = LocalContext.current
     val touchless = remember { isTouchless(importContext) }
     val errorEncrypted   = stringResource(R.string.keys_import_error_encrypted)
     val errorWrongPass   = stringResource(R.string.keys_import_error_wrong_passphrase)
     val errorInvalid     = stringResource(R.string.keys_import_error_invalid)
+    val errorEncryption  = stringResource(R.string.keys_import_error_encryption)
     val defaultLabel     = stringResource(R.string.keys_import_default_label)
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        // With the keyboard up, this dialog is taller than the room left for it. The window must
+        // not try to fit the IME itself — it keeps its full height and leaves the buttons behind
+        // the keyboard. Padding the dialog's own content instead shrinks the space it is measured
+        // in, so all of it, buttons included, is laid out above the keyboard and the body scrolls
+        // for the rest. Hence no height cap on the body: the space left is the cap.
+        modifier = Modifier.imePadding(),
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.keys_import_title)) },
         text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+            ScrollingDialogBody(
+                maxHeight = Dp.Infinity,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (touchless) {
                     TvTapField(
                         value = label,
-                        onValueChange = { label = it; errorMessage = "" },
+                        onValueChange = { label = it; clearErrors() },
                         label = stringResource(R.string.keygen_field_label),
                         modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
                     OutlinedTextField(
                         value = label,
-                        onValueChange = { label = it; errorMessage = "" },
+                        onValueChange = { label = it; clearErrors() },
                         label = { Text(stringResource(R.string.keygen_field_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -323,39 +374,51 @@ private fun ImportKeyDialog(
                 if (touchless) {
                     TvTapField(
                         value = pem,
-                        onValueChange = { onPemChange(it); errorMessage = "" },
+                        onValueChange = { onPemChange(it); clearErrors() },
                         label = stringResource(R.string.keys_import_pem_label),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = false,
+                        supporting = pemError.takeIf { it.isNotEmpty() },
+                        isError = pemError.isNotEmpty(),
                     )
                 } else {
                     OutlinedTextField(
                         value = pem,
-                        onValueChange = { onPemChange(it); errorMessage = "" },
+                        onValueChange = { onPemChange(it); clearErrors() },
                         label = { Text(stringResource(R.string.keys_import_pem_label)) },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
                         textStyle = androidx.compose.ui.text.TextStyle(fontFamily = FontFamily.Monospace),
                         maxLines = 8,
+                        isError = pemError.isNotEmpty(),
+                        supportingText = if (pemError.isEmpty()) null else {
+                            { Text(pemError) }
+                        },
                     )
                 }
                 if (touchless) {
                     TvTapField(
                         value = passphrase,
-                        onValueChange = { passphrase = it; errorMessage = "" },
+                        onValueChange = { passphrase = it; clearErrors() },
                         label = stringResource(R.string.keys_import_passphrase_label),
                         modifier = Modifier.fillMaxWidth(),
                         keyboardType = KeyboardType.Password,
                         isPassword = true,
+                        supporting = passphraseError.takeIf { it.isNotEmpty() },
+                        isError = passphraseError.isNotEmpty(),
                     )
                 } else {
                     OutlinedTextField(
                         value = passphrase,
-                        onValueChange = { passphrase = it; errorMessage = "" },
+                        onValueChange = { passphrase = it; clearErrors() },
                         label = { Text(stringResource(R.string.keys_import_passphrase_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        isError = passphraseError.isNotEmpty(),
+                        supportingText = if (passphraseError.isEmpty()) null else {
+                            { Text(passphraseError) }
+                        },
                         trailingIcon = {
                             TextButton(onClick = { passphraseVisible = !passphraseVisible }) {
                                 Text(
@@ -366,13 +429,11 @@ private fun ImportKeyDialog(
                         },
                     )
                 }
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
+                Text(
+                    stringResource(R.string.keys_passphrase_note),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         },
         confirmButton = {
@@ -383,10 +444,14 @@ private fun ImportKeyDialog(
                         pem,
                         passphrase.takeIf { it.isNotEmpty() },
                     ) { rawError ->
-                        errorMessage = when (rawError) {
-                            "encrypted"       -> errorEncrypted
-                            "wrong_passphrase" -> errorWrongPass
-                            else              -> errorInvalid
+                        clearErrors()
+                        when (rawError) {
+                            "encrypted"        -> passphraseError = errorEncrypted
+                            "wrong_passphrase" -> passphraseError = errorWrongPass
+                            // The passphrase was right; it is the key's own encryption we
+                            // cannot undo, so this belongs to the key, not to what was typed.
+                            "unsupported_encryption" -> pemError = errorEncryption
+                            else               -> pemError = errorInvalid
                         }
                     }
                 },
@@ -413,9 +478,14 @@ private fun GenerateKeyDialog(onGenerate: (String, String, String) -> Unit, onDi
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.imePadding(),
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(stringResource(R.string.keygen_title)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            ScrollingDialogBody(
+                maxHeight = Dp.Infinity,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 if (touchless) {
                     TvTapField(
                         value = label,

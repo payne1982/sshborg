@@ -566,17 +566,31 @@ object SshManager {
     }
 
     /**
-     * Loads a PEM or OpenSSH private key and derives its public key.
+     * Loads a PEM or OpenSSH private key, unlocks it if it is encrypted, and returns it in a
+     * form that needs no passphrase again.
+     *
+     * The passphrase is used here and **nowhere else**: it is never stored. A passphrase is a
+     * secret people reuse — on other keys, on other machines — while a private key is worth only
+     * itself, so keeping the key unlocked beside its own passphrase, which is what a stored
+     * passphrase amounts to, would give away the second secret for nothing. What the app keeps
+     * is the unlocked key, protected exactly like a key that never had a passphrase: the app's
+     * private storage, and the Keystore blob when that setting is on.
+     *
+     * Not every encrypted key can be written back out — see [unlockedText] — and one that cannot
+     * is refused rather than stored half-way, with `unsupported_encryption`.
+     *
      * @param pem  private key text (PEM / OpenSSH format)
      * @param passphrase  only needed if the key is encrypted
-     * @return Triple(normalizedPem, publicKeyAuthorizedKeys, keyTypeShort)
      */
-    fun importPrivateKey(pem: String, passphrase: String? = null): Triple<String, String, String> {
+    fun importPrivateKey(pem: String, passphrase: String? = null): ImportedKey {
         val jsch = JSch()
         val normalizedPem = pem.replace("\r\n", "\n").trim()
         val kp = KeyPair.load(jsch, normalizedPem.toByteArray(Charsets.UTF_8), null)
         try {
-            if (kp.isEncrypted) {
+            // Read before decrypting: a successful decrypt clears JSch's own flag, so asking
+            // afterwards reports every key as unencrypted.
+            val wasEncrypted = kp.isEncrypted
+            if (wasEncrypted) {
                 if (passphrase.isNullOrEmpty()) throw JSchException("encrypted")
                 if (!kp.decrypt(passphrase.toByteArray(Charsets.UTF_8))) throw JSchException("wrong_passphrase")
             }
@@ -590,11 +604,99 @@ object SshManager {
                 algToken.startsWith("ecdsa") -> "ecdsa"
                 else                         -> algToken
             }
-            return Triple(normalizedPem, pub, keyType)
+            // An unencrypted key is stored as it arrived, byte for byte.
+            val stored =
+                if (!wasEncrypted) normalizedPem
+                else unlockedText(kp, pub) ?: throw JSchException("unsupported_encryption")
+            return ImportedKey(stored, pub, keyType)
         } finally {
             kp.dispose()
         }
     }
+
+    /**
+     * The text of an unlocked [kp], or null when it cannot be produced.
+     *
+     * Two routes, because JSch has no single one. `writePrivateKey` covers RSA, ECDSA and the
+     * old PEM form, and throws for the rest — `UnsupportedOperationException` for ed25519, whose
+     * private half it refuses to serialise, and a `NullPointerException` for a key that came out
+     * of a PKCS#8 container. What those have in common is `forSSHAgent`, which is public and has
+     * to contain the private material, since that is what an agent is handed; from an ed25519
+     * blob the 32-byte seed is enough to write the file with the same BouncyCastle encoder
+     * [generateEd25519WithBc] already uses.
+     *
+     * Whatever comes out is verified before it is trusted: it is loaded back, and its public key
+     * must match [expectedPublicKey] exactly, with nothing left encrypted. So a mistake here
+     * cannot produce a key that looks imported and is in fact something else — it produces null,
+     * and the import is refused.
+     */
+    private fun unlockedText(kp: KeyPair, expectedPublicKey: String): String? {
+        val candidate = writtenOut(kp) ?: fromAgentBlob(kp) ?: return null
+        val reloaded = runCatching {
+            KeyPair.load(JSch(), candidate.toByteArray(Charsets.UTF_8), null)
+        }.getOrNull() ?: return null
+        return try {
+            if (reloaded.isEncrypted) return null
+            val out = java.io.ByteArrayOutputStream()
+            reloaded.writePublicKey(out, "")
+            candidate.takeIf { out.toString(Charsets.UTF_8.name()).trim() == expectedPublicKey }
+        } catch (_: Exception) {
+            null
+        } finally {
+            reloaded.dispose()
+        }
+    }
+
+    /** JSch's own serialisation, which works for some key types and throws for others. */
+    private fun writtenOut(kp: KeyPair): String? = runCatching {
+        val out = java.io.ByteArrayOutputStream()
+        kp.writePrivateKey(out)
+        out.toString(Charsets.UTF_8.name()).takeIf { it.isNotBlank() }
+    }.getOrNull()
+
+    /**
+     * An ed25519 key rebuilt from the blob JSch would hand to an SSH agent, which is
+     * `string type, string publicKey, string privateKey, string comment` — the private string
+     * being the 32-byte seed followed by the public key.
+     */
+    private fun fromAgentBlob(kp: KeyPair): String? = runCatching {
+        val blob = kp.forSSHAgent()
+        val reader = SshStringReader(blob)
+        if (reader.next()?.toString(Charsets.UTF_8) != "ssh-ed25519") return@runCatching null
+        val publicKey = reader.next() ?: return@runCatching null
+        val privateKey = reader.next() ?: return@runCatching null
+        if (privateKey.size < 32) return@runCatching null
+        val seed = privateKey.copyOfRange(0, 32)
+        val params = org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters(seed, 0)
+        // Cheap self-check before the caller's: the seed has to belong to this key.
+        if (!params.generatePublicKey().encoded.contentEquals(publicKey)) return@runCatching null
+        val encoded = org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil.encodePrivateKey(params)
+        val base64 = java.util.Base64.getMimeEncoder(64, "\n".toByteArray()).encodeToString(encoded)
+        "-----BEGIN OPENSSH PRIVATE KEY-----\n$base64\n-----END OPENSSH PRIVATE KEY-----\n"
+    }.getOrNull()
+
+    /** Walks the `uint32 length, bytes` strings an SSH blob is made of. */
+    private class SshStringReader(private val blob: ByteArray) {
+        private var at = 0
+
+        fun next(): ByteArray? {
+            if (at + 4 > blob.size) return null
+            var length = 0
+            repeat(4) { length = (length shl 8) or (blob[at++].toInt() and 0xff) }
+            if (length < 0 || at + length > blob.size) return null
+            return blob.copyOfRange(at, at + length).also { at += length }
+        }
+    }
+
+    /**
+     * Whether [pem] is an encrypted private key, and therefore useless without its passphrase.
+     * A key this cannot parse at all counts as not encrypted: the failure to report then is
+     * "unreadable key", which the import path already words for itself.
+     */
+    fun isKeyEncrypted(pem: String): Boolean = runCatching {
+        val kp = KeyPair.load(JSch(), pem.replace("\r\n", "\n").trim().toByteArray(Charsets.UTF_8), null)
+        try { kp.isEncrypted } finally { kp.dispose() }
+    }.getOrDefault(false)
 
     /** Builds a known_hosts line from a JSch HostKey. */
     fun buildKnownHostsLine(hostKey: HostKey): String =
@@ -610,6 +712,16 @@ object SshManager {
         config.setProperty("server_host_key",  "${JSch.getConfig("server_host_key")},$legacyHostKey")
     }
 }
+
+/**
+ * The outcome of [SshManager.importPrivateKey]: the key text to store, which never needs a
+ * passphrase, its public half, and its type.
+ */
+data class ImportedKey(
+    val pem: String,
+    val publicKey: String,
+    val keyType: String,
+)
 
 /** A live interactive SSH shell. */
 class ShellSession(
@@ -685,6 +797,10 @@ data class SftpEntry(
     val size: Long,
     val modTimeSeconds: Int,   // Unix timestamp
 )
+
+/** Thrown by [SftpSession.readFile] when the file is larger than the caller is willing to hold. */
+class FileTooLargeException(val size: Long, val limit: Long) :
+    Exception("$size bytes exceeds the $limit byte limit")
 
 /** A live SFTP session. */
 class SftpSession(
@@ -826,6 +942,60 @@ class SftpSession(
             override fun count(count: Long): Boolean { sent += count; onProgress(sent); return true }
             override fun end() {}
         }, com.jcraft.jsch.ChannelSftp.OVERWRITE) }
+    }
+
+    /** The size of [remotePath] in bytes. */
+    fun sizeOf(remotePath: String): Long = op { it.stat(remotePath) }.size
+
+    /**
+     * Reads [remotePath] whole into memory, for the editor. Checks the size first and refuses
+     * anything over [limit]: a file too big to edit is also too big to be worth downloading.
+     */
+    fun readFile(
+        remotePath: String,
+        limit: Long,
+        onProgress: (bytesReceived: Long) -> Unit = {},
+    ): ByteArray {
+        val size = op { it.stat(remotePath) }.size
+        if (size > limit) throw FileTooLargeException(size, limit)
+        val out = java.io.ByteArrayOutputStream(size.coerceIn(0L, limit).toInt())
+        downloadFile(remotePath, out, onProgress)
+        return out.toByteArray()
+    }
+
+    /**
+     * Replaces [remotePath]'s contents with [bytes] without ever leaving it half-written: the
+     * new contents go to a hidden sibling first and take the original's place only once they
+     * are all there, so a connection lost mid-write costs the temporary file and nothing else.
+     *
+     * The swap is a plain rename, which JSch turns into posix-rename@openssh.com wherever the
+     * server offers it (OpenSSH always does) — one atomic step, and the original survives if it
+     * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there
+     * we write in place instead rather than delete the original and hope.
+     */
+    fun writeFile(remotePath: String, bytes: ByteArray) {
+        val slash = remotePath.lastIndexOf('/')
+        val dir = if (slash <= 0) "" else remotePath.substring(0, slash)
+        val name = remotePath.substring(slash + 1)
+        val temp = "$dir/.$name.sshborg-tmp"
+        val mode = runCatching { op { it.stat(remotePath) }.permissions }.getOrNull()
+
+        try {
+            uploadFile(java.io.ByteArrayInputStream(bytes), temp)
+        } catch (e: Exception) {
+            runCatching { op { it.rm(temp) } }
+            throw e
+        }
+        // The temporary file is created with the server's default mode; give it the original's
+        // before the swap, or saving would quietly clear an executable bit or widen a 0600 file.
+        if (mode != null) runCatching { op { it.chmod(mode, temp) } }
+        try {
+            op { it.rename(temp, remotePath) }
+        } catch (e: com.jcraft.jsch.SftpException) {
+            android.util.Log.w("SftpSession", "rename onto an existing name refused, writing in place", e)
+            uploadFile(java.io.ByteArrayInputStream(bytes), remotePath)
+            runCatching { op { it.rm(temp) } }
+        }
     }
 
     fun deleteFile(remotePath: String) = op { it.rm(remotePath) }

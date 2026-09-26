@@ -68,6 +68,7 @@ module.exports = {
   footer_privacy: 'Confidentialité',
   footer_issues:  'Bugs &amp; Retours',
   footer_source:  'Code source',
+  footer_licenses: 'Licences',
   footer_powered: 'Connectivité SSH fournie par',
 
   page_title_docs:       'SSHBorg – Guide utilisateur',
@@ -92,6 +93,8 @@ module.exports = {
             <li class="sub"><a href="#sftp">Navigation</a></li>
             <li class="sub"><a href="#sftp">Envoyer et télécharger</a></li>
             <li class="sub"><a href="#sftp">Sélection multiple</a></li>
+            <li class="sub"><a href="#sftp">Modifier les fichiers</a></li>
+            <li class="sub"><a href="#sftp">Éditeur hexadécimal</a></li>
             <li><a href="#ssh-keys">Clés SSH</a></li>
             <li class="sub"><a href="#ssh-keys">Générer une clé</a></li>
             <li class="sub"><a href="#ssh-keys">Autoriser sur le serveur</a></li>
@@ -110,8 +113,10 @@ module.exports = {
             <li class="sub"><a href="#jump-hosts">Chaînes multi-sauts</a></li>
             <li><a href="#sessions">Sessions multiples</a></li>
             <li><a href="#security">Sécurité de l'app</a></li>
+            <li class="sub"><a href="#security">La configuration la plus sûre</a></li>
             <li><a href="#backup">Sauvegarde de la configuration</a></li>
-            <li><a href="#android-tv">Android TV</a></li>`,
+            <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">Licences open source</a></li>`,
 
   doc_adding_host: `
             <h2>// AJOUTER UN HÔTE</h2>
@@ -183,6 +188,14 @@ module.exports = {
                 <li><strong>Télécharger</strong> — télécharge tous les fichiers et dossiers sélectionnés en une seule fois, avec une boîte de dialogue de progression et la possibilité d'annuler.</li>
                 <li><strong>Supprimer</strong> — supprime tous les éléments sélectionnés. La suppression d'un dossier non vide efface tout son contenu de manière récursive. <em>Cette action est irréversible.</em></li>
             </ul>
+            <h3>Modifier les fichiers</h3>
+            <p>Ouvrez le menu d'un fichier — appui long, ou le bouton <strong>⋮</strong> — et choisissez <strong>Ouvrir dans l'éditeur</strong> pour le modifier directement sur le serveur. Rien n'est conservé sur le téléphone : le fichier est lu en mémoire, modifié, puis réécrit sur le serveur.</p>
+            <p>Le fichier repart tel qu'il est arrivé. Son encodage est détecté et réutilisé à l'enregistrement, les fins de ligne LF ou CRLF sont préservées, un fichier qui se terminait sans retour à la ligne le reste, et les droits ne changent pas. Si l'encodage a été mal lu, touchez-le dans la barre en bas de l'éditeur et choisissez-en un autre — la liste ne propose que des encodages capables de reproduire exactement les octets de ce fichier : un mauvais choix peut s'afficher de travers, il ne peut pas abîmer le fichier.</p>
+            <p>L'enregistrement écrit un fichier temporaire à côté de l'original puis le renomme à sa place, de sorte qu'une connexion perdue en cours de route ne laisse jamais un fichier à moitié écrit sur le serveur.</p>
+            <p>Les fichiers s'ouvrent jusqu'à 4 Mo, quelle que soit leur longueur : seules les lignes à l'écran sont dessinées, donc un fichier de plusieurs mégaoctets défile comme un court. Au-delà, la réponse est le terminal, avec <code>nano</code> ou <code>vi</code>, qui n'a aucune limite.</p>
+            <p>Les fichiers de configuration sont colorés — commentaires, chaînes, nombres, clés, en-têtes de section, variables de shell et balises XML — d'après le nom du fichier ou, lorsque le nom ne dit rien, d'après la forme du contenu : scripts shell, directives à la manière de nginx et sshd, INI, YAML, JSON et XML. Le texte libre, les notes et les journaux restent volontairement sans couleur, où elle ne serait que du bruit. La coloration n'est qu'apparence et ne change jamais un octet.</p>
+            <h3>Éditeur hexadécimal</h3>
+            <p>Un fichier qui n'est pas du texte s'ouvre dans l'éditeur hexadécimal : les décalages à gauche, les octets au milieu, les caractères imprimables à droite, et un pavé pour les chiffres hexadécimaux. Touchez un octet et tapez deux chiffres pour le remplacer. Les valeurs changent, jamais la longueur : chaque position du fichier reste où elle était. <strong>Ouvrir en hexadécimal</strong> dans le menu d'un fichier ouvre ainsi n'importe quel fichier, et un fichier texte pris pour un binaire — avec un octet NUL égaré — peut tout de même être ouvert comme texte depuis la même boîte de dialogue.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -191,6 +204,8 @@ module.exports = {
                     <li><strong>Dossiers</strong> — appuyez longuement sur un fichier ou un dossier pour ouvrir son menu : <em>Télécharger</em>, <em>Renommer</em>, <em>Supprimer</em>.</li>
                     <li><strong>Sélection multiple</strong> — choisissez <em>Sélectionner des éléments</em> dans le menu Actions, puis cochez les éléments. Un appui long ouvre plutôt le menu de l'élément.</li>
                     <li><strong>Conflits à l'envoi</strong> — la boîte de dialogue propose <em>Écraser</em>, <em>Conserver les deux</em> (le fichier envoyé reçoit un nouveau nom) ou <em>Annuler</em>.</li>
+                    <li><strong>Édition</strong> — l'éditeur et l'éditeur hexadécimal sont là aussi : le menu d'un fichier, par appui long, propose <em>Ouvrir dans l'éditeur</em> et <em>Ouvrir en hexadécimal</em>. Pendant le chargement, le fichier passe par le dossier temporaire de l'app et en est retiré dès qu'il est lu.</li>
+                    <li><strong>Enregistrement</strong> — le fichier est écrit directement par-dessus l'original, et non dans un fichier temporaire à côté qui serait ensuite renommé à sa place : une connexion perdue au milieu d'un enregistrement peut donc le laisser à moitié écrit.</li>
                 </ul>
             </div>`,
 
@@ -229,7 +244,15 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>Chiffrer les clés et mots de passe enregistrés</h3>
             <p>Activez <strong>Paramètres → Sécurité → Chiffrer les données sensibles</strong> pour stocker les clés privées et les mots de passe des hôtes chiffrés avec une clé conservée dans le matériel sécurisé de l'appareil — l'Android Keystore, ou le Trousseau sur iOS. L'option reste désactivée tant que vous ne l'activez pas ; le conseil de sécurité affiché au premier lancement la signale.</p>
             <p>Les données chiffrées sont liées à l'appareil et à cette installation de l'app : après désinstallation, les clés enregistrées ne peuvent pas être récupérées, et il faudrait en générer de nouvelles et les autoriser à nouveau sur vos serveurs. Avec un verrouillage de l'app, c'est fortement recommandé si vous gardez des identifiants sensibles sur votre téléphone.</p>
-            <p>Une clé importée protégée par une phrase secrète est déverrouillée avec celle-ci une seule fois, lors de l'import.</p>`,
+            <p>Une clé protégée par une phrase secrète la demande une seule fois, à l'import, puis elle est conservée déverrouillée : la phrase elle-même n'est jamais écrite sur l'appareil. Une phrase secrète est le plus souvent réutilisée ailleurs, alors qu'une clé privée ne vaut que pour elle-même — et une clé conservée à côté de sa propre phrase n'en serait de toute façon pas protégée. Ici, ce qui la protège, c'est le stockage privé de l'app, <strong>Chiffrer les données sensibles</strong> et le verrou de l'app. Une clé importée par une version antérieure est restée chiffrée et ne peut pas s'authentifier : la liste les signale, et il faut les réimporter.</p>
+            <p>Deux formats chiffrés que l'app ne sait pas ouvrir : le conteneur OpenSSL (<code>BEGIN ENCRYPTED PRIVATE KEY</code>) et le <code>.ppk</code> de PuTTY. L'import le dit, plutôt que de prendre la clé à moitié. Déchiffrez-la avec l'outil qui l'a créée et réimportez-la — sur une copie, jamais sur votre seul fichier :</p>
+            <pre><code>ssh-keygen -p -N "" -f id_ed25519_copy
+openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
+            <p>PuTTYgen convertit un <code>.ppk</code> via <em>Conversions → Export OpenSSH key</em>.</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                Sur iOS, c'est identique : la phrase secrète est demandée une fois, à l'import, la clé est conservée déverrouillée et la phrase n'est écrite nulle part. iOS refuse un format de plus qu'Android : outre le conteneur OpenSSL et le <code>.ppk</code> de PuTTY, aussi l'ancien chiffrement PEM (<code>Proc-Type: 4,ENCRYPTED</code>), celui que <code>ssh-keygen -m PEM</code> écrit quand on lui donne une phrase secrète. Déchiffrez une telle clé et réimportez-la.
+            </div>`,
 
   doc_suggestions: `
             <h2>// SUGGESTIONS DE COMMANDES</h2>
@@ -492,9 +515,9 @@ Host target
   doc_security: `
             <h2>// SÉCURITÉ DE L'APP</h2>
             <h3>Verrouillage de l'app</h3>
-            <p>Choisissez comment l'app est protégée dans <strong>Paramètres → Sécurité → Verrouillage de l'app</strong> : <strong>Aucun</strong> (par défaut), <strong>Biométrie uniquement</strong> (empreinte digitale ou reconnaissance faciale), <strong>Verrouillage de l'appareil</strong> (le code PIN, le schéma ou le mot de passe de l'appareil, en plus de la biométrie) ou un <strong>PIN ou une phrase secrète</strong> intégrés. Quand un verrouillage est actif, SSHBorg exige une authentification avant d'afficher des hôtes, des identifiants ou des données de session.</p>
+            <p>Choisissez comment l'app est protégée dans <strong>Paramètres → Sécurité → Verrouillage de l'app</strong> : <strong>Aucun</strong> (par défaut), <strong>Biométrie uniquement</strong> (empreinte digitale ou reconnaissance faciale), <strong>Verrouillage de l'appareil</strong> (le code PIN, le schéma ou le mot de passe de l'appareil, en plus de la biométrie) ou un <strong>PIN ou une phrase secrète</strong> intégrés. Quand un verrouillage est actif, SSHBorg exige une authentification avant d'afficher des hôtes, des identifiants ou des données de session. Si l'authentification est refusée, ou si vous l'annulez, l'app reste sur son propre écran de verrouillage avec un bouton pour réessayer : elle ne se ferme pas, les sessions ouvertes sont donc toujours là au déverrouillage.</p>
             <p>Le <strong>PIN ou la phrase secrète</strong> intégrés fonctionnent sur tout appareil, même sans matériel biométrique ni verrouillage d'écran système — c'est donc le bon choix sur une Android TV. Les modifier ou les supprimer demande d'abord le code actuel. Il n'y a aucun moyen de le récupérer en cas d'oubli : vous devriez effacer les données de l'app ou la réinstaller, alors gardez une sauvegarde de vos hôtes.</p>
-            <p>Vous pouvez définir un délai d'inactivité — après ce nombre de minutes en arrière-plan, l'app se verrouille automatiquement.</p>
+            <p>Vous pouvez définir un délai d'inactivité — après ce délai en arrière-plan, l'app se verrouille automatiquement.</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 Le verrouillage propose <strong>Aucun</strong>, <strong>Biométrie uniquement</strong> (Face ID ou Touch ID) et <strong>Verrouillage de l'appareil</strong> (le code de l'appareil ou la biométrie). Il n'y a pas de PIN ni de phrase secrète intégrés.
@@ -511,7 +534,18 @@ Host target
             <div class="callout callout-warn">
                 <div class="callout-label">// NOTE SUR LES SAUVEGARDES</div>
                 Comme la clé de chiffrement ne quitte jamais le matériel sécurisé de l'appareil, les clés <strong>ne peuvent pas être restaurées</strong> depuis une sauvegarde cloud ou de l'appareil et ne seront pas transférées automatiquement vers un nouveau téléphone. Avant de changer d'appareil, assurez-vous d'autoriser une nouvelle clé générée sur le nouvel appareil sur tous vos serveurs.
-            </div>`,
+            </div>
+            <h3>La configuration la plus sûre</h3>
+            <p>Chaque élément ci-dessus est utile en soi. Ensemble, ils constituent le maximum que l'app puisse offrir, et cela prend deux minutes :</p>
+            <ol>
+                <li>Activez <strong>Réglages → Sécurité → Chiffrer les données sensibles</strong>.</li>
+                <li>Mettez le verrou de l'app sur <strong>Biométrie seule</strong> — ou sur <strong>Code ou phrase secrète</strong> si vous préférez ne pas dépendre de la biométrie du téléphone.</li>
+                <li>Mettez le délai de verrouillage sur <strong>Immédiatement</strong>, au plus <strong>30 secondes</strong>.</li>
+                <li>Générez une nouvelle clé dans l'app, avec un nom qui dise de quel appareil il s'agit.</li>
+                <li>Autorisez cette clé sur vos serveurs et utilisez-la à la place du mot de passe.</li>
+            </ol>
+            <p>Une clé générée sur le téléphone n'a jamais existé ailleurs : pas de copie plus ancienne qui aurait pu fuiter, rien à nettoyer sur une autre machine. Une clé par appareil signifie aussi qu'un téléphone perdu coûte une ligne dans <code>authorized_keys</code> — vous la retirez et vos autres appareils continuent de fonctionner, et c'est pourquoi le nom mérite d'être bien choisi.</p>
+            <p>Ce que rien de tout cela ne peut faire : si le téléphone lui-même est compromis, cette clé l'est avec lui, quoi qu'il la protège sur le disque. Une phrase secrète ne la sauverait pas non plus — ce qui peut lire le stockage de l'app peut aussi lire ce que vous tapez. C'est pourquoi SSHBorg demande la phrase secrète d'une clé une seule fois, à l'import, et conserve la clé déverrouillée plutôt que la phrase (voir <a href="#ssh-keys">Clés SSH</a>).</p>`,
 
   doc_android_tv: `
             <h2>// ANDROID TV</h2>
@@ -529,6 +563,17 @@ Host target
             <p>Sans clavier, le clavier à l'écran gère tout de même les saisies courtes : sélectionnez un champ, appuyez sur OK pour l'ouvrir, tapez, puis appuyez sur <strong>OK / Valider</strong> du clavier pour confirmer — sur l'invite de mot de passe, cela connecte directement. Saisir des commandes shell avec le clavier à l'écran reste toutefois peu pratique.</p>
             <h3>Verrouiller l'app sur un téléviseur</h3>
             <p>Un téléviseur n'a généralement ni lecteur d'empreinte ni verrouillage d'écran : protégez l'app avec le verrouillage intégré par <strong>code PIN ou phrase secrète</strong> (Paramètres → Sécurité) — il fonctionne entièrement à la télécommande ou au clavier. Voir <a href="#security">Sécurité de l'app</a>.</p>`,
+
+  doc_licenses: `
+            <h2>// LICENCES OPEN SOURCE</h2>
+            <p>SSHBorg est un logiciel libre, publié sous <strong>GNU General Public License v3</strong>. Son code source est sur GitHub, pour l'application Android comme pour celle d'iOS. Il utilise les bibliothèques suivantes, chacune sous sa propre licence :</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — le protocole SSH sur Android — licence de type BSD</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — la cryptographie sur Android — licence de type MIT</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — le composant d'édition de texte utilisé pour modifier les fichiers sur le serveur, sur Android — GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — le protocole SSH sur iOS — licence BSD</li>
+            </ul>
+            <p>Aucune ne se connecte à quoi que ce soit d'elle-même : les seules adresses contactées par SSHBorg sont les serveurs que vous lui indiquez, et sshborg.com lorsque vous touchez un lien. Il n'y a aucune bibliothèque d'analyse, aucune régie publicitaire et aucun traceur.</p>`,
 
   doc_backup: `
             <h2>// SAUVEGARDE DE LA CONFIGURATION</h2>

@@ -139,6 +139,11 @@
     <string name="keys_import_error_encrypted">Ключ зашифрован — введите пароль</string>
     <string name="keys_import_error_wrong_passphrase">Неверный пароль</string>
     <string name="keys_import_error_invalid">Неверный или неподдерживаемый формат ключа</string>
+    <string name="keys_import_error_encryption">Этот ключ зашифрован в формате, который приложение не может открыть. Расшифруйте его тем же инструментом, которым он создан, и импортируйте заново.</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Нет пароля ключа — импортируйте ключ заново</string>
+    <string name="keys_passphrase_note">Нужен только чтобы открыть ключ, и не сохраняется. Открытый ключ хранится так же, как все остальные.</string>
 
     <!-- Generate key dialog -->
     <string name="keygen_title">Генерация SSH-ключа</string>
@@ -277,6 +282,8 @@
     <string name="sftp_mkdir_folder_name">Название папки</string>
 
     <string name="sftp_menu_open">Открыть</string>
+    <string name="sftp_menu_edit">Открыть в редакторе</string>
+    <string name="sftp_menu_hex">Открыть в HEX</string>
     <string name="sftp_menu_rename">Переименовать</string>
     <string name="sftp_menu_delete">Удалить</string>
     <string name="sftp_menu_download_in_background">Скачать в фоне</string>
@@ -391,6 +398,7 @@
     <string name="error_decryption_failed">Ошибка расшифровки</string>
     <string name="error_unknown">Что-то пошло не так</string>
     <string name="lock_title">Разблокировать SSHBorg</string>
+    <string name="lock_unlock_action">Разблокировать</string>
     <string name="lock_enter_pin">Введите PIN-код</string>
     <string name="lock_enter_passphrase">Введите парольную фразу</string>
     <string name="lock_incorrect">Неверно — попробуйте снова</string>
@@ -480,4 +488,27 @@
     <string name="settings_host_sort_manual">Вручную</string>
     <string name="hosts_move_up">Переместить вверх</string>
     <string name="hosts_move_down">Переместить вниз</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Редактор</string>
+    <string name="editor_unsaved_title">Несохранённые изменения</string>
+    <string name="editor_unsaved_message">Закрыть редактор и потерять сделанные изменения?</string>
+    <string name="editor_discard">Отбросить</string>
+    <string name="editor_unsaved">не сохранено</string>
+    <string name="editor_saved">сохранено</string>
+    <string name="editor_mixed_endings">смешанные переводы строк</string>
+    <string name="editor_too_large">Размер файла %1$s — больше, чем %2$s, которые может открыть редактор.</string>
+    <string name="editor_binary">Это не текстовый файл, здесь его нельзя редактировать.</string>
+    <string name="editor_use_terminal">Его можно отредактировать на сервере в сеансе терминала.</string>
+    <string name="editor_loading">Чтение…</string>
+    <string name="editor_suggestions">Подсказки клавиатуры</string>
+    <string name="editor_open_as_text">Всё равно открыть как текст</string>
+    <string name="action_undo">Отменить</string>
+    <string name="editor_hex_subtitle">%1$d байт · замена</string>
+    <string name="editor_open_hex">Открыть в HEX</string>
+    <string name="editor_hex">Шестнадцатеричный</string>
+    <string name="editor_charset">Кодировка</string>
+    <string name="editor_charset_discard">Чтение файла в другой кодировке заменит текст на экране. Несохранённые изменения будут потеряны.</string>
+    <string name="editor_cannot_encode">В тексте есть символы, которые %1$s не может записать. Выберите другую кодировку, чтобы сохранить его.</string>
+    <string name="editor_save_failed">Не сохранено</string>
 </resources>

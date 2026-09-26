@@ -135,6 +135,11 @@
     <string name="keys_import_error_encrypted">Cette clé est chiffrée — entrez la phrase secrète</string>
     <string name="keys_import_error_wrong_passphrase">Phrase secrète incorrecte</string>
     <string name="keys_import_error_invalid">Format de clé invalide ou non pris en charge</string>
+    <string name="keys_import_error_encryption">Cette clé est chiffrée dans un format que l\'app ne sait pas ouvrir. Déchiffrez-la avec l\'outil qui l\'a créée, puis réimportez-la.</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Phrase secrète manquante — réimportez cette clé</string>
+    <string name="keys_passphrase_note">Elle sert seulement à ouvrir la clé et n\'est pas conservée. La clé, ouverte, est gardée comme toutes les autres.</string>
 
     <string name="keygen_title">Générer une clé SSH</string>
     <string name="keygen_field_label">Étiquette</string>
@@ -262,6 +267,8 @@
     <string name="sftp_mkdir_folder_name">Nom du dossier</string>
 
     <string name="sftp_menu_open">Ouvrir</string>
+    <string name="sftp_menu_edit">Ouvrir dans l\'éditeur</string>
+    <string name="sftp_menu_hex">Ouvrir en hexadécimal</string>
     <string name="sftp_menu_rename">Renommer</string>
     <string name="sftp_menu_download_in_background">Télécharger en arrière-plan</string>
     <string name="sftp_background_downloads_title">Téléchargements en arrière-plan</string>
@@ -377,6 +384,7 @@
     <string name="settings_allow_screenshots_title">Autoriser les captures d\'écran</string>
     <string name="settings_allow_screenshots_subtitle">Autoriser les captures d\'écran et l\'enregistrement. Laisser désactivé pour protéger les contenus sensibles.</string>
     <string name="lock_title">Déverrouiller SSHBorg</string>
+    <string name="lock_unlock_action">Déverrouiller</string>
     <string name="lock_enter_pin">Saisissez votre code PIN</string>
     <string name="lock_enter_passphrase">Saisissez votre phrase secrète</string>
     <string name="lock_incorrect">Incorrect — réessayez</string>
@@ -466,4 +474,27 @@
     <string name="settings_host_sort_manual">Manuel</string>
     <string name="hosts_move_up">Monter</string>
     <string name="hosts_move_down">Descendre</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Éditeur</string>
+    <string name="editor_unsaved_title">Modifications non enregistrées</string>
+    <string name="editor_unsaved_message">Fermer l\'éditeur et perdre les modifications ?</string>
+    <string name="editor_discard">Abandonner</string>
+    <string name="editor_unsaved">non enregistré</string>
+    <string name="editor_saved">enregistré</string>
+    <string name="editor_mixed_endings">fins de ligne mélangées</string>
+    <string name="editor_too_large">Ce fichier fait %1$s, plus que les %2$s que l\'éditeur peut ouvrir.</string>
+    <string name="editor_binary">Ce fichier n\'est pas du texte, il ne peut pas être modifié ici.</string>
+    <string name="editor_use_terminal">Vous pouvez le modifier sur le serveur depuis une session terminal.</string>
+    <string name="editor_loading">Lecture…</string>
+    <string name="editor_suggestions">Suggestions du clavier</string>
+    <string name="editor_open_as_text">Ouvrir quand même comme texte</string>
+    <string name="action_undo">Annuler</string>
+    <string name="editor_hex_subtitle">%1$d octets · écrasement</string>
+    <string name="editor_open_hex">Ouvrir en hexadécimal</string>
+    <string name="editor_hex">Hexadécimal</string>
+    <string name="editor_charset">Encodage</string>
+    <string name="editor_charset_discard">Relire le fichier autrement remplace le texte à l\'écran. Les modifications non enregistrées seront perdues.</string>
+    <string name="editor_cannot_encode">Le texte contient des caractères que %1$s ne peut pas écrire. Choisissez un autre encodage pour l\'enregistrer.</string>
+    <string name="editor_save_failed">Non enregistré</string>
 </resources>

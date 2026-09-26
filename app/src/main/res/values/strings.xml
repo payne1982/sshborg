@@ -139,6 +139,11 @@
     <string name="keys_import_error_encrypted">This key is encrypted — enter the passphrase</string>
     <string name="keys_import_error_wrong_passphrase">Wrong passphrase</string>
     <string name="keys_import_error_invalid">Invalid or unsupported key format</string>
+    <string name="keys_import_error_encryption">This key is encrypted in a format the app cannot unlock. Decrypt it with the tool that created it, then import it again.</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Passphrase missing — import this key again</string>
+    <string name="keys_passphrase_note">Used once to unlock the key and then dropped — the passphrase itself is never stored. The unlocked key is kept like any other key.</string>
 
     <!-- Generate key dialog -->
     <string name="keygen_title">Generate SSH Key</string>
@@ -277,6 +282,8 @@
     <string name="sftp_mkdir_folder_name">Folder name</string>
 
     <string name="sftp_menu_open">Open</string>
+    <string name="sftp_menu_edit">Open in editor</string>
+    <string name="sftp_menu_hex">Open in hex</string>
     <string name="sftp_menu_rename">Rename</string>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>
@@ -388,6 +395,7 @@
     <string name="error_decryption_failed">Decryption failed</string>
     <string name="error_unknown">Something went wrong</string>
     <string name="lock_title">Unlock SSHBorg</string>
+    <string name="lock_unlock_action">Unlock</string>
     <string name="lock_enter_pin">Enter your PIN</string>
     <string name="lock_enter_passphrase">Enter your passphrase</string>
     <string name="lock_incorrect">Incorrect — try again</string>
@@ -477,4 +485,27 @@
     <string name="settings_host_sort_manual">Manual</string>
     <string name="hosts_move_up">Move up</string>
     <string name="hosts_move_down">Move down</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Unsaved changes</string>
+    <string name="editor_unsaved_message">Close the editor and lose the changes you made?</string>
+    <string name="editor_discard">Discard</string>
+    <string name="editor_unsaved">unsaved</string>
+    <string name="editor_saved">saved</string>
+    <string name="editor_mixed_endings">mixed line endings</string>
+    <string name="editor_too_large">This file is %1$s, more than the %2$s the editor can open.</string>
+    <string name="editor_binary">This file is not text, so it cannot be edited here.</string>
+    <string name="editor_use_terminal">You can edit it on the server from a terminal session.</string>
+    <string name="editor_loading">Reading…</string>
+    <string name="editor_suggestions">Keyboard suggestions</string>
+    <string name="editor_open_as_text">Open as text anyway</string>
+    <string name="action_undo">Undo</string>
+    <string name="editor_hex_subtitle">%1$d bytes · overwrite</string>
+    <string name="editor_open_hex">Open in hex</string>
+    <string name="editor_hex">Hexadecimal</string>
+    <string name="editor_charset">Encoding</string>
+    <string name="editor_charset_discard">Reading the file another way replaces the text on screen. The changes you have not saved will be lost.</string>
+    <string name="editor_cannot_encode">The text now holds characters that %1$s cannot write. Pick another encoding to save it.</string>
+    <string name="editor_save_failed">Not saved</string>
 </resources>

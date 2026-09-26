@@ -102,6 +102,10 @@ fun HostsScreen(
                         Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.hosts_settings_cd))
                     }
                     IconButton(onClick = {
+                        // Reading the guide is a trip out of the app like choosing a file, not a
+                        // reason to ask for the PIN again on the way back. It sits next to the
+                        // other two icons, so it is also the easiest one to hit by mistake.
+                        (context.applicationContext as com.sshborg.SshBorgApp).allowPickerTrip()
                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://sshborg.com")))
                     }) {
                         Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = stringResource(R.string.hosts_help_cd))

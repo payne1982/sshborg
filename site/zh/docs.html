@@ -525,6 +525,8 @@
             <li class="sub"><a href="#sftp">浏览</a></li>
             <li class="sub"><a href="#sftp">上传与下载</a></li>
             <li class="sub"><a href="#sftp">批量选择</a></li>
+            <li class="sub"><a href="#sftp">编辑文件</a></li>
+            <li class="sub"><a href="#sftp">十六进制编辑器</a></li>
             <li><a href="#ssh-keys">SSH 密钥</a></li>
             <li class="sub"><a href="#ssh-keys">生成密钥</a></li>
             <li class="sub"><a href="#ssh-keys">在服务器授权</a></li>
@@ -543,8 +545,10 @@
             <li class="sub"><a href="#jump-hosts">多跳链</a></li>
             <li><a href="#sessions">多会话</a></li>
             <li><a href="#security">应用安全</a></li>
+            <li class="sub"><a href="#security">最安全的设置</a></li>
             <li><a href="#backup">配置备份</a></li>
             <li><a href="#android-tv">Android TV</a></li>
+            <li><a href="#licenses">开源许可证</a></li>
         </ul>
     </nav>
 
@@ -626,6 +630,14 @@
                 <li><strong>下载</strong> — 一次性下载所有选中的文件和文件夹，带进度对话框和取消支持。</li>
                 <li><strong>删除</strong> — 删除所有选中的项目。删除非空文件夹会递归删除其所有内容。<em>此操作不可撤销。</em></li>
             </ul>
+            <h3>编辑文件</h3>
+            <p>打开文件菜单（长按，或 <strong>⋮</strong> 按钮），选择<strong>在编辑器中打开</strong>，即可直接在服务器上修改。手机上不留任何文件：内容读入内存、编辑后直接写回服务器。</p>
+            <p>文件原样返回。字符编码会被识别并在保存时沿用，LF 或 CRLF 换行符保持不变，原本结尾没有换行的文件依旧没有，权限也不变。如果编码判断有误，点一下编辑器底部那一行换一个即可——列表里只有能够原样还原该文件字节的编码，所以选错只会显示错乱，不会损坏文件。</p>
+            <p>保存时先在原文件旁写入临时文件，再改名顶替，因此连接中途断开也不会在服务器上留下写了一半的文件。</p>
+            <p>文件最大可打开 4 MB，无论多长：只绘制屏幕上的行，因此几兆字节的文件与短文件滚动起来一样顺畅。再大的文件请用终端里的 <code>nano</code> 或 <code>vi</code>，那边没有任何上限。</p>
+            <p>配置文件会着色——注释、字符串、数字、键、节标题、shell 变量和 XML 标签——依据文件名判断，文件名看不出时则依据内容的形态：shell 脚本、nginx 与 sshd 风格的配置、INI、YAML、JSON 和 XML。普通文章、笔记和日志则刻意不着色，那里的颜色只会变成干扰。着色只是外观，不会改变任何一个字节。</p>
+            <h3>十六进制编辑器</h3>
+            <p>非文本文件会在十六进制编辑器中打开：左侧是偏移量，中间是字节，右侧是可打印字符，底部是十六进制数字键盘。点选一个字节并输入两位数字即可替换。数值会变，长度不变，因此文件中每个偏移量都保持原位。文件菜单中的<strong>以十六进制打开</strong>可以用这种方式打开任何文件；被误判为二进制的文本文件（例如混入了一个 NUL 字节）仍可从同一个对话框以文本方式打开。</p>
             <div class="callout callout-ios">
                 <div class="callout-label">// iOS</div>
                 <ul>
@@ -634,6 +646,8 @@
                     <li><strong>文件夹</strong> — 长按文件或文件夹打开其菜单：<em>下载</em>、<em>重命名</em>、<em>删除</em>。</li>
                     <li><strong>多选</strong> — 在“操作”菜单中选择<em>选择项目</em>，然后勾选项目。长按则会打开该项目的菜单。</li>
                     <li><strong>上传冲突</strong> — 对话框提供<em>覆盖</em>、<em>保留两者</em>（上传的文件会获得新名称）或<em>取消</em>。</li>
+                    <li><strong>编辑</strong> — 编辑器和十六进制编辑器在这里也有：长按文件打开菜单，可选择<em>在编辑器中打开</em>和<em>以十六进制打开</em>。加载时文件会经过应用的临时目录，读取完毕后立即删除。</li>
+                    <li><strong>保存</strong> — 文件直接写回原文件，而不是先写到旁边的临时文件再重命名覆盖，因此保存中途断线可能留下只写了一半的文件。</li>
                 </ul>
             </div>
         </div>
@@ -674,7 +688,15 @@ chmod 600 ~/.ssh/authorized_keys</code></pre>
             <h3>加密存储的密钥和密码</h3>
             <p>开启 <strong>设置 → 安全 → 加密敏感数据</strong>，即可使用保存在设备安全硬件中的密钥（Android 上为 Android 密钥库，iOS 上为钥匙串）加密存储私钥和已保存的主机密码。在您启用之前该选项保持关闭；首次启动时显示的安全提示会指向它。</p>
             <p>加密数据与设备以及本次安装的应用绑定：卸载应用后，已存储的密钥无法恢复，您需要生成新密钥并重新在服务器上授权。如果您在手机上保存了敏感的服务器凭据，强烈建议同时启用应用锁和此选项。</p>
-            <p>导入受密码短语保护的密钥时，只需在导入时用密码短语解锁一次。</p>
+            <p>受密码短语保护的密钥只在导入时询问一次，之后以已解锁的形式保存：密码短语本身不会写入设备。密码短语通常还会用在别处，而私钥只代表它自己——况且密钥与自己的密码短语存放在一起，本来也谈不上被它保护。在这里保护密钥的是应用的私有存储、<strong>加密敏感数据</strong>和应用锁。由较早版本导入的密钥仍处于加密状态，无法完成认证；列表会标出这些密钥，需要重新导入。</p>
+            <p>有两种加密格式应用打不开：OpenSSL 的容器（<code>BEGIN ENCRYPTED PRIVATE KEY</code>）和 PuTTY 的 <code>.ppk</code>。导入时会明确说明，而不会把密钥导入一半。请用创建它的工具解密后重新导入——在副本上操作，不要动你唯一的那份文件：</p>
+            <pre><code>ssh-keygen -p -N "" -f id_ed25519_copy
+openssl pkcs8 -in key.pem -out key_plain.pem</code></pre>
+            <p>PuTTYgen 可通过 <em>Conversions → Export OpenSSH key</em> 转换 <code>.ppk</code>。</p>
+            <div class="callout callout-ios">
+                <div class="callout-label">// iOS</div>
+                iOS 的做法相同：导入时只询问一次密码短语，密钥以解锁状态保存，密码短语不写入任何地方。iOS 比 Android 多拒绝一种格式：除了 OpenSSL 容器和 PuTTY 的 <code>.ppk</code>，还有旧式 PEM 加密（<code>Proc-Type: 4,ENCRYPTED</code>），即 <code>ssh-keygen -m PEM</code> 带密码短语时写出的格式。请先解密这类密钥再重新导入。
+            </div>
         </div>
 
         <div class="doc-section" id="suggestions">
@@ -957,7 +979,7 @@ Host target
 
             <h2>// 应用安全</h2>
             <h3>应用锁</h3>
-            <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁）、<strong>设备锁</strong>（除生物识别外，还可使用设备的 PIN、图案或密码），或应用内 <strong>PIN 或密码短语</strong>。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。</p>
+            <p>在 <strong>设置 → 安全 → 应用锁</strong> 中选择保护方式：<strong>无</strong>（默认）、<strong>仅生物识别</strong>（指纹或人脸解锁）、<strong>设备锁</strong>（除生物识别外，还可使用设备的 PIN、图案或密码），或应用内 <strong>PIN 或密码短语</strong>。启用锁定后，SSHBorg 在显示任何主机、凭据或会话数据前都会要求验证。如果验证被拒绝或你取消了验证，应用会留在自己的锁定界面上，并提供一个重试按钮——它不会退出，因此解锁后原先打开的会话仍在。</p>
             <p>应用内 <strong>PIN 或密码短语</strong> 可在任何设备上使用，即使没有生物识别硬件或系统屏幕锁——因此它是 Android TV 上的正确选择。更改或移除时会先要求输入当前的。忘记后无法找回：你需要清除应用数据或重新安装，因此请保留主机的备份。</p>
             <p>您可以设置不活动超时——在后台等待该时长后，应用会自动锁定。</p>
             <div class="callout callout-ios">
@@ -977,6 +999,17 @@ Host target
                 <div class="callout-label">// 备份说明</div>
                 由于加密密钥永远不会离开设备的安全硬件，密钥<strong>无法</strong>从云备份或设备备份中恢复，也不会自动迁移到新手机。更换设备前，请确保在新设备上生成新密钥并在所有服务器上授权。
             </div>
+            <h3>最安全的设置</h3>
+            <p>上面每一项单独都有用。合在一起，就是这个应用能做到的最严密的配置，只需两分钟：</p>
+            <ol>
+                <li>打开<strong>设置 → 安全 → 加密敏感数据</strong>。</li>
+                <li>把应用锁设为<strong>仅生物识别</strong>——若不愿依赖手机的生物识别，则设为<strong>PIN 或密码短语</strong>。</li>
+                <li>把锁定超时设为<strong>立即</strong>，最多 <strong>30 秒</strong>。</li>
+                <li>在应用内生成一把新密钥，名字要能看出它属于哪台设备。</li>
+                <li>把该密钥授权到你的服务器，用它代替密码。</li>
+            </ol>
+            <p>在手机上生成的密钥从未在别处存在过：没有更早的副本可能已经泄露，也没有别的机器需要清理。一台设备一把密钥还意味着，丢了手机只不过是 <code>authorized_keys</code> 里的一行——删掉它，其他设备照常可用。这也正是名字值得好好取的原因。</p>
+            <p>这些措施都做不到的一点：如果手机本身被攻破，那把密钥也随之失守，无论它在磁盘上受什么保护。给密钥加密码短语同样救不了它——能读取应用存储的东西，也能读取你键入的内容。这正是 SSHBorg 只在导入时询问一次密钥的密码短语、并以解锁状态保存密钥而不保存密码短语的原因（见<a href="#ssh-keys">SSH 密钥</a>）。</p>
         </div>
 
         <div class="doc-section" id="backup">
@@ -1084,6 +1117,19 @@ Host target
             <p>TV 通常没有指纹识别或屏幕锁，因此请用内置的 <strong>PIN 或密码短语</strong> 锁保护应用（设置 → 安全）——它完全可用遥控器或键盘操作。参见 <a href="#security">应用安全</a>。</p>
         </div>
 
+        <div class="doc-section" id="licenses">
+
+            <h2>// 开源许可证</h2>
+            <p>SSHBorg 是自由软件，以 <strong>GNU General Public License v3</strong> 发布。Android 版与 iOS 版的源代码都在 GitHub 上。它使用了以下库，各自遵循自己的许可证：</p>
+            <ul>
+                <li><a href="https://github.com/mwiede/jsch" target="_blank" rel="noopener"><strong>mwiede/JSch</strong></a> — Android 上的 SSH 协议 —— BSD 风格许可证</li>
+                <li><a href="https://www.bouncycastle.org" target="_blank" rel="noopener"><strong>Bouncy Castle</strong></a> — Android 上的加密实现 —— MIT 风格许可证</li>
+                <li><a href="https://github.com/Rosemoe/sora-editor" target="_blank" rel="noopener"><strong>sora-editor</strong></a> — 用于在服务器上修改文件的文本编辑控件（Android） —— GNU LGPL v2.1</li>
+                <li><a href="https://libssh2.org" target="_blank" rel="noopener"><strong>libssh2</strong></a> — iOS 上的 SSH 协议 —— BSD 许可证</li>
+            </ul>
+            <p>它们都不会自行连接任何地方：SSHBorg 只会连接你指定的服务器，以及你点击链接时的 sshborg.com。没有任何统计库、广告库或追踪器。</p>
+        </div>
+
     </div><!-- /doc-content -->
 </div><!-- /docs-layout -->
 
@@ -1096,6 +1142,7 @@ Host target
         <a href="../privacy_policy.html" target="_blank" rel="noopener">隐私政策</a> &nbsp;&#9135;&nbsp;
         <a href="index.html#support">问题与反馈</a> &nbsp;&#9135;&nbsp;
         源代码: <a href="https://github.com/payne1982/sshborg" target="_blank" rel="noopener">Android</a> &middot; <a href="https://github.com/payne1982/sshborg-ios" target="_blank" rel="noopener">iOS</a> &nbsp;&#9135;&nbsp;
+        <a href="docs.html#licenses">许可证</a> &nbsp;&#9135;&nbsp;
         <a href="mailto:massimiliano.playdev AT gmail.com">massimiliano.playdev AT gmail.com</a>
     </p>
     <p style="margin-top:10px; font-size:0.8em; opacity:0.5;">

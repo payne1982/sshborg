@@ -138,6 +138,11 @@
     <string name="keys_import_error_encrypted">この鍵は暗号化されています — パスフレーズを入力してください</string>
     <string name="keys_import_error_wrong_passphrase">パスフレーズが正しくありません</string>
     <string name="keys_import_error_invalid">無効またはサポートされていない鍵の形式です</string>
+    <string name="keys_import_error_encryption">この鍵は、アプリが開けない形式で暗号化されています。作成に使ったツールで復号してから、もう一度インポートしてください。</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">パスフレーズがありません — この鍵を再度インポートしてください</string>
+    <string name="keys_passphrase_note">鍵を開くためだけに使われ、保存されません。開かれた鍵はほかの鍵と同じように保管されます。</string>
 
     <!-- Generate key dialog -->
     <string name="keygen_title">SSH 鍵を生成</string>
@@ -276,6 +281,8 @@
     <string name="sftp_mkdir_folder_name">フォルダ名</string>
 
     <string name="sftp_menu_open">開く</string>
+    <string name="sftp_menu_edit">エディタで開く</string>
+    <string name="sftp_menu_hex">16進数で開く</string>
     <string name="sftp_menu_rename">名前変更</string>
     <string name="sftp_menu_download_in_background">バックグラウンドでダウンロード</string>
     <string name="sftp_background_downloads_title">バックグラウンドダウンロード</string>
@@ -382,6 +389,7 @@
     <string name="backup_import_success">%1$d 件インポート、%2$d 件更新しました</string>
     <string name="error_unknown">エラーが発生しました</string>
     <string name="lock_title">SSHBorg のロックを解除</string>
+    <string name="lock_unlock_action">ロック解除</string>
     <string name="lock_enter_pin">PIN を入力</string>
     <string name="lock_enter_passphrase">パスフレーズを入力</string>
     <string name="lock_incorrect">正しくありません — 再試行してください</string>
@@ -471,4 +479,27 @@
     <string name="settings_host_sort_manual">手動</string>
     <string name="hosts_move_up">上へ移動</string>
     <string name="hosts_move_down">下へ移動</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">エディタ</string>
+    <string name="editor_unsaved_title">未保存の変更</string>
+    <string name="editor_unsaved_message">エディタを閉じて、変更を破棄しますか？</string>
+    <string name="editor_discard">破棄</string>
+    <string name="editor_unsaved">未保存</string>
+    <string name="editor_saved">保存済み</string>
+    <string name="editor_mixed_endings">改行コード混在</string>
+    <string name="editor_too_large">このファイルは %1$s で、エディタで開ける %2$s を超えています。</string>
+    <string name="editor_binary">このファイルはテキストではないため、ここでは編集できません。</string>
+    <string name="editor_use_terminal">ターミナルのセッションからサーバー上で編集できます。</string>
+    <string name="editor_loading">読み込み中…</string>
+    <string name="editor_suggestions">キーボードの予測変換</string>
+    <string name="editor_open_as_text">それでもテキストとして開く</string>
+    <string name="action_undo">元に戻す</string>
+    <string name="editor_hex_subtitle">%1$d バイト · 上書き</string>
+    <string name="editor_open_hex">16進数で開く</string>
+    <string name="editor_hex">16進数</string>
+    <string name="editor_charset">文字コード</string>
+    <string name="editor_charset_discard">別の文字コードで読み直すと、画面のテキストが置き換わります。保存していない変更は失われます。</string>
+    <string name="editor_cannot_encode">テキストに %1$s では書き出せない文字が含まれています。保存するには別の文字コードを選んでください。</string>
+    <string name="editor_save_failed">保存できません</string>
 </resources>

@@ -1,0 +1,3 @@
+• SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage, fins de ligne et droits, les fichiers de configuration sont colorés, le reste s'ouvre dans un éditeur hexadécimal
+• Clés SSH : une clé avec phrase secrète fonctionne — la phrase est demandée une fois à l'import et n'est enregistrée nulle part. Les clés importées avant sont à réimporter ; la liste les signale.
+• Corrigé : l'app pouvait rester couverte par un écran vide.

@@ -63,6 +63,12 @@ object BiometricHelper {
                 }
                 .build()
 
+            // A cancelled attempt takes the prompt with it, so the caller can always ask again:
+            // a prompt Android decided not to show would otherwise keep this call suspended for
+            // the life of the process.
+            cont.invokeOnCancellation {
+                activity.runOnUiThread { runCatching { prompt.cancelAuthentication() } }
+            }
             prompt.authenticate(info)
         }
 }

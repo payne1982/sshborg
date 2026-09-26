@@ -135,6 +135,11 @@
     <string name="keys_import_error_encrypted">Dieser Schlüssel ist verschlüsselt — Passphrase eingeben</string>
     <string name="keys_import_error_wrong_passphrase">Falsche Passphrase</string>
     <string name="keys_import_error_invalid">Ungültiges oder nicht unterstütztes Schlüsselformat</string>
+    <string name="keys_import_error_encryption">Dieser Schlüssel ist in einem Format verschlüsselt, das die App nicht öffnen kann. Entschlüssle ihn mit dem Werkzeug, das ihn erstellt hat, und importiere ihn erneut.</string>
+
+    <!-- Passphrase of an imported key -->
+    <string name="keys_needs_passphrase">Passphrase fehlt — Schlüssel erneut importieren</string>
+    <string name="keys_passphrase_note">Wird nur zum Öffnen des Schlüssels verwendet und nicht gespeichert. Der geöffnete Schlüssel wird wie jeder andere aufbewahrt.</string>
 
     <string name="keygen_title">SSH-Schlüssel generieren</string>
     <string name="keygen_field_label">Bezeichnung</string>
@@ -262,6 +267,8 @@
     <string name="sftp_mkdir_folder_name">Ordnername</string>
 
     <string name="sftp_menu_open">Öffnen</string>
+    <string name="sftp_menu_edit">Im Editor öffnen</string>
+    <string name="sftp_menu_hex">Hexadezimal öffnen</string>
     <string name="sftp_menu_rename">Umbenennen</string>
     <string name="sftp_menu_download_in_background">Im Hintergrund herunterladen</string>
     <string name="sftp_background_downloads_title">Hintergrund-Downloads</string>
@@ -377,6 +384,7 @@
     <string name="settings_allow_screenshots_title">Screenshots erlauben</string>
     <string name="settings_allow_screenshots_subtitle">Screenshots und Bildschirmaufnahmen erlauben. Deaktiviert lassen, um sensible Inhalte zu schützen.</string>
     <string name="lock_title">SSHBorg entsperren</string>
+    <string name="lock_unlock_action">Entsperren</string>
     <string name="lock_enter_pin">PIN eingeben</string>
     <string name="lock_enter_passphrase">Passphrase eingeben</string>
     <string name="lock_incorrect">Falsch – erneut versuchen</string>
@@ -466,4 +474,27 @@
     <string name="settings_host_sort_manual">Manuell</string>
     <string name="hosts_move_up">Nach oben</string>
     <string name="hosts_move_down">Nach unten</string>
+
+    <!-- Editor -->
+    <string name="editor_failed">Editor</string>
+    <string name="editor_unsaved_title">Ungespeicherte Änderungen</string>
+    <string name="editor_unsaved_message">Editor schließen und die Änderungen verwerfen?</string>
+    <string name="editor_discard">Verwerfen</string>
+    <string name="editor_unsaved">nicht gespeichert</string>
+    <string name="editor_saved">gespeichert</string>
+    <string name="editor_mixed_endings">gemischte Zeilenenden</string>
+    <string name="editor_too_large">Diese Datei ist %1$s groß, mehr als die %2$s, die der Editor öffnen kann.</string>
+    <string name="editor_binary">Diese Datei ist kein Text und kann hier nicht bearbeitet werden.</string>
+    <string name="editor_use_terminal">Du kannst sie auf dem Server in einer Terminal-Sitzung bearbeiten.</string>
+    <string name="editor_loading">Wird gelesen…</string>
+    <string name="editor_suggestions">Tastaturvorschläge</string>
+    <string name="editor_open_as_text">Trotzdem als Text öffnen</string>
+    <string name="action_undo">Rückgängig</string>
+    <string name="editor_hex_subtitle">%1$d Bytes · Überschreiben</string>
+    <string name="editor_open_hex">Hexadezimal öffnen</string>
+    <string name="editor_hex">Hexadezimal</string>
+    <string name="editor_charset">Kodierung</string>
+    <string name="editor_charset_discard">Die Datei anders zu lesen ersetzt den Text auf dem Bildschirm. Nicht gespeicherte Änderungen gehen verloren.</string>
+    <string name="editor_cannot_encode">Der Text enthält Zeichen, die %1$s nicht schreiben kann. Wähle zum Speichern eine andere Kodierung.</string>
+    <string name="editor_save_failed">Nicht gespeichert</string>
 </resources>
