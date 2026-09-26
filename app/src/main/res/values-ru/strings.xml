@@ -398,6 +398,7 @@
     <string name="error_decryption_failed">Ошибка расшифровки</string>
     <string name="error_unknown">Что-то пошло не так</string>
     <string name="lock_title">Разблокировать SSHBorg</string>
+    <string name="lock_unlock_action">Разблокировать</string>
     <string name="lock_enter_pin">Введите PIN-код</string>
     <string name="lock_enter_passphrase">Введите парольную фразу</string>
     <string name="lock_incorrect">Неверно — попробуйте снова</string>

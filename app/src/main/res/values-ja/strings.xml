@@ -389,6 +389,7 @@
     <string name="backup_import_success">%1$d 件インポート、%2$d 件更新しました</string>
     <string name="error_unknown">エラーが発生しました</string>
     <string name="lock_title">SSHBorg のロックを解除</string>
+    <string name="lock_unlock_action">ロック解除</string>
     <string name="lock_enter_pin">PIN を入力</string>
     <string name="lock_enter_passphrase">パスフレーズを入力</string>
     <string name="lock_incorrect">正しくありません — 再試行してください</string>

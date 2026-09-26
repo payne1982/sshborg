@@ -395,6 +395,7 @@
     <string name="error_decryption_failed">Decryption failed</string>
     <string name="error_unknown">Something went wrong</string>
     <string name="lock_title">Unlock SSHBorg</string>
+    <string name="lock_unlock_action">Unlock</string>
     <string name="lock_enter_pin">Enter your PIN</string>
     <string name="lock_enter_passphrase">Enter your passphrase</string>
     <string name="lock_incorrect">Incorrect — try again</string>

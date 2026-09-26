@@ -118,9 +118,7 @@ class SshForegroundService : Service() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         if (!nm.areNotificationsEnabled()) return
         val tapIntent = PendingIntent.getActivity(
-            this, NOTIFICATION_ID_TIMEOUT,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE,
+            this, NOTIFICATION_ID_TIMEOUT, reopenIntent(), PendingIntent.FLAG_IMMUTABLE,
         )
         val text = ctx.getString(R.string.notification_bg_timeout_text)
         nm.notify(
@@ -169,12 +167,20 @@ class SshForegroundService : Service() {
         )
     }
 
+    /**
+     * Reopens the app the way its own launcher icon does. A bare `Intent(this, MainActivity)`
+     * does not match the task's root intent (ACTION_MAIN / CATEGORY_LAUNCHER), so a tap starts a
+     * *second* MainActivity over the running one — a second window, blank until it has drawn,
+     * on top of a working app — instead of bringing the task back as it was.
+     */
+    private fun reopenIntent(): Intent =
+        packageManager.getLaunchIntentForPackage(packageName)
+            ?: Intent(this, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+
     private fun buildNotification(sessionCount: Int, downloadCount: Int = 0): Notification {
         val ctx = localizedContext()
         val tapIntent = PendingIntent.getActivity(
-            this, 0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE,
+            this, 0, reopenIntent(), PendingIntent.FLAG_IMMUTABLE,
         )
         val disconnectAllIntent = PendingIntent.getService(
             this, 0,

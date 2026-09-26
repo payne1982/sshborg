@@ -384,6 +384,7 @@
     <string name="settings_allow_screenshots_title">Permitir capturas de ecrã</string>
     <string name="settings_allow_screenshots_subtitle">Permitir capturas de ecrã e gravação de ecrã. Manter desativado para proteger conteúdo sensível.</string>
     <string name="lock_title">Desbloquear o SSHBorg</string>
+    <string name="lock_unlock_action">Desbloquear</string>
     <string name="lock_enter_pin">Introduza o PIN</string>
     <string name="lock_enter_passphrase">Introduza a frase-passe</string>
     <string name="lock_incorrect">Incorreto — tente novamente</string>

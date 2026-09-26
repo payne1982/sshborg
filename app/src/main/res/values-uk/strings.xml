@@ -388,6 +388,7 @@
     <string name="settings_allow_screenshots_title">Дозволити знімки екрана</string>
     <string name="settings_allow_screenshots_subtitle">Дозволити знімки екрана та запис екрана. Залиште вимкненим для захисту конфіденційного вмісту.</string>
     <string name="lock_title">Розблокувати SSHBorg</string>
+    <string name="lock_unlock_action">Розблокувати</string>
     <string name="lock_enter_pin">Введіть PIN-код</string>
     <string name="lock_enter_passphrase">Введіть парольну фразу</string>
     <string name="lock_incorrect">Неправильно — спробуйте ще раз</string>

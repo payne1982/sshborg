@@ -389,6 +389,7 @@
     <string name="backup_import_success">已导入 %1$d 个，已更新 %2$d 个主机</string>
     <string name="error_unknown">出现错误</string>
     <string name="lock_title">解锁 SSHBorg</string>
+    <string name="lock_unlock_action">解锁</string>
     <string name="lock_enter_pin">输入 PIN 码</string>
     <string name="lock_enter_passphrase">输入密码短语</string>
     <string name="lock_incorrect">不正确 — 请重试</string>

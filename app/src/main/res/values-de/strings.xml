@@ -384,6 +384,7 @@
     <string name="settings_allow_screenshots_title">Screenshots erlauben</string>
     <string name="settings_allow_screenshots_subtitle">Screenshots und Bildschirmaufnahmen erlauben. Deaktiviert lassen, um sensible Inhalte zu schützen.</string>
     <string name="lock_title">SSHBorg entsperren</string>
+    <string name="lock_unlock_action">Entsperren</string>
     <string name="lock_enter_pin">PIN eingeben</string>
     <string name="lock_enter_passphrase">Passphrase eingeben</string>
     <string name="lock_incorrect">Falsch – erneut versuchen</string>
