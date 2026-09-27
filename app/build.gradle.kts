@@ -51,7 +51,7 @@ android {
 
     // The exported schemas ride along in the test APK's assets, which is where
     // MigrationTestHelper looks for them.
-    sourceSets["androidTest"].assets.srcDir("$projectDir/schemas")
+    sourceSets["androidTest"].assets.directories.add("$projectDir/schemas")
 
     testOptions {
         unitTests {
