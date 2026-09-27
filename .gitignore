@@ -20,10 +20,6 @@ test.properties
 *.jks
 *.keystore
 
-# Screenshot generati dai test per la scheda degli store: si rifanno con
-# scripts/make-screenshots.sh, non vanno nel repo
-/screenshots/
-
 # Log
 *.log
 

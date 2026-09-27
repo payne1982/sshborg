@@ -6,9 +6,9 @@
 # unlike the ones in fastlane/, taken by hand on real phones over a year, which is why they are
 # five different sizes.
 #
-# Nothing is published: the pictures land in screenshots/ (git-ignored, and deliberately not
-# under build/, where a clean would take them away) for you to look at and copy over the
-# listing's own if you like them. The emulator's language decides theirs.
+# Nothing is published: the pictures land in app/build/outputs/screenshots for you to look at and
+# copy over the listing's own if you like them. A `gradlew clean` takes them with it, which is
+# where a run's leftovers belong — they cost one command to make again. The emulator's language decides theirs.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -24,7 +24,7 @@ package=$(sed -n 's/.*applicationId = "\(.*\)".*/\1/p' app/build.gradle.kts)
 suffix=$(sed -n 's/.*applicationIdSuffix = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
 target="${package}${suffix}"
 on_device="/sdcard/Android/data/$target/files/screenshots"
-here=screenshots   # non sotto build/: un ./gradlew clean se li porterebbe via
+here=app/build/outputs/screenshots
 
 ssh "${ssh_opts[@]}" "$remote" "$adb shell rm -rf '$on_device'" || true
 
