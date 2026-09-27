@@ -86,6 +86,15 @@ android {
 }
 
 dependencies {
+    constraints {
+        // room-testing needs kotlinx-serialization 1.8.x to read the exported schemas. Another
+        // library drags 1.7.3 into the app's runtime classpath, and AGP's consistent resolution
+        // then pins the instrumented tests to that same 1.7.3, where Room dies with an
+        // AbstractMethodError on GeneratedSerializer. A constraint raises the version already
+        // there without adding a dependency of our own.
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    }
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

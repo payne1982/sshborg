@@ -27,3 +27,15 @@ sshPort=22
 sshUser=a-service-account
 sshKeyDir=/path/to/ssh-test
 sshKeyPassphrase=the passphrase those keys were made with
+
+# ── The machine with the Android emulator on it ──────────────────────────────────
+# Used by scripts/run-instrumented.sh, which builds both APKs here, copies them over
+# and drives the run through that machine's adb. A key of yours has to be authorized
+# there for emuUser, and an emulator has to be running. Any AVD will do for the
+# database tests — a TV image is a device like any other.
+emuHost=the-machine.lan
+emuUser=the-login-that-runs-the-emulator
+# Only if adb is not in that login's PATH:
+#emuAdb=/path/to/platform-tools/adb
+# Where to leave the APKs on that machine (default: /tmp/sshborg-instrumented):
+#emuDir=/path/to/a/folder
