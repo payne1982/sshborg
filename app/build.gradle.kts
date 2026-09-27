@@ -87,12 +87,19 @@ android {
 
 dependencies {
     constraints {
-        // room-testing needs kotlinx-serialization 1.8.x to read the exported schemas. Another
-        // library drags 1.7.3 into the app's runtime classpath, and AGP's consistent resolution
-        // then pins the instrumented tests to that same 1.7.3, where Room dies with an
-        // AbstractMethodError on GeneratedSerializer. A constraint raises the version already
-        // there without adding a dependency of our own.
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+        // room-testing needs kotlinx-serialization 1.8.x to read the exported schemas, while
+        // androidx.navigation asks for 1.7.3 — and AGP's consistent resolution hands the app's
+        // resolved version to the instrumented tests as well, where Room then dies with an
+        // AbstractMethodError on GeneratedSerializer that names no version at all.
+        //
+        // `require` is a floor, not a pin: it raises what is already there to at least this, and
+        // any dependency asking for more still wins (checked: with a 1.9.0 request in the graph,
+        // everything resolves to 1.9.0). The pin that trapped us was the `strictly` in
+        // kotlinx-serialization's own BOM. Delete this whole block once navigation asks for
+        // 1.8.1 or later by itself.
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+            version { require("1.8.1") }
+        }
     }
 
     implementation(libs.androidx.core.ktx)
