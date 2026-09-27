@@ -48,7 +48,13 @@ fi
 # The system bars belong to the device, not to the app: without this the app is dark and the
 # status and navigation bars around it are not. Put back afterwards, whatever happens.
 ssh "${ssh_opts[@]}" "$remote" "$adb shell cmd uimode night yes" > /dev/null || true
-trap 'ssh "${ssh_opts[@]}" "$remote" "$adb shell cmd uimode night auto" > /dev/null 2>&1 || true' EXIT
+# An emulator comes with a hardware keyboard, and then Android does not draw the soft one at all:
+# the picture meant to show the keyboard and the extra-key bar came out without either.
+ssh "${ssh_opts[@]}" "$remote" "$adb shell settings put secure show_ime_with_hard_keyboard 1" > /dev/null || true
+# The AOSP keyboard asks for contacts in a banner across its suggestion strip, which is the last
+# thing a store listing needs above the extra-key bar. Granting it shuts the banner up.
+ssh "${ssh_opts[@]}" "$remote" "$adb shell pm grant com.android.inputmethod.latin android.permission.READ_CONTACTS" > /dev/null 2>&1 || true
+trap 'ssh "${ssh_opts[@]}" "$remote" "$adb shell cmd uimode night auto; $adb shell settings put secure show_ime_with_hard_keyboard 0" > /dev/null 2>&1 || true' EXIT
 
 ./scripts/run-instrumented.sh com.sshborg.ui.StoreScreenshots
 
