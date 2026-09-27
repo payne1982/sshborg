@@ -39,3 +39,6 @@ emuUser=the-login-that-runs-the-emulator
 #emuAdb=/path/to/platform-tools/adb
 # Where to leave the APKs on that machine (default: /tmp/sshborg-instrumented):
 #emuDir=/path/to/a/folder
+# For the terminal screenshot: an address of the SSH server above that the EMULATOR can reach.
+# It is on another machine, so 127.0.0.1 is not it. Unset means that one picture is skipped.
+#emuSshHost=192.0.2.1

@@ -26,6 +26,24 @@ on_device="/sdcard/Android/data/$target/files/screenshots"
 here=app/build/outputs/screenshots
 
 ssh "${ssh_opts[@]}" "$remote" "$adb shell rm -rf '$on_device'" || true
+
+# The terminal picture needs a real server, reachable from the emulator — which is on another
+# machine, so "127.0.0.1" is not it. Set emuSshHost to an address that machine can dial; without
+# it every other screenshot is taken and the terminal one is skipped.
+demo_host=$(setting emuSshHost)
+demo_user=$(setting sshUser)
+demo_key="$(setting sshKeyDir)/i_plain"
+files="/sdcard/Android/data/$target/files"
+ssh "${ssh_opts[@]}" "$remote" "$adb shell rm -f '$files/demo.properties' '$files/demo.key'" || true
+if [ -n "$demo_host" ] && [ -f "$demo_key" ]; then
+    printf 'host=%s\nuser=%s\n' "$demo_host" "$demo_user" > /tmp/demo.properties
+    scp "${ssh_opts[@]}" -q /tmp/demo.properties "$demo_key" "$remote:/tmp/"
+    ssh "${ssh_opts[@]}" "$remote" "$adb shell mkdir -p '$files' && $adb push /tmp/demo.properties '$files/demo.properties' && $adb push /tmp/$(basename "$demo_key") '$files/demo.key' && rm -f /tmp/demo.properties /tmp/$(basename "$demo_key")" > /dev/null
+    rm -f /tmp/demo.properties
+    echo "terminale: si collega a $demo_host come $demo_user"
+else
+    echo "terminale: saltato (emuSshHost non impostato)"
+fi
 ./scripts/run-instrumented.sh com.sshborg.ui.StoreScreenshots
 
 rm -rf "$here"; mkdir -p "$here"

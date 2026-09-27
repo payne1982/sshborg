@@ -1,6 +1,7 @@
 package com.sshborg.ui
 
 import android.graphics.Bitmap
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -20,6 +21,7 @@ import com.sshborg.data.db.HostEntity
 import com.sshborg.data.db.SshKeyEntity
 import com.sshborg.data.ssh.SshManager
 import java.io.File
+import java.util.Properties
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -139,6 +141,104 @@ class StoreScreenshots {
         back()
 
         compose.onNodeWithText(text(R.string.hosts_title)).assertIsDisplayed()
+
+        // Last, because it is the only one that needs a server: if it cannot be taken, the other
+        // five are already in hand.
+        runCatching { terminal() }.onFailure { note("the terminal shot did not happen: $it") }
+    }
+
+    /**
+     * The one picture that needs a real server: a shell, connected over the network with a key.
+     * Skipped unless make-screenshots.sh has pushed a key and an address onto the device.
+     *
+     * The prompt and the window title are replaced with something of our own before the shot, so
+     * the listing shows a shell rather than the name of somebody's machine.
+     */
+    private fun terminal() {
+        val settings = File(context.getExternalFilesDir(null), "demo.properties")
+        val key = File(context.getExternalFilesDir(null), "demo.key")
+        if (!settings.isFile || !key.isFile) {
+            note("no server to connect to: ${settings.path} exists=${settings.isFile}, key exists=${key.isFile}")
+            return
+        }
+        val demo = Properties().apply { settings.reader().use { load(it) } }
+        val host = demo.getProperty("host")
+        val user = demo.getProperty("user")
+        if (host.isNullOrBlank() || user.isNullOrBlank()) {
+            note("demo.properties says host=$host user=$user")
+            return
+        }
+
+        runBlocking {
+            val dao = TestApp.app.db
+            val imported = SshManager.importPrivateKey(key.readText())
+            val keyId = dao.sshKeyDao().upsert(
+                SshKeyEntity(
+                    label = "demo",
+                    keyType = imported.keyType,
+                    privateKeyPem = imported.pem,
+                    publicKey = imported.publicKey,
+                ),
+            )
+            dao.sshKeyDao().getById(keyId)?.let(keys::add)
+            val hostId = dao.hostDao().upsert(
+                HostEntity(label = "demo-server", hostname = host, username = user, keyId = keyId),
+            )
+            dao.hostDao().getById(hostId)?.let(hosts::add)
+        }
+
+        awaitText("demo-server")
+        compose.onNodeWithText("demo-server", substring = true).performClick()
+
+        // First meeting with a server: trust it, as the user would. It is asked a moment after
+        // the connection starts, not immediately — waiting two seconds and looking once caught
+        // the dialog still on its way, and photographed it instead of the shell.
+        runCatching { awaitText(text(R.string.action_trust)) }
+        if (compose.onAllNodesWithText(text(R.string.action_trust)).fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithText(text(R.string.action_trust)).performClick()
+        }
+        Thread.sleep(5_000)
+
+        // Typed as keys, the way a person would: the terminal is a plain View and takes no other
+        // input. A prompt and a title of our own first, then a few ordinary commands.
+        line("PS1='demo:~$ '")
+        line("printf '\\033]0;demo\\007'")
+        line("clear")
+        line("uptime")
+        line("df -h /")
+        line("ls --color=always -l /etc/ssh")
+        Thread.sleep(1_500)
+
+        hideKeyboard()
+        shoot("06-terminal")
+    }
+
+    /**
+     * A line typed into the shell, down the same path a key press takes: the view model writes to
+     * the session. Injected key events do not get there — the terminal takes its text from the
+     * input method, and a screenshot run that pressed keys reached the shell with nothing at all.
+     */
+    private fun line(command: String) {
+        val shell = TestApp.app.sessionManager.sessions.value
+            .firstNotNullOfOrNull { it.shellSession }
+            ?: error("no shell session is open")
+        shell.write((command + "\n").toByteArray())
+        Thread.sleep(700)
+    }
+
+    /** A terminal is worth more without half the screen taken by a keyboard. */
+    private fun hideKeyboard() {
+        scenario.onActivity { activity ->
+            val manager = activity.getSystemService(InputMethodManager::class.java)
+            manager?.hideSoftInputFromWindow(activity.window.decorView.windowToken, 0)
+        }
+        Thread.sleep(1_000)
+    }
+
+    /** Left beside the pictures: a generator that skips something has to say so. */
+    private fun note(why: String) {
+        val directory = File(context.getExternalFilesDir(null), "screenshots").apply { mkdirs() }
+        File(directory, "06-terminal-SKIPPED.txt").writeText(why + "\n")
     }
 
     private companion object {
