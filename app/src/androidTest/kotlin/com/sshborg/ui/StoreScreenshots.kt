@@ -10,11 +10,13 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -329,12 +331,17 @@ class StoreScreenshots {
         Thread.sleep(700)
     }
 
+    /**
+     * A tap in the middle of the terminal, which is how a person asks for the keyboard.
+     *
+     * Asking the input method directly does nothing here: the ComposeView takes IME focus, so the
+     * app reattaches the input connection to the terminal view itself (TerminalView.showKeyboard),
+     * and a showSoftInput aimed at whatever Compose believes is focused is ignored. Two runs came
+     * back with no keyboard at all before this was clear.
+     */
     private fun showKeyboard() {
-        scenario.onActivity { activity ->
-            val target = activity.currentFocus ?: activity.window.decorView
-            activity.getSystemService(InputMethodManager::class.java)?.showSoftInput(target, 0)
-        }
-        Thread.sleep(2_000)
+        compose.onRoot().performTouchInput { click() }
+        Thread.sleep(3_000)
     }
 
     /** A terminal is worth more without half the screen taken by a keyboard. */
