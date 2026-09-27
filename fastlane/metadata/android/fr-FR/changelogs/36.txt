@@ -1,0 +1,1 @@
+• Mise à jour des bibliothèques sur lesquelles l'app est construite ; elle occupe aussi environ un mégaoctet de moins.
