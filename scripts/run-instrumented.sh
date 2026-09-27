@@ -56,8 +56,13 @@ run "$adb install -r -t '$dir/$(basename "$test_app")'"
 # test device is for.
 run "$adb shell pm grant '$target' android.permission.POST_NOTIFICATIONS" 2>/dev/null || true
 
-filter=""
-[ $# -gt 0 ] && filter="-e class $1"
+# With no argument, everything except the screenshot runs: those photograph the app instead of
+# checking it, and they are slow. Naming a class asks for exactly that class, screenshots included.
+if [ $# -gt 0 ]; then
+    filter="-e class $1"
+else
+    filter="-e notAnnotation com.sshborg.Screenshots"
+fi
 
 echo "== running"
 # -r for the machine-readable stream, so a failure can be found in the output; the runner's own
