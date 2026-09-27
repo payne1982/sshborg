@@ -1,39 +1,39 @@
 <en-US>
-• Updated the libraries the app is built on; it also takes about a megabyte less space.
+• Updated the libraries the app is built on.
 </en-US>
 
 <it-IT>
-• Aggiornate le librerie su cui è costruita l'app, che ora occupa circa un megabyte in meno.
+• Aggiornate le librerie su cui è costruita l'app.
 </it-IT>
 
 <de-DE>
-• Die Bibliotheken, auf denen die App aufbaut, sind aktualisiert; sie braucht jetzt rund ein Megabyte weniger Platz.
+• Die Bibliotheken, auf denen die App aufbaut, wurden aktualisiert.
 </de-DE>
 
 <es-ES>
-• Actualizadas las bibliotecas sobre las que se construye la app, que ahora ocupa alrededor de un megabyte menos.
+• Actualizadas las bibliotecas sobre las que se construye la app.
 </es-ES>
 
 <fr-FR>
-• Mise à jour des bibliothèques sur lesquelles l'app est construite ; elle occupe aussi environ un mégaoctet de moins.
+• Mise à jour des bibliothèques sur lesquelles l'app est construite.
 </fr-FR>
 
 <pt-PT>
-• Atualizadas as bibliotecas em que a app assenta; passa também a ocupar cerca de um megabyte a menos.
+• Atualizadas as bibliotecas em que a app assenta.
 </pt-PT>
 
 <uk>
-• Оновлено бібліотеки, на яких побудовано застосунок; тепер він займає приблизно на мегабайт менше.
+• Оновлено бібліотеки, на яких побудовано застосунок.
 </uk>
 
 <ru-RU>
-• Обновлены библиотеки, на которых построено приложение; теперь оно занимает примерно на мегабайт меньше.
+• Обновлены библиотеки, на которых построено приложение.
 </ru-RU>
 
 <zh-CN>
-• 更新了应用所依赖的库，安装体积也减少了约 1 MB。
+• 更新了应用所依赖的库。
 </zh-CN>
 
 <ja-JP>
-• アプリが使っているライブラリを更新しました。サイズも約1MB小さくなっています。
+• アプリが使っているライブラリを更新しました。
 </ja-JP>

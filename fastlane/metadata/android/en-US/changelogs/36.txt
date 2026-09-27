@@ -1,1 +1,1 @@
-• Updated the libraries the app is built on; it also takes about a megabyte less space.
+• Updated the libraries the app is built on.

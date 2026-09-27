@@ -1,1 +1,1 @@
-• Atualizadas as bibliotecas em que a app assenta; passa também a ocupar cerca de um megabyte a menos.
+• Atualizadas as bibliotecas em que a app assenta.
