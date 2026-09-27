@@ -50,6 +50,12 @@ scp "${ssh_opts[@]}" -q "$app" "$test_app" "$remote:$dir/"
 run "$adb install -r -t '$dir/$(basename "$app")'"
 run "$adb install -r -t '$dir/$(basename "$test_app")'"
 
+# Android 13+ asks for POST_NOTIFICATIONS the first time the app runs, and that system dialog
+# sits in front of everything: the activity never reaches the foreground and a Compose test finds
+# no hierarchy at all ("No compose hierarchies found in the app"). Granting it up front is what a
+# test device is for.
+run "$adb shell pm grant '$target' android.permission.POST_NOTIFICATIONS" 2>/dev/null || true
+
 filter=""
 [ $# -gt 0 ] && filter="-e class $1"
 
