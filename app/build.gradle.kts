@@ -146,6 +146,13 @@ ksp {
 // see test.properties.example. Each entry becomes an environment variable (keyCorpus ->
 // SSHBORG_KEY_CORPUS); a test whose settings are missing skips itself. A -P property of the same
 // name wins over the file, which is how a CI run passes them in.
+// The bundle we upload is built only after the unit tests have passed. Deliberately not wired to
+// assembleRelease: that is the command F-Droid builds with, and a test failing on a machine we
+// cannot look at would break a build for reasons that have nothing to do with the code.
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    dependsOn("testDebugUnitTest")
+}
+
 tasks.withType<Test>().configureEach {
     fun variableFor(name: String) =
         "SSHBORG_" + name.replace(Regex("([a-z0-9])([A-Z])"), "$1_$2").uppercase()
