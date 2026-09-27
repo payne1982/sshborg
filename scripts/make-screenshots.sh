@@ -45,6 +45,11 @@ if [ -n "$demo_host" ] && [ -f "$demo_key" ]; then
 else
     echo "terminale: saltato (emuSshHost non impostato)"
 fi
+# The system bars belong to the device, not to the app: without this the app is dark and the
+# status and navigation bars around it are not. Put back afterwards, whatever happens.
+ssh "${ssh_opts[@]}" "$remote" "$adb shell cmd uimode night yes" > /dev/null || true
+trap 'ssh "${ssh_opts[@]}" "$remote" "$adb shell cmd uimode night auto" > /dev/null 2>&1 || true' EXIT
+
 ./scripts/run-instrumented.sh com.sshborg.ui.StoreScreenshots
 
 rm -rf "$here"; mkdir -p "$here"

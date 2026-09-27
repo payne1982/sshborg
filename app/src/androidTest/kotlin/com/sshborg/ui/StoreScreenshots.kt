@@ -1,6 +1,7 @@
 package com.sshborg.ui
 
 import android.graphics.Bitmap
+import androidx.appcompat.app.AppCompatDelegate
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
@@ -69,7 +70,14 @@ class StoreScreenshots {
             alreadyThere.isEmpty(),
         )
         TestApp.asReturningUser()
-        runBlocking { TestApp.app.appPreferences.setAllowScreenshots(true) }
+        runBlocking {
+            TestApp.app.appPreferences.setAllowScreenshots(true)
+            // The listing wants the dark theme, and it is the app's own setting that decides it —
+            // set here rather than left to the device, so the pictures come out the same wherever
+            // they are taken. The device is put into dark mode as well by make-screenshots.sh,
+            // for the system bars, which are not ours to colour.
+            TestApp.app.appPreferences.setNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
         runBlocking {
             val dao = TestApp.app.db
             val servers = dao.groupDao().upsert(GroupEntity(name = "Servers", color = GroupEntity.SWATCHES[0]))
@@ -109,6 +117,7 @@ class StoreScreenshots {
     @After fun putItBack() = runBlocking {
         scenario.close()
         TestApp.app.appPreferences.setAllowScreenshots(false)
+        TestApp.app.appPreferences.setNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         val dao = TestApp.app.db
         keys.forEach { dao.sshKeyDao().delete(it) }
         hosts.forEach { dao.hostDao().delete(it) }
