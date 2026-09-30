@@ -42,6 +42,14 @@ was skipped is said out loud rather than left to be discovered on a store.
 - [ ] Push `V1_DEV`, `V1` and the tag. F-Droid builds from the tag by itself; it uses
       `assembleRelease`, which is why the tests are not wired to that task.
 - [ ] Upload the AAB to Play (test track first) and to Huawei AppGallery.
+- [ ] Play asks, under **App content → Foreground service permissions**, what the service is for.
+      The service is declared `specialUse`, so the answer has to match the manifest's
+      `PROPERTY_SPECIAL_USE_FGS_SUBTYPE` word for word in substance: sessions the user opened stay
+      alive while the app is not in front, the user ends them from the app or from the notification,
+      and no named type describes an interactive remote terminal. A short screen recording of a
+      session continuing after the app is backgrounded is the evidence that answers it fastest.
+      If it is refused, the way back is one line in the manifest plus its permission — and
+      `ForegroundServiceTest` then stops skipping the timeout test.
 - [ ] Rebuild the site **after** the tag exists — `cd site && node build.js` — because the changelog
       pages list a version only once it is tagged. Commit the regenerated pages and deploy.
 - [ ] Expect Play to take days rather than minutes, and longer still when the release touches
@@ -64,3 +72,7 @@ was skipped is said out loud rather than left to be discovered on a store.
   German. `scripts/check-notes.sh` now says so before an upload does.
 - A screenshot taken on the TV emulator would show the hosts somebody left on it, with their real
   addresses. The screenshot run refuses to start if the app on that device already holds any.
+- **Sessions left open overnight were being closed by Android**, not by the app and not by the
+  network: a `dataSync` foreground service gets 6 cumulative hours per 24, and the clock only runs
+  while the app is in the background. The service type is now `specialUse`, which has no limit.
+  Reading the type as "only a label" is the mistake: it is the app's running time.

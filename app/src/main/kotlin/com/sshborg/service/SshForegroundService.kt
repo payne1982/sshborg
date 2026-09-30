@@ -94,12 +94,18 @@ class SshForegroundService : Service() {
     }
 
     /**
-     * Android 15+ caps a `dataSync` foreground service at ~6 cumulative hours per 24h. When the
-     * budget is spent the system calls onTimeout() and gives us a few seconds to stop; if we don't,
-     * it force-kills the process with ForegroundServiceDidNotStopInTimeException. A long-lived SSH
-     * session is exactly the case that reaches the cap, so we stop the foreground state cleanly here
-     * instead of crashing. The 6h ceiling itself is OS policy for this service type and can't be
-     * lifted from the app side. Android 16 (API 36) calls the 2-arg overload; API 35 the 1-arg one.
+     * The system taking the foreground service away before the user is done with it.
+     *
+     * Android 15+ caps a `dataSync` foreground service at 6 cumulative hours per 24, and when the
+     * budget is spent it calls onTimeout() and gives us a few seconds to stop; if we don't, it
+     * force-kills the process with ForegroundServiceDidNotStopInTimeException. A session left open
+     * overnight is exactly the case that reaches the cap, which is why the manifest now declares
+     * `specialUse` instead — no timed type, so on Android 15 and 16 nothing calls this any more.
+     *
+     * It stays, and is tested, because it is the difference between stopping cleanly and crashing:
+     * `specialUse` is subject to a Play review that can refuse it, the manifest then goes back to
+     * `dataSync`, and any later Android may put a limit on more types. Android 16 (API 36) calls the
+     * 2-arg overload; API 35 the 1-arg one. See ForegroundServiceTest.
      */
     override fun onTimeout(startId: Int) = handleForegroundTimeout()
 
@@ -214,11 +220,11 @@ class SshForegroundService : Service() {
     companion object {
         private const val CHANNEL_ID = "ssh_sessions"
         internal const val CHANNEL_ID_TRANSFERS = "transfers"
-        private const val NOTIFICATION_ID = 1
+        internal const val NOTIFICATION_ID = 1
         private const val NOTIFICATION_ID_DOWNLOAD = 2
         private const val NOTIFICATION_ID_UPLOAD = 3
         private const val NOTIFICATION_ID_DOWNLOAD_ERROR = 4
-        private const val NOTIFICATION_ID_TIMEOUT = 5
+        internal const val NOTIFICATION_ID_TIMEOUT = 5
         private const val ACTION_DISCONNECT_ALL = "com.sshborg.DISCONNECT_ALL"
 
         fun start(context: Context) {
