@@ -88,6 +88,10 @@ class StoreScreenshots {
             // The extra-key bar is one of the things the listing is for, and by default it comes
             // and goes with the keyboard. Pinned, it is in the picture for certain.
             TestApp.app.appPreferences.setExtraKeysBarPinned(true)
+            // The title bar auto-hides by default, which would put it half way through its
+            // slide in some pictures and gone from others. Fixed here: a photograph has to come
+            // out the same every time, and the bar is where the host's name is.
+            TestApp.app.appPreferences.setTerminalBarAutoHide(false)
         }
         runBlocking {
             val dao = TestApp.app.db

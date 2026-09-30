@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Invia Tab due volte</string>
     <string name="settings_keep_screen_on_title">Mantieni lo schermo acceso</string>
     <string name="settings_keep_screen_on_subtitle">Impedisce lo spegnimento dello schermo mentre un terminale è aperto</string>
+    <string name="settings_terminal_bar_autohide_title">Barra del titolo a scomparsa</string>
+    <string name="settings_terminal_bar_autohide_subtitle">Nel terminale la barra si ritrae e torna quando tocchi lo schermo. Disattiva per tenerla sempre visibile.</string>
+    <string name="settings_terminal_hide_status_bar_title">Nascondi la barra di stato</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">Nel terminale nascondi anche l\'orologio e le notifiche di Android. Trascina dal bordo superiore per rivederla.</string>
     <string name="settings_terminal_colors_title">Colori del terminale</string>
     <string name="settings_terminal_colors_follow_app">Come il tema dell\'app</string>
     <string name="settings_font_size_title">Dimensione carattere</string>

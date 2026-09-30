@@ -64,6 +64,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val keepScreenOn: StateFlow<Boolean> =
         prefs.keepScreenOn.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val terminalBarAutoHide: StateFlow<Boolean> =
+        prefs.terminalBarAutoHide.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val terminalHideStatusBar: StateFlow<Boolean> =
+        prefs.terminalHideStatusBar.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val terminalColorScheme: StateFlow<Int> =
         prefs.terminalColorScheme.stateIn(
             viewModelScope, SharingStarted.WhileSubscribed(5000),
@@ -177,6 +183,14 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setKeepScreenOn(enabled: Boolean) {
         viewModelScope.launch { prefs.setKeepScreenOn(enabled) }
+    }
+
+    fun setTerminalBarAutoHide(enabled: Boolean) {
+        viewModelScope.launch { prefs.setTerminalBarAutoHide(enabled) }
+    }
+
+    fun setTerminalHideStatusBar(enabled: Boolean) {
+        viewModelScope.launch { prefs.setTerminalHideStatusBar(enabled) }
     }
 
     fun setDoubleTapAction(action: Int) {

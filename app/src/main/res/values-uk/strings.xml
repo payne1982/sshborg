@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Надіслати Tab двічі</string>
     <string name="settings_keep_screen_on_title">Не вимикати екран</string>
     <string name="settings_keep_screen_on_subtitle">Запобігає вимкненню екрана, поки відкрито термінал</string>
+    <string name="settings_terminal_bar_autohide_title">Автоматично ховати смужку заголовка</string>
+    <string name="settings_terminal_bar_autohide_subtitle">У терміналі смужка ховається й повертається, коли торкнутися екрана. Виключено — вона завжди видима.</string>
+    <string name="settings_terminal_hide_status_bar_title">Ховати смужку стану</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">У терміналі ховати також годинник і сповіщення Android. Щоб побачити її, потягніть від верхнього краю.</string>
     <string name="settings_terminal_colors_title">Кольори термінала</string>
     <string name="settings_terminal_colors_follow_app">Як тема застосунку</string>
     <string name="settings_font_size_title">Розмір шрифту</string>

@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Tab zweimal senden</string>
     <string name="settings_keep_screen_on_title">Bildschirm eingeschaltet lassen</string>
     <string name="settings_keep_screen_on_subtitle">Verhindert das Ausschalten des Bildschirms, solange ein Terminal geöffnet ist</string>
+    <string name="settings_terminal_bar_autohide_title">Titelleiste automatisch ausblenden</string>
+    <string name="settings_terminal_bar_autohide_subtitle">Im Terminal fährt die Leiste ein und kommt zurück, wenn du den Bildschirm antippst. Aus: sie bleibt immer sichtbar.</string>
+    <string name="settings_terminal_hide_status_bar_title">Statusleiste ausblenden</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">Im Terminal auch Androids Uhr- und Benachrichtigungsleiste ausblenden. Zum Anzeigen vom oberen Rand nach unten wischen.</string>
     <string name="settings_terminal_colors_title">Terminalfarben</string>
     <string name="settings_terminal_colors_follow_app">Wie das App-Design</string>
     <string name="settings_font_size_title">Schriftgröße</string>

@@ -183,6 +183,10 @@
     <string name="settings_double_tap_tab_twice">Отправить Tab дважды</string>
     <string name="settings_keep_screen_on_title">Не выключать экран</string>
     <string name="settings_keep_screen_on_subtitle">Не давать экрану гаснуть, пока открыт терминал</string>
+    <string name="settings_terminal_bar_autohide_title">Автоматически скрывать строку заголовка</string>
+    <string name="settings_terminal_bar_autohide_subtitle">В терминале строка убирается и возвращается при касании экрана. Выключено — остаётся всегда видимой.</string>
+    <string name="settings_terminal_hide_status_bar_title">Скрывать строку состояния</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">В терминале скрывать также часы и уведомления Android. Потяните от верхнего края, чтобы её увидеть.</string>
     <string name="settings_terminal_colors_title">Цвета терминала</string>
     <string name="settings_terminal_colors_follow_app">Как в теме приложения</string>
     <string name="settings_font_size_title">Размер шрифта</string>

@@ -182,6 +182,10 @@
     <string name="settings_double_tap_tab_twice">Tab を 2 回送信</string>
     <string name="settings_keep_screen_on_title">画面をオンのまま維持</string>
     <string name="settings_keep_screen_on_subtitle">ターミナルを開いている間、画面が消灯しないようにします</string>
+    <string name="settings_terminal_bar_autohide_title">タイトルバーを自动で隠す</string>
+    <string name="settings_terminal_bar_autohide_subtitle">ターミナルでバーが引っ込み、画面をタップすると戻ります。オフにすると常に表示されます。</string>
+    <string name="settings_terminal_hide_status_bar_title">ステータスバーを隠す</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">ターミナルで Android の時計と通知のバーも隠します。上端から下にスワイプすると再表示できます。</string>
     <string name="settings_terminal_colors_title">ターミナルの配色</string>
     <string name="settings_terminal_colors_follow_app">アプリのテーマに合わせる</string>
     <string name="settings_font_size_title">文字サイズ</string>
