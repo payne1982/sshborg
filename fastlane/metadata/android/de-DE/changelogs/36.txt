@@ -1,1 +1,2 @@
+• Im Hintergrund offen gelassene Sitzungen werden vom System nicht mehr nach einigen Stunden beendet.
 • Die Bibliotheken, auf denen die App aufbaut, wurden aktualisiert.

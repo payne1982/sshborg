@@ -1,1 +1,2 @@
+• Le sessioni lasciate aperte in background non vengono più fermate dal sistema dopo alcune ore.
 • Aggiornate le librerie su cui è costruita l'app.

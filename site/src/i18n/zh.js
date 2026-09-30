@@ -404,7 +404,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Wi-Fi ↔ 移动数据切换</strong> — 在 Wi-Fi 和移动数据之间切换会改变 IP 并中断所有开放的 TCP 连接。</li>
                 <li><strong>空闲超时</strong> — 运营商和 NAT 路由器通常在几分钟后断开空闲连接。长时间运行但静默的会话（查看日志、等待输入）容易受此影响。</li>
                 <li><strong>信号丢失</strong> — 隧道、地下车库或信号弱区域都可能短暂断网，足以终止会话。</li>
-                <li><strong>Android 后台限制</strong> — 为了省电，Android 会限制应用在后台持续运行的时长。在后台累计约六小时后，系统会停止 SSHBorg 的会话；你会收到通知，重新打开应用即可重新连接。将应用切回前台会重置此限制。</li>
+                <li><strong>Android 后台限制</strong> — 只要有会话打开，SSHBorg 就会保持一个带通知的前台服务，因此 Android 不再在固定时间后停止会话：保持打开的会话会在你使用其他应用时继续工作。仍可能终止它的是手机回收内存，或某些厂商对后台应用施加的省电策略 — 如果会话自行停止，首先可以把 SSHBorg 排除在电池优化之外。重新打开应用即可重新连接。</li>
                 <li><strong>iOS 会在后台挂起应用</strong> — SSHBorg 离开屏幕约三十秒后，iOS 会将其挂起，连接随之断开。回到应用时，SSHBorg 会自动重新连接（仅在未保存密码时才会询问密码），并在输出中标记该位置：这是一个新的 shell，旧 shell 中运行的内容已经丢失。在 iOS 上，终端复用器是在使用其他应用时让工作继续运行的唯一方法。</li>
             </ul>
             <div class="callout callout-warn">

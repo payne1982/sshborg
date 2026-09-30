@@ -1,1 +1,2 @@
+• Las sesiones que quedan abiertas en segundo plano ya no las detiene el sistema al cabo de unas horas.
 • Actualizadas las bibliotecas sobre las que se construye la app.

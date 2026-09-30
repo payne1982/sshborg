@@ -1,1 +1,2 @@
+• As sessões deixadas abertas em segundo plano já não são interrompidas pelo sistema depois de algumas horas.
 • Atualizadas as bibliotecas em que a app assenta.

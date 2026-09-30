@@ -1,1 +1,2 @@
+• Sessions left open in the background are no longer stopped by the system after a few hours.
 • Updated the libraries the app is built on.

@@ -1,1 +1,2 @@
+• Les sessions laissées ouvertes en arrière-plan ne sont plus arrêtées par le système au bout de quelques heures.
 • Mise à jour des bibliothèques sur lesquelles l'app est construite.

@@ -1,39 +1,49 @@
 <en-US>
+• Sessions left open in the background are no longer stopped by the system after a few hours.
 • Updated the libraries the app is built on.
 </en-US>
 
 <it-IT>
+• Le sessioni lasciate aperte in background non vengono più fermate dal sistema dopo alcune ore.
 • Aggiornate le librerie su cui è costruita l'app.
 </it-IT>
 
 <de-DE>
+• Im Hintergrund offen gelassene Sitzungen werden vom System nicht mehr nach einigen Stunden beendet.
 • Die Bibliotheken, auf denen die App aufbaut, wurden aktualisiert.
 </de-DE>
 
 <es-ES>
+• Las sesiones que quedan abiertas en segundo plano ya no las detiene el sistema al cabo de unas horas.
 • Actualizadas las bibliotecas sobre las que se construye la app.
 </es-ES>
 
 <fr-FR>
+• Les sessions laissées ouvertes en arrière-plan ne sont plus arrêtées par le système au bout de quelques heures.
 • Mise à jour des bibliothèques sur lesquelles l'app est construite.
 </fr-FR>
 
 <pt-PT>
+• As sessões deixadas abertas em segundo plano já não são interrompidas pelo sistema depois de algumas horas.
 • Atualizadas as bibliotecas em que a app assenta.
 </pt-PT>
 
 <uk>
+• Сеанси, залишені відкритими у фоновому режимі, більше не зупиняє система через кілька годин.
 • Оновлено бібліотеки, на яких побудовано застосунок.
 </uk>
 
 <ru-RU>
+• Сессии, оставленные открытыми в фоне, больше не прерываются системой через несколько часов.
 • Обновлены библиотеки, на которых построено приложение.
 </ru-RU>
 
 <zh-CN>
+• 在后台保持打开的会话，不再会在几小时后被系统终止。
 • 更新了应用所依赖的库。
 </zh-CN>
 
 <ja-JP>
+• バックグラウンドで開いたままのセッションが、数時間後にシステムに終了されることはなくなりました。
 • アプリが使っているライブラリを更新しました。
 </ja-JP>
