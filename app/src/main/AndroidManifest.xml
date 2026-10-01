@@ -32,9 +32,19 @@
                 android:value="true" />
         </service>
 
+        <!-- configChanges: a rotation or a switch to the system's dark theme must not destroy and
+             rebuild this activity. It used to, and with the app lock set to "Immediately" every
+             recreation looked like the user leaving the app (onStop stamps the clock, onStart finds
+             more than nothing gone), so the lock came up on a rotation. On a phone whose biometric
+             prompt is portrait-only that became a loop: the prompt turned the screen, the turn
+             recreated the activity, the activity asked for the prompt again. Claiming these says we
+             handle them, and Compose does — it reads the configuration itself, and the app has no
+             night-qualified resources to go stale. Not claimed, so still recreating as before:
+             locale, density and fontScale. See LockGateTest. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
             android:importantForAutofill="noExcludeDescendants"
             android:banner="@mipmap/tv_banner"
             android:windowSoftInputMode="adjustResize">
