@@ -1,2 +1,4 @@
 • Sessions left open in the background are no longer stopped by the system after a few hours.
+• More room in the terminal: the title bar hides itself and comes back when you tap the screen, and the system status bar can be hidden too (both in Settings).
+• Turning the phone no longer asks for the app lock again.
 • Updated the libraries the app is built on.

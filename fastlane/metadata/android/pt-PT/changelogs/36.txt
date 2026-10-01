@@ -1,2 +1,4 @@
 • As sessões deixadas abertas em segundo plano já não são interrompidas pelo sistema depois de algumas horas.
+• Mais espaço no terminal: a barra de título esconde-se sozinha e volta quando toca no ecrã, e também pode ocultar a barra de estado do sistema (ambas nas definições).
+• Rodar o telefone já não volta a pedir o bloqueio da app.
 • Atualizadas as bibliotecas em que a app assenta.
