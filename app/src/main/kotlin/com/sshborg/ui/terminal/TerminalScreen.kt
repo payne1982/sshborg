@@ -3,6 +3,8 @@ package com.sshborg.ui.terminal
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.appcompat.app.AppCompatDelegate
@@ -58,6 +60,14 @@ import kotlinx.coroutines.delay
 
 /** How long the auto-hiding title bar stays down after the tap that called it. */
 private const val TITLE_BAR_LINGER_MS = 3_000L
+
+/**
+ * How long it takes to slide back up. Deliberately slower than the default spring and slower than
+ * its own arrival: coming down it is answering a tap, so it should be quick, but going away it is
+ * acting on its own, and something that leaves the screen abruptly reads as a glitch. The slow
+ * retreat also keeps it reachable a moment longer — a tap during it reverses the animation.
+ */
+private const val TITLE_BAR_RETRACT_MS = 700
 
 @Suppress("UNUSED_VARIABLE")
 
@@ -377,7 +387,9 @@ fun TerminalScreen(
                 AnimatedVisibility(
                     visible = barShown && !inSelectionMode,
                     enter = slideInVertically { -it },
-                    exit = slideOutVertically { -it },
+                    exit = slideOutVertically(
+                        animationSpec = tween(TITLE_BAR_RETRACT_MS, easing = FastOutSlowInEasing),
+                    ) { -it },
                     modifier = Modifier.align(Alignment.TopCenter),
                 ) {
                     Box(
