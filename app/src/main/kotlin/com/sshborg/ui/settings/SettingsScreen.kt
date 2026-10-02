@@ -74,6 +74,8 @@ fun SettingsScreen(
     val invertTerminalScroll  by vm.invertTerminalScroll.collectAsState()
     val sftpSortDirsFirst     by vm.sftpSortDirsFirst.collectAsState()
     val keepScreenOn          by vm.keepScreenOn.collectAsState()
+    val terminalBarAutoHide   by vm.terminalBarAutoHide.collectAsState()
+    val terminalHideStatusBar by vm.terminalHideStatusBar.collectAsState()
     val terminalColorScheme   by vm.terminalColorScheme.collectAsState()
     val doubleTapAction       by vm.doubleTapAction.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
@@ -310,6 +312,32 @@ fun SettingsScreen(
                     Switch(
                         checked = keepScreenOn,
                         onCheckedChange = { vm.setKeepScreenOn(it) },
+                    )
+                },
+            )
+
+            // A device with no touchscreen has no tap to bring the bar back, so there the bar is
+            // always fixed and the switch would promise something it cannot do.
+            if (!touchless) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_terminal_bar_autohide_title)) },
+                    supportingContent = { Text(stringResource(R.string.settings_terminal_bar_autohide_subtitle)) },
+                    trailingContent = {
+                        Switch(
+                            checked = terminalBarAutoHide,
+                            onCheckedChange = { vm.setTerminalBarAutoHide(it) },
+                        )
+                    },
+                )
+            }
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_terminal_hide_status_bar_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_terminal_hide_status_bar_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = terminalHideStatusBar,
+                        onCheckedChange = { vm.setTerminalHideStatusBar(it) },
                     )
                 },
             )

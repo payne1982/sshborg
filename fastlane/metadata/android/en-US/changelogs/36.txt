@@ -1,0 +1,5 @@
+• Sessions left open in the background are no longer stopped by the system after a few hours.
+• More room in the terminal: the title bar hides itself and comes back at a tap, and the status bar can be hidden too.
+• SFTP: a tap on a file opens its actions, now including cut and paste to move it on the server; the arrow on the right downloads it.
+• Turning the phone no longer asks for the app lock again.
+• Updated the libraries the app is built on.

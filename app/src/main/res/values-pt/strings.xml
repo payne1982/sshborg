@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Enviar Tab duas vezes</string>
     <string name="settings_keep_screen_on_title">Manter o ecrã ligado</string>
     <string name="settings_keep_screen_on_subtitle">Impede que o ecrã se desligue enquanto um terminal está aberto</string>
+    <string name="settings_terminal_bar_autohide_title">Ocultar a barra de título automaticamente</string>
+    <string name="settings_terminal_bar_autohide_subtitle">No terminal, a barra recolhe e volta quando toca no ecrã. Desligado, fica sempre visível.</string>
+    <string name="settings_terminal_hide_status_bar_title">Ocultar a barra de estado</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">No terminal, ocultar também o relógio e as notificações do Android. Arraste a partir da margem superior para a ver.</string>
     <string name="settings_terminal_colors_title">Cores do terminal</string>
     <string name="settings_terminal_colors_follow_app">Conforme o tema do app</string>
     <string name="settings_font_size_title">Tamanho da letra</string>
@@ -261,7 +265,7 @@
     <string name="sftp_rename_new_name">Novo nome</string>
 
     <string name="sftp_conflict_title">O ficheiro já existe</string>
-    <string name="sftp_conflict_message">\"%1$s\" já existe em Transferências/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" já existe em %2$s.</string>
 
     <string name="sftp_mkdir_title">Nova pasta</string>
     <string name="sftp_mkdir_folder_name">Nome da pasta</string>
@@ -270,6 +274,18 @@
     <string name="sftp_menu_edit">Abrir no editor</string>
     <string name="sftp_menu_hex">Abrir em hexadecimal</string>
     <string name="sftp_menu_rename">Renomear</string>
+    <string name="sftp_menu_cut">Cortar</string>
+    <string name="sftp_cut_cd">Cortar</string>
+    <string name="sftp_paste">Colar</string>
+    <string name="sftp_cut_cancel_cd">Cancelar a movimentação</string>
+    <string name="sftp_move_folder_exists">Já existe aqui uma pasta chamada \"%1$s\", e duas pastas não podem ser fundidas.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d de %2$d nomes já estão ocupados aqui, e um é uma pasta: duas pastas não podem ser fundidas.</string>
+    <string name="sftp_move_into_itself">Uma pasta não pode ser movida para dentro de si mesma.</string>
+    <string name="error_move_failed">Não foi possível mover</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d item para mover de %2$s</item>
+        <item quantity="other">%1$d itens para mover de %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Transferir em segundo plano</string>
     <string name="sftp_background_downloads_title">Transferências em segundo plano</string>
     <string name="sftp_background_download_failed">Transferência falhada</string>

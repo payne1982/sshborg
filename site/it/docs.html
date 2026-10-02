@@ -613,25 +613,28 @@
             <h2>// FILE MANAGER SFTP</h2>
             <p>Il file manager SFTP ti permette di navigare, caricare, scaricare, rinominare ed eliminare file sul server direttamente dal telefono. Aprilo dalla schermata degli host con <strong>File</strong> nel menu dell'host.</p>
             <h3>Navigazione</h3>
-            <p>Tocca una cartella per aprirla. Usa la freccia indietro o tocca qualsiasi segmento della barra del percorso per risalire nell'albero delle directory.</p>
+            <p>Tocca una cartella per aprirla. Usa la freccia indietro o tocca qualsiasi segmento della barra del percorso per risalire nell'albero delle directory. Toccando un file si apre quello che puoi farci: scaricare, aprire nell'editor, rinominare, eliminare.</p>
             <p>I link simbolici sono mostrati con un piccolo badge a forma di catena. Toccare un link simbolico naviga verso la sua destinazione: se punta a una cartella la si entra, se punta a un file si comporta come un file normale.</p>
             <h3>Caricamento file</h3>
             <p>Tocca il pulsante di <strong>caricamento</strong> (↑) per scegliere uno o più file dallo storage del telefono. Il caricamento inizia immediatamente e il progresso viene mostrato in cima alla schermata.</p>
             <h3>Download di file e cartelle</h3>
-            <p>Tocca un file qualsiasi per scaricarlo immediatamente. Per scaricare un'intera cartella, tocca l'icona di <strong>download</strong> accanto ad essa — SSHBorg scaricherà l'intero albero di directory e lo salverà nella cartella <strong>Download</strong> del telefono.</p>
+            <p>Tocca l'icona di <strong>download</strong> a destra nella riga di un file per scaricarlo subito. Per scaricare un'intera cartella, tocca l'icona di <strong>download</strong> accanto ad essa — SSHBorg scaricherà l'intero albero di directory e lo salverà nella cartella <strong>Download</strong> del telefono.</p>
             <p>Se un file esiste già nella destinazione, un dialogo chiederà se <strong>sovrascrivere</strong>, <strong>saltare</strong> il file, oppure <strong>annullare</strong> l'intero trasferimento.</p>
             <div class="callout callout-info">
                 <div class="callout-label">// NOTA SUI LINK SIMBOLICI</div>
                 Durante il download di una cartella, i link simbolici che puntano a directory vengono saltati — vengono scaricati solo i file normali (inclusi i link simbolici che puntano a file). Questo evita download ricorsivi involontari.
             </div>
             <h3>Selezione multipla e operazioni batch</h3>
-            <p>Tieni premuto un elemento per entrare in modalità selezione, poi tocca altri elementi per aggiungere alla selezione. La barra degli strumenti mostra le azioni disponibili:</p>
+            <p>Tocca <strong>Seleziona elementi</strong> nella barra in alto per entrare in modalità selezione, poi spunta gli elementi che ti servono. La barra degli strumenti mostra le azioni disponibili:</p>
             <ul>
                 <li><strong>Scarica</strong> — scarica tutti i file e le cartelle selezionati in una volta, con un dialogo di avanzamento e supporto all'annullamento.</li>
                 <li><strong>Elimina</strong> — elimina tutti gli elementi selezionati. L'eliminazione di una cartella non vuota rimuove tutto il suo contenuto ricorsivamente. <em>Non è possibile annullare l'operazione.</em></li>
             </ul>
+            <h3>Spostare i file sul server</h3>
+            <p>Scegli <strong>Taglia</strong> nel menu di un file o di una cartella — o di più elementi insieme con <strong>Seleziona elementi</strong> — poi apri la cartella di destinazione e tocca <strong>Incolla</strong> nella barra comparsa sopra l'elenco. Lo spostamento lo fa il server: non viene scaricato né caricato niente, quindi un file di qualsiasi dimensione si sposta istantaneamente.</p>
+            <p>Se nella destinazione quel nome è già occupato, SSHBorg chiede prima di toccare qualcosa. Un file può essere sostituito o tenuto accanto a quello esistente; due cartelle con lo stesso nome possono solo stare affiancate, perché nessun server SFTP sa unire due cartelle — e <code>mv</code> si rifiuta anche lui. È rifiutato anche lo spostamento fra due dischi diversi del server: uno spostamento è una rinomina, e una rinomina non attraversa i filesystem. Per quello serve una copia, che SSHBorg per ora non fa.</p>
             <h3>Modificare i file</h3>
-            <p>Apri il menu di un file — pressione prolungata, oppure il pulsante <strong>⋮</strong> — e scegli <strong>Apri nell'editor</strong> per modificarlo direttamente sul server. Sul telefono non resta niente: il file viene letto in memoria, modificato e riscritto sul server.</p>
+            <p>Tocca un file per aprire il suo menu e scegli <strong>Apri nell'editor</strong> per modificarlo direttamente sul server. Sul telefono non resta niente: il file viene letto in memoria, modificato e riscritto sul server.</p>
             <p>Il file torna com'era arrivato. La codifica dei caratteri viene riconosciuta e riusata al salvataggio, la fine riga LF o CRLF viene mantenuta, un file che finiva senza a capo continua a finire senza, e i permessi restano quelli. Se la codifica è stata letta male, toccala nella barra in fondo all'editor e scegline un'altra — l'elenco propone solo codifiche in grado di riprodurre esattamente i byte di quel file, quindi una scelta sbagliata può sembrare sbagliata a schermo ma non può rovinare il file.</p>
             <p>Il salvataggio scrive su un file temporaneo affianco all'originale e poi lo rinomina al suo posto, così una connessione caduta a metà non può lasciare un file scritto a metà sul server.</p>
             <p>I file si aprono fino a 4 MB, qualunque sia la loro lunghezza: vengono disegnate solo le righe a schermo, quindi un file di megabyte scorre come uno corto. Oltre quella soglia la risposta è il terminale, con <code>nano</code> o <code>vi</code>, che non ha nessun limite.</p>
@@ -860,7 +863,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Cambio Wi-Fi ↔ dati mobili</strong> — passare da una rete Wi-Fi ai dati mobili (o viceversa) cambia il tuo IP e interrompe qualsiasi connessione TCP aperta.</li>
                 <li><strong>Timeout di inattività</strong> — operatori e router NAT spesso chiudono le connessioni inattive dopo pochi minuti. Le sessioni attive ma silenziose (guardare log, aspettare input) sono vulnerabili a questo.</li>
                 <li><strong>Perdita di segnale</strong> — tunnel, parcheggi sotterranei o semplicemente un segnale debole possono interrompere brevemente la rete, il che è sufficiente per uccidere una sessione.</li>
-                <li><strong>Limiti di Android in background</strong> — per risparmiare batteria, Android limita quanto a lungo un'app può restare attiva in background. Dopo circa sei ore cumulative in background, il sistema interrompe le sessioni di SSHBorg; ricevi una notifica e puoi riconnetterti riaprendo l'app. Riportare l'app in primo piano azzera questo limite.</li>
+                <li><strong>Limiti di Android in background</strong> — mentre una sessione è aperta SSHBorg tiene attivo un servizio in primo piano, con la sua notifica, così Android non interrompe più le sessioni a tempo: una sessione lasciata aperta continua a lavorare mentre usi altre app. Possono ancora fermarla il telefono che recupera memoria o il risparmio energetico che alcuni produttori applicano alle app in background — se le sessioni si fermano da sole, la prima cosa da provare è escludere SSHBorg dall'ottimizzazione della batteria. Riaprendo l'app puoi riconnetterti.</li>
                 <li><strong>iOS sospende le app in background</strong> — circa trenta secondi dopo che SSHBorg lascia lo schermo, iOS lo sospende e le sue connessioni cadono. Quando torni, SSHBorg si riconnette da solo (chiedendo la password solo se non è salvata) e segna il punto nell'output: è una nuova shell, e ciò che girava in quella vecchia è perso. Su iOS un multiplexer è l'unico modo per lasciare un lavoro in esecuzione mentre usi un'altra app.</li>
             </ul>
             <div class="callout callout-warn">

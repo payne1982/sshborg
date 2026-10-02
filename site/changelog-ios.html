@@ -564,6 +564,21 @@
     </div>
 
         <article class="release">
+            <h2>1.1.0<span class="release-date">2026-09-27</span></h2>
+            <ul>
+                <li>SFTP: a built-in editor for the files on your server — text files are edited in place and keep their encoding and line endings, configuration files are syntax coloured, and anything that is not text opens in a hex editor</li>
+                <li>SSH keys: a key with a passphrase now works — the passphrase is asked once when you import the key and is not stored anywhere. Keys imported earlier must be imported again; the list marks them.</li>
+                <li>Fixed scrolling inside tmux and other full-screen apps with the mouse on: a swipe now scrolls their history instead of selecting text</li>
+                <li>Fixed text selection: a long press now selects straight away, the selection no longer disappears when new output arrives, and its handles can be dragged</li>
+                <li>SFTP: errors stay on screen and say which file failed; an operation over several files keeps going and lists the ones it could not do</li>
+                <li>Terminal: command history is read without a second login</li>
+                <li>App lock: the timeout counts from leaving the app, not from the last unlock</li>
+                <li>Extra key bar: on the two-row layout the arrows line up again — the keyboard key no longer shifts the top row</li>
+                <li>Terminal: copying works again on the newest iOS — a long press, or a double tap on a word, now offers Copy; before, no menu appeared at all</li>
+                <li>Terminal: no more blue flash over the whole screen while typing quickly with word suggestions on</li>
+            </ul>
+        </article>
+        <article class="release">
             <h2>1.0.0<span class="release-date">2026-09-14</span></h2>
             <ul>
                 <li>First release on the App Store</li>

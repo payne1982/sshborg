@@ -171,25 +171,28 @@ module.exports = {
             <h2>// GESTOR DE ARCHIVOS SFTP</h2>
             <p>El gestor de archivos SFTP te permite explorar, subir, descargar, renombrar y eliminar archivos en tu servidor directamente desde el teléfono. Ábrelo desde la pantalla de hosts con <strong>Archivos</strong> en el menú de un host.</p>
             <h3>Navegación</h3>
-            <p>Toca una carpeta para abrirla. Usa la flecha de retroceso o toca cualquier segmento de la barra de ruta para subir en el árbol de directorios.</p>
+            <p>Toca una carpeta para abrirla. Usa la flecha de retroceso o toca cualquier segmento de la barra de ruta para subir en el árbol de directorios. Al tocar un archivo se abre lo que puedes hacer con él: descargar, abrir en el editor, renombrar, eliminar.</p>
             <p>Los enlaces simbólicos se muestran con un pequeño distintivo de cadena. Al tocar un enlace simbólico se navega a su destino: si apunta a un directorio se entra en él; si apunta a un archivo se comporta como un archivo normal.</p>
             <h3>Subir archivos</h3>
             <p>Toca el botón de <strong>subida</strong> (↑) para seleccionar uno o varios archivos del almacenamiento del teléfono. La subida comienza de inmediato y el progreso se muestra en la parte superior de la pantalla.</p>
             <h3>Descargar archivos y carpetas</h3>
-            <p>Toca cualquier archivo para descargarlo inmediatamente. Para descargar una carpeta completa, toca el icono de <strong>descarga</strong> que aparece junto a ella — SSHBorg descargará todo el árbol de directorios y lo guardará en la carpeta <strong>Descargas</strong> del teléfono.</p>
+            <p>Toca el icono de <strong>descarga</strong> a la derecha de la fila de un archivo para descargarlo de inmediato. Para descargar una carpeta completa, toca el icono de <strong>descarga</strong> que aparece junto a ella — SSHBorg descargará todo el árbol de directorios y lo guardará en la carpeta <strong>Descargas</strong> del teléfono.</p>
             <p>Si un archivo ya existe en el destino, un diálogo te preguntará si deseas <strong>sobrescribir</strong>, <strong>omitir</strong> el archivo o <strong>cancelar</strong> toda la transferencia.</p>
             <div class="callout callout-info">
                 <div class="callout-label">// NOTA SOBRE ENLACES SIMBÓLICOS</div>
                 Durante la descarga de una carpeta, los enlaces simbólicos que apuntan a directorios se omiten — solo se descargan los archivos normales (incluidos los enlaces a archivos). Esto evita descargas recursivas no deseadas.
             </div>
             <h3>Selección múltiple y operaciones por lotes</h3>
-            <p>Mantén pulsado cualquier elemento para entrar en el modo de selección y toca otros elementos para ampliar la selección. La barra de herramientas muestra las acciones disponibles:</p>
+            <p>Toca <strong>Seleccionar elementos</strong> en la barra superior para entrar en el modo de selección y marca los elementos que quieras. La barra de herramientas muestra las acciones disponibles:</p>
             <ul>
                 <li><strong>Descargar</strong> — descarga todos los archivos y carpetas seleccionados de una vez, con un diálogo de progreso y opción de cancelación.</li>
                 <li><strong>Eliminar</strong> — elimina todos los elementos seleccionados. Eliminar una carpeta no vacía borra todo su contenido de forma recursiva. <em>Esta acción no se puede deshacer.</em></li>
             </ul>
+            <h3>Mover archivos en el servidor</h3>
+            <p>Elige <strong>Cortar</strong> en el menú de un archivo o de una carpeta — o varios a la vez con <strong>Seleccionar elementos</strong> — luego abre la carpeta de destino y toca <strong>Pegar</strong> en la barra que aparece sobre la lista. El movimiento lo hace el servidor: no se descarga ni se sube nada, así que un archivo de cualquier tamaño se mueve al instante.</p>
+            <p>Si en el destino ese nombre ya está ocupado, SSHBorg pregunta antes de tocar nada. Un archivo puede sustituirse o conservarse junto al existente; dos carpetas con el mismo nombre solo pueden quedar una al lado de la otra, porque ningún servidor SFTP sabe fusionar carpetas — <code>mv</code> también se niega. Mover entre dos discos distintos del servidor también se rechaza: mover es renombrar, y renombrar no cruza sistemas de archivos. Para eso hace falta una copia, que SSHBorg todavía no hace.</p>
             <h3>Editar archivos</h3>
-            <p>Abre el menú de un archivo — pulsación larga o el botón <strong>⋮</strong> — y elige <strong>Abrir en el editor</strong> para modificarlo directamente en el servidor. En el teléfono no queda nada: el archivo se lee en memoria, se edita y se escribe de vuelta.</p>
+            <p>Toca un archivo para abrir su menú y elige <strong>Abrir en el editor</strong> para modificarlo directamente en el servidor. En el teléfono no queda nada: el archivo se lee en memoria, se edita y se escribe de vuelta.</p>
             <p>El archivo vuelve tal como llegó. Su codificación se detecta y se usa de nuevo al guardar, los finales de línea LF o CRLF se conservan, un archivo que terminaba sin salto de línea sigue igual, y los permisos no cambian. Si la codificación se leyó mal, tócala en la barra inferior del editor y elige otra — la lista solo ofrece codificaciones capaces de reproducir exactamente los bytes de ese archivo, así que una elección equivocada puede verse mal pero no puede dañarlo.</p>
             <p>Al guardar se escribe un archivo temporal junto al original y luego se renombra en su lugar, de modo que una conexión cortada a medias no puede dejar un archivo escrito a medias en el servidor.</p>
             <p>Los archivos se abren hasta 4 MB, sea cual sea su longitud: solo se dibujan las líneas en pantalla, así que un archivo de megabytes se desplaza como uno corto. Por encima de eso la respuesta es el terminal, con <code>nano</code> o <code>vi</code>, que no tiene límite alguno.</p>
@@ -402,7 +405,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Cambio Wi-Fi ↔ datos móviles</strong> — cambiar entre una red Wi-Fi y datos móviles (o viceversa) cambia tu IP y rompe cualquier conexión TCP abierta.</li>
                 <li><strong>Tiempos de espera por inactividad</strong> — los operadores y routers NAT suelen cerrar las conexiones inactivas tras unos minutos. Las sesiones activas pero silenciosas (observar logs, esperar entrada) son vulnerables.</li>
                 <li><strong>Pérdida de señal</strong> — túneles, aparcamientos subterráneos o simplemente una señal débil pueden interrumpir brevemente la red, lo que es suficiente para matar una sesión.</li>
-                <li><strong>Límites de Android en segundo plano</strong> — para ahorrar batería, Android limita cuánto tiempo puede seguir trabajando una app en segundo plano. Tras unas seis horas acumuladas en segundo plano, el sistema detiene las sesiones de SSHBorg; recibes una notificación y puedes reconectarte volviendo a abrir la app. Llevar la app a primer plano restablece este límite.</li>
+                <li><strong>Límites de Android en segundo plano</strong> — mientras hay una sesión abierta, SSHBorg mantiene un servicio en primer plano, con su propia notificación, así que Android ya no detiene las sesiones al cabo de un tiempo fijo: una sesión que dejas abierta sigue trabajando mientras usas otras apps. Todavía pueden terminarla el teléfono al recuperar memoria o el ahorro de batería que algunos fabricantes aplican a las apps en segundo plano — si tus sesiones se detienen solas, lo primero que conviene probar es excluir SSHBorg de la optimización de batería. Volviendo a abrir la app puedes reconectarte.</li>
                 <li><strong>iOS suspende las apps en segundo plano</strong> — unos treinta segundos después de que SSHBorg sale de la pantalla, iOS la suspende y sus conexiones se cortan. Al volver, SSHBorg se reconecta sola (pidiendo la contraseña solo si no hay una guardada) y marca el punto en la salida: es una shell nueva, y lo que se ejecutaba en la anterior se ha perdido. En iOS, un multiplexor es la única forma de mantener un trabajo en marcha mientras usas otra app.</li>
             </ul>
             <div class="callout callout-warn">

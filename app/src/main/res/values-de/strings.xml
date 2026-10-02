@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Tab zweimal senden</string>
     <string name="settings_keep_screen_on_title">Bildschirm eingeschaltet lassen</string>
     <string name="settings_keep_screen_on_subtitle">Verhindert das Ausschalten des Bildschirms, solange ein Terminal geöffnet ist</string>
+    <string name="settings_terminal_bar_autohide_title">Titelleiste automatisch ausblenden</string>
+    <string name="settings_terminal_bar_autohide_subtitle">Im Terminal fährt die Leiste ein und kommt zurück, wenn du den Bildschirm antippst. Aus: sie bleibt immer sichtbar.</string>
+    <string name="settings_terminal_hide_status_bar_title">Statusleiste ausblenden</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">Im Terminal auch Androids Uhr- und Benachrichtigungsleiste ausblenden. Zum Anzeigen vom oberen Rand nach unten wischen.</string>
     <string name="settings_terminal_colors_title">Terminalfarben</string>
     <string name="settings_terminal_colors_follow_app">Wie das App-Design</string>
     <string name="settings_font_size_title">Schriftgröße</string>
@@ -261,7 +265,7 @@
     <string name="sftp_rename_new_name">Neuer Name</string>
 
     <string name="sftp_conflict_title">Datei existiert bereits</string>
-    <string name="sftp_conflict_message">\"%1$s\" existiert bereits in Downloads/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" existiert bereits in %2$s.</string>
 
     <string name="sftp_mkdir_title">Neuer Ordner</string>
     <string name="sftp_mkdir_folder_name">Ordnername</string>
@@ -270,6 +274,18 @@
     <string name="sftp_menu_edit">Im Editor öffnen</string>
     <string name="sftp_menu_hex">Hexadezimal öffnen</string>
     <string name="sftp_menu_rename">Umbenennen</string>
+    <string name="sftp_menu_cut">Ausschneiden</string>
+    <string name="sftp_cut_cd">Ausschneiden</string>
+    <string name="sftp_paste">Einfügen</string>
+    <string name="sftp_cut_cancel_cd">Verschieben abbrechen</string>
+    <string name="sftp_move_folder_exists">Ein Ordner namens \"%1$s\" ist hier schon vorhanden, und zwei Ordner können nicht zusammengeführt werden.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d von %2$d Namen sind hier schon vergeben, und einer davon ist ein Ordner: zwei Ordner können nicht zusammengeführt werden.</string>
+    <string name="sftp_move_into_itself">Ein Ordner kann nicht in sich selbst verschoben werden.</string>
+    <string name="error_move_failed">Verschieben fehlgeschlagen</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d Element zu verschieben aus %2$s</item>
+        <item quantity="other">%1$d Elemente zu verschieben aus %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Im Hintergrund herunterladen</string>
     <string name="sftp_background_downloads_title">Hintergrund-Downloads</string>
     <string name="sftp_background_download_failed">Download fehlgeschlagen</string>

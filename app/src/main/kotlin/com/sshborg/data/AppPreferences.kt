@@ -33,6 +33,8 @@ class AppPreferences(private val context: Context) {
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
+        val TERMINAL_BAR_AUTO_HIDE    = booleanPreferencesKey("terminal_bar_auto_hide")
+        val TERMINAL_HIDE_STATUS_BAR  = booleanPreferencesKey("terminal_hide_status_bar")
         val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
         val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
         val SFTP_SORT_DIRS_FIRST      = booleanPreferencesKey("sftp_sort_dirs_first")
@@ -107,6 +109,27 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setInvertTerminalScroll(enabled: Boolean) {
         context.dataStore.edit { it[Keys.INVERT_TERMINAL_SCROLL] = enabled }
+    }
+
+    /**
+     * The terminal's title bar slides away by itself and comes back on a tap. Default true: the
+     * bar costs about five lines of terminal, and as an overlay it takes none — it draws over the
+     * top rows instead of pushing them down, so the grid never resizes and the remote program
+     * never sees a SIGWINCH. Turn it off to have it fixed, as it was before.
+     */
+    val terminalBarAutoHide: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.TERMINAL_BAR_AUTO_HIDE] ?: true }
+
+    suspend fun setTerminalBarAutoHide(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.TERMINAL_BAR_AUTO_HIDE] = enabled }
+    }
+
+    /** Hide Android's status bar while a terminal is on screen. Default false. */
+    val terminalHideStatusBar: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.TERMINAL_HIDE_STATUS_BAR] ?: false }
+
+    suspend fun setTerminalHideStatusBar(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.TERMINAL_HIDE_STATUS_BAR] = enabled }
     }
 
     /** In the SFTP browser, list folders before files. Default true (folders first). */

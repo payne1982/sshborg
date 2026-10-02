@@ -70,6 +70,15 @@ class TerminalView @JvmOverloads constructor(
     var doubleTapAction: Int = AppPreferences.DOUBLE_TAP_NONE
 
     /**
+     * A tap the detector has ruled out as the first half of a double tap. Used by the screen to
+     * bring the auto-hiding title bar down: hanging that on [GestureListener.onSingleTapUp], which
+     * is where the keyboard is asked for, would flash the bar on every double tap as well — and a
+     * double tap is Tab (issue #4). The keyboard keeps the immediate handler; the bar waits the
+     * ~300ms the detector needs to be sure.
+     */
+    var onTapConfirmed: (() -> Unit)? = null
+
+    /**
      * Default font size from settings. Applied as long as the user hasn't pinch-zoomed:
      * once they do, the pinched size takes over for the rest of the session.
      */
@@ -891,6 +900,13 @@ class TerminalView @JvmOverloads constructor(
             requestFocus()
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(this@TerminalView, 0)
+            return true
+        }
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            // In selection mode the tap dismisses the selection (see onSingleTapUp) and the
+            // selection bar is already at the top of the screen, where the title bar would land.
+            if (inSelectionMode) return false
+            onTapConfirmed?.invoke()
             return true
         }
         override fun onDoubleTap(e: MotionEvent): Boolean {

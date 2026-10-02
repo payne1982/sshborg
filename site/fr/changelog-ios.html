@@ -564,6 +564,21 @@
     </div>
 
         <article class="release">
+            <h2>1.1.0<span class="release-date">2026-09-27</span></h2>
+            <ul>
+                <li>SFTP : éditeur intégré pour les fichiers du serveur — les fichiers texte se modifient sur place en conservant encodage et fins de ligne, les fichiers de configuration sont colorés, et ce qui n'est pas du texte s'ouvre dans un éditeur hexadécimal</li>
+                <li>Clés SSH : une clé avec phrase secrète fonctionne enfin — la phrase est demandée une fois à l'import et n'est enregistrée nulle part. Les clés importées avant doivent être réimportées ; la liste les signale.</li>
+                <li>Correction du défilement dans tmux et les autres applications plein écran avec la souris activée : un glissement fait désormais défiler leur historique au lieu de sélectionner du texte</li>
+                <li>Correction de la sélection de texte : un appui long sélectionne désormais immédiatement, la sélection ne disparaît plus à l'arrivée de nouvelles sorties et ses poignées peuvent être déplacées</li>
+                <li>SFTP : les erreurs restent à l'écran et nomment le fichier en échec ; une opération sur plusieurs fichiers continue et liste ce qu'elle n'a pas pu faire</li>
+                <li>Terminal : l'historique des commandes est lu sans seconde connexion</li>
+                <li>Verrouillage : le délai est compté depuis la sortie de l'app, pas depuis le dernier déverrouillage</li>
+                <li>Barre de touches : dans la disposition à deux rangées les flèches sont de nouveau alignées — la touche clavier ne décale plus la rangée du haut</li>
+                <li>Terminal : la copie fonctionne de nouveau sur les dernières versions d'iOS — un appui long, ou un double appui sur un mot, propose désormais Copier ; auparavant aucun menu n'apparaissait</li>
+                <li>Terminal : plus de flash bleu sur tout l'écran en tapant vite avec les suggestions activées</li>
+            </ul>
+        </article>
+        <article class="release">
             <h2>1.0.0<span class="release-date">2026-09-14</span></h2>
             <ul>
                 <li>Première version sur l'App Store</li>

@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <!-- Touchless devices (Android TV / Google TV): don't let Play filter us out -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -32,9 +32,19 @@
                 android:value="true" />
         </service>
 
+        <!-- configChanges: a rotation or a switch to the system's dark theme must not destroy and
+             rebuild this activity. It used to, and with the app lock set to "Immediately" every
+             recreation looked like the user leaving the app (onStop stamps the clock, onStart finds
+             more than nothing gone), so the lock came up on a rotation. On a phone whose biometric
+             prompt is portrait-only that became a loop: the prompt turned the screen, the turn
+             recreated the activity, the activity asked for the prompt again. Claiming these says we
+             handle them, and Compose does — it reads the configuration itself, and the app has no
+             night-qualified resources to go stale. Not claimed, so still recreating as before:
+             locale, density and fontScale. See LockGateTest. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
             android:importantForAutofill="noExcludeDescendants"
             android:banner="@mipmap/tv_banner"
             android:windowSoftInputMode="adjustResize">
@@ -45,10 +55,20 @@
             </intent-filter>
         </activity>
 
+        <!-- specialUse, not dataSync: a `dataSync` service is capped by the system at 6 cumulative
+             hours per 24 (Android 15+), and when the budget runs out the OS calls onTimeout() and the
+             sessions have to be closed — which is what killed sessions left open overnight. An
+             interactive remote shell is not a data transfer that finishes; the type below is the one
+             Android provides for cases the named types do not describe, and its value is read by a
+             Play reviewer. See SshForegroundService and docs/release-checklist.md. -->
         <service
             android:name=".service.SshForegroundService"
             android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps the SSH and SFTP sessions the user has opened alive while the app is not in front, so a remote shell, an editing session or a file transfer is not cut off when the user switches app or the screen goes off. The user opens each session deliberately and closes it from the app or from this service's own notification. No other foreground service type describes an interactive remote terminal: nothing is synchronised, played or messaged, and the work has no length the app can know in advance." />
+        </service>
 
     </application>
 

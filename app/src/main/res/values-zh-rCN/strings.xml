@@ -182,6 +182,10 @@
     <string name="settings_double_tap_tab_twice">发送两次 Tab</string>
     <string name="settings_keep_screen_on_title">保持屏幕常亮</string>
     <string name="settings_keep_screen_on_subtitle">终端打开时防止屏幕关闭</string>
+    <string name="settings_terminal_bar_autohide_title">自动隐藏标题标栏</string>
+    <string name="settings_terminal_bar_autohide_subtitle">在终端中，标题标栏会收起，轻触屏幕时返回。关闭则始终显示。</string>
+    <string name="settings_terminal_hide_status_bar_title">隐藏状态栏</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">在终端中同时隐藏 Android 的时钟和通知栏。从顶部边缘下滑可再次看到。</string>
     <string name="settings_terminal_colors_title">终端配色</string>
     <string name="settings_terminal_colors_follow_app">跟随应用主题</string>
     <string name="settings_font_size_title">字体大小</string>
@@ -275,7 +279,7 @@
     <string name="sftp_rename_new_name">新名称</string>
 
     <string name="sftp_conflict_title">文件已存在</string>
-    <string name="sftp_conflict_message">"%1$s"已存在于 Downloads/SSHBorg/ 中。</string>
+    <string name="sftp_conflict_message">"%1$s"已存在于 %2$s 中。</string>
 
     <string name="sftp_mkdir_title">新建文件夹</string>
     <string name="sftp_mkdir_folder_name">文件夹名称</string>
@@ -284,6 +288,17 @@
     <string name="sftp_menu_edit">在编辑器中打开</string>
     <string name="sftp_menu_hex">以十六进制打开</string>
     <string name="sftp_menu_rename">重命名</string>
+    <string name="sftp_menu_cut">剪切</string>
+    <string name="sftp_cut_cd">剪切</string>
+    <string name="sftp_paste">粘贴</string>
+    <string name="sftp_cut_cancel_cd">取消移动</string>
+    <string name="sftp_move_folder_exists">这里已经有名为“%1$s”的文件夹，两个文件夹无法合并。</string>
+    <string name="sftp_move_batch_folder_exists">%2$d 个名称中有 %1$d 个在此已被占用，其中包含文件夹：两个文件夹无法合并。</string>
+    <string name="sftp_move_into_itself">文件夹不能移动到它自己里面。</string>
+    <string name="error_move_failed">移动失败</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="other">%1$d 项待从 %2$s 移动</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>
     <string name="sftp_background_download_failed">下载失败</string>

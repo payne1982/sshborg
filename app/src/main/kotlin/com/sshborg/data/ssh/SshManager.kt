@@ -1002,6 +1002,25 @@ class SftpSession(
     fun deleteDir(remotePath: String)  = op { it.rmdir(remotePath) }
 
     fun rename(oldPath: String, newPath: String) = op { it.rename(oldPath, newPath) }
+
+    /**
+     * What [remotePath] is, or null when that name is free.
+     *
+     * lstat, not stat: a symbolic link whose target is gone still occupies its name, and a move
+     * onto it would fail. Used before every move, because "the destination already exists" is the
+     * one case where the two SFTP clients this project ships behave differently — see
+     * docs/sftp-move.md.
+     */
+    fun lstatOrNull(remotePath: String): SftpEntry? = runCatching {
+        val a = op { it.lstat(remotePath) }
+        SftpEntry(
+            name = remotePath.substringAfterLast('/'),
+            isDir = a.isDir,
+            isLink = a.isLink,
+            size = a.size,
+            modTimeSeconds = a.mTime,
+        )
+    }.getOrNull()
     fun mkdir(remotePath: String)      = op { it.mkdir(remotePath) }
 
     /** Opens a second SFTP channel on the same authenticated session for background transfers. */

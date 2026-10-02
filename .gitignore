@@ -6,6 +6,10 @@ build/
 # Local configuration (contiene il path dell'SDK, non va in repo)
 local.properties
 
+# Dove trovare i corpora di prova e il server per i test di integrazione, con le
+# relative passphrase: sta su questa macchina e basta (vedi test.properties.example)
+test.properties
+
 # Android Studio / IntelliJ
 .idea/
 *.iml

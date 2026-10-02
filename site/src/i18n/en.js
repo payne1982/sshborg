@@ -174,25 +174,28 @@ module.exports = {
             <h2>// SFTP FILE MANAGER</h2>
             <p>The SFTP file manager lets you browse, upload, download, rename, and delete files on your server directly from your phone. Open it from the hosts screen with <strong>Files</strong> in a host's menu.</p>
             <h3>Navigation</h3>
-            <p>Tap a folder to open it. Use the back arrow or tap any segment of the path bar to jump up the directory tree.</p>
+            <p>Tap a folder to open it. Use the back arrow or tap any segment of the path bar to jump up the directory tree. A tap on a file opens what you can do with it: download, open in the editor, rename, delete.</p>
             <p>Symbolic links are shown with a small link icon badge. Tapping a symlink navigates to its target: if it points to a directory you enter it, if it points to a file it behaves like a regular file.</p>
             <h3>Uploading files</h3>
             <p>Tap the <strong>upload</strong> button (↑) to pick one or more files from your phone's storage. The upload starts immediately and progress is shown at the top of the screen.</p>
             <h3>Downloading files and folders</h3>
-            <p>Tap any file to download it immediately. To download an entire folder, tap the <strong>download</strong> icon next to it — SSHBorg will download the entire directory tree and save it under the <strong>Downloads</strong> folder on your phone.</p>
+            <p>Tap the <strong>download</strong> icon at the right of a file's row to download it at once. To download an entire folder, tap the <strong>download</strong> icon next to it — SSHBorg will download the entire directory tree and save it under the <strong>Downloads</strong> folder on your phone.</p>
             <p>If a file already exists at the destination, a dialog will ask you whether to <strong>overwrite</strong>, <strong>skip</strong> the file, or <strong>cancel</strong> the entire transfer.</p>
             <div class="callout callout-info">
                 <div class="callout-label">// NOTE ON SYMLINKS</div>
                 During a folder download, symbolic links that point to directories are skipped — only regular files (including symlinks to files) are downloaded. This prevents unintended recursive downloads.
             </div>
             <h3>Multi-select and batch operations</h3>
-            <p>Long-press any item to enter selection mode, then tap additional items to build up your selection. The toolbar shows actions for the current selection:</p>
+            <p>Tap <strong>Select items</strong> in the toolbar to enter selection mode, then tick the items you want. The toolbar shows actions for the current selection:</p>
             <ul>
                 <li><strong>Download</strong> — downloads all selected files and folders at once, with a progress dialog and cancellation support.</li>
                 <li><strong>Delete</strong> — deletes all selected items. Deleting a non-empty folder removes all its contents recursively. <em>There is no undo.</em></li>
             </ul>
+            <h3>Moving files on the server</h3>
+            <p>Choose <strong>Cut</strong> in a file's or a folder's menu — or several at once with <strong>Select items</strong> — then open the destination folder and tap <strong>Paste</strong> in the bar that appears above the list. The move is done by the server itself: nothing is downloaded and nothing is uploaded, so a file of any size moves instantly.</p>
+            <p>If the destination already holds that name, SSHBorg asks before touching anything. A file can be replaced or kept alongside the existing one; two folders with the same name can only be kept side by side, because no SFTP server can merge folders — <code>mv</code> refuses as well. Moving between two different disks on the server is also refused: a move is a rename, and a rename cannot cross filesystems. That needs a copy, which SSHBorg does not do yet.</p>
             <h3>Editing files</h3>
-            <p>Open a file's menu — a long press, or the <strong>⋮</strong> button — and choose <strong>Open in editor</strong> to change it directly on the server. Nothing is stored on the phone: the file is read into memory, edited, and written straight back.</p>
+            <p>Tap a file to open its menu and choose <strong>Open in editor</strong> to change it directly on the server. Nothing is stored on the phone: the file is read into memory, edited, and written straight back.</p>
             <p>The file goes back as it came. Its character encoding is detected and used again when saving, LF or CRLF line endings are preserved, a file that ended without a newline still does, and the permissions stay as they were. If the encoding was read wrong, tap it in the bar at the bottom of the editor and choose another — the list only offers encodings that can reproduce this file's bytes exactly, so a wrong choice can look wrong on screen but cannot damage the file.</p>
             <p>Saving writes to a temporary file beside the original and renames it into place, so a connection lost halfway cannot leave a half-written file on the server.</p>
             <p>Files open up to 4 MB, whatever their length: only the lines on screen are drawn, so a file of megabytes scrolls like a short one. Above that the terminal is the answer, with <code>nano</code> or <code>vi</code>, and it has no limit at all.</p>
@@ -405,7 +408,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Wi-Fi ↔ mobile handover</strong> — switching between a Wi-Fi network and mobile data (or vice versa) changes your IP and breaks any open TCP connection.</li>
                 <li><strong>Idle timeouts</strong> — carriers and NAT routers often drop idle connections after a few minutes. Long-running but silent sessions (watching logs, waiting for input) are vulnerable to this.</li>
                 <li><strong>Signal loss</strong> — tunnels, underground car parks, or simply a weak signal can briefly drop the network, which is enough to kill a session.</li>
-                <li><strong>Android background limits</strong> — to save battery, Android limits how long an app may keep working in the background. After about six cumulative hours in the background, the system stops SSHBorg's sessions; you get a notification and can reconnect by reopening the app. Bringing the app to the foreground resets this limit.</li>
+                <li><strong>Android background limits</strong> — while a session is open SSHBorg keeps a foreground service running, with its own notification, so Android does not stop your sessions on a timer: one left open goes on working while you use other apps. What can still end it is the phone reclaiming memory, or the battery saving that some manufacturers apply to background apps — if your sessions stop on their own, excluding SSHBorg from battery optimisation is the first thing to try. Reopening the app lets you connect again.</li>
                 <li><strong>iOS suspends apps in the background</strong> — about thirty seconds after SSHBorg leaves the screen, iOS suspends it and its connections drop. When you come back, SSHBorg reconnects by itself (asking for the password only if none is saved) and marks the spot in the output: it is a new shell, and whatever was running in the old one is gone. On iOS a multiplexer is the only way to keep work running while you use another app.</li>
             </ul>
             <div class="callout callout-warn">

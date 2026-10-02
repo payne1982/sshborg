@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Invia Tab due volte</string>
     <string name="settings_keep_screen_on_title">Mantieni lo schermo acceso</string>
     <string name="settings_keep_screen_on_subtitle">Impedisce lo spegnimento dello schermo mentre un terminale è aperto</string>
+    <string name="settings_terminal_bar_autohide_title">Barra del titolo a scomparsa</string>
+    <string name="settings_terminal_bar_autohide_subtitle">Nel terminale la barra si ritrae e torna quando tocchi lo schermo. Disattiva per tenerla sempre visibile.</string>
+    <string name="settings_terminal_hide_status_bar_title">Nascondi la barra di stato</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">Nel terminale nascondi anche l\'orologio e le notifiche di Android. Trascina dal bordo superiore per rivederla.</string>
     <string name="settings_terminal_colors_title">Colori del terminale</string>
     <string name="settings_terminal_colors_follow_app">Come il tema dell\'app</string>
     <string name="settings_font_size_title">Dimensione carattere</string>
@@ -261,7 +265,7 @@
     <string name="sftp_rename_new_name">Nuovo nome</string>
 
     <string name="sftp_conflict_title">Il file esiste già</string>
-    <string name="sftp_conflict_message">\"%1$s\" esiste già in Download/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" esiste già in %2$s.</string>
 
     <string name="sftp_mkdir_title">Nuova cartella</string>
     <string name="sftp_mkdir_folder_name">Nome cartella</string>
@@ -270,6 +274,18 @@
     <string name="sftp_menu_edit">Apri nell\'editor</string>
     <string name="sftp_menu_hex">Apri in esadecimale</string>
     <string name="sftp_menu_rename">Rinomina</string>
+    <string name="sftp_menu_cut">Taglia</string>
+    <string name="sftp_cut_cd">Taglia</string>
+    <string name="sftp_paste">Incolla</string>
+    <string name="sftp_cut_cancel_cd">Annulla lo spostamento</string>
+    <string name="sftp_move_folder_exists">Una cartella di nome \"%1$s\" è già qui, e due cartelle non possono essere unite.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d nomi su %2$d sono già presenti qui, e uno è una cartella: due cartelle non possono essere unite.</string>
+    <string name="sftp_move_into_itself">Una cartella non può essere spostata dentro se stessa.</string>
+    <string name="error_move_failed">Spostamento non riuscito</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d elemento da spostare da %2$s</item>
+        <item quantity="other">%1$d elementi da spostare da %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Scarica in background</string>
     <string name="sftp_background_downloads_title">Download in background</string>
     <string name="sftp_background_download_failed">Download non riuscito</string>

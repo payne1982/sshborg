@@ -1,6 +1,12 @@
 package com.sshborg.ui.terminal
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +26,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
@@ -36,15 +44,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.SshBorgApp
 import com.sshborg.isTelevision
+import com.sshborg.isTouchless
 import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import com.sshborg.ui.common.ProblemContent
 import kotlinx.coroutines.delay
+
+/** How long the auto-hiding title bar stays down after the tap that called it. */
+private const val TITLE_BAR_LINGER_MS = 3_000L
+
+/**
+ * How long it takes to slide back up. Deliberately slower than the default spring and slower than
+ * its own arrival: coming down it is answering a tap, so it should be quick, but going away it is
+ * acting on its own, and something that leaves the screen abruptly reads as a glitch. The slow
+ * retreat also keeps it reachable a moment longer — a tap during it reverses the animation.
+ */
+private const val TITLE_BAR_RETRACT_MS = 700
 
 @Suppress("UNUSED_VARIABLE")
 
@@ -96,6 +119,20 @@ fun TerminalScreen(
         AppPreferences.TERMINAL_SCHEME_FOLLOW_APP -> !appDark
         else                                      -> false
     }
+
+    // The title bar as an overlay that retracts by itself (the default) rather than a fixed bar
+    // that costs the terminal about five lines for good. A device with no touchscreen has no tap
+    // to call it back, so there it stays fixed whatever the setting says.
+    val touchless = remember { isTouchless(ctx) }
+    val barAutoHidePref by app.appPreferences.terminalBarAutoHide.collectAsState(initial = true)
+    val hideStatusBar   by app.appPreferences.terminalHideStatusBar.collectAsState(initial = false)
+    val barAutoHide = barAutoHidePref && !touchless
+    // Down on arrival, which teaches the gesture without a word, then it goes. Every tap on the
+    // terminal re-arms the wait, and a finger resting on the bar suspends it: reaching for the
+    // disconnect button cannot lose the bar half way there.
+    var barShown by remember { mutableStateOf(true) }
+    var barHeld  by remember { mutableStateOf(false) }
+    var barTick  by remember { mutableIntStateOf(0) }
     val suggestions   by vm.suggestions.collectAsState()
     val extraBarPinned by vm.extraBarPinned.collectAsState()
     val extraBar       by vm.extraBar.collectAsState()
@@ -141,35 +178,65 @@ fun TerminalScreen(
         }
     }
 
+    LaunchedEffect(barAutoHide, barShown, barHeld, barTick) {
+        if (barAutoHide && barShown && !barHeld) {
+            delay(TITLE_BAR_LINGER_MS)
+            barShown = false
+        }
+    }
+
+    // Android's own strip, hidden for the length of this screen only and put back on the way out
+    // whatever happens. The transient-bars behaviour is what lets a swipe from the top edge bring
+    // it back for a moment without leaving the terminal.
+    DisposableEffect(hideStatusBar) {
+        val controller = (rootView.context as? Activity)
+            ?.let { WindowCompat.getInsetsController(it.window, rootView) }
+        if (hideStatusBar && controller != null) {
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.hide(WindowInsetsCompat.Type.statusBars())
+        }
+        onDispose {
+            if (hideStatusBar) controller?.show(WindowInsetsCompat.Type.statusBars())
+        }
+    }
+
     val imeVisible = WindowInsets.isImeVisible
+
+    val titleBar: @Composable () -> Unit = {
+        TopAppBar(
+            title = {
+                Text(
+                    title.ifEmpty { currentSession?.hostLabel ?: stringResource(R.string.terminal_title_default) },
+                    maxLines = 1
+                )
+            },
+            navigationIcon = {
+                // Back = send to background (don't disconnect)
+                IconButton(onClick = { vm.background(); onBack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back))
+                }
+            },
+            actions = {
+                // Disconnect button
+                IconButton(onClick = { vm.disconnect(); onBack() }) {
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.terminal_disconnect_cd))
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                // Opaque on purpose: over a terminal a translucent bar makes both itself and the
+                // text under it unreadable.
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        )
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        title.ifEmpty { currentSession?.hostLabel ?: stringResource(R.string.terminal_title_default) },
-                        maxLines = 1
-                    )
-                },
-                navigationIcon = {
-                    // Back = send to background (don't disconnect)
-                    IconButton(onClick = { vm.background(); onBack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back))
-                    }
-                },
-                actions = {
-                    // Disconnect button
-                    IconButton(onClick = { vm.disconnect(); onBack() }) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.terminal_disconnect_cd))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-            )
-        },
+        // Fixed: the bar is the Scaffold's, and the terminal starts below it, exactly as before.
+        // Auto-hiding: the Scaffold has no top bar at all and the terminal owns the whole height,
+        // with the bar drawn over it further down.
+        topBar = { if (!barAutoHide) titleBar() },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             // Bottom padding = max(IME, navigation bar): with the keyboard up the IME
@@ -181,6 +248,19 @@ fun TerminalScreen(
                     .windowInsetsPadding(
                         WindowInsets.ime.union(WindowInsets.navigationBars)
                             .only(WindowInsetsSides.Bottom)
+                    )
+                    // With no fixed bar above it, the terminal has to keep clear of the system's
+                    // own furniture itself: the status bar while it is there, and the camera
+                    // cut-out when it is not — in landscape that hole sits on a short edge, where
+                    // it would eat the first characters of every line.
+                    .then(
+                        when {
+                            !barAutoHide   -> Modifier
+                            hideStatusBar  -> Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+                            else           -> Modifier.windowInsetsPadding(
+                                WindowInsets.statusBars.only(WindowInsetsSides.Top)
+                            )
+                        }
                     )
             ) {
                 // Terminal view
@@ -196,6 +276,7 @@ fun TerminalScreen(
                             view.onInput              = sendInput
                             view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                            view.onTapConfirmed        = { barTick++; barShown = true }
                             vm.onNeedsRedraw           = { view.postInvalidate() }
                             terminalView               = view
                         }
@@ -210,6 +291,7 @@ fun TerminalScreen(
                         view.onInput              = sendInput
                         view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                        view.onTapConfirmed        = { barTick++; barShown = true }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         terminalView               = view
                         view.wordMode              = wordMode
@@ -294,6 +376,35 @@ fun TerminalScreen(
                             cursorKeys       = { vm.cursorKeyBytes(it) },
                         ),
                     )
+                }
+            }
+
+            // The title bar, drawn over the terminal's top rows instead of pushing them down, so
+            // the grid never changes size and the remote program never sees a resize. Suppressed in
+            // selection mode, where the tap means "dismiss the selection" and the selection bar is
+            // already in this corner.
+            if (barAutoHide) {
+                AnimatedVisibility(
+                    visible = barShown && !inSelectionMode,
+                    enter = slideInVertically { -it },
+                    exit = slideOutVertically(
+                        animationSpec = tween(TITLE_BAR_RETRACT_MS, easing = FastOutSlowInEasing),
+                    ) { -it },
+                    modifier = Modifier.align(Alignment.TopCenter),
+                ) {
+                    Box(
+                        Modifier.pointerInput(Unit) {
+                            // Watched on the Initial pass and never consumed, so the bar's own
+                            // buttons still get their taps; a finger down here only suspends the
+                            // countdown that would take the bar away.
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                                    barHeld = event.changes.any { it.pressed }
+                                }
+                            }
+                        }
+                    ) { titleBar() }
                 }
             }
 

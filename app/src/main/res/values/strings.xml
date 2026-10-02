@@ -183,6 +183,10 @@
     <string name="settings_double_tap_tab_twice">Send Tab twice</string>
     <string name="settings_keep_screen_on_title">Keep screen on</string>
     <string name="settings_keep_screen_on_subtitle">Prevent the screen from turning off while a terminal is open</string>
+    <string name="settings_terminal_bar_autohide_title">Auto-hide the title bar</string>
+    <string name="settings_terminal_bar_autohide_subtitle">In the terminal, the bar slides away and comes back when you tap the screen. Off keeps it always visible.</string>
+    <string name="settings_terminal_hide_status_bar_title">Hide the status bar</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">In the terminal, hide Android\'s clock and notification strip as well. Swipe down from the top edge to see it again.</string>
     <string name="settings_terminal_colors_title">Terminal colors</string>
     <string name="settings_terminal_colors_follow_app">Match app theme</string>
     <string name="settings_font_size_title">Font size</string>
@@ -276,7 +280,7 @@
     <string name="sftp_rename_new_name">New name</string>
 
     <string name="sftp_conflict_title">File already exists</string>
-    <string name="sftp_conflict_message">\"%1$s\" already exists in Downloads/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" already exists in %2$s.</string>
 
     <string name="sftp_mkdir_title">New folder</string>
     <string name="sftp_mkdir_folder_name">Folder name</string>
@@ -285,6 +289,18 @@
     <string name="sftp_menu_edit">Open in editor</string>
     <string name="sftp_menu_hex">Open in hex</string>
     <string name="sftp_menu_rename">Rename</string>
+    <string name="sftp_menu_cut">Cut</string>
+    <string name="sftp_cut_cd">Cut</string>
+    <string name="sftp_paste">Paste</string>
+    <string name="sftp_cut_cancel_cd">Cancel the move</string>
+    <string name="sftp_move_folder_exists">A folder called \"%1$s\" is already here, and two folders cannot be merged.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d of %2$d names are already taken here, and one of them is a folder: two folders cannot be merged.</string>
+    <string name="sftp_move_into_itself">A folder cannot be moved inside itself.</string>
+    <string name="error_move_failed">Move failed</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d item to move from %2$s</item>
+        <item quantity="other">%1$d items to move from %2$s</item>
+    </plurals>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>
     <string name="sftp_background_downloads_title">Background downloads</string>

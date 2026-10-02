@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -159,6 +160,8 @@ fun SftpScreen(
     var pendingConflict  by remember { mutableStateOf<SftpViewModel.ConflictData?>(null) }
     var pendingBatchConflict by remember { mutableStateOf<SftpViewModel.BatchConflictData?>(null) }
     var pendingUploadConflict by remember { mutableStateOf<SftpViewModel.UploadConflict?>(null) }
+    var pendingMoveConflict by remember { mutableStateOf<SftpViewModel.MoveConflict?>(null) }
+    val pendingCut by vm.cut.collectAsState()
 
     LaunchedEffect(Unit) {
         vm.conflictEvent.collect { pendingConflict = it }
@@ -168,6 +171,9 @@ fun SftpScreen(
     }
     LaunchedEffect(Unit) {
         vm.uploadConflictEvent.collect { pendingUploadConflict = it }
+    }
+    LaunchedEffect(Unit) {
+        vm.moveConflictEvent.collect { pendingMoveConflict = it }
     }
 
     // File picker — opens system file chooser, result forwarded to ViewModel
@@ -212,6 +218,16 @@ fun SftpScreen(
                                 enabled = selectedEntries.isNotEmpty(),
                             ) {
                                 Icon(Icons.Default.Download, stringResource(R.string.sftp_download_selected_cd))
+                            }
+                            IconButton(
+                                onClick = {
+                                    vm.cutEntries(selectedEntries.toList(), currentPath)
+                                    selectionMode = false
+                                    selectedEntries = emptySet()
+                                },
+                                enabled = selectedEntries.isNotEmpty(),
+                            ) {
+                                Icon(Icons.Default.ContentCut, stringResource(R.string.sftp_cut_cd))
                             }
                             IconButton(
                                 onClick = { pendingBulkDelete = selectedEntries.toList() },
@@ -328,6 +344,20 @@ fun SftpScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(bottom = 240.dp),
                         ) {
+                            // What was cut, where you can see it and get out of it: how many
+                            // things are waiting, where they came from, and the two buttons.
+                            // Sticky rather than an icon in the toolbar, because an icon alone
+                            // answers none of those three questions.
+                            pendingCut?.let { c ->
+                                stickyHeader(key = "cut") {
+                                    CutBar(
+                                        count    = c.entries.size,
+                                        fromDir  = c.fromDir,
+                                        onPaste  = { vm.paste(s.path) },
+                                        onCancel = { vm.clearCut() },
+                                    )
+                                }
+                            }
                             // ".." row — go up one level (hidden at root, not selectable)
                             if (!atRoot) {
                                 item(key = "..") {
@@ -390,6 +420,7 @@ fun SftpScreen(
                                         } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
+                                        onCut          = { vm.cutEntries(listOf(entry), s.path) },
                                         showOverflow   = isTouchless,
                                     )
                                 }
@@ -611,7 +642,12 @@ fun SftpScreen(
     // Download conflict dialogs
     pendingConflict?.let { conflict ->
         FileConflictDialog(
-            message    = stringResource(R.string.sftp_conflict_message, conflict.entry.name),
+            // The folder is passed in, not written into the string: a debug build downloads
+            // into Download/SSHBorg-debug/ and the message used to name the release folder,
+            // so it told you about an app you were not using.
+            message    = stringResource(
+                R.string.sftp_conflict_message, conflict.entry.name, vm.downloadFolder,
+            ),
             onKeepBoth = { pendingConflict = null; vm.downloadKeepBoth(conflict) },
             onOverwrite = { pendingConflict = null; vm.downloadOverwrite(conflict) },
             onCancel   = { pendingConflict = null },
@@ -642,6 +678,39 @@ fun SftpScreen(
                 onSkip         = { decide(SftpViewModel.UploadDecision.SKIP_EXISTING) },
                 onOverwriteAll = { decide(SftpViewModel.UploadDecision.OVERWRITE) },
                 onCancel       = { decide(SftpViewModel.UploadDecision.CANCEL) },
+            )
+        }
+    }
+
+    // Move conflict: the same two dialogs, about a name already taken in the destination. A
+    // folder collision gets no Overwrite — nothing in SFTP can merge two folders, and `mv`
+    // refuses as well, so the only honest offers are to keep both or to stop.
+    pendingMoveConflict?.let { conflict ->
+        val decide = { d: SftpViewModel.MoveDecision -> pendingMoveConflict = null; vm.resolveMoveConflict(d) }
+        when (conflict) {
+            is SftpViewModel.MoveConflict.Single -> FileConflictDialog(
+                message     = stringResource(
+                    if (conflict.folder) R.string.sftp_move_folder_exists
+                    else R.string.sftp_upload_conflict_message,
+                    conflict.name,
+                ),
+                onKeepBoth  = { decide(SftpViewModel.MoveDecision.KEEP_BOTH) },
+                onOverwrite = if (conflict.folder) null else {
+                    { decide(SftpViewModel.MoveDecision.OVERWRITE) }
+                },
+                onCancel    = { decide(SftpViewModel.MoveDecision.CANCEL) },
+            )
+            is SftpViewModel.MoveConflict.Batch -> FileConflictDialog(
+                message     = stringResource(
+                    if (conflict.folder) R.string.sftp_move_batch_folder_exists
+                    else R.string.sftp_upload_batch_conflict_message,
+                    conflict.conflictCount, conflict.totalCount,
+                ),
+                onKeepBoth  = { decide(SftpViewModel.MoveDecision.KEEP_BOTH) },
+                onOverwrite = if (conflict.folder) null else {
+                    { decide(SftpViewModel.MoveDecision.OVERWRITE) }
+                },
+                onCancel    = { decide(SftpViewModel.MoveDecision.CANCEL) },
             )
         }
     }
@@ -766,6 +835,7 @@ private fun SftpEntryItem(
     onHex: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
+    onCut: () -> Unit,
     showOverflow: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -773,12 +843,22 @@ private fun SftpEntryItem(
     Box {
         ListItem(
             modifier = Modifier
-                // Remote/keyboard Menu key opens the action menu; CENTER stays the primary
-                // action (open a folder / download a file). Trailing buttons aren't D-pad-
-                // focusable and a long-press isn't practical with a remote.
+                // Remote/keyboard Menu key opens the action menu. Trailing buttons aren't
+                // D-pad-focusable and a long-press isn't practical with a remote.
                 .onMenuKey(enabled = showOverflow && !selectionMode) { menuExpanded = true }
                 .combinedClickable(
-                    onClick = onClick,
+                    // A tap on a FOLDER enters it — that is the one gesture nobody doubts in a
+                    // file browser, and a menu there would make browsing twice as slow. A tap on
+                    // a FILE opens the menu, for two reasons given in issue #17: the actions on a
+                    // remote file (download, edit, hex, rename, delete) were reachable only by
+                    // long-pressing, which nothing on screen announces, so the editor could not
+                    // be found at all; and the old tap started a download of any size with no
+                    // confirmation, which is the most consequential thing on the row. Downloading
+                    // is now the button on the right and the first item of the menu, so the old
+                    // habit costs one extra tap at worst.
+                    onClick = {
+                        if (selectionMode || entry.isDir) onClick() else menuExpanded = true
+                    },
                     onLongClick = { menuExpanded = true },
                 ),
             leadingContent = {
@@ -835,25 +915,34 @@ private fun SftpEntryItem(
             },
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (entry.isDir && !entry.isLink && !selectionMode) {
+                    // Both are real buttons and the same size: before, a folder's download icon
+                    // was a button and a file's was decoration, in the same place with the same
+                    // glyph. Hidden while selecting, where the row's job is to tick a box.
+                    //
+                    // Wide but not tall, on purpose. A file's row is a two-line ListItem and a
+                    // folder's is one line, so a 48dp-tall button fits inside the first and pushes
+                    // the second past its 56dp — folders grew and files did not. 40dp of height
+                    // keeps every row the size it was, and the 8dp of slop above and below lands on
+                    // the row's own padding, which opens the menu: a harmless neighbour. Width is
+                    // where a real neighbour is, so that is where the target is generous — and only
+                    // that generous: aiming at the row and hitting download starts a transfer you
+                    // did not want, while aiming at download and hitting the row costs one tap,
+                    // because Download is the first item of the menu.
+                    if (!selectionMode && (!entry.isDir || !entry.isLink)) {
                         IconButton(
-                            onClick = onDownloadFolder,
-                            modifier = Modifier.size(40.dp),
+                            onClick = if (entry.isDir) onDownloadFolder else onClick,
+                            modifier = Modifier.size(width = 48.dp, height = 40.dp),
                         ) {
                             Icon(
                                 Icons.Default.Download,
-                                contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                                contentDescription = stringResource(
+                                    if (entry.isDir) R.string.sftp_download_folder_cd
+                                    else R.string.sftp_download_cd
+                                ),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp),
                             )
                         }
-                    } else if (!entry.isDir) {
-                        Icon(
-                            Icons.Default.Download,
-                            contentDescription = stringResource(R.string.sftp_download_cd),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp),
-                        )
                     }
                 }
             },
@@ -864,8 +953,9 @@ private fun SftpEntryItem(
             onDismissRequest = { menuExpanded = false },
             offset = DpOffset(x = (-8).dp, y = 0.dp),
         ) {
-            // On touchless devices CENTER opens this menu, so the primary action lives here too.
-            if (showOverflow && !selectionMode) {
+            // First, because a tap used to download and this menu is what a tap now opens: the
+            // habit survives as one extra tap instead of becoming a dead end.
+            if (!selectionMode) {
                 if (entry.isDir) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.sftp_menu_open)) },
@@ -908,6 +998,13 @@ private fun SftpEntryItem(
                     onClick = { menuExpanded = false; onHex() },
                 )
             }
+            // Cut sits with rename rather than with the download actions: both are things you
+            // do to the entry where it lives, and neither moves a byte over the network.
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.sftp_menu_cut)) },
+                leadingIcon = { Icon(Icons.Default.ContentCut, null) },
+                onClick = { menuExpanded = false; onCut() },
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.sftp_menu_rename)) },
                 leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) },
@@ -1275,7 +1372,9 @@ private fun BoxScope.DownloadComplete(
 private fun FileConflictDialog(
     message: String,
     onKeepBoth: () -> Unit,
-    onOverwrite: () -> Unit,
+    // Null hides the button: two folders of the same name cannot be merged by any SFTP request,
+    // so offering to replace one would mean deleting a tree nobody has looked at.
+    onOverwrite: (() -> Unit)?,
     onCancel: () -> Unit,
 ) {
     AlertDialog(
@@ -1296,17 +1395,19 @@ private fun FileConflictDialog(
                     OutlinedButton(onClick = onKeepBoth, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.action_keep_both))
                     }
-                    OutlinedButton(
-                        onClick = onOverwrite,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        ),
-                        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                            brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
-                        ),
-                    ) {
-                        Text(stringResource(R.string.action_overwrite))
+                    if (onOverwrite != null) {
+                        OutlinedButton(
+                            onClick = onOverwrite,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
+                            ),
+                        ) {
+                            Text(stringResource(R.string.action_overwrite))
+                        }
                     }
                 }
                 TextButton(onClick = onCancel) {
@@ -1315,6 +1416,34 @@ private fun FileConflictDialog(
             }
         },
     )
+}
+
+/**
+ * The pending cut, above the listing: what is waiting, where it came from, Paste and cancel.
+ *
+ * Deliberately a row of its own and not an icon in the toolbar: a cut is a mode the user is in,
+ * and a mode has to say what it holds and how to leave it.
+ */
+@Composable
+private fun CutBar(count: Int, fromDir: String, onPaste: () -> Unit, onCancel: () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.secondaryContainer, tonalElevation = 2.dp) {
+        Row(
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                pluralStringResource(R.plurals.sftp_cut_pending, count, count, fromDir),
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            TextButton(onClick = onPaste) { Text(stringResource(R.string.sftp_paste)) }
+            IconButton(onClick = onCancel) {
+                Icon(Icons.Default.Close, stringResource(R.string.sftp_cut_cancel_cd))
+            }
+        }
+    }
 }
 
 /** "Some files already exist": skip them, overwrite all, or cancel. Downloads and uploads. */

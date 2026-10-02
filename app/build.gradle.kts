@@ -14,8 +14,9 @@ android {
         applicationId = "com.sshborg"
         minSdk = 29
         targetSdk = 36
-        versionCode = 35
-        versionName = "1.18.0"
+        versionCode = 36
+        versionName = "1.19.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     val localProps = Properties()
@@ -48,6 +49,19 @@ android {
         }
     }
 
+    // The exported schemas ride along in the test APK's assets, which is where
+    // MigrationTestHelper looks for them.
+    sourceSets["androidTest"].assets.directories.add("$projectDir/schemas")
+
+    testOptions {
+        unitTests {
+            // The SSH layer logs through android.util.Log on a couple of fallback paths, and an
+            // android.jar stub throws when called. Returning defaults instead keeps a real code
+            // path from dying on a log line it only reaches when something unusual happened.
+            isReturnDefaultValues = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -72,6 +86,22 @@ android {
 }
 
 dependencies {
+    constraints {
+        // room-testing needs kotlinx-serialization 1.8.x to read the exported schemas, while
+        // androidx.navigation asks for 1.7.3 — and AGP's consistent resolution hands the app's
+        // resolved version to the instrumented tests as well, where Room then dies with an
+        // AbstractMethodError on GeneratedSerializer that names no version at all.
+        //
+        // `require` is a floor, not a pin: it raises what is already there to at least this, and
+        // any dependency asking for more still wins (checked: with a 1.9.0 request in the graph,
+        // everything resolves to 1.9.0). The pin that trapped us was the `strictly` in
+        // kotlinx-serialization's own BOM. Delete this whole block once navigation asks for
+        // 1.8.1 or later by itself.
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+            version { require("1.8.1") }
+        }
+    }
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -94,4 +124,56 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.sora.editor)
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.androidx.room.testing)
+}
+
+// Room writes the schema of every version here, and the files are committed: a migration test
+// has nothing to validate against without them, and a schema that changed without a migration
+// shows up as a diff instead of as a crash on someone's phone.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+// Unit tests run on the JVM: no device, no emulator. The ones that need a corpus of real files
+// or a real server are told where to find them by test.properties, which is not in the repo —
+// see test.properties.example. Each entry becomes an environment variable (keyCorpus ->
+// SSHBORG_KEY_CORPUS); a test whose settings are missing skips itself. A -P property of the same
+// name wins over the file, which is how a CI run passes them in.
+// The bundle we upload is built only after the unit tests have passed. Deliberately not wired to
+// assembleRelease: that is the command F-Droid builds with, and a test failing on a machine we
+// cannot look at would break a build for reasons that have nothing to do with the code.
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    dependsOn("testDebugUnitTest")
+}
+
+tasks.withType<Test>().configureEach {
+    fun variableFor(name: String) =
+        "SSHBORG_" + name.replace(Regex("([a-z0-9])([A-Z])"), "$1_$2").uppercase()
+
+    val settings = linkedMapOf<String, String>()
+    val file = rootProject.file("test.properties")
+    if (file.exists()) {
+        // Read as UTF-8, not the ISO-8859-1 a .properties file defaults to: a passphrase may
+        // well have an accent or an emoji in it, and that is exactly what one of them tests.
+        val loaded = Properties()
+        file.reader(Charsets.UTF_8).use { loaded.load(it) }
+        loaded.forEach { (key, value) -> settings[key.toString()] = value.toString() }
+    }
+    settings.keys.toList().forEach { name ->
+        (project.findProperty(name) as String?)?.let { settings[name] = it }
+    }
+    listOf("keyCorpus", "keyCorpusPassphrase", "keyCorpusUtf8Passphrase", "editorCorpus",
+           "sshHost", "sshPort", "sshUser", "sshKeyDir", "sshKeyPassphrase").forEach { name ->
+        if (name !in settings) (project.findProperty(name) as String?)?.let { settings[name] = it }
+    }
+    settings.forEach { (name, value) -> environment(variableFor(name), value) }
+
+    testLogging { events("passed", "skipped", "failed") }
 }

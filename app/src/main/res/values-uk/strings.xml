@@ -173,6 +173,10 @@
     <string name="settings_double_tap_tab_twice">Надіслати Tab двічі</string>
     <string name="settings_keep_screen_on_title">Не вимикати екран</string>
     <string name="settings_keep_screen_on_subtitle">Запобігає вимкненню екрана, поки відкрито термінал</string>
+    <string name="settings_terminal_bar_autohide_title">Автоматично ховати смужку заголовка</string>
+    <string name="settings_terminal_bar_autohide_subtitle">У терміналі смужка ховається й повертається, коли торкнутися екрана. Виключено — вона завжди видима.</string>
+    <string name="settings_terminal_hide_status_bar_title">Ховати смужку стану</string>
+    <string name="settings_terminal_hide_status_bar_subtitle">У терміналі ховати також годинник і сповіщення Android. Щоб побачити її, потягніть від верхнього краю.</string>
     <string name="settings_terminal_colors_title">Кольори термінала</string>
     <string name="settings_terminal_colors_follow_app">Як тема застосунку</string>
     <string name="settings_font_size_title">Розмір шрифту</string>
@@ -261,7 +265,7 @@
     <string name="sftp_rename_new_name">Нова назва</string>
 
     <string name="sftp_conflict_title">Файл вже існує</string>
-    <string name="sftp_conflict_message">\"%1$s\" вже існує в Downloads/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" вже існує в %2$s.</string>
 
     <string name="sftp_mkdir_title">Нова папка</string>
     <string name="sftp_mkdir_folder_name">Назва папки</string>
@@ -270,6 +274,20 @@
     <string name="sftp_menu_edit">Відкрити в редакторі</string>
     <string name="sftp_menu_hex">Відкрити в HEX</string>
     <string name="sftp_menu_rename">Перейменувати</string>
+    <string name="sftp_menu_cut">Вирізати</string>
+    <string name="sftp_cut_cd">Вирізати</string>
+    <string name="sftp_paste">Вставити</string>
+    <string name="sftp_cut_cancel_cd">Скасувати переміщення</string>
+    <string name="sftp_move_folder_exists">Тут уже є папка з назвою \"%1$s\", а дві папки не можна об\'єднати.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d із %2$d назв тут уже зайняті, і одна з них — папка: дві папки не можна об\'єднати.</string>
+    <string name="sftp_move_into_itself">Папку не можна перемістити в саму себе.</string>
+    <string name="error_move_failed">Не вдалося перемістити</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d елемент для переміщення з %2$s</item>
+        <item quantity="few">%1$d елементи для переміщення з %2$s</item>
+        <item quantity="many">%1$d елементів для переміщення з %2$s</item>
+        <item quantity="other">%1$d елементів для переміщення з %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
     <string name="sftp_background_download_failed">Помилка завантаження</string>

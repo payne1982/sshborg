@@ -564,6 +564,21 @@
     </div>
 
         <article class="release">
+            <h2>1.1.0<span class="release-date">2026-09-27</span></h2>
+            <ul>
+                <li>SFTP: eingebauter Editor für die Dateien auf dem Server — Textdateien werden direkt dort bearbeitet und behalten Kodierung und Zeilenenden, Konfigurationsdateien werden farbig hervorgehoben, und alles, was kein Text ist, öffnet im Hex-Editor</li>
+                <li>SSH-Schlüssel: ein Schlüssel mit Passphrase funktioniert jetzt — die Passphrase wird beim Import einmal verlangt und nirgends gespeichert. Früher importierte Schlüssel neu importieren; die Liste zeigt sie.</li>
+                <li>Scrollen in tmux und anderen Vollbild-Apps mit aktivierter Maus korrigiert: Eine Wischgeste scrollt jetzt deren Verlauf, statt Text auszuwählen</li>
+                <li>Textauswahl korrigiert: Langes Drücken wählt jetzt sofort aus, die Auswahl verschwindet nicht mehr bei neuer Ausgabe, und ihre Griffe lassen sich ziehen</li>
+                <li>SFTP: Fehler bleiben sichtbar und nennen die fehlgeschlagene Datei; eine Aktion über mehrere Dateien läuft weiter und listet auf, was nicht ging</li>
+                <li>Terminal: Befehlsverlauf wird ohne zweite Anmeldung gelesen</li>
+                <li>App-Sperre: die Zeit zählt ab dem Verlassen der App, nicht ab dem letzten Entsperren</li>
+                <li>Zusatztastenleiste: im zweizeiligen Layout stehen die Pfeile wieder untereinander — die Tastaturtaste verschiebt die obere Zeile nicht mehr</li>
+                <li>Terminal: Kopieren funktioniert auf neueren iOS-Versionen wieder — langes Drücken oder ein Doppeltippen auf ein Wort bietet jetzt Kopieren an; vorher erschien überhaupt kein Menü</li>
+                <li>Terminal: kein blaues Aufblitzen mehr über den ganzen Bildschirm beim schnellen Tippen mit eingeschalteten Wortvorschlägen</li>
+            </ul>
+        </article>
+        <article class="release">
             <h2>1.0.0<span class="release-date">2026-09-14</span></h2>
             <ul>
                 <li>Erste Version im App Store</li>
