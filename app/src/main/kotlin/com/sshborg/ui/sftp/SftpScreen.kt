@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -159,6 +160,8 @@ fun SftpScreen(
     var pendingConflict  by remember { mutableStateOf<SftpViewModel.ConflictData?>(null) }
     var pendingBatchConflict by remember { mutableStateOf<SftpViewModel.BatchConflictData?>(null) }
     var pendingUploadConflict by remember { mutableStateOf<SftpViewModel.UploadConflict?>(null) }
+    var pendingMoveConflict by remember { mutableStateOf<SftpViewModel.MoveConflict?>(null) }
+    val pendingCut by vm.cut.collectAsState()
 
     LaunchedEffect(Unit) {
         vm.conflictEvent.collect { pendingConflict = it }
@@ -168,6 +171,9 @@ fun SftpScreen(
     }
     LaunchedEffect(Unit) {
         vm.uploadConflictEvent.collect { pendingUploadConflict = it }
+    }
+    LaunchedEffect(Unit) {
+        vm.moveConflictEvent.collect { pendingMoveConflict = it }
     }
 
     // File picker — opens system file chooser, result forwarded to ViewModel
@@ -212,6 +218,16 @@ fun SftpScreen(
                                 enabled = selectedEntries.isNotEmpty(),
                             ) {
                                 Icon(Icons.Default.Download, stringResource(R.string.sftp_download_selected_cd))
+                            }
+                            IconButton(
+                                onClick = {
+                                    vm.cutEntries(selectedEntries.toList(), currentPath)
+                                    selectionMode = false
+                                    selectedEntries = emptySet()
+                                },
+                                enabled = selectedEntries.isNotEmpty(),
+                            ) {
+                                Icon(Icons.Default.ContentCut, stringResource(R.string.sftp_cut_cd))
                             }
                             IconButton(
                                 onClick = { pendingBulkDelete = selectedEntries.toList() },
@@ -328,6 +344,20 @@ fun SftpScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(bottom = 240.dp),
                         ) {
+                            // What was cut, where you can see it and get out of it: how many
+                            // things are waiting, where they came from, and the two buttons.
+                            // Sticky rather than an icon in the toolbar, because an icon alone
+                            // answers none of those three questions.
+                            pendingCut?.let { c ->
+                                stickyHeader(key = "cut") {
+                                    CutBar(
+                                        count    = c.entries.size,
+                                        fromDir  = c.fromDir,
+                                        onPaste  = { vm.paste(s.path) },
+                                        onCancel = { vm.clearCut() },
+                                    )
+                                }
+                            }
                             // ".." row — go up one level (hidden at root, not selectable)
                             if (!atRoot) {
                                 item(key = "..") {
@@ -390,6 +420,7 @@ fun SftpScreen(
                                         } else null,
                                         onRename       = { entryToRename = entry },
                                         onDelete       = { entryToDelete = entry },
+                                        onCut          = { vm.cutEntries(listOf(entry), s.path) },
                                         showOverflow   = isTouchless,
                                     )
                                 }
@@ -651,6 +682,39 @@ fun SftpScreen(
         }
     }
 
+    // Move conflict: the same two dialogs, about a name already taken in the destination. A
+    // folder collision gets no Overwrite — nothing in SFTP can merge two folders, and `mv`
+    // refuses as well, so the only honest offers are to keep both or to stop.
+    pendingMoveConflict?.let { conflict ->
+        val decide = { d: SftpViewModel.MoveDecision -> pendingMoveConflict = null; vm.resolveMoveConflict(d) }
+        when (conflict) {
+            is SftpViewModel.MoveConflict.Single -> FileConflictDialog(
+                message     = stringResource(
+                    if (conflict.folder) R.string.sftp_move_folder_exists
+                    else R.string.sftp_upload_conflict_message,
+                    conflict.name,
+                ),
+                onKeepBoth  = { decide(SftpViewModel.MoveDecision.KEEP_BOTH) },
+                onOverwrite = if (conflict.folder) null else {
+                    { decide(SftpViewModel.MoveDecision.OVERWRITE) }
+                },
+                onCancel    = { decide(SftpViewModel.MoveDecision.CANCEL) },
+            )
+            is SftpViewModel.MoveConflict.Batch -> FileConflictDialog(
+                message     = stringResource(
+                    if (conflict.folder) R.string.sftp_move_batch_folder_exists
+                    else R.string.sftp_upload_batch_conflict_message,
+                    conflict.conflictCount, conflict.totalCount,
+                ),
+                onKeepBoth  = { decide(SftpViewModel.MoveDecision.KEEP_BOTH) },
+                onOverwrite = if (conflict.folder) null else {
+                    { decide(SftpViewModel.MoveDecision.OVERWRITE) }
+                },
+                onCancel    = { decide(SftpViewModel.MoveDecision.CANCEL) },
+            )
+        }
+    }
+
     // New folder dialog
     if (showMkdirDialog) {
         var folderName by remember { mutableStateOf("") }
@@ -771,6 +835,7 @@ private fun SftpEntryItem(
     onHex: (() -> Unit)?,
     onRename: () -> Unit,
     onDelete: () -> Unit,
+    onCut: () -> Unit,
     showOverflow: Boolean = false,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -933,6 +998,13 @@ private fun SftpEntryItem(
                     onClick = { menuExpanded = false; onHex() },
                 )
             }
+            // Cut sits with rename rather than with the download actions: both are things you
+            // do to the entry where it lives, and neither moves a byte over the network.
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.sftp_menu_cut)) },
+                leadingIcon = { Icon(Icons.Default.ContentCut, null) },
+                onClick = { menuExpanded = false; onCut() },
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.sftp_menu_rename)) },
                 leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, null) },
@@ -1300,7 +1372,9 @@ private fun BoxScope.DownloadComplete(
 private fun FileConflictDialog(
     message: String,
     onKeepBoth: () -> Unit,
-    onOverwrite: () -> Unit,
+    // Null hides the button: two folders of the same name cannot be merged by any SFTP request,
+    // so offering to replace one would mean deleting a tree nobody has looked at.
+    onOverwrite: (() -> Unit)?,
     onCancel: () -> Unit,
 ) {
     AlertDialog(
@@ -1321,17 +1395,19 @@ private fun FileConflictDialog(
                     OutlinedButton(onClick = onKeepBoth, modifier = Modifier.fillMaxWidth()) {
                         Text(stringResource(R.string.action_keep_both))
                     }
-                    OutlinedButton(
-                        onClick = onOverwrite,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        ),
-                        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                            brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
-                        ),
-                    ) {
-                        Text(stringResource(R.string.action_overwrite))
+                    if (onOverwrite != null) {
+                        OutlinedButton(
+                            onClick = onOverwrite,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
+                            ),
+                        ) {
+                            Text(stringResource(R.string.action_overwrite))
+                        }
                     }
                 }
                 TextButton(onClick = onCancel) {
@@ -1340,6 +1416,34 @@ private fun FileConflictDialog(
             }
         },
     )
+}
+
+/**
+ * The pending cut, above the listing: what is waiting, where it came from, Paste and cancel.
+ *
+ * Deliberately a row of its own and not an icon in the toolbar: a cut is a mode the user is in,
+ * and a mode has to say what it holds and how to leave it.
+ */
+@Composable
+private fun CutBar(count: Int, fromDir: String, onPaste: () -> Unit, onCancel: () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.secondaryContainer, tonalElevation = 2.dp) {
+        Row(
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                pluralStringResource(R.plurals.sftp_cut_pending, count, count, fromDir),
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            TextButton(onClick = onPaste) { Text(stringResource(R.string.sftp_paste)) }
+            IconButton(onClick = onCancel) {
+                Icon(Icons.Default.Close, stringResource(R.string.sftp_cut_cancel_cd))
+            }
+        }
+    }
 }
 
 /** "Some files already exist": skip them, overwrite all, or cancel. Downloads and uploads. */

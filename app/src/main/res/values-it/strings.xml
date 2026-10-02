@@ -274,6 +274,18 @@
     <string name="sftp_menu_edit">Apri nell\'editor</string>
     <string name="sftp_menu_hex">Apri in esadecimale</string>
     <string name="sftp_menu_rename">Rinomina</string>
+    <string name="sftp_menu_cut">Taglia</string>
+    <string name="sftp_cut_cd">Taglia</string>
+    <string name="sftp_paste">Incolla</string>
+    <string name="sftp_cut_cancel_cd">Annulla lo spostamento</string>
+    <string name="sftp_move_folder_exists">Una cartella di nome \"%1$s\" è già qui, e due cartelle non possono essere unite.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d nomi su %2$d sono già presenti qui, e uno è una cartella: due cartelle non possono essere unite.</string>
+    <string name="sftp_move_into_itself">Una cartella non può essere spostata dentro se stessa.</string>
+    <string name="error_move_failed">Spostamento non riuscito</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d elemento da spostare da %2$s</item>
+        <item quantity="other">%1$d elementi da spostare da %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Scarica in background</string>
     <string name="sftp_background_downloads_title">Download in background</string>
     <string name="sftp_background_download_failed">Download non riuscito</string>

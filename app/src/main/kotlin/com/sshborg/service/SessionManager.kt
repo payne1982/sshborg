@@ -1,5 +1,6 @@
 package com.sshborg.service
 
+import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.data.ssh.ShellSession
 import com.sshborg.data.ssh.SftpSession
 import com.sshborg.terminal.TerminalEmulator
@@ -31,7 +32,18 @@ class SessionManager {
         // SFTP-specific
         val sftpSession: SftpSession? = null,
         val sftpCurrentPath: String = "/",
+        val sftpCut: SftpCut? = null,
     )
+
+    /**
+     * Entries cut in the SFTP browser, waiting to be pasted somewhere else on the same server.
+     *
+     * Held on the session rather than in the browser's ViewModel, which is recreated when you
+     * step into a terminal tab and back — and deliberately scoped to one session, because a cut
+     * is a rename on one server: pasting it onto another host would be a transfer, which SFTP
+     * cannot do at all.
+     */
+    data class SftpCut(val fromDir: String, val entries: List<SftpEntry>)
 
     private val _sessions = MutableStateFlow<List<ActiveSession>>(emptyList())
     val sessions: StateFlow<List<ActiveSession>> = _sessions.asStateFlow()

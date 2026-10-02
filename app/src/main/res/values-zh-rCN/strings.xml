@@ -288,6 +288,17 @@
     <string name="sftp_menu_edit">在编辑器中打开</string>
     <string name="sftp_menu_hex">以十六进制打开</string>
     <string name="sftp_menu_rename">重命名</string>
+    <string name="sftp_menu_cut">剪切</string>
+    <string name="sftp_cut_cd">剪切</string>
+    <string name="sftp_paste">粘贴</string>
+    <string name="sftp_cut_cancel_cd">取消移动</string>
+    <string name="sftp_move_folder_exists">这里已经有名为“%1$s”的文件夹，两个文件夹无法合并。</string>
+    <string name="sftp_move_batch_folder_exists">%2$d 个名称中有 %1$d 个在此已被占用，其中包含文件夹：两个文件夹无法合并。</string>
+    <string name="sftp_move_into_itself">文件夹不能移动到它自己里面。</string>
+    <string name="error_move_failed">移动失败</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="other">%1$d 项待从 %2$s 移动</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">在后台下载</string>
     <string name="sftp_background_downloads_title">后台下载</string>
     <string name="sftp_background_download_failed">下载失败</string>

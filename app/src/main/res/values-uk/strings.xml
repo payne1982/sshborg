@@ -274,6 +274,20 @@
     <string name="sftp_menu_edit">Відкрити в редакторі</string>
     <string name="sftp_menu_hex">Відкрити в HEX</string>
     <string name="sftp_menu_rename">Перейменувати</string>
+    <string name="sftp_menu_cut">Вирізати</string>
+    <string name="sftp_cut_cd">Вирізати</string>
+    <string name="sftp_paste">Вставити</string>
+    <string name="sftp_cut_cancel_cd">Скасувати переміщення</string>
+    <string name="sftp_move_folder_exists">Тут уже є папка з назвою \"%1$s\", а дві папки не можна об\'єднати.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d із %2$d назв тут уже зайняті, і одна з них — папка: дві папки не можна об\'єднати.</string>
+    <string name="sftp_move_into_itself">Папку не можна перемістити в саму себе.</string>
+    <string name="error_move_failed">Не вдалося перемістити</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d елемент для переміщення з %2$s</item>
+        <item quantity="few">%1$d елементи для переміщення з %2$s</item>
+        <item quantity="many">%1$d елементів для переміщення з %2$s</item>
+        <item quantity="other">%1$d елементів для переміщення з %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Завантажити у фоні</string>
     <string name="sftp_background_downloads_title">Фонові завантаження</string>
     <string name="sftp_background_download_failed">Помилка завантаження</string>

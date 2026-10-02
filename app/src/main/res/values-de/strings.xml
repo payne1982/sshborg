@@ -274,6 +274,18 @@
     <string name="sftp_menu_edit">Im Editor öffnen</string>
     <string name="sftp_menu_hex">Hexadezimal öffnen</string>
     <string name="sftp_menu_rename">Umbenennen</string>
+    <string name="sftp_menu_cut">Ausschneiden</string>
+    <string name="sftp_cut_cd">Ausschneiden</string>
+    <string name="sftp_paste">Einfügen</string>
+    <string name="sftp_cut_cancel_cd">Verschieben abbrechen</string>
+    <string name="sftp_move_folder_exists">Ein Ordner namens \"%1$s\" ist hier schon vorhanden, und zwei Ordner können nicht zusammengeführt werden.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d von %2$d Namen sind hier schon vergeben, und einer davon ist ein Ordner: zwei Ordner können nicht zusammengeführt werden.</string>
+    <string name="sftp_move_into_itself">Ein Ordner kann nicht in sich selbst verschoben werden.</string>
+    <string name="error_move_failed">Verschieben fehlgeschlagen</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d Element zu verschieben aus %2$s</item>
+        <item quantity="other">%1$d Elemente zu verschieben aus %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Im Hintergrund herunterladen</string>
     <string name="sftp_background_downloads_title">Hintergrund-Downloads</string>
     <string name="sftp_background_download_failed">Download fehlgeschlagen</string>

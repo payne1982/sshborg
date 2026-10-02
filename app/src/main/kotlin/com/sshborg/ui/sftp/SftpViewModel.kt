@@ -436,6 +436,23 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
     fun resolveUploadConflict(decision: UploadDecision) { uploadDecision.tryEmit(decision) }
 
+    /** Emitted when a paste finds something already using a name in the destination. */
+    sealed interface MoveConflict {
+        data class Single(val name: String, val folder: Boolean) : MoveConflict
+        data class Batch(val conflictCount: Int, val totalCount: Int, val folder: Boolean) : MoveConflict
+    }
+    /** No OVERWRITE for folders: see [paste]. */
+    enum class MoveDecision { OVERWRITE, KEEP_BOTH, CANCEL }
+    private val _moveConflictEvent = MutableSharedFlow<MoveConflict>(extraBufferCapacity = 1)
+    val moveConflictEvent: SharedFlow<MoveConflict> = _moveConflictEvent
+    private val moveDecision = MutableSharedFlow<MoveDecision>(extraBufferCapacity = 1)
+
+    fun resolveMoveConflict(decision: MoveDecision) { moveDecision.tryEmit(decision) }
+
+    private val _cut = MutableStateFlow<SessionManager.SftpCut?>(null)
+    /** What is waiting to be pasted, or null. Mirrors the session's own copy. */
+    val cut: StateFlow<SessionManager.SftpCut?> = _cut.asStateFlow()
+
     /** Job covering the Preparing phase of a batch download. */
     private var preparationJob: Job? = null
     /** ID of the transfer currently shown in the foreground (mirrored to [_state]). */
@@ -453,6 +470,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun attach(id: String) {
         sessionId = id
+        _cut.value = sessionManager.get(id)?.sftpCut
         seedShowHidden()
         val session = sessionManager.get(id) ?: run {
             _state.value = State.Error(getApplication<Application>().getString(R.string.error_session_not_found)); return
@@ -1088,6 +1106,133 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             runCatching { sftpSession!!.rename(oldPath, newPath) }
                 .onSuccess { refreshListing() }
                 .onFailure { report(ErrorReport(str(R.string.error_rename_failed), listOf(FileFailure.of(entry.name, it))), refresh = false) }
+        }
+    }
+
+    // ── Move: cut and paste ───────────────────────────────────────────────────
+
+    fun cutEntries(entries: List<SftpEntry>, fromDir: String) {
+        if (entries.isEmpty()) return
+        val c = SessionManager.SftpCut(fromDir.trimEnd('/'), entries)
+        _cut.value = c
+        sessionId?.let { id -> sessionManager.update(id) { it.copy(sftpCut = c) } }
+    }
+
+    fun clearCut() {
+        _cut.value = null
+        sessionId?.let { id -> sessionManager.update(id) { it.copy(sftpCut = null) } }
+    }
+
+    /**
+     * Moves what was cut into [toDir], with SFTP alone: every step here is a rename, which the
+     * server performs on its own filesystem without a byte crossing the network. There is no
+     * copy in the protocol and no shell involved, so nothing here works on a file's contents.
+     *
+     * The destination is always checked first. That is not caution for its own sake: a rename
+     * onto a name that exists overwrites silently on a server offering posix-rename@openssh.com
+     * and fails on one that does not, so leaving the decision to the server would mean the same
+     * gesture destroying a file on one host and refusing on another. docs/sftp-move.md has the
+     * details and the same rule for the iOS side.
+     *
+     * Folders that collide are never replaced. POSIX rename can only replace an empty directory,
+     * two directories cannot be merged by any SFTP request, and `mv` itself refuses — so the
+     * dialog offers to keep both or to stop, and says why.
+     */
+    fun paste(toDir: String) {
+        val session = sftpSession ?: return
+        val c = _cut.value ?: return
+        val dest = toDir.trimEnd('/')
+        // Already where it was asked to go: nothing to do, and the clipboard has served.
+        if (c.fromDir == dest) { clearCut(); return }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            // A folder cannot be moved inside itself: the server would either refuse or strand
+            // the tree, and the test is a prefix of the path.
+            val intoItself = c.entries.filter { it.isDir && !it.isLink }.filter { e ->
+                dest == "${c.fromDir}/${e.name}" || dest.startsWith("${c.fromDir}/${e.name}/")
+            }
+            if (intoItself.isNotEmpty()) {
+                report(
+                    ErrorReport(
+                        str(R.string.error_move_failed),
+                        intoItself.map {
+                            FileFailure(it.name, str(R.string.sftp_move_into_itself), "")
+                        },
+                    ),
+                    refresh = false,
+                )
+                return@launch
+            }
+
+            val taken = c.entries.mapNotNull { e ->
+                session.lstatOrNull("$dest/${e.name}")?.let { e to it }
+            }.toMap()
+
+            var policy = MoveDecision.OVERWRITE
+            if (taken.isNotEmpty()) {
+                // One folder anywhere in the collision takes the overwrite option away for the
+                // whole paste: a button that replaces some names and refuses others would be
+                // worse than one that does not appear.
+                val folder = taken.any { (entry, existing) -> entry.isDir || existing.isDir }
+                _moveConflictEvent.tryEmit(
+                    if (c.entries.size == 1)
+                        MoveConflict.Single(c.entries.first().name, folder)
+                    else
+                        MoveConflict.Batch(taken.size, c.entries.size, folder)
+                )
+                policy = moveDecision.first()
+                if (policy == MoveDecision.CANCEL) return@launch
+            }
+
+            val failures = mutableListOf<FileFailure>()
+            for (entry in c.entries) {
+                val src = "${c.fromDir}/${entry.name}"
+                runCatching {
+                    when {
+                        entry !in taken -> session.rename(src, "$dest/${entry.name}")
+                        policy == MoveDecision.KEEP_BOTH ->
+                            session.rename(src, "$dest/${freeName(session, dest, entry)}")
+                        else -> replace(session, src, "$dest/${entry.name}")
+                    }
+                }.onFailure { failures += FileFailure.of(entry.name, it) }
+            }
+            clearCut()
+            if (failures.isEmpty()) refreshListing()
+            else report(ErrorReport(str(R.string.error_move_failed), failures), refresh = true)
+        }
+    }
+
+    /**
+     * Overwriting, done by us rather than asked of the server: park what is in the way under a
+     * free name, move the source into place, then delete the parked copy — and if the move
+     * fails, put the parked file back. Every rename here has a free destination, which is what
+     * makes it behave identically on every server and under both of this project's SFTP
+     * clients, and at no point does the user's file exist under no name at all.
+     *
+     * Only ever called for a file: a folder collision does not offer this.
+     */
+    private fun replace(session: SftpSession, src: String, dst: String) {
+        val parked = "$dst.sshborg-replaced-${System.currentTimeMillis()}"
+        session.rename(dst, parked)
+        try {
+            session.rename(src, dst)
+        } catch (e: Exception) {
+            runCatching { session.rename(parked, dst) }
+            throw e
+        }
+        runCatching { session.deleteFile(parked) }
+    }
+
+    /** "name(1)", "name(2)"… the first the destination does not hold; the same shape downloads use. */
+    private fun freeName(session: SftpSession, dir: String, entry: SftpEntry): String {
+        val dot = if (entry.isDir) -1 else entry.name.lastIndexOf('.')
+        val base = if (dot > 0) entry.name.substring(0, dot) else entry.name
+        val ext  = if (dot > 0) entry.name.substring(dot) else ""
+        var n = 1
+        while (true) {
+            val candidate = "$base($n)$ext"
+            if (session.lstatOrNull("$dir/$candidate") == null) return candidate
+            n++
         }
     }
 

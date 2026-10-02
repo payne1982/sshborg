@@ -289,6 +289,18 @@
     <string name="sftp_menu_edit">Open in editor</string>
     <string name="sftp_menu_hex">Open in hex</string>
     <string name="sftp_menu_rename">Rename</string>
+    <string name="sftp_menu_cut">Cut</string>
+    <string name="sftp_cut_cd">Cut</string>
+    <string name="sftp_paste">Paste</string>
+    <string name="sftp_cut_cancel_cd">Cancel the move</string>
+    <string name="sftp_move_folder_exists">A folder called \"%1$s\" is already here, and two folders cannot be merged.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d of %2$d names are already taken here, and one of them is a folder: two folders cannot be merged.</string>
+    <string name="sftp_move_into_itself">A folder cannot be moved inside itself.</string>
+    <string name="error_move_failed">Move failed</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d item to move from %2$s</item>
+        <item quantity="other">%1$d items to move from %2$s</item>
+    </plurals>
     <string name="sftp_menu_delete">Delete</string>
     <string name="sftp_menu_download_in_background">Download in background</string>
     <string name="sftp_background_downloads_title">Background downloads</string>

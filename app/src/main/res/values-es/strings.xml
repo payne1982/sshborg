@@ -274,6 +274,18 @@
     <string name="sftp_menu_edit">Abrir en el editor</string>
     <string name="sftp_menu_hex">Abrir en hexadecimal</string>
     <string name="sftp_menu_rename">Renombrar</string>
+    <string name="sftp_menu_cut">Cortar</string>
+    <string name="sftp_cut_cd">Cortar</string>
+    <string name="sftp_paste">Pegar</string>
+    <string name="sftp_cut_cancel_cd">Cancelar el movimiento</string>
+    <string name="sftp_move_folder_exists">Ya hay aquí una carpeta llamada \"%1$s\", y dos carpetas no se pueden fusionar.</string>
+    <string name="sftp_move_batch_folder_exists">%1$d de %2$d nombres ya están ocupados aquí, y uno es una carpeta: dos carpetas no se pueden fusionar.</string>
+    <string name="sftp_move_into_itself">Una carpeta no se puede mover dentro de sí misma.</string>
+    <string name="error_move_failed">No se pudo mover</string>
+    <plurals name="sftp_cut_pending">
+        <item quantity="one">%1$d elemento para mover desde %2$s</item>
+        <item quantity="other">%1$d elementos para mover desde %2$s</item>
+    </plurals>
     <string name="sftp_menu_download_in_background">Descargar en segundo plano</string>
     <string name="sftp_background_downloads_title">Descargas en segundo plano</string>
     <string name="sftp_background_download_failed">Descarga fallida</string>
