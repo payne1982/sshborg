@@ -15,6 +15,11 @@
 # Usage:  scripts/run-instrumented.sh [test class or method]
 #     scripts/run-instrumented.sh
 #     scripts/run-instrumented.sh com.sshborg.data.db.MigrationTest
+#
+# Two switches, for the screen recording in make-fgs-video.sh: --install-only builds, copies and
+# installs without running anything, and SSHBORG_SKIP_INSTALL=1 runs the tests on what is already
+# installed. Pushing 86 MB onto the emulator is heavy enough to kill a recording in progress, so
+# that script installs first and only then turns the camera on.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -32,14 +37,19 @@ remote="$user@$host"
 ssh_opts=(-o BatchMode=yes -o ConnectTimeout=10)
 run() { ssh "${ssh_opts[@]}" "$remote" "$@"; }
 
-echo "== building"
-JAVA_HOME=${JAVA_HOME:-/home/payne/jdk21} ./gradlew -q assembleDebug assembleDebugAndroidTest
+install_only=""
+if [ "${1:-}" = "--install-only" ]; then install_only=yes; shift; fi
 
+# Which app we are talking to is needed whether or not anything is installed this time round.
 app=app/build/outputs/apk/debug/app-debug.apk
 test_app=app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 package=$(sed -n 's/.*applicationId = "\(.*\)".*/\1/p' app/build.gradle.kts)
 suffix=$(sed -n 's/.*applicationIdSuffix = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
 target="${package}${suffix}"
+
+if [ -z "${SSHBORG_SKIP_INSTALL:-}" ]; then
+echo "== building"
+JAVA_HOME=${JAVA_HOME:-/home/payne/jdk21} ./gradlew -q assembleDebug assembleDebugAndroidTest
 
 echo "== waiting for a device on $host"
 run "$adb wait-for-device" || { echo "no device: is the emulator running there?" >&2; exit 1; }
@@ -55,6 +65,8 @@ run "$adb install -r -t '$dir/$(basename "$test_app")'"
 # no hierarchy at all ("No compose hierarchies found in the app"). Granting it up front is what a
 # test device is for.
 run "$adb shell pm grant '$target' android.permission.POST_NOTIFICATIONS" 2>/dev/null || true
+fi
+[ -z "$install_only" ] || { echo "== installato"; exit 0; }
 
 # With no argument, everything except the screenshot runs: those photograph the app instead of
 # checking it, and they are slow. Naming a class asks for exactly that class, screenshots included.
