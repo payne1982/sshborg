@@ -265,7 +265,7 @@
     <string name="sftp_rename_new_name">Nuevo nombre</string>
 
     <string name="sftp_conflict_title">El archivo ya existe</string>
-    <string name="sftp_conflict_message">\"%1$s\" ya existe en Descargas/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" ya existe en %2$s.</string>
 
     <string name="sftp_mkdir_title">Nueva carpeta</string>
     <string name="sftp_mkdir_folder_name">Nombre de carpeta</string>

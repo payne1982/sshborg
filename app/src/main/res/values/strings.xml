@@ -280,7 +280,7 @@
     <string name="sftp_rename_new_name">New name</string>
 
     <string name="sftp_conflict_title">File already exists</string>
-    <string name="sftp_conflict_message">\"%1$s\" already exists in Downloads/SSHBorg/.</string>
+    <string name="sftp_conflict_message">\"%1$s\" already exists in %2$s.</string>
 
     <string name="sftp_mkdir_title">New folder</string>
     <string name="sftp_mkdir_folder_name">Folder name</string>

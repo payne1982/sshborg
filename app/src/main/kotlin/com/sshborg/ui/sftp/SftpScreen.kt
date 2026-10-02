@@ -611,7 +611,12 @@ fun SftpScreen(
     // Download conflict dialogs
     pendingConflict?.let { conflict ->
         FileConflictDialog(
-            message    = stringResource(R.string.sftp_conflict_message, conflict.entry.name),
+            // The folder is passed in, not written into the string: a debug build downloads
+            // into Download/SSHBorg-debug/ and the message used to name the release folder,
+            // so it told you about an app you were not using.
+            message    = stringResource(
+                R.string.sftp_conflict_message, conflict.entry.name, vm.downloadFolder,
+            ),
             onKeepBoth = { pendingConflict = null; vm.downloadKeepBoth(conflict) },
             onOverwrite = { pendingConflict = null; vm.downloadOverwrite(conflict) },
             onCancel   = { pendingConflict = null },

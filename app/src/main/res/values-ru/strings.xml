@@ -280,7 +280,7 @@
     <string name="sftp_rename_new_name">Новое имя</string>
 
     <string name="sftp_conflict_title">Файл уже существует</string>
-    <string name="sftp_conflict_message">«%1$s» уже существует в Downloads/SSHBorg/.</string>
+    <string name="sftp_conflict_message">«%1$s» уже существует в %2$s.</string>
 
     <string name="sftp_mkdir_title">Новая папка</string>
     <string name="sftp_mkdir_folder_name">Название папки</string>

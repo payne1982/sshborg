@@ -279,7 +279,7 @@
     <string name="sftp_rename_new_name">新名称</string>
 
     <string name="sftp_conflict_title">文件已存在</string>
-    <string name="sftp_conflict_message">"%1$s"已存在于 Downloads/SSHBorg/ 中。</string>
+    <string name="sftp_conflict_message">"%1$s"已存在于 %2$s 中。</string>
 
     <string name="sftp_mkdir_title">新建文件夹</string>
     <string name="sftp_mkdir_folder_name">文件夹名称</string>
