@@ -773,12 +773,22 @@ private fun SftpEntryItem(
     Box {
         ListItem(
             modifier = Modifier
-                // Remote/keyboard Menu key opens the action menu; CENTER stays the primary
-                // action (open a folder / download a file). Trailing buttons aren't D-pad-
-                // focusable and a long-press isn't practical with a remote.
+                // Remote/keyboard Menu key opens the action menu. Trailing buttons aren't
+                // D-pad-focusable and a long-press isn't practical with a remote.
                 .onMenuKey(enabled = showOverflow && !selectionMode) { menuExpanded = true }
                 .combinedClickable(
-                    onClick = onClick,
+                    // A tap on a FOLDER enters it — that is the one gesture nobody doubts in a
+                    // file browser, and a menu there would make browsing twice as slow. A tap on
+                    // a FILE opens the menu, for two reasons given in issue #17: the actions on a
+                    // remote file (download, edit, hex, rename, delete) were reachable only by
+                    // long-pressing, which nothing on screen announces, so the editor could not
+                    // be found at all; and the old tap started a download of any size with no
+                    // confirmation, which is the most consequential thing on the row. Downloading
+                    // is now the button on the right and the first item of the menu, so the old
+                    // habit costs one extra tap at worst.
+                    onClick = {
+                        if (selectionMode || entry.isDir) onClick() else menuExpanded = true
+                    },
                     onLongClick = { menuExpanded = true },
                 ),
             leadingContent = {
@@ -835,25 +845,25 @@ private fun SftpEntryItem(
             },
             trailingContent = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (entry.isDir && !entry.isLink && !selectionMode) {
+                    // Both are real buttons and the same size: before, a folder's download icon
+                    // was a button and a file's was decoration, in the same place with the same
+                    // glyph. 48dp is Material's minimum target and the two-line row has the height
+                    // for it. Hidden while selecting, where the row's job is to tick a box.
+                    if (!selectionMode && (!entry.isDir || !entry.isLink)) {
                         IconButton(
-                            onClick = onDownloadFolder,
-                            modifier = Modifier.size(40.dp),
+                            onClick = if (entry.isDir) onDownloadFolder else onClick,
+                            modifier = Modifier.size(48.dp),
                         ) {
                             Icon(
                                 Icons.Default.Download,
-                                contentDescription = stringResource(R.string.sftp_download_folder_cd),
+                                contentDescription = stringResource(
+                                    if (entry.isDir) R.string.sftp_download_folder_cd
+                                    else R.string.sftp_download_cd
+                                ),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp),
                             )
                         }
-                    } else if (!entry.isDir) {
-                        Icon(
-                            Icons.Default.Download,
-                            contentDescription = stringResource(R.string.sftp_download_cd),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp),
-                        )
                     }
                 }
             },
@@ -864,8 +874,9 @@ private fun SftpEntryItem(
             onDismissRequest = { menuExpanded = false },
             offset = DpOffset(x = (-8).dp, y = 0.dp),
         ) {
-            // On touchless devices CENTER opens this menu, so the primary action lives here too.
-            if (showOverflow && !selectionMode) {
+            // First, because a tap used to download and this menu is what a tap now opens: the
+            // habit survives as one extra tap instead of becoming a dead end.
+            if (!selectionMode) {
                 if (entry.isDir) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.sftp_menu_open)) },

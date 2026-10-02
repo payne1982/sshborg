@@ -286,7 +286,9 @@ class StoreScreenshots {
         awaitText("nginx.conf")
         shoot("10-sftp")
 
-        compose.onNodeWithText("nginx.conf", substring = true).performTouchInput { longClick() }
+        // A plain tap, which is what opens a file's menu now (issue #17); the long press
+        // still does the same, but the pictures should follow the gesture a user is told about.
+        compose.onNodeWithText("nginx.conf", substring = true).performClick()
         compose.onNodeWithText(text(R.string.sftp_menu_edit)).performClick()
         // Wait on the editor's own chrome, not on the text: the editor is a custom View, and what
         // it draws is nowhere in the semantics tree. Looking for a word of the file there waits
