@@ -1,5 +1,5 @@
 • Las sesiones que quedan abiertas en segundo plano ya no las detiene el sistema al cabo de unas horas.
-• Más espacio en el terminal: la barra de título se oculta sola y vuelve al tocar la pantalla, y también se puede ocultar la barra de estado.
-• SFTP: al tocar un archivo se abren sus acciones (editar, renombrar, eliminar) y la flecha de la derecha lo descarga.
+• Más espacio en el terminal: la barra de título se oculta sola y vuelve al tocar, y también se puede ocultar la barra de estado.
+• SFTP: al tocar un archivo se abren sus acciones, ahora con cortar y pegar para moverlo en el servidor; la flecha de la derecha lo descarga.
 • Al girar el teléfono, la app ya no vuelve a pedir el bloqueo.
 • Actualizadas las bibliotecas de la app.
