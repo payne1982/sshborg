@@ -1,69 +1,79 @@
 <en-US>
 • Sessions left open in the background are no longer stopped by the system after a few hours.
-• More room in the terminal: the title bar hides itself and comes back when you tap the screen, and the system status bar can be hidden too (both in Settings).
+• More room in the terminal: the title bar hides itself and comes back when you tap the screen, and the system status bar can be hidden too.
+• SFTP: a tap on a file opens its actions — edit, rename, delete — and the arrow on the right downloads it.
 • Turning the phone no longer asks for the app lock again.
 • Updated the libraries the app is built on.
 </en-US>
 
 <it-IT>
 • Le sessioni lasciate aperte in background non vengono più fermate dal sistema dopo alcune ore.
-• Più spazio nel terminale: la barra del titolo si nasconde da sola e torna quando tocchi lo schermo, e si può nascondere anche la barra di stato di sistema (entrambe nelle impostazioni).
+• Più spazio nel terminale: la barra del titolo si nasconde da sola e torna quando tocchi lo schermo, e si può nascondere anche la barra di stato.
+• SFTP: toccando un file si aprono le sue azioni — modifica, rinomina, elimina — e la freccia a destra lo scarica.
 • Ruotando il telefono l'app non chiede più di sbloccarsi di nuovo.
 • Aggiornate le librerie su cui è costruita l'app.
 </it-IT>
 
 <de-DE>
 • Im Hintergrund offen gelassene Sitzungen werden vom System nicht mehr nach einigen Stunden beendet.
-• Mehr Platz im Terminal: die Titelleiste blendet sich selbst aus und kommt beim Antippen des Bildschirms zurück, und auch die Statusleiste des Systems lässt sich ausblenden (beides in den Einstellungen).
+• Mehr Platz im Terminal: die Titelleiste blendet sich selbst aus und kommt beim Antippen zurück; auch die Statusleiste lässt sich ausblenden.
+• SFTP: Antippen einer Datei öffnet ihre Aktionen (bearbeiten, umbenennen, löschen); der Pfeil rechts lädt sie herunter.
 • Beim Drehen des Telefons fragt die App nicht mehr erneut nach der Sperre.
-• Die Bibliotheken, auf denen die App aufbaut, wurden aktualisiert.
+• Die Bibliotheken der App wurden aktualisiert.
 </de-DE>
 
 <es-ES>
 • Las sesiones que quedan abiertas en segundo plano ya no las detiene el sistema al cabo de unas horas.
-• Más espacio en el terminal: la barra de título se oculta sola y vuelve al tocar la pantalla, y también se puede ocultar la barra de estado del sistema (ambas en los ajustes).
+• Más espacio en el terminal: la barra de título se oculta sola y vuelve al tocar la pantalla, y también se puede ocultar la barra de estado.
+• SFTP: al tocar un archivo se abren sus acciones (editar, renombrar, eliminar) y la flecha de la derecha lo descarga.
 • Al girar el teléfono, la app ya no vuelve a pedir el bloqueo.
-• Actualizadas las bibliotecas sobre las que se construye la app.
+• Actualizadas las bibliotecas de la app.
 </es-ES>
 
 <fr-FR>
 • Les sessions laissées ouvertes en arrière-plan ne sont plus arrêtées par le système au bout de quelques heures.
-• Plus de place dans le terminal : la barre de titre se masque d'elle-même et revient quand vous touchez l'écran, et la barre d'état du système peut aussi être masquée (les deux dans les réglages).
-• Tourner le téléphone ne redemande plus le verrouillage de l'app.
-• Mise à jour des bibliothèques sur lesquelles l'app est construite.
+• Plus de place dans le terminal : la barre de titre se masque d'elle-même et revient quand vous touchez l'écran, et la barre d'état peut aussi être masquée.
+• SFTP : toucher un fichier ouvre ses actions (modifier, renommer, supprimer) et la flèche à droite le télécharge.
+• Tourner le téléphone ne redemande plus le verrouillage.
+• Mise à jour des bibliothèques de l'app.
 </fr-FR>
 
 <pt-PT>
 • As sessões deixadas abertas em segundo plano já não são interrompidas pelo sistema depois de algumas horas.
-• Mais espaço no terminal: a barra de título esconde-se sozinha e volta quando toca no ecrã, e também pode ocultar a barra de estado do sistema (ambas nas definições).
+• Mais espaço no terminal: a barra de título esconde-se sozinha e volta quando toca no ecrã, e também pode ocultar a barra de estado.
+• SFTP: tocar num ficheiro abre as suas ações (editar, renomear, eliminar) e a seta à direita descarrega-o.
 • Rodar o telefone já não volta a pedir o bloqueio da app.
 • Atualizadas as bibliotecas em que a app assenta.
 </pt-PT>
 
 <uk>
 • Сеанси, залишені відкритими у фоновому режимі, більше не зупиняє система через кілька годин.
-• Більше місця в терміналі: смужка заголовка ховається сама й повертається, коли торкнутися екрана; смужку стану системи теж можна сховати (обидва — у налаштуваннях).
+• Більше місця в терміналі: смужка заголовка ховається сама й повертається, коли торкнутися екрана; смужку стану теж можна сховати.
+• SFTP: дотик до файлу відкриває його дії (редагувати, перейменувати, видалити), а стрілка праворуч завантажує його.
 • Поворот телефона більше не вимагає знову розблоковувати застосунок.
 • Оновлено бібліотеки, на яких побудовано застосунок.
 </uk>
 
 <ru-RU>
 • Сессии, оставленные открытыми в фоне, больше не прерываются системой через несколько часов.
-• Больше места в терминале: строка заголовка скрывается сама и возвращается при касании экрана; системную строку состояния тоже можно скрыть (оба — в настройках).
+• Больше места в терминале: строка заголовка скрывается сама и возвращается при касании экрана; строку состояния тоже можно скрыть.
+• SFTP: касание файла открывает его действия (изменить, переименовать, удалить), а стрелка справа загружает его.
 • Поворот телефона больше не требует снова разблокировать приложение.
 • Обновлены библиотеки, на которых построено приложение.
 </ru-RU>
 
 <zh-CN>
 • 在后台保持打开的会话，不再会在几小时后被系统终止。
-• 终端空间更大：标题栏会自动收起，轻触屏幕即返回；系统状态栏也可以隐藏（均在设置中）。
+• 终端空间更大：标题栏会自动收起，轻触屏幕即返回；系统状态栏也可以隐藏。
+• SFTP：轻触文件即可打开其操作（编辑、重命名、删除），右侧的箭头直接下载。
 • 旋转手机不再要求重新解锁应用。
 • 更新了应用所依赖的库。
 </zh-CN>
 
 <ja-JP>
 • バックグラウンドで開いたままのセッションが、数時間後にシステムに終了されることはなくなりました。
-• ターミナルが広くなりました：タイトルバーは自動で隠れ、画面をタップすると戻ります。システムのステータスバーも隠せます（どちらも設定から）。
+• ターミナルが広くなりました：タイトルバーは自動で隠れ、画面をタップすると戻ります。システムのステータスバーも隠せます。
+• SFTP：ファイルをタップすると操作（編集・名前の変更・削除）が開きます。右側の矢印でダウンロードできます。
 • 画面を回転しても、アプリのロック解除を再度求められなくなりました。
 • アプリが使っているライブラリを更新しました。
 </ja-JP>

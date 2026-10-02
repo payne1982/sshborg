@@ -171,25 +171,25 @@ module.exports = {
             <h2>// GESTOR DE FICHEIROS SFTP</h2>
             <p>O gestor de ficheiros SFTP permite-lhe explorar, carregar, transferir, renomear e eliminar ficheiros no servidor diretamente a partir do telemóvel. Abra-o no ecrã de hosts com <strong>Ficheiros</strong> no menu de um host.</p>
             <h3>Navegação</h3>
-            <p>Toque numa pasta para a abrir. Use a seta de retrocesso ou toque em qualquer segmento da barra de caminho para subir na árvore de diretórios.</p>
+            <p>Toque numa pasta para a abrir. Use a seta de retrocesso ou toque em qualquer segmento da barra de caminho para subir na árvore de diretórios. Tocar num ficheiro abre o que pode fazer com ele: transferir, abrir no editor, renomear, eliminar.</p>
             <p>As ligações simbólicas são apresentadas com um pequeno crachá em forma de corrente. Tocar numa ligação simbólica navega para o seu destino: se apontar para um diretório, entra nele; se apontar para um ficheiro, comporta-se como um ficheiro normal.</p>
             <h3>Carregar ficheiros</h3>
             <p>Toque no botão de <strong>carregamento</strong> (↑) para selecionar um ou mais ficheiros do armazenamento do telemóvel. O carregamento começa imediatamente e o progresso é mostrado no topo do ecrã.</p>
             <h3>Transferir ficheiros e pastas</h3>
-            <p>Toque em qualquer ficheiro para o transferir imediatamente. Para transferir uma pasta inteira, toque no ícone de <strong>transferência</strong> junto a ela — o SSHBorg transfere toda a árvore de diretórios e guarda-a na pasta <strong>Downloads</strong> do telemóvel.</p>
+            <p>Toque no ícone de <strong>transferência</strong> à direita da linha de um ficheiro para o transferir imediatamente. Para transferir uma pasta inteira, toque no ícone de <strong>transferência</strong> junto a ela — o SSHBorg transfere toda a árvore de diretórios e guarda-a na pasta <strong>Downloads</strong> do telemóvel.</p>
             <p>Se um ficheiro já existir no destino, uma caixa de diálogo perguntará se pretende <strong>substituir</strong>, <strong>ignorar</strong> o ficheiro ou <strong>cancelar</strong> toda a transferência.</p>
             <div class="callout callout-info">
                 <div class="callout-label">// NOTA SOBRE LIGAÇÕES SIMBÓLICAS</div>
                 Durante a transferência de uma pasta, as ligações simbólicas que apontam para diretórios são ignoradas — apenas os ficheiros normais (incluindo ligações para ficheiros) são transferidos. Isto evita transferências recursivas não intencionais.
             </div>
             <h3>Seleção múltipla e operações em lote</h3>
-            <p>Prima longamente qualquer item para entrar no modo de seleção e toque noutros itens para os adicionar à seleção. A barra de ferramentas mostra as ações disponíveis:</p>
+            <p>Toque em <strong>Selecionar itens</strong> na barra superior para entrar no modo de seleção e marque os itens que quiser. A barra de ferramentas mostra as ações disponíveis:</p>
             <ul>
                 <li><strong>Transferir</strong> — transfere todos os ficheiros e pastas selecionados de uma só vez, com uma caixa de diálogo de progresso e possibilidade de cancelamento.</li>
                 <li><strong>Eliminar</strong> — elimina todos os itens selecionados. Eliminar uma pasta não vazia remove todo o seu conteúdo de forma recursiva. <em>Esta ação não pode ser desfeita.</em></li>
             </ul>
             <h3>Editar ficheiros</h3>
-            <p>Abra o menu de um ficheiro — toque longo, ou o botão <strong>⋮</strong> — e escolha <strong>Abrir no editor</strong> para o alterar diretamente no servidor. No telemóvel não fica nada: o ficheiro é lido para memória, editado e escrito de volta.</p>
+            <p>Toque num ficheiro para abrir o seu menu e escolha <strong>Abrir no editor</strong> para o alterar diretamente no servidor. No telemóvel não fica nada: o ficheiro é lido para memória, editado e escrito de volta.</p>
             <p>O ficheiro volta como chegou. A codificação é detetada e reutilizada ao guardar, os fins de linha LF ou CRLF mantêm-se, um ficheiro que acabava sem mudança de linha continua assim, e as permissões ficam iguais. Se a codificação foi lida mal, toque nela na barra ao fundo do editor e escolha outra — a lista só oferece codificações capazes de reproduzir exatamente os bytes daquele ficheiro, por isso uma escolha errada pode parecer errada no ecrã mas não danifica nada.</p>
             <p>Ao guardar, é escrito um ficheiro temporário ao lado do original e depois renomeado para o lugar dele, de modo que uma ligação perdida a meio não deixa um ficheiro escrito pela metade no servidor.</p>
             <p>Os ficheiros abrem até 4 MB, seja qual for o seu tamanho: só são desenhadas as linhas no ecrã, por isso um ficheiro de megabytes desliza como um curto. Acima disso a resposta é o terminal, com <code>nano</code> ou <code>vi</code>, que não tem limite nenhum.</p>

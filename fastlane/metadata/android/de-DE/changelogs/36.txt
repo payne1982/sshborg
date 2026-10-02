@@ -1,4 +1,5 @@
 • Im Hintergrund offen gelassene Sitzungen werden vom System nicht mehr nach einigen Stunden beendet.
-• Mehr Platz im Terminal: die Titelleiste blendet sich selbst aus und kommt beim Antippen des Bildschirms zurück, und auch die Statusleiste des Systems lässt sich ausblenden (beides in den Einstellungen).
+• Mehr Platz im Terminal: die Titelleiste blendet sich selbst aus und kommt beim Antippen zurück; auch die Statusleiste lässt sich ausblenden.
+• SFTP: Antippen einer Datei öffnet ihre Aktionen (bearbeiten, umbenennen, löschen); der Pfeil rechts lädt sie herunter.
 • Beim Drehen des Telefons fragt die App nicht mehr erneut nach der Sperre.
-• Die Bibliotheken, auf denen die App aufbaut, wurden aktualisiert.
+• Die Bibliotheken der App wurden aktualisiert.

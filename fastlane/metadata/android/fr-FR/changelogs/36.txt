@@ -1,4 +1,5 @@
 • Les sessions laissées ouvertes en arrière-plan ne sont plus arrêtées par le système au bout de quelques heures.
-• Plus de place dans le terminal : la barre de titre se masque d'elle-même et revient quand vous touchez l'écran, et la barre d'état du système peut aussi être masquée (les deux dans les réglages).
-• Tourner le téléphone ne redemande plus le verrouillage de l'app.
-• Mise à jour des bibliothèques sur lesquelles l'app est construite.
+• Plus de place dans le terminal : la barre de titre se masque d'elle-même et revient quand vous touchez l'écran, et la barre d'état peut aussi être masquée.
+• SFTP : toucher un fichier ouvre ses actions (modifier, renommer, supprimer) et la flèche à droite le télécharge.
+• Tourner le téléphone ne redemande plus le verrouillage.
+• Mise à jour des bibliothèques de l'app.

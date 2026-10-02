@@ -1,4 +1,5 @@
 • Le sessioni lasciate aperte in background non vengono più fermate dal sistema dopo alcune ore.
-• Più spazio nel terminale: la barra del titolo si nasconde da sola e torna quando tocchi lo schermo, e si può nascondere anche la barra di stato di sistema (entrambe nelle impostazioni).
+• Più spazio nel terminale: la barra del titolo si nasconde da sola e torna quando tocchi lo schermo, e si può nascondere anche la barra di stato.
+• SFTP: toccando un file si aprono le sue azioni — modifica, rinomina, elimina — e la freccia a destra lo scarica.
 • Ruotando il telefono l'app non chiede più di sbloccarsi di nuovo.
 • Aggiornate le librerie su cui è costruita l'app.
