@@ -847,12 +847,21 @@ private fun SftpEntryItem(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Both are real buttons and the same size: before, a folder's download icon
                     // was a button and a file's was decoration, in the same place with the same
-                    // glyph. 48dp is Material's minimum target and the two-line row has the height
-                    // for it. Hidden while selecting, where the row's job is to tick a box.
+                    // glyph. Hidden while selecting, where the row's job is to tick a box.
+                    //
+                    // Wide but not tall, on purpose. A file's row is a two-line ListItem and a
+                    // folder's is one line, so a 48dp-tall button fits inside the first and pushes
+                    // the second past its 56dp — folders grew and files did not. 40dp of height
+                    // keeps every row the size it was, and the 8dp of slop above and below lands on
+                    // the row's own padding, which opens the menu: a harmless neighbour. Width is
+                    // where a real neighbour is, so that is where the target is generous — and only
+                    // that generous: aiming at the row and hitting download starts a transfer you
+                    // did not want, while aiming at download and hitting the row costs one tap,
+                    // because Download is the first item of the menu.
                     if (!selectionMode && (!entry.isDir || !entry.isLink)) {
                         IconButton(
                             onClick = if (entry.isDir) onDownloadFolder else onClick,
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(width = 48.dp, height = 40.dp),
                         ) {
                             Icon(
                                 Icons.Default.Download,
