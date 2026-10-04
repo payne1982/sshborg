@@ -26,6 +26,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -245,6 +246,12 @@ fun TerminalScreen(
             Column(
                 Modifier
                     .fillMaxSize()
+                    // Keep the grid inside the visible display, including waterfall edges.
+                    // This handles devices with bezel-covered pixels. Apply before
+                    // measuring TerminalView so its SSH column count uses the safe width.
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+                    )
                     .windowInsetsPadding(
                         WindowInsets.ime.union(WindowInsets.navigationBars)
                             .only(WindowInsetsSides.Bottom)
@@ -302,7 +309,11 @@ fun TerminalScreen(
                         terminalView     = null
                         vm.onNeedsRedraw = null
                     },
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .background(if (terminalLight) Color.White else Color.Black)
+                        .padding(horizontal = 4.dp),
                 )
 
                 // Tab chips. Many hosts -> one tab per host (tap a multi-session host
