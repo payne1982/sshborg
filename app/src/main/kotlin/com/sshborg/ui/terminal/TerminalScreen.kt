@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -134,6 +136,11 @@ fun TerminalScreen(
     var barShown by remember { mutableStateOf(true) }
     var barHeld  by remember { mutableStateOf(false) }
     var barTick  by remember { mutableIntStateOf(0) }
+    // What the selection covers on screen, and how tall the selection bar is: between them,
+    // enough to tell whether that bar — sitting in its usual corner — would be hiding the very
+    // text it is offering to copy, and where to put it instead.
+    var selectionBand      by remember { mutableStateOf<TerminalView.SelectionBand?>(null) }
+    var selectionBarHeight by remember { mutableIntStateOf(0) }
     val suggestions   by vm.suggestions.collectAsState()
     val extraBarPinned by vm.extraBarPinned.collectAsState()
     val extraBar       by vm.extraBar.collectAsState()
@@ -204,6 +211,19 @@ fun TerminalScreen(
 
     val imeVisible = WindowInsets.isImeVisible
 
+    // The system's furniture along the top edge, which both the terminal and anything floating
+    // over it have to keep clear of: the status bar while it is there, and the camera cut-out when
+    // it is not — in landscape that hole sits on a short edge, where it would eat the first
+    // characters of every line. With a fixed title bar there is nothing to do, because the bar is
+    // the Scaffold's and has already made the room.
+    val topFurniture: Modifier = when {
+        !barAutoHide  -> Modifier
+        hideStatusBar -> Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+        else          -> Modifier.windowInsetsPadding(
+            WindowInsets.statusBars.only(WindowInsetsSides.Top)
+        )
+    }
+
     val titleBar: @Composable () -> Unit = {
         TopAppBar(
             title = {
@@ -256,19 +276,7 @@ fun TerminalScreen(
                         WindowInsets.ime.union(WindowInsets.navigationBars)
                             .only(WindowInsetsSides.Bottom)
                     )
-                    // With no fixed bar above it, the terminal has to keep clear of the system's
-                    // own furniture itself: the status bar while it is there, and the camera
-                    // cut-out when it is not — in landscape that hole sits on a short edge, where
-                    // it would eat the first characters of every line.
-                    .then(
-                        when {
-                            !barAutoHide   -> Modifier
-                            hideStatusBar  -> Modifier.windowInsetsPadding(WindowInsets.displayCutout)
-                            else           -> Modifier.windowInsetsPadding(
-                                WindowInsets.statusBars.only(WindowInsetsSides.Top)
-                            )
-                        }
-                    )
+                    .then(topFurniture)
             ) {
                 // Terminal view
                 AndroidView(
@@ -283,6 +291,7 @@ fun TerminalScreen(
                             view.onInput              = sendInput
                             view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                            view.onSelectionBandChanged = { band -> selectionBand = band }
                             view.onTapConfirmed        = { barTick++; barShown = true }
                             vm.onNeedsRedraw           = { view.postInvalidate() }
                             terminalView               = view
@@ -298,6 +307,7 @@ fun TerminalScreen(
                         view.onInput              = sendInput
                         view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                        view.onSelectionBandChanged = { band -> selectionBand = band }
                         view.onTapConfirmed        = { barTick++; barShown = true }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         terminalView               = view
@@ -419,7 +429,7 @@ fun TerminalScreen(
                 }
             }
 
-            // Selection action bar — floats at the top of the terminal when in selection mode
+            // Selection action bar — floats over the terminal while a selection is held.
             if (inSelectionMode) {
                 val strCopied    = stringResource(R.string.action_copied)
                 val strSelection = stringResource(R.string.terminal_copy_selection)
@@ -435,9 +445,33 @@ fun TerminalScreen(
                         it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN) ||
                         it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_HTML)
                     } == true
+                // Its usual place is the top corner, out of the way of the prompt. But the
+                // selection can be up there too, and then the bar hides the very text it is
+                // offering to copy — and on a phone whose camera sits in the status bar, that
+                // strip is the worst place on the screen for a row of buttons. So when the
+                // selection reaches into the band the bar would cover, the bar steps down to just
+                // under the selection's lower handle, the way a text field's own toolbar drops
+                // below a selection it cannot fit above.
+                //
+                // It keeps the top alignment and moves by an offset, clamped to the terminal's
+                // own height: sending it to the bottom of the screen instead was tried first and
+                // the jump across the extra-key bar read as a glitch. Comparing the offset
+                // against the band works because the bar carries the same top inset as the
+                // terminal, so the two share an origin.
+                val band = selectionBand
+                val barOffsetPx = when {
+                    band == null || band.top >= selectionBarHeight -> 0
+                    else -> band.bottom.toInt()
+                        .coerceIn(0, (band.viewHeight - selectionBarHeight).coerceAtLeast(0))
+                }
                 SelectionBar(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
+                        .then(topFurniture)
+                        // Measured inside the inset, so this is the band of terminal the bar
+                        // actually covers — which is what the selection is compared against.
+                        .onSizeChanged { selectionBarHeight = it.height }
+                        .offset { IntOffset(0, barOffsetPx) }
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     labelCopySelection = strSelection,
                     labelCopyAll       = strAll,
