@@ -1,0 +1,2 @@
+• Im Querformat läuft der Terminaltext nicht mehr unter die Navigationsleiste, und an abgerundeten Bildschirmrändern wird nichts abgeschnitten.
+• Die Kopierschaltflächen erscheinen nicht mehr unter der Statusleiste oder der Frontkamera: bei einer Auswahl am oberen Rand öffnen sie sich darunter.

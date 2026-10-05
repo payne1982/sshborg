@@ -1,0 +1,2 @@
+• En paysage le texte du terminal ne passe plus sous la barre de navigation, et rien n'est coupé aux bords arrondis de l'écran.
+• Les boutons de copie n'apparaissent plus sous la barre d'état ni sous la caméra frontale : avec une sélection en haut, ils s'ouvrent en dessous.

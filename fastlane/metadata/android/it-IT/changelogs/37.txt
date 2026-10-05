@@ -1,0 +1,2 @@
+• In orizzontale il testo del terminale non passa più sotto la barra di navigazione, e ai bordi arrotondati dello schermo non si perde nulla.
+• I pulsanti di copia non compaiono più sotto la barra di stato o la fotocamera frontale: con una selezione in alto si aprono sotto di essa.

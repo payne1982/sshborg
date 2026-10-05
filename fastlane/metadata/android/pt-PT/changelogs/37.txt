@@ -1,0 +1,2 @@
+• Na horizontal o texto do terminal já não passa por baixo da barra de navegação, e nas bordas arredondadas do ecrã não se perde nada.
+• Os botões de copiar já não aparecem sob a barra de estado nem a câmara frontal: com uma seleção no topo, abrem-se abaixo dela.

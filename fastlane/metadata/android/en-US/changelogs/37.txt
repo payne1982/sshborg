@@ -1,0 +1,2 @@
+• In landscape the terminal text no longer runs under the navigation bar, and nothing is clipped at a rounded display's edges.
+• The copy buttons no longer appear under the status bar or the front camera: with a selection at the top of the screen they open below it.
