@@ -31,6 +31,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -224,6 +225,19 @@ fun TerminalScreen(
         )
     }
 
+    // How much of the terminal the retracting bar lies over. Measured rather than assumed, and
+    // then less the strip the two share: the bar brings its own top inset (TopAppBar's default)
+    // and the terminal has the same one from `topFurniture`, so that part covers nothing and
+    // cancels out. What remains is fed to the view model, which starts the first prompt below it.
+    val density = LocalDensity.current
+    var titleBarHeightPx by remember { mutableIntStateOf(0) }
+    val sharedTopInsetPx = when {
+        !barAutoHide  -> 0
+        hideStatusBar -> WindowInsets.displayCutout.getTop(density)
+        else          -> WindowInsets.statusBars.getTop(density)
+    }
+    val titleBarOverlapPx = (titleBarHeightPx - sharedTopInsetPx).coerceAtLeast(0).toFloat()
+
     val titleBar: @Composable () -> Unit = {
         TopAppBar(
             title = {
@@ -312,6 +326,10 @@ fun TerminalScreen(
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         terminalView               = view
                         view.wordMode              = wordMode
+                        // Re-read on every recomposition, not inside onResize: the bar is measured
+                        // a frame after the terminal, and no resize follows to ask again.
+                        vm.rowsUnderTitleBar =
+                            if (barAutoHide) view.rowsCovering(titleBarOverlapPx) else 0
                         view.postInvalidate()
                     },
                     onRelease = {
@@ -414,17 +432,20 @@ fun TerminalScreen(
                     modifier = Modifier.align(Alignment.TopCenter),
                 ) {
                     Box(
-                        Modifier.pointerInput(Unit) {
-                            // Watched on the Initial pass and never consumed, so the bar's own
-                            // buttons still get their taps; a finger down here only suspends the
-                            // countdown that would take the bar away.
-                            awaitPointerEventScope {
-                                while (true) {
-                                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                                    barHeld = event.changes.any { it.pressed }
+                        Modifier
+                            // How tall the bar is, which is how much terminal it hides.
+                            .onSizeChanged { titleBarHeightPx = it.height }
+                            .pointerInput(Unit) {
+                                // Watched on the Initial pass and never consumed, so the bar's own
+                                // buttons still get their taps; a finger down here only suspends
+                                // the countdown that would take the bar away.
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                                        barHeld = event.changes.any { it.pressed }
+                                    }
                                 }
                             }
-                        }
                     ) { titleBar() }
                 }
             }
@@ -445,13 +466,12 @@ fun TerminalScreen(
                         it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN) ||
                         it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_HTML)
                     } == true
-                // Its usual place is the top corner, out of the way of the prompt. But the
-                // selection can be up there too, and then the bar hides the very text it is
-                // offering to copy — and on a phone whose camera sits in the status bar, that
-                // strip is the worst place on the screen for a row of buttons. So when the
-                // selection reaches into the band the bar would cover, the bar steps down to just
-                // under the selection's lower handle, the way a text field's own toolbar drops
-                // below a selection it cannot fit above.
+                // It follows the selection, the way a text field's own toolbar does: resting on
+                // the selection's upper edge, and dropping below its lower one when there is not
+                // the room above. That second case is the one that was wrong — a selection near
+                // the top of the screen left the bar under the status bar and, on a phone whose
+                // camera sits in that strip, under the camera, while it covered the very text it
+                // was offering to copy.
                 //
                 // It keeps the top alignment and moves by an offset, clamped to the terminal's
                 // own height: sending it to the bottom of the screen instead was tried first and
@@ -459,9 +479,9 @@ fun TerminalScreen(
                 // against the band works because the bar carries the same top inset as the
                 // terminal, so the two share an origin.
                 val band = selectionBand
-                val barOffsetPx = when {
-                    band == null || band.top >= selectionBarHeight -> 0
-                    else -> band.bottom.toInt()
+                val barOffsetPx = if (band == null) 0 else {
+                    val above = band.top - selectionBarHeight
+                    (if (above >= 0f) above else band.bottom).toInt()
                         .coerceIn(0, (band.viewHeight - selectionBarHeight).coerceAtLeast(0))
                 }
                 SelectionBar(

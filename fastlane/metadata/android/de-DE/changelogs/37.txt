@@ -1,2 +1,3 @@
 • Im Querformat läuft der Terminaltext nicht mehr unter die Navigationsleiste, und an abgerundeten Bildschirmrändern wird nichts abgeschnitten.
-• Die Kopierschaltflächen erscheinen nicht mehr unter der Statusleiste oder der Frontkamera: bei einer Auswahl am oberen Rand öffnen sie sich darunter.
+• Die Kopierschaltflächen folgen der Auswahl, direkt darüber oder darunter, statt unter der Statusleiste oder der Frontkamera zu liegen.
+• Eine kurze Login-Meldung ist sofort lesbar: die ersten Zeilen der Sitzung beginnen jetzt unter der einfahrenden Titelleiste.

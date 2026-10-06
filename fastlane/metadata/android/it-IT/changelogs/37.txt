@@ -1,2 +1,3 @@
 • In orizzontale il testo del terminale non passa più sotto la barra di navigazione, e ai bordi arrotondati dello schermo non si perde nulla.
-• I pulsanti di copia non compaiono più sotto la barra di stato o la fotocamera frontale: con una selezione in alto si aprono sotto di essa.
+• I pulsanti di copia seguono la selezione, appena sopra o appena sotto, invece di finire sotto la barra di stato o la fotocamera frontale.
+• Un messaggio di login breve si legge subito: le prime righe della sessione partono sotto la barra del titolo che si ritira.

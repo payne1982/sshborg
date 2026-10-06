@@ -8,6 +8,7 @@ import android.view.*
 import android.view.inputmethod.*
 import com.sshborg.data.AppPreferences
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.hypot
 
@@ -259,6 +260,15 @@ class TerminalView @JvmOverloads constructor(
 
     val termColumns: Int get() = if (cellW > 0) floor(width / cellW).toInt().coerceAtLeast(1) else 80
     val termRows: Int get() = if (cellH > 0) floor(height / cellH).toInt().coerceAtLeast(1) else 24
+
+    /**
+     * How many whole rows of the grid something [px] pixels tall, lying over the top of the view,
+     * hides. Rounded up, because a row half covered is a row that cannot be read.
+     *
+     * Zero before the first measurement, when there is no cell height yet and so no answer.
+     */
+    fun rowsCovering(px: Float): Int =
+        if (cellH > 0f && px > 0f) ceil(px / cellH).toInt() else 0
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)

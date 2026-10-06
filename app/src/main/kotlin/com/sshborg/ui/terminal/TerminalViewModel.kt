@@ -164,6 +164,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         maybeConnect()
     }
 
+    /**
+     * Rows at the top of the grid that the retracting title bar lies over, as the screen measures
+     * them (0 when the bar is fixed and the terminal starts below it). Used once, at login, by
+     * [connect].
+     */
+    var rowsUnderTitleBar = 0
+
     /** Set once [attach] has run, so a size callback that races ahead of it doesn't try to connect early. */
     private var attached = false
     /** Last real geometry reported by the view (0 until the first measurement). */
@@ -314,6 +321,18 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
                     }
                     hostDao.recordConnection(hostId, System.currentTimeMillis())
+                    // A login that prints two lines leaves both of them under the title bar, and
+                    // the screen reads as empty until the bar retracts. So the first prompt starts
+                    // below the bar: as many line feeds as the bar covers, into our own grid,
+                    // before the first byte of the banner arrives. Nothing is sent to the server
+                    // and nothing enters the scrollback — the cursor simply begins further down.
+                    //
+                    // Here and not in [startReading], which also runs for a session being picked
+                    // up again after the app was away: that one already has its output on screen
+                    // and must not be nudged.
+                    val blankRows = rowsUnderTitleBar
+                        .coerceIn(0, (em.buffer.rows - 1).coerceAtLeast(0))
+                    if (blankRows > 0) synchronized(em) { em.process("\n".repeat(blankRows)) }
                     startReading(session)
                     if (prefs.historySuggestions.first()) loadCommandHistory(session)
                     return@launch

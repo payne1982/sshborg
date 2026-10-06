@@ -1,2 +1,3 @@
 • En paysage le texte du terminal ne passe plus sous la barre de navigation, et rien n'est coupé aux bords arrondis de l'écran.
-• Les boutons de copie n'apparaissent plus sous la barre d'état ni sous la caméra frontale : avec une sélection en haut, ils s'ouvrent en dessous.
+• Les boutons de copie suivent la sélection, juste au-dessus ou juste en dessous, au lieu de se placer sous la barre d'état ou la caméra frontale.
+• Un message de connexion court se lit tout de suite : les premières lignes de la session commencent sous la barre de titre escamotable.

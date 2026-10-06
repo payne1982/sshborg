@@ -1,2 +1,3 @@
 • En horizontal el texto del terminal ya no pasa por debajo de la barra de navegación, y en los bordes redondeados de la pantalla no se pierde nada.
-• Los botones de copiar ya no aparecen bajo la barra de estado ni la cámara frontal: con una selección arriba se abren debajo de ella.
+• Los botones de copiar siguen la selección, justo encima o justo debajo, en lugar de quedar bajo la barra de estado o la cámara frontal.
+• Un mensaje de inicio de sesión corto se lee de inmediato: las primeras líneas de la sesión empiezan debajo de la barra de título que se retrae.

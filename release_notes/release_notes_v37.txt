@@ -1,49 +1,59 @@
 <en-US>
 • In landscape the terminal text no longer runs under the navigation bar, and nothing is clipped at a rounded display's edges.
-• The copy buttons no longer appear under the status bar or the front camera: with a selection at the top of the screen they open below it.
+• The copy buttons follow the selection, just above it or just below it, instead of sitting under the status bar or the front camera.
+• A short login message is readable straight away: the session's first lines now start below the retracting title bar.
 </en-US>
 
 <it-IT>
 • In orizzontale il testo del terminale non passa più sotto la barra di navigazione, e ai bordi arrotondati dello schermo non si perde nulla.
-• I pulsanti di copia non compaiono più sotto la barra di stato o la fotocamera frontale: con una selezione in alto si aprono sotto di essa.
+• I pulsanti di copia seguono la selezione, appena sopra o appena sotto, invece di finire sotto la barra di stato o la fotocamera frontale.
+• Un messaggio di login breve si legge subito: le prime righe della sessione partono sotto la barra del titolo che si ritira.
 </it-IT>
 
 <de-DE>
 • Im Querformat läuft der Terminaltext nicht mehr unter die Navigationsleiste, und an abgerundeten Bildschirmrändern wird nichts abgeschnitten.
-• Die Kopierschaltflächen erscheinen nicht mehr unter der Statusleiste oder der Frontkamera: bei einer Auswahl am oberen Rand öffnen sie sich darunter.
+• Die Kopierschaltflächen folgen der Auswahl, direkt darüber oder darunter, statt unter der Statusleiste oder der Frontkamera zu liegen.
+• Eine kurze Login-Meldung ist sofort lesbar: die ersten Zeilen der Sitzung beginnen jetzt unter der einfahrenden Titelleiste.
 </de-DE>
 
 <es-ES>
 • En horizontal el texto del terminal ya no pasa por debajo de la barra de navegación, y en los bordes redondeados de la pantalla no se pierde nada.
-• Los botones de copiar ya no aparecen bajo la barra de estado ni la cámara frontal: con una selección arriba se abren debajo de ella.
+• Los botones de copiar siguen la selección, justo encima o justo debajo, en lugar de quedar bajo la barra de estado o la cámara frontal.
+• Un mensaje de inicio de sesión corto se lee de inmediato: las primeras líneas de la sesión empiezan debajo de la barra de título que se retrae.
 </es-ES>
 
 <fr-FR>
 • En paysage le texte du terminal ne passe plus sous la barre de navigation, et rien n'est coupé aux bords arrondis de l'écran.
-• Les boutons de copie n'apparaissent plus sous la barre d'état ni sous la caméra frontale : avec une sélection en haut, ils s'ouvrent en dessous.
+• Les boutons de copie suivent la sélection, juste au-dessus ou juste en dessous, au lieu de se placer sous la barre d'état ou la caméra frontale.
+• Un message de connexion court se lit tout de suite : les premières lignes de la session commencent sous la barre de titre escamotable.
 </fr-FR>
 
 <pt-PT>
 • Na horizontal o texto do terminal já não passa por baixo da barra de navegação, e nas bordas arredondadas do ecrã não se perde nada.
-• Os botões de copiar já não aparecem sob a barra de estado nem a câmara frontal: com uma seleção no topo, abrem-se abaixo dela.
+• Os botões de copiar seguem a seleção, logo acima ou logo abaixo, em vez de ficarem sob a barra de estado ou a câmara frontal.
+• Uma mensagem de início de sessão curta lê-se de imediato: as primeiras linhas da sessão começam abaixo da barra de título que se recolhe.
 </pt-PT>
 
 <uk>
 • У горизонтальній орієнтації текст термінала більше не йде під смужку навігації, а на закруглених краях екрана нічого не обрізається.
-• Кнопки копіювання більше не з'являються під смужкою стану чи фронтальною камерою: якщо виділення вгорі, вони відкриваються під ним.
+• Кнопки копіювання йдуть за виділенням — трохи вище або трохи нижче нього — замість того, щоб ховатися під смужкою стану чи фронтальною камерою.
+• Коротке вітання при вході видно відразу: перші рядки сесії тепер починаються під смужкою заголовка, що складається.
 </uk>
 
 <ru-RU>
 • В горизонтальной ориентации текст терминала больше не уходит под строку навигации, а на закруглённых краях экрана ничего не обрезается.
-• Кнопки копирования больше не появляются под строкой состояния или фронтальной камерой: если выделение вверху, они открываются под ним.
+• Кнопки копирования следуют за выделением — чуть выше или чуть ниже него — вместо того чтобы оказываться под строкой состояния или фронтальной камерой.
+• Короткое приветствие при входе видно сразу: первые строки сессии теперь начинаются под убирающейся строкой заголовка.
 </ru-RU>
 
 <zh-CN>
 • 横屏时终端文字不再被导航栏遮住，屏幕圆角处也不会再被裁掉。
-• 复制按钮不再出现在状态栏或前置摄像头下方：选中屏幕上方的文字时，按钮会显示在选区下面。
+• 复制按钮会跟着选区走，显示在它的上方或下方，不再落到状态栏或前置摄像头下面。
+• 登录信息很短时也能立刻看到：会话的头几行现在从可收起的标题栏下方开始。
 </zh-CN>
 
 <ja-JP>
 • 横向きでターミナルの文字がナビゲーションバーの下に隠れることがなくなり、画面の丸い角で切れることもなくなりました。
-• コピーのボタンがステータスバーや前面カメラの下に出なくなりました。画面上部を選択したときは、選択範囲の下に開きます。
+• コピーのボタンが選択範囲に合わせて、その少し上または少し下に出るようになり、ステータスバーや前面カメラの下に入らなくなりました。
+• ログインの表示が短くても、すぐに読めます。セッションの最初の行が、自動で隠れるタイトルバーの下から始まります。
 </ja-JP>
