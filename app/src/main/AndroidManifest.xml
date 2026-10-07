@@ -6,6 +6,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!--
+         Writing a download into the public Downloads folder is a filesystem write on Android 9 and
+         below. From Android 10 the media store takes the file without any permission, which is why
+         this stops at 28 and never reaches a modern device.
+    -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <!-- Touchless devices (Android TV / Google TV): don't let Play filter us out -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -70,6 +77,17 @@
                 android:value="Keeps the SSH and SFTP sessions the user has opened alive while the app is not in front, so a remote shell, an editing session or a file transfer is not cut off when the user switches app or the screen goes off. The user opens each session deliberately and closes it from the app or from this service's own notification. No other foreground service type describes an interactive remote terminal: nothing is synchronised, played or messaged, and the work has no length the app can know in advance." />
         </service>
 
+
+        <!-- Hands a finished download to a viewer on Android 9 and below; see res/xml/file_paths. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.downloads"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

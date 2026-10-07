@@ -1,9 +1,12 @@
 package com.sshborg.ui.sftp
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -78,6 +81,22 @@ fun SftpScreen(
         vm.attach(sessionId)
         if (vm.state.value == SftpViewModel.State.Connecting) {
             vm.connect()
+        }
+    }
+
+    // Android 9 and below have no Downloads collection: a download is a filesystem write into the
+    // public folder, and that needs the user's permission. Asked for on the way in rather than at
+    // the moment of a download, so the question does not land on top of a conflict dialog — and
+    // asked for only where it means anything, since from Android 10 the media store wants nothing.
+    val askForStorage = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* a refusal is reported by the download that fails, not by a second dialog */ }
+    LaunchedEffect(Unit) {
+        if (DownloadStore.needsStoragePermission &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED
+        ) {
+            askForStorage.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
     }
 

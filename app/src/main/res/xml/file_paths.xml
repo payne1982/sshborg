@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What the app's provider is allowed to hand to other apps: the public Downloads folder, and only
+  on Android 9 and below, where a finished download is a file rather than a media-store row and a
+  file:// uri cannot be shared. From Android 10 the row's own uri is used and nothing comes through
+  here.
+-->
+<paths>
+    <external-path name="downloads" path="Download/" />
+</paths>
