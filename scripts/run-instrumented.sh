@@ -68,6 +68,17 @@ run "$adb install -r -t '$dir/$(basename "$test_app")'"
 # no hierarchy at all ("No compose hierarchies found in the app"). Granting it up front is what a
 # test device is for.
 run "$adb shell pm grant '$target' android.permission.POST_NOTIFICATIONS" 2>/dev/null || true
+# Storage, for the download tests on API 28 and below. It has to be granted here and not from the
+# test, because below Android 10 this permission is a supplementary GID (sdcard_rw) handed to the
+# process when zygote forks it: granting it to a process already running leaves the permission
+# reported as held and every write still refused. Fails harmlessly from API 29, where the manifest
+# caps it at 28 and there is nothing to grant.
+# Both halves of the storage group: `pm grant` grants one permission, where a person tapping
+# "Allow" grants the group — and below Android 10 it is READ that decides the process's storage
+# mount mode, so WRITE alone leaves every write refused and list() returning null.
+run "$adb shell pm grant '$target' android.permission.READ_EXTERNAL_STORAGE" 2>/dev/null || true
+run "$adb shell pm grant '$target' android.permission.WRITE_EXTERNAL_STORAGE" 2>/dev/null || true
+run "$adb shell am force-stop '$target'" 2>/dev/null || true
 fi
 [ -z "$install_only" ] || { echo "== installato"; exit 0; }
 
@@ -82,7 +93,14 @@ fi
 echo "== running"
 # -r for the machine-readable stream, so a failure can be found in the output; the runner's own
 # exit status is not enough, it reports OK even when a test fails.
-output=$(run "$adb shell am instrument -w -r $filter $target.test/androidx.test.runner.AndroidJUnitRunner")
+# Under `timeout` for the same reason as the device wait: a test that hangs — androidx.test's
+# ActivityScenario.close() does, on API 28, when the launcher is in front — would otherwise keep
+# this script waiting for ever with nothing on screen to say so.
+output=$(run "timeout ${SSHBORG_TEST_TIMEOUT:-900} $adb shell am instrument -w -r $filter $target.test/androidx.test.runner.AndroidJUnitRunner") || {
+    echo "the test run did not finish within ${SSHBORG_TEST_TIMEOUT:-900}s (a hung test? ask the device for a thread dump)" >&2
+    echo "$output"
+    exit 1
+}
 echo "$output" | sed -n 's/^INSTRUMENTATION_STATUS: //p;s/^INSTRUMENTATION_RESULT: //p;/^Time:/p;/^OK (/p;/^FAILURES/p' | grep -vE "^(numtests|stream|id|current|class|test)=" || true
 
 if echo "$output" | grep -qE "^(FAILURES|INSTRUMENTATION_RESULT: shortMsg)"; then
