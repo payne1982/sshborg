@@ -187,8 +187,14 @@ fun TerminalScreen(
         }
     }
 
-    LaunchedEffect(barAutoHide, barShown, barHeld, barTick) {
-        if (barAutoHide && barShown && !barHeld) {
+    // The countdown waits for the session to be up. Measured from the moment the screen appears
+    // instead, it runs out while the user is still answering a password prompt or trusting a host
+    // key, and they arrive at a terminal whose bar has already gone — never having seen it, so
+    // never having learnt that a tap brings it back. With a key the connection is quick enough that
+    // it was only ever visible by luck.
+    val sessionUp = state is ConnectionState.Connected
+    LaunchedEffect(barAutoHide, barShown, barHeld, barTick, sessionUp) {
+        if (barAutoHide && barShown && !barHeld && sessionUp) {
             delay(TITLE_BAR_LINGER_MS)
             barShown = false
         }
