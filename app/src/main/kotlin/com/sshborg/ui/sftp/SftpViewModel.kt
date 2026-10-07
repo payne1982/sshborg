@@ -903,22 +903,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun findExistingDownload(filename: String, localDir: String): Uri? {
-        val context = getApplication<Application>()
-        val projection = arrayOf(MediaStore.Downloads._ID)
-        val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ? AND " +
-                        "${MediaStore.Downloads.RELATIVE_PATH} LIKE ?"
-        val selectionArgs = arrayOf(filename, "%${localDir.trimEnd('/')}%")
-        return context.contentResolver.query(
-            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-            projection, selection, selectionArgs, null,
-        )?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID))
-                ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id)
-            } else null
-        }
-    }
+    /** @see DownloadStore.find */
+    private fun findExistingDownload(filename: String, localDir: String): Uri? =
+        DownloadStore.find(getApplication<Application>().contentResolver, filename, localDir)
 
     /** Returns a name like "file(1).txt" that is not in [taken] (the remote folder's names). */
     private fun uniqueRemoteName(original: String, taken: Set<String>): String =
