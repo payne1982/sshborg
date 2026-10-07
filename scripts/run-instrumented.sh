@@ -52,7 +52,10 @@ echo "== building"
 JAVA_HOME=${JAVA_HOME:-/home/payne/jdk21} ./gradlew -q assembleDebug assembleDebugAndroidTest
 
 echo "== waiting for a device on $host"
-run "$adb wait-for-device" || { echo "no device: is the emulator running there?" >&2; exit 1; }
+# Through `timeout`, because wait-for-device does not fail when there is nothing to wait for —
+# it blocks for ever, and the message below could never be reached. A run then looks slow rather
+# than broken, which is how a stopped emulator cost an afternoon once.
+run "timeout 180 $adb wait-for-device" || { echo "no device: is the emulator running there? (~/Documents/sshborg-emulator/start.sh <avd>)" >&2; exit 1; }
 
 echo "== copying and installing"
 run "mkdir -p '$dir'"
