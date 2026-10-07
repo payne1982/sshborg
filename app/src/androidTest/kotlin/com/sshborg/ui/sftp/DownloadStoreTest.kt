@@ -32,10 +32,16 @@ class DownloadStoreTest {
     private val resolver =
         InstrumentationRegistry.getInstrumentation().targetContext.contentResolver
 
-    private val folder       = "${Environment.DIRECTORY_DOWNLOADS}/sshborg-query-test/"
-    private val below        = "${folder}sub/"
-    private val prefixSibling = "${Environment.DIRECTORY_DOWNLOADS}/sshborg-query-test-debug/"
-    private val underscored  = "${Environment.DIRECTORY_DOWNLOADS}/sshborg-query-test/a_b/"
+    /**
+     * A folder of this run's own. The media store does not always let go of a path when the row
+     * that held it is deleted — a second run then meets `UNIQUE constraint failed: files._data`
+     * from its own history — so no two runs are ever given the same name to collide over.
+     */
+    private val folder        = "${Environment.DIRECTORY_DOWNLOADS}/sshborg-test-${System.nanoTime()}/"
+    private val below         = "${folder}sub/"
+    /** Named so that [folder]'s name is a prefix of it, as the release and debug folders are. */
+    private val prefixSibling = "${folder.trimEnd('/')}-debug/"
+    private val underscored   = "${folder}a_b/"
 
     private val created = mutableListOf<Uri>()
 
@@ -92,7 +98,7 @@ class DownloadStoreTest {
     @Test fun anUnderscoreInAFolderNameIsACharacterAndNotAWildcard() {
         // Folder names come from the remote server, and SQL LIKE reads _ as "any character".
         put("report.txt", underscored)
-        assertNull(find("report.txt", "${Environment.DIRECTORY_DOWNLOADS}/sshborg-query-test/axb/"))
+        assertNull(find("report.txt", "${folder}axb/"))
         assertEquals(1, created.size)
     }
 
