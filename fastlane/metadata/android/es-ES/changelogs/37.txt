@@ -1,3 +1,4 @@
-• En horizontal el texto del terminal ya no pasa por debajo de la barra de navegación, y en los bordes redondeados de la pantalla no se pierde nada.
-• Los botones de copiar siguen la selección, justo encima o justo debajo, en lugar de quedar bajo la barra de estado o la cámara frontal.
-• Un mensaje de inicio de sesión corto se lee de inmediato: las primeras líneas de la sesión empiezan debajo de la barra de título que se retrae.
+• En horizontal el terminal ya no pasa por debajo de la barra de navegación, y en los bordes redondeados no se pierde nada.
+• Los botones de copiar siguen a la selección en vez de quedar bajo la barra de estado o la cámara frontal.
+• Un inicio de sesión corto se lee de inmediato: las primeras líneas empiezan debajo de la barra de título.
+• Una descarga ya no choca con un archivo del mismo nombre en otra carpeta, y al sobrescribir se reemplaza el correcto.

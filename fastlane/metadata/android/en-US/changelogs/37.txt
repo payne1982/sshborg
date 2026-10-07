@@ -1,3 +1,4 @@
-• In landscape the terminal text no longer runs under the navigation bar, and nothing is clipped at a rounded display's edges.
-• The copy buttons follow the selection, just above it or just below it, instead of sitting under the status bar or the front camera.
-• A short login message is readable straight away: the session's first lines now start below the retracting title bar.
+• In landscape the terminal no longer runs under the navigation bar, and nothing is clipped at rounded screen edges.
+• The copy buttons follow the selection instead of sitting under the status bar or the front camera.
+• A short login is readable at once: the session's first lines start below the retracting title bar.
+• A download no longer clashes with a file of the same name in another folder, and overwriting replaces the right one.
