@@ -20,6 +20,22 @@ import java.util.Properties
  */
 object SshManager {
 
+    /** How wide ssh-keygen wraps the body of an OpenSSH private key. PEM would say 64. */
+    private const val OPENSSH_PEM_WIDTH = 70
+
+    /**
+     * The body of an OpenSSH private key, broken into lines the way ssh-keygen breaks them.
+     *
+     * The breaking is done here instead of by `Base64.getMimeEncoder(width, …)` because MIME wants
+     * a line length that is a multiple of four and the JDK rounds a request down to one — asking
+     * it for 70 quietly returns 68, measured. OpenSSH does not follow that rule: it cuts the
+     * encoded string every 70 characters whatever that lands on. So the only way to match the file
+     * ssh-keygen writes is to encode it unbroken and break it afterwards.
+     */
+    private fun opensshPemBody(bytes: ByteArray): String =
+        java.util.Base64.getEncoder().encodeToString(bytes)
+            .chunked(OPENSSH_PEM_WIDTH).joinToString("\n")
+
     /**
      * Blocking JSch calls run here rather than in the caller's scope. A socket read cannot be
      * interrupted, so a connect stuck in one would hold a cancelled caller until it returned —
@@ -535,7 +551,10 @@ object SshManager {
 
         // Private key in OpenSSH format (understood by all modern SSH clients)
         val privBytes = org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil.encodePrivateKey(priv)
-        val b64 = java.util.Base64.getMimeEncoder(64, "\n".toByteArray()).encodeToString(privBytes)
+        // 70, which is what ssh-keygen writes. PEM says 64 and that is what this did until now, but
+        // OpenSSH's own private-key format is the one being written here and it wraps at 70 — and
+        // the iOS app follows ssh-keygen too, so the same key is now the same file on both.
+        val b64 = opensshPemBody(privBytes)
         val privPem = "-----BEGIN OPENSSH PRIVATE KEY-----\n$b64\n-----END OPENSSH PRIVATE KEY-----\n"
 
         // Public key in OpenSSH wire format → base64
@@ -671,7 +690,9 @@ object SshManager {
         // Cheap self-check before the caller's: the seed has to belong to this key.
         if (!params.generatePublicKey().encoded.contentEquals(publicKey)) return@runCatching null
         val encoded = org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil.encodePrivateKey(params)
-        val base64 = java.util.Base64.getMimeEncoder(64, "\n".toByteArray()).encodeToString(encoded)
+        // @see OPENSSH_PEM_WIDTH — this one re-serialises a key the user imported, so writing it
+        // at a width of our own would hand them back a file that no longer matches theirs.
+        val base64 = opensshPemBody(encoded)
         "-----BEGIN OPENSSH PRIVATE KEY-----\n$base64\n-----END OPENSSH PRIVATE KEY-----\n"
     }.getOrNull()
 
