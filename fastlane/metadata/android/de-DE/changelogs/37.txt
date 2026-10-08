@@ -1,0 +1,4 @@
+• Im Querformat läuft der Terminaltext nicht mehr unter die Navigationsleiste, und an runden Rändern wird nichts abgeschnitten.
+• Die Kopierschaltflächen folgen der Auswahl, statt unter der Statusleiste oder der Frontkamera zu liegen.
+• Eine kurze Login-Meldung ist sofort lesbar: die ersten Zeilen beginnen unter der einfahrenden Titelleiste.
+• Ein Download kollidiert nicht mehr mit einer gleichnamigen Datei in einem anderen Ordner, und Überschreiben ersetzt die richtige.

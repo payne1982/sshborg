@@ -26,9 +26,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -133,6 +137,11 @@ fun TerminalScreen(
     var barShown by remember { mutableStateOf(true) }
     var barHeld  by remember { mutableStateOf(false) }
     var barTick  by remember { mutableIntStateOf(0) }
+    // What the selection covers on screen, and how tall the selection bar is: between them,
+    // enough to tell whether that bar — sitting in its usual corner — would be hiding the very
+    // text it is offering to copy, and where to put it instead.
+    var selectionBand      by remember { mutableStateOf<TerminalView.SelectionBand?>(null) }
+    var selectionBarHeight by remember { mutableIntStateOf(0) }
     val suggestions   by vm.suggestions.collectAsState()
     val extraBarPinned by vm.extraBarPinned.collectAsState()
     val extraBar       by vm.extraBar.collectAsState()
@@ -178,8 +187,14 @@ fun TerminalScreen(
         }
     }
 
-    LaunchedEffect(barAutoHide, barShown, barHeld, barTick) {
-        if (barAutoHide && barShown && !barHeld) {
+    // The countdown waits for the session to be up. Measured from the moment the screen appears
+    // instead, it runs out while the user is still answering a password prompt or trusting a host
+    // key, and they arrive at a terminal whose bar has already gone — never having seen it, so
+    // never having learnt that a tap brings it back. With a key the connection is quick enough that
+    // it was only ever visible by luck.
+    val sessionUp = state is ConnectionState.Connected
+    LaunchedEffect(barAutoHide, barShown, barHeld, barTick, sessionUp) {
+        if (barAutoHide && barShown && !barHeld && sessionUp) {
             delay(TITLE_BAR_LINGER_MS)
             barShown = false
         }
@@ -202,6 +217,32 @@ fun TerminalScreen(
     }
 
     val imeVisible = WindowInsets.isImeVisible
+
+    // The system's furniture along the top edge, which both the terminal and anything floating
+    // over it have to keep clear of: the status bar while it is there, and the camera cut-out when
+    // it is not — in landscape that hole sits on a short edge, where it would eat the first
+    // characters of every line. With a fixed title bar there is nothing to do, because the bar is
+    // the Scaffold's and has already made the room.
+    val topFurniture: Modifier = when {
+        !barAutoHide  -> Modifier
+        hideStatusBar -> Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+        else          -> Modifier.windowInsetsPadding(
+            WindowInsets.statusBars.only(WindowInsetsSides.Top)
+        )
+    }
+
+    // How much of the terminal the retracting bar lies over. Measured rather than assumed, and
+    // then less the strip the two share: the bar brings its own top inset (TopAppBar's default)
+    // and the terminal has the same one from `topFurniture`, so that part covers nothing and
+    // cancels out. What remains is fed to the view model, which starts the first prompt below it.
+    val density = LocalDensity.current
+    var titleBarHeightPx by remember { mutableIntStateOf(0) }
+    val sharedTopInsetPx = when {
+        !barAutoHide  -> 0
+        hideStatusBar -> WindowInsets.displayCutout.getTop(density)
+        else          -> WindowInsets.statusBars.getTop(density)
+    }
+    val titleBarOverlapPx = (titleBarHeightPx - sharedTopInsetPx).coerceAtLeast(0).toFloat()
 
     val titleBar: @Composable () -> Unit = {
         TopAppBar(
@@ -245,23 +286,17 @@ fun TerminalScreen(
             Column(
                 Modifier
                     .fillMaxSize()
+                    // Keep the grid inside the visible display, including waterfall edges.
+                    // This handles devices with bezel-covered pixels. Apply before
+                    // measuring TerminalView so its SSH column count uses the safe width.
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+                    )
                     .windowInsetsPadding(
                         WindowInsets.ime.union(WindowInsets.navigationBars)
                             .only(WindowInsetsSides.Bottom)
                     )
-                    // With no fixed bar above it, the terminal has to keep clear of the system's
-                    // own furniture itself: the status bar while it is there, and the camera
-                    // cut-out when it is not — in landscape that hole sits on a short edge, where
-                    // it would eat the first characters of every line.
-                    .then(
-                        when {
-                            !barAutoHide   -> Modifier
-                            hideStatusBar  -> Modifier.windowInsetsPadding(WindowInsets.displayCutout)
-                            else           -> Modifier.windowInsetsPadding(
-                                WindowInsets.statusBars.only(WindowInsetsSides.Top)
-                            )
-                        }
-                    )
+                    .then(topFurniture)
             ) {
                 // Terminal view
                 AndroidView(
@@ -276,6 +311,7 @@ fun TerminalScreen(
                             view.onInput              = sendInput
                             view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                             view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                            view.onSelectionBandChanged = { band -> selectionBand = band }
                             view.onTapConfirmed        = { barTick++; barShown = true }
                             vm.onNeedsRedraw           = { view.postInvalidate() }
                             terminalView               = view
@@ -291,10 +327,15 @@ fun TerminalScreen(
                         view.onInput              = sendInput
                         view.onResize             = { cols, rows -> vm.onTerminalSize(cols, rows) }
                         view.onSelectionModeChanged = { active -> inSelectionMode = active }
+                        view.onSelectionBandChanged = { band -> selectionBand = band }
                         view.onTapConfirmed        = { barTick++; barShown = true }
                         vm.onNeedsRedraw           = { view.postInvalidate() }
                         terminalView               = view
                         view.wordMode              = wordMode
+                        // Re-read on every recomposition, not inside onResize: the bar is measured
+                        // a frame after the terminal, and no resize follows to ask again.
+                        vm.rowsUnderTitleBar =
+                            if (barAutoHide) view.rowsCovering(titleBarOverlapPx) else 0
                         view.postInvalidate()
                     },
                     onRelease = {
@@ -302,7 +343,11 @@ fun TerminalScreen(
                         terminalView     = null
                         vm.onNeedsRedraw = null
                     },
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .background(if (terminalLight) Color.White else Color.Black)
+                        .padding(horizontal = 4.dp),
                 )
 
                 // Tab chips. Many hosts -> one tab per host (tap a multi-session host
@@ -393,22 +438,25 @@ fun TerminalScreen(
                     modifier = Modifier.align(Alignment.TopCenter),
                 ) {
                     Box(
-                        Modifier.pointerInput(Unit) {
-                            // Watched on the Initial pass and never consumed, so the bar's own
-                            // buttons still get their taps; a finger down here only suspends the
-                            // countdown that would take the bar away.
-                            awaitPointerEventScope {
-                                while (true) {
-                                    val event = awaitPointerEvent(PointerEventPass.Initial)
-                                    barHeld = event.changes.any { it.pressed }
+                        Modifier
+                            // How tall the bar is, which is how much terminal it hides.
+                            .onSizeChanged { titleBarHeightPx = it.height }
+                            .pointerInput(Unit) {
+                                // Watched on the Initial pass and never consumed, so the bar's own
+                                // buttons still get their taps; a finger down here only suspends
+                                // the countdown that would take the bar away.
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                                        barHeld = event.changes.any { it.pressed }
+                                    }
                                 }
                             }
-                        }
                     ) { titleBar() }
                 }
             }
 
-            // Selection action bar — floats at the top of the terminal when in selection mode
+            // Selection action bar — floats over the terminal while a selection is held.
             if (inSelectionMode) {
                 val strCopied    = stringResource(R.string.action_copied)
                 val strSelection = stringResource(R.string.terminal_copy_selection)
@@ -424,9 +472,32 @@ fun TerminalScreen(
                         it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN) ||
                         it.hasMimeType(android.content.ClipDescription.MIMETYPE_TEXT_HTML)
                     } == true
+                // It follows the selection, the way a text field's own toolbar does: resting on
+                // the selection's upper edge, and dropping below its lower one when there is not
+                // the room above. That second case is the one that was wrong — a selection near
+                // the top of the screen left the bar under the status bar and, on a phone whose
+                // camera sits in that strip, under the camera, while it covered the very text it
+                // was offering to copy.
+                //
+                // It keeps the top alignment and moves by an offset, clamped to the terminal's
+                // own height: sending it to the bottom of the screen instead was tried first and
+                // the jump across the extra-key bar read as a glitch. Comparing the offset
+                // against the band works because the bar carries the same top inset as the
+                // terminal, so the two share an origin.
+                val band = selectionBand
+                val barOffsetPx = if (band == null) 0 else {
+                    val above = band.top - selectionBarHeight
+                    (if (above >= 0f) above else band.bottom).toInt()
+                        .coerceIn(0, (band.viewHeight - selectionBarHeight).coerceAtLeast(0))
+                }
                 SelectionBar(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
+                        .then(topFurniture)
+                        // Measured inside the inset, so this is the band of terminal the bar
+                        // actually covers — which is what the selection is compared against.
+                        .onSizeChanged { selectionBarHeight = it.height }
+                        .offset { IntOffset(0, barOffsetPx) }
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     labelCopySelection = strSelection,
                     labelCopyAll       = strAll,

@@ -1,0 +1,69 @@
+<en-US>
+• In landscape the terminal no longer runs under the navigation bar, and nothing is clipped at rounded screen edges.
+• The copy buttons follow the selection instead of sitting under the status bar or the front camera.
+• A short login is readable at once: the session's first lines start below the retracting title bar.
+• A download no longer clashes with a file of the same name in another folder, and overwriting replaces the right one.
+</en-US>
+
+<it-IT>
+• In orizzontale il terminale non passa più sotto la barra di navigazione, e ai bordi arrotondati non si perde nulla.
+• I pulsanti di copia seguono la selezione invece di finire sotto la barra di stato o la fotocamera.
+• Un login breve si legge subito: le prime righe partono sotto la barra del titolo che si ritira.
+• Un download non va più in conflitto con un file omonimo in un'altra cartella, e sovrascrivendo si sostituisce quello giusto.
+</it-IT>
+
+<de-DE>
+• Im Querformat läuft der Terminaltext nicht mehr unter die Navigationsleiste, und an runden Rändern wird nichts abgeschnitten.
+• Die Kopierschaltflächen folgen der Auswahl, statt unter der Statusleiste oder der Frontkamera zu liegen.
+• Eine kurze Login-Meldung ist sofort lesbar: die ersten Zeilen beginnen unter der einfahrenden Titelleiste.
+• Ein Download kollidiert nicht mehr mit einer gleichnamigen Datei in einem anderen Ordner, und Überschreiben ersetzt die richtige.
+</de-DE>
+
+<es-ES>
+• En horizontal el terminal ya no pasa por debajo de la barra de navegación, y en los bordes redondeados no se pierde nada.
+• Los botones de copiar siguen a la selección en vez de quedar bajo la barra de estado o la cámara frontal.
+• Un inicio de sesión corto se lee de inmediato: las primeras líneas empiezan debajo de la barra de título.
+• Una descarga ya no choca con un archivo del mismo nombre en otra carpeta, y al sobrescribir se reemplaza el correcto.
+</es-ES>
+
+<fr-FR>
+• En paysage le terminal ne passe plus sous la barre de navigation, et rien n'est coupé aux bords arrondis.
+• Les boutons de copie suivent la sélection au lieu de se placer sous la barre d'état ou la caméra frontale.
+• Une connexion courte se lit tout de suite : les premières lignes commencent sous la barre de titre escamotable.
+• Un téléchargement n'entre plus en conflit avec un fichier de même nom dans un autre dossier, et l'écrasement remplace le bon.
+</fr-FR>
+
+<pt-PT>
+• Na horizontal o terminal já não passa por baixo da barra de navegação, e nas bordas arredondadas não se perde nada.
+• Os botões de copiar seguem a seleção em vez de ficarem sob a barra de estado ou a câmara frontal.
+• Um início de sessão curto lê-se de imediato: as primeiras linhas começam abaixo da barra de título.
+• Uma transferência já não entra em conflito com um ficheiro com o mesmo nome noutra pasta, e substituir troca o certo.
+</pt-PT>
+
+<uk>
+• У горизонтальній орієнтації термінал більше не йде під смужку навігації, а на закруглених краях нічого не обрізається.
+• Кнопки копіювання йдуть за виділенням, а не ховаються під смужкою стану чи фронтальною камерою.
+• Коротке вітання при вході видно відразу: перші рядки починаються під смужкою заголовка.
+• Завантаження більше не конфліктує з однойменним файлом в іншій теці, а перезапис замінює потрібний.
+</uk>
+
+<ru-RU>
+• В горизонтальной ориентации терминал больше не уходит под строку навигации, а на закруглённых краях ничего не обрезается.
+• Кнопки копирования следуют за выделением, а не оказываются под строкой состояния или фронтальной камерой.
+• Короткое приветствие при входе видно сразу: первые строки начинаются под убирающейся строкой заголовка.
+• Загрузка больше не конфликтует с одноимённым файлом в другой папке, а перезапись заменяет нужный.
+</ru-RU>
+
+<zh-CN>
+• 横屏时终端文字不再被导航栏遮住，屏幕圆角处也不会再被裁掉。
+• 复制按钮会跟着选区走，不再落到状态栏或前置摄像头下面。
+• 登录信息很短时也能立刻看到：会话的头几行从可收起的标题栏下方开始。
+• 下载不再与其他文件夹中的同名文件冲突，覆盖时替换的也是正确的那个。
+</zh-CN>
+
+<ja-JP>
+• 横向きでターミナルの文字がナビゲーションバーの下に隠れることがなくなり、画面の丸い角で切れることもなくなりました。
+• コピーのボタンが選択範囲に合わせて出るようになり、ステータスバーや前面カメラの下に入らなくなりました。
+• ログインの表示が短くても、すぐに読めます。最初の行が、自動で隠れるタイトルバーの下から始まります。
+• ダウンロードが別のフォルダーにある同名のファイルと競合しなくなり、上書きでは正しいファイルが置き換わります。
+</ja-JP>

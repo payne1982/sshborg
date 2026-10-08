@@ -15,6 +15,11 @@
 # Usage:  scripts/run-instrumented.sh [test class or method]
 #     scripts/run-instrumented.sh
 #     scripts/run-instrumented.sh com.sshborg.data.db.MigrationTest
+#
+# Two switches, for the screen recording in make-fgs-video.sh: --install-only builds, copies and
+# installs without running anything, and SSHBORG_SKIP_INSTALL=1 runs the tests on what is already
+# installed. Pushing 86 MB onto the emulator is heavy enough to kill a recording in progress, so
+# that script installs first and only then turns the camera on.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -32,17 +37,25 @@ remote="$user@$host"
 ssh_opts=(-o BatchMode=yes -o ConnectTimeout=10)
 run() { ssh "${ssh_opts[@]}" "$remote" "$@"; }
 
-echo "== building"
-JAVA_HOME=${JAVA_HOME:-/home/payne/jdk21} ./gradlew -q assembleDebug assembleDebugAndroidTest
+install_only=""
+if [ "${1:-}" = "--install-only" ]; then install_only=yes; shift; fi
 
+# Which app we are talking to is needed whether or not anything is installed this time round.
 app=app/build/outputs/apk/debug/app-debug.apk
 test_app=app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 package=$(sed -n 's/.*applicationId = "\(.*\)".*/\1/p' app/build.gradle.kts)
 suffix=$(sed -n 's/.*applicationIdSuffix = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
 target="${package}${suffix}"
 
+if [ -z "${SSHBORG_SKIP_INSTALL:-}" ]; then
+echo "== building"
+JAVA_HOME=${JAVA_HOME:-/home/payne/jdk21} ./gradlew -q assembleDebug assembleDebugAndroidTest
+
 echo "== waiting for a device on $host"
-run "$adb wait-for-device" || { echo "no device: is the emulator running there?" >&2; exit 1; }
+# Through `timeout`, because wait-for-device does not fail when there is nothing to wait for —
+# it blocks for ever, and the message below could never be reached. A run then looks slow rather
+# than broken, which is how a stopped emulator cost an afternoon once.
+run "timeout 180 $adb wait-for-device" || { echo "no device: is the emulator running there? (~/Documents/sshborg-emulator/start.sh <avd>)" >&2; exit 1; }
 
 echo "== copying and installing"
 run "mkdir -p '$dir'"
@@ -55,6 +68,19 @@ run "$adb install -r -t '$dir/$(basename "$test_app")'"
 # no hierarchy at all ("No compose hierarchies found in the app"). Granting it up front is what a
 # test device is for.
 run "$adb shell pm grant '$target' android.permission.POST_NOTIFICATIONS" 2>/dev/null || true
+# Storage, for the download tests on API 28 and below. It has to be granted here and not from the
+# test, because below Android 10 this permission is a supplementary GID (sdcard_rw) handed to the
+# process when zygote forks it: granting it to a process already running leaves the permission
+# reported as held and every write still refused. Fails harmlessly from API 29, where the manifest
+# caps it at 28 and there is nothing to grant.
+# Both halves of the storage group: `pm grant` grants one permission, where a person tapping
+# "Allow" grants the group — and below Android 10 it is READ that decides the process's storage
+# mount mode, so WRITE alone leaves every write refused and list() returning null.
+run "$adb shell pm grant '$target' android.permission.READ_EXTERNAL_STORAGE" 2>/dev/null || true
+run "$adb shell pm grant '$target' android.permission.WRITE_EXTERNAL_STORAGE" 2>/dev/null || true
+run "$adb shell am force-stop '$target'" 2>/dev/null || true
+fi
+[ -z "$install_only" ] || { echo "== installato"; exit 0; }
 
 # With no argument, everything except the screenshot runs: those photograph the app instead of
 # checking it, and they are slow. Naming a class asks for exactly that class, screenshots included.
@@ -67,7 +93,14 @@ fi
 echo "== running"
 # -r for the machine-readable stream, so a failure can be found in the output; the runner's own
 # exit status is not enough, it reports OK even when a test fails.
-output=$(run "$adb shell am instrument -w -r $filter $target.test/androidx.test.runner.AndroidJUnitRunner")
+# Under `timeout` for the same reason as the device wait: a test that hangs — androidx.test's
+# ActivityScenario.close() does, on API 28, when the launcher is in front — would otherwise keep
+# this script waiting for ever with nothing on screen to say so.
+output=$(run "timeout ${SSHBORG_TEST_TIMEOUT:-900} $adb shell am instrument -w -r $filter $target.test/androidx.test.runner.AndroidJUnitRunner") || {
+    echo "the test run did not finish within ${SSHBORG_TEST_TIMEOUT:-900}s (a hung test? ask the device for a thread dump)" >&2
+    echo "$output"
+    exit 1
+}
 echo "$output" | sed -n 's/^INSTRUMENTATION_STATUS: //p;s/^INSTRUMENTATION_RESULT: //p;/^Time:/p;/^OK (/p;/^FAILURES/p' | grep -vE "^(numtests|stream|id|current|class|test)=" || true
 
 if echo "$output" | grep -qE "^(FAILURES|INSTRUMENTATION_RESULT: shortMsg)"; then

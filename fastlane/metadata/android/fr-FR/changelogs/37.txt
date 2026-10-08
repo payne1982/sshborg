@@ -1,0 +1,4 @@
+• En paysage le terminal ne passe plus sous la barre de navigation, et rien n'est coupé aux bords arrondis.
+• Les boutons de copie suivent la sélection au lieu de se placer sous la barre d'état ou la caméra frontale.
+• Une connexion courte se lit tout de suite : les premières lignes commencent sous la barre de titre escamotable.
+• Un téléchargement n'entre plus en conflit avec un fichier de même nom dans un autre dossier, et l'écrasement remplace le bon.

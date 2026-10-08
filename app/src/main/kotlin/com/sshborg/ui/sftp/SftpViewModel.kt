@@ -762,19 +762,14 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 tasksToDownload = allTasks
             } else {
                 _batchConflictEvent.tryEmit(BatchConflictData(conflicting.size, allTasks.size))
-                when (batchConflictDecision.first()) {
-                    BatchConflictDecision.CANCEL -> { refreshListing(); return@launch }
-                    BatchConflictDecision.SKIP_EXISTING -> {
-                        tasksToDownload = allTasks.filter { it !in conflicting }
-                    }
-                    BatchConflictDecision.OVERWRITE_ALL -> {
-                        conflicting.forEach { task ->
-                            findExistingDownload(task.filename, task.localDir)
-                                ?.let { context.contentResolver.delete(it, null, null) }
-                        }
-                        tasksToDownload = allTasks
-                    }
+                val plan = DownloadConflicts.plan(allTasks, conflicting, batchConflictDecision.first())
+                // The rows go first: see DownloadConflicts.plan for why this is not a write over
+                // the top. A cancelled batch plans nothing, and the empty check below ends it.
+                plan.toDelete.forEach { task ->
+                    findExistingDownload(task.filename, task.localDir)
+                        ?.let { context.contentResolver.delete(it, null, null) }
                 }
+                tasksToDownload = plan.toDownload
             }
 
             if (tasksToDownload.isEmpty()) { refreshListing(); return@launch }
@@ -908,43 +903,17 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun findExistingDownload(filename: String, localDir: String): Uri? {
-        val context = getApplication<Application>()
-        val projection = arrayOf(MediaStore.Downloads._ID)
-        val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ? AND " +
-                        "${MediaStore.Downloads.RELATIVE_PATH} LIKE ?"
-        val selectionArgs = arrayOf(filename, "%${localDir.trimEnd('/')}%")
-        return context.contentResolver.query(
-            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-            projection, selection, selectionArgs, null,
-        )?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID))
-                ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id)
-            } else null
-        }
-    }
+    /** @see DownloadStore.find */
+    private fun findExistingDownload(filename: String, localDir: String): Uri? =
+        DownloadStore.find(getApplication<Application>().contentResolver, filename, localDir)
 
     /** Returns a name like "file(1).txt" that is not in [taken] (the remote folder's names). */
-    private fun uniqueRemoteName(original: String, taken: Set<String>): String {
-        val dot = original.lastIndexOf('.')
-        val base = if (dot > 0) original.substring(0, dot) else original
-        val ext  = if (dot > 0) original.substring(dot) else ""
-        return generateSequence(1) { it + 1 }.map { "$base($it)$ext" }.first { it !in taken }
-    }
+    private fun uniqueRemoteName(original: String, taken: Set<String>): String =
+        DownloadConflicts.firstFreeName(original) { it in taken }
 
     /** Returns a filename like "file(1).txt" that does not yet exist in [localDir]. */
-    private fun uniqueFilename(original: String, localDir: String): String {
-        val dot = original.lastIndexOf('.')
-        val base = if (dot > 0) original.substring(0, dot) else original
-        val ext  = if (dot > 0) original.substring(dot) else ""
-        var counter = 1
-        while (true) {
-            val candidate = "$base($counter)$ext"
-            if (findExistingDownload(candidate, localDir) == null) return candidate
-            counter++
-        }
-    }
+    private fun uniqueFilename(original: String, localDir: String): String =
+        DownloadConflicts.firstFreeName(original) { findExistingDownload(it, localDir) != null }
 
     // ── Upload ────────────────────────────────────────────────────────────────
 

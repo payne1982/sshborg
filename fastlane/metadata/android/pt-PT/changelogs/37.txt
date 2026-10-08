@@ -1,0 +1,4 @@
+• Na horizontal o terminal já não passa por baixo da barra de navegação, e nas bordas arredondadas não se perde nada.
+• Os botões de copiar seguem a seleção em vez de ficarem sob a barra de estado ou a câmara frontal.
+• Um início de sessão curto lê-se de imediato: as primeiras linhas começam abaixo da barra de título.
+• Uma transferência já não entra em conflito com um ficheiro com o mesmo nome noutra pasta, e substituir troca o certo.

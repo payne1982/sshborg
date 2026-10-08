@@ -1,0 +1,4 @@
+• In orizzontale il terminale non passa più sotto la barra di navigazione, e ai bordi arrotondati non si perde nulla.
+• I pulsanti di copia seguono la selezione invece di finire sotto la barra di stato o la fotocamera.
+• Un login breve si legge subito: le prime righe partono sotto la barra del titolo che si ritira.
+• Un download non va più in conflitto con un file omonimo in un'altra cartella, e sovrascrivendo si sostituisce quello giusto.

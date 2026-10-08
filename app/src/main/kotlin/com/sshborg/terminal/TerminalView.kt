@@ -8,6 +8,7 @@ import android.view.*
 import android.view.inputmethod.*
 import com.sshborg.data.AppPreferences
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.hypot
 
@@ -118,6 +119,26 @@ class TerminalView @JvmOverloads constructor(
 
     val inSelectionMode: Boolean get() = selStart != null
     var onSelectionModeChanged: ((Boolean) -> Unit)? = null
+
+    /**
+     * The strip of the view the selection draws on, or null when nothing is selected.
+     *
+     * Reported so that a bar floating over the terminal can get out of the way of what the user
+     * has just selected, and reported from [onDraw] because that is the only place that knows both
+     * the anchors and which slice of the scrollback is on screen — a handle drag, an auto-scroll
+     * and the remote program's own output all move this. Only a change is passed on, so dragging
+     * along one row costs nothing.
+     */
+    var onSelectionBandChanged: ((SelectionBand?) -> Unit)? = null
+    private var reportedBand: SelectionBand? = null
+
+    /**
+     * What the selection occupies vertically, in pixels down from the top of the view: the
+     * highlighted rows *and* the two round handles, which are drawn outside them and must not be
+     * covered either. [viewHeight] rides along so a caller positioning something against this
+     * band can keep it inside the terminal without measuring the view itself.
+     */
+    data class SelectionBand(val top: Float, val bottom: Float, val viewHeight: Int)
 
     private val selectionPaint = Paint().apply { color = Color.argb(80, 100, 149, 237) }
     private val handlePaint    = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(100, 149, 237) }
@@ -240,6 +261,15 @@ class TerminalView @JvmOverloads constructor(
     val termColumns: Int get() = if (cellW > 0) floor(width / cellW).toInt().coerceAtLeast(1) else 80
     val termRows: Int get() = if (cellH > 0) floor(height / cellH).toInt().coerceAtLeast(1) else 24
 
+    /**
+     * How many whole rows of the grid something [px] pixels tall, lying over the top of the view,
+     * hides. Rounded up, because a row half covered is a row that cannot be read.
+     *
+     * Zero before the first measurement, when there is no cell height yet and so no answer.
+     */
+    fun rowsCovering(px: Float): Int =
+        if (cellH > 0f && px > 0f) ceil(px / cellH).toInt() else 0
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val cols = termColumns; val rows = termRows
@@ -337,6 +367,29 @@ class TerminalView @JvmOverloads constructor(
         }
 
         if (inSelectionMode) drawSelection(canvas)
+        reportSelectionBand()
+    }
+
+    /** @see onSelectionBandChanged */
+    private fun reportSelectionBand() {
+        val band = selStart?.let { start ->
+            val end = selEnd ?: start
+            val (s, e) = if (compareAnchors(start, end) <= 0) start to end else end to start
+            // Clamped to the rows on screen: a selection that runs off an edge still reaches it.
+            val firstRow = (s.first - cachedViewStart).coerceIn(0, termRows - 1)
+            val lastRow  = (e.first  - cachedViewStart).coerceIn(0, termRows - 1)
+            // The knobs: one circle above the first row, one below the last (see drawHandle).
+            val knob = 2f * handleRadius
+            SelectionBand(
+                top        = (firstRow * cellH - knob).coerceAtLeast(0f),
+                bottom     = ((lastRow + 1) * cellH + knob).coerceAtMost(height.toFloat()),
+                viewHeight = height,
+            )
+        }
+        if (band == reportedBand) return
+        reportedBand = band
+        // Out of the draw pass: the listener writes Compose state, which asks for a layout.
+        post { onSelectionBandChanged?.invoke(band) }
     }
 
     // --- Selection drawing ---
