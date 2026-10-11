@@ -1,7 +1,8 @@
 package com.sshborg.ui.sftp
 
-import android.content.ContentValues
+import android.Manifest
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,17 +11,24 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
  * Whether "is a file of this name already in that folder?" answers about **that** folder and no
- * other.
+ * other — and it has to hold on both of the places a download can live: a media-store row from
+ * Android 10, a file in the public Downloads folder before that.
  *
- * Instrumented, because the question is a SQL selection against the media store and the thing that
- * was wrong was the SQL: the folder used to be matched as a fragment, so a row one level down
- * answered for the folder above it — and overwriting then deleted that row, a file the user never
- * named. A JVM test cannot see any of this.
+ * Instrumented, because on a modern device the question is a SQL selection against the store and
+ * the thing that was wrong was the SQL: the folder used to be matched as a fragment, so a row one
+ * level down answered for the folder above it — and overwriting then deleted that row, a file the
+ * user never named. A JVM test cannot see any of this.
+ *
+ * Everything here goes through [DownloadStore] and never names a backend, so the same run on an
+ * API 28 emulator checks the filesystem path instead. The one test that is about the store's own
+ * behaviour says so and stands aside below Android 10.
  *
  * It works in folders of its own, so a run leaves nothing in anybody's downloads. The pair it uses
  * stands in the same relation as the app's release and debug folders — one name is a prefix of the
@@ -29,8 +37,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DownloadStoreTest {
 
-    private val resolver =
-        InstrumentationRegistry.getInstrumentation().targetContext.contentResolver
+    private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    private val context = instrumentation.targetContext
 
     /**
      * A folder of this run's own. The media store does not always let go of a path when the row
@@ -43,36 +51,37 @@ class DownloadStoreTest {
     private val prefixSibling = "${folder.trimEnd('/')}-debug/"
     private val underscored   = "${folder}a_b/"
 
-    private val created = mutableListOf<Uri>()
+    private val created = mutableListOf<DownloadRef>()
 
-    /** Writes a one-byte file called [name] into [dir] and returns the row it made. */
-    private fun put(name: String, dir: String): Uri {
-        val values = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, name)
-            put(MediaStore.Downloads.MIME_TYPE, "text/plain")
-            put(MediaStore.Downloads.RELATIVE_PATH, dir)
+    @Before fun grantStorageWhereADownloadNeedsIt() {
+        // Only Android 9 and below ask, and uiAutomation can grant from exactly that version.
+        if (DownloadStore.needsStoragePermission) {
+            instrumentation.uiAutomation.grantRuntimePermission(
+                context.packageName, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            )
         }
-        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-            ?: error("the store refused a row in $dir")
-        created += uri
-        resolver.openOutputStream(uri)!!.use { it.write(0) }
-        return uri
     }
 
-    private fun nameOf(uri: Uri): String = resolver.query(
-        uri, arrayOf(MediaStore.Downloads.DISPLAY_NAME), null, null, null,
-    )!!.use { it.moveToFirst(); it.getString(0) }
-
-    private fun find(name: String, dir: String) = DownloadStore.find(resolver, name, dir)
-
     @After fun removeWhatThisRunWrote() {
-        created.forEach { runCatching { resolver.delete(it, null, null) } }
+        created.forEach { runCatching { DownloadStore.remove(context, it) } }
         created.clear()
     }
 
+    /** Writes a one-byte file called [name] into [dir], the way a download does. */
+    private fun put(name: String, dir: String): DownloadRef {
+        val ref = DownloadStore.create(context, name, dir, "text/plain")
+            ?: error("the device refused a file called $name in $dir")
+        created += ref
+        DownloadStore.openStream(context, ref).use { it.write(0) }
+        return ref
+    }
+
+    private fun find(name: String, dir: String) = DownloadStore.find(context, name, dir)
+
     @Test fun aFileIsFoundInTheFolderItWasWrittenTo() {
-        val uri = put("report.txt", folder)
-        assertEquals(uri, find("report.txt", folder))
+        put("report.txt", folder)
+        assertEquals(1, created.size)
+        assertEquals(created.single(), find("report.txt", folder))
     }
 
     @Test fun aFileOneLevelDownDoesNotAnswerForTheFolderAboveIt() {
@@ -84,8 +93,8 @@ class DownloadStoreTest {
     }
 
     @Test fun theFolderBelowIsFoundWhenItIsTheOneAskedAbout() {
-        val uri = put("report.txt", below)
-        assertEquals(uri, find("report.txt", below))
+        val ref = put("report.txt", below)
+        assertEquals(ref, find("report.txt", below))
     }
 
     @Test fun aFolderWhoseNameStartsLikeAnotherIsADifferentFolder() {
@@ -99,7 +108,6 @@ class DownloadStoreTest {
         // Folder names come from the remote server, and SQL LIKE reads _ as "any character".
         put("report.txt", underscored)
         assertNull(find("report.txt", "${folder}axb/"))
-        assertEquals(1, created.size)
     }
 
     @Test fun aNameThatIsNotThereIsNotFound() {
@@ -108,17 +116,32 @@ class DownloadStoreTest {
     }
 
     @Test fun theTrailingSeparatorIsOptionalForTheCaller() {
-        val uri = put("report.txt", folder)
-        assertEquals(uri, find("report.txt", folder.trimEnd('/')))
+        val ref = put("report.txt", folder)
+        assertEquals(ref, find("report.txt", folder.trimEnd('/')))
+    }
+
+    @Test fun aFinishedDownloadCanBeHandedToAnotherApp() {
+        // On Android 9 this is the provider's doing, and a file:// uri would have thrown instead.
+        val uri = DownloadStore.viewUri(context, put("report.txt", folder))
+        assertEquals("content", uri.scheme)
     }
 
     @Test fun theStoreInventsANameForACollidingInsertWhichIsWhyAFreeOneIsChosenFirst() {
-        // The premise the whole conflict design rests on, and the only place it can be checked:
-        // an insert onto an occupied name is not refused and does not replace. If Android ever
-        // changes this, the app's "keep both" and "overwrite" both stop making sense — and this
-        // test is how we find out.
+        // The premise the conflict design rests on, and the only place it can be checked: an
+        // insert onto an occupied name is not refused and does not replace. If Android ever
+        // changes this, "keep both" and "overwrite" both stop making sense — and this test is how
+        // we find out. Below Android 10 there is no insert and a write simply truncates, which is
+        // why this one stands aside there.
+        assumeTrue(
+            "no media store below Android 10: a file write truncates and invents nothing",
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
+        )
         put("report.txt", folder)
         val second = put("report.txt", folder)
-        assertNotEquals("report.txt", nameOf(second))
+        assertNotEquals("report.txt", displayNameOf((second as StoreRow).uri))
     }
+
+    private fun displayNameOf(uri: Uri): String = context.contentResolver.query(
+        uri, arrayOf(MediaStore.Downloads.DISPLAY_NAME), null, null, null,
+    )!!.use { it.moveToFirst(); it.getString(0) }
 }

@@ -397,7 +397,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     /** Emitted when a file to be downloaded already exists in [downloadFolder]. */
-    data class ConflictData(val entry: SftpEntry, val remotePath: String, val existingUri: Uri, val localDir: String)
+    data class ConflictData(val entry: SftpEntry, val remotePath: String, val existing: DownloadRef, val localDir: String)
     private val _conflictEvent = MutableSharedFlow<ConflictData>(extraBufferCapacity = 1)
     val conflictEvent: SharedFlow<ConflictData> = _conflictEvent
 
@@ -704,7 +704,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         val session = sftpSession ?: return
         val id = sessionId ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            getApplication<Application>().contentResolver.delete(conflict.existingUri, null, null)
+            DownloadStore.remove(getApplication(), conflict.existing)
             startForegroundObservation(transferManager.enqueue(id, session, conflict.remotePath, conflict.entry.name, conflict.localDir))
         }
     }
@@ -767,7 +767,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 // the top. A cancelled batch plans nothing, and the empty check below ends it.
                 plan.toDelete.forEach { task ->
                     findExistingDownload(task.filename, task.localDir)
-                        ?.let { context.contentResolver.delete(it, null, null) }
+                        ?.let { DownloadStore.remove(context, it) }
                 }
                 tasksToDownload = plan.toDownload
             }
@@ -895,17 +895,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
      * silently if the file is gone or nothing can open it.
      */
     fun openDownloadedFile(filename: String, localDir: String) {
-        val uri = findExistingDownload(filename, localDir) ?: return
+        val context = getApplication<Application>()
+        val ref = findExistingDownload(filename, localDir) ?: return
         val mime = MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(filename.substringAfterLast('.', "").lowercase())
         runCatching {
-            getApplication<Application>().startActivity(DownloadIntents.open(uri, mime, filename))
+            context.startActivity(
+                DownloadIntents.open(DownloadStore.viewUri(context, ref), mime, filename)
+            )
         }
     }
 
     /** @see DownloadStore.find */
-    private fun findExistingDownload(filename: String, localDir: String): Uri? =
-        DownloadStore.find(getApplication<Application>().contentResolver, filename, localDir)
+    private fun findExistingDownload(filename: String, localDir: String): DownloadRef? =
+        DownloadStore.find(getApplication(), filename, localDir)
 
     /** Returns a name like "file(1).txt" that is not in [taken] (the remote folder's names). */
     private fun uniqueRemoteName(original: String, taken: Set<String>): String =
