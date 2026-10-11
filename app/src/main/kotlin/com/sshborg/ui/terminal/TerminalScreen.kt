@@ -148,6 +148,20 @@ fun TerminalScreen(
     val allExtraBars   by vm.allExtraBars.collectAsState()
     val rootView = LocalView.current
 
+    /**
+     * Leaving this screen for good. The keyboard goes away now, at the tap, rather than in
+     * onDispose: Navigation destroys a screen only once its transition has finished, so a
+     * keyboard put away there hangs over the host list for the length of the animation. The
+     * session's memory is sealed first — this hide is ours, not the user putting the keyboard
+     * away, and it must not be recorded as such — and the seal comes off when the session is
+     * next on screen.
+     */
+    val leave: () -> Unit = {
+        app.sessionManager.freezeKeyboard(sessionId)
+        hideKeyboard(rootView)
+        onBack()
+    }
+
     // Tab bar data. All open Shell sessions, grouped by host (order preserved).
     // One host  -> per-session tabs (#1 #2 …); many hosts -> one tab per host.
     val currentSession = sessions.find { it.id == sessionId }
@@ -178,14 +192,7 @@ fun TerminalScreen(
     // Reject host key on hardware back during verification
     BackHandler(state is ConnectionState.HostKeyPrompt) { vm.rejectHostKey() }
     // Cancel password prompt on hardware back
-    BackHandler(state is ConnectionState.PasswordPrompt) { vm.submitPassword(""); onBack() }
-
-    LaunchedEffect(state) {
-        if (state is ConnectionState.Connected) {
-            delay(300)
-            terminalView?.showKeyboard()
-        }
-    }
+    BackHandler(state is ConnectionState.PasswordPrompt) { vm.submitPassword(""); leave() }
 
     // The countdown waits for the session to be up. Measured from the moment the screen appears
     // instead, it runs out while the user is still answering a password prompt or trusting a host
@@ -217,6 +224,46 @@ fun TerminalScreen(
     }
 
     val imeVisible = WindowInsets.isImeVisible
+
+    // The keyboard: the one moment it comes up by itself, and the memory that replaces the rest.
+    //
+    // Arriving: a session that has never been on screen opens with the keyboard up — that is the
+    // one automatic raise left in the app. Any session that has been here before, whether it was
+    // a sibling tab a moment ago or backgrounded for an hour, gets back exactly what it had when
+    // it left. Applied, not merely allowed: a keyboard that has to go down is put down, because
+    // the screen being left deliberately leaves it up.
+    //
+    // Leaving: whatever the user then does with it is recorded against the session, the tap on the
+    // terminal and the bar's own key included, since both of them end up in this inset. Recording
+    // only starts once the IME has settled, or the frames before it opens would be read as "put
+    // away" and the memory would be wrong from the first moment.
+    var keyboardSettled by remember { mutableStateOf(false) }
+    LaunchedEffect(sessionId, sessionUp, terminalView) {
+        if (!sessionUp || terminalView == null) return@LaunchedEffect
+        // Nothing is recorded while this runs: a reconnect restarts the effect, and the keyboard
+        // moving because we moved it is not the user's doing. The seal from the last time this
+        // session was left comes off here, now that it is the one on screen.
+        keyboardSettled = false
+        val wanted = app.sessionManager.keyboardWasUp(sessionId)
+        app.sessionManager.thawKeyboard(sessionId)
+        if (wanted) {
+            // The wait is for the view: asked sooner, the IME has nothing attached to open onto.
+            delay(300)
+            // Not behind the lock gate: it is drawn over this screen, not instead of it, so a
+            // session that finishes connecting while the app is locked would open a keyboard on
+            // top of the PIN pad.
+            if (!app.lockGateUp) terminalView?.showKeyboard()
+        } else {
+            // Put down at once, with no wait: after a tab switch the keyboard is on screen this
+            // very frame, and a third of a second of it sliding away reads as a glitch.
+            hideKeyboard(rootView)
+        }
+        delay(500)
+        keyboardSettled = true
+    }
+    LaunchedEffect(imeVisible, keyboardSettled, sessionId) {
+        if (keyboardSettled) app.sessionManager.setKeyboardUp(sessionId, imeVisible)
+    }
 
     // The system's furniture along the top edge, which both the terminal and anything floating
     // over it have to keep clear of: the status bar while it is there, and the camera cut-out when
@@ -254,13 +301,13 @@ fun TerminalScreen(
             },
             navigationIcon = {
                 // Back = send to background (don't disconnect)
-                IconButton(onClick = { vm.background(); onBack() }) {
+                IconButton(onClick = { vm.background(); leave() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back))
                 }
             },
             actions = {
                 // Disconnect button
-                IconButton(onClick = { vm.disconnect(); onBack() }) {
+                IconButton(onClick = { vm.disconnect(); leave() }) {
                     Icon(Icons.Default.Close, contentDescription = stringResource(R.string.terminal_disconnect_cd))
                 }
             },
@@ -409,13 +456,8 @@ fun TerminalScreen(
                             onWordModeToggle = { wordMode   = !wordMode   },
                             onPinToggle      = { vm.toggleExtraBarPinned() },
                             onKeyboardToggle = {
-                                if (imeVisible) {
-                                    val imm = ctx.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
-                                        as android.view.inputmethod.InputMethodManager
-                                    imm.hideSoftInputFromWindow(rootView.windowToken, 0)
-                                } else {
-                                    terminalView?.showKeyboard()
-                                }
+                                if (imeVisible) hideKeyboard(rootView)
+                                else terminalView?.showKeyboard()
                             },
                             onKey            = { bytes -> sendInput(bytes) },
                             cursorKeys       = { vm.cursorKeyBytes(it) },
@@ -541,7 +583,7 @@ fun TerminalScreen(
                     hostname      = s.hostname,
                     wrongPassword = s.wrongPassword,
                     onConfirm     = vm::submitPassword,
-                    onDismiss     = { vm.submitPassword(""); onBack() },
+                    onDismiss     = { vm.submitPassword(""); leave() },
                 )
                 is ConnectionState.HostKeyPrompt   -> HostKeyDialog(
                     hostname    = s.hostname,
@@ -553,7 +595,7 @@ fun TerminalScreen(
                 is ConnectionState.Disconnected    -> DisconnectedOverlay(
                     summary = s.summary,
                     detail  = s.detail,
-                    onClose = { vm.disconnect(); onBack() },
+                    onClose = { vm.disconnect(); leave() },
                 )
                 is ConnectionState.Connected       -> { /* normal */ }
             }
@@ -571,7 +613,7 @@ fun TerminalScreen(
 
     // Auto-navigate back when the remote shell exits cleanly
     LaunchedEffect(Unit) {
-        vm.navBack.collect { onBack() }
+        vm.navBack.collect { leave() }
     }
 
     // Dismiss keyboard on screen exit — unless we're just switching to a
@@ -582,12 +624,21 @@ fun TerminalScreen(
             if (app.sessionManager.switchingTab) {
                 app.sessionManager.switchingTab = false
             } else {
-                val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
-                        as android.view.inputmethod.InputMethodManager
-                imm.hideSoftInputFromWindow(view.windowToken, 0)
+                hideKeyboard(view)
             }
         }
     }
+}
+
+/**
+ * Puts the soft keyboard away. [view] only has to be in the right window; the terminal takes its
+ * input connection back by hand (TerminalView.reattachIme), so Compose's own keyboard controller
+ * does not know about it and cannot dismiss it.
+ */
+private fun hideKeyboard(view: android.view.View) {
+    val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+            as android.view.inputmethod.InputMethodManager
+    imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
 @Composable

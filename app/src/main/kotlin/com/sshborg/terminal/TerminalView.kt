@@ -212,7 +212,12 @@ class TerminalView @JvmOverloads constructor(
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         super.onWindowFocusChanged(hasWindowFocus)
-        if (hasWindowFocus) post { reattachIme() }
+        // Take the IME connection back, but do not raise the keyboard. The window regains focus
+        // every time a dialog closes, the app returns to the foreground or the lock gate goes up,
+        // and raising it on each of those is what made the keyboard feel like it was fighting the
+        // user — and what put it on top of the lock screen, which is drawn over a terminal that is
+        // still attached and still focused.
+        if (hasWindowFocus) post { reattachIme(show = false) }
     }
 
     override fun onDetachedFromWindow() {
@@ -222,20 +227,20 @@ class TerminalView @JvmOverloads constructor(
     }
 
     fun showKeyboard() {
-        post { reattachIme() }
+        post { reattachIme(show = true) }
     }
 
     /**
-     * Force IME to reconnect to this view.
+     * Force IME to reconnect to this view, and with [show] also ask for the keyboard.
      * Needed in Compose: the ComposeView parent captures IME focus and we must
      * explicitly displace it with restartInput().
      */
-    private fun reattachIme() {
+    private fun reattachIme(show: Boolean) {
         requestFocus()
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE)
                 as android.view.inputmethod.InputMethodManager
         imm.restartInput(this)
-        imm.showSoftInput(this, 0)
+        if (show) imm.showSoftInput(this, 0)
     }
 
     private fun updateMetrics() {
@@ -789,7 +794,10 @@ class TerminalView @JvmOverloads constructor(
 
     var wordMode: Boolean = false
         set(value) {
-            if (field != value) { field = value; post { reattachIme() } }
+            // The keyboard is asked for here: word mode is a key on the extra bar, so the user
+            // has just reached for the keyboard's own behaviour, and the IME has to be restarted
+            // anyway for it to read the new inputType.
+            if (field != value) { field = value; post { reattachIme(show = true) } }
         }
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection {

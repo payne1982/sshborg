@@ -39,6 +39,15 @@ class SshBorgApp : Application() {
      * shorter, so "lock immediately" doesn't ask for the PIN after every file chosen. One-shot:
      * the next return consumes it, whether or not a file was picked.
      */
+    /**
+     * True while the lock gate is drawn over the app. The gate covers the live content without
+     * dismantling it, so the terminal underneath is still there, still focused and still able to
+     * open a keyboard — which is how the soft keyboard ended up on top of the lock screen. Read
+     * before raising it.
+     */
+    @Volatile
+    var lockGateUp: Boolean = false
+
     @Volatile private var pickerTrip = false
 
     fun allowPickerTrip() { pickerTrip = true }
