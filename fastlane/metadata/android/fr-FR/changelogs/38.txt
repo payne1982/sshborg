@@ -1,0 +1,3 @@
+• Le clavier ne remonte plus tout seul : il reste baissé jusqu'à ce que vous le demandiez et n'apparaît pas sur l'écran de verrouillage.
+• Chaque session retient si le clavier était ouvert : en changeant d'onglet ou en y revenant, il est comme vous l'avez laissé.
+• Les clés ed25519 générées sont écrites exactement comme ssh-keygen les écrit.

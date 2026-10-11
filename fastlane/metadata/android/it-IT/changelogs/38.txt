@@ -1,0 +1,3 @@
+• La tastiera non torna più su da sola: resta giù finché non la chiami, e non compare sopra la schermata di blocco.
+• Ogni sessione ricorda se la tastiera era alzata, così cambiando tab o rientrando la ritrovi come l'avevi lasciata.
+• Le chiavi ed25519 generate sono scritte esattamente come le scrive ssh-keygen.

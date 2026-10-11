@@ -1,0 +1,59 @@
+<en-US>
+• The keyboard no longer comes back on its own: it stays away until you ask for it, and it does not appear over the lock screen.
+• Each session remembers whether the keyboard was up, so switching tab or returning to a session puts it back as you left it.
+• Generated ed25519 keys are written exactly as ssh-keygen writes them.
+</en-US>
+
+<it-IT>
+• La tastiera non torna più su da sola: resta giù finché non la chiami, e non compare sopra la schermata di blocco.
+• Ogni sessione ricorda se la tastiera era alzata, così cambiando tab o rientrando la ritrovi come l'avevi lasciata.
+• Le chiavi ed25519 generate sono scritte esattamente come le scrive ssh-keygen.
+</it-IT>
+
+<de-DE>
+• Die Tastatur kommt nicht mehr von selbst zurück: sie bleibt unten, bis Sie sie holen, und erscheint nicht über dem Sperrbildschirm.
+• Jede Sitzung merkt sich, ob die Tastatur offen war: beim Tabwechsel und bei der Rückkehr ist sie wieder so, wie Sie sie verlassen haben.
+• Erzeugte ed25519-Schlüssel werden genau so geschrieben, wie ssh-keygen sie schreibt.
+</de-DE>
+
+<es-ES>
+• El teclado ya no vuelve a aparecer por su cuenta: se queda abajo hasta que lo pidas y no sale sobre la pantalla de bloqueo.
+• Cada sesión recuerda si el teclado estaba abierto, así que al cambiar de pestaña o al volver lo encuentras como lo dejaste.
+• Las claves ed25519 generadas se escriben exactamente como las escribe ssh-keygen.
+</es-ES>
+
+<fr-FR>
+• Le clavier ne remonte plus tout seul : il reste baissé jusqu'à ce que vous le demandiez et n'apparaît pas sur l'écran de verrouillage.
+• Chaque session retient si le clavier était ouvert : en changeant d'onglet ou en y revenant, il est comme vous l'avez laissé.
+• Les clés ed25519 générées sont écrites exactement comme ssh-keygen les écrit.
+</fr-FR>
+
+<pt-PT>
+• O teclado já não volta a subir sozinho: fica em baixo até o pedir e não aparece sobre o ecrã de bloqueio.
+• Cada sessão lembra-se se o teclado estava aberto, por isso ao mudar de separador ou ao voltar fica como o deixou.
+• As chaves ed25519 geradas são escritas exatamente como o ssh-keygen as escreve.
+</pt-PT>
+
+<uk>
+• Клавіатура більше не з'являється сама: вона залишається прихованою, поки ви її не викличете, і не виринає над екраном блокування.
+• Кожен сеанс пам'ятає, чи була клавіатура відкрита, тож перемикаючи вкладку або повертаючись, ви знайдете її такою, якою залишили.
+• Створені ключі ed25519 записуються точно так, як їх записує ssh-keygen.
+</uk>
+
+<ru-RU>
+• Клавиатура больше не поднимается сама: она остаётся убранной, пока вы её не вызовете, и не появляется поверх экрана блокировки.
+• Каждый сеанс помнит, была ли клавиатура открыта, поэтому при переключении вкладки или возврате она такая, какой вы её оставили.
+• Создаваемые ключи ed25519 записываются точно так, как их пишет ssh-keygen.
+</ru-RU>
+
+<zh-CN>
+• 键盘不再自己弹出来：你不叫它就一直收着，也不会出现在锁屏上面。
+• 每个会话都会记住键盘是开着还是收起，切换标签或回到会话时，它还是你离开时的样子。
+• 生成的 ed25519 密钥的写法与 ssh-keygen 完全一致。
+</zh-CN>
+
+<ja-JP>
+• キーボードが勝手に出てこなくなりました。呼び出すまで下がったままで、ロック画面の上にも出ません。
+• セッションごとにキーボードが出ていたかを覚えるので、タブを切り替えても、戻ってきても、離れたときのままです。
+• 生成する ed25519 鍵は、ssh-keygen が書くのとまったく同じ形式で書き出されます。
+</ja-JP>

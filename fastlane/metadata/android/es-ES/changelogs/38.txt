@@ -1,0 +1,3 @@
+• El teclado ya no vuelve a aparecer por su cuenta: se queda abajo hasta que lo pidas y no sale sobre la pantalla de bloqueo.
+• Cada sesión recuerda si el teclado estaba abierto, así que al cambiar de pestaña o al volver lo encuentras como lo dejaste.
+• Las claves ed25519 generadas se escriben exactamente como las escribe ssh-keygen.
