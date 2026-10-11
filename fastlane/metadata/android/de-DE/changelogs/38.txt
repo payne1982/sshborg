@@ -1,3 +1,3 @@
-• Die Tastatur kommt nicht mehr von selbst zurück: sie bleibt unten, bis Sie sie holen, und erscheint nicht über dem Sperrbildschirm.
-• Jede Sitzung merkt sich, ob die Tastatur offen war: beim Tabwechsel und bei der Rückkehr ist sie wieder so, wie Sie sie verlassen haben.
+• Die Unterstützung wurde auf Android 9 erweitert.
+• Die Tastatur geht nicht mehr von selbst auf: jede Sitzung behält sie so, wie Sie sie verlassen haben, und über dem Sperrbildschirm erscheint sie nicht mehr.
 • Erzeugte ed25519-Schlüssel werden genau so geschrieben, wie ssh-keygen sie schreibt.

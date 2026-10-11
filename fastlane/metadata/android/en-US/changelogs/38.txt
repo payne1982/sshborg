@@ -1,3 +1,3 @@
-• The keyboard no longer comes back on its own: it stays away until you ask for it, and it does not appear over the lock screen.
-• Each session remembers whether the keyboard was up, so switching tab or returning to a session puts it back as you left it.
+• Support has been extended to include Android 9.
+• The keyboard no longer comes up by itself: each session keeps it as you left it, up or away, and it never appears over the lock screen.
 • Generated ed25519 keys are written exactly as ssh-keygen writes them.

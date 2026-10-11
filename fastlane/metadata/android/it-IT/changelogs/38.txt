@@ -1,3 +1,3 @@
-• La tastiera non torna più su da sola: resta giù finché non la chiami, e non compare sopra la schermata di blocco.
-• Ogni sessione ricorda se la tastiera era alzata, così cambiando tab o rientrando la ritrovi come l'avevi lasciata.
+• Il supporto dell'app è stato esteso per includere Android 9.
+• La tastiera non si alza più da sola: ogni sessione la mantiene come l'avevi lasciata, su o giù, e non compare più sopra la schermata di blocco.
 • Le chiavi ed25519 generate sono scritte esattamente come le scrive ssh-keygen.

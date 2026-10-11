@@ -1,3 +1,3 @@
-• O teclado já não volta a subir sozinho: fica em baixo até o pedir e não aparece sobre o ecrã de bloqueio.
-• Cada sessão lembra-se se o teclado estava aberto, por isso ao mudar de separador ou ao voltar fica como o deixou.
+• O suporte foi ampliado para incluir o Android 9.
+• O teclado já não se abre sozinho: cada sessão mantém-no como o deixou, aberto ou fechado, e já não aparece sobre o ecrã de bloqueio.
 • As chaves ed25519 geradas são escritas exatamente como o ssh-keygen as escreve.
