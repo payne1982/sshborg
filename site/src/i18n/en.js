@@ -559,14 +559,14 @@ Host target
             <h3>Navigating with the remote</h3>
             <ul>
                 <li><strong>D-pad arrows</strong> — move the focus between rows and controls.</li>
-                <li><strong>OK (center)</strong> — the primary action: connect to a host, open a folder, download a file, expand a group.</li>
+                <li><strong>OK (center)</strong> — the primary action: connect to a host, open a folder, download a file, expand a group. In the terminal it opens the on-screen keyboard.</li>
                 <li><strong>Back</strong> — go up a level or leave the screen.</li>
             </ul>
             <h3>Opening a row's menu</h3>
             <p>To rename, delete, edit, duplicate or download from a row, open its menu: press the remote's <strong>Menu (options) key</strong> on the focused row, or <strong>hold OK</strong> (long-press). OK by itself runs the primary action, not the menu.</p>
             <h3>Typing: use a physical keyboard</h3>
             <p>A <strong>physical keyboard — USB or Bluetooth</strong> (Android TV supports both) is strongly recommended, and effectively required for the terminal. With one, text fields and the shell behave normally.</p>
-            <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical.</p>
+            <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical. In the terminal that keyboard is opened with OK and put away with Back.</p>
             <h3>Locking the app on a TV</h3>
             <p>A TV usually has no fingerprint reader or screen lock, so protect the app with the built-in <strong>PIN or passphrase</strong> lock (Settings → Security) — it works entirely with the remote or a keyboard. See <a href="#security">App Security</a>.</p>`,
 

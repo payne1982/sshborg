@@ -556,14 +556,14 @@ Host target
             <h3>Navegar com o comando</h3>
             <ul>
                 <li><strong>Setas do D-pad</strong> — movem o foco entre linhas e controlos.</li>
-                <li><strong>OK (centro)</strong> — a ação principal: ligar a um host, abrir uma pasta, transferir um ficheiro, expandir um grupo.</li>
+                <li><strong>OK (centro)</strong> — a ação principal: ligar a um host, abrir uma pasta, transferir um ficheiro, expandir um grupo. No terminal, abre o teclado no ecrã.</li>
                 <li><strong>Voltar</strong> — subir um nível ou sair do ecrã.</li>
             </ul>
             <h3>Abrir o menu de uma linha</h3>
             <p>Para renomear, eliminar, editar, duplicar ou transferir a partir de uma linha, abra o seu menu: prima a <strong>tecla Menu (opções)</strong> do comando na linha focada, ou <strong>mantenha OK premido</strong> (pressão longa). O OK sozinho executa a ação principal, não o menu.</p>
             <h3>Escrever: use um teclado físico</h3>
             <p>Um <strong>teclado físico — USB ou Bluetooth</strong> (o Android TV suporta ambos) é fortemente recomendado e praticamente indispensável para o terminal. Com ele, os campos de texto e a shell funcionam normalmente.</p>
-            <p>Sem um, o teclado no ecrã ainda serve para entradas curtas: foque um campo, prima OK para o abrir, escreva e prima <strong>OK / Ir</strong> no teclado para confirmar — no pedido de palavra-passe isto liga diretamente. Introduzir comandos da shell com o teclado no ecrã é, no entanto, pouco prático.</p>
+            <p>Sem um, o teclado no ecrã ainda serve para entradas curtas: foque um campo, prima OK para o abrir, escreva e prima <strong>OK / Ir</strong> no teclado para confirmar — no pedido de palavra-passe isto liga diretamente. Introduzir comandos da shell com o teclado no ecrã é, no entanto, pouco prático. No terminal, esse teclado abre-se com OK e fecha-se com Voltar.</p>
             <h3>Bloquear a app numa TV</h3>
             <p>Uma TV normalmente não tem leitor de impressões nem bloqueio de ecrã, por isso proteja a app com o bloqueio integrado por <strong>PIN ou frase-passe</strong> (Definições → Segurança) — funciona totalmente com o comando ou um teclado. Ver <a href="#security">Segurança da app</a>.</p>`,
 
