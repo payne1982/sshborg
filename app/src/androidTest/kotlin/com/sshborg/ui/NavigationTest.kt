@@ -1,15 +1,17 @@
 package com.sshborg.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sshborg.MainActivity
 import com.sshborg.R
 import com.sshborg.TestApp
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,16 +25,34 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NavigationTest {
 
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    /**
+     * An empty rule, so the activity is started by hand once the preferences are set.
+     *
+     * `createAndroidComposeRule` launches it before `@Before` runs, which on a fresh install puts
+     * the privacy-policy dialog over the host list; it is what kept [DpadWalkTest] red, and the
+     * note there tells the story. This test survived it only because it clicks instead of pressing
+     * keys, which is luck and not a reason to keep the pattern.
+     */
+    @get:Rule val compose = createEmptyComposeRule()
+
+    private lateinit var scenario: ActivityScenario<MainActivity>
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private fun text(id: Int) = context.getString(id)
 
-    @Before fun arrange() = TestApp.asReturningUser()
+    @Before fun arrange() {
+        TestApp.asReturningUser()
+        scenario = ActivityScenario.launch(MainActivity::class.java)
+        compose.waitForIdle()
+    }
+
+    @After fun cleanUp() {
+        if (::scenario.isInitialized) scenario.close()
+    }
 
     /** The system back button, through the dispatcher the app itself listens on. */
     private fun pressBack() {
-        compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
+        scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
         compose.waitForIdle()
     }
 
