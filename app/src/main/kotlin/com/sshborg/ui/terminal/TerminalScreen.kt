@@ -60,6 +60,7 @@ import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import com.sshborg.ui.common.ProblemContent
+import com.sshborg.ui.common.ServerBanner
 import kotlinx.coroutines.delay
 
 /** How long the auto-hiding title bar stays down after the tap that called it. */
@@ -582,6 +583,7 @@ fun TerminalScreen(
                 is ConnectionState.PasswordPrompt  -> PasswordDialog(
                     hostname      = s.hostname,
                     wrongPassword = s.wrongPassword,
+                    banner        = s.banner,
                     onConfirm     = vm::submitPassword,
                     onDismiss     = { vm.submitPassword(""); leave() },
                 )
@@ -859,6 +861,7 @@ private fun LoadingOverlay(message: String) {
 private fun PasswordDialog(
     hostname: String,
     wrongPassword: Boolean = false,
+    banner: String? = null,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -869,6 +872,8 @@ private fun PasswordDialog(
         title = { Text(stringResource(R.string.password_dialog_title, hostname)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Above the field, because a banner is read before typing or not at all.
+                if (!banner.isNullOrBlank()) ServerBanner(banner)
                 if (wrongPassword) {
                     Text(
                         stringResource(R.string.password_auth_failed),

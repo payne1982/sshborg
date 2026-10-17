@@ -21,7 +21,15 @@ sealed interface ConnectionState {
     object Connecting : ConnectionState
     object Connected : ConnectionState
     data class HostKeyPrompt(val hostname: String, val fingerprint: String) : ConnectionState
-    data class PasswordPrompt(val hostname: String, val wrongPassword: Boolean = false) : ConnectionState
+    /**
+     * @param banner what the server said before letting anyone in, if it said anything. It is
+     *               read before typing or not at all, which is why it comes with the prompt.
+     */
+    data class PasswordPrompt(
+        val hostname: String,
+        val wrongPassword: Boolean = false,
+        val banner: String? = null,
+    ) : ConnectionState
     data class Error(val message: String, val detail: String? = null) : ConnectionState
     /**
      * @param summary short, human-readable line shown under the title (all non-clean cases).
@@ -218,8 +226,16 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             val host = hostDao.getById(hostId) ?: run {
                 _state.value = ConnectionState.Error(getApplication<Application>().getString(R.string.error_host_not_found)); return@launch
             }
-            var auth = buildAuth(host) ?: return@launch
-            var wrongPassword = false
+            var auth: SshAuth = buildAuth(host)
+            // The person closed the password prompt instead of answering it. The attempt then
+            // ends as an authentication failure, which must not be read as one worth retrying.
+            var passwordCancelled = false
+            // A server has refused a password at some point, so every prompt from here on says
+            // so — including one raised on a later attempt, which starts counting again.
+            var passwordRefused = false
+            // Whether this attempt got as far as asking. Without it, a server that offers no
+            // password method at all would fail, be retried, and fail again for ever.
+            var passwordAsked = false
 
             // Pre-load jump host entities for host-list mode so we can look them up in onHostKeyVerify
             val jumpHostEntities = if (host.jumpMode == "host_list") {
@@ -228,6 +244,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
             while (true) {
                 _state.value = ConnectionState.Connecting
+                passwordAsked = false
 
                 val jumpHosts = if (host.jumpMode == "host_list") {
                     jumpHostEntities.mapNotNull { jumpHost ->
@@ -260,6 +277,28 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         ),
                         columns = columns,
                         rows    = rows,
+                        // Raised from inside the connect, because the banner only exists there
+                        // (see [SshAuth.Interactive]). Blocks the JSch thread while the person
+                        // reads and types, exactly as the host-key question below does.
+                        onPasswordNeeded = { hostname, banner, retry ->
+                            runBlocking {
+                                passwordAsked = true
+                                if (retry) passwordRefused = true
+                                _state.value = ConnectionState.PasswordPrompt(
+                                    hostname      = hostname,
+                                    wrongPassword = passwordRefused,
+                                    banner        = banner,
+                                )
+                                val pwd = passwordResult.first()
+                                if (pwd.isEmpty()) {
+                                    passwordCancelled = true
+                                    null
+                                } else {
+                                    _state.value = ConnectionState.Connecting
+                                    pwd
+                                }
+                            }
+                        },
                         onHostKeyVerify = { hostname, fingerprint, keyLine ->
                             runBlocking {
                                 _state.value = ConnectionState.HostKeyPrompt(hostname, fingerprint)
@@ -339,16 +378,21 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 }
 
                 val err = result.exceptionOrNull()
-                if (isAuthFailure(err) && auth !is SshAuth.PublicKey) {
-                    _state.value = ConnectionState.PasswordPrompt(host.hostname, wrongPassword = true)
-                    val pwd = passwordResult.first()
-                    if (pwd.isEmpty()) {
-                        _state.value = ConnectionState.Disconnected()
-                        sessionManager.remove(id)
-                        if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
-                        return@launch
-                    }
-                    auth = SshAuth.Password(pwd)
+                // Closing the prompt is an answer: leave, and don't ask again.
+                if (passwordCancelled) {
+                    _state.value = ConnectionState.Disconnected()
+                    sessionManager.remove(id)
+                    if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
+                    return@launch
+                }
+                // A refused password is worth one more attempt, and the person is asked during
+                // it — a saved password that no longer works becomes a question, with whatever
+                // the server has to say in front of it. Only when this attempt did ask, or had
+                // something saved to try: otherwise there is nobody to ask and nothing changes.
+                val worthAsking = auth !is SshAuth.Interactive || passwordAsked
+                if (isAuthFailure(err) && auth !is SshAuth.PublicKey && worthAsking) {
+                    passwordRefused = true
+                    auth = SshAuth.Interactive
                 } else {
                     val summary = err?.message?.takeIf { it.isNotBlank() }
                         ?: getApplication<Application>().getString(R.string.error_connection_failed)
@@ -398,7 +442,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private suspend fun buildAuth(host: HostEntity): SshAuth? {
+    private suspend fun buildAuth(host: HostEntity): SshAuth {
         val keyAuth = keyAuthFor(host)
         return if (keyAuth != null) {
             keyAuth
@@ -407,10 +451,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         } else if (!host.password.isNullOrEmpty()) {
             SshAuth.Password(host.password)
         } else {
-            _state.value = ConnectionState.PasswordPrompt(host.hostname)
-            val pwd = passwordResult.first()
-            if (pwd.isEmpty()) { _state.value = ConnectionState.Disconnected(); null }
-            else SshAuth.Password(pwd)
+            // Nothing saved: the question is put during the connection instead of before it,
+            // so the server's banner can be read before anything is typed.
+            SshAuth.Interactive
         }
     }
 

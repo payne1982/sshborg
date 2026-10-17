@@ -35,7 +35,12 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         object Connecting : State
         object Preparing : State
         data class HostKeyPrompt(val hostname: String, val fingerprint: String) : State
-        data class PasswordPrompt(val hostname: String, val wrongPassword: Boolean = false) : State
+        /** @param banner what the server said before letting anyone in, if it said anything. */
+        data class PasswordPrompt(
+            val hostname: String,
+            val wrongPassword: Boolean = false,
+            val banner: String? = null,
+        ) : State
         data class Listing(val path: String, val entries: List<SftpEntry>, val nonce: Long = 0L) : State
         data class Downloading(val filename: String, val location: String, val bytesReceived: Long, val fileIndex: Int = 1, val totalFiles: Int = 1, val startedAt: Long = 0L) : State
         data class Downloaded(
@@ -512,8 +517,13 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 _state.value = State.Error(getApplication<Application>().getString(R.string.error_host_not_found)); return@launch
             }
             _showHidden.value = host.sftpShowHidden
-            var auth = buildAuth(host) ?: return@launch
-            var wrongPassword = false
+            var auth: SshAuth = buildAuth(host)
+            // Same three as in the terminal, and for the same reasons: the prompt is raised
+            // from inside the connect now, so closing it, a refusal and "was anyone even
+            // asked" all have to be carried out of the attempt. See [TerminalViewModel.connect].
+            var passwordCancelled = false
+            var passwordRefused = false
+            var passwordAsked = false
 
             val jumpHostEntities = if (host.jumpMode == "host_list") {
                 buildJumpHostEntities(host.jumpHostIdList)
@@ -521,6 +531,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
 
             while (true) {
                 _state.value = State.Connecting
+                passwordAsked = false
 
                 val jumpHosts = if (host.jumpMode == "host_list") {
                     jumpHostEntities.mapNotNull { jumpHost ->
@@ -550,7 +561,26 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                             jumpHosts          = jumpHosts,
                             portForwardings    = parsePortForwardings(host.portForwardings),
                             allowLegacyCiphers = host.allowLegacyCiphers,
-                        )
+                        ),
+                        onPasswordNeeded = { hostname, banner, retry ->
+                            runBlocking {
+                                passwordAsked = true
+                                if (retry) passwordRefused = true
+                                _state.value = State.PasswordPrompt(
+                                    hostname      = hostname,
+                                    wrongPassword = passwordRefused,
+                                    banner        = banner,
+                                )
+                                val pwd = passwordResult.first()
+                                if (pwd.isEmpty()) {
+                                    passwordCancelled = true
+                                    null
+                                } else {
+                                    _state.value = State.Connecting
+                                    pwd
+                                }
+                            }
+                        },
                     ) { hostname, fingerprint, keyLine ->
                         runBlocking {
                             _state.value = State.HostKeyPrompt(hostname, fingerprint)
@@ -622,15 +652,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                 }
 
                 val err = result.exceptionOrNull()
-                if (isAuthFailure(err) && auth !is SshAuth.PublicKey) {
-                    _state.value = State.PasswordPrompt(host.hostname, wrongPassword = true)
-                    val pwd = passwordResult.first()
-                    if (pwd.isEmpty()) {
-                        _state.value = State.Disconnected
-                        sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
-                        return@launch
-                    }
-                    auth = SshAuth.Password(pwd)
+                if (passwordCancelled) {
+                    _state.value = State.Disconnected
+                    sessionManager.update(id) { it.copy(status = SessionManager.Status.Error) }
+                    return@launch
+                }
+                val worthAsking = auth !is SshAuth.Interactive || passwordAsked
+                if (isAuthFailure(err) && auth !is SshAuth.PublicKey && worthAsking) {
+                    passwordRefused = true
+                    auth = SshAuth.Interactive
                 } else {
                     _state.value = State.Error(
                         err?.message ?: getApplication<Application>().getString(R.string.error_connection_failed),
@@ -1329,7 +1359,7 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private suspend fun buildAuth(host: HostEntity): SshAuth? {
+    private suspend fun buildAuth(host: HostEntity): SshAuth {
         val keyAuth = keyAuthFor(host)
         return if (keyAuth != null) {
             keyAuth
@@ -1338,10 +1368,9 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
         } else if (!host.password.isNullOrEmpty()) {
             SshAuth.Password(host.password)
         } else {
-            _state.value = State.PasswordPrompt(host.hostname)
-            val pwd = passwordResult.first()
-            if (pwd.isEmpty()) { _state.value = State.Disconnected; null }
-            else SshAuth.Password(pwd)
+            // Nothing saved: asked for during the connection, so the server's banner can be
+            // read before anything is typed (see [SshAuth.Interactive]).
+            SshAuth.Interactive
         }
     }
 }

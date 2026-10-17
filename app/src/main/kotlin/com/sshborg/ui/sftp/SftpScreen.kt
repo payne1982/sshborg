@@ -54,6 +54,7 @@ import com.sshborg.ui.editor.EditorUnsupportedDialog
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.service.BackgroundTransfer
 import com.sshborg.ui.common.ProblemContent
+import com.sshborg.ui.common.ServerBanner
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -335,6 +336,7 @@ fun SftpScreen(
                     PasswordDialog(
                         hostname      = s.hostname,
                         wrongPassword = s.wrongPassword,
+                        banner        = s.banner,
                         onSubmit      = vm::submitPassword,
                         onCancel      = { vm.submitPassword(""); onBack() },
                     )
@@ -1521,6 +1523,7 @@ private fun HostKeyDialog(
 private fun PasswordDialog(
     hostname: String,
     wrongPassword: Boolean = false,
+    banner: String? = null,
     onSubmit: (String) -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -1531,6 +1534,8 @@ private fun PasswordDialog(
         title = { Text(stringResource(R.string.password_dialog_title, hostname)) },
         text  = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Above the field, because a banner is read before typing or not at all.
+                if (!banner.isNullOrBlank()) ServerBanner(banner)
                 if (wrongPassword) {
                     Text(
                         stringResource(R.string.password_auth_failed),
