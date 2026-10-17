@@ -3,6 +3,7 @@ package com.sshborg.ui.common
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
@@ -19,10 +20,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -47,8 +51,10 @@ import kotlinx.coroutines.launch
  *
  * Shown as it arrived, in the terminal's own font because banners are drawn with spaces, in a
  * box that stops at [maxHeight] and scrolls: a server with sixty lines of policy must not push
- * the password field off the dialog. Selectable, because a banner sometimes carries a reference
- * number somebody has to write down.
+ * the password field off the dialog. It scrolls sideways as well and never wraps — a banner is
+ * laid out for eighty columns, and a dialog is narrower than that: wrapped, its frame breaks in
+ * half and a centred title lands on two lines. Selectable, because a banner sometimes carries a
+ * reference number somebody has to write down.
  */
 @Composable
 fun ServerBanner(
@@ -57,6 +63,7 @@ fun ServerBanner(
     maxHeight: Dp = 150.dp,
 ) {
     val scroll = rememberScrollState()
+    val sideways = rememberScrollState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val touchless = remember(context) { isTouchless(context) }
@@ -65,16 +72,30 @@ fun ServerBanner(
     // and while it is here the box is outlined, because focus nobody can see is issue #3 again.
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
+    // And it is handed the focus as the dialog opens, which is the only way it gets any: a
+    // D-pad walk never finds it from the field below (measured on the TV emulator — UP from the
+    // password field does nothing at all), and the field, once focused, raises the television's
+    // own keyboard, which then swallows every key of the remote. Asking first also puts the
+    // banner where it belongs on a television: read before anything is typed, not behind a
+    // keyboard. From here DOWN passes through to the field once there is nothing left to scroll.
+    val requester = remember { FocusRequester() }
+    LaunchedEffect(touchless) { if (touchless) runCatching { requester.requestFocus() } }
     val step = with(LocalDensity.current) { maxHeight.toPx() / 3f }
     val dpad = Modifier
+        .focusRequester(requester)
         .focusable(enabled = touchless, interactionSource = interaction)
         .onPreviewKeyEvent { ev ->
             if (!touchless || ev.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
             val down = ev.key == Key.DirectionDown
             val up = ev.key == Key.DirectionUp
-            val room = (down && scroll.canScrollForward) || (up && scroll.canScrollBackward)
+            val right = ev.key == Key.DirectionRight
+            val left = ev.key == Key.DirectionLeft
+            val state = if (right || left) sideways else scroll
+            val forward = down || right
+            val room = (forward && state.canScrollForward) ||
+                ((up || left) && state.canScrollBackward)
             if (!room) return@onPreviewKeyEvent false
-            scope.launch { scroll.animateScrollBy(if (down) step else -step) }
+            scope.launch { state.animateScrollBy(if (forward) step else -step) }
             true
         }
 
@@ -96,9 +117,11 @@ fun ServerBanner(
                     text,
                     style = MaterialTheme.typography.bodySmall,
                     fontFamily = monoFont(),
+                    softWrap = false,
                     modifier = dpad
                         .heightIn(max = maxHeight)
                         .verticalScroll(scroll)
+                        .horizontalScroll(sideways)
                         .padding(8.dp),
                 )
             }
