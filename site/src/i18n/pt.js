@@ -132,7 +132,10 @@ module.exports = {
             <p>Na primeira ligação, o SSHBorg mostra a impressão digital do servidor e pede que a aceite. É uma verificação de segurança: garante que está a ligar à máquina correta e não a um impostor. Verifique se a impressão digital corresponde à fornecida pelo administrador do servidor antes de aceitar.</p>
             <p>Uma vez aceite, a impressão digital é guardada localmente. Se mudar numa ligação futura, o SSHBorg avisá-lo-á — pode indicar uma reconstrução do servidor, uma rotação de chaves ou um ataque man-in-the-middle.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// DICA</div>
+                <h3>A mensagem do servidor antes do início de sessão</h3>
+            <p>Muitos servidores enviam uma mensagem antes de deixar entrar quem seja: um aviso legal, uma janela de manutenção, um número de referência a citar. O SSHBorg mostra-a acima do pedido de palavra-passe, para a poder ler antes de escrever, e fica à vista se a palavra-passe for recusada e pedida de novo.</p>
+            <p>Aparece sempre que a aplicação lhe pede uma palavra-passe — no terminal e no gestor de ficheiros. Com a palavra-passe guardada ou com uma chave não há pedido, portanto não há nada para mostrar. A mensagem é apresentada tal como o servidor a desenhou: as linhas nunca são quebradas, pelo que um banner composto em colunas mantém a sua forma, e a caixa desloca-se para baixo e para o lado quando não cabe. No Android TV a caixa tem o foco assim que a janela abre — desloque-a com o D-pad e, quando não restar nada para deslocar, o foco passa ao campo da palavra-passe.</p>
+            <div class="callout-label">// DICA</div>
                 Pode verificar a impressão digital do servidor a qualquer momento com:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,

@@ -132,7 +132,10 @@ module.exports = {
             <p>Lors de la première connexion, SSHBorg affiche l'empreinte du serveur et vous demande de l'accepter. C'est une vérification de sécurité : elle garantit que vous vous connectez à la bonne machine et non à un imposteur. Vérifiez que l'empreinte correspond à celle fournie par votre administrateur avant d'accepter.</p>
             <p>Une fois acceptée, l'empreinte est stockée localement. Si elle change lors d'une connexion future, SSHBorg vous avertira — cela pourrait indiquer une reconstruction du serveur, une rotation des clés ou une attaque man-in-the-middle.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// ASTUCE</div>
+                <h3>Le message du serveur avant la connexion</h3>
+            <p>Beaucoup de serveurs envoient un message avant de laisser entrer qui que ce soit : une mention légale, une fenêtre de maintenance, un numéro de dossier à rappeler. SSHBorg l'affiche au-dessus de la demande de mot de passe, pour que vous le lisiez avant de taper, et il reste visible si le mot de passe est refusé et redemandé.</p>
+            <p>Il apparaît chaque fois que l'application vous demande un mot de passe — dans le terminal et dans le gestionnaire de fichiers. Avec un mot de passe enregistré ou une clé, il n'y a pas de demande, donc rien à afficher. Le message est présenté tel que le serveur l'a dessiné : les lignes ne sont jamais renvoyées à la ligne, afin qu'une bannière mise en colonnes garde sa forme, et le cadre défile vers le bas et sur le côté lorsqu'il ne tient pas. Sur Android TV, le cadre a le focus dès l'ouverture de la boîte de dialogue : faites-le défiler avec le D-pad, et quand il n'y a plus rien à faire défiler, le focus passe au champ du mot de passe.</p>
+            <div class="callout-label">// ASTUCE</div>
                 Vous pouvez vérifier l'empreinte du serveur à tout moment avec :
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,

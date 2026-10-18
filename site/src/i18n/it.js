@@ -133,7 +133,10 @@ module.exports = {
             <p>Alla prima connessione SSHBorg mostra il fingerprint del server e chiede di accettarlo. È un controllo di sicurezza: garantisce che ti stai connettendo alla macchina giusta e non a un impostore. Verifica che il fingerprint corrisponda a quello fornito dall'amministratore del server o ottenuto tramite un canale affidabile prima di accettare.</p>
             <p>Una volta accettato, il fingerprint viene salvato localmente. Se cambia in una connessione futura, SSHBorg ti avviserà — potrebbe indicare una reinstallazione del server, una rotazione delle chiavi o un attacco man-in-the-middle.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// SUGGERIMENTO</div>
+                <h3>Il messaggio del server prima del login</h3>
+            <p>Molti server mandano un messaggio prima di far entrare chiunque: un avviso legale, una finestra di manutenzione, un numero di riferimento da citare. SSHBorg lo mostra sopra la richiesta della password, così lo leggi prima di scrivere, e resta in vista se la password viene rifiutata e richiesta di nuovo.</p>
+            <p>Compare ogni volta che l'app ti chiede una password — nel terminale e nel gestore file. Con la password salvata o con una chiave non c'è nessuna richiesta, quindi non c'è niente da mostrare. Il messaggio è mostrato come l'ha disegnato il server: le righe non vengono mai mandate a capo, così un banner impaginato a colonne conserva la sua forma, e la cassetta scorre in basso e di lato quando non ci sta. Su Android TV la cassetta ha il fuoco appena si apre la finestra — scorrila col D-pad, e quando non c'è più niente da scorrere il fuoco passa al campo della password.</p>
+            <div class="callout-label">// SUGGERIMENTO</div>
                 Puoi controllare il fingerprint del server in qualsiasi momento con:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,

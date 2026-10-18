@@ -570,7 +570,10 @@
             <p>En la primera conexión, SSHBorg muestra la huella del servidor y te pide que la aceptes. Es una comprobación de seguridad: garantiza que te estás conectando a la máquina correcta y no a un impostor. Verifica que la huella coincida con la que te proporcionó el administrador del servidor antes de aceptarla.</p>
             <p>Una vez aceptada, la huella se almacena localmente. Si cambia en una conexión futura, SSHBorg te avisará — podría indicar una reinstalación del servidor, una rotación de claves o un ataque man-in-the-middle.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// CONSEJO</div>
+                <h3>El mensaje del servidor antes de iniciar sesión</h3>
+            <p>Muchos servidores envían un mensaje antes de dejar entrar a nadie: un aviso legal, una ventana de mantenimiento, un número de referencia que citar. SSHBorg lo muestra sobre la petición de contraseña, así lo lees antes de escribir, y se queda a la vista si la contraseña se rechaza y se vuelve a pedir.</p>
+            <p>Aparece siempre que la app te pide una contraseña — en el terminal y en el gestor de archivos. Con la contraseña guardada o con una clave no hay petición, así que no hay nada que mostrar. El mensaje se muestra tal como lo dibujó el servidor: las líneas nunca se parten, de modo que un banner maquetado en columnas conserva su forma, y el cuadro se desplaza hacia abajo y hacia los lados cuando no cabe. En Android TV el cuadro tiene el foco en cuanto se abre el diálogo: desplázalo con el D-pad, y cuando no queda nada por desplazar el foco pasa al campo de la contraseña.</p>
+            <div class="callout-label">// CONSEJO</div>
                 Puedes comprobar la huella del servidor en cualquier momento con:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
