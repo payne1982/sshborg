@@ -1,3 +1,5 @@
 • Die Unterstützung wurde auf Android 9 erweitert.
+• Die Meldung, die ein Server vor der Anmeldung zeigt, steht jetzt über der Passwortabfrage – lesbar, bevor Sie tippen.
 • Die Tastatur geht nicht mehr von selbst auf: jede Sitzung behält sie so, wie Sie sie verlassen haben, und über dem Sperrbildschirm erscheint sie nicht mehr.
 • Erzeugte ed25519-Schlüssel werden genau so geschrieben, wie ssh-keygen sie schreibt.
+• Auf dem Fernseher öffnet die OK-Taste die Tastatur im Terminal.

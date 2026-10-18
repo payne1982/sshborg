@@ -1,3 +1,5 @@
 • La compatibilidad se ha ampliado para incluir Android 9.
+• El mensaje que un servidor muestra antes de iniciar sesión ahora aparece sobre la petición de contraseña, así lo lees antes de escribir.
 • El teclado ya no se abre por su cuenta: cada sesión lo mantiene como lo dejaste, abierto o cerrado, y ya no sale sobre la pantalla de bloqueo.
 • Las claves ed25519 generadas se escriben exactamente como las escribe ssh-keygen.
+• En Android TV, la tecla OK abre el teclado en el terminal.
