@@ -333,6 +333,7 @@
     <string name="password_dialog_title">Пароль для %1$s</string>
     <string name="password_field_label">Пароль</string>
     <string name="password_auth_failed">Автентифікацію не вдалося. Будь ласка, спробуйте ще раз.</string>
+    <string name="password_server_banner">Повідомлення сервера</string>
 
     <!-- ── Root warning dialog ───────────────────────────────────────────── -->
     <string name="root_warning_title">Попередження безпеки</string>

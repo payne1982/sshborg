@@ -1,0 +1,5 @@
+• Support has been extended to include Android 9.
+• The message a server shows before login now appears above the password request, so you can read it before typing.
+• The keyboard no longer comes up by itself: each session keeps it as you left it, up or away, and it never appears over the lock screen.
+• Generated ed25519 keys are written exactly as ssh-keygen writes them.
+• On a television, the OK key opens the keyboard in the terminal.

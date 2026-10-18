@@ -132,7 +132,10 @@ module.exports = {
             <p>En la primera conexión, SSHBorg muestra la huella del servidor y te pide que la aceptes. Es una comprobación de seguridad: garantiza que te estás conectando a la máquina correcta y no a un impostor. Verifica que la huella coincida con la que te proporcionó el administrador del servidor antes de aceptarla.</p>
             <p>Una vez aceptada, la huella se almacena localmente. Si cambia en una conexión futura, SSHBorg te avisará — podría indicar una reinstalación del servidor, una rotación de claves o un ataque man-in-the-middle.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// CONSEJO</div>
+                <h3>El mensaje del servidor antes de iniciar sesión</h3>
+            <p>Muchos servidores envían un mensaje antes de dejar entrar a nadie: un aviso legal, una ventana de mantenimiento, un número de referencia que citar. SSHBorg lo muestra sobre la petición de contraseña, así lo lees antes de escribir, y se queda a la vista si la contraseña se rechaza y se vuelve a pedir.</p>
+            <p>Aparece siempre que la app te pide una contraseña — en el terminal y en el gestor de archivos. Con la contraseña guardada o con una clave no hay petición, así que no hay nada que mostrar. El mensaje se muestra tal como lo dibujó el servidor: las líneas nunca se parten, de modo que un banner maquetado en columnas conserva su forma, y el cuadro se desplaza hacia abajo y hacia los lados cuando no cabe. En Android TV el cuadro tiene el foco en cuanto se abre el diálogo: desplázalo con el D-pad, y cuando no queda nada por desplazar el foco pasa al campo de la contraseña.</p>
+            <div class="callout-label">// CONSEJO</div>
                 Puedes comprobar la huella del servidor en cualquier momento con:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
@@ -556,14 +559,14 @@ Host target
             <h3>Navegar con el mando</h3>
             <ul>
                 <li><strong>Flechas del D-pad</strong> — mueven el foco entre filas y controles.</li>
-                <li><strong>OK (centro)</strong> — la acción principal: conectar a un host, abrir una carpeta, descargar un archivo, expandir un grupo.</li>
+                <li><strong>OK (centro)</strong> — la acción principal: conectar a un host, abrir una carpeta, descargar un archivo, expandir un grupo. En el terminal abre el teclado en pantalla.</li>
                 <li><strong>Atrás</strong> — subir un nivel o salir de la pantalla.</li>
             </ul>
             <h3>Abrir el menú de una fila</h3>
             <p>Para renombrar, eliminar, editar, duplicar o descargar desde una fila, abre su menú: pulsa la <strong>tecla Menú (opciones)</strong> del mando sobre la fila enfocada, o <strong>mantén pulsado OK</strong> (pulsación larga). OK por sí solo ejecuta la acción principal, no el menú.</p>
             <h3>Escribir: usa un teclado físico</h3>
             <p>Se recomienda encarecidamente un <strong>teclado físico — USB o Bluetooth</strong> (Android TV admite ambos), y es prácticamente imprescindible para el terminal. Con él, los campos de texto y la shell funcionan con normalidad.</p>
-            <p>Sin él, el teclado en pantalla sirve para entradas cortas: enfoca un campo, pulsa OK para abrirlo, escribe y pulsa <strong>OK / Ir</strong> en el teclado para confirmar — en la solicitud de contraseña esto conecta directamente. Escribir comandos de shell con el teclado en pantalla, sin embargo, es poco práctico.</p>
+            <p>Sin él, el teclado en pantalla sirve para entradas cortas: enfoca un campo, pulsa OK para abrirlo, escribe y pulsa <strong>OK / Ir</strong> en el teclado para confirmar — en la solicitud de contraseña esto conecta directamente. Escribir comandos de shell con el teclado en pantalla, sin embargo, es poco práctico. En el terminal ese teclado se abre con OK y se cierra con Atrás.</p>
             <h3>Bloquear la app en un TV</h3>
             <p>Un TV normalmente no tiene lector de huellas ni bloqueo de pantalla, así que protege la app con el bloqueo integrado por <strong>PIN o frase de contraseña</strong> (Ajustes → Seguridad) — funciona por completo con el mando o un teclado. Consulta <a href="#security">Seguridad de la app</a>.</p>`,
 

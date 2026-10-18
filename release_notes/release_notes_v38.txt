@@ -1,0 +1,79 @@
+<en-US>
+• Support has been extended to include Android 9.
+• The message a server shows before login now appears above the password request, so you can read it before typing.
+• The keyboard no longer comes up by itself: each session keeps it as you left it, up or away, and it never appears over the lock screen.
+• Generated ed25519 keys are written exactly as ssh-keygen writes them.
+• On a television, the OK key opens the keyboard in the terminal.
+</en-US>
+
+<it-IT>
+• Il supporto dell'app è stato esteso per includere Android 9.
+• Il messaggio che un server mostra prima del login ora compare sopra la richiesta della password, così lo leggi prima di scrivere.
+• La tastiera non si alza più da sola: ogni sessione la mantiene come l'avevi lasciata, su o giù, e non compare più sopra la schermata di blocco.
+• Le chiavi ed25519 generate sono scritte esattamente come le scrive ssh-keygen.
+• Su Android TV il tasto OK apre la tastiera nel terminale.
+</it-IT>
+
+<de-DE>
+• Die Unterstützung wurde auf Android 9 erweitert.
+• Die Meldung, die ein Server vor der Anmeldung zeigt, steht jetzt über der Passwortabfrage – lesbar, bevor Sie tippen.
+• Die Tastatur geht nicht mehr von selbst auf: jede Sitzung behält sie so, wie Sie sie verlassen haben, und über dem Sperrbildschirm erscheint sie nicht mehr.
+• Erzeugte ed25519-Schlüssel werden genau so geschrieben, wie ssh-keygen sie schreibt.
+• Auf dem Fernseher öffnet die OK-Taste die Tastatur im Terminal.
+</de-DE>
+
+<es-ES>
+• La compatibilidad se ha ampliado para incluir Android 9.
+• El mensaje que un servidor muestra antes de iniciar sesión ahora aparece sobre la petición de contraseña, así lo lees antes de escribir.
+• El teclado ya no se abre por su cuenta: cada sesión lo mantiene como lo dejaste, abierto o cerrado, y ya no sale sobre la pantalla de bloqueo.
+• Las claves ed25519 generadas se escriben exactamente como las escribe ssh-keygen.
+• En Android TV, la tecla OK abre el teclado en el terminal.
+</es-ES>
+
+<fr-FR>
+• La prise en charge a été étendue à Android 9.
+• Le message qu'un serveur affiche avant la connexion apparaît désormais au-dessus de la demande de mot de passe, à lire avant de taper.
+• Le clavier ne s'ouvre plus tout seul : chaque session le garde comme vous l'avez laissé, ouvert ou baissé, et il n'apparaît plus sur l'écran de verrouillage.
+• Les clés ed25519 générées sont écrites exactement comme ssh-keygen les écrit.
+• Sur un téléviseur, la touche OK ouvre le clavier dans le terminal.
+</fr-FR>
+
+<pt-PT>
+• O suporte foi ampliado para incluir o Android 9.
+• A mensagem que um servidor mostra antes do início de sessão aparece agora acima do pedido de palavra-passe, para a poder ler antes de escrever.
+• O teclado já não se abre sozinho: cada sessão mantém-no como o deixou, aberto ou fechado, e já não aparece sobre o ecrã de bloqueio.
+• As chaves ed25519 geradas são escritas exatamente como o ssh-keygen as escreve.
+• Na televisão, a tecla OK abre o teclado no terminal.
+</pt-PT>
+
+<uk>
+• Підтримку розширено на Android 9.
+• Повідомлення, яке сервер показує до входу, тепер з'являється над запитом пароля — його можна прочитати, перш ніж набирати.
+• Клавіатура більше не відкривається сама: кожен сеанс тримає її такою, якою ви її залишили, і вона більше не виринає над екраном блокування.
+• Створені ключі ed25519 записуються точно так, як їх записує ssh-keygen.
+• На телевізорі кнопка OK відкриває клавіатуру в терміналі.
+</uk>
+
+<ru-RU>
+• Поддержка расширена и включает Android 9.
+• Сообщение, которое сервер показывает до входа, теперь появляется над запросом пароля — его можно прочитать, прежде чем набирать.
+• Клавиатура больше не открывается сама: каждый сеанс сохраняет её такой, какой вы её оставили, и она больше не появляется поверх экрана блокировки.
+• Создаваемые ключи ed25519 записываются точно так, как их пишет ssh-keygen.
+• На телевизоре кнопка OK открывает клавиатуру в терминале.
+</ru-RU>
+
+<zh-CN>
+• 应用的支持范围已扩展到 Android 9。
+• 服务器在登录前显示的提示信息，现在会出现在密码输入框的上方，输入之前就能读到。
+• 键盘不再自己弹出来：每个会话都会保持你离开时的状态，也不会再出现在锁屏上面。
+• 生成的 ed25519 密钥的写法与 ssh-keygen 完全一致。
+• 在电视上，OK 键可以在终端里打开键盘。
+</zh-CN>
+
+<ja-JP>
+• 対応範囲が広がり、Android 9 でも使えるようになりました。
+• サーバーがログイン前に表示するメッセージが、パスワードの入力欄の上に出るようになりました。入力する前に読めます。
+• キーボードが勝手に出てこなくなりました。セッションごとに離れたときの状態を保ち、ロック画面の上にも出ません。
+• 生成する ed25519 鍵は、ssh-keygen が書くのとまったく同じ形式で書き出されます。
+• テレビではリモコンの OK キーでターミナルのキーボードが開きます。
+</ja-JP>

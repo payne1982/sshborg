@@ -20,6 +20,22 @@ import java.util.Properties
  */
 object SshManager {
 
+    /** How wide ssh-keygen wraps the body of an OpenSSH private key. PEM would say 64. */
+    private const val OPENSSH_PEM_WIDTH = 70
+
+    /**
+     * The body of an OpenSSH private key, broken into lines the way ssh-keygen breaks them.
+     *
+     * The breaking is done here instead of by `Base64.getMimeEncoder(width, …)` because MIME wants
+     * a line length that is a multiple of four and the JDK rounds a request down to one — asking
+     * it for 70 quietly returns 68, measured. OpenSSH does not follow that rule: it cuts the
+     * encoded string every 70 characters whatever that lands on. So the only way to match the file
+     * ssh-keygen writes is to encode it unbroken and break it afterwards.
+     */
+    private fun opensshPemBody(bytes: ByteArray): String =
+        java.util.Base64.getEncoder().encodeToString(bytes)
+            .chunked(OPENSSH_PEM_WIDTH).joinToString("\n")
+
     /**
      * Blocking JSch calls run here rather than in the caller's scope. A socket read cannot be
      * interrupted, so a connect stuck in one would hold a cancelled caller until it returned —
@@ -44,6 +60,7 @@ object SshManager {
      */
     private class ConnectGuard(
         private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        private val onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
     ) {
         private val sessions = mutableListOf<Session>()
         private val jumpHops = mutableListOf<Session>()
@@ -116,6 +133,21 @@ object SshManager {
             try { onHostKeyVerify(hostname, fingerprint, keyLine) } finally { waitingForUser = false }
         }
 
+        /**
+         * Asks for a password mid-connect, with the server's banner if it sent one. Null when
+         * nothing can be asked — no caller took the question — or when the person cancelled.
+         *
+         * Wrapped like [verify], and for the same reason: reading a banner and typing a password
+         * is thinking time, and the watchdog must not spend the connection's budget on it.
+         */
+        val askPassword: (String, String?, Boolean) -> String? = { hostname, banner, retry ->
+            val ask = onPasswordNeeded
+            if (ask == null) null else {
+                waitingForUser = true
+                try { ask(hostname, banner, retry) } finally { waitingForUser = false }
+            }
+        }
+
         @Synchronized fun track(session: Session) {
             if (aborted) runCatching { session.disconnect() } else sessions.add(session)
         }
@@ -136,6 +168,51 @@ object SshManager {
     }
 
     /**
+     * The banner the servers send before letting anyone in, and the password the person types
+     * when the server asks for one.
+     *
+     * Both belong to the attempt rather than to a single hop. The banner, because it arrives
+     * during authentication and must be in front of the person *before* they type — which is
+     * the whole reason the prompt is raised from in here instead of before the connect. The
+     * password, because a jump host without credentials of its own borrows the target's (see
+     * [parseJumpHosts]): asked once, used by every hop, exactly as a saved password is.
+     */
+    private class InteractivePassword(private val guard: ConnectGuard) {
+        private var banner: String? = null
+        private var value: String? = null
+        private var asked = false
+
+        /** Keeps what a server said, in the order it was said. */
+        fun noteBanner(message: String?) { banner = SshManager.appendBanner(banner, message) }
+
+        /** The answer already given, asking for one if nothing has been asked yet. */
+        fun get(hostname: String): String? {
+            if (!asked) ask(hostname)
+            return value
+        }
+
+        /** Asks again, telling the prompt that what it gave last time was refused. */
+        fun ask(hostname: String): String? {
+            value = guard.askPassword(hostname, banner, asked)
+            asked = true
+            return value
+        }
+    }
+
+    /**
+     * One banner after another, as something that can be read on a screen.
+     *
+     * A banner travels with CR LF line endings, which would show as a blank line between every
+     * line, and nothing says a server sends only one. Trailing blank lines go — most banners end
+     * with one — while blank lines inside stay: a banner is usually laid out on purpose.
+     */
+    internal fun appendBanner(current: String?, incoming: String?): String? {
+        val text = incoming?.replace("\r\n", "\n")?.replace('\r', '\n')?.trimEnd() ?: return current
+        if (text.isBlank()) return current
+        return if (current.isNullOrEmpty()) text else current + "\n" + text
+    }
+
+    /**
      * Runs one connect attempt under a deadline, off the caller's job tree.
      *
      * Two things end it early: the watchdog, when the attempt has spent its budget, and the
@@ -147,9 +224,10 @@ object SshManager {
     private suspend fun <T> guardedConnect(
         params: SshConnectionParams,
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
         block: suspend (ConnectGuard) -> T,
     ): T {
-        val guard = ConnectGuard(onHostKeyVerify)
+        val guard = ConnectGuard(onHostKeyVerify, onPasswordNeeded)
         // A hop's worth of handshake on top of the base budget for every jump in the chain.
         val budgetMs = 30_000L + 15_000L * params.jumpHosts.size
         // One attempt, deliberately: retrying automatically would paper over the stall while
@@ -192,8 +270,9 @@ object SshManager {
         termType: String = "xterm-256color",
         columns: Int = 80,
         rows: Int = 24,
+        onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
-    ): ShellSession = guardedConnect(params, onHostKeyVerify) { guard -> runInterruptible {
+    ): ShellSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard -> runInterruptible {
 
         val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
 
@@ -227,8 +306,9 @@ object SshManager {
      */
     suspend fun openSftp(
         params: SshConnectionParams,
+        onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
-    ): SftpSession = guardedConnect(params, onHostKeyVerify) { guard ->
+    ): SftpSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard ->
 
         val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) =
             runInterruptible { createSession(params, guard) }
@@ -270,6 +350,9 @@ object SshManager {
         params: SshConnectionParams,
         guard: ConnectGuard,
     ): SessionResult {
+        // Asked for at most once, and only if some server asks us for a password.
+        val typed = InteractivePassword(guard)
+
         // ── 1. Build jump-host chain ────────────────────────────────────────────
         val jumpSessions = mutableListOf<Session>()
         val newJumpKeyLines = mutableListOf<String>()
@@ -301,11 +384,21 @@ object SshManager {
                 private var passwordUsed = false
                 private var kbiUsed = false
                 override fun getPassphrase(): String? = null
-                override fun getPassword(): String? = (jumpAuth as? SshAuth.Password)?.password
+                override fun getPassword(): String? = when (jumpAuth) {
+                    is SshAuth.Password -> jumpAuth.password
+                    // Simple mode: this hop has no credentials of its own and borrows the
+                    // target's, which here means the one being typed during this attempt.
+                    SshAuth.Interactive -> typed.get(jump.host)
+                    else -> null
+                }
                 override fun promptPassword(message: String?): Boolean {
                     if (passwordUsed) return false
                     passwordUsed = true
-                    return jumpAuth is SshAuth.Password
+                    return when (jumpAuth) {
+                        is SshAuth.Password -> true
+                        SshAuth.Interactive -> typed.get(jump.host) != null
+                        else -> false
+                    }
                 }
                 override fun promptPassphrase(message: String?) = false
                 override fun promptYesNo(message: String?): Boolean {
@@ -314,14 +407,18 @@ object SshManager {
                         ?: message ?: "unknown"
                     return guard.verify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
                 }
-                override fun showMessage(message: String?) {}
+                override fun showMessage(message: String?) = typed.noteBanner(message)
                 override fun promptKeyboardInteractive(
                     destination: String?, name: String?, instruction: String?,
                     prompt: Array<out String>?, echo: BooleanArray?,
                 ): Array<String>? {
-                    val pw = (jumpAuth as? SshAuth.Password)?.password ?: return null
                     if (prompt.isNullOrEmpty()) return arrayOf()
                     if (kbiUsed) return null
+                    val pw = when (jumpAuth) {
+                        is SshAuth.Password -> jumpAuth.password
+                        SshAuth.Interactive -> typed.get(jump.host)
+                        else -> null
+                    } ?: return null
                     kbiUsed = true
                     return Array(prompt.size) { pw }
                 }
@@ -331,7 +428,7 @@ object SshManager {
                 setProperty("StrictHostKeyChecking", if (jump.knownHostsEntry.isNullOrBlank()) "ask" else "yes")
                 setProperty("PreferredAuthentications", when (jumpAuth) {
                     is SshAuth.PublicKey -> "publickey"
-                    is SshAuth.Password  -> "password,keyboard-interactive"
+                    is SshAuth.Password, SshAuth.Interactive -> "password,keyboard-interactive"
                 })
                 setProperty("HashKnownHosts", "no")
                 setProperty("TCPKeepAlive", "yes")
@@ -390,8 +487,21 @@ object SshManager {
             private var passwordUsed = false
             private var kbiUsed = false
             override fun getPassphrase(): String? = null
-            override fun getPassword(): String? = (params.auth as? SshAuth.Password)?.password
+            override fun getPassword(): String? = when (params.auth) {
+                is SshAuth.Password -> params.auth.password
+                SshAuth.Interactive -> typed.get(params.hostname)
+                else -> null
+            }
             override fun promptPassword(message: String?): Boolean {
+                // A password the person types can be asked for again: being asked a second time
+                // means the server refused the first, and the prompt says so. A saved one is
+                // offered once and then given up on, or a wrong password would be sent until
+                // the server's own limit stopped us.
+                if (params.auth is SshAuth.Interactive) {
+                    val pw = if (passwordUsed) typed.ask(params.hostname) else typed.get(params.hostname)
+                    passwordUsed = true
+                    return pw != null
+                }
                 if (passwordUsed) return false
                 passwordUsed = true
                 return params.auth is SshAuth.Password
@@ -403,16 +513,26 @@ object SshManager {
                     ?: message ?: "unknown"
                 return guard.verify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
             }
-            override fun showMessage(message: String?) {}
+            // Where the banner arrives: during authentication, which is why the prompt for a
+            // password that is not saved anywhere is raised from in here (see [SshAuth.Interactive]).
+            override fun showMessage(message: String?) = typed.noteBanner(message)
             // Servers with `PasswordAuthentication no` but `KbdInteractiveAuthentication yes`
             // deliver the typed password over keyboard-interactive; answer its prompt(s) with it.
             override fun promptKeyboardInteractive(
                 destination: String?, name: String?, instruction: String?,
                 prompt: Array<out String>?, echo: BooleanArray?,
             ): Array<String>? {
-                val pw = (params.auth as? SshAuth.Password)?.password ?: return null
                 if (prompt.isNullOrEmpty()) return arrayOf()   // info-only round: continue
-                if (kbiUsed) return null                        // don't retry a wrong password forever
+                val pw = when (params.auth) {
+                    // A second round means the server refused what we sent, so ask again —
+                    // this is the only method some servers offer, and then it is here that the
+                    // person is asked at all.
+                    SshAuth.Interactive ->
+                        if (kbiUsed) typed.ask(params.hostname) else typed.get(params.hostname)
+                    is SshAuth.Password ->
+                        if (kbiUsed) null else params.auth.password  // don't retry a wrong password forever
+                    else -> null
+                } ?: return null
                 kbiUsed = true
                 return Array(prompt.size) { pw }
             }
@@ -422,7 +542,7 @@ object SshManager {
             setProperty("StrictHostKeyChecking", "ask")
             setProperty("PreferredAuthentications", when (params.auth) {
                 is SshAuth.PublicKey -> "publickey"
-                is SshAuth.Password  -> "password,keyboard-interactive"
+                is SshAuth.Password, SshAuth.Interactive -> "password,keyboard-interactive"
             })
             setProperty("HashKnownHosts", "no")
             setProperty("TCPKeepAlive", "yes")
@@ -535,7 +655,10 @@ object SshManager {
 
         // Private key in OpenSSH format (understood by all modern SSH clients)
         val privBytes = org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil.encodePrivateKey(priv)
-        val b64 = java.util.Base64.getMimeEncoder(64, "\n".toByteArray()).encodeToString(privBytes)
+        // 70, which is what ssh-keygen writes. PEM says 64 and that is what this did until now, but
+        // OpenSSH's own private-key format is the one being written here and it wraps at 70 — and
+        // the iOS app follows ssh-keygen too, so the same key is now the same file on both.
+        val b64 = opensshPemBody(privBytes)
         val privPem = "-----BEGIN OPENSSH PRIVATE KEY-----\n$b64\n-----END OPENSSH PRIVATE KEY-----\n"
 
         // Public key in OpenSSH wire format → base64
@@ -671,7 +794,9 @@ object SshManager {
         // Cheap self-check before the caller's: the seed has to belong to this key.
         if (!params.generatePublicKey().encoded.contentEquals(publicKey)) return@runCatching null
         val encoded = org.bouncycastle.crypto.util.OpenSSHPrivateKeyUtil.encodePrivateKey(params)
-        val base64 = java.util.Base64.getMimeEncoder(64, "\n".toByteArray()).encodeToString(encoded)
+        // @see OPENSSH_PEM_WIDTH — this one re-serialises a key the user imported, so writing it
+        // at a width of our own would hand them back a file that no longer matches theirs.
+        val base64 = opensshPemBody(encoded)
         "-----BEGIN OPENSSH PRIVATE KEY-----\n$base64\n-----END OPENSSH PRIVATE KEY-----\n"
     }.getOrNull()
 

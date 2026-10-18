@@ -347,6 +347,7 @@
     <string name="password_dialog_title">Password for %1$s</string>
     <string name="password_field_label">Password</string>
     <string name="password_auth_failed">Authentication failed. Please try again.</string>
+    <string name="password_server_banner">Message from the server</string>
 
     <!-- ── Root warning dialog ───────────────────────────────────────────── -->
     <string name="root_warning_title">Security warning</string>

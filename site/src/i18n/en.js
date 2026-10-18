@@ -135,7 +135,10 @@ module.exports = {
             <p>On the first connection SSHBorg shows you the server's fingerprint and asks you to accept it. This is a security check: it ensures you are connecting to the right machine and not to an impostor. You should verify the fingerprint matches the one shown by your server admin or obtained via a trusted channel before accepting.</p>
             <p>Once accepted, the fingerprint is stored locally. If it changes on a future connection, SSHBorg will warn you — this could indicate a server rebuild, a key rotation, or a man-in-the-middle attack.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// TIP</div>
+                <h3>The server's pre-login message</h3>
+            <p>Many servers send a message before letting anyone in: a legal notice, a maintenance window, a reference number to quote. SSHBorg shows it above the password request, so you can read it before you type, and it stays in view if the password is refused and asked for again.</p>
+            <p>It appears whenever the app asks you for a password — in the terminal and in the file manager. With a saved password or a key there is no request, so there is nothing to show. The message is displayed as the server drew it: lines are never re-wrapped, so a banner laid out in columns keeps its shape, and the box scrolls down and sideways when it does not fit. On Android TV the box has the focus as soon as the dialog opens — scroll it with the D-pad, and when there is nothing left to scroll the focus moves on to the password field.</p>
+            <div class="callout-label">// TIP</div>
                 You can check the server fingerprint at any time with:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
@@ -559,14 +562,14 @@ Host target
             <h3>Navigating with the remote</h3>
             <ul>
                 <li><strong>D-pad arrows</strong> — move the focus between rows and controls.</li>
-                <li><strong>OK (center)</strong> — the primary action: connect to a host, open a folder, download a file, expand a group.</li>
+                <li><strong>OK (center)</strong> — the primary action: connect to a host, open a folder, download a file, expand a group. In the terminal it opens the on-screen keyboard.</li>
                 <li><strong>Back</strong> — go up a level or leave the screen.</li>
             </ul>
             <h3>Opening a row's menu</h3>
             <p>To rename, delete, edit, duplicate or download from a row, open its menu: press the remote's <strong>Menu (options) key</strong> on the focused row, or <strong>hold OK</strong> (long-press). OK by itself runs the primary action, not the menu.</p>
             <h3>Typing: use a physical keyboard</h3>
             <p>A <strong>physical keyboard — USB or Bluetooth</strong> (Android TV supports both) is strongly recommended, and effectively required for the terminal. With one, text fields and the shell behave normally.</p>
-            <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical.</p>
+            <p>Without one, the on-screen keyboard still handles short entries: focus a field, press OK to open it, type, and press the keyboard's <strong>OK / Go</strong> to confirm — on the password prompt this connects directly. Entering shell commands with the on-screen keyboard, however, is impractical. In the terminal that keyboard is opened with OK and put away with Back.</p>
             <h3>Locking the app on a TV</h3>
             <p>A TV usually has no fingerprint reader or screen lock, so protect the app with the built-in <strong>PIN or passphrase</strong> lock (Settings → Security) — it works entirely with the remote or a keyboard. See <a href="#security">App Security</a>.</p>`,
 

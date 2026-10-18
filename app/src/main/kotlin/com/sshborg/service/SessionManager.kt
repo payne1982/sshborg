@@ -58,6 +58,49 @@ class SessionManager {
     var switchingTab: Boolean = false
 
     /**
+     * Whether the soft keyboard was up when each terminal session was last on screen, by session
+     * id. A session not in here has never been on screen, and a new one opens with the keyboard
+     * up — that one moment is the only time anything raises it by itself. From then on the
+     * terminal records what the user does with it and restores that on the way back in, so a
+     * keyboard put away stays away across tab switches and re-entries.
+     *
+     * Not part of session state on purpose: it is where the keyboard was, not what the session is,
+     * and writing it through [update] would recompose every screen watching the session list.
+     */
+    private val keyboardUp = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
+
+    fun keyboardWasUp(id: String): Boolean = keyboardUp[id] ?: true
+
+    fun setKeyboardUp(id: String, up: Boolean) {
+        if (id == frozenKeyboard) return
+        keyboardUp[id] = up
+    }
+
+    /**
+     * The one session whose keyboard memory is sealed: the tab being left, from the tap that
+     * leaves it until it is on screen again.
+     *
+     * Without this the memory cannot be trusted at all. The IME insets belong to the window, not
+     * to a screen, and the screen being left stays composed for the length of the tab transition
+     * — longer than it takes the arriving tab to open the keyboard. The tab being left therefore
+     * watched the arriving tab's keyboard and wrote it down as its own: leave a tab with the
+     * keyboard away, arrive somewhere that opens it, and the tab you left is marked "up". Which
+     * is exactly the keyboard that then came back, unasked, the next time you returned to it.
+     *
+     * One slot is enough: only one tab can be being left at a time.
+     */
+    @Volatile
+    private var frozenKeyboard: String? = null
+
+    fun freezeKeyboard(id: String) {
+        frozenKeyboard = id
+    }
+
+    fun thawKeyboard(id: String) {
+        if (frozenKeyboard == id) frozenKeyboard = null
+    }
+
+    /**
      * Cluster-scoped override for the extra-keys bar "pin". Null = untouched, so the
      * UI falls back to the settings default. Set to a concrete value when the user taps
      * the on-bar pin; it holds for as long as at least one session is open and resets to
@@ -86,6 +129,8 @@ class SessionManager {
         runCatching { session?.shellSession?.disconnect() }
         runCatching { session?.sftpSession?.disconnect() }
         _sessions.update { list -> list.filter { it.id != id } }
+        keyboardUp.remove(id)
+        thawKeyboard(id)
         if (_sessions.value.isEmpty()) _extraBarPinned.value = null
     }
 

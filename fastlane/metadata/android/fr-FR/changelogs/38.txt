@@ -1,0 +1,5 @@
+• La prise en charge a été étendue à Android 9.
+• Le message qu'un serveur affiche avant la connexion apparaît désormais au-dessus de la demande de mot de passe, à lire avant de taper.
+• Le clavier ne s'ouvre plus tout seul : chaque session le garde comme vous l'avez laissé, ouvert ou baissé, et il n'apparaît plus sur l'écran de verrouillage.
+• Les clés ed25519 générées sont écrites exactement comme ssh-keygen les écrit.
+• Sur un téléviseur, la touche OK ouvre le clavier dans le terminal.

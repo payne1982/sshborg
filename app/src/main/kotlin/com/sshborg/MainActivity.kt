@@ -233,6 +233,7 @@ class MainActivity : AppCompatActivity() {
         // lockout; the real value follows from disk a moment later.
         initialLockoutSeconds.value = 0L
         gate.value = g
+        (application as SshBorgApp).lockGateUp = true
         if (g is Gate.System) {
             // Normally the prompt is opened by onResume, which runs after the gate is up. When
             // the gate arrives later than that — the asynchronous decision, on the first start
@@ -257,6 +258,7 @@ class MainActivity : AppCompatActivity() {
     private fun openUp() {
         unlocked = true
         gate.value = null
+        (application as SshBorgApp).lockGateUp = false
         setPrivacy(false)
     }
 

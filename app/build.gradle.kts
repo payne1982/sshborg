@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId = "com.sshborg"
-        minSdk = 29
+        minSdk = 28
         targetSdk = 36
-        versionCode = 37
-        versionName = "1.19.1"
+        versionCode = 38
+        versionName = "1.20.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

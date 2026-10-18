@@ -8,6 +8,7 @@ import android.webkit.MimeTypeMap
 import com.sshborg.BuildConfig
 import com.sshborg.R
 import com.sshborg.data.ssh.SftpSession
+import com.sshborg.ui.sftp.DownloadStore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.UUID
@@ -97,7 +98,7 @@ class TransferManager(private val app: Application) {
             val failures = preparationFailures.toMutableList()
             var current = ""   // the file being handled; empty while opening the channel
             var done = 0
-            var lastUri: android.net.Uri? = null   // set on a successful single-file save, for the tap-to-open intent
+            var lastRef: com.sshborg.ui.sftp.DownloadRef? = null   // set on a successful single-file save, for the tap-to-open intent
             var lastMime: String? = null
             fun fail(notAttempted: List<String>) {
                 update(id) {
@@ -130,13 +131,8 @@ class TransferManager(private val app: Application) {
 
                     val ext  = task.filename.substringAfterLast('.', "").lowercase()
                     val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
-                    val values = ContentValues().apply {
-                        put(MediaStore.Downloads.DISPLAY_NAME, task.filename)
-                        put(MediaStore.Downloads.MIME_TYPE, mime)
-                        put(MediaStore.Downloads.RELATIVE_PATH, task.localDir)
-                    }
-                    val uri = app.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-                    if (uri == null) {
+                    val ref = DownloadStore.create(app, task.filename, task.localDir, mime)
+                    if (ref == null) {
                         skipped++
                         failures += FileFailure(task.filename, app.getString(R.string.sftp_report_local_file_failed), "")
                         update(id) { it.copy(failures = failures.toList()) }
@@ -144,7 +140,7 @@ class TransferManager(private val app: Application) {
                     }
 
                     try {
-                        app.contentResolver.openOutputStream(uri)!!.use { out ->
+                        DownloadStore.openStream(app, ref).use { out ->
                             var received = 0L
                             channel.get(task.remotePath, out, object : com.jcraft.jsch.SftpProgressMonitor {
                                 override fun init(op: Int, src: String?, dest: String?, max: Long) {}
@@ -157,10 +153,10 @@ class TransferManager(private val app: Application) {
                                 override fun end() {}
                             })
                         }
-                        lastUri = uri; lastMime = mime
+                        lastRef = ref; lastMime = mime
                         done++
                     } catch (e: Exception) {
-                        app.contentResolver.delete(uri, null, null)
+                        DownloadStore.remove(app, ref)
                         if (!thisJob.isActive || e is CancellationException) break
                         skipped++   // per-file error: record it, skip and continue
                         failures += FileFailure.of(task.filename, e)
@@ -188,7 +184,8 @@ class TransferManager(private val app: Application) {
                         (if (failures.isNotEmpty()) "\n" + app.getString(R.string.sftp_notify_see_details) else "")
                     SshForegroundService.notifyDownloadComplete(
                         app, body,
-                        openUri = if (single) lastUri else null,   // tap: single -> open the file, multi -> open Downloads
+                        // tap: single -> open the file, multi -> open Downloads
+                        openUri = if (single) lastRef?.let { DownloadStore.viewUri(app, it) } else null,
                         mime = if (single) lastMime else null,
                     )
                 } else if (jobMap.remove(id) != null) {

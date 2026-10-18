@@ -345,6 +345,7 @@
     <string name="password_dialog_title">%1$s 的密码</string>
     <string name="password_field_label">密码</string>
     <string name="password_auth_failed">身份验证失败，请重试。</string>
+    <string name="password_server_banner">服务器消息</string>
 
     <!-- ── Root warning dialog ── -->
     <string name="root_warning_title">安全警告</string>

@@ -4,12 +4,14 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isFocused
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import android.os.SystemClock
 import android.view.KeyEvent
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.getOrNull
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sshborg.MainActivity
@@ -41,7 +43,19 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DpadWalkTest {
 
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    /**
+     * An empty rule, so the activity is started by hand once the preferences are set.
+     *
+     * `createAndroidComposeRule` launches it before `@Before` runs, which on a fresh install puts
+     * the privacy-policy dialog over the host list while the walk is pressing keys. The dialog's
+     * window takes those keys, the focus underneath never moves, and the walk calls the first
+     * control it lands on a trap. That is the whole of this test's history: red at tag v1.19.0,
+     * red again after wiping the AVD — because wiping makes every install a first one — and green
+     * whenever the app happened to have been run on that device before.
+     */
+    @get:Rule val compose = createEmptyComposeRule()
+
+    private lateinit var scenario: ActivityScenario<MainActivity>
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private fun text(id: Int) = context.getString(id)
@@ -62,10 +76,13 @@ class DpadWalkTest {
                 TestApp.app.db.hostDao().getById(id)?.let(seeded::add)
             }
         }
+        scenario = ActivityScenario.launch(MainActivity::class.java)
         compose.waitForIdle()
     }
 
     @After fun cleanUp() = runBlocking {
+        // Not launched at all when the assumption above sent this test away on a phone.
+        if (::scenario.isInitialized) scenario.close()
         seeded.forEach { TestApp.app.db.hostDao().delete(it) }
     }
 
@@ -189,12 +206,32 @@ class DpadWalkTest {
      * A key as a remote sends it: through the instrumentation, so it travels the whole dispatch
      * chain the device uses. Injecting into Compose instead would skip what the Activity and the
      * views do with a key first — which on a TV is where the Menu key and Back are handled.
+     *
+     * Then it waits for the focus to move, which none of the idle calls above it does.
+     * `sendKeyDownUpSync` waits for the injection to finish, not for what the key then causes:
+     * focus moves in a later frame, and a frame callback waiting for the next vsync does not keep
+     * the looper busy, so `waitForIdleSync` comes back before it has run. Read the focus in that
+     * window and it is still where it was — and a walk that reads a stale focus four times over
+     * calls a control a trap when it could be left perfectly well in the first direction tried.
+     * This is what made the walk red on a television and not on a phone: the TV emulator is slow
+     * enough to lose that race every time rather than now and then.
+     *
+     * A press that rightly changes nothing — the end of a list, which is not a trap — costs the
+     * whole [SETTLE_MS], so the wait is kept as short as it can be and gives up as soon as the
+     * focus has moved.
      */
     private fun press(keyCode: Int) {
+        val before = focusedLabel()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.sendKeyDownUpSync(keyCode)
         instrumentation.waitForIdleSync()
         compose.waitForIdle()
+        val deadline = SystemClock.uptimeMillis() + SETTLE_MS
+        while (SystemClock.uptimeMillis() < deadline) {
+            if (focusedLabel() != before) return
+            SystemClock.sleep(POLL_MS)
+            compose.waitForIdle()
+        }
     }
 
     /** What is focused now, named the way the user would name it. */
@@ -210,5 +247,11 @@ class DpadWalkTest {
     private companion object {
         /** Enough presses to wander the screen without running for ever. */
         const val PRESS_LIMIT = 80
+
+        /** How long a key is given to move the focus before the answer is taken as final. */
+        const val SETTLE_MS = 600L
+
+        /** How often the focus is read while waiting. */
+        const val POLL_MS = 50L
     }
 }

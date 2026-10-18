@@ -132,7 +132,10 @@ module.exports = {
             <p>Lors de la première connexion, SSHBorg affiche l'empreinte du serveur et vous demande de l'accepter. C'est une vérification de sécurité : elle garantit que vous vous connectez à la bonne machine et non à un imposteur. Vérifiez que l'empreinte correspond à celle fournie par votre administrateur avant d'accepter.</p>
             <p>Une fois acceptée, l'empreinte est stockée localement. Si elle change lors d'une connexion future, SSHBorg vous avertira — cela pourrait indiquer une reconstruction du serveur, une rotation des clés ou une attaque man-in-the-middle.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// ASTUCE</div>
+                <h3>Le message du serveur avant la connexion</h3>
+            <p>Beaucoup de serveurs envoient un message avant de laisser entrer qui que ce soit : une mention légale, une fenêtre de maintenance, un numéro de dossier à rappeler. SSHBorg l'affiche au-dessus de la demande de mot de passe, pour que vous le lisiez avant de taper, et il reste visible si le mot de passe est refusé et redemandé.</p>
+            <p>Il apparaît chaque fois que l'application vous demande un mot de passe — dans le terminal et dans le gestionnaire de fichiers. Avec un mot de passe enregistré ou une clé, il n'y a pas de demande, donc rien à afficher. Le message est présenté tel que le serveur l'a dessiné : les lignes ne sont jamais renvoyées à la ligne, afin qu'une bannière mise en colonnes garde sa forme, et le cadre défile vers le bas et sur le côté lorsqu'il ne tient pas. Sur Android TV, le cadre a le focus dès l'ouverture de la boîte de dialogue : faites-le défiler avec le D-pad, et quand il n'y a plus rien à faire défiler, le focus passe au champ du mot de passe.</p>
+            <div class="callout-label">// ASTUCE</div>
                 Vous pouvez vérifier l'empreinte du serveur à tout moment avec :
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>`,
@@ -556,14 +559,14 @@ Host target
             <h3>Naviguer avec la télécommande</h3>
             <ul>
                 <li><strong>Flèches du D-pad</strong> — déplacent le focus entre les lignes et les contrôles.</li>
-                <li><strong>OK (centre)</strong> — l'action principale : se connecter à un hôte, ouvrir un dossier, télécharger un fichier, déployer un groupe.</li>
+                <li><strong>OK (centre)</strong> — l'action principale : se connecter à un hôte, ouvrir un dossier, télécharger un fichier, déployer un groupe. Dans le terminal, il ouvre le clavier à l'écran.</li>
                 <li><strong>Retour</strong> — remonter d'un niveau ou quitter l'écran.</li>
             </ul>
             <h3>Ouvrir le menu d'une ligne</h3>
             <p>Pour renommer, supprimer, modifier, dupliquer ou télécharger depuis une ligne, ouvrez son menu : appuyez sur la <strong>touche Menu (options)</strong> de la télécommande sur la ligne sélectionnée, ou <strong>maintenez OK</strong> (appui long). OK seul exécute l'action principale, pas le menu.</p>
             <h3>Saisie : utilisez un clavier physique</h3>
             <p>Un <strong>clavier physique — USB ou Bluetooth</strong> (Android TV prend en charge les deux) est fortement recommandé, et pratiquement indispensable pour le terminal. Avec lui, les champs de texte et le shell fonctionnent normalement.</p>
-            <p>Sans clavier, le clavier à l'écran gère tout de même les saisies courtes : sélectionnez un champ, appuyez sur OK pour l'ouvrir, tapez, puis appuyez sur <strong>OK / Valider</strong> du clavier pour confirmer — sur l'invite de mot de passe, cela connecte directement. Saisir des commandes shell avec le clavier à l'écran reste toutefois peu pratique.</p>
+            <p>Sans clavier, le clavier à l'écran gère tout de même les saisies courtes : sélectionnez un champ, appuyez sur OK pour l'ouvrir, tapez, puis appuyez sur <strong>OK / Valider</strong> du clavier pour confirmer — sur l'invite de mot de passe, cela connecte directement. Saisir des commandes shell avec le clavier à l'écran reste toutefois peu pratique. Dans le terminal, ce clavier s'ouvre avec OK et se referme avec Retour.</p>
             <h3>Verrouiller l'app sur un téléviseur</h3>
             <p>Un téléviseur n'a généralement ni lecteur d'empreinte ni verrouillage d'écran : protégez l'app avec le verrouillage intégré par <strong>code PIN ou phrase secrète</strong> (Paramètres → Sécurité) — il fonctionne entièrement à la télécommande ou au clavier. Voir <a href="#security">Sécurité de l'app</a>.</p>`,
 

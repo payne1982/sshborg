@@ -570,7 +570,10 @@
             <p>Bei der ersten Verbindung zeigt SSHBorg den Fingerabdruck des Servers und bittet dich, ihn zu akzeptieren. Dies ist eine Sicherheitsprüfung: Sie stellt sicher, dass du dich mit dem richtigen Gerät verbindest und nicht mit einem Angreifer. Überprüfe, ob der Fingerabdruck mit dem übereinstimmt, den dir dein Server-Administrator mitgeteilt hat oder den du über einen vertrauenswürdigen Kanal erhalten hast.</p>
             <p>Nach der Akzeptanz wird der Fingerabdruck lokal gespeichert. Wenn er sich bei einer zukünftigen Verbindung ändert, warnt dich SSHBorg — dies könnte auf einen Server-Neuaufbau, eine Schlüsselrotation oder einen Man-in-the-Middle-Angriff hinweisen.</p>
             <div class="callout callout-info">
-                <div class="callout-label">// TIPP</div>
+                <h3>Die Meldung des Servers vor der Anmeldung</h3>
+            <p>Viele Server senden eine Meldung, bevor sie jemanden hereinlassen: einen rechtlichen Hinweis, ein Wartungsfenster, eine Vorgangsnummer. SSHBorg zeigt sie über der Passwortabfrage, damit du sie lesen kannst, bevor du tippst, und sie bleibt stehen, wenn das Passwort abgelehnt und erneut verlangt wird.</p>
+            <p>Sie erscheint immer dann, wenn die App dich nach einem Passwort fragt — im Terminal und im Dateimanager. Mit gespeichertem Passwort oder mit einem Schlüssel gibt es keine Abfrage und daher nichts zu zeigen. Die Meldung wird so dargestellt, wie der Server sie gezeichnet hat: Zeilen werden nie umgebrochen, damit ein spaltenweise gesetztes Banner seine Form behält, und das Feld lässt sich nach unten und zur Seite scrollen, wenn es nicht passt. Auf Android TV hat das Feld den Fokus, sobald der Dialog aufgeht — scrolle mit dem D-Pad, und wenn nichts mehr zu scrollen ist, wandert der Fokus weiter zum Passwortfeld.</p>
+            <div class="callout-label">// TIPP</div>
                 Den Server-Fingerabdruck kannst du jederzeit überprüfen mit:
                 <pre><code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code></pre>
             </div>
@@ -1108,14 +1111,14 @@ Host target
             <h3>Navigation mit der Fernbedienung</h3>
             <ul>
                 <li><strong>D-Pad-Pfeile</strong> — bewegen den Fokus zwischen Zeilen und Bedienelementen.</li>
-                <li><strong>OK (Mitte)</strong> — die primäre Aktion: mit einem Host verbinden, einen Ordner öffnen, eine Datei herunterladen, eine Gruppe aufklappen.</li>
+                <li><strong>OK (Mitte)</strong> — die primäre Aktion: mit einem Host verbinden, einen Ordner öffnen, eine Datei herunterladen, eine Gruppe aufklappen. Im Terminal öffnet OK die Bildschirmtastatur.</li>
                 <li><strong>Zurück</strong> — eine Ebene höher oder Bildschirm verlassen.</li>
             </ul>
             <h3>Das Menü einer Zeile öffnen</h3>
             <p>Zum Umbenennen, Löschen, Bearbeiten, Duplizieren oder Herunterladen einer Zeile das Menü öffnen: die <strong>Menü-(Optionen-)Taste</strong> der Fernbedienung auf der fokussierten Zeile drücken oder <strong>OK gedrückt halten</strong> (langer Druck). OK allein führt die primäre Aktion aus, nicht das Menü.</p>
             <h3>Tippen: eine physische Tastatur verwenden</h3>
             <p>Eine <strong>physische Tastatur — USB oder Bluetooth</strong> (Android TV unterstützt beide) wird dringend empfohlen und ist für das Terminal praktisch erforderlich. Damit funktionieren Textfelder und die Shell normal.</p>
-            <p>Ohne eine solche bewältigt die Bildschirmtastatur trotzdem kurze Eingaben: ein Feld fokussieren, OK drücken, um es zu öffnen, tippen und <strong>OK / Los</strong> auf der Tastatur drücken — bei der Passwortabfrage verbindet dies direkt. Shell-Befehle mit der Bildschirmtastatur einzugeben ist jedoch unpraktisch.</p>
+            <p>Ohne eine solche bewältigt die Bildschirmtastatur trotzdem kurze Eingaben: ein Feld fokussieren, OK drücken, um es zu öffnen, tippen und <strong>OK / Los</strong> auf der Tastatur drücken — bei der Passwortabfrage verbindet dies direkt. Shell-Befehle mit der Bildschirmtastatur einzugeben ist jedoch unpraktisch. Im Terminal wird diese Tastatur mit OK geöffnet und mit Zurück wieder geschlossen.</p>
             <h3>Die App auf einem TV sperren</h3>
             <p>Ein TV hat meist keinen Fingerabdrucksensor und keine Bildschirmsperre — schütze die App daher mit der integrierten <strong>PIN- oder Passphrase-Sperre</strong> (Einstellungen → Sicherheit); sie funktioniert vollständig mit der Fernbedienung oder einer Tastatur. Siehe <a href="#security">App-Sicherheit</a>.</p>
         </div>

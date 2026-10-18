@@ -80,6 +80,17 @@ data class SshConnectionParams(
 sealed interface SshAuth {
     data class Password(val password: String) : SshAuth
     data class PublicKey(val privateKeyPem: String, val passphrase: String? = null) : SshAuth
+
+    /**
+     * No password in hand: it is asked for during the connection, at the moment the server asks
+     * for it.
+     *
+     * That moment is the only one at which the server's banner can be put in front of the person
+     * typing, because the banner arrives as part of authentication — a prompt raised before the
+     * connect has nothing to show yet. It also means the host is known to be reachable before
+     * anyone types anything.
+     */
+    object Interactive : SshAuth
 }
 
 /**

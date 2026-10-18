@@ -1,0 +1,5 @@
+• O suporte foi ampliado para incluir o Android 9.
+• A mensagem que um servidor mostra antes do início de sessão aparece agora acima do pedido de palavra-passe, para a poder ler antes de escrever.
+• O teclado já não se abre sozinho: cada sessão mantém-no como o deixou, aberto ou fechado, e já não aparece sobre o ecrã de bloqueio.
+• As chaves ed25519 geradas são escritas exatamente como o ssh-keygen as escreve.
+• Na televisão, a tecla OK abre o teclado no terminal.

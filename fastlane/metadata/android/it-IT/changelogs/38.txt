@@ -1,0 +1,5 @@
+• Il supporto dell'app è stato esteso per includere Android 9.
+• Il messaggio che un server mostra prima del login ora compare sopra la richiesta della password, così lo leggi prima di scrivere.
+• La tastiera non si alza più da sola: ogni sessione la mantiene come l'avevi lasciata, su o giù, e non compare più sopra la schermata di blocco.
+• Le chiavi ed25519 generate sono scritte esattamente come le scrive ssh-keygen.
+• Su Android TV il tasto OK apre la tastiera nel terminale.
