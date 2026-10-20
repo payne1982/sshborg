@@ -170,7 +170,8 @@ tasks.withType<Test>().configureEach {
         (project.findProperty(name) as String?)?.let { settings[name] = it }
     }
     listOf("keyCorpus", "keyCorpusPassphrase", "keyCorpusUtf8Passphrase", "editorCorpus",
-           "sshHost", "sshPort", "sshUser", "sshKeyDir", "sshKeyPassphrase").forEach { name ->
+           "sshHost", "sshPort", "sshUser", "sshKeyDir", "sshKeyPassphrase",
+           "moshHost", "moshPort", "moshKey").forEach { name ->
         if (name !in settings) (project.findProperty(name) as String?)?.let { settings[name] = it }
     }
     settings.forEach { (name, value) -> environment(variableFor(name), value) }

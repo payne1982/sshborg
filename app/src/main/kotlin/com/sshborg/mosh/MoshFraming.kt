@@ -132,28 +132,30 @@ class MoshFragmentAssembly {
 /**
  * Splits an instruction's compressed payload into fragments.
  *
- * The id advances only when the instruction's header fields change, so resending the same
- * instruction resends the same id: that is what lets the far end recognise a retransmission
- * instead of starting a fresh assembly. [budget] is what is left for the fragment *including* its
- * ten-byte header, which is how mosh expresses it — the caller has already taken the nonce, the
- * timestamps and the tag out of the path MTU.
+ * The id advances whenever the bytes to send differ from the last ones, and only then. That is
+ * what lets the far end tell a retransmission from a new instruction — and it has to be the whole
+ * payload rather than the state numbers, because the random chaff makes two otherwise identical
+ * instructions different on the wire. Reusing an id for different bytes would be the one real
+ * hazard here: the far end would mix the fragments of two instructions into one assembly.
+ *
+ * [budget] is what is left for the fragment *including* its ten-byte header, which is how mosh
+ * expresses it — the caller has already taken the nonce, the timestamps and the tag out of the
+ * path MTU.
  */
 class MoshFragmenter {
 
     private var nextId = 0L
-    private var lastHeader: String? = null
+    private var lastPayload: ByteArray? = null
     private var lastBudget = -1
 
     fun fragments(instruction: MoshInstruction, budget: Int): List<MoshFragment> {
         val room = budget - MoshFragment.HEADER_BYTES
         require(room > 0) { "no room left for a fragment in $budget bytes" }
 
-        val header = instruction.headerIdentity()
-        if (header != lastHeader || room != lastBudget) nextId++
-        lastHeader = header
-        lastBudget = room
-
         val payload = instruction.encode()
+        if (!payload.contentEquals(lastPayload) || room != lastBudget) nextId++
+        lastPayload = payload
+        lastBudget = room
         val out = ArrayList<MoshFragment>()
         var offset = 0
         var number = 0

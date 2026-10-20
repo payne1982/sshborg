@@ -23,6 +23,7 @@ class MoshInstruction(
     val ackNumber: Long = 0,
     val throwawayNumber: Long = 0,
     val diff: ByteArray = EMPTY,
+    val chaff: ByteArray = EMPTY,
 ) {
 
     fun encode(): ByteArray = deflate(serialize())
@@ -35,16 +36,11 @@ class MoshInstruction(
             .varint(FIELD_ACK_NUM, ackNumber)
             .varint(FIELD_THROWAWAY_NUM, throwawayNumber)
         if (diff.isNotEmpty()) w.bytes(FIELD_DIFF, diff)
+        // Padding of a random length, which mosh sends to keep the size of a datagram from
+        // reporting how much was typed. We send it for the same reason and ignore it on the way in.
+        if (chaff.isNotEmpty()) w.bytes(FIELD_CHAFF, chaff)
         return w.toByteArray()
     }
-
-    /**
-     * Everything except the diff, which is what the fragmenter compares to decide whether this is
-     * a new instruction or the same one being sent again. Mosh asserts that two instructions
-     * agreeing on the state numbers also agree on the diff, so the diff adds nothing here.
-     */
-    internal fun headerIdentity(): String =
-        "$protocolVersion/$oldNumber/$newNumber/$ackNumber/$throwawayNumber"
 
     override fun toString(): String =
         "MoshInstruction(v=$protocolVersion, $oldNumber=>$newNumber, ack=$ackNumber, " +

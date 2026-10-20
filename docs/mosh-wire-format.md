@@ -251,10 +251,14 @@ Two behaviours of the server that only a running one teaches, both useful:
 
 ### Left for the next phases
 
+Phase 4 closed the timing half of this list the same day: the transport state machine
+holds a real session, idles through heartbeats and survives its local port being
+replaced mid-session, which the server announces in its own log. What is left:
+
 1. the escape repertoire against real programs — `vim`, `htop`, `less`, 256-colour and
    true-colour output, and a mouse-driven program — fed into our own emulator rather
    than merely printed. That is phase 5's repaint gate and the one remaining unknown
    that could cost real work;
-2. the timing behaviour under loss and under a changed local port, which is phase 4;
-3. how a 2048-byte MTU boundary is reached in practice, to exercise multi-fragment
-   reassembly (a full-screen repaint of a large terminal is the easy way).
+2. multi-fragment reassembly **from the server**: our own 4 kB paste exercises the
+   sending half, but a full-screen repaint of a large terminal is what exercises the
+   other, and the lab's 80×24 shell never gets near the MTU.

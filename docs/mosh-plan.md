@@ -303,7 +303,7 @@ re-delivers it for every repeat of the final fragment and leans on idempotency. 
 idempotent too, but decompressing a full-screen repaint again on each retransmission is
 work a peer could ask for at will.
 
-### Phase 4 — the transport state machine. This is the actual work
+### Phase 4 — the transport state machine. Written, 2026-10-20
 
 Sequence numbers, acknowledgement, the idempotency rule on `old_num`/`new_num`,
 retransmission driven by the round-trip estimate, the 3 s empty ack, local port
@@ -312,7 +312,25 @@ closing handshake.
 
 *Gate: a session stays up for ten minutes with neither side giving up, survives the
 local port being changed underneath it, and resynchronises after the socket is
-recreated.*
+recreated.* Met, in `MoshTransport` and `MoshTiming`, with `scripts/mosh-lab.sh` as the
+one command that starts a throwaway server, runs the session against it and takes it
+down again. The session types into a real shell, reads its output back, idles through
+several heartbeats, has its **local port replaced underneath it** mid-session — the
+server's own log says `Server now attached to client at …` and the session carries on,
+which is the mobile case the whole feature exists for — and then closes with the
+handshake acknowledged.
+
+The state machine owns no socket and starts no thread: every entry point takes the time
+and `tick` returns the datagrams to send, so the timing is driven by a test with a clock
+it controls. That is the only honest way to check a heartbeat and a retransmission, and
+it is why there is no `Thread.sleep` and no call to the clock anywhere in the package.
+
+Two things the lab found that reading could not. The sequence counter has to survive the
+socket being replaced, or the server ignores us as a replay — the first probe wasted two
+runs on exactly that. And a frame whose reference state we do not hold must be dropped
+*and acknowledged at once*: before that, the server spent the first 1.3 seconds of every
+session resending the prompt while we threw it away, because it had no way to learn which
+state we held until our next heartbeat. The fix cut it to one frame interval.
 
 ### Phase 5 — input and output
 
@@ -343,8 +361,9 @@ which reads as a bug in the app rather than as a feature in progress.
 
 `app/src/main/kotlin/com/sshborg/mosh/`, **pure JVM, no Android API at all** — not even
 `android.util.Log` (as of 2026-10-20: `MoshCrypto`, `MoshFraming`, `ProtoWire`,
-`MoshInstruction`, `MoshDiffs`, with their tests and vectors under
-`app/src/test/{kotlin,resources}/`). That is what lets `./gradlew test` cover the protocol and lets the
+`MoshInstruction`, `MoshDiffs`, `MoshTiming`, `MoshUserStream`, `MoshTransport`, with
+their tests and vectors under `app/src/test/{kotlin,resources}/`). The one integration
+test talks to a real server and skips itself when there is none, the way the SSH ones do. That is what lets `./gradlew test` cover the protocol and lets the
 phase 1 harness run on it with no adapter in between. Exactly one class touches Android
 and JSch: the glue that owns the session, and it lives outside that package.
 
