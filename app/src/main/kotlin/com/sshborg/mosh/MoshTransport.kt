@@ -54,6 +54,12 @@ class MoshTransport(
     /** Exposed because the round-trip estimate is the most useful thing to show in a diagnostic. */
     val timing = MoshTiming()
 
+    /** The largest number of fragments one arriving instruction has been split into. */
+    val largestAssembly: Int get() = assembly.largestAssembly
+
+    /** See [MoshFragmentAssembly.conflictingFragments]; anything but zero is a broken assumption. */
+    val conflictingFragments: Int get() = assembly.conflictingFragments
+
     private val sent = ArrayList<SentState>().apply { add(SentState(0, 0, 0)) }
     private var assumedReceiver = 0
 
@@ -320,8 +326,28 @@ class MoshTransport(
     }
 
     companion object {
-        /** Mosh's starting MTU for both address families; it falls back to 500 on EMSGSIZE. */
-        const val DEFAULT_MTU = 1280
+        /**
+         * The UDP payload we are allowed to fill, per address family.
+         *
+         * Mosh aims at a 1280-byte **IP datagram** — not a 1280-byte payload — and takes the IP
+         * and UDP headers out of it before anything else (`network.h:104-130`, `network.cc:200`).
+         * The lab caught us getting this wrong: we were treating 1280 as the payload, so our
+         * datagrams went out at up to 1308 bytes on IPv4 and 1328 on IPv6, the second of which is
+         * over the minimum MTU every IPv6 path is required to carry. Mosh's own comment explains
+         * why it stays low: tunnels and mobile networks drop more than Ethernet's 1500 suggests,
+         * and it names a real network that dropped anything from 1320 bytes up.
+         *
+         * For IPv4 it guesses the minimum header (20 + 8) because fragmentation there is merely
+         * wasteful; for IPv6 it is deliberately pessimistic (40 base + 16 for two extension
+         * headers + 8) because fragmentation there is not allowed on the path. The default is the
+         * IPv6 figure, which is safe on both — phase 6 passes the IPv4 one once the socket has
+         * told it which family it got.
+         */
+        const val IPV4_MTU = 1280 - (20 + 8)                 // 1252
+        const val IPV6_MTU = 1280 - (40 + 16 + 8)            // 1216
+        const val DEFAULT_MTU = IPV6_MTU
+
+        /** Mosh's payload MTU of last resort, used after the kernel refuses a datagram as too big. */
         const val FALLBACK_MTU = 500
 
         const val SEND_MINDELAY = 8L

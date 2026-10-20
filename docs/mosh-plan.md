@@ -301,7 +301,17 @@ accepted, and now in `MoshFraming`, `ProtoWire`, `MoshInstruction` and `MoshDiff
 One deliberate departure from mosh: a completed assembly is handed over once, where mosh
 re-delivers it for every repeat of the final fragment and leans on idempotency. Ours is
 idempotent too, but decompressing a full-screen repaint again on each retransmission is
-work a peer could ask for at will.
+work a peer could ask for at will. That shortcut is only safe while the sender never
+reuses a fragment id for different bytes, so `MoshFragmentAssembly` counts the fragments
+that contradict one it already holds, and the integration test asserts that counter is
+zero against a real server rather than taking mosh's chaff on trust.
+
+The receiving half was closed on the same day by resizing the window to 240×70 and
+painting it with `base64` of `/dev/urandom`: **nine fragments in one instruction**, back
+together, and the zlib checksum inside is what proves the order was right. It also found
+a defect reading had missed — we were treating mosh's 1280 as a UDP payload when it is an
+*IP datagram*, so our packets were 28 bytes over on IPv4 and 48 over on IPv6, where 1280
+is the minimum every path must carry. See §5 of the wire-format document.
 
 ### Phase 4 — the transport state machine. Written, 2026-10-20
 
@@ -342,6 +352,50 @@ input stream, which is easy to forget and hard to debug later.
 no dirt; a resize propagates both ways.* The first step is done — the rig ran
 `echo mosh-lab-ok` in a real session — and the repaint step is the one unknown left that
 could still cost real work.
+
+#### Where it plugs in: a byte source under the terminal, and nothing above it
+
+The rule, decided before any of this is wired up: **the terminal must not learn that
+mosh exists.** It is not only a matter of taste. Everything above the byte stream — the
+scrollback, the selection, the extra-key bar, the IME's word mode, the TV remote, the
+title bar, the history suggestions — has been settled by use and by bug reports, and
+none of it has any business being touched by a transport.
+
+That is affordable because the seam is already narrow. Today the bytes reach the
+emulator through exactly three places:
+
+| direction | today |
+|---|---|
+| output in | `session.inputStream.read(buf)` → `em.process(buf, 0, n)`, the reader loop in `TerminalViewModel` |
+| input out | `shellSession.write(data)` — from `sendData`, and from `em.onSendResponse` for the emulator's own query replies |
+| resize | `shellSession.resize(cols, rows)` |
+
+So the layer is a small interface over those three, with two implementations: the SSH
+one, which is what exists, and the mosh one, which is `MoshTransport` plus a socket and
+the tick loop. The output direction becomes a push rather than a blocking read, because
+mosh's bytes come out of a tick and not out of a stream — which is the only shape change
+the reader loop needs. `MoshTransport.Listener.onHostBytes` was written to be exactly
+that, and the transport deliberately owns no socket and no thread so that it can sit
+under either.
+
+What that buys: the per-host switch, detection and silent fallback, and the ability to
+take the whole feature out again by not constructing the mosh implementation.
+
+**What it does not buy, and no architecture could.** If the repaint gate finds that we
+mis-render a sequence mosh leans on, the fix lands in `TerminalEmulator`, which SSH
+shares. That is acceptable on one condition: the fix has to be *"we now behave like
+xterm"*, which is a bug fix for SSH as well and is guarded by the existing suite. What
+must not happen is an `if (mosh)` branch inside the emulator. Two interpretations of the
+same escape sequence is precisely how the work done so far would get damaged, and it
+would double the terminal's test matrix for good.
+
+The one place that was worth checking before saying any of this: mosh relies on the
+client's own autowrap and compensates for terminals that snap the cursor to the true last
+column instead of leaving it past the margin (`terminaldisplay.cc:425-432`, and a note at
+469 about making the terminal wrap where it wrapped for mosh). Our emulator defers the
+wrap for narrow characters (`TerminalEmulator.kt:366-369`), which is the xterm behaviour
+mosh is written for. That one looks already right, which is a good sign for the gate
+without being a substitute for it.
 
 ### Phase 6 — the Android integration
 

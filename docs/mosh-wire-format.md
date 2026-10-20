@@ -171,6 +171,26 @@ port** when nothing has round-tripped for 10 s, which is how it escapes a stale 
 binding (`network.cc:424`, `PORT_HOP_INTERVAL`). Old sockets stay open for up to 60 s
 (`MAX_OLD_SOCKET_AGE`) and every one of them has to be read, not just the newest.
 
+**The 1280 is an IP datagram, not a payload.** This is worth stating plainly because we
+got it wrong and the rig caught it. Mosh aims at a 1280-byte packet *on the wire* and
+subtracts the IP and UDP headers before anything else (`network.h:104-130`,
+`network.cc:200`): 20 + 8 guessed for IPv4, and for IPv6 a deliberately pessimistic
+40 + 16 (two extension headers) + 8. Its own comment gives the reason — tunnels and
+mobile networks drop well below Ethernet's 1500, and it names a network that dropped
+anything from 1320 bytes up. So:
+
+| family | UDP payload | less nonce+timestamps (12) and tag (16) | less fragment header (10) |
+|---|---|---|---|
+| IPv4 | 1280 − 28 = **1252** | 1224 | **1214** per fragment |
+| IPv6 | 1280 − 64 = **1216** | 1188 | **1178** per fragment |
+
+The 1214 is confirmed by the server's own log, which reports exactly that length for
+every non-final fragment of a repaint on a loopback IPv4 socket. Treating 1280 as the
+payload, as we did at first, puts 1308 bytes on an IPv4 path and 1328 on an IPv6 one —
+and 1280 is the minimum MTU every IPv6 path is *required* to carry, so the second is not
+a matter of efficiency. After the kernel refuses a datagram (`EMSGSIZE`) mosh drops to a
+payload MTU of 500 and stays there (`network.cc:413`).
+
 | constant | value | what it governs |
 |---|---|---|
 | `SEND_INTERVAL_MIN` / `MAX` | 20 ms / 250 ms | minimum and maximum gap between frames |
@@ -258,7 +278,25 @@ replaced mid-session, which the server announces in its own log. What is left:
 1. the escape repertoire against real programs — `vim`, `htop`, `less`, 256-colour and
    true-colour output, and a mouse-driven program — fed into our own emulator rather
    than merely printed. That is phase 5's repaint gate and the one remaining unknown
-   that could cost real work;
-2. multi-fragment reassembly **from the server**: our own 4 kB paste exercises the
-   sending half, but a full-screen repaint of a large terminal is what exercises the
-   other, and the lab's 80×24 shell never gets near the MTU.
+   that could cost real work.
+
+### Multi-fragment reassembly from the server, closed 2026-10-20
+
+The second leftover is done. The integration test now resizes the window to 240×70 and
+paints it with `base64` of `/dev/urandom`, which deflate cannot squeeze below about three
+quarters of its size; the server answered with **one instruction in nine fragments** and
+it went back together. Three things came out of it:
+
+- **the assertion is weaker than the check.** The reassembled payload is a zlib stream,
+  so its Adler-32 is verified when `MoshInstruction.decode` inflates it. Fragments put
+  together in the wrong order, or one counted twice, do not inflate at all. Arriving at a
+  frame we can parse *is* the proof that the assembly was right, which is why the test
+  needs no knowledge of the random content it asked for;
+- **the id-reuse assumption is now checked, not trusted.** Our assembly hands a completed
+  instruction over once, which is only safe if the sender never reuses a fragment id for
+  different bytes — mosh's random chaff is what makes that true. `MoshFragmentAssembly`
+  counts the fragments that arrive with an id and number it already holds but different
+  contents, and the test asserts that counter is zero against a real server;
+- **it found the MTU defect above**, which reading had not. The server's fragment lengths
+  did not match our budget, and the 28 bytes of difference were the IPv4 header we were
+  not subtracting.

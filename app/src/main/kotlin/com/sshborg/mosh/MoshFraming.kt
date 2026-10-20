@@ -93,6 +93,20 @@ class MoshFragmentAssembly {
     private var delivered = false
     private var fragments = arrayOfNulls<MoshFragment>(0)
 
+    /** How many fragments the largest instruction we have assembled was split into. */
+    var largestAssembly = 0
+        private set
+
+    /**
+     * How many times a fragment arrived with an id and number we already held but **different
+     * contents**. It should never happen, and nothing here can repair it if it does: it would mean
+     * the sender reuses an id for a changed instruction, which is exactly what the "deliver once"
+     * rule above relies on it not doing. Counting it is how that reliance gets checked against a
+     * real server instead of trusted.
+     */
+    var conflictingFragments = 0
+        private set
+
     /** @return the complete payload once the last missing piece arrives, otherwise null. */
     fun add(fragment: MoshFragment): ByteArray? {
         if (fragment.id != currentId) {
@@ -106,12 +120,16 @@ class MoshFragmentAssembly {
         if (fragment.number >= fragments.size) {
             fragments = fragments.copyOf(maxOf(fragment.number + 1, fragments.size * 2))
         }
-        if (fragments[fragment.number] == null) {
+        val held = fragments[fragment.number]
+        if (held == null) {
             fragments[fragment.number] = fragment
             arrived++
+        } else if (!held.contents.contentEquals(fragment.contents)) {
+            conflictingFragments++
         }
         if (total < 0 || arrived != total || delivered) return null
         delivered = true
+        if (total > largestAssembly) largestAssembly = total
 
         val size = (0 until total).sumOf { fragments[it]!!.contents.size }
         val out = ByteArray(size)
