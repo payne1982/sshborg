@@ -536,6 +536,35 @@
         }
         .tip-section p.support-source { margin: 26px 0 0; }
 
+        /* ── Landing on a section from the nav or the footer ──── */
+        /* The nav is sticky, so without a scroll margin the heading of the section
+           jumped to ends up behind it: that is how the support section came to look
+           as if it were not there at all. The docs pages already do this. */
+        section[id], .tip-section[id] { scroll-margin-top: 84px; }
+
+        /* Arriving there it says so: two flashes in the section's own colour, which
+           settle into a quiet outline so the section stays marked afterwards. */
+        .support-section { --flash: var(--neon-blue); }
+        #tip { --flash: var(--copper); }
+        .tip-section[id] {
+            border: 1px solid transparent;
+            transition: border-color 0.4s;
+        }
+        .tip-section[id]:target { border-color: rgba(255,255,255,0.10); }
+        .tip-section.arrived { animation: section-arrival 2.2s ease-out 1; }
+        @keyframes section-arrival {
+            0%   { border-color: transparent;  box-shadow: none;                      background: transparent; }
+            12%  { border-color: var(--flash); box-shadow: 0 0 26px -6px var(--flash); background: rgba(255,255,255,0.03); }
+            40%  { border-color: transparent;  box-shadow: none;                      background: transparent; }
+            60%  { border-color: var(--flash); box-shadow: 0 0 26px -6px var(--flash); background: rgba(255,255,255,0.03); }
+            100% { border-color: transparent;  box-shadow: none;                      background: transparent; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .tip-section.arrived { animation: none; }
+            .tip-section[id]:target { border-color: var(--flash); }
+        }
+
         /* ── Footer ──────────────────────────────────────────── */
         footer {
             border-top: 1px solid var(--border);
@@ -627,6 +656,7 @@
         /* ── Responsive ──────────────────────────────────────── */
         @media (max-width: 600px) {
             nav { padding: 12px 16px; flex-wrap: wrap; }
+            section[id], .tip-section[id] { scroll-margin-top: 112px; }
             .nav-hamburger { display: block; }
             .nav-links {
                 display: none;
@@ -901,6 +931,24 @@ document.addEventListener('keydown', function(e) {
             dd.querySelector('.dl-toggle').focus();
         }
     }
+});
+
+// Clicking the same link twice does not change :target, so the flash would play
+// only the first time. Start it by hand, and on arrival from another page too.
+function flashSection(el) {
+    if (!el || !el.classList.contains('tip-section')) return;
+    el.classList.remove('arrived');
+    void el.offsetWidth;
+    el.classList.add('arrived');
+}
+document.addEventListener('click', function(e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    if (id) flashSection(document.getElementById(id));
+});
+window.addEventListener('load', function() {
+    if (location.hash.length > 1) flashSection(document.getElementById(location.hash.slice(1)));
 });
 </script>
 </body>
