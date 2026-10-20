@@ -5,10 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.InetAddress
-import java.net.SocketTimeoutException
 
 /**
  * Phase 4's gate: a session with a real `mosh-server`, driven by the code the app would use.
@@ -32,7 +28,7 @@ class MoshSessionIntegrationTest {
 
     @Test fun `a session types, idles, survives a new local port and reassembles a big repaint`() {
         assumeTrue(TestConfig.NO_MOSH_SERVER, configured != null)
-        val session = Session(configured!!)
+        val session = MoshLabSession(configured!!)
         try {
             session.resize(80, 24)
 
@@ -90,101 +86,4 @@ class MoshSessionIntegrationTest {
         }
     }
 
-    /**
-     * The smallest loop that can hold a session: tick, send what comes back, wait for a datagram
-     * or for the next deadline, tick again. The real one belongs to phase 6, with the foreground
-     * service and the Wi-Fi lock around it; this is here to prove the state machine, not to be
-     * that.
-     */
-    private class Session(lab: TestConfig.Mosh) : AutoCloseable {
-
-        private val address: InetAddress = InetAddress.getByName(lab.host)
-        private val port = lab.port
-        private var socket = DatagramSocket()
-        private val output = StringBuilder()
-        private var lastHeard = 0L
-
-        /** Datagrams we could not open or parse. On a loopback server this should stay at zero. */
-        var protocolErrors = 0
-            private set
-
-        private val transport = MoshTransport(
-            MoshCrypto.fromPrintableKey(lab.key),
-            object : MoshTransport.Listener {
-                override fun onHostBytes(bytes: ByteArray) {
-                    output.append(String(bytes, Charsets.ISO_8859_1))
-                }
-            },
-        )
-
-        private fun now(): Long = System.nanoTime() / 1_000_000
-
-        fun type(text: String) = transport.type(text.toByteArray())
-
-        fun resize(width: Int, height: Int) = transport.resize(width, height)
-
-        /** Replaces the socket, as a change of network would, and keeps everything else. */
-        fun rebindLocalPort() {
-            socket.close()
-            socket = DatagramSocket()
-        }
-
-        fun awaitOutput(text: String, timeoutMs: Long): Boolean =
-            pumpUntil(timeoutMs) { output.contains(text) }
-
-        val largestAssembly: Int get() = transport.largestAssembly
-        val conflictingFragments: Int get() = transport.conflictingFragments
-
-        fun awaitLargeAssembly(minFragments: Int, timeoutMs: Long): Boolean =
-            pumpUntil(timeoutMs) { transport.largestAssembly >= minFragments }
-
-        fun heardFromServerWithin(timeoutMs: Long): Boolean {
-            val before = lastHeard
-            return pumpUntil(timeoutMs) { lastHeard > before }
-        }
-
-        fun idle(forMs: Long) {
-            pumpUntil(forMs) { false }
-        }
-
-        fun shutdown(timeoutMs: Long): Boolean {
-            transport.startShutdown(now())
-            return pumpUntil(timeoutMs) { transport.shutdownAcknowledged || transport.shutdownTimedOut(now()) } &&
-                transport.shutdownAcknowledged
-        }
-
-        private fun pumpUntil(timeoutMs: Long, done: () -> Boolean): Boolean {
-            val deadline = now() + timeoutMs
-            while (now() < deadline) {
-                send(transport.tick(now()))
-                if (done()) return true
-                val wait = (transport.nextWakeup() - now()).coerceIn(1, 100)
-                socket.soTimeout = wait.toInt()
-                val buffer = ByteArray(2048)
-                val packet = DatagramPacket(buffer, buffer.size)
-                try {
-                    socket.receive(packet)
-                    lastHeard = now()
-                    transport.onDatagram(packet.data.copyOf(packet.length), now())
-                    send(transport.tick(now()))
-                } catch (_: SocketTimeoutException) {
-                    // Nothing arrived in time, which is ordinary: tick again and wait some more.
-                } catch (_: MoshProtocolException) {
-                    // Someone else's packet, or a damaged one. Dropping it is the whole response —
-                    // but it is counted, because on loopback there is nobody else to blame.
-                    protocolErrors++
-                }
-                if (done()) return true
-            }
-            return done()
-        }
-
-        private fun send(datagrams: List<ByteArray>) {
-            for (datagram in datagrams) {
-                socket.send(DatagramPacket(datagram, datagram.size, address, port))
-            }
-        }
-
-        override fun close() = socket.close()
-    }
 }

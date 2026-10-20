@@ -269,16 +269,24 @@ Two behaviours of the server that only a running one teaches, both useful:
   and attaches immediately, but in the rig it means: attach promptly, or type something
   to force a repaint.
 
-### Left for the next phases
+### What was left after phase 4, and when it was closed
 
 Phase 4 closed the timing half of this list the same day: the transport state machine
 holds a real session, idles through heartbeats and survives its local port being
 replaced mid-session, which the server announces in its own log. What is left:
 
-1. the escape repertoire against real programs — `vim`, `htop`, `less`, 256-colour and
-   true-colour output, and a mouse-driven program — fed into our own emulator rather
-   than merely printed. That is phase 5's repaint gate and the one remaining unknown
-   that could cost real work.
+1. ~~the escape repertoire against real programs~~ — **closed 2026-10-21**. See the
+   repaint gate in §8 phase 5 of the plan: `vim`, `less`, `htop`, a scroll region, `ECH`,
+   256-colour and true-colour output and wide characters against the right margin, all
+   fed into our emulator and into a `tmux` pane of the same size from the identical
+   bytes, with no disagreement. The only thing the gate still cannot see is an attribute,
+   which is asserted separately against known coordinates.
+
+   Mouse mode is half-answered by the same recordings. `htop` turning reporting on and
+   off appears in the host stream as `?1000`/`?1002`/`?1003`/`?1006` and the rest, which
+   confirms §4's correction — the modes really are part of the synchronised state and
+   reach us by themselves. Whether we then *send* the reports back is the terminal view's
+   wiring, not the protocol's, and belongs to phase 6.
 
 ### Multi-fragment reassembly from the server, closed 2026-10-20
 

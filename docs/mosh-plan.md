@@ -342,16 +342,60 @@ runs on exactly that. And a frame whose reference state we do not hold must be d
 session resending the prompt while we threw it away, because it had no way to learn which
 state we held until our next heartbeat. The fix cut it to one frame interval.
 
-### Phase 5 — input and output
+### Phase 5 — input and output. Gate met, 2026-10-21
 
 The user-input diff towards the server, and the host diff applied to the existing
 `TerminalEmulator` — including routing the emulator's own query replies back into the
 input stream, which is easy to forget and hard to debug later.
 
 *Gate, in three steps: a keystroke reaches `cat`; `vim`, `htop` and `less` repaint with
-no dirt; a resize propagates both ways.* The first step is done — the rig ran
-`echo mosh-lab-ok` in a real session — and the repaint step is the one unknown left that
-could still cost real work.
+no dirt; a resize propagates both ways.* **All three met**, by `scripts/mosh-gate.sh`.
+This was the unknown that could still have cost real work, and it did not: the answer is
+that our emulator already agrees with mosh.
+
+#### The oracle, because an opinion was not going to be enough
+
+"Repaints with no dirt" cannot be asserted by the code that produced the repaint. So the
+gate records the host byte stream of a scripted session, replays it into our emulator,
+and replays **the identical bytes** through a second, independent emulator — a detached
+`tmux` pane of the same size — then diffs the two renderings cell by cell. Two emulators
+disagreeing about the same bytes is a defect in one of them; two agreeing is the only
+evidence worth having here. The result, at 100×30:
+
+| checkpoint | what it is for | result |
+|---|---|---|
+| `wide-margin` | 日本語 against the right margin at four offsets, where our `CharWidth` and the server's `wcwidth` have to agree and where mosh leans on the terminal's own deferred wrap | identical |
+| `colours` | the 256-colour cube and a true-colour ramp, as cell *placement* | identical |
+| `colour-cells` | one cell per palette entry at a known row — the attribute half, asserted directly | 256 cells, all correct, palette and 24-bit |
+| `partial` | a scroll region, absolute positioning and `ECH`: the moves mosh picks when they are cheaper, which a program would rarely make by itself | identical |
+| `less` | a pager: reverse-video status line, screen repainted by scrolling | identical |
+| `vim` | a full-screen editor: alternate screen, status line, repaint driven by cursor movement | identical |
+| `htop` | the densest partial-update program to hand; recorded but **not** diffed, because its screen is never the same twice | identical anyway, including the sort arrow |
+
+Seventeen checkpoints compared, none disagreeing, and the resize step proved separately
+by asking the far end's shell what size it thinks it is (`tput cols`) and reading 120×40
+back.
+
+Two things are worth being plain about. The text diff **cannot see an attribute** — a
+cell in the wrong colour holds the right character and the oracle shrugs — which is why
+`colour-cells` exists and asserts the colours itself rather than comparing them with
+anything. And `tmux` is one mature emulator, not the truth; agreement means we are not
+alone in a misreading, not that neither of us has one.
+
+#### What the gate found, which was not what it was looking for
+
+The first run reported fifteen checkpoints and no disagreements, and it had tested
+**nothing**: every recording was the same 259 bytes of untouched prompt. `awaitQuiet`
+waited for the screen to go quiet, and the screen is always already quiet at the moment
+keystrokes are handed to the transport — a tick schedules them 8 ms out so that a burst
+becomes one packet — so it returned at once, every time, and the keys piled up unsent.
+Only the resize assertion at the end noticed. It now waits for the host to answer first
+and for silence second, which is the difference between a gate and a formality.
+
+That is the second time on this branch that a passing check turned out to be a vacuous
+one, and both times what caught it was an assertion about something *else* in the same
+test. It is an argument for a gate always ending on a question whose answer cannot be
+"nothing happened".
 
 #### Where it plugs in: a byte source under the terminal, and nothing above it
 
@@ -388,6 +432,9 @@ xterm"*, which is a bug fix for SSH as well and is guarded by the existing suite
 must not happen is an `if (mosh)` branch inside the emulator. Two interpretations of the
 same escape sequence is precisely how the work done so far would get damaged, and it
 would double the terminal's test matrix for good.
+
+The gate above has now taken the sting out of this: the one fix the repaint comparison
+asked for in the terminal was none. Should a later one ask, the rule still holds.
 
 The one place that was worth checking before saying any of this: mosh relies on the
 client's own autowrap and compensates for terminals that snap the cursor to the true last

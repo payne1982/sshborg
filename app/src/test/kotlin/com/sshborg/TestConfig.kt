@@ -52,6 +52,13 @@ internal object TestConfig {
 
     data class Mosh(val host: String, val port: Int, val key: String)
 
+    /**
+     * Where the repaint gate leaves what it recorded, so that `scripts/mosh-gate.sh` can replay it
+     * through a second terminal emulator and compare. Nothing durable goes here: it is all
+     * regenerable by running the gate again.
+     */
+    fun moshGateOut(): File? = value("MOSH_GATE_OUT")?.let(::File)?.also { it.mkdirs() }
+
     const val NO_SERVER = "no server configured in test.properties (sshHost, sshUser, sshKeyDir)"
     const val NO_KEY_CORPUS = "keyCorpus is not set in test.properties"
     const val NO_EDITOR_CORPUS = "editorCorpus is not set in test.properties"
