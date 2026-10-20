@@ -752,6 +752,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。 在 iOS 上，长按会选中手指下的单词并打开系统菜单，其中有<em>拷贝</em>、<em>粘贴</em>和<em>全选</em>；拖动选区任一端可扩大选区。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
             </ul>
+            <p><strong>标题栏。</strong>会话建立三秒后，顶部的标题栏会收起，文字占满整个屏幕高度。轻触任意位置可让它再出现三秒；手指按在标题栏上时它不会收起，因此有时间按到上面的按钮。如果希望它一直可见，请在<strong>设置 &rarr; 终端</strong>中关闭<em>自动隐藏标题栏</em>。在电视上标题栏从不隐藏：那里没有可以轻触的地方让它回来。</p>
+
             <p><strong>全屏程序。</strong> 占据整个屏幕的程序 — tmux、vim、nano、less — 没有自己的回滚缓冲区，因此在它们运行期间，视图会停留在当前画面，而不会滑入下面的 shell 输出。</p>
             <p>要在其中滚动，需要由程序自己处理。在 tmux 中，将 <code>set -g mouse on</code> 加入 <code>~/.tmux.conf</code>：此后滑动即可翻阅手指所在窗格的历史。任何接受鼠标输入的程序同理，例如设置了 <code>set mouse=a</code> 的 vim。使用 <code>screen</code> 时，请检查 <code>~/.screenrc</code> 中是否有 <code>altscreen on</code> — 许多系统默认关闭它，此时 screen 会直接画在普通回滚缓冲区之上。</p>
         </div>
@@ -763,6 +765,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>终端配色</strong> — 经典<em>深色</em>方案（黑底白字）、在强光下更易读的<em>浅色</em>方案（白底黑字），或<em>跟随应用主题</em>（随应用深浅色主题自动切换）。更改立即生效，包括已打开的会话。</li>
                 <li><strong>保持屏幕常亮</strong> — 终端打开时阻止屏幕熄灭。查看日志或运行长时间命令时很实用。默认关闭。</li>
+                <li><strong>自动隐藏标题栏</strong> &mdash; 上面讲到的会收起的标题栏。默认开启；关闭后标题栏始终可见。</li>
+                <li><strong>隐藏状态栏</strong> &mdash; 在终端中同时隐藏系统的时钟和通知栏，多出几行空间。从顶部边缘下滑可再看到它一会儿。默认关闭；仅 Android。</li>
                 <li><strong>默认字体大小</strong> — 新终端会话的初始文字大小；每个会话中仍可用双指缩放。</li>
                 <li><strong>回滚缓冲区</strong>、<strong>反向滚动</strong>和<strong>命令建议</strong> — 分别控制保留多少输出历史、滚动方向，以及上文介绍的建议栏。</li>
                 <li><strong>双击操作</strong> — 可选：在终端双击时发送 <em>Tab</em>（自动补全），或连按两次 <em>Tab</em>（列出所有候选项）。默认关闭。 在 iOS 上，此选项关闭时双击会选中一个单词。</li>
