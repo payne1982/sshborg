@@ -531,15 +531,12 @@
            as if it were not there at all. The docs pages already do this. */
         section[id], .tip-section[id] { scroll-margin-top: 84px; }
 
-        /* Arriving there it says so: two flashes in the section's own colour, which
-           settle into a quiet outline so the section stays marked afterwards. */
+        /* Arriving there it says so: two flashes in the section's own colour, and
+           then nothing — the border is there only for the flash to colour, so the
+           box does not shift while it plays, and it leaves no outline behind. */
         .support-section { --flash: var(--neon-blue); }
         #tip { --flash: var(--copper); }
-        .tip-section[id] {
-            border: 1px solid transparent;
-            transition: border-color 0.4s;
-        }
-        .tip-section[id]:target { border-color: rgba(255,255,255,0.10); }
+        .tip-section[id] { border: 1px solid transparent; }
         .tip-section.arrived { animation: section-arrival 2.2s ease-out 1; }
         @keyframes section-arrival {
             0%   { border-color: transparent;  box-shadow: none;                      background: transparent; }
@@ -548,10 +545,15 @@
             60%  { border-color: var(--flash); box-shadow: 0 0 26px -6px var(--flash); background: rgba(255,255,255,0.03); }
             100% { border-color: transparent;  box-shadow: none;                      background: transparent; }
         }
+        /* Reduced motion gets one slow fade instead of two flashes, and still
+           nothing that stays. */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
-            .tip-section.arrived { animation: none; }
-            .tip-section[id]:target { border-color: var(--flash); }
+            .tip-section.arrived { animation: section-arrival-gentle 1.8s ease-in-out 1; }
+            @keyframes section-arrival-gentle {
+                0%, 100% { border-color: transparent;  background: transparent; }
+                45%      { border-color: var(--flash); background: rgba(255,255,255,0.03); }
+            }
         }
 
         /* ── Footer ──────────────────────────────────────────── */
@@ -909,8 +911,9 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Clicking the same link twice does not change :target, so the flash would play
-// only the first time. Start it by hand, and on arrival from another page too.
+// The flash is driven from here rather than from :target, which would play once
+// and never again for a second click on the link of the section we are already
+// in. Started by hand on a click, and on arrival from another page.
 function flashSection(el) {
     if (!el || !el.classList.contains('tip-section')) return;
     el.classList.remove('arrived');
