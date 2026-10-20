@@ -275,26 +275,33 @@ suite that already exists.
 The rig lives in `~/Documents/claude-generico/sshborg/mosh-lab/`, with its recipe and
 its two traps in the `README.md` there.
 
-### Phase 2 — crypto and packet. Gate met in the rig, 2026-10-20
+### Phase 2 — crypto and packet. Written, 2026-10-20
 
 Nonce with its direction bit, OCB through BouncyCastle, the two timestamp fields.
 
 *Gate: a datagram captured from the real server decrypts, and re-encrypting the
 plaintext reproduces the captured bytes exactly.* Real vectors, not invented ones.
 
-Proved in Java against a live server before any Kotlin was written: the server
-authenticated our datagram and its answers decrypt. What remains is to write it as
-`com.sshborg.mosh` with the captured vectors as unit tests — the knowledge is in hand,
-the production code is not.
+Proved in Java against a live server before any Kotlin was written, then written as
+`com.sshborg.mosh.MoshCrypto`: the server authenticated our datagram, its answers
+decrypt, and **re-sealing its plaintext reproduces its own ciphertext byte for byte**,
+which is the interoperability claim made into a test rather than a sentence. The
+sequence counter and the replay filter (direction bit included) came with it.
 
-### Phase 3 — fragments, zlib and protobuf. Gate met in the rig, 2026-10-20
+### Phase 3 — fragments, zlib and protobuf. Written, 2026-10-20
 
 Reassembly keyed on the instruction id, `Inflater` on the payload, and a hand-written
 varint reader for the three messages.
 
 *Gate: a frame from the real server parses, and re-serialising it yields the same
-bytes.* Both directions confirmed, including a hand-built `UserMessage` the server
-accepted.
+bytes.* Met in both directions, including a hand-built `UserMessage` the server
+accepted, and now in `MoshFraming`, `ProtoWire`, `MoshInstruction` and `MoshDiffs` with
+30 unit tests over mosh's own captured bytes.
+
+One deliberate departure from mosh: a completed assembly is handed over once, where mosh
+re-delivers it for every repeat of the final fragment and leans on idempotency. Ours is
+idempotent too, but decompressing a full-screen repaint again on each retransmission is
+work a peer could ask for at will.
 
 ### Phase 4 — the transport state machine. This is the actual work
 
@@ -335,7 +342,9 @@ which reads as a bug in the app rather than as a feature in progress.
 ### Where the code lives
 
 `app/src/main/kotlin/com/sshborg/mosh/`, **pure JVM, no Android API at all** — not even
-`android.util.Log`. That is what lets `./gradlew test` cover the protocol and lets the
+`android.util.Log` (as of 2026-10-20: `MoshCrypto`, `MoshFraming`, `ProtoWire`,
+`MoshInstruction`, `MoshDiffs`, with their tests and vectors under
+`app/src/test/{kotlin,resources}/`). That is what lets `./gradlew test` cover the protocol and lets the
 phase 1 harness run on it with no adapter in between. Exactly one class touches Android
 and JSch: the glue that owns the session, and it lives outside that package.
 
