@@ -47,6 +47,15 @@ make it an invariant of our own type, and it must survive the local socket being
 recreated after a network change. Mosh also refuses to encrypt more than 2^47 blocks
 under one key and kills the session instead — worth copying, as a cheap safety net.
 
+**The sequence number is also a replay filter, and the gate roaming passes through.**
+Each side keeps an `expected_receiver_seq`: a datagram whose sequence number is below it
+is still handed to the transport layer, but it does **not** update the peer address and
+does not count as having heard from the other side (`network.cc:515-518`, flagged in the
+source as security-sensitive). Our receiving side has to keep the same counter. In the
+test rig this is the first thing to get wrong: a second run of a probe that restarts its
+counter at 1 is authenticated and parsed, and then answered to the *previous* run's
+address — which looks exactly like broken crypto and is not.
+
 **Timestamps** (`Packet`, `src/network/network.{h,cc}`). Two 16-bit fields in front of
 the payload: our own millisecond clock modulo 65536, and the last timestamp we received
 from the other side (with the time we held it subtracted), which is how both ends
@@ -198,15 +207,54 @@ MOSH_SERVER_NETWORK_TMOUT=<s> SSH_AUTH_SOCK=<stable path> mosh-server new -s -c 
 run on a pty-backed channel of the right size, from which we read `MOSH CONNECT <port>
 <key>`.
 
-## 7. Still to settle empirically
+## 7. What the test rig proved, 2026-10-20
 
-These are questions the test rig of phase 1 answers in minutes and reading answers
-badly, so they are deliberately left here rather than guessed:
+A `mosh-server` 1.4.0 launched by hand on the development host and a throwaway Java
+probe — `~/Documents/claude-generico/sshborg/mosh-lab/`, outside this repository,
+with the recipe in its `README.md` — closed the first gates of phase 1 in an afternoon,
+and everything in §§1–4 above is now measured rather than read:
 
-1. the exact initial state on both sides — state 0 is a blank terminal, but of which
-   size, and what the server expects before the first resize arrives;
-2. whether anything in `Display`'s repertoire upsets our parser in practice (run
-   `vim`, `htop`, `less`, a 256-colour and a true-colour test, and a mouse-driven
-   program);
-3. how the server behaves at the first packet: what it accepts as an opening
-   instruction from a client that has only just been told the key.
+- **the cipher is interoperable in both directions.** Our datagram was authenticated by
+  the server (`Server now attached to client at …`), and its answers decrypt. BouncyCastle
+  OCB against mosh's own OCB v3, no new dependency, nothing native. This was the plan's
+  biggest risk and it is gone;
+- **framing, zlib and the hand-written protobuf are right in both directions.** Fragment
+  header, `Deflater`/`Inflater` with default (zlib) settings, and the five varint fields
+  of the transport instruction;
+- **the opening packet can be minimal**: `protocol_version=2`, `old_num=new_num=0`,
+  `ack_num=throwaway_num=0`, no diff. The server adopts the sender's address on it and
+  starts sending state;
+- **acknowledgement, state numbering and throwaway work as described.** With our acks
+  flowing, the server's instructions walked `1=>2, 2=>3, …` and its `throwaway_num`
+  followed one behind, which is the queue being pruned;
+- **input reaches the shell.** A `ClientBuffers.UserMessage` carrying one keystroke
+  instruction, sent as our state `0 => 1` and retransmitted until the server's `ack_num`
+  reached 1, ran `echo mosh-lab-ok` in the session. The reply came back as two host
+  diffs, the second of which carries `OSC 0` for the title, `SGR` colour, `?25l/h`
+  around the redraw and `?2004h` from the shell's own prompt — i.e. real material for
+  the emulator, now kept as a test vector;
+- **`echo_ack_num` really does arrive** (as an `echoack` extension), unused until there
+  is a prediction engine.
+
+Two behaviours of the server that only a running one teaches, both useful:
+
+- **a session nobody talks to cleans itself up.** With no client it exits after sixty
+  seconds; after a client that stops answering it detaches at forty seconds
+  (`SERVER_ASSOCIATION_TIMEOUT`) and then exits. The orphan-process worry in the plan is
+  smaller than it looked, and `MOSH_SERVER_NETWORK_TMOUT` covers the rest;
+- **a client that attaches late does not get the screen it missed.** The server diffs
+  from the state it assumes the client shares, which is the terminal as it was when the
+  transport was created; output produced before the first datagram arrived is never
+  retransmitted. It cannot bite in the app, because there the client launches the server
+  and attaches immediately, but in the rig it means: attach promptly, or type something
+  to force a repaint.
+
+### Left for the next phases
+
+1. the escape repertoire against real programs — `vim`, `htop`, `less`, 256-colour and
+   true-colour output, and a mouse-driven program — fed into our own emulator rather
+   than merely printed. That is phase 5's repaint gate and the one remaining unknown
+   that could cost real work;
+2. the timing behaviour under loss and under a changed local port, which is phase 4;
+3. how a 2048-byte MTU boundary is reached in practice, to exercise multi-fragment
+   reassembly (a full-screen repaint of a large terminal is the easy way).

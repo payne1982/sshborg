@@ -257,7 +257,7 @@ this phase and none should have been.
 
 *Gate: the four open questions answered or consciously deferred to phase 1.* Met.
 
-### Phase 1 — the test rig. Nothing else matters as much
+### Phase 1 — the test rig. Nothing else matters as much. Done, 2026-10-20
 
 `mosh-server new -s -c 256` launched **by hand** on the development host, which prints
 its port and key, driven by a small JVM harness that talks to it — no Android, no
@@ -270,22 +270,31 @@ seconds instead of after a week of code written blind. Every later layer gets it
 evidence from the same rig, and a captured datagram becomes a test vector for the JVM
 suite that already exists.
 
-*Gate: a `MOSH CONNECT` line parsed and a server process we can talk to on loopback.*
+*Gate: a `MOSH CONNECT` line parsed and a server process we can talk to on loopback.* Met
+— and it went further than its own gate, see [mosh-wire-format.md](mosh-wire-format.md) §7.
+The rig lives in `~/Documents/claude-generico/sshborg/mosh-lab/`, with its recipe and
+its two traps in the `README.md` there.
 
-### Phase 2 — crypto and packet
+### Phase 2 — crypto and packet. Gate met in the rig, 2026-10-20
 
 Nonce with its direction bit, OCB through BouncyCastle, the two timestamp fields.
 
 *Gate: a datagram captured from the real server decrypts, and re-encrypting the
 plaintext reproduces the captured bytes exactly.* Real vectors, not invented ones.
 
-### Phase 3 — fragments, zlib and protobuf
+Proved in Java against a live server before any Kotlin was written: the server
+authenticated our datagram and its answers decrypt. What remains is to write it as
+`com.sshborg.mosh` with the captured vectors as unit tests — the knowledge is in hand,
+the production code is not.
+
+### Phase 3 — fragments, zlib and protobuf. Gate met in the rig, 2026-10-20
 
 Reassembly keyed on the instruction id, `Inflater` on the payload, and a hand-written
 varint reader for the three messages.
 
 *Gate: a frame from the real server parses, and re-serialising it yields the same
-bytes.*
+bytes.* Both directions confirmed, including a hand-built `UserMessage` the server
+accepted.
 
 ### Phase 4 — the transport state machine. This is the actual work
 
@@ -305,7 +314,9 @@ The user-input diff towards the server, and the host diff applied to the existin
 input stream, which is easy to forget and hard to debug later.
 
 *Gate, in three steps: a keystroke reaches `cat`; `vim`, `htop` and `less` repaint with
-no dirt; a resize propagates both ways.*
+no dirt; a resize propagates both ways.* The first step is done — the rig ran
+`echo mosh-lab-ok` in a real session — and the repaint step is the one unknown left that
+could still cost real work.
 
 ### Phase 6 — the Android integration
 
