@@ -899,6 +899,94 @@ class ShellSession(
     }
 
     /**
+     * Starts a `mosh-server` on this connection and reads its handover line.
+     *
+     * One exec channel, one command, one line of output. Three details are not obvious:
+     *
+     * - **no pty is asked for.** `mosh-server` takes its initial size from `TIOCGWINSZ` on its
+     *   stdin and falls back to 80x24, and the stock client does not request one either: the real
+     *   size arrives a moment later in the first datagram, which costs one extra frame and avoids
+     *   handing a detaching daemon a controlling terminal;
+     * - **`env` rather than `VAR=value cmd`.** sshd runs the command through the account's login
+     *   shell, and `fish` has no such syntax at all — we already know fish users exist, because
+     *   the history reader looks for its history file;
+     * - **the network timeout is raised far above the default.** A server hears nothing for forty
+     *   seconds and detaches, then exits. On a phone that is not an edge case: Doze batches our
+     *   heartbeat as soon as the screen goes off, so the default would end the session in exactly
+     *   the situation mosh exists for. Making the server patient is the cure, and it costs one
+     *   environment variable.
+     *
+     * @param networkTimeoutSeconds what the server waits, hearing nothing, before giving up.
+     * @param command the server binary, for the accounts where it is installed somewhere the
+     *   login shell's PATH does not reach.
+     * @throws MoshUnavailable with the reason, which the caller shows to the user. Never with the
+     *   key in it: anything echoed back into a diagnostic has the handover line taken out first.
+     */
+    fun startMoshServer(
+        networkTimeoutSeconds: Int,
+        command: String = "mosh-server",
+        timeoutMs: Int = 20_000,
+    ): MoshBootstrap {
+        val channel = session.openChannel("exec") as com.jcraft.jsch.ChannelExec
+        channel.setCommand(
+            "env MOSH_SERVER_NETWORK_TMOUT=$networkTimeoutSeconds $command new -s -c 256"
+        )
+        val errors = java.io.ByteArrayOutputStream()
+        channel.setErrStream(errors)
+        // The pipe has to exist before connect() or JSch silently drops what arrives first.
+        val output = channel.inputStream
+        try {
+            channel.connect(timeoutMs)
+            val said = readUntilClosed(channel, output, timeoutMs)
+            val full = said + errors.toString(Charsets.UTF_8.name())
+
+            MoshBootstrap.CONNECT_LINE.find(said)?.let { match ->
+                return MoshBootstrap(
+                    host = hostname,
+                    port = match.groupValues[1].toInt(),
+                    key = match.groupValues[2],
+                )
+            }
+            throw MoshUnavailable(
+                reason = when {
+                    channel.exitStatus == 127 || "not found" in full -> MoshUnavailable.Reason.NotInstalled
+                    "UTF-8" in full || "utf-8" in full -> MoshUnavailable.Reason.LocaleNotUtf8
+                    else -> MoshUnavailable.Reason.NoConnectLine
+                },
+                detail = MoshBootstrap.redact(full),
+            )
+        } finally {
+            runCatching { channel.disconnect() }
+        }
+    }
+
+    /** Reads an exec channel's output until it closes or [timeoutMs] runs out. */
+    private fun readUntilClosed(
+        channel: com.jcraft.jsch.ChannelExec,
+        output: java.io.InputStream,
+        timeoutMs: Int,
+    ): String {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        val said = StringBuilder()
+        val buffer = ByteArray(1024)
+        while (System.currentTimeMillis() < deadline) {
+            if (output.available() > 0) {
+                val n = output.read(buffer)
+                if (n < 0) break
+                said.append(String(buffer, 0, n, Charsets.UTF_8))
+                // The handover is the first line; waiting for the channel to close as well would
+                // mean waiting for the daemon to let go of it.
+                if (MoshBootstrap.CONNECT_LINE.containsMatchIn(said)) break
+            } else if (channel.isClosed) {
+                break
+            } else {
+                Thread.sleep(POLL_MS)
+            }
+        }
+        return said.toString()
+    }
+
+    /**
      * Opens an SFTP channel on this connection, already authenticated and host-key checked —
      * for a quick side read (the shell history) without logging in a second time. The caller
      * owns the channel and must disconnect it; it runs alongside the shell, not in place of it.
@@ -911,6 +999,11 @@ class ShellSession(
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
         jumpSessions.reversed().forEach { runCatching { it.disconnect() } }
+    }
+
+    private companion object {
+        /** How long to wait between looks at an exec channel that has said nothing yet. */
+        const val POLL_MS = 20L
     }
 }
 

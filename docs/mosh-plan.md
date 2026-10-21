@@ -446,11 +446,53 @@ without being a substitute for it.
 
 ### Phase 6 — the Android integration
 
-Bootstrap over a JSch exec channel with a pty of the right size, the per-host switch,
-detection and silent fallback, the SSH session kept alive underneath, and the same
-foreground service and Wi-Fi lock the SSH sessions already use.
+Bootstrap over a JSch exec channel, the per-host switch, the SSH session kept alive
+underneath, and the same foreground service and Wi-Fi lock the SSH sessions already use.
 
 *Gate: the Wi-Fi is switched off on a real phone and the session carries on.*
+
+#### Decisions taken 2026-10-21, which change what was written above
+
+- **The switch is a checkbox in the host form**, beside the colour row where there is
+  room, labelled `Mosh` with `(experimental)` under it, and **off by default**.
+- **No silent fallback, and no autodetect worth the name.** The plan said detection and a
+  quiet fall back to SSH. That was wrong for an explicit per-host switch: somebody who
+  asked for mosh and did not get it is owed the reason. A failure raises a dialog saying
+  what went wrong, with *carry on over SSH* and *leave* as the two answers.
+  [MoshUnavailable.Reason] is therefore a real enumeration — not installed, locale not
+  UTF-8, an unreadable answer, no datagram ever came back — because each has a different
+  cure and three of the four are on the server.
+- **mosh and a jump chain exclude each other** in the configuration, but a host reached
+  over mosh is still a perfectly good bastion: the inward hop is SSH, runs server-side,
+  and is immune to the phone's network. That is the arrangement in §5.2, and it is the
+  right way round. What is excluded is SSH → jump → mosh.
+- **The radio cost goes in the guide** rather than being engineered around: a heartbeat
+  every three seconds for as long as the session is open.
+- **The scrollback stays as it comes.** Lines that scroll away do enter it, because mosh
+  really does scroll the terminal, but a mosh session starts with an empty one and
+  anything painted without scrolling leaves nothing behind. The gesture is not disabled
+  and the difference is written in the guide.
+
+#### The bootstrap, done and gated 2026-10-21
+
+`ShellSession.startMoshServer` opens one exec channel, runs one command, reads one line.
+`MoshBootstrapIntegrationTest` drives it against a real server from the JVM — no device
+needed, which is why it is the part of phase 6 that could be finished first: it logs in
+over SSH, starts the server, holds a session with the handed-over key, types into it, and
+then checks that **SFTP still works on the SSH session underneath**, which is the whole
+reason for not closing it.
+
+Three things that are not obvious are in that function's KDoc: no pty, `env` rather than
+`VAR=value cmd` because fish has no such syntax, and the network timeout raised far above
+the default because Doze would otherwise end the session in exactly the situation mosh
+exists for.
+
+The handover line carries the session key, so `MoshBootstrap.redact` takes it out of
+anything that can reach a log or the error dialog's copy button, and that is unit-tested
+rather than reasoned about. The first version of that test was wrong in an instructive
+way: it fed the parser a *fake* handover line and expected it to be rejected. But a line
+that looks like a handover **is** one — SSH has already authenticated whoever printed it,
+so there is nothing there to distrust. Redaction is a pure function and is tested as one.
 
 ### Phase 7 — prediction, separately or never
 

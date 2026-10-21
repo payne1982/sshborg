@@ -221,11 +221,28 @@ wake-up every three seconds for as long as the session is up.
 So the bootstrap command has the shape
 
 ```
-MOSH_SERVER_NETWORK_TMOUT=<s> SSH_AUTH_SOCK=<stable path> mosh-server new -s -c 256 -l LANG=…
+env MOSH_SERVER_NETWORK_TMOUT=<s> SSH_AUTH_SOCK=<stable path> mosh-server new -s -c 256
 ```
 
-run on a pty-backed channel of the right size, from which we read `MOSH CONNECT <port>
-<key>`.
+run on an exec channel, from which we read `MOSH CONNECT <port> <key>`. Two corrections
+to what this section said before, both made while writing it:
+
+- **`env`, not `VAR=value cmd`.** sshd runs the command through the account's login
+  shell, and `fish` has no such syntax at all — it would simply fail. We already know
+  fish users exist, because the history reader looks for its history file. `env` is
+  POSIX and works whatever the shell is.
+- **No pty.** This said "a pty-backed channel of the right size". It does not need one:
+  `mosh-server` takes its initial size from `TIOCGWINSZ` on stdin and falls back to
+  80×24, and the stock client asks for no pty either — the real size arrives a moment
+  later in the first datagram. That costs one extra frame and avoids handing a
+  controlling terminal to a process that is about to detach.
+
+The network timeout also turns out to matter for the opposite reason from the one given
+above. It stops a forgotten server living forever, yes — but on a phone the default is
+too *short*: forty seconds of silence and the server detaches, then exits, and Doze
+starts batching our three-second heartbeat as soon as the screen goes off. So it is set
+far above the default, which makes the server patient, which is the whole point of a
+mobile client.
 
 ## 7. What the test rig proved, 2026-10-20
 
