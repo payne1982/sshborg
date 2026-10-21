@@ -60,4 +60,14 @@ data class HostEntity(
     val position: Int? = null,
     /** How many terminal sessions were opened to this host; drives the "most used" order. */
     val connectCount: Int = 0,
+    /**
+     * If true, the terminal for this host rides mosh instead of the SSH shell channel: SSH still
+     * logs in, starts `mosh-server` and stays open for SFTP, port forwarding and the agent, but
+     * the screen is synchronised over UDP and survives a change of network.
+     *
+     * Off by default, per host and explicit — there is no detection and no silent fall back to
+     * SSH, because somebody who asked for mosh and did not get it is owed the reason. It also
+     * excludes a jump chain: see `docs/mosh-plan.md` phase 6.
+     */
+    val mosh: Boolean = false,
 )

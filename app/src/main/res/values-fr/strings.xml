@@ -53,6 +53,10 @@
     <string name="host_color_label">Couleur</string>
     <string name="host_color_auto">Automatique</string>
     <string name="host_color_custom">Personnalisée</string>
+    <string name="host_mosh_label">Mosh</string>
+    <string name="host_mosh_experimental">(expérimental)</string>
+    <string name="host_mosh_no_jump">Mosh ne peut pas être utilisé avec un hôte de saut. Supprimez les hôtes de saut ci-dessous pour l’activer.</string>
+    <string name="host_jump_not_with_mosh">Non disponible avec Mosh. Un hôte atteint via Mosh peut toujours servir d’hôte de saut pour d’autres hôtes.</string>
     <string name="host_color_dialog_title">Couleur de l\'hôte</string>
     <string name="host_color_remove">Supprimer la couleur personnalisée</string>
 

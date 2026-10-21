@@ -54,6 +54,10 @@
     <string name="host_color_label">色</string>
     <string name="host_color_auto">自動</string>
     <string name="host_color_custom">カスタム</string>
+    <string name="host_mosh_label">Mosh</string>
+    <string name="host_mosh_experimental">（実験的）</string>
+    <string name="host_mosh_no_jump">Mosh は踏み台ホストと併用できません。有効にするには下の踏み台ホストを削除してください。</string>
+    <string name="host_jump_not_with_mosh">Mosh では使用できません。Mosh で接続するホストは、他のホストの踏み台としては引き続き使えます。</string>
     <string name="host_color_dialog_title">ホストの色</string>
     <string name="host_color_remove">カスタムの色を削除</string>
 

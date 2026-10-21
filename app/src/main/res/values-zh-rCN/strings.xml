@@ -54,6 +54,10 @@
     <string name="host_color_label">颜色</string>
     <string name="host_color_auto">自动</string>
     <string name="host_color_custom">自定义</string>
+    <string name="host_mosh_label">Mosh</string>
+    <string name="host_mosh_experimental">（实验性）</string>
+    <string name="host_mosh_no_jump">Mosh 不能与跳板机同时使用。要启用它，请先删除下面的跳板机。</string>
+    <string name="host_jump_not_with_mosh">与 Mosh 不可同时使用。通过 Mosh 连接的主机仍然可以作为其他主机的跳板机。</string>
     <string name="host_color_dialog_title">主机颜色</string>
     <string name="host_color_remove">移除自定义颜色</string>
 

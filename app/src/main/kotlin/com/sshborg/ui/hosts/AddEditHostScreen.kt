@@ -71,6 +71,8 @@ fun AddEditHostScreen(
     val sftpStartDir by vm.sftpStartDir.collectAsState()
     val sftpShowHidden by vm.sftpShowHidden.collectAsState()
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
+    val mosh by vm.mosh.collectAsState()
+    val jumpConfigured by vm.jumpConfigured.collectAsState()
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
     val hostColor by vm.hostColor.collectAsState()
@@ -204,38 +206,81 @@ fun AddEditHostScreen(
                     }
                 }
             }
+            // The colour and the mosh switch share a line. They have nothing to do with each
+            // other; the colour row simply left the right half of its line empty, and that is
+            // where the switch was asked for.
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showHostColorDialog = true }
-                    .padding(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                val groupColor = groups.find { it.id == groupId }?.color
-                val shownColor = hostColor ?: groupColor
-                Box(
-                    Modifier
-                        .size(28.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-                        .padding(3.dp)
-                        .then(
-                            if (shownColor != null)
-                                Modifier.background(Color(shownColor), CircleShape)
-                            else Modifier
-                        )
-                )
-                Column {
-                    Text(stringResource(R.string.host_color_label), style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        stringResource(
-                            if (hostColor != null) R.string.host_color_custom
-                            else R.string.host_color_auto
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { showHostColorDialog = true }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    val groupColor = groups.find { it.id == groupId }?.color
+                    val shownColor = hostColor ?: groupColor
+                    Box(
+                        Modifier
+                            .size(28.dp)
+                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                            .padding(3.dp)
+                            .then(
+                                if (shownColor != null)
+                                    Modifier.background(Color(shownColor), CircleShape)
+                                else Modifier
+                            )
                     )
+                    Column {
+                        Text(stringResource(R.string.host_color_label), style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            stringResource(
+                                if (hostColor != null) R.string.host_color_custom
+                                else R.string.host_color_auto
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
+                // The whole row stops responding when a jump chain is configured, not only the
+                // box: a tap on the label must not be able to turn on what the box refuses, and
+                // the line underneath says why it does.
+                Row(
+                    modifier = Modifier
+                        .clickable(enabled = !jumpConfigured) { vm.mosh.value = !mosh }
+                        .padding(vertical = 8.dp, horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = mosh && !jumpConfigured,
+                        onCheckedChange = { vm.mosh.value = it },
+                        enabled = !jumpConfigured,
+                    )
+                    Column {
+                        Text(
+                            stringResource(R.string.host_mosh_label),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (jumpConfigured) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            stringResource(R.string.host_mosh_experimental),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+            if (jumpConfigured) {
+                Text(
+                    stringResource(R.string.host_mosh_no_jump),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             HorizontalDivider()
@@ -348,67 +393,78 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
-            // Mode selector
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    RadioButton(
-                        selected = jumpMode == "simple",
-                        onClick  = { vm.jumpMode.value = "simple" },
-                    )
-                    Text(stringResource(R.string.host_jump_mode_simple))
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    RadioButton(
-                        selected = jumpMode == "host_list",
-                        onClick  = { vm.jumpMode.value = "host_list" },
-                    )
-                    Text(stringResource(R.string.host_jump_mode_host_list))
-                }
-            }
-
-            if (jumpMode == "simple") {
-                HostField(
-                    value = jumpHosts,
-                    onValueChange = { vm.jumpHosts.value = it },
-                    label = stringResource(R.string.host_field_jump_hosts),
-                    touchless = touchless,
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardType = KeyboardType.Uri,
-                    placeholder = stringResource(R.string.host_jump_hosts_placeholder),
-                    supporting = stringResource(R.string.host_jump_hosts_supporting),
+            if (mosh) {
+                // Nothing is cleared when this appears: the switch above is what cannot be
+                // turned on while a chain exists, so by the time it is on there is no chain
+                // left to lose.
+                Text(
+                    stringResource(R.string.host_jump_not_with_mosh),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                // Host-list mode: one row per hop
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    jumpHostIds.forEachIndexed { index, selectedId ->
-                        JumpHostRow(
-                            touchless        = touchless,
-                            selectedId       = selectedId,
-                            options          = availableJumpHosts,
-                            onSelect         = { newId ->
-                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                    .also { it[index] = newId }
-                            },
-                            onRemove         = {
-                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                    .also { it.removeAt(index) }
-                            },
-                        )
-                    }
-                    OutlinedButton(
-                        onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
-                        modifier  = Modifier.fillMaxWidth(),
+                // Mode selector
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = null,
-                            modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.host_jump_add))
+                        RadioButton(
+                            selected = jumpMode == "simple",
+                            onClick  = { vm.jumpMode.value = "simple" },
+                        )
+                        Text(stringResource(R.string.host_jump_mode_simple))
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        RadioButton(
+                            selected = jumpMode == "host_list",
+                            onClick  = { vm.jumpMode.value = "host_list" },
+                        )
+                        Text(stringResource(R.string.host_jump_mode_host_list))
+                    }
+                }
+
+                if (jumpMode == "simple") {
+                    HostField(
+                        value = jumpHosts,
+                        onValueChange = { vm.jumpHosts.value = it },
+                        label = stringResource(R.string.host_field_jump_hosts),
+                        touchless = touchless,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = KeyboardType.Uri,
+                        placeholder = stringResource(R.string.host_jump_hosts_placeholder),
+                        supporting = stringResource(R.string.host_jump_hosts_supporting),
+                    )
+                } else {
+                    // Host-list mode: one row per hop
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        jumpHostIds.forEachIndexed { index, selectedId ->
+                            JumpHostRow(
+                                touchless        = touchless,
+                                selectedId       = selectedId,
+                                options          = availableJumpHosts,
+                                onSelect         = { newId ->
+                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                        .also { it[index] = newId }
+                                },
+                                onRemove         = {
+                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                        .also { it.removeAt(index) }
+                                },
+                            )
+                        }
+                        OutlinedButton(
+                            onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
+                            modifier  = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null,
+                                modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.host_jump_add))
+                        }
                     }
                 }
             }

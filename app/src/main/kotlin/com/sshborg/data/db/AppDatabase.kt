@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [HostEntity::class, SshKeyEntity::class, GroupEntity::class],
-    version = 13,
+    version = 14,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -28,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
         internal val MIGRATIONS: Array<Migration> get() = arrayOf(
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
             MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11,
-            MIGRATION_11_12, MIGRATION_12_13,
+            MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14,
         )
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -114,6 +114,20 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE hosts ADD COLUMN position INTEGER")
                 db.execSQL("ALTER TABLE hosts ADD COLUMN connectCount INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE host_groups ADD COLUMN position INTEGER")
+            }
+        }
+
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // The per-host mosh switch. Off for everybody who already has a database, which
+                // is also its default for a new host: it is experimental and it needs something
+                // installed on the server.
+                //
+                // Version 14 was briefly used on this branch's history for two `ssh_keys` columns
+                // that were then taken out again (see MigrationTest). No release ever carried
+                // that schema, so no user database is at 14; a development one still holding it
+                // has to be wiped, which is what happened at the time.
+                db.execSQL("ALTER TABLE hosts ADD COLUMN mosh INTEGER NOT NULL DEFAULT 0")
             }
         }
 

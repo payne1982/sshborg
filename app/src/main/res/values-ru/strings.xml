@@ -55,6 +55,10 @@
     <string name="host_color_label">Цвет</string>
     <string name="host_color_auto">Автоматически</string>
     <string name="host_color_custom">Свой</string>
+    <string name="host_mosh_label">Mosh</string>
+    <string name="host_mosh_experimental">(экспериментально)</string>
+    <string name="host_mosh_no_jump">Mosh нельзя использовать с промежуточным хостом. Уберите промежуточные хосты ниже, чтобы включить его.</string>
+    <string name="host_jump_not_with_mosh">Недоступно с Mosh. Хост, доступный через Mosh, по-прежнему может быть промежуточным для других хостов.</string>
     <string name="host_color_dialog_title">Цвет хоста</string>
     <string name="host_color_remove">Убрать свой цвет</string>
 

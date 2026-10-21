@@ -53,6 +53,10 @@
     <string name="host_color_label">Colore</string>
     <string name="host_color_auto">Automatico</string>
     <string name="host_color_custom">Personalizzato</string>
+    <string name="host_mosh_label">Mosh</string>
+    <string name="host_mosh_experimental">(sperimentale)</string>
+    <string name="host_mosh_no_jump">Mosh non si può usare con un jump host. Togli i jump host qui sotto per attivarlo.</string>
+    <string name="host_jump_not_with_mosh">Non disponibile con Mosh. Un host raggiunto via Mosh può comunque fare da jump host per altri host.</string>
     <string name="host_color_dialog_title">Colore dell\'host</string>
     <string name="host_color_remove">Rimuovi colore personalizzato</string>
 

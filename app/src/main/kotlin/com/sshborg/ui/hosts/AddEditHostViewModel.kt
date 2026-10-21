@@ -52,10 +52,26 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /** Whether the SFTP browser shows dotfiles for this host. Default hides them. */
     var sftpShowHidden = MutableStateFlow(false)
     var allowLegacyCiphers = MutableStateFlow(false)
+    /** Whether this host's terminal rides mosh instead of the SSH shell channel. */
+    var mosh = MutableStateFlow(false)
     /** Null = ungrouped; otherwise the selected group's ID. */
     var groupId = MutableStateFlow<Long?>(null)
     /** Optional per-host ARGB color; overrides the group color. */
     var hostColor = MutableStateFlow<Int?>(null)
+
+    /**
+     * Whether a jump chain is configured, in whichever of the two modes is selected.
+     *
+     * Mosh and a jump chain exclude each other, so the form needs to know: it is what disables
+     * the mosh switch, and [save] applies the same rule where it cannot be got round. The
+     * exclusion is only in this direction — a host reached over mosh is still a perfectly good
+     * bastion for others, because that inward hop is SSH, runs on the server and is immune to
+     * whatever the phone's network does.
+     */
+    val jumpConfigured: StateFlow<Boolean> =
+        combine(jumpMode, jumpHosts, jumpHostIds) { mode, text, ids ->
+            if (mode == "simple") text.isNotBlank() else ids.any { it != 0L }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     /** When true, the saved host key and cached jump-host keys are cleared on save. */
     var resetHostKeys = MutableStateFlow(false)
@@ -116,6 +132,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir.value = h.sftpStartDir ?: ""
             sftpShowHidden.value = h.sftpShowHidden
             allowLegacyCiphers.value = h.allowLegacyCiphers
+            mosh.value = h.mosh
             groupId.value = h.groupId
             hostColor.value = h.color
             _hasStoredHostKeys.value = h.knownHostsEntry != null || h.jumpHostKeys != null
@@ -145,6 +162,10 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
         val newJumpHosts = if (currentMode == "simple") {
             jumpHosts.value.trim().takeIf { it.isNotEmpty() }
         } else null
+
+        // The exclusion, where nothing can get round it: whatever the form did, a row never
+        // leaves here with both mosh and a jump chain on it.
+        val newMosh = mosh.value && newJumpHosts == null && newJumpHostIdList == null
 
         val existing = editingId?.let { hostDao.getById(it) }
         val newHostname = hostname.value.trim()
@@ -186,6 +207,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir         = newSftpStartDir,
             sftpShowHidden       = sftpShowHidden.value,
             allowLegacyCiphers   = allowLegacyCiphers.value,
+            mosh                 = newMosh,
             groupId              = groupId.value,
             color                = hostColor.value,
         )

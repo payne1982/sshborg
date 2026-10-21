@@ -265,6 +265,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         put("sftpStartMode", h.sftpStartMode)
                         put("sftpShowHidden", h.sftpShowHidden)
                         put("allowLegacyCiphers", h.allowLegacyCiphers)
+                        // Backup version 8. Written for every host rather than only when on, so
+                        // that restoring over a host which has it on turns it off again: the
+                        // backup is what the hosts were, not a set of things to add.
+                        put("mosh", h.mosh)
                         h.jumpHosts?.let { put("jumpHosts", it) }
                         h.jumpHostIdList?.let { put("jumpHostIdList", it) }
                         h.portForwardings?.let { put("portForwardings", it) }
@@ -280,7 +284,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 7)
+                    put("version", 8)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
@@ -362,6 +366,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         sftpStartDir = o.optString("sftpStartDir").takeIf { it.isNotEmpty() },
                         sftpShowHidden = o.optBoolean("sftpShowHidden", false),
                         allowLegacyCiphers = o.optBoolean("allowLegacyCiphers", false),
+                        // Absent in backups up to version 7, where no host could have it on.
+                        mosh = o.optBoolean("mosh", false),
                         groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
                         color = if (o.has("color")) o.getInt("color") else null,
                         position = if (o.has("position")) o.getInt("position") else null,
