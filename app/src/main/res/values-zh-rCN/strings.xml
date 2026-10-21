@@ -58,6 +58,13 @@
     <string name="host_mosh_experimental">（实验性）</string>
     <string name="host_mosh_no_jump">Mosh 不能与跳板机同时使用。要启用它，请先删除下面的跳板机。</string>
     <string name="host_jump_not_with_mosh">与 Mosh 不可同时使用。通过 Mosh 连接的主机仍然可以作为其他主机的跳板机。</string>
+    <string name="mosh_failed_title">Mosh 无法启动</string>
+    <string name="mosh_failed_not_installed">此主机上没有 mosh-server。请在服务器上安装 mosh，或者关闭该主机的 Mosh。</string>
+    <string name="mosh_failed_locale">服务器的区域设置不是 UTF-8，mosh-server 拒绝启动。请在服务器上设置 UTF-8 区域设置。</string>
+    <string name="mosh_failed_no_answer">mosh-server 的回应不符合预期。它所说的内容见下方。</string>
+    <string name="mosh_failed_no_udp">UDP 没有任何回应。这里到主机之间的网络很可能屏蔽了 UDP 端口 60001-60999。</string>
+    <string name="mosh_action_carry_on">继续使用 SSH</string>
+    <string name="mosh_action_leave">退出</string>
     <string name="host_color_dialog_title">主机颜色</string>
     <string name="host_color_remove">移除自定义颜色</string>
 

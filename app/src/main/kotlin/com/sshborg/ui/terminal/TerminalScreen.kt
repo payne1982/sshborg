@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -35,6 +37,7 @@ import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.text.KeyboardActions
@@ -59,6 +62,7 @@ import com.sshborg.isTouchless
 import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
+import com.sshborg.data.ssh.MoshUnavailable
 import com.sshborg.ui.common.ProblemContent
 import com.sshborg.ui.common.ServerBanner
 import kotlinx.coroutines.delay
@@ -194,6 +198,9 @@ fun TerminalScreen(
     BackHandler(state is ConnectionState.HostKeyPrompt) { vm.rejectHostKey() }
     // Cancel password prompt on hardware back
     BackHandler(state is ConnectionState.PasswordPrompt) { vm.submitPassword(""); leave() }
+    // Back out of a mosh failure the same way its own button does: SSH is already connected
+    // underneath, so leaving has to be said out loud and not simply by the screen going away.
+    BackHandler(state is ConnectionState.MoshFailed) { vm.leaveAfterMoshFailed(); leave() }
 
     // The countdown waits for the session to be up. Measured from the moment the screen appears
     // instead, it runs out while the user is still answering a password prompt or trusting a host
@@ -593,6 +600,12 @@ fun TerminalScreen(
                     onAccept    = { vm.acceptHostKey() },
                     onReject    = { vm.rejectHostKey() },
                 )
+                is ConnectionState.MoshFailed      -> MoshFailedDialog(
+                    reason     = s.reason,
+                    detail     = s.detail,
+                    onCarryOn  = { vm.carryOnOverSsh() },
+                    onLeave    = { vm.leaveAfterMoshFailed(); leave() },
+                )
                 is ConnectionState.Error           -> ErrorOverlay(message = s.message, detail = s.detail, onBack = onBack)
                 is ConnectionState.Disconnected    -> DisconnectedOverlay(
                     summary = s.summary,
@@ -908,6 +921,71 @@ private fun PasswordDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
+/**
+ * Mosh was asked for and could not be started: what went wrong, and the two things that can be
+ * done about it.
+ *
+ * There is no third option and no silent one. The switch is per host and explicit, so falling back
+ * to SSH without a word would be answering a question nobody asked — and three of the four causes
+ * are on the server, where only the person reading this can do anything about them.
+ */
+@Composable
+private fun MoshFailedDialog(
+    reason: MoshUnavailable.Reason,
+    detail: String?,
+    onCarryOn: () -> Unit,
+    onLeave: () -> Unit,
+) {
+    AlertDialog(
+        // Not dismissible by tapping outside: the session is waiting for an answer, and there is
+        // no sensible default to give it.
+        onDismissRequest = {},
+        title = { Text(stringResource(R.string.mosh_failed_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    stringResource(
+                        when (reason) {
+                            MoshUnavailable.Reason.NotInstalled -> R.string.mosh_failed_not_installed
+                            MoshUnavailable.Reason.LocaleNotUtf8 -> R.string.mosh_failed_locale
+                            MoshUnavailable.Reason.NoConnectLine -> R.string.mosh_failed_no_answer
+                            MoshUnavailable.Reason.NoUdpAnswer -> R.string.mosh_failed_no_udp
+                        }
+                    )
+                )
+                // What the server actually said, for the one case where that is the diagnosis.
+                // Selectable rather than copied by a button: it is short, and the dialog already
+                // has two buttons that matter more. The handover line never reaches here — the
+                // session key is taken out of it before anything else happens to the text.
+                if (!detail.isNullOrBlank()) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.extraSmall,
+                    ) {
+                        SelectionContainer {
+                            Text(
+                                detail,
+                                modifier = Modifier
+                                    .heightIn(max = 160.dp)
+                                    .verticalScroll(rememberScrollState())
+                                    .padding(8.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            OutlinedButton(onClick = onCarryOn) { Text(stringResource(R.string.mosh_action_carry_on)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onLeave) { Text(stringResource(R.string.mosh_action_leave)) }
         },
     )
 }

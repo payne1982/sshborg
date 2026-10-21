@@ -562,6 +562,65 @@ claims it. What the gate does *not* cover: the minute-long grace on a retired po
 nine-socket ceiling, which are four lines of arithmetic, and a real change of network —
 that one is the phone gate, and it is what the switch in the host form exists to reach.
 
+#### The switch and the dialog, 2026-10-21
+
+The checkbox sits beside the colour row, which had left the right half of its line empty,
+labelled `Mosh` with `(experimental)` under it. Database 14 adds one column defaulting to
+0 and the migration test asserts that a host which predates mosh comes out with it off;
+backup format 8 carries it for every host rather than only when it is on, so restoring
+over a host that has it on turns it off again — a backup is what the hosts were, not a
+list of things to add.
+
+The exclusion with jump chains is resolved in the direction that loses nothing: while a
+chain is configured the whole switch row stops responding and a line underneath says why,
+so the cure is to remove the chain first and nothing is ever silently thrown away. When
+mosh is on, the jump-host section is one line in place of its fields, and that line says
+the thing worth saying — a host reached over mosh is still a perfectly good bastion for
+others. The rule is then applied twice more, where nothing can get round it: in `save`, so
+no row ever leaves with both, and in the connect path, because an imported backup could
+have been edited by hand and a jump chain is the one thing mosh cannot carry.
+
+The failure dialog came with the wiring rather than after it, because writing a failure
+path that was known to be wrong and then replacing it would have been the longer way
+round. Four reasons, four sentences, and the two answers the user asked for: *carry on
+over SSH* and *leave*. Carrying on costs nothing at all — the SSH session is already open
+and healthy, since it is what started the server — so it is simply the transport that
+would have been made anyway. The server's own words are shown only for the case where they
+are the diagnosis, selectable and in a monospace box, and the handover line has already
+had the session key taken out of it before the text could reach anything.
+
+One hazard found while wiring: the SSH session reaches the `SessionManager` only once the
+transport has been chosen, so during the window in which the dialog is waiting for an
+answer it belongs to nobody. Leaving the screen then — the back gesture, a rotation —
+cancelled the connect coroutine and left a live login, and a `mosh-server`, with nothing
+holding either. `onCleared` now closes it, which was also the one thing standing between
+the password prompt and the same leak.
+
+**Two timeouts, and why they are the way round they are.** The client gives up after half
+an hour of silence (`MoshTerminalTransport.SILENCE_LIMIT`) and the server is told an hour.
+The client is therefore always the first of the two to give up, so the server's figure
+never decides when a session ends — it decides only how long a server the client has
+already written off keeps a shell on the host, which matters because a phone abandons
+sessions far more readily than a laptop does. Half an hour is not a technical limit but a
+compromise with something missing: mosh's own client shows a "contact lost" line and goes
+on trying for ever, and until the terminal has somewhere to say that, a screen that cannot
+be reached is a photograph with nothing to explain it. Both numbers grow together the day
+that line exists. This also corrects what §6 of [mosh-wire-format.md](mosh-wire-format.md)
+used to say: `MOSH_SERVER_NETWORK_TMOUT` unset means *wait indefinitely*, not forty
+seconds — the forty is the server forgetting the client's address, which is roaming, not
+exiting.
+
+#### What phase 6 still owes
+
+- **The guide, in ten locales**: the three-second heartbeat and what it costs in radio,
+  the scrollback that starts empty, and the three failures that are on the server.
+- **"Contact lost, still trying"**, as above. It is the difference between a patient
+  client and a frozen screen, and it is what would let both timeouts be as long as mosh's
+  own.
+- **The gate on a real phone**: switch the Wi-Fi off mid-session and keep typing.
+  Everything up to here is gated from the JVM against a real server, and that is the one
+  question the JVM cannot be asked.
+
 ### Phase 7 — prediction, separately or never
 
 Only after everything above has been in use for a while, behind its own switch. A

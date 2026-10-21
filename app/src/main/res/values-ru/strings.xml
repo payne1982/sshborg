@@ -59,6 +59,13 @@
     <string name="host_mosh_experimental">(экспериментально)</string>
     <string name="host_mosh_no_jump">Mosh нельзя использовать с промежуточным хостом. Уберите промежуточные хосты ниже, чтобы включить его.</string>
     <string name="host_jump_not_with_mosh">Недоступно с Mosh. Хост, доступный через Mosh, по-прежнему может быть промежуточным для других хостов.</string>
+    <string name="mosh_failed_title">Mosh не запустился</string>
+    <string name="mosh_failed_not_installed">На этом хосте нет mosh-server. Установите mosh там или выключите Mosh для этого хоста.</string>
+    <string name="mosh_failed_locale">mosh-server не запускается, потому что локаль сервера не UTF-8. Задайте на сервере локаль UTF-8.</string>
+    <string name="mosh_failed_no_answer">mosh-server ответил не так, как должен. Что он сказал — ниже.</string>
+    <string name="mosh_failed_no_udp">По UDP ничего не пришло. Скорее всего, сеть между вами и хостом блокирует UDP-порты 60001-60999.</string>
+    <string name="mosh_action_carry_on">Продолжить по SSH</string>
+    <string name="mosh_action_leave">Выйти</string>
     <string name="host_color_dialog_title">Цвет хоста</string>
     <string name="host_color_remove">Убрать свой цвет</string>
 

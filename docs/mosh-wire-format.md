@@ -237,12 +237,24 @@ to what this section said before, both made while writing it:
   later in the first datagram. That costs one extra frame and avoids handing a
   controlling terminal to a process that is about to detach.
 
-The network timeout also turns out to matter for the opposite reason from the one given
-above. It stops a forgotten server living forever, yes — but on a phone the default is
-too *short*: forty seconds of silence and the server detaches, then exits, and Doze
-starts batching our three-second heartbeat as soon as the screen goes off. So it is set
-far above the default, which makes the server patient, which is the whole point of a
-mobile client.
+**Correction, made while wiring it up on 2026-10-21.** This section claimed the default
+network timeout was too *short* for a phone — forty seconds of silence and the server
+gone. That was wrong, and wrong in the direction that matters: `mosh-server` with
+`MOSH_SERVER_NETWORK_TMOUT` unset **waits indefinitely**, and its own manual page
+suggests setting a high value such as 604800 (a week) rather than a low one. The forty
+seconds is `SERVER_ASSOCIATION_TIMEOUT`, which makes the server *forget the client's
+address* so that another client can take the session over — detaching, which is part of
+roaming, not exiting.
+
+So the variable is not about patience at all; it is only hygiene, and the figure is
+chosen against our own give-up rather than against the network. The client stops after
+half an hour of silence (`MoshTerminalTransport.SILENCE_LIMIT`), because until the
+terminal has somewhere to show mosh's "contact lost, still trying" line, a screen that
+cannot be reached is a photograph with nothing to explain it. The server is told an hour,
+which is deliberately the larger of the two: the client is always the first to give up,
+so this number never decides when a session ends — it decides only how long a server the
+client has already written off keeps a shell on the host. A phone abandons sessions far
+more readily than a laptop does, which is why "wait for ever" is the wrong default here.
 
 ## 7. What the test rig proved, 2026-10-20
 

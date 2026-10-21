@@ -57,6 +57,13 @@
     <string name="host_mosh_experimental">(expérimental)</string>
     <string name="host_mosh_no_jump">Mosh ne peut pas être utilisé avec un hôte de saut. Supprimez les hôtes de saut ci-dessous pour l’activer.</string>
     <string name="host_jump_not_with_mosh">Non disponible avec Mosh. Un hôte atteint via Mosh peut toujours servir d’hôte de saut pour d’autres hôtes.</string>
+    <string name="mosh_failed_title">Mosh n’a pas pu démarrer</string>
+    <string name="mosh_failed_not_installed">Il n’y a pas de mosh-server sur cet hôte. Installez mosh là-bas, ou désactivez Mosh pour cet hôte.</string>
+    <string name="mosh_failed_locale">mosh-server refuse de démarrer car la locale du serveur n’est pas UTF-8. Définissez une locale UTF-8 sur le serveur.</string>
+    <string name="mosh_failed_no_answer">mosh-server n’a pas répondu comme il le devrait. Ce qu’il a dit figure ci-dessous.</string>
+    <string name="mosh_failed_no_udp">Rien n’est revenu en UDP. Le réseau entre ici et l’hôte bloque probablement les ports UDP 60001-60999.</string>
+    <string name="mosh_action_carry_on">Continuer en SSH</string>
+    <string name="mosh_action_leave">Quitter</string>
     <string name="host_color_dialog_title">Couleur de l\'hôte</string>
     <string name="host_color_remove">Supprimer la couleur personnalisée</string>
 

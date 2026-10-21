@@ -59,13 +59,21 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class MoshTerminalTransport(
     bootstrap: MoshBootstrap,
     /**
-     * The same figure `mosh-server` was started with. It is how long the server tolerates silence
-     * from us, so it is also the longest a session can be worth waiting for.
+     * How long to keep trying while nothing at all comes back, before calling the session lost.
+     *
+     * Not the server's own patience, which is a different number set when it is started and is
+     * deliberately much larger — a week, as mosh itself suggests, so that a server forgotten by a
+     * killed app does not hold a shell for ever. This is ours, and it is a compromise with
+     * something the app does not have yet: mosh's own client shows a "contact lost" line and goes
+     * on trying indefinitely, and until there is somewhere to say that, a terminal that cannot be
+     * reached is a photograph with nothing to explain it. So we stay patient for long enough to
+     * cover what mosh is actually for — a tunnel, a lift, a change of network, a phone asleep —
+     * and after that we say so rather than go on showing a screen that is no longer anybody's.
      */
-    private val networkTimeoutSeconds: Int,
+    private val silenceLimitMs: Long = SILENCE_LIMIT,
+    private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
     /** Where host bytes go while no [read] is attached: the session's own emulator. */
     private val unattendedSink: (ByteArray, Int) -> Unit,
-    private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
 ) : TerminalTransport {
 
     /**
@@ -262,7 +270,6 @@ class MoshTerminalTransport(
         var hopWanted = false
         var closeDeadline = Long.MAX_VALUE
         var farewellDeadline = Long.MAX_VALUE
-        val giveUpAfter = networkTimeoutSeconds * 1000L + GIVE_UP_MARGIN
         val startedAt = clock()
 
         while (true) {
@@ -286,7 +293,7 @@ class MoshTerminalTransport(
             if (now >= closeDeadline) return TerminalTransport.End.CleanExit
             if (now >= farewellDeadline) return TerminalTransport.End.CleanExit
             val silentSince = if (lastHeard != 0L) lastHeard else startedAt
-            if (now - silentSince > giveUpAfter) return lost(now - silentSince)
+            if (now - silentSince > silenceLimitMs) return lost(now - silentSince)
 
             if (!closing && (hopWanted || hopRequested || mosh.shouldHopLocalPort(now, lastHopAt)) &&
                 now - lastHopAt >= HOP_MIN_INTERVAL
@@ -440,9 +447,9 @@ class MoshTerminalTransport(
      */
     private fun lost(silentFor: Long): TerminalTransport.End.Lost = TerminalTransport.End.Lost(
         summary = null,
-        detail = "mosh: nothing heard for ${silentFor / 1000}s, and the server stops waiting after " +
-            "${networkTimeoutSeconds}s\nround trip ~${mosh.timing.srtt.toInt()}ms, local port hops " +
-            "$hops, sends refused $failedSends, undecipherable datagrams $protocolErrors",
+        detail = "mosh: nothing heard for ${silentFor / 1000}s, which is as long as we wait\n" +
+            "round trip ~${mosh.timing.srtt.toInt()}ms, local port hops $hops, sends refused " +
+            "$failedSends, undecipherable datagrams $protocolErrors",
     )
 
     private companion object {
@@ -455,8 +462,8 @@ class MoshTerminalTransport(
         /** How long a session with no answer at all is given before it is called a failure. */
         const val FIRST_CONTACT_TIMEOUT = 10_000L
 
-        /** Added to the server's own network timeout before giving up on a silent session. */
-        const val GIVE_UP_MARGIN = 15_000L
+        /** How long a session hears nothing before it is called lost. See [silenceLimitMs]. */
+        const val SILENCE_LIMIT = 30 * 60 * 1000L
 
         /** How long [close] waits for the server to acknowledge the goodbye. */
         const val CLOSE_GRACE = 1_000L

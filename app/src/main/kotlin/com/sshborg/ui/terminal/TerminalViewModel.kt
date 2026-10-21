@@ -10,6 +10,7 @@ import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
+import com.sshborg.data.terminal.MoshTerminalTransport
 import com.sshborg.data.terminal.SshTerminalTransport
 import com.sshborg.data.terminal.TerminalTransport
 import com.sshborg.service.SessionManager
@@ -33,6 +34,19 @@ sealed interface ConnectionState {
         val banner: String? = null,
     ) : ConnectionState
     data class Error(val message: String, val detail: String? = null) : ConnectionState
+    /**
+     * Mosh was asked for and could not be had. There is no silent fall back to SSH: the switch is
+     * per host and explicit, so somebody who asked for mosh and did not get it is owed the reason
+     * and the choice. The SSH session is already open and healthy underneath, which is why
+     * carrying on over it costs nothing.
+     *
+     * @param detail what the server said, with the handover line taken out of it; null when the
+     *   failure was silence, which has nothing to show.
+     */
+    data class MoshFailed(
+        val reason: MoshUnavailable.Reason,
+        val detail: String? = null,
+    ) : ConnectionState
     /**
      * @param summary short, human-readable line shown under the title (all non-clean cases).
      * @param detail  full technical cause (exception text + recent JSch log tail), shown
@@ -82,6 +96,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private var connectJob: Job? = null
 
     private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    /** True = carry on over SSH, false = leave. See [ConnectionState.MoshFailed]. */
+    private val moshFailureResult = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     // ── Command history suggestions ───────────────────────────────────────────
@@ -349,9 +365,26 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 val session = result.getOrNull()
                 if (session != null) {
                     shellSession = session
-                    val made = SshTerminalTransport(session)
-                    transport = made
                     val em = _emulator.value
+                    // Mosh if the host asks for it and has no jump chain. The second half is not
+                    // belt and braces: the form cannot produce a host with both, but an imported
+                    // backup could have been edited by hand, and a jump chain is the one thing
+                    // mosh cannot carry.
+                    val made = if (host.mosh && jumpHosts.isEmpty()) {
+                        moshOrAnswerFor(session, em) ?: run {
+                            // Asked, told why, and the answer was to leave.
+                            runCatching { session.disconnect() }
+                            withContext(Dispatchers.Main.immediate) {
+                                _state.value = ConnectionState.Disconnected()
+                            }
+                            sessionManager.remove(id)
+                            if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
+                            return@launch
+                        }
+                    } else {
+                        SshTerminalTransport(session)
+                    }
+                    transport = made
                     synchronized(em) { made.resize(em.buffer.columns, em.buffer.rows) }
                     withContext(Dispatchers.Main.immediate) {
                         sessionManager.update(id) {
@@ -503,6 +536,68 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Starts `mosh-server` over the SSH session and hands back the transport that rides it, or
+     * asks the person what to do when it cannot be started at all.
+     *
+     * The SSH session is left open whatever happens — it carries SFTP, port forwarding, the agent
+     * and the shell history — so "carry on over SSH" is simply the transport we would have made
+     * anyway, with nothing to redial.
+     *
+     * The size is sent before the handshake, so that the server's very first frame is already the
+     * right shape; the caller resizes again, which costs one more action in the same first
+     * datagram and keeps the two paths identical from there on.
+     *
+     * @return the transport to use, or null when the answer was to leave.
+     */
+    private suspend fun moshOrAnswerFor(
+        session: ShellSession,
+        em: TerminalEmulator,
+    ): TerminalTransport? {
+        // Held so that it can be closed again if this never gets as far as handing it over. Its
+        // loop is already running by then, and nothing else knows about it: a screen left during
+        // the handshake would otherwise leave a pump answering a server for ever.
+        var unowned: MoshTerminalTransport? = null
+        val failure = try {
+            val handover = session.startMoshServer(MOSH_SERVER_TIMEOUT_SECONDS)
+            // The sink of last resort takes the emulator and nothing else — in particular not
+            // this ViewModel, which a tab switch throws away while the session carries on.
+            val made = MoshTerminalTransport(handover) { buffer, n ->
+                synchronized(em) { em.process(buffer, 0, n) }
+            }
+            unowned = made
+            synchronized(em) { made.resize(em.buffer.columns, em.buffer.rows) }
+            made.start()
+            if (made.awaitFirstContact()) {
+                unowned = null
+                return made
+            }
+            // Nothing came back. There is no error from the far end for a path that will not
+            // carry UDP — it looks exactly like a server that has not spoken yet — so silence is
+            // the whole diagnosis, and the server is told to go away again.
+            made.close()
+            unowned = null
+            MoshUnavailable(MoshUnavailable.Reason.NoUdpAnswer)
+        } catch (e: CancellationException) {
+            // Before the general catch, which would otherwise turn a screen being left into a
+            // dialog nobody is there to answer.
+            throw e
+        } catch (e: MoshUnavailable) {
+            e
+        } catch (e: Exception) {
+            // The exec channel itself went wrong. Same question, with whatever is known.
+            MoshUnavailable(MoshUnavailable.Reason.NoConnectLine, e.message)
+        } finally {
+            unowned?.let { runCatching { it.close() } }
+        }
+        withContext(Dispatchers.Main.immediate) {
+            _state.value = ConnectionState.MoshFailed(failure.reason, failure.detail)
+        }
+        if (!moshFailureResult.first()) return null
+        withContext(Dispatchers.Main.immediate) { _state.value = ConnectionState.Connecting }
+        return SshTerminalTransport(session)
+    }
+
     /** Takes the session out of [SessionManager] and tells the screen why it ended. */
     private fun finishSession(transport: TerminalTransport, end: TerminalTransport.End) {
         val id = sessionId ?: return
@@ -544,6 +639,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             runCatching { transport?.resize(cols, rows) }
         }
     }
+
+    fun carryOnOverSsh() { moshFailureResult.tryEmit(true) }
+    fun leaveAfterMoshFailed() { moshFailureResult.tryEmit(false) }
 
     fun acceptHostKey() { hostKeyResult.tryEmit(true) }
     fun rejectHostKey() { hostKeyResult.tryEmit(false) }
@@ -695,10 +793,30 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         // If the connection never completed, clean up the dangling session
         val id = sessionId ?: return
         if (sessionManager.get(id)?.status == SessionManager.Status.Connecting) {
+            // A connection still being set up has nobody to hand over to. The SSH session only
+            // reaches the SessionManager once the transport has been chosen, so until then it is
+            // closed here or not at all — which matters for the window in which the mosh failure
+            // dialog is waiting for an answer and the login underneath is already live.
+            runCatching { shellSession?.disconnect() }
             sessionManager.remove(id)
             if (sessionManager.sessions.value.isEmpty()) {
                 SshForegroundService.stop(getApplication())
             }
         }
+    }
+
+    private companion object {
+        /**
+         * How long `mosh-server` is told to wait for us before exiting. Unset it would wait for
+         * ever, which mosh itself suggests for a laptop; a phone abandons sessions far more
+         * readily, and a server nobody will ever come back to is a shell left running.
+         *
+         * An hour, which is deliberately more than [MoshTerminalTransport.SILENCE_LIMIT]: the
+         * client is always the first of the two to give up, so this number never decides when a
+         * session ends — it only decides how long a server the client has already written off
+         * stays on the host. If the terminal ever gains mosh's own "contact lost, still trying"
+         * line, both numbers grow together.
+         */
+        const val MOSH_SERVER_TIMEOUT_SECONDS = 3600
     }
 }

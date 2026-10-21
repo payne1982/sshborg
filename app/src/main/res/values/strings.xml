@@ -59,6 +59,13 @@
     <string name="host_mosh_experimental">(experimental)</string>
     <string name="host_mosh_no_jump">Mosh cannot be used with a jump host. Remove the jump hosts below to turn it on.</string>
     <string name="host_jump_not_with_mosh">Not available with Mosh. A host reached over Mosh can still be a jump host for other hosts.</string>
+    <string name="mosh_failed_title">Mosh could not start</string>
+    <string name="mosh_failed_not_installed">There is no mosh-server on this host. Install mosh there, or turn the Mosh switch off for this host.</string>
+    <string name="mosh_failed_locale">mosh-server will not run because the host’s locale is not UTF-8. Set a UTF-8 locale on the server.</string>
+    <string name="mosh_failed_no_answer">mosh-server did not answer the way it should. What it said is below.</string>
+    <string name="mosh_failed_no_udp">Nothing came back over UDP. The network between here and the host is probably blocking UDP ports 60001-60999.</string>
+    <string name="mosh_action_carry_on">Continue over SSH</string>
+    <string name="mosh_action_leave">Leave</string>
     <string name="host_color_dialog_title">Host color</string>
     <string name="host_color_remove">Remove custom color</string>
 

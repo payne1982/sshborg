@@ -64,7 +64,7 @@ class MoshTerminalTransportTest {
         }
 
         // The sink of last resort is the session's own emulator, exactly as it will be in the app.
-        val transport = MoshTerminalTransport(handover, NETWORK_TIMEOUT, unattendedSink = ::toScreen)
+        val transport = MoshTerminalTransport(handover, silenceLimitMs = SILENCE_LIMIT, unattendedSink = ::toScreen)
         var reader: Deferred<TerminalTransport.End>? = null
         try {
             transport.start()
@@ -194,11 +194,13 @@ class MoshTerminalTransportTest {
         const val TALLER = 40
 
         /**
-         * What `mosh-server` is told to tolerate of our silence. Generous for a test that is going
-         * to be interrupted by nothing, and short enough that a server left behind by a crashed
-         * run goes away by itself.
+         * What `mosh-server` is told to tolerate of our silence: short, so that a server left
+         * behind by a run that crashed goes away by itself instead of holding a shell.
          */
         const val NETWORK_TIMEOUT = 120
+
+        /** And how long the client waits, which here only has to outlast the test itself. */
+        const val SILENCE_LIMIT = 120_000L
 
         const val SCREEN_TIMEOUT = 15_000L
         const val END_TIMEOUT = 15_000L
