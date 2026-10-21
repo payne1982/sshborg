@@ -2,6 +2,7 @@ package com.sshborg.service
 
 import com.sshborg.data.ssh.SftpEntry
 import com.sshborg.data.ssh.ShellSession
+import com.sshborg.data.terminal.TerminalTransport
 import com.sshborg.data.ssh.SftpSession
 import com.sshborg.terminal.TerminalEmulator
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,12 @@ class SessionManager {
         val status: Status = Status.Connecting,
         // Shell-specific
         val shellSession: ShellSession? = null,
+        /**
+         * Where this terminal's bytes come from. Held here rather than in the ViewModel because a
+         * tab switch recreates the ViewModel and a transport may be carrying state that cannot be
+         * rebuilt — a mosh session's sequence counter, for one.
+         */
+        val transport: TerminalTransport? = null,
         val emulator: TerminalEmulator? = null,
         // Terminal suggestion state — cached here so it survives the ViewModel
         // being recreated when switching between sibling tabs.
@@ -126,6 +133,7 @@ class SessionManager {
 
     fun remove(id: String) {
         val session = _sessions.value.find { it.id == id }
+        runCatching { session?.transport?.close() }
         runCatching { session?.shellSession?.disconnect() }
         runCatching { session?.sftpSession?.disconnect() }
         _sessions.update { list -> list.filter { it.id != id } }
@@ -137,6 +145,7 @@ class SessionManager {
     fun removeAll() {
         _sessions.update { list ->
             list.forEach {
+                runCatching { it.transport?.close() }
                 runCatching { it.shellSession?.disconnect() }
                 runCatching { it.sftpSession?.disconnect() }
             }

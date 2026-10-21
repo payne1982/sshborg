@@ -10,6 +10,8 @@ import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
+import com.sshborg.data.terminal.SshTerminalTransport
+import com.sshborg.data.terminal.TerminalTransport
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
 import com.sshborg.terminal.TerminalEmulator
@@ -69,6 +71,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     var onNeedsRedraw: (() -> Unit)? = null
 
     private var shellSession: ShellSession? = null
+
+    /**
+     * Where the terminal's bytes come from. Separate from [shellSession] on purpose: the SSH
+     * session carries SFTP, port forwarding, the agent and the shell history, and it stays even
+     * when the terminal itself is riding something else.
+     */
+    private var transport: TerminalTransport? = null
     private var readerJob: Job? = null
     private var connectJob: Job? = null
 
@@ -153,9 +162,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         // If already connected, resume reading
         if (session.shellSession != null) {
             shellSession = session.shellSession
-            if (session.shellSession.isConnected) {
+            val resumed = session.transport ?: SshTerminalTransport(session.shellSession).also { made ->
+                sessionManager.update(id) { it.copy(transport = made) }
+            }
+            transport = resumed
+            if (resumed.isConnected) {
                 _state.value = ConnectionState.Connected
-                startReading(session.shellSession)
+                startReading(resumed)
             } else {
                 // Session dropped while backgrounded: no exception to catch here, so show JSch's
                 // own last disconnect reason as the summary (falls back to a generic line).
@@ -336,10 +349,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 val session = result.getOrNull()
                 if (session != null) {
                     shellSession = session
+                    val made = SshTerminalTransport(session)
+                    transport = made
                     val em = _emulator.value
-                    synchronized(em) { session.resize(em.buffer.columns, em.buffer.rows) }
+                    synchronized(em) { made.resize(em.buffer.columns, em.buffer.rows) }
                     withContext(Dispatchers.Main.immediate) {
-                        sessionManager.update(id) { it.copy(shellSession = session, status = SessionManager.Status.Connected) }
+                        sessionManager.update(id) {
+                            it.copy(shellSession = session, transport = made, status = SessionManager.Status.Connected)
+                        }
                         _state.value = ConnectionState.Connected
                     }
                     val saved = hostDao.getById(hostId) ?: host
@@ -372,7 +389,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     val blankRows = rowsUnderTitleBar
                         .coerceIn(0, (em.buffer.rows - 1).coerceAtLeast(0))
                     if (blankRows > 0) synchronized(em) { em.process("\n".repeat(blankRows)) }
-                    startReading(session)
+                    startReading(made)
                     if (prefs.historySuggestions.first()) loadCommandHistory(session)
                     return@launch
                 }
@@ -457,91 +474,50 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun startReading(session: ShellSession) {
+    /**
+     * Starts feeding the emulator from [transport], and decides what to do when it ends.
+     *
+     * The loop itself is three lines; everything that used to make it long — EOF against a late
+     * exit status, a session that goes away without an EOF, JSch closing the pipe instead of
+     * returning one — belongs to the transport, because every bit of it is specific to SSH. What
+     * is left here is what the *terminal* has to do: feed the emulator, ask for a redraw, keep the
+     * prompt detection and the suggestions fed, and close the session down when it is over.
+     */
+    private fun startReading(transport: TerminalTransport) {
         val em = _emulator.value
         em.onSendResponse = { bytes ->
-            runCatching { session.write(bytes) }
+            runCatching { transport.write(bytes) }
         }
         readerJob?.cancel()
         readerJob = viewModelScope.launch(Dispatchers.IO) {
-            val buf = ByteArray(4096)
-            var cleanExit = false
-            // summary = short line under the title; detail = full technical cause (expandable).
-            var causeSummary: String? = null
-            var causeDetail: String? = null
-            // When the SSH session dies, JSch closes the channel and we only see EOF here — the
-            // real reason (e.g. "Software caused connection abort") is in JSch's log, not an
-            // exception. Use that reason as the short line and its detail (reason + stack) for the
-            // expandable section; fall back to a generic string.
-            val captureLoss = {
-                causeSummary = com.sshborg.data.ssh.SshDiagnostics.lastDisconnectReason()
-                    ?: getApplication<Application>().getString(R.string.terminal_connection_lost)
-                causeDetail = com.sshborg.data.ssh.SshDiagnostics.lastDisconnectDetail()
-            }
-            try {
-                while (isActive && session.isConnected) {
-                    val n = session.inputStream.read(buf)
-                    com.sshborg.data.ssh.SshDiagnostics.onRead(n)   // debug-only breadcrumb
-                    if (n < 0) {
-                        var waited = 0
-                        while (session.exitStatus == -1 && waited < 1000) {
-                            kotlinx.coroutines.delay(50)
-                            waited += 50
-                        }
-                        if (session.exitStatus != -1) {
-                            cleanExit = true
-                        } else {
-                            captureLoss()
-                        }
-                        break
-                    }
-                    synchronized(em) { em.process(buf, 0, n) }
-                    onNeedsRedraw?.invoke()
-                    detectPromptIfNeeded()
-                    scheduleUpdateSuggestions()
-                }
-                // Loop exited because session.isConnected flipped without EOF — unexpected disconnect.
-                if (isActive && !cleanExit && causeSummary == null) {
-                    if (session.exitStatus != -1) {
-                        cleanExit = true
-                    } else {
-                        captureLoss()
-                    }
-                }
-            } catch (e: Exception) {
-                // JSch may close the pipe via disconnect() before or instead of returning EOF,
-                // causing read() to throw IOException even on a clean exit. If exit-status is
-                // already set, treat it as a clean exit rather than an error.
-                if (session.exitStatus != -1) {
-                    cleanExit = true
-                } else {
-                    // Short summary from the exception; detail = just this exception's stack
-                    // trace (one relevant error, no cross-session log noise, no key info).
-                    causeSummary = e.message?.takeIf { it.isNotBlank() } ?: e.javaClass.simpleName
-                    causeDetail = e.stackTraceToString()
-                }
+            val end = transport.read { buffer, n ->
+                synchronized(em) { em.process(buffer, 0, n) }
+                onNeedsRedraw?.invoke()
+                detectPromptIfNeeded()
+                scheduleUpdateSuggestions()
             }
 
-            // If the job was cancelled (background() called), don't touch the session
+            // Cancelled by background(): the session stays alive and is not ours to end.
             if (!isActive) return@launch
+            finishSession(transport, end)
+        }
+    }
 
-            // Session ended — remove it from SessionManager so the notification updates
-            val id = sessionId ?: return@launch
-            if (sessionManager.get(id)?.shellSession === session) {
-                sessionManager.remove(id)
-                if (sessionManager.sessions.value.isEmpty()) {
-                    SshForegroundService.stop(getApplication())
-                }
-                if (cleanExit) {
-                    _navBack.tryEmit(Unit)
-                } else {
-                    // Debug builds append session/network breadcrumbs so a remote tester can copy
-                    // the error overlay instead of running adb logcat. No-op in release.
-                    val diag = com.sshborg.data.ssh.SshDiagnostics.snapshot()
-                    val detailWithDiag = if (diag != null) (causeDetail.orEmpty() + diag) else causeDetail
-                    _state.value = ConnectionState.Disconnected(causeSummary, detailWithDiag)
-                }
-            }
+    /** Takes the session out of [SessionManager] and tells the screen why it ended. */
+    private fun finishSession(transport: TerminalTransport, end: TerminalTransport.End) {
+        val id = sessionId ?: return
+        if (sessionManager.get(id)?.transport !== transport) return
+        sessionManager.remove(id)
+        if (sessionManager.sessions.value.isEmpty()) {
+            SshForegroundService.stop(getApplication())
+        }
+        when (end) {
+            is TerminalTransport.End.CleanExit -> _navBack.tryEmit(Unit)
+            is TerminalTransport.End.Lost -> _state.value = ConnectionState.Disconnected(
+                summary = end.summary
+                    ?: getApplication<Application>().getString(R.string.terminal_connection_lost),
+                detail = end.detail,
+            )
         }
     }
 
@@ -551,7 +527,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             _suggestions.value = emptyList()
         }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { shellSession?.write(data) }
+            runCatching { transport?.write(data) }
         }
     }
 
@@ -565,7 +541,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         val em = _emulator.value
         synchronized(em) { em.resize(cols, rows) }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { shellSession?.resize(cols, rows) }
+            runCatching { transport?.resize(cols, rows) }
         }
     }
 
@@ -586,6 +562,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         connectJob?.cancel()
         readerJob?.cancel()
         shellSession = null
+        transport = null
         sessionManager.remove(id)
         _state.value = ConnectionState.Disconnected()
         if (sessionManager.sessions.value.isEmpty()) {
