@@ -1,0 +1,39 @@
+<en-US>
+• Editing a host no longer clears the statistics used to order the list.
+</en-US>
+
+<it-IT>
+• Editare un host non cancella più le statistiche per l'ordinamento nella lista.
+</it-IT>
+
+<de-DE>
+• Das Bearbeiten eines Hosts löscht nicht mehr die Statistiken für die Sortierung der Liste.
+</de-DE>
+
+<es-ES>
+• Editar un host ya no borra las estadísticas que ordenan la lista.
+</es-ES>
+
+<fr-FR>
+• Modifier un hôte n'efface plus les statistiques qui servent à trier la liste.
+</fr-FR>
+
+<pt-PT>
+• Editar um host já não apaga as estatísticas usadas para ordenar a lista.
+</pt-PT>
+
+<uk>
+• Редагування хоста більше не стирає статистику, за якою впорядковується список.
+</uk>
+
+<ru-RU>
+• Изменение хоста больше не стирает статистику, по которой сортируется список.
+</ru-RU>
+
+<zh-CN>
+• 编辑主机不会再清除用于列表排序的统计数据。
+</zh-CN>
+
+<ja-JP>
+• ホストを編集しても、一覧の並び替えに使う統計が消えなくなりました。
+</ja-JP>

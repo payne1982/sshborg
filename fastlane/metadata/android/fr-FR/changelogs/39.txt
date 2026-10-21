@@ -1,0 +1,1 @@
+• Modifier un hôte n'efface plus les statistiques qui servent à trier la liste.

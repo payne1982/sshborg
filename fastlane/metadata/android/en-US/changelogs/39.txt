@@ -1,0 +1,1 @@
+• Editing a host no longer clears the statistics used to order the list.

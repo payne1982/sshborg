@@ -1,0 +1,1 @@
+• Editar un host ya no borra las estadísticas que ordenan la lista.
