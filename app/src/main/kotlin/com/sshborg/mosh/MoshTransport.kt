@@ -26,7 +26,7 @@ import java.security.SecureRandom
 class MoshTransport(
     private val crypto: MoshCrypto,
     private val listener: Listener,
-    private val mtu: Int = DEFAULT_MTU,
+    private var mtu: Int = DEFAULT_MTU,
     private val random: SecureRandom = SecureRandom(),
 ) {
 
@@ -143,6 +143,17 @@ class MoshTransport(
             now >= nextSendTime || now >= nextAckTime -> sendDiff(diff, now)
             else -> emptyList()
         }
+    }
+
+    /**
+     * Drops to [FALLBACK_MTU] after the kernel has refused a datagram as too big.
+     *
+     * The budget is a guess about the path, and the one thing that proves it wrong is EMSGSIZE.
+     * There is no way back up: mosh does not probe for a larger one either, and a session that
+     * works slightly less efficiently is the right end of that trade.
+     */
+    fun useFallbackMtu() {
+        mtu = FALLBACK_MTU
     }
 
     /**

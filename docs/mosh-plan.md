@@ -494,6 +494,74 @@ way: it fed the parser a *fake* handover line and expected it to be rejected. Bu
 that looks like a handover **is** one — SSH has already authenticated whoever printed it,
 so there is nothing there to distrust. Redaction is a pure function and is tested as one.
 
+#### The socket loop, done and gated 2026-10-21
+
+`MoshTerminalTransport` is the other half of the protocol: `MoshTransport` owns no socket
+and no thread so that a test can drive it with a clock it controls, and this is the loop
+that asks it what to send, puts it on the wire, waits for an answer or for the next
+deadline, and hands back what arrives. It has no Android in it either, which is what lets
+it be gated from the JVM against a real server through the same `TerminalTransport` the
+SSH side uses.
+
+**The loop does not live in the screen's ViewModel, and that is the one structural thing
+mosh forces on the app.** `SshTerminalTransport` reads while somebody is reading, and that
+is enough: nothing is lost while the terminal is away because TCP holds what arrives. Mosh
+has nowhere to put anything — the session exists only for as long as we keep answering,
+three seconds of heartbeat at a time — so the loop has to outlive the ViewModel, which a
+switch between sibling tabs recreates. It therefore runs in a scope the transport owns,
+started by `start()` and ended by `close()`: for exactly as long as the session is in the
+`SessionManager`. Which is also exactly as long as the foreground service lives, so
+**nothing new is asked of the service or of its Wi-Fi lock** — the process stays alive and
+the radio stays out of power-save for the same reason the SSH sessions do.
+
+That has a consequence worth stating. Because the loop runs whether or not anybody is
+reading, the host's bytes have to go somewhere when nobody is, and they are *applied to
+the session's emulator* rather than queued. A queue is the obvious answer and the wrong
+one: a program left running with the terminal in the background would fill it without
+limit, where the emulator has a bounded scrollback and is the thing that will be on screen
+when the user comes back.
+
+The client's half of roaming is the local port, and there are three things that move it:
+nothing having made it there and back for ten seconds, a send failing outright — which is
+what a Wi-Fi interface going away looks like from here, and is cured by a new socket on
+whatever network the phone has now rather than by ending the session — and being *told*,
+which is what `changeLocalPort()` is for and what the `ConnectivityManager` callback will
+use, ten seconds earlier than noticing. The port we have left is kept open and readable
+for a minute, because what the server is sending at that moment is still addressed to it;
+nine sockets is the ceiling, as in mosh. EMSGSIZE, the one thing that can prove the MTU
+guess wrong, drops it to 500.
+
+`close()` says goodbye and gives the server a second to acknowledge it. Without that it
+detaches and sits there until its own network timeout — minutes of a process, and of a
+terminal, for a session the user has closed. The session is given up on after the server's
+own network timeout plus fifteen seconds, since that is the longest the far end can still
+be there; there is no summary line for it, only the generic one the SSH side already uses,
+and the detail carries the round-trip estimate, the number of hops, the refused sends and
+the undecipherable datagrams — no key, no address, no host name.
+
+One limit is inherited and cannot be fixed from here: `mosh-server -s` binds to the
+address the SSH connection arrived on, and the handover says nothing about which that was,
+so we resolve the host name again and send there. A host with several addresses whose
+first is not the one SSH ended up using leaves us talking to a port nobody is listening
+on. It looks exactly like a blocked path, which is reported, and the cure is to put the
+address in the host instead of the name. The stock client avoids this by resolving the
+name itself and then ssh-ing to the address; we cannot, because by the time the question
+arises the SSH session is not ours to re-dial.
+
+*Gate: `MoshTerminalTransportTest`, which ends on four questions whose answer cannot be
+"nothing happened".* A command typed through `write` appears **on our own screen** rather
+than merely in a byte stream, so the frames, the emulator and both sizes agree. With the
+reader detached, as a tab switch leaves it, the screen keeps up. After moving to a new
+local port the session carries on, because the server followed us — the roaming the whole
+feature is for. And `exit` ends it as `CleanExit`, the way an SSH shell does, so the
+screen above closes itself without ever learning which transport it had.
+
+This time the gate's honesty was checked on purpose rather than by accident: the
+unattended sink was broken deliberately, and the run failed on exactly the assertion that
+claims it. What the gate does *not* cover: the minute-long grace on a retired port and the
+nine-socket ceiling, which are four lines of arithmetic, and a real change of network —
+that one is the phone gate, and it is what the switch in the host form exists to reach.
+
 ### Phase 7 — prediction, separately or never
 
 Only after everything above has been in use for a while, behind its own switch. A
@@ -507,8 +575,14 @@ which reads as a bug in the app rather than as a feature in progress.
 `MoshInstruction`, `MoshDiffs`, `MoshTiming`, `MoshUserStream`, `MoshTransport`, with
 their tests and vectors under `app/src/test/{kotlin,resources}/`). The one integration
 test talks to a real server and skips itself when there is none, the way the SSH ones do. That is what lets `./gradlew test` cover the protocol and lets the
-phase 1 harness run on it with no adapter in between. Exactly one class touches Android
-and JSch: the glue that owns the session, and it lives outside that package.
+phase 1 harness run on it with no adapter in between.
+
+Two things live outside that package and still have no Android in them, which is why both
+are gated from the JVM: `ShellSession.startMoshServer`, which touches JSch because the
+bootstrap is an SSH exec channel, and `data/terminal/MoshTerminalTransport`, which touches
+neither — only `java.nio` and a clock. What is left for Android is the part that is
+genuinely Android: the switch in the host form, the failure dialog, and the service that
+was already there.
 
 ### Rough shape of the effort
 
