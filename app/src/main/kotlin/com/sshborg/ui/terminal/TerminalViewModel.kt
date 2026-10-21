@@ -385,7 +385,16 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         SshTerminalTransport(session)
                     }
                     transport = made
-                    synchronized(em) { made.resize(em.buffer.columns, em.buffer.rows) }
+                    synchronized(em) {
+                        made.resize(em.buffer.columns, em.buffer.rows)
+                        // mosh keeps the terminal on its own side and sends us only what it looks
+                        // like, so it never forwards `?1049h` and there is no alternate screen
+                        // here to go by. Without this a scroll gesture inside tmux went to our
+                        // scrollback instead of to tmux — found on a real device. Asked of the
+                        // transport rather than remembered, so the two cannot drift apart: a
+                        // session that carried on over SSH after mosh failed gets it right too.
+                        em.hasAlternateScreen = made !is MoshTerminalTransport
+                    }
                     withContext(Dispatchers.Main.immediate) {
                         sessionManager.update(id) {
                             it.copy(shellSession = session, transport = made, status = SessionManager.Status.Connected)

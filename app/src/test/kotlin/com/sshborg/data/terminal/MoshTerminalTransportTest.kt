@@ -147,6 +147,62 @@ class MoshTerminalTransportTest {
         }
     }
 
+    /**
+     * What a mouse-aware program's modes do on the way through mosh — which is not what we
+     * assumed, and is why a scroll gesture inside tmux did nothing on a real device.
+     *
+     * `?1000h` and `?1006h` arrive: mosh does carry mouse reporting, so the terminal knows the
+     * program wants to be sent wheel events. `?1049h` does **not**: mosh keeps the terminal on its
+     * own side and sends us only what it looks like, so it switches to the alternate screen itself
+     * and never says so. Our gate for "the wheel belongs to the program" was *alternate screen and
+     * mouse reporting*, and the first half can never be true here.
+     *
+     * Hence [TerminalEmulator.hasAlternateScreen], and hence this test: the fix rests on both
+     * halves of this being true of the real server, not on reading its source.
+     */
+    @Test fun `mosh carries mouse reporting but never the alternate screen`() = runBlocking {
+        val ssh = login()
+        val handover = try {
+            ssh.startMoshServer(networkTimeoutSeconds = NETWORK_TIMEOUT)
+        } catch (e: MoshUnavailable) {
+            assumeTrue("the test server has no usable mosh-server (${e.reason})", false)
+            throw e
+        }
+        val transport = MoshTerminalTransport(handover, unattendedSink = ::toScreen)
+        try {
+            transport.start()
+            assumeTrue("no datagram came back", transport.awaitFirstContact())
+            transport.resize(COLUMNS, ROWS)
+            assertTrue("no prompt arrived", awaitScreen { it.isNotBlank() })
+
+            // Exactly what tmux asks for when it turns the mouse on.
+            transport.write("printf '\\033[?1049h\\033[?1000h\\033[?1006h'\r".toByteArray())
+            assertTrue(
+                "mouse reporting never reached us, so the wheel could never be sent anywhere",
+                awaitThat { synchronized(emulator) { emulator.mouseReporting } },
+            )
+            // Given a moment, in case the alternate screen were merely late rather than absent.
+            awaitThat(timeoutMs = 2_000) { synchronized(emulator) { emulator.altScreenActive } }
+            assertFalse(
+                "mosh forwarded the alternate screen after all — then the wheel gate can go back " +
+                    "to asking about it, and TerminalEmulator.hasAlternateScreen can go away",
+                synchronized(emulator) { emulator.altScreenActive },
+            )
+
+            // And so, with the flag the mosh glue sets, the wheel reaches the program.
+            synchronized(emulator) {
+                emulator.hasAlternateScreen = false
+                assertTrue(
+                    "a wheel notch would still have gone to our own scrollback, not to tmux",
+                    emulator.wheelBelongsToApplication,
+                )
+            }
+        } finally {
+            transport.close()
+            runCatching { ssh.disconnect() }
+        }
+    }
+
     // ── the terminal above it ───────────────────────────────────────────────────
 
     private fun toScreen(buffer: ByteArray, n: Int) {

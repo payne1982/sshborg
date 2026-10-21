@@ -34,6 +34,34 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     /** True while the remote app has asked to be sent mouse events. */
     val mouseReporting: Boolean get() = mouseMode != 0
 
+    /**
+     * Whether the stream feeding this terminal ever uses the alternate screen.
+     *
+     * True for everything that sends a program's own output, which is all of SSH. False for a
+     * *synchronised* screen — mosh's — where the far end keeps the terminal and sends us only what
+     * it looks like: it handles `?1049h` itself and never passes it on, so a full-screen program
+     * is indistinguishable from the shell. Measured, not assumed: see `MoshTerminalTransportTest`,
+     * which holds mosh to forwarding `?1000h` and `?1006h` and to never forwarding `?1049h`.
+     *
+     * Not a branch in the parsing — nothing here reads it — but a statement about what the stream
+     * can contain, and the one thing [wheelBelongsToApplication] cannot work out for itself.
+     */
+    var hasAlternateScreen = true
+
+    /**
+     * Whether a wheel notch is the far side's business rather than our own scrollback's.
+     *
+     * A program drawing a whole screen scrolls itself — in tmux, its own copy-mode history — so
+     * the wheel has to reach it. At a shell prompt the wheel belongs to our scrollback, even if
+     * some program left mouse reporting switched on behind it, which is why the alternate screen
+     * is part of the question at all. Where there is no alternate screen to go by, mouse reporting
+     * alone decides, and that is honest there: the synchronised stream turns the modes off
+     * explicitly when the program that wanted them has gone, which is visible in the recording in
+     * that same test.
+     */
+    val wheelBelongsToApplication: Boolean
+        get() = mouseReporting && (onAltScreen || !hasAlternateScreen)
+
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
     var onBell: (() -> Unit)? = null

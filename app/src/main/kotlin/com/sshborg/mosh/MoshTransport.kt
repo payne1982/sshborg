@@ -60,6 +60,16 @@ class MoshTransport(
     /** See [MoshFragmentAssembly.conflictingFragments]; anything but zero is a broken assumption. */
     val conflictingFragments: Int get() = assembly.conflictingFragments
 
+    /**
+     * Frames thrown away because they were diffed against a state we no longer hold.
+     *
+     * The price of keeping one terminal instead of mosh's queue of them, and the number to look at
+     * when typing feels slow: each one costs a round trip plus [ACK_DELAY] before the server sends
+     * a frame we can use.
+     */
+    var staleFrames = 0
+        private set
+
     private val sent = ArrayList<SentState>().apply { add(SentState(0, 0, 0)) }
     private var assumedReceiver = 0
 
@@ -203,6 +213,7 @@ class MoshTransport(
         // that turned a 1.3-second stall at the start of every session, during which the prompt
         // was being retransmitted and thrown away, into one round trip.
         if (instruction.oldNumber != heldState) {
+            staleFrames++
             pendingDataAck = true
             return
         }
