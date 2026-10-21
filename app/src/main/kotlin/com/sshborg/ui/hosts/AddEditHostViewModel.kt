@@ -210,6 +210,14 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             mosh                 = newMosh,
             groupId              = groupId.value,
             color                = hostColor.value,
+            // Not fields of this form, and `upsert` replaces the whole row — so leaving them out
+            // did not mean "don't touch", it meant "set them back to the defaults". Saving an
+            // edit therefore reset the most-used counter, forgot when the host was last connected
+            // to and lost the place it had been dragged to in the manual order. Nothing in this
+            // screen ever means to touch any of the three.
+            lastConnected        = existing?.lastConnected,
+            connectCount         = existing?.connectCount ?: 0,
+            position             = existing?.position,
         )
         hostDao.upsert(entity)
         onDone()
