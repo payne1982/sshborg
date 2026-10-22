@@ -750,6 +750,53 @@ every two seconds on a real device: the lab cannot answer for somebody's tablet,
 of my explanations for that tablet were wrong before one measurement from it settled the
 matter.
 
+#### The screen's recent pasts, and what typing then costs, 2026-10-22
+
+`TerminalScreenHistory` keeps the last eight screens, so a frame the far end computed
+against a state we have already passed is applied to the right screen instead of thrown
+away. What it holds and what it deliberately does not is in its own KDoc; the one thing
+worth repeating here is the scrollback length, because the lines that scrolled away since
+are about to scroll away again, carried by the frame replayed over the top, and a history
+that left them behind would quietly double every line of a long session's output.
+
+Three things make it fit the architecture rather than sit on top of it. The emulator
+gained a capability, not a branch: "give me the visible screen as a value, and put it
+back", which nothing in the parsing consults and SSH never asks for. The protocol gained
+one listener method that defaults to *no*, so a client without a history behaves exactly
+as it did. And the ordering lives in the one queue that already existed: bytes reach the
+screen off the protocol loop, so "put the screen back to 233, then draw this on top" and
+"keep a copy of 236 once 236 is on the screen" travel in that same queue, while the loop
+keeps its own tally of returnable states because it has to answer before the screen's
+thread gets round to the work. A resize throws the lot away on both sides at once.
+
+**What a keystroke costs on the tablet**, measured through four stages of the same
+evening, with plain SSH on the same device and network as the ruler:
+
+| | median | p90 | worst | frames dropped |
+|---|---|---|---|---|
+| as first built | 135 ms | ~440 ms | 770 ms | 21 of 40 |
+| acknowledging at once | 115 ms | 240 ms | 316 ms | 140 of 253 |
+| with the screen's pasts | **97 ms** | 168 ms | 282 ms | 28 of 160 |
+| SSH, same device | 72 ms | — | 134 ms | — |
+
+Seventy-eight frames rescued in one session of typing, nothing refused, nothing lost in
+transit, and a floor of 2 ms when the far end happens to be in step.
+
+**Why the last seventeen per cent cannot be rescued either.** The frames still dropped all
+have the same shape — `old=99 new=101 held=100` — a difference computed against a state we
+never passed through, so there is no screen of ours to put back. Mosh's own client cannot
+do better: it keeps the states it *received* and ignores an instruction starting from one
+it does not know. This is parity with the original, not a remaining shortcut.
+
+**What the 25 ms between 97 and 72 is.** The server's frame rate, which is half its own
+round-trip estimate. Mosh's answer to that is prediction — the client draws the character
+locally at once and corrects it if the server disagrees — which is phase 7 and still the
+same judgement as before: a half-finished prediction engine shows wrong characters and
+takes them back, and reads as a bug in the app rather than a feature in progress. What has
+changed is that the question is now a real one rather than theoretical: without
+prediction, mosh is a touch slower to type on than SSH over the same network, and
+everything it gives is in surviving the network changing underneath.
+
 #### What phase 6 still owes
 
 - **The guide, in ten locales**: the three-second heartbeat and what it costs in radio,
@@ -757,10 +804,6 @@ matter.
 - **"Contact lost, still trying"**, as above. It is the difference between a patient
   client and a frozen screen, and it is what would let both timeouts be as long as mosh's
   own.
-- **A few screens of history**, so that a frame diffed against a state we have passed is
-  applied from the older screen instead of thrown away. Measured on a real device as half of
-  everything the server sends; see the section above. This is the one that decides whether typing
-  over mosh ever feels better than typing over SSH rather than merely close to it.
 - **The gate on a real phone**: switch the Wi-Fi off mid-session and keep typing.
   Everything up to here is gated from the JVM against a real server, and that is the one
   question the JVM cannot be asked.
