@@ -150,6 +150,17 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _navBack = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val navBack: SharedFlow<Unit> = _navBack
 
+    private val _outOfContact = MutableStateFlow(0)
+
+    /**
+     * Seconds since the far end was last heard from, 0 while in contact or when the transport
+     * cannot tell — see [TerminalTransport.outOfContactSeconds]. The screen shows a line once it
+     * passes a threshold, and takes it away by itself when contact returns.
+     */
+    val outOfContact: StateFlow<Int> = _outOfContact.asStateFlow()
+
+    private var contactJob: Job? = null
+
     private val _barWouldHideOutput = MutableStateFlow(false)
 
     /**
@@ -566,6 +577,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun startReading(transport: TerminalTransport) {
         val em = _emulator.value
+        // Whatever this transport knows about being out of contact, passed on to the screen. SSH
+        // knows nothing, and then the number stays at zero and no line is ever shown.
+        contactJob?.cancel()
+        _outOfContact.value = 0
+        transport.outOfContactSeconds?.let { seconds ->
+            contactJob = viewModelScope.launch { seconds.collect { _outOfContact.value = it } }
+        }
         em.onSendResponse = { bytes ->
             runCatching { transport.write(bytes) }
         }
@@ -762,6 +780,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     fun background() {
         readerJob?.cancel()
         readerJob = null
+        contactJob?.cancel()
+        contactJob = null
         onNeedsRedraw = null
     }
 

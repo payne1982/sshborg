@@ -6,6 +6,9 @@ import com.sshborg.mosh.MoshProtocolException
 import com.sshborg.mosh.MoshTransport
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -264,6 +267,16 @@ class MoshTerminalTransport(
 
     override val isConnected: Boolean get() = !ended.isCompleted
 
+    private val _outOfContactSeconds = MutableStateFlow(0)
+
+    /**
+     * How long the far end has been silent, in whole seconds, 0 while in contact.
+     *
+     * Whole seconds rather than milliseconds so that it changes at most once a second: the loop
+     * comes round several times a second and the screen has no use for that.
+     */
+    override val outOfContactSeconds: StateFlow<Int> = _outOfContactSeconds.asStateFlow()
+
     override val screenIsSynchronised: Boolean get() = true
 
     override val survivesUnattended: Boolean get() = false
@@ -412,7 +425,11 @@ class MoshTerminalTransport(
             if (now >= closeDeadline) return TerminalTransport.End.CleanExit
             if (now >= farewellDeadline) return TerminalTransport.End.CleanExit
             val silentSince = if (lastHeard != 0L) lastHeard else startedAt
-            if (now - silentSince > silenceLimitMs) return lost(now - silentSince)
+            val silent = now - silentSince
+            if (silent > silenceLimitMs) return lost(silent)
+            // Told to the screen, so that a terminal nothing is arriving at can say why.
+            val seconds = (silent / 1000).toInt()
+            if (_outOfContactSeconds.value != seconds) _outOfContactSeconds.value = seconds
 
             if (!closing && (hopWanted || hopRequested || mosh.shouldHopLocalPort(now, lastHopAt)) &&
                 now - lastHopAt >= HOP_MIN_INTERVAL
@@ -505,6 +522,7 @@ class MoshTerminalTransport(
                 val datagram = ByteArray(buffer.remaining())
                 buffer.get(datagram)
                 lastHeard = now
+                if (_outOfContactSeconds.value != 0) _outOfContactSeconds.value = 0
                 firstContact.complete(true)
                 try {
                     mosh.onDatagram(datagram, now)

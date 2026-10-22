@@ -65,6 +65,8 @@
     <string name="mosh_failed_no_udp">UDP で何も返ってきませんでした。ここからホストまでの経路で UDP ポート 60001-60999 が遮断されている可能性が高いです。</string>
     <string name="mosh_action_carry_on">SSH で続ける</string>
     <string name="mosh_action_leave">終了</string>
+    <string name="terminal_no_contact_seconds">%1$d 秒間応答なし — 再試行中</string>
+    <string name="terminal_no_contact_minutes">%1$d 分間応答なし — 再試行中</string>
     <string name="host_color_dialog_title">ホストの色</string>
     <string name="host_color_remove">カスタムの色を削除</string>
 

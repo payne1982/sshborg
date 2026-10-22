@@ -78,6 +78,15 @@ private const val TITLE_BAR_LINGER_MS = 3_000L
  */
 private const val TITLE_BAR_RETRACT_MS = 700
 
+/**
+ * How long the far end has to be silent before the terminal says so.
+ *
+ * Six seconds, which is two of mosh's three-second heartbeats: long enough that a packet lost
+ * once says nothing, short enough that somebody typing into a session that has stopped answering
+ * finds out before they wonder whether the app has frozen.
+ */
+private const val OUT_OF_CONTACT_AFTER_S = 6
+
 @Suppress("UNUSED_VARIABLE")
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -145,6 +154,8 @@ fun TerminalScreen(
     // clear of the bar. See TerminalViewModel.barWouldHideOutput. Only the arrival changes — a tap
     // brings the bar back as always, and the countdown then takes it away as always.
     val barWouldHideOutput by vm.barWouldHideOutput.collectAsState()
+    // How long the far end has been silent, 0 when in contact or when the transport cannot tell.
+    val outOfContact by vm.outOfContact.collectAsState()
     LaunchedEffect(barWouldHideOutput, barAutoHide) {
         // Only the overlay can cover anything: a bar the user has chosen to keep fixed is above
         // the terminal, not over it, and on a television it is fixed whatever the setting says.
@@ -513,6 +524,36 @@ fun TerminalScreen(
                                 }
                             }
                     ) { titleBar() }
+                }
+            }
+
+            // Contact lost, and still trying. The one thing a synchronised screen owes whoever is
+            // looking at it: a terminal nothing is arriving at looks exactly like a terminal with
+            // nothing to say, and without this line the difference is invisible for as long as the
+            // transport is willing to wait. It appears by itself and goes by itself.
+            //
+            // Under the title bar when the bar is out, at the top when it is not: the two would
+            // otherwise sit on each other, and the bar's own height is already measured here.
+            if (outOfContact >= OUT_OF_CONTACT_AFTER_S) {
+                val sinceLabel = if (outOfContact < 60) {
+                    stringResource(R.string.terminal_no_contact_seconds, outOfContact)
+                } else {
+                    stringResource(R.string.terminal_no_contact_minutes, outOfContact / 60)
+                }
+                Surface(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset { IntOffset(0, if (barAutoHide && barShown) titleBarHeightPx else 0) }
+                        .padding(8.dp),
+                ) {
+                    Text(
+                        sinceLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    )
                 }
             }
 

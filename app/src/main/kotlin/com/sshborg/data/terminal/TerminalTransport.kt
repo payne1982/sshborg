@@ -1,5 +1,7 @@
 package com.sshborg.data.terminal
 
+import kotlinx.coroutines.flow.StateFlow
+
 /**
  * Where a terminal's bytes come from.
  *
@@ -54,6 +56,18 @@ interface TerminalTransport {
      * of them takes from it only what it needs.
      */
     val screenIsSynchronised: Boolean get() = false
+
+    /**
+     * Whole seconds since the far end was last heard from, 0 while in contact — or null for a
+     * transport that cannot tell.
+     *
+     * SSH cannot tell, and that is not an oversight in this interface: TCP acknowledges and
+     * retransmits below us, so silence on an SSH session is indistinguishable from a server with
+     * nothing to say. A protocol that keeps its own session alive with a heartbeat knows exactly,
+     * and owes the screen the number — a terminal that cannot be reached is otherwise a
+     * photograph with nothing to explain it.
+     */
+    val outOfContactSeconds: StateFlow<Int>? get() = null
 
     /**
      * Whether the session survives being left unattended while the terminal is in the background.

@@ -66,6 +66,8 @@
     <string name="mosh_failed_no_udp">Nothing came back over UDP. The network between here and the host is probably blocking UDP ports 60001-60999.</string>
     <string name="mosh_action_carry_on">Continue over SSH</string>
     <string name="mosh_action_leave">Leave</string>
+    <string name="terminal_no_contact_seconds">No contact for %1$d s — still trying</string>
+    <string name="terminal_no_contact_minutes">No contact for %1$d min — still trying</string>
     <string name="host_color_dialog_title">Host color</string>
     <string name="host_color_remove">Remove custom color</string>
 

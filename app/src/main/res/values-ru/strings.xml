@@ -66,6 +66,8 @@
     <string name="mosh_failed_no_udp">По UDP ничего не пришло. Скорее всего, сеть между вами и хостом блокирует UDP-порты 60001-60999.</string>
     <string name="mosh_action_carry_on">Продолжить по SSH</string>
     <string name="mosh_action_leave">Выйти</string>
+    <string name="terminal_no_contact_seconds">Нет связи %1$d с — продолжаю попытки</string>
+    <string name="terminal_no_contact_minutes">Нет связи %1$d мин — продолжаю попытки</string>
     <string name="host_color_dialog_title">Цвет хоста</string>
     <string name="host_color_remove">Убрать свой цвет</string>
 

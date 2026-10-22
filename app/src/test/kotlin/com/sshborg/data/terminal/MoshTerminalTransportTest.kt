@@ -74,6 +74,10 @@ class MoshTerminalTransportTest {
                 transport.awaitFirstContact(),
             )
             assertTrue("the transport says it is not connected", transport.isConnected)
+            assertEquals(
+                "a session in contact must report no silence, or the screen would say it was lost",
+                0, transport.outOfContactSeconds.value,
+            )
             assertFalse(
                 "a mosh session must not claim it survives being left unattended",
                 transport.survivesUnattended,

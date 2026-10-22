@@ -65,6 +65,8 @@
     <string name="mosh_failed_no_udp">UDP 没有任何回应。这里到主机之间的网络很可能屏蔽了 UDP 端口 60001-60999。</string>
     <string name="mosh_action_carry_on">继续使用 SSH</string>
     <string name="mosh_action_leave">退出</string>
+    <string name="terminal_no_contact_seconds">已失联 %1$d 秒 — 仍在重试</string>
+    <string name="terminal_no_contact_minutes">已失联 %1$d 分钟 — 仍在重试</string>
     <string name="host_color_dialog_title">主机颜色</string>
     <string name="host_color_remove">移除自定义颜色</string>
 

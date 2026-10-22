@@ -64,6 +64,8 @@
     <string name="mosh_failed_no_udp">Non è tornato niente via UDP. Probabilmente la rete fra qui e l’host blocca le porte UDP 60001-60999.</string>
     <string name="mosh_action_carry_on">Continua con SSH</string>
     <string name="mosh_action_leave">Esci</string>
+    <string name="terminal_no_contact_seconds">Nessun contatto da %1$d s — continuo a provare</string>
+    <string name="terminal_no_contact_minutes">Nessun contatto da %1$d min — continuo a provare</string>
     <string name="host_color_dialog_title">Colore dell\'host</string>
     <string name="host_color_remove">Rimuovi colore personalizzato</string>
 
