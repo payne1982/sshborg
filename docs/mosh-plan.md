@@ -610,6 +610,42 @@ used to say: `MOSH_SERVER_NETWORK_TMOUT` unset means *wait indefinitely*, not fo
 seconds — the forty is the server forgetting the client's address, which is roaming, not
 exiting.
 
+#### Why the login cannot be pushed down below the title bar, 2026-10-22
+
+Under SSH the terminal's first screenful is kept clear of the retracting title bar by
+writing `rowsUnderTitleBar` line feeds into **our own** emulator before a single byte has
+arrived (`TerminalViewModel.connect`). The server's output is a stream appended at the
+cursor, so the motd simply begins further down and nothing else in the app has to know.
+
+The first run on a real device reported that this does not happen under mosh, and the
+question was whether the same trick could not just be applied there. It cannot, and the
+reason is worth keeping because it is the whole character of the protocol. These are the
+first bytes of a real session, recorded with three line feeds already in our emulator:
+
+```
+ESC[r ESC[0m ESC[H ESC[2J ESC[?25l  ESC[K LF (×29)  ESC[2;1H ESC[?25h …
+```
+
+Home, **clear the screen**, clear every line, then an absolute cursor position. Measured:
+the cursor was on row 3 before the first frame and the prompt ended up on row 1 — exactly
+where it would have been with no trick at all. The line feeds existed for a fraction of a
+second and were erased.
+
+And in general it is not merely ineffective but unsound. After that first frame mosh sends
+*differences against the screen it believes we hold*, which is the screen its own terminal
+had at the state we last acknowledged. Anything we write into our emulator ourselves makes
+that belief false, and every later frame is then computed against a screen we do not have
+— permanently, since there is no second full repaint except on a resize. The screen, under
+mosh, is the server's. The client may not edit it.
+
+What is left is to move the *drawing* rather than the content: offset the drawn grid
+downward by the height the bar covers while the bar is there, and let the offset follow
+the bar as it retracts. No injection, no protocol involvement, nothing the transport has
+to know, and it would work the same for both — which would let the line-feed trick be
+deleted rather than branched. The cost is a change to settled behaviour: today the content
+under SSH sits still while the bar slides away, and with a following offset it would slide
+up with it. That is the user's call, not a decision for this document.
+
 #### What phase 6 still owes
 
 - **The guide, in ten locales**: the three-second heartbeat and what it costs in radio,
