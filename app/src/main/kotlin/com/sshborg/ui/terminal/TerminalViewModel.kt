@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
+import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.ExtraBar
@@ -419,9 +420,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         // scrollback instead of to tmux — found on a real device. Asked of the
                         // transport rather than remembered, so the two cannot drift apart: a
                         // session that carried on over SSH after mosh failed gets it right too.
-                        em.hasAlternateScreen = made !is MoshTerminalTransport
+                        em.hasAlternateScreen = !made.screenIsSynchronised
                     }
-                    _barWouldHideOutput.value = made is MoshTerminalTransport
+                    _barWouldHideOutput.value = made.screenIsSynchronised
+                    if (made is MoshTerminalTransport) watchMoshInDebug(made)
                     withContext(Dispatchers.Main.immediate) {
                         sessionManager.update(id) {
                             it.copy(shellSession = session, transport = made, status = SessionManager.Status.Connected)
@@ -455,8 +457,16 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     // Here and not in [startReading], which also runs for a session being picked
                     // up again after the app was away: that one already has its output on screen
                     // and must not be nudged.
-                    val blankRows = rowsUnderTitleBar
-                        .coerceIn(0, (em.buffer.rows - 1).coerceAtLeast(0))
+                    // Not when the screen is the far side's: writing into our own emulator then
+                    // puts us out of step with the frames being computed against it, and the bar
+                    // is kept out of the way instead (see [barWouldHideOutput]). It was a race as
+                    // well as a mistake — whether these landed before the first frame's clear or
+                    // after it decided whether the session was merely odd or actually corrupt,
+                    // which is why it showed up as "sometimes three blank rows, sometimes not,
+                    // and then the line jumps to the top after a few words".
+                    val blankRows = if (made.screenIsSynchronised) 0 else {
+                        rowsUnderTitleBar.coerceIn(0, (em.buffer.rows - 1).coerceAtLeast(0))
+                    }
                     if (blankRows > 0) synchronized(em) { em.process("\n".repeat(blankRows)) }
                     startReading(made)
                     if (prefs.historySuggestions.first()) loadCommandHistory(session)
@@ -632,6 +642,26 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         if (!moshFailureResult.first()) return null
         withContext(Dispatchers.Main.immediate) { _state.value = ConnectionState.Connecting }
         return SshTerminalTransport(session)
+    }
+
+    /**
+     * In a debug build, one line in the log every few seconds about how the mosh session is going.
+     *
+     * The lab can measure a keystroke against a real server from a desktop; it cannot tell us what
+     * the same session costs on somebody's tablet, and the first field report was "half a second a
+     * character" where the lab said seventeen milliseconds. This is how that gap gets a number
+     * instead of a theory: `adb logcat -s SSHBorgMosh`. Nothing in release builds, and nothing in
+     * the line that is anybody's business but the session's own health.
+     */
+    private fun watchMoshInDebug(transport: MoshTerminalTransport) {
+        if (!BuildConfig.DEBUG) return
+        viewModelScope.launch {
+            while (true) {
+                delay(DIAGNOSTIC_INTERVAL_MS)
+                if (!transport.isConnected) return@launch
+                android.util.Log.i("SSHBorgMosh", transport.diagnosticLine())
+            }
+        }
     }
 
     /** Takes the session out of [SessionManager] and tells the screen why it ended. */
@@ -854,5 +884,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
          * line, both numbers grow together.
          */
         const val MOSH_SERVER_TIMEOUT_SECONDS = 3600
+
+        /** How often a debug build says in the log how the mosh session is going. */
+        const val DIAGNOSTIC_INTERVAL_MS = 2_000L
     }
 }

@@ -99,7 +99,7 @@ class MoshTerminalTransport(
         object : MoshTransport.Listener {
             override fun onHostBytes(bytes: ByteArray) {
                 // Handed over, not applied: see [toScreen].
-                toScreen.trySend(bytes)
+                toScreen.trySend(Frame(bytes, clock()))
             }
             // The server telling us how big it thinks the terminal is. We are the ones who decide
             // that, and we have already told it, so there is nothing here to obey.
@@ -123,7 +123,10 @@ class MoshTerminalTransport(
      *
      * One consumer, so the order the server sent them in is the order the screen gets them in.
      */
-    private val toScreen = Channel<ByteArray>(Channel.UNLIMITED)
+    private val toScreen = Channel<Frame>(Channel.UNLIMITED)
+
+    /** A run of host bytes and the moment it arrived, so the wait for the screen can be seen. */
+    private class Frame(val bytes: ByteArray, val at: Long)
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val selector: Selector = Selector.open()
@@ -185,6 +188,25 @@ class MoshTerminalTransport(
     /** See [MoshTransport.staleFrames]: the cost of holding one terminal instead of several. */
     val staleFrames: Int get() = mosh.staleFrames
 
+    @Volatile
+    private var worstScreenWait = 0L
+    private var framesApplied = 0
+
+    /**
+     * One line of how the session is actually going, for a debug build's log — the only way to ask
+     * a real device the questions the lab cannot answer for it. Reading it resets the worst case,
+     * so each line describes the interval since the last.
+     *
+     * No key, no address, no host name: the round trip, what the screen cost, and the three
+     * counters that say whether the protocol is fighting something.
+     */
+    fun diagnosticLine(): String {
+        val worst = worstScreenWait
+        worstScreenWait = 0
+        return "rtt~${mosh.timing.srtt.toInt()}ms screen-wait<=${worst}ms applied=$framesApplied " +
+            "stale=${mosh.staleFrames} hops=$hops refused=$failedSends bad=$protocolErrors"
+    }
+
     /**
      * Datagrams from the server's address that we could not open or parse. On a working session
      * this stays at zero; anything else is worth knowing about, and is in the error report.
@@ -192,6 +214,8 @@ class MoshTerminalTransport(
     val undecipherableDatagrams: Int get() = protocolErrors
 
     override val isConnected: Boolean get() = !ended.isCompleted
+
+    override val screenIsSynchronised: Boolean get() = true
 
     override val survivesUnattended: Boolean get() = false
 
@@ -208,7 +232,12 @@ class MoshTerminalTransport(
         scope.launch {
             // Drains to the end: a channel that is closed hands out what is already in it first,
             // so the last frames of a session still reach the screen.
-            for (bytes in toScreen) (attached ?: unattendedSink)(bytes, bytes.size)
+            for (frame in toScreen) {
+                (attached ?: unattendedSink)(frame.bytes, frame.bytes.size)
+                val waited = clock() - frame.at
+                if (waited > worstScreenWait) worstScreenWait = waited
+                framesApplied++
+            }
         }
         scope.launch {
             val end = try {

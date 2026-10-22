@@ -34,6 +34,28 @@ interface TerminalTransport {
     suspend fun read(onBytes: (ByteArray, Int) -> Unit): End
 
     /**
+     * Whether the screen is synchronised from the far side rather than streamed to us.
+     *
+     * False for SSH, where the bytes are the remote program's own output appended at the cursor.
+     * The client may then write into its own terminal as well, and does: the first screenful is
+     * kept clear of the retracting title bar by line feeds of our own, put in before the first
+     * byte arrives.
+     *
+     * True for mosh, where the far end keeps the terminal and sends what it *looks like* — as
+     * differences against the screen it believes we hold. Two things follow, and both were learnt
+     * the hard way on a real device. Anything we write into the emulator ourselves makes that
+     * belief false, and from then on every frame is computed against a screen we do not have:
+     * observed as the typed line jumping back to the top of the window after a few words, which is
+     * the server positioning the cursor for its own layout while ours sat three rows lower. And
+     * there is no alternate screen to go by, because `?1049h` is handled over there and never
+     * forwarded — see [com.sshborg.terminal.TerminalEmulator.hasAlternateScreen].
+     *
+     * So this is not a label for "is it mosh". It is the one fact the layers above need, and each
+     * of them takes from it only what it needs.
+     */
+    val screenIsSynchronised: Boolean get() = false
+
+    /**
      * Whether the session survives being left unattended while the terminal is in the background.
      *
      * SSH does: nothing is read, and TCP holds what arrives until [read] resumes. A protocol that
