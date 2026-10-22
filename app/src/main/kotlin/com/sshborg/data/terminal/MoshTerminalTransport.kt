@@ -204,7 +204,8 @@ class MoshTerminalTransport(
         val worst = worstScreenWait
         worstScreenWait = 0
         return "rtt~${mosh.timing.srtt.toInt()}ms screen-wait<=${worst}ms applied=$framesApplied " +
-            "stale=${mosh.staleFrames} hops=$hops refused=$failedSends bad=$protocolErrors"
+            "stale=${mosh.staleFrames} got=${mosh.receivedDatagrams} missed=${mosh.missedDatagrams} " +
+            "hops=$hops refused=$failedSends bad=$protocolErrors [${mosh.lastStaleFrame}]"
     }
 
     /**

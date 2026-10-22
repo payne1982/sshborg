@@ -243,22 +243,39 @@ class MoshTransportTest {
     @Test fun `a diff against a state we do not hold is left alone`() {
         handshake()
         // We hold state 1. This one claims to start from 5, so applying it would corrupt the
-        // screen; it must not be applied and must not be acknowledged either.
+        // screen; it must not be applied, and what we acknowledge must still be what we hold.
         transport.onDatagram(fromServer(now = 1_100, oldNumber = 5, newNumber = 6, diff = hostBytes("lost")), 1_100)
         assertEquals("", hostOutput.toString())
-        transport.tick(1_150)
-        assertEquals("still acknowledging the state we really hold", 1L, ours(transport.tick(1_250).single()).ackNumber)
+        assertEquals(
+            "still acknowledging the state we really hold",
+            1L, ours(transport.tick(1_150).single()).ackNumber,
+        )
     }
 
     @Test fun `a frame we cannot use still gets an answer at once`() {
         handshake()
         // The server is behind: it does not yet know which state we hold, so it is sending — and
-        // resending, at frame rate — a diff we have to throw away. Waiting for the three-second
-        // heartbeat to tell it so would stall the screen; the acknowledgement is due immediately.
+        // resending, at frame rate — a diff we have to throw away. It goes on doing that until it
+        // hears which state we hold, so the acknowledgement is due *now* and not [ACK_DELAY]
+        // later: on a real link, at a hundred milliseconds of round trip, those delayed
+        // acknowledgements were measured as half a second a keystroke.
         transport.onDatagram(fromServer(now = 1_100, oldNumber = 0, newNumber = 7, diff = hostBytes("lost")), 1_100)
-        assertTrue(transport.tick(1_150).isEmpty())
-        assertEquals("the ack is scheduled, not left to the heartbeat", 1_250L, transport.nextWakeup())
-        assertEquals(1L, ours(transport.tick(1_250).single()).ackNumber)
+        assertEquals("the ack is owed at once, not after a delay", 1_100L, transport.nextWakeup())
+        assertEquals(1L, ours(transport.tick(1_150).single()).ackNumber)
+    }
+
+    @Test fun `every state we accept is acknowledged without waiting for the heartbeat`() {
+        handshake()
+        // Even one that carried nothing to show. Mosh marks only a *data* acknowledgement owed and
+        // can afford to, because its client keeps a history of screens and applies a frame diffed
+        // against an older one instead of dropping it. We keep one screen, so a far end that has
+        // lost track of which state we hold costs us a round trip per frame — and being slow to
+        // tell it is the one thing this design cannot afford.
+        transport.onDatagram(fromServer(now = 1_100, oldNumber = 1, newNumber = 2, diff = ByteArray(0)), 1_100)
+        // The scheduling happens in a tick, which is what the loop does after every datagram.
+        assertTrue(transport.tick(1_100).isEmpty())
+        assertEquals("nothing to show, and still an ack owed", 1_200L, transport.nextWakeup())
+        assertEquals(2L, ours(transport.tick(1_200).single()).ackNumber)
     }
 
     @Test fun `our own datagram played back at us is refused`() {

@@ -571,6 +571,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         readerJob = viewModelScope.launch(Dispatchers.IO) {
             val end = transport.read { buffer, n ->
                 synchronized(em) { em.process(buffer, 0, n) }
+                noteEcho()
                 onNeedsRedraw?.invoke()
                 detectPromptIfNeeded()
                 scheduleUpdateSuggestions()
@@ -682,7 +683,35 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * When the oldest keystroke still waiting for an answer was typed, or 0.
+     *
+     * Debug builds only, and the reason it exists is that a field report of "half a second a
+     * character" and a lab measurement of seventeen milliseconds cannot both be acted on. It is
+     * measured for *either* transport on purpose: the useful comparison is the same device, the
+     * same network and the same finger, over SSH and over mosh.
+     */
+    @Volatile
+    private var typedAt = 0L
+
+    private fun noteKeystroke() {
+        if (BuildConfig.DEBUG && typedAt == 0L) typedAt = System.currentTimeMillis()
+    }
+
+    private fun noteEcho() {
+        if (!BuildConfig.DEBUG) return
+        val typed = typedAt
+        if (typed == 0L) return
+        typedAt = 0L
+        android.util.Log.i(
+            "SSHBorgMosh",
+            "echo=${System.currentTimeMillis() - typed}ms" +
+                if (transport?.screenIsSynchronised == true) " mosh" else " ssh",
+        )
+    }
+
     fun sendInput(data: ByteArray) {
+        noteKeystroke()
         // Enter (\r or \n) and Ctrl+C immediately clear suggestions — the line is gone.
         if (data.size == 1 && (data[0] == 0x0D.toByte() || data[0] == 0x0A.toByte() || data[0] == 0x03.toByte())) {
             _suggestions.value = emptyList()

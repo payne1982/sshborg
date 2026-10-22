@@ -70,6 +70,38 @@ class MoshTransport(
     var staleFrames = 0
         private set
 
+    /** Datagrams from the far end that opened and parsed. */
+    var receivedDatagrams = 0
+        private set
+
+    /**
+     * Datagrams the far end sent that never reached us, counted from the gaps it leaves in its own
+     * sequence numbers.
+     *
+     * The one number that tells a lossy link from a protocol that is merely getting in its own
+     * way, and the two have the same symptom: a frame diffed against a state we no longer hold.
+     * Reordering counts here too — a datagram that arrives late is already past [expected] and the
+     * replay filter drops it — which is the right way round for a diagnostic, because to the
+     * protocol a late datagram and a lost one are the same thing.
+     */
+    var missedDatagrams = 0
+        private set
+
+    private var highestSequence = -1L
+
+    /**
+     * The state numbers of the last frame we had to throw away: what it was diffed against, what
+     * it would have produced, and what we actually hold.
+     *
+     * Three shapes tell three different stories, and until one of them is on the screen there is
+     * no point guessing which: `old` one behind `held` is the far end being optimistic and a
+     * round trip stale, `old` far behind is it having given up on our acknowledgements and fallen
+     * back to its oldest unacknowledged state, and `new` equal to a number we have already seen
+     * is a retransmission we are counting twice.
+     */
+    var lastStaleFrame = ""
+        private set
+
     private val sent = ArrayList<SentState>().apply { add(SentState(0, 0, 0)) }
     private var assumedReceiver = 0
 
@@ -183,6 +215,12 @@ class MoshTransport(
      */
     fun onDatagram(datagram: ByteArray, now: Long) {
         val opened = crypto.open(datagram)
+        receivedDatagrams++
+        val sequence = opened.nonce.sequence
+        if (highestSequence >= 0 && sequence > highestSequence + 1) {
+            missedDatagrams += (sequence - highestSequence - 1).toInt()
+        }
+        if (sequence > highestSequence) highestSequence = sequence
         val fresh = replay.accept(opened.nonce)
         val packet = MoshPacket.decode(opened.plaintext)
 
@@ -214,7 +252,13 @@ class MoshTransport(
         // was being retransmitted and thrown away, into one round trip.
         if (instruction.oldNumber != heldState) {
             staleFrames++
+            lastStaleFrame = "old=${instruction.oldNumber} new=${instruction.newNumber} held=$heldState"
+            // And acknowledged *now*, not in [ACK_DELAY]. The delay exists to batch
+            // acknowledgements, which is right when one is merely owed; here the far end is
+            // sending frames we cannot use and will go on doing so until it learns which state we
+            // hold, so every millisecond of batching is a millisecond of the screen not moving.
             pendingDataAck = true
+            nextAckTime = now
             return
         }
 
@@ -226,10 +270,16 @@ class MoshTransport(
                     is MoshDiffs.HostAction.EchoAck -> listener.onEchoAck(action.number)
                 }
             }
-            pendingDataAck = true
         }
         heldState = instruction.newNumber
         ackNumber = instruction.newNumber
+        // Every state we accept is worth saying so about, and within [ACK_DELAY] rather than
+        // whenever we next happen to send something. Mosh only marks a *data* acknowledgement
+        // owed, and can afford to: its client keeps a history of screens, so a far end that has
+        // lost track of which state we hold costs it nothing — the frame is applied from the older
+        // screen instead of thrown away. We keep one screen and throw the frame away, so being
+        // slow to say where we are is the one thing we cannot afford.
+        pendingDataAck = true
     }
 
     // ─────────────────────────── the sender ───────────────────────────
