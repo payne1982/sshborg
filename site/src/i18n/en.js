@@ -112,6 +112,8 @@ module.exports = {
             <li><a href="#legacy-ciphers">Legacy Ciphers</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh (experimental)</a></li>
+            <li class="sub"><a href="#mosh">What the server needs</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
@@ -464,6 +466,34 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// TIP</div>
                 You can add <code>tmux attach || tmux new -s main</code> to your <code>~/.bashrc</code> or <code>~/.zshrc</code> on the server so that a multiplexer session starts automatically every time you log in via SSHBorg.
+            </div>`,
+
+  doc_mosh: `
+            <h2>// MOSH (EXPERIMENTAL)</h2>
+            <p>Mosh is a second way of carrying the terminal. Instead of sending the server's output down the SSH connection, it keeps the terminal <em>on the server</em> and sends your phone a picture of what the screen looks like, over UDP. Because nothing is tied to a TCP connection any more, the session survives what normally ends one: a change of IP, a Wi-Fi to mobile handover, a tunnel, a phone that was asleep in your pocket. You come back and the session is simply there.</p>
+            <p>SSHBorg does not replace SSH with it. SSH still logs you in, starts the mosh server and <strong>stays open</strong>, which is what keeps SFTP, port forwarding, agent forwarding and the command suggestions working on the same host while the terminal rides UDP.</p>
+            <h3>What the server needs</h3>
+            <ul>
+                <li><strong>mosh installed</strong> — the <code>mosh-server</code> program must be on the server. On most distributions the package is called <code>mosh</code>.</li>
+                <li><strong>A UTF-8 locale</strong> — mosh refuses to start without one, because it has to interpret the terminal's contents itself.</li>
+                <li><strong>Inbound UDP, ports 60001–60999</strong> — the server must be reachable on them from your phone. This is the one that hotel, campus and corporate networks tend to block.</li>
+            </ul>
+            <h3>Turning it on</h3>
+            <p>Open the host editor and tick <strong>Mosh</strong>, next to the colour. It is per host and off by default: nothing changes for any host you do not tick. It is marked experimental because it is new, not because it is unfinished.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// BATTERY</div>
+                A mosh session sends a small packet about every three seconds for as long as it is open, which is what lets it notice a change of network straight away. That is more radio than a plain SSH session uses, and on a phone it costs battery. Leave it off for hosts where you do not need it.
+            </div>
+            <h3>What is different in the terminal</h3>
+            <p><strong>The scrollback starts empty.</strong> Over SSH, everything the server has ever printed passes through your phone, so it can all be kept. Over mosh only the screen is sent, so the history fills up with the lines that genuinely scroll off the top — and a program that redraws the screen without scrolling leaves nothing behind. The scroll gesture still works; there is simply less to find above a fresh session.</p>
+            <p><strong>Typing is not faster.</strong> Mosh is famous for instant local echo, which SSHBorg does not do yet: a keystroke still goes to the server and back. Measured on a phone over the same network, typing over mosh is about as quick as over SSH. What you gain is the session not dying.</p>
+            <h3>Mosh and jump hosts</h3>
+            <p>The two exclude each other on the same host, and the host editor will not let you tick Mosh while a jump chain is configured. A host reached over mosh can still be used as a jump host <em>for others</em>, which is the arrangement worth having anyway: the hop inward runs on the server, where your phone's network cannot disturb it.</p>
+            <h3>When it cannot start</h3>
+            <p>SSHBorg never falls back quietly. If the mosh server cannot be started, or no answer comes back over UDP, it tells you which of those happened and offers two choices: carry on over SSH — the login is already done, so it costs nothing — or leave. Three of the four possible causes are on the server, and the message names the one you have.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// TIP</div>
+                Mosh is not a substitute for tmux. It keeps a session alive across changes of network; tmux keeps your <em>work</em> alive across everything else, including the app being closed or the phone being restarted. The two together are the strongest arrangement: start mosh to reach the server, and run anything long inside tmux.
             </div>`,
 
   doc_jump_hosts: `

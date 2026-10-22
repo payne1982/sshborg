@@ -541,6 +541,8 @@
             <li><a href="#legacy-ciphers">Cifras legadas</a></li>
             <li><a href="#connection-drops">Quedas de ligação</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh (experimental)</a></li>
+            <li class="sub"><a href="#mosh">O que o servidor precisa</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Cadeias multi-salto</a></li>
             <li><a href="#sessions">Sessões múltiplas</a></li>
@@ -919,6 +921,36 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// DICA</div>
                 Pode adicionar <code>tmux attach || tmux new -s main</code> ao seu <code>~/.bashrc</code> ou <code>~/.zshrc</code> no servidor para que uma sessão de multiplexador inicie automaticamente sempre que iniciar sessão via SSHBorg.
+            </div>
+        </div>
+
+        <div class="doc-section" id="mosh">
+
+            <h2>// MOSH (EXPERIMENTAL)</h2>
+            <p>O mosh é uma segunda forma de transportar o terminal. Em vez de enviar a saída do servidor pela ligação SSH, mantém o terminal <em>no servidor</em> e envia ao telefone uma imagem do aspeto do ecrã, por UDP. Como já nada está preso a uma ligação TCP, a sessão sobrevive àquilo que normalmente lhe põe fim: uma mudança de IP, a passagem do Wi-Fi para os dados móveis, um túnel, um telefone que ficou a dormir no bolso. Volta e a sessão está simplesmente lá.</p>
+            <p>O SSHBorg não substitui o SSH por mosh. O SSH continua a fazer a autenticação, arranca o servidor mosh e <strong>fica aberto</strong> — é isso que mantém a funcionar o SFTP, o encaminhamento de portas, o encaminhamento do agente e as sugestões de comandos no mesmo host enquanto o terminal viaja por UDP.</p>
+            <h3>O que o servidor precisa</h3>
+            <ul>
+                <li><strong>mosh instalado</strong> — o programa <code>mosh-server</code> tem de estar no servidor. Na maioria das distribuições o pacote chama-se <code>mosh</code>.</li>
+                <li><strong>Uma configuração regional UTF-8</strong> — o mosh recusa-se a arrancar sem ela, porque tem de interpretar ele próprio o conteúdo do terminal.</li>
+                <li><strong>UDP de entrada, portas 60001–60999</strong> — o servidor tem de estar alcançável nelas a partir do telefone. É o requisito que as redes de hotéis, campus e empresas costumam bloquear.</li>
+            </ul>
+            <h3>Como ligar</h3>
+            <p>Abra a ficha do host e marque <strong>Mosh</strong>, ao lado da cor. É por host e está desligado por predefinição: nos hosts que não marcar, nada muda. Está marcado como experimental porque é recente, não porque esteja incompleto.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// BATERIA</div>
+                Uma sessão mosh envia um pacote pequeno mais ou menos a cada três segundos enquanto estiver aberta, e é isso que lhe permite dar-se conta de imediato de uma mudança de rede. É mais rádio do que uma sessão SSH normal usa e, num telefone, custa bateria. Nos hosts onde não precisar, deixe-a desligada.
+            </div>
+            <h3>O que muda no terminal</h3>
+            <p><strong>O histórico começa vazio.</strong> Com o SSH, tudo o que o servidor imprimiu passa pelo telefone, pelo que pode ser todo guardado. Com o mosh viaja apenas o ecrã, de modo que o histórico se enche com as linhas que realmente saem por cima — e um programa que redesenha o ecrã sem o fazer deslizar não deixa nada para trás. O gesto de deslizar continua a funcionar; há apenas menos para encontrar acima de uma sessão recém-aberta.</p>
+            <p><strong>Não se escreve mais depressa.</strong> O mosh é conhecido pelo eco local instantâneo, que o SSHBorg ainda não faz: uma tecla continua a ir ao servidor e a voltar. Medido num telefone na mesma rede, escrever com mosh é mais ou menos tão rápido como com SSH. O que se ganha é a sessão não morrer.</p>
+            <h3>O mosh e os hosts de salto</h3>
+            <p>Os dois excluem-se no mesmo host, e a ficha não deixa marcar Mosh enquanto houver uma cadeia de salto configurada. Um host alcançado por mosh pode ainda servir de host de salto <em>para outros</em>, que é aliás o arranjo que convém: o salto para dentro corre no servidor, onde a rede do telefone não o pode incomodar.</p>
+            <h3>Quando não consegue arrancar</h3>
+            <p>O SSHBorg nunca recorre ao SSH em silêncio. Se o servidor mosh não arrancar, ou se por UDP não voltar nada, diz-lhe qual das duas coisas aconteceu e oferece duas escolhas: continuar com SSH — a autenticação já está feita, portanto não custa nada — ou sair. Três das quatro causas possíveis estão no servidor, e a mensagem nomeia aquela que tem.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                O mosh não substitui o tmux. Mantém uma sessão viva através das mudanças de rede; o tmux mantém o seu <em>trabalho</em> vivo através de tudo o resto, incluindo a aplicação ser fechada ou o telefone reiniciado. Os dois juntos são o arranjo mais sólido: mosh para chegar ao servidor, e dentro do tmux tudo o que for longo.
             </div>
         </div>
 
