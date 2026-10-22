@@ -654,9 +654,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             // Nothing came back. There is no error from the far end for a path that will not
             // carry UDP — it looks exactly like a server that has not spoken yet — so silence is
             // the whole diagnosis, and the server is told to go away again.
+            val where = made.peerDescription
             made.close()
             unowned = null
-            MoshUnavailable(MoshUnavailable.Reason.NoUdpAnswer)
+            // Which port and, above all, which address family: a rule written for IPv4 does
+            // nothing for a session SSH made over IPv6, and that is the mistake this failure looks
+            // exactly like. Without it the dialog can only say "something is blocking UDP".
+            MoshUnavailable(MoshUnavailable.Reason.NoUdpAnswer, where)
         } catch (e: CancellationException) {
             // Before the general catch, which would otherwise turn a screen being left into a
             // dialog nobody is there to answer.

@@ -225,6 +225,19 @@ class MoshTerminalTransport(
     /** How many of our ports are still open: the one we send from, plus the retired ones. */
     val openLocalPorts: Int get() = sockets.size
 
+    /**
+     * Where we were trying to talk, in the words somebody needs to go and look: the port and the
+     * address family, which is the half of it that gets forgotten. A firewall rule written for
+     * IPv4 does nothing for a session SSH happened to make over IPv6, and `mosh-server -s` binds
+     * to the family the SSH connection arrived on — so a path can be open and the session still
+     * hear nothing.
+     *
+     * The address itself is deliberately not here. This goes in a dialog with a copy button, and
+     * somebody's server address is not something to make easy to paste into an issue.
+     */
+    val peerDescription: String
+        get() = "UDP port ${peer.port} over " + if (peer.address is Inet4Address) "IPv4" else "IPv6"
+
     /** The smoothed round-trip estimate, which is what the frame rate is derived from. */
     val roundTripMs: Int get() = mosh.timing.srtt.toInt()
 
