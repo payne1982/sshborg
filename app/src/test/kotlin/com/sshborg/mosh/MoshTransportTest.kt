@@ -26,9 +26,24 @@ class MoshTransportTest {
     private var resizes = ArrayList<Pair<Int, Int>>()
     private var echoAcks = ArrayList<Long>()
 
+    /** The states the screen says it can be put back to, and the ones it was asked to. */
+    private val canReturnTo = HashSet<Long>()
+    private val reached = ArrayList<Long>()
+    private val returned = ArrayList<Long>()
+
     private val listener = object : MoshTransport.Listener {
         override fun onHostBytes(bytes: ByteArray) {
             hostOutput.append(String(bytes, Charsets.ISO_8859_1))
+        }
+
+        override fun onStateReached(number: Long) {
+            reached.add(number)
+        }
+
+        override fun onReturnToState(number: Long): Boolean {
+            if (number !in canReturnTo) return false
+            returned.add(number)
+            return true
         }
 
         override fun onHostResize(width: Int, height: Int) {
@@ -262,6 +277,40 @@ class MoshTransportTest {
         transport.onDatagram(fromServer(now = 1_100, oldNumber = 0, newNumber = 7, diff = hostBytes("lost")), 1_100)
         assertEquals("the ack is owed at once, not after a delay", 1_100L, transport.nextWakeup())
         assertEquals(1L, ours(transport.tick(1_150).single()).ackNumber)
+    }
+
+    @Test fun `a frame from a state the screen can go back to is used, not thrown away`() {
+        handshake()
+        // We hold state 1 and the screen can be put back to it — which is what the glue answers
+        // when it has a copy. The far end is a state behind, as a round trip of latency makes it:
+        // it diffs from 1 while we are already showing 1's successor.
+        transport.onDatagram(fromServer(now = 1_100, oldNumber = 1, newNumber = 2, diff = hostBytes("first")), 1_100)
+        assertEquals("first", hostOutput.toString())
+        // State 1 is the handshake's own frame; 2 is this one.
+        assertEquals("every state reached is offered for keeping", listOf(1L, 2L), reached)
+
+        canReturnTo.add(1)
+        transport.onDatagram(fromServer(now = 1_200, oldNumber = 1, newNumber = 3, diff = hostBytes("-again")), 1_200)
+        assertEquals("the frame was applied on top of the screen it was computed against",
+            "first-again", hostOutput.toString())
+        assertEquals("and the screen was asked to go back to exactly that state", listOf(1L), returned)
+        assertEquals(1, transport.returnedToState)
+        assertEquals(0, transport.staleFrames)
+        assertEquals("and the newer state is what we now hold", listOf(1L, 2L, 3L), reached)
+        // Whichever tick carries it — the loop ticks after every datagram and again on the
+        // deadline — the next thing we send acknowledges the state the frame produced.
+        val answers = transport.tick(1_200) + transport.tick(1_300)
+        assertEquals("acknowledging the state the frame produced", 3L, ours(answers.first()).ackNumber)
+    }
+
+    @Test fun `a frame from a state the screen cannot go back to is still thrown away`() {
+        handshake()
+        // Nothing in canReturnTo: the past is too old, or the terminal has changed shape.
+        transport.onDatagram(fromServer(now = 1_100, oldNumber = 5, newNumber = 6, diff = hostBytes("lost")), 1_100)
+        assertEquals("", hostOutput.toString())
+        assertEquals(1, transport.staleFrames)
+        assertEquals(0, transport.returnedToState)
+        assertEquals("and said so at once", 1L, ours(transport.tick(1_150).single()).ackNumber)
     }
 
     @Test fun `every state we accept is acknowledged without waiting for the heartbeat`() {

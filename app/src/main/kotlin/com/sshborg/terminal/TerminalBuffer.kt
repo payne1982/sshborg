@@ -209,6 +209,21 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (r in 0 until rows) screen[r] = snapshot[r].copyOf()
     }
 
+    /**
+     * Drops the newest [count] lines of scrollback.
+     *
+     * For putting the screen back as it was at an earlier moment: the lines that scrolled away
+     * since then are about to be scrolled away again by whatever is replayed over the top, and
+     * left here they would appear in the history twice. Nothing real is lost — it is the same
+     * content, arriving again.
+     */
+    fun dropNewestScrollback(count: Int) {
+        repeat(count.coerceIn(0, scrollback.size)) {
+            scrollback.removeLast()
+            if (scrollbackWrapped.isNotEmpty()) scrollbackWrapped.removeLast()
+        }
+    }
+
     /** Returns a snapshot of the screen wrap flags (for alt-screen save/restore). */
     fun copyWrapFlags(): BooleanArray = screenWrapped.copyOf()
 

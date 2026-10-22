@@ -41,7 +41,7 @@ class MoshLatencyTest {
             assumeTrue("no usable mosh-server (${e.reason})", false)
             throw e
         }
-        val transport = MoshTerminalTransport(handover, unattendedSink = ::toScreen)
+        val transport = MoshTerminalTransport(handover, past = past(), unattendedSink = ::toScreen)
         var reader: Deferred<TerminalTransport.End>? = null
         try {
             transport.start()
@@ -78,7 +78,8 @@ class MoshLatencyTest {
             )
             println(
                 "the transport's own view: round trip ~${transport.roundTripMs}ms, " +
-                    "stale frames ${transport.staleFrames}, port hops ${transport.localPortHops}, " +
+                    "stale frames ${transport.staleFrames}, went back ${history.returns} times " +
+                    "(refused ${history.refused}), port hops ${transport.localPortHops}, " +
                     "undecipherable ${transport.undecipherableDatagrams}"
             )
             println("all samples: $samples")
@@ -106,7 +107,7 @@ class MoshLatencyTest {
             assumeTrue("no usable mosh-server (${e.reason})", false)
             throw e
         }
-        val transport = MoshTerminalTransport(handover, unattendedSink = ::toScreen)
+        val transport = MoshTerminalTransport(handover, past = past(), unattendedSink = ::toScreen)
         var reader: Deferred<TerminalTransport.End>? = null
         val drawing = java.util.concurrent.atomic.AtomicBoolean(true)
         // How long the painter had to wait for the lock before it could draw at all: on a device
@@ -155,7 +156,7 @@ class MoshLatencyTest {
             )
             println(
                 "the transport's own view: round trip ~${transport.roundTripMs}ms, " +
-                    "stale frames ${transport.staleFrames}"
+                    "stale frames ${transport.staleFrames}, went back ${history.returns} times"
             )
             println("the painter drew $draws times and waited at worst ${worstWait}ms for the lock")
             println("all samples: $samples")
@@ -177,6 +178,16 @@ class MoshLatencyTest {
      * which is what the session's latency actually is.
      */
     private val heard = StringBuilder()
+
+    /** The same arrangement the app makes: the screen's recent pasts, under the emulator's lock. */
+    private val history = com.sshborg.terminal.TerminalScreenHistory(emulator)
+
+    private fun past(): ScreenPast = object : ScreenPast {
+        override val depth get() = history.depth
+        override fun keep(state: Long) = synchronized(emulator) { history.keep(state) }
+        override fun restore(state: Long) = synchronized(emulator) { history.restore(state) }
+        override fun forget() = synchronized(emulator) { history.forget() }
+    }
 
     private fun toScreen(buffer: ByteArray, n: Int) {
         synchronized(heard) { heard.append(String(buffer, 0, n, Charsets.ISO_8859_1)) }

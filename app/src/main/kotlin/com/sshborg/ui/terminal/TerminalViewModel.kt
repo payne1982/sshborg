@@ -16,7 +16,9 @@ import com.sshborg.data.terminal.SshTerminalTransport
 import com.sshborg.data.terminal.TerminalTransport
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
+import com.sshborg.data.terminal.ScreenPast
 import com.sshborg.terminal.TerminalEmulator
+import com.sshborg.terminal.TerminalScreenHistory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.ByteArrayOutputStream
@@ -609,7 +611,19 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             val handover = session.startMoshServer(MOSH_SERVER_TIMEOUT_SECONDS)
             // The sink of last resort takes the emulator and nothing else — in particular not
             // this ViewModel, which a tab switch throws away while the session carries on.
-            val made = MoshTerminalTransport(handover) { buffer, n ->
+            // The screen's recent pasts, so that a frame the far end computed against a state we
+            // have already passed can be used instead of costing a round trip. Every call into it
+            // happens on the one thread that applies host bytes, under the emulator's own lock.
+            val history = TerminalScreenHistory(em)
+            val made = MoshTerminalTransport(
+                handover,
+                past = object : ScreenPast {
+                    override val depth get() = history.depth
+                    override fun keep(state: Long) = synchronized(em) { history.keep(state) }
+                    override fun restore(state: Long) = synchronized(em) { history.restore(state) }
+                    override fun forget() = synchronized(em) { history.forget() }
+                },
+            ) { buffer, n ->
                 synchronized(em) { em.process(buffer, 0, n) }
             }
             unowned = made

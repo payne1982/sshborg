@@ -41,6 +41,22 @@ class MoshTransport(
 
         /** Predictive echo only; there is no prediction engine yet, so this is for the record. */
         fun onEchoAck(number: Long) {}
+
+        /**
+         * The screen now *is* the state numbered [number]. A copy of it taken here is what makes
+         * [onReturnToState] possible later.
+         */
+        fun onStateReached(number: Long) {}
+
+        /**
+         * Asks for the screen to be put back as it was at state [number], because a frame has
+         * arrived that was computed against it and we have moved on since.
+         *
+         * @return true if it will be — the frame is then applied on top and supersedes what we
+         *   had, since it is the newer state. False, which is the default, and the frame is
+         *   dropped unacknowledged, as it was before anything could go back.
+         */
+        fun onReturnToState(number: Long): Boolean = false
     }
 
     private class SentState(var timestamp: Long, val number: Long, val actionCount: Long)
@@ -68,6 +84,17 @@ class MoshTransport(
      * a frame we can use.
      */
     var staleFrames = 0
+        private set
+
+    /**
+     * Frames that would have been thrown away and were not, because the screen could be put back
+     * to what they were computed against.
+     *
+     * The pair of numbers to read together: against a far end that is a state or two behind — what
+     * a round trip makes of any link with latency in it — every one of these is a round trip the
+     * screen did not have to wait for.
+     */
+    var returnedToState = 0
         private set
 
     /** Datagrams from the far end that opened and parsed. */
@@ -251,15 +278,24 @@ class MoshTransport(
         // that turned a 1.3-second stall at the start of every session, during which the prompt
         // was being retransmitted and thrown away, into one round trip.
         if (instruction.oldNumber != heldState) {
-            staleFrames++
-            lastStaleFrame = "old=${instruction.oldNumber} new=${instruction.newNumber} held=$heldState"
-            // And acknowledged *now*, not in [ACK_DELAY]. The delay exists to batch
-            // acknowledgements, which is right when one is merely owed; here the far end is
-            // sending frames we cannot use and will go on doing so until it learns which state we
-            // hold, so every millisecond of batching is a millisecond of the screen not moving.
-            pendingDataAck = true
-            nextAckTime = now
-            return
+            // We hold one screen, not mosh's list of them — but we can be put back. If the screen
+            // can return to what this frame was computed against, it is applied on top and
+            // supersedes what we had, being the newer state.
+            if (listener.onReturnToState(instruction.oldNumber)) {
+                returnedToState++
+                heldState = instruction.oldNumber
+            } else {
+                staleFrames++
+                lastStaleFrame = "old=${instruction.oldNumber} new=${instruction.newNumber} held=$heldState"
+                // And acknowledged *now*, not in [ACK_DELAY]. The delay exists to batch
+                // acknowledgements, which is right when one is merely owed; here the far end is
+                // sending frames we cannot use and will go on doing so until it learns which state
+                // we hold, so every millisecond of batching is a millisecond of the screen not
+                // moving.
+                pendingDataAck = true
+                nextAckTime = now
+                return
+            }
         }
 
         if (instruction.diff.isNotEmpty()) {
@@ -273,6 +309,7 @@ class MoshTransport(
         }
         heldState = instruction.newNumber
         ackNumber = instruction.newNumber
+        listener.onStateReached(instruction.newNumber)
         // Every state we accept is worth saying so about, and within [ACK_DELAY] rather than
         // whenever we next happen to send something. Mosh only marks a *data* acknowledgement
         // owed, and can afford to: its client keeps a history of screens, so a far end that has

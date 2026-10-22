@@ -73,6 +73,12 @@ class MoshTerminalTransport(
      */
     private val silenceLimitMs: Long = SILENCE_LIMIT,
     private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
+    /**
+     * The screen's recent pasts, so that a frame computed against one of them can be used instead
+     * of thrown away. Null is the old behaviour: every such frame costs a round trip, which on a
+     * link with latency in it was measured as half a second a keystroke.
+     */
+    private val past: ScreenPast? = null,
     /** Where host bytes go while no [read] is attached: the session's own emulator. */
     private val unattendedSink: (ByteArray, Int) -> Unit,
 ) : TerminalTransport {
@@ -99,7 +105,25 @@ class MoshTerminalTransport(
         object : MoshTransport.Listener {
             override fun onHostBytes(bytes: ByteArray) {
                 // Handed over, not applied: see [toScreen].
-                toScreen.trySend(Frame(bytes, clock()))
+                toScreen.trySend(ToScreen.Bytes(bytes, clock()))
+            }
+
+            override fun onStateReached(number: Long) {
+                if (past == null) return
+                toScreen.trySend(ToScreen.Keep(number))
+                // The loop's own tally of what the screen can be put back to. It cannot ask the
+                // screen directly: the answer is needed here, on this thread, before the frame is
+                // either used or thrown away, and the copies themselves are made over there.
+                kept.addLast(number)
+                while (kept.size > past.depth) kept.removeFirst()
+            }
+
+            override fun onReturnToState(number: Long): Boolean {
+                if (past == null || number !in kept) return false
+                toScreen.trySend(ToScreen.Restore(number))
+                // Everything after it never happened.
+                while (kept.isNotEmpty() && kept.last() != number) kept.removeLast()
+                return true
             }
             // The server telling us how big it thinks the terminal is. We are the ones who decide
             // that, and we have already told it, so there is nothing here to obey.
@@ -123,10 +147,23 @@ class MoshTerminalTransport(
      *
      * One consumer, so the order the server sent them in is the order the screen gets them in.
      */
-    private val toScreen = Channel<Frame>(Channel.UNLIMITED)
+    private val toScreen = Channel<ToScreen>(Channel.UNLIMITED)
 
-    /** A run of host bytes and the moment it arrived, so the wait for the screen can be seen. */
-    private class Frame(val bytes: ByteArray, val at: Long)
+    /**
+     * What the loop sends the screen's way, in the order the far end sent it.
+     *
+     * The order is the point. "Put the screen back as it was at 233, then draw this on top" only
+     * means something if the two arrive that way round, and keeping a copy of the screen only
+     * means something if it is taken when the bytes of that state have been applied and not
+     * before. One consumer, one queue, no exceptions.
+     */
+    private sealed interface ToScreen {
+        /** A run of host bytes, with the moment it arrived so the wait can be seen. */
+        class Bytes(val bytes: ByteArray, val at: Long) : ToScreen
+        class Keep(val state: Long) : ToScreen
+        class Restore(val state: Long) : ToScreen
+        object Forget : ToScreen
+    }
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val selector: Selector = Selector.open()
@@ -168,6 +205,9 @@ class MoshTerminalTransport(
     @Volatile
     private var closing = false
 
+    /** State numbers the screen can be put back to, newest last. Touched by the loop only. */
+    private val kept = ArrayDeque<Long>()
+
     @Volatile
     private var hopRequested = false
 
@@ -205,7 +245,8 @@ class MoshTerminalTransport(
         worstScreenWait = 0
         return "rtt~${mosh.timing.srtt.toInt()}ms screen-wait<=${worst}ms applied=$framesApplied " +
             "stale=${mosh.staleFrames} got=${mosh.receivedDatagrams} missed=${mosh.missedDatagrams} " +
-            "hops=$hops refused=$failedSends bad=$protocolErrors [${mosh.lastStaleFrame}]"
+            "back=${mosh.returnedToState} hops=$hops refused=$failedSends bad=$protocolErrors " +
+            "[${mosh.lastStaleFrame}]"
     }
 
     /**
@@ -229,15 +270,26 @@ class MoshTerminalTransport(
     fun start() {
         if (started) return
         started = true
+        // The state we begin at, which is a blank screen, and is worth being able to return to:
+        // the far end's very first frame is computed against exactly that.
+        if (past != null) {
+            toScreen.trySend(ToScreen.Keep(0))
+            kept.addLast(0)
+        }
         openSocket()
         scope.launch {
             // Drains to the end: a channel that is closed hands out what is already in it first,
             // so the last frames of a session still reach the screen.
-            for (frame in toScreen) {
-                (attached ?: unattendedSink)(frame.bytes, frame.bytes.size)
-                val waited = clock() - frame.at
-                if (waited > worstScreenWait) worstScreenWait = waited
-                framesApplied++
+            for (message in toScreen) when (message) {
+                is ToScreen.Bytes -> {
+                    (attached ?: unattendedSink)(message.bytes, message.bytes.size)
+                    val waited = clock() - message.at
+                    if (waited > worstScreenWait) worstScreenWait = waited
+                    framesApplied++
+                }
+                is ToScreen.Keep -> past?.keep(message.state)
+                is ToScreen.Restore -> past?.restore(message.state)
+                is ToScreen.Forget -> past?.forget()
             }
         }
         scope.launch {
@@ -379,7 +431,15 @@ class MoshTerminalTransport(
         while (true) {
             when (val event = pending.poll() ?: return) {
                 is Event.Typed -> mosh.type(event.bytes)
-                is Event.Resized -> mosh.resize(event.columns, event.rows)
+                is Event.Resized -> {
+                    mosh.resize(event.columns, event.rows)
+                    // A screen of a different shape cannot be put back: nothing kept describes
+                    // this terminal any more.
+                    if (past != null) {
+                        kept.clear()
+                        toScreen.trySend(ToScreen.Forget)
+                    }
+                }
             }
         }
     }
