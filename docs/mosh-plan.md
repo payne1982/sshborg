@@ -680,6 +680,76 @@ deleted rather than branched. The cost is a change to settled behaviour: today t
 under SSH sits still while the bar slides away, and with a following offset it would slide
 up with it. That is the user's call, not a decision for this document.
 
+#### What the first field test cost and taught, 2026-10-22
+
+Three reports from a real device, and the order they were answered in is the lesson.
+
+**The wheel in tmux did nothing.** mosh carries `?1000h` and `?1006h` but never `?1049h` —
+it keeps the terminal on its own side and sends what it looks like, so it switches to the
+alternate screen itself and says nothing. The gate for "the wheel belongs to the program"
+was *alternate screen and mouse reporting*, and the first half can never be true there.
+The policy moved into `TerminalEmulator.wheelBelongsToApplication`, which reads
+`hasAlternateScreen`, set from `TerminalTransport.screenIsSynchronised`. Both facts about
+mosh are now held by a test against a real server rather than by a reading of its source.
+
+**Three blank rows on arrival, sometimes, and then the typed line jumping to the top.**
+One bug, and the one looked at the day before and called harmless: the title-bar line
+feeds were still being written under mosh. The first frame erases them, which had been
+measured — but the pump is already running by then, so whether they land before that clear
+or after it decides whether the session is merely odd or corrupt. Landing after, our
+screen sits three rows below the one the server is computing differences against, and the
+jump is the server positioning the cursor for its own layout. **A race left open by a
+conclusion that was right about the common case.** The fact now has one name on the
+transport and three places take from it only what they need.
+
+**"Half a second a character, and plain SSH is fine on the same tablet."** This one took
+three wrong explanations before a number, and every wrong one was a guess about a machine
+that was not in front of me:
+
+1. *the draw holds the emulator's lock and blocks the protocol loop.* Plausible, and the
+   lab even reproduced a 240 ms every other keystroke with a simulated slow draw — but
+   that 240 ms turned out to be the measurement itself queueing for that lock behind its
+   own painter, Java's monitors not being fair. The real number, taken from the device,
+   was `screen-wait<=10ms`: innocent. Delivery was moved off the loop anyway and that
+   stands on its own merits, but it was not the cure;
+2. *the radio is losing datagrams.* `missed=0` out of 55, counted from the gaps the far
+   end leaves in its own sequence numbers: innocent;
+3. *the cost per datagram of OCB and inflate on a 2017 ARM.* Never got as far as being
+   tested, because by then the counter that mattered was already on the screen.
+
+What it actually is: `stale=21` against `applied=19` — **more frames thrown away than
+applied, with nothing lost in transit.** That is the shortcut of phase 4, where this
+document says the cost of keeping one terminal instead of mosh's queue of them is "an
+occasional extra retransmission". On a LAN with no round trip to speak of that is true,
+which is exactly why the lab measures 17 ms a keystroke and cannot see this at all. At
+71-110 ms of round trip, with the server's frame interval at half of that, about half of
+what it sends can never be used by a client that keeps one screen.
+
+Acknowledging faster took the tail off: every state we accept is acknowledged within
+`ACK_DELAY` instead of only the ones carrying something to show, and a frame we threw away
+is acknowledged immediately, because until the far end hears which state we hold it goes
+on sending frames we cannot use. Median 115 ms and a worst of 316 over 125 samples, where
+before there were 438s and 770s. SSH on the same device is a median of 72 ms, so mosh is
+now within about one round trip of it rather than ten.
+
+**What is left, and now with a measurement behind it:** keep a few screens of history, as
+mosh does, so that a frame diffed against a state we have passed is applied from the older
+screen instead of dropped. The log prints the three numbers that say so — a thrown-away
+frame reads `old=233 new=236 held=235`, the far end diffing from the state it has heard us
+acknowledge rather than the one we hold — and no amount of faster acknowledging can close
+that, because the acknowledgement still takes half a round trip. It wants a snapshot of
+the visible screen per state, which our emulator has no way to make yet.
+
+**And a rule, for the third time on this branch.** A gate that ends on a question whose
+answer cannot be "nothing happened" is not enough on its own: `MoshTerminalTransportTest`
+typed, saw the right text come back, and would have passed just as happily at two seconds
+a character, because it waits fifteen seconds for the text to appear. A gate has to end on
+a question whose answer is a **number**, where a wrong one is a different number rather
+than a missing event. Hence `MoshLatencyTest`, and hence the one line a debug build logs
+every two seconds on a real device: the lab cannot answer for somebody's tablet, and three
+of my explanations for that tablet were wrong before one measurement from it settled the
+matter.
+
 #### What phase 6 still owes
 
 - **The guide, in ten locales**: the three-second heartbeat and what it costs in radio,
@@ -687,6 +757,10 @@ up with it. That is the user's call, not a decision for this document.
 - **"Contact lost, still trying"**, as above. It is the difference between a patient
   client and a frozen screen, and it is what would let both timeouts be as long as mosh's
   own.
+- **A few screens of history**, so that a frame diffed against a state we have passed is
+  applied from the older screen instead of thrown away. Measured on a real device as half of
+  everything the server sends; see the section above. This is the one that decides whether typing
+  over mosh ever feels better than typing over SSH rather than merely close to it.
 - **The gate on a real phone**: switch the Wi-Fi off mid-session and keep typing.
   Everything up to here is gated from the JVM against a real server, and that is the one
   question the JVM cannot be asked.
