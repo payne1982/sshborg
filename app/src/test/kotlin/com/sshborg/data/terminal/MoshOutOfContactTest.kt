@@ -74,6 +74,28 @@ class MoshOutOfContactTest {
         }
     }
 
+    @Test fun `the family talked on is the family of the address, and it is said out loud`() {
+        // Which family a session is on decides whether a firewall rule applies to it at all:
+        // `mosh-server -s` binds to the address the SSH connection arrived on, so a rule written
+        // for IPv4 does nothing for a session SSH made over IPv6. The dialog has to be able to say
+        // which, because that is the one thing somebody needs in order to go and look — and the
+        // socket has to be opened on the matching family, which the gate confirms end to end over
+        // ::1 (`./gradlew test -PsshHost=::1`).
+        val six = MoshTerminalTransport(
+            MoshBootstrap("::1", 60123, com.sshborg.mosh.MoshVectors.SESSION_KEY),
+        ) { _, _ -> }
+        val four = MoshTerminalTransport(
+            MoshBootstrap("127.0.0.1", 60124, com.sshborg.mosh.MoshVectors.SESSION_KEY),
+        ) { _, _ -> }
+        try {
+            assertEquals("UDP port 60123 over IPv6", six.peerDescription)
+            assertEquals("UDP port 60124 over IPv4", four.peerDescription)
+        } finally {
+            six.close()
+            four.close()
+        }
+    }
+
     private companion object {
         /** Short, because the whole point here is to reach the end of patience quickly. */
         const val SILENCE_LIMIT = 4_000L
