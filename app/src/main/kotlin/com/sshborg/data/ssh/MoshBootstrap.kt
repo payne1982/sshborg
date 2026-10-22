@@ -14,6 +14,24 @@ class MoshBootstrap(val host: String, val port: Int, val key: String) {
     override fun toString(): String = "MoshBootstrap($host:$port)"
 
     companion object {
+        /**
+         * The port range a host asks for, as `60001-60999` or a single port, turned into what
+         * `mosh-server` wants after `-p`. Null for anything we cannot make sense of, and then the
+         * server is left to its own default rather than handed nonsense.
+         *
+         * Deliberately forgiving about the separator, because this is typed by hand from a
+         * firewall rule and a person may well write a colon the way mosh does.
+         */
+        fun portRange(asked: String?): String? {
+            val text = asked?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+            val parts = text.split('-', ':').map { it.trim() }
+            if (parts.size > 2) return null
+            val from = parts[0].toIntOrNull() ?: return null
+            val to = if (parts.size == 1) from else parts[1].toIntOrNull() ?: return null
+            if (from !in 1..65535 || to !in 1..65535 || to < from) return null
+            return if (from == to) "$from" else "$from:$to"
+        }
+
         /** `MOSH CONNECT <port> <key>`, the whole of the handover. */
         val CONNECT_LINE = Regex("MOSH CONNECT (\\d{1,5}) (\\S+)")
 

@@ -70,4 +70,32 @@ data class HostEntity(
      * excludes a jump chain: see `docs/mosh-plan.md` phase 6.
      */
     val mosh: Boolean = false,
+    /**
+     * Which address family a mosh session should be made over: `auto`, `ipv4` or `ipv6`.
+     *
+     * It matters more than it looks. A mosh session is bound to the family it was born on —
+     * `mosh-server -s` listens on the address the SSH connection arrived on, one address of one
+     * family — so roaming works *within* a family and not across one. A session made over IPv6 on
+     * Wi-Fi cannot follow the phone onto a carrier that has no IPv6, and the reverse is just as
+     * true on an IPv6-only carrier. Neither can be guessed for somebody else's networks, which is
+     * why this is a choice and its default is to let the resolver decide as it always has.
+     *
+     * A preference, not a demand: if the chosen family has no address, the other is used.
+     */
+    val moshFamily: String = "auto",
+    /**
+     * The UDP port range `mosh-server` may choose from, as `60001-60999` or a single port. Null
+     * means mosh's own default, which is that whole range — a thousand ports for a firewall rule
+     * to open, which is why it can be narrowed. One port per session open at once on that server.
+     */
+    val moshPorts: String? = null,
+    /**
+     * What to run on the server, when `mosh-server` is not what a non-interactive shell finds on
+     * its PATH. Null means `mosh-server`.
+     *
+     * Without this, a server that has mosh installed somewhere unusual reports itself as not
+     * having it at all, and there is nothing the person can do about a diagnosis that is simply
+     * wrong. The stock client has `--server=` for the same reason.
+     */
+    val moshCommand: String? = null,
 )

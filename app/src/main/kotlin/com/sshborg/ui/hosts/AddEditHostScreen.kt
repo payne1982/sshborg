@@ -72,6 +72,9 @@ fun AddEditHostScreen(
     val sftpShowHidden by vm.sftpShowHidden.collectAsState()
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
     val mosh by vm.mosh.collectAsState()
+    val moshFamily by vm.moshFamily.collectAsState()
+    val moshPorts by vm.moshPorts.collectAsState()
+    val moshCommand by vm.moshCommand.collectAsState()
     val jumpConfigured by vm.jumpConfigured.collectAsState()
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
@@ -396,11 +399,63 @@ fun AddEditHostScreen(
             if (mosh) {
                 // Nothing is cleared when this appears: the switch above is what cannot be
                 // turned on while a chain exists, so by the time it is on there is no chain
-                // left to lose.
+                // left to lose. The three mosh settings take this slot instead, since the two
+                // exclude each other anyway — and they are the three things about a mosh session
+                // that cannot be decided on somebody else's behalf.
                 Text(
                     stringResource(R.string.host_jump_not_with_mosh),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(Modifier.height(4.dp))
+                Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
+
+                Text(stringResource(R.string.host_mosh_family_label), style = MaterialTheme.typography.bodyMedium)
+                Column {
+                    listOf(
+                        "auto" to R.string.host_mosh_family_auto,
+                        "ipv4" to R.string.host_mosh_family_ipv4,
+                        "ipv6" to R.string.host_mosh_family_ipv6,
+                    ).forEach { (family, labelRes) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            RadioButton(
+                                selected = moshFamily == family,
+                                onClick  = { vm.moshFamily.value = family },
+                            )
+                            Text(stringResource(labelRes))
+                        }
+                    }
+                }
+                Text(
+                    stringResource(R.string.host_mosh_family_supporting),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                HostField(
+                    value = moshPorts,
+                    onValueChange = { vm.moshPorts.value = it },
+                    label = stringResource(R.string.host_mosh_ports_label),
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardType = KeyboardType.Uri,
+                    placeholder = stringResource(R.string.host_mosh_ports_placeholder),
+                    supporting = stringResource(R.string.host_mosh_ports_supporting),
+                )
+
+                HostField(
+                    value = moshCommand,
+                    onValueChange = { vm.moshCommand.value = it },
+                    label = stringResource(R.string.host_mosh_command_label),
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardType = KeyboardType.Uri,
+                    placeholder = stringResource(R.string.host_mosh_command_placeholder),
+                    supporting = stringResource(R.string.host_mosh_command_supporting),
                 )
             } else {
                 // Mode selector

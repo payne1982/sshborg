@@ -1,6 +1,7 @@
 package com.sshborg.data.ssh
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -60,5 +61,22 @@ class MoshBootstrapTest {
     @Test fun `the bootstrap never prints its own key`() {
         val shown = MoshBootstrap("example.test", 60001, "SeCrEtKeYSeCrEtKeY1234==").toString()
         assertFalse(shown, shown.contains("SeCrEtKeY"))
+    }
+
+    @Test fun `a port range is read the way somebody would write it down`() {
+        // The shapes a person copies out of a firewall rule, including mosh's own colon.
+        assertEquals("60001:60010", MoshBootstrap.portRange("60001-60010"))
+        assertEquals("60001:60010", MoshBootstrap.portRange("60001:60010"))
+        assertEquals("60001:60010", MoshBootstrap.portRange("  60001 - 60010 "))
+        assertEquals("a single port is a range of one", "60001", MoshBootstrap.portRange("60001"))
+    }
+
+    @Test fun `nonsense asks for nothing rather than handing the server rubbish`() {
+        // Null everywhere means "no -p", which leaves mosh its own range of a thousand ports —
+        // the right answer for an empty field and the only safe one for a typo.
+        for (asked in listOf(null, "", "   ", "abc", "60001-", "-60010", "0-10", "1-70000",
+                             "60010-60001", "1-2-3")) {
+            assertNull("this should not have become a -p argument: $asked", MoshBootstrap.portRange(asked))
+        }
     }
 }

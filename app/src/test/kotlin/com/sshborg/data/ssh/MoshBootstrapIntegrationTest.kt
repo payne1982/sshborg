@@ -38,6 +38,53 @@ class MoshBootstrapIntegrationTest {
         return runBlocking { SshManager.openShell(params) { _, _, _ -> true } }
     }
 
+    @Test fun `a chosen address family is dialled, and the host key still vouches by name`() {
+        assumeTrue(TestConfig.NO_SERVER, configured != null)
+        val s = configured!!
+        // Deliberately by name and not by the configured address, because a name is the only
+        // thing a family can be chosen *from* — and `localhost` is the one name every machine
+        // has on both families, so this needs nothing of the configuration but the login.
+        val both = runCatching { java.net.InetAddress.getAllByName(NAME) }.getOrNull().orEmpty()
+        assumeTrue(
+            "$NAME does not resolve to both families on this machine",
+            both.any { it is java.net.Inet4Address } && both.any { it is java.net.Inet6Address },
+        )
+
+        val ssh = runBlocking {
+            SshManager.openShell(
+                SshConnectionParams(
+                    hostname = NAME,
+                    port = s.port,
+                    username = s.user,
+                    auth = SshAuth.PublicKey(s.key("i_plain")),
+                    addressFamily = "ipv4",
+                ),
+            ) { _, _, _ -> true }
+        }
+        try {
+            assertTrue("the session should be up", ssh.isConnected)
+            assertEquals(
+                "mosh must be handed the address SSH actually dialled, not the name to resolve again",
+                "127.0.0.1", ssh.dialledAddress,
+            )
+            // The address it was dialled at is what mosh will be handed; the host key line is
+            // still written under the *name*, which is the thing the pin is kept against. Getting
+            // that second half wrong would turn a routing preference into a question about
+            // trusting the server all over again.
+            assertTrue(
+                "the host key should still vouch for the name, not the address it was dialled at",
+                ssh.hostKeyLine.startsWith("$NAME "),
+            )
+        } finally {
+            runCatching { ssh.disconnect() }
+        }
+    }
+
+    private companion object {
+        /** The one name every machine has on both address families. */
+        const val NAME = "localhost"
+    }
+
     @Test fun `SSH starts a mosh-server and the session it hands over works`() {
         val ssh = login()
         var mosh: MoshLabSession? = null

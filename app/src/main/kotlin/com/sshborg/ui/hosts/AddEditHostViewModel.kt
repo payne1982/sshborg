@@ -54,6 +54,12 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var allowLegacyCiphers = MutableStateFlow(false)
     /** Whether this host's terminal rides mosh instead of the SSH shell channel. */
     var mosh = MutableStateFlow(false)
+    /** Which address family a mosh session is made over: "auto" | "ipv4" | "ipv6". */
+    var moshFamily = MutableStateFlow("auto")
+    /** The UDP port range mosh-server may pick from; blank means its own default. */
+    var moshPorts = MutableStateFlow("")
+    /** What to run on the server; blank means `mosh-server`. */
+    var moshCommand = MutableStateFlow("")
     /** Null = ungrouped; otherwise the selected group's ID. */
     var groupId = MutableStateFlow<Long?>(null)
     /** Optional per-host ARGB color; overrides the group color. */
@@ -133,6 +139,9 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpShowHidden.value = h.sftpShowHidden
             allowLegacyCiphers.value = h.allowLegacyCiphers
             mosh.value = h.mosh
+            moshFamily.value = h.moshFamily
+            moshPorts.value = h.moshPorts ?: ""
+            moshCommand.value = h.moshCommand ?: ""
             groupId.value = h.groupId
             hostColor.value = h.color
             _hasStoredHostKeys.value = h.knownHostsEntry != null || h.jumpHostKeys != null
@@ -208,6 +217,11 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpShowHidden       = sftpShowHidden.value,
             allowLegacyCiphers   = allowLegacyCiphers.value,
             mosh                 = newMosh,
+            // Kept whatever the switch says, so that turning mosh off and on again does not lose
+            // a port range somebody had to get from their firewall.
+            moshFamily           = moshFamily.value,
+            moshPorts            = moshPorts.value.trim().takeIf { it.isNotEmpty() },
+            moshCommand          = moshCommand.value.trim().takeIf { it.isNotEmpty() },
             groupId              = groupId.value,
             color                = hostColor.value,
             // Not fields of this form, and `upsert` replaces the whole row — so leaving them out

@@ -75,6 +75,18 @@ data class SshConnectionParams(
     val portForwardings: List<PortForwarding> = emptyList(),
     /** If true, legacy/weak ciphers are appended to the negotiation list (for old servers). */
     val allowLegacyCiphers: Boolean = false,
+    /**
+     * Which address family to prefer when the name has both: `auto`, `ipv4` or `ipv6`.
+     *
+     * `auto` is what this app has always done — the resolver's own order, which on Android
+     * prefers IPv6. It is worth choosing only because of mosh, whose session is bound to the
+     * family it was born on and can therefore only follow a phone between networks that both have
+     * it. A preference and not a demand: if the chosen family has no address, the other is used.
+     *
+     * Ignored when the connection goes through a jump chain, where there is no socket of ours to
+     * aim at an address — and mosh and a jump chain exclude each other anyway.
+     */
+    val addressFamily: String = "auto",
 )
 
 sealed interface SshAuth {

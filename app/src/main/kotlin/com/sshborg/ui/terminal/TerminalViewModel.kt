@@ -343,6 +343,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             jumpHosts          = jumpHosts,
                             portForwardings    = parsePortForwardings(host.portForwardings),
                             allowLegacyCiphers = host.allowLegacyCiphers,
+                            // Only mosh has a reason to care which family a session is born on,
+                            // and only its own hosts carry an answer.
+                            addressFamily      = if (host.mosh) host.moshFamily else "auto",
                         ),
                         columns = columns,
                         rows    = rows,
@@ -411,7 +414,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     // backup could have been edited by hand, and a jump chain is the one thing
                     // mosh cannot carry.
                     val made = if (host.mosh && jumpHosts.isEmpty()) {
-                        moshOrAnswerFor(session, em) ?: run {
+                        moshOrAnswerFor(session, host, em) ?: run {
                             // Asked, told why, and the answer was to leave.
                             runCatching { session.disconnect() }
                             withContext(Dispatchers.Main.immediate) {
@@ -619,6 +622,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
      */
     private suspend fun moshOrAnswerFor(
         session: ShellSession,
+        host: HostEntity,
         em: TerminalEmulator,
     ): TerminalTransport? {
         // Held so that it can be closed again if this never gets as far as handing it over. Its
@@ -626,7 +630,11 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         // the handshake would otherwise leave a pump answering a server for ever.
         var unowned: MoshTerminalTransport? = null
         val failure = try {
-            val handover = session.startMoshServer(MOSH_SERVER_TIMEOUT_SECONDS)
+            val handover = session.startMoshServer(
+                networkTimeoutSeconds = MOSH_SERVER_TIMEOUT_SECONDS,
+                command = host.moshCommand?.takeIf { it.isNotBlank() } ?: "mosh-server",
+                ports = host.moshPorts,
+            )
             // The sink of last resort takes the emulator and nothing else — in particular not
             // this ViewModel, which a tab switch throws away while the session carries on.
             // The screen's recent pasts, so that a frame the far end computed against a state we
