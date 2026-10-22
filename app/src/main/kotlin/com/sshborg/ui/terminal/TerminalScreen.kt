@@ -532,28 +532,30 @@ fun TerminalScreen(
             // nothing to say, and without this line the difference is invisible for as long as the
             // transport is willing to wait. It appears by itself and goes by itself.
             //
-            // Under the title bar when the bar is out, at the top when it is not: the two would
-            // otherwise sit on each other, and the bar's own height is already measured here.
+            // Placed where the error overlays are placed, a quarter from the top, and for both of
+            // the reasons that position exists. At the top it landed on the front camera of the
+            // first tablet it was tried on — the same strip that put the selection bar under a
+            // camera once — and at the true centre the soft keyboard can cover it, since the
+            // terminal does not always give the keyboard its space back.
             if (outOfContact >= OUT_OF_CONTACT_AFTER_S) {
                 val sinceLabel = if (outOfContact < 60) {
                     stringResource(R.string.terminal_no_contact_seconds, outOfContact)
                 } else {
                     stringResource(R.string.terminal_no_contact_minutes, outOfContact / 60)
                 }
-                Surface(
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .offset { IntOffset(0, if (barAutoHide && barShown) titleBarHeightPx else 0) }
-                        .padding(8.dp),
-                ) {
-                    Text(
-                        sinceLabel,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    )
+                Box(Modifier.fillMaxSize(), contentAlignment = BiasAlignment(0f, -0.5f)) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        shape = MaterialTheme.shapes.small,
+                        shadowElevation = 4.dp,
+                    ) {
+                        Text(
+                            sinceLabel,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        )
+                    }
                 }
             }
 
