@@ -665,7 +665,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
      * The lab can measure a keystroke against a real server from a desktop; it cannot tell us what
      * the same session costs on somebody's tablet, and the first field report was "half a second a
      * character" where the lab said seventeen milliseconds. This is how that gap gets a number
-     * instead of a theory: `adb logcat -s SSHBorgMosh`. Nothing in release builds, and nothing in
+     * instead of a theory: `adb logcat -s SshBorgMosh`. Nothing in release builds, and nothing in
      * the line that is anybody's business but the session's own health.
      */
     private fun watchMoshInDebug(transport: MoshTerminalTransport) {
@@ -674,7 +674,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             while (true) {
                 delay(DIAGNOSTIC_INTERVAL_MS)
                 if (!transport.isConnected) return@launch
-                android.util.Log.i("SSHBorgMosh", transport.diagnosticLine())
+                android.util.Log.i(TAG_MOSH, transport.diagnosticLine())
             }
         }
     }
@@ -718,7 +718,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         if (typed == 0L) return
         typedAt = 0L
         android.util.Log.i(
-            "SSHBorgMosh",
+            // Not the mosh tag: this one is measured for either transport, which is the whole
+            // point of it — the comparison is the same device, network and finger.
+            TAG_TERMINAL,
             "echo=${System.currentTimeMillis() - typed}ms" +
                 if (transport?.screenIsSynchronised == true) " mosh" else " ssh",
         )
@@ -930,5 +932,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
         /** How often a debug build says in the log how the mosh session is going. */
         const val DIAGNOSTIC_INTERVAL_MS = 2_000L
+
+        /**
+         * Logcat tags, in the shape the app already uses for `SshDiagnostics`: one for how a mosh
+         * session is going, one for what a keystroke costs over whichever transport is carrying
+         * it. `adb logcat -s SshBorgMosh` or `-s SshBorgTerminal`, debug builds only.
+         */
+        const val TAG_MOSH = "SshBorgMosh"
+        const val TAG_TERMINAL = "SshBorgTerminal"
     }
 }

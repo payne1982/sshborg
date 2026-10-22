@@ -225,8 +225,13 @@ class MoshTerminalTransport(
     /** The smoothed round-trip estimate, which is what the frame rate is derived from. */
     val roundTripMs: Int get() = mosh.timing.srtt.toInt()
 
-    /** See [MoshTransport.staleFrames]: the cost of holding one terminal instead of several. */
+    /** See [MoshTransport.staleFrames]: what a far end a state or two behind costs us. */
     val staleFrames: Int get() = mosh.staleFrames
+
+    /** See [MoshTransport.returnedToState]: and what the screen's recent pasts save of it. */
+    val framesSavedByGoingBack: Int get() = mosh.returnedToState
+
+    private val receivedFromPeer: Int get() = mosh.receivedDatagrams
 
     @Volatile
     private var worstScreenWait = 0L
@@ -569,7 +574,13 @@ class MoshTerminalTransport(
         summary = null,
         detail = "mosh: nothing heard for ${silentFor / 1000}s, which is as long as we wait\n" +
             "round trip ~${mosh.timing.srtt.toInt()}ms, local port hops $hops, sends refused " +
-            "$failedSends, undecipherable datagrams $protocolErrors",
+            "$failedSends, undecipherable datagrams $protocolErrors\n" +
+            // The three that say how the session was going rather than how it ended, so that a
+            // report of "it was slow" arrives with the numbers in it instead of needing a device
+            // on a cable and an evening. Frames the far end sent that never reached us, frames we
+            // could not use, and frames saved by putting the screen back.
+            "datagrams $receivedFromPeer received and ${mosh.missedDatagrams} missed, " +
+            "${mosh.staleFrames} frames unusable, ${mosh.returnedToState} saved by going back",
     )
 
     private companion object {
