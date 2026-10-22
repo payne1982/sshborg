@@ -659,6 +659,19 @@ login shell may be an interactive program — a menu, an attach that asks for co
 a `read` — and three Enters it did not ask for are three answers it did not expect. Input
 the user did not type is not ours to send.
 
+**Decided, 2026-10-22: the bar starts out of the way instead.**
+`TerminalViewModel.barWouldHideOutput` says whether a bar lying over the top of this
+terminal would cover the host's own output rather than rows left blank for it, and the
+screen keeps the overlay retracted from the start when it would. It is asked of the
+*host's* switch and not of the transport, because the bar's countdown is shorter than a
+login: by the time there is a transport to ask, the bar would already have covered the
+first screenful. It is then corrected from the transport, so a session that fell back to
+SSH is not left with a stale answer. Only the arrival changes — a tap brings the bar back
+as always, and the countdown takes it away as always. What is given up is the host's name
+being shown at the start of a mosh session, and with it the lesson that a tap brings the
+bar back; what is gained is that nothing is ever hidden. The user chose this over the
+alternative below.
+
 What is left is to move the *drawing* rather than the content: offset the drawn grid
 downward by the height the bar covers while the bar is there, and let the offset follow
 the bar as it retracts. No injection, no protocol involvement, nothing the transport has

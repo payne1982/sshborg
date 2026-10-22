@@ -140,6 +140,16 @@ fun TerminalScreen(
     // terminal re-arms the wait, and a finger resting on the bar suspends it: reaching for the
     // disconnect button cannot lose the bar half way there.
     var barShown by remember { mutableStateOf(true) }
+    // Unless it would be lying over the host's own output instead of over rows left blank for it,
+    // which is a mosh session: there the screen belongs to the server and nothing can be pushed
+    // clear of the bar. See TerminalViewModel.barWouldHideOutput. Only the arrival changes — a tap
+    // brings the bar back as always, and the countdown then takes it away as always.
+    val barWouldHideOutput by vm.barWouldHideOutput.collectAsState()
+    LaunchedEffect(barWouldHideOutput, barAutoHide) {
+        // Only the overlay can cover anything: a bar the user has chosen to keep fixed is above
+        // the terminal, not over it, and on a television it is fixed whatever the setting says.
+        if (barWouldHideOutput && barAutoHide) barShown = false
+    }
     var barHeld  by remember { mutableStateOf(false) }
     var barTick  by remember { mutableIntStateOf(0) }
     // What the selection covers on screen, and how tall the selection bar is: between them,

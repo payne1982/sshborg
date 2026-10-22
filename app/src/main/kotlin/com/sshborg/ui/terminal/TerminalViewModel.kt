@@ -147,6 +147,24 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _navBack = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val navBack: SharedFlow<Unit> = _navBack
 
+    private val _barWouldHideOutput = MutableStateFlow(false)
+
+    /**
+     * Whether a title bar lying over the top of this terminal would cover the host's own output
+     * rather than rows deliberately left blank for it.
+     *
+     * The retracting bar is an overlay, and what keeps it from hiding anything is [rowsUnderTitleBar]
+     * line feeds written into the emulator before the first byte arrives, so that the login begins
+     * below it. That works because under SSH the output is a stream appended at the cursor.
+     *
+     * Under mosh it does not work and cannot be made to: the first frame homes the cursor and
+     * clears the screen before painting at absolute positions, so the line feeds are erased —
+     * measured, and recorded in `docs/mosh-plan.md`. The screen is the server's there, and the
+     * client is not allowed to edit it. So the bar starts out of the way instead, and a tap still
+     * brings it back for as long as it is wanted.
+     */
+    val barWouldHideOutput: StateFlow<Boolean> = _barWouldHideOutput.asStateFlow()
+
     /**
      * Attaches this ViewModel to an existing session in [SessionManager].
      * Must be called before [connect]. If the session is already connected, starts reading.
@@ -164,6 +182,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
         em.onTitleChanged = { t -> _title.value = t }
         _emulator.value = em
+
+        // Asked of the host rather than of the transport, because the bar's own countdown is
+        // shorter than a login: by the time there is a transport to ask, it would already have
+        // covered the first screenful. Corrected from the transport once there is one, so a
+        // session that fell back to SSH is not left with a stale answer.
+        viewModelScope.launch {
+            _barWouldHideOutput.value = hostDao.getById(session.hostId)?.mosh == true
+        }
 
         // Restore suggestion state cached on the session. When switching tabs the
         // ViewModel is recreated, and attach() (not connect()) runs, so without this
@@ -395,6 +421,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         // session that carried on over SSH after mosh failed gets it right too.
                         em.hasAlternateScreen = made !is MoshTerminalTransport
                     }
+                    _barWouldHideOutput.value = made is MoshTerminalTransport
                     withContext(Dispatchers.Main.immediate) {
                         sessionManager.update(id) {
                             it.copy(shellSession = session, transport = made, status = SessionManager.Status.Connected)
