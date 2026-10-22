@@ -638,6 +638,27 @@ that belief false, and every later frame is then computed against a screen we do
 — permanently, since there is no second full repaint except on a resize. The screen, under
 mosh, is the server's. The client may not edit it.
 
+The obvious next question, and it was asked: why not send three Enters to the *shell* once
+mosh is up, which is real input and therefore cannot put us out of step with the server?
+Tried, and the screen says why not:
+
+```
+before:  row 1: sshborg@fatberry:~ $            (cursor row 1)
+after:   row 1: sshborg@fatberry:~ $
+         row 2: sshborg@fatberry:~ $
+         row 3: sshborg@fatberry:~ $
+         row 4: sshborg@fatberry:~ $            (cursor row 4)
+```
+
+Adding lines below does not move what is above them. The first prompt — and on a host that
+has one, the whole motd — stays exactly where it was, under the bar; what moves down is
+only the line being typed into. The cost is three duplicated prompts, which on a two-line
+prompt looks like a fault in the app, and on a long motd the Enters would scroll it *up*
+and away instead. There is also a safety side to it that has nothing to do with looks: a
+login shell may be an interactive program — a menu, an attach that asks for confirmation,
+a `read` — and three Enters it did not ask for are three answers it did not expect. Input
+the user did not type is not ours to send.
+
 What is left is to move the *drawing* rather than the content: offset the drawn grid
 downward by the height the bar covers while the bar is there, and let the offset follow
 the bar as it retracts. No injection, no protocol involvement, nothing the transport has
