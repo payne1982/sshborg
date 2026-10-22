@@ -231,23 +231,25 @@ class MoshTerminalTransport(
     /** See [MoshTransport.returnedToState]: and what the screen's recent pasts save of it. */
     val framesSavedByGoingBack: Int get() = mosh.returnedToState
 
-    private val receivedFromPeer: Int get() = mosh.receivedDatagrams
-
     @Volatile
     private var worstScreenWait = 0L
     private var framesApplied = 0
 
     /**
-     * One line of how the session is actually going, for a debug build's log — the only way to ask
-     * a real device the questions the lab cannot answer for it. Reading it resets the worst case,
-     * so each line describes the interval since the last.
+     * One line of how the session is actually going — for a debug build's log, which is the only
+     * way to ask a real device the questions the lab cannot answer for it, and for the report the
+     * user can copy when a session is lost. One format for both, so a number somebody pastes into
+     * an issue and a number read over a cable mean the same thing.
      *
-     * No key, no address, no host name: the round trip, what the screen cost, and the three
-     * counters that say whether the protocol is fighting something.
+     * @param reset clears the worst case, so each logged line describes the interval since the
+     *   last one. A report of how the session ended asks for it without resetting.
+     *
+     * No key, no address, no host name: the round trip, what the screen cost, and the counters
+     * that say whether the protocol is fighting something.
      */
-    fun diagnosticLine(): String {
+    fun diagnosticLine(reset: Boolean = true): String {
         val worst = worstScreenWait
-        worstScreenWait = 0
+        if (reset) worstScreenWait = 0
         return "rtt~${mosh.timing.srtt.toInt()}ms screen-wait<=${worst}ms applied=$framesApplied " +
             "stale=${mosh.staleFrames} got=${mosh.receivedDatagrams} missed=${mosh.missedDatagrams} " +
             "back=${mosh.returnedToState} hops=$hops refused=$failedSends bad=$protocolErrors " +
@@ -565,22 +567,19 @@ class MoshTerminalTransport(
     }
 
     /**
-     * @param silentFor how long nothing has been heard, which is the only symptom there is. There
-     *   is no summary: only the caller can reach the string resources, and it has a generic line
-     *   for exactly this. The detail is what somebody could paste into a bug report — and carries
-     *   no key, no address and no host name.
+     * @param silentFor how long nothing has been heard, which is the only symptom there is.
+     *
+     * There is no summary: only the caller can reach the string resources, and it has a line in
+     * every locale for exactly this. What is here is the detail — the same block that holds a
+     * stack trace on the SSH side, and untranslated for the same reason: it exists to be pasted
+     * into an issue, and a reader who has to act on it is better served by numbers whose names do
+     * not change with the phone's language. It is the same line a debug build logs, so the two can
+     * be compared, and it carries no key, no address and no host name.
      */
     private fun lost(silentFor: Long): TerminalTransport.End.Lost = TerminalTransport.End.Lost(
         summary = null,
-        detail = "mosh: nothing heard for ${silentFor / 1000}s, which is as long as we wait\n" +
-            "round trip ~${mosh.timing.srtt.toInt()}ms, local port hops $hops, sends refused " +
-            "$failedSends, undecipherable datagrams $protocolErrors\n" +
-            // The three that say how the session was going rather than how it ended, so that a
-            // report of "it was slow" arrives with the numbers in it instead of needing a device
-            // on a cable and an evening. Frames the far end sent that never reached us, frames we
-            // could not use, and frames saved by putting the screen back.
-            "datagrams $receivedFromPeer received and ${mosh.missedDatagrams} missed, " +
-            "${mosh.staleFrames} frames unusable, ${mosh.returnedToState} saved by going back",
+        detail = "mosh silent=${silentFor / 1000}s limit=${silenceLimitMs / 1000}s\n" +
+            diagnosticLine(reset = false),
     )
 
     private companion object {
