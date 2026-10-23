@@ -804,9 +804,12 @@ everything it gives is in surviving the network changing underneath.
 - **"Contact lost, still trying"**, as above. It is the difference between a patient
   client and a frozen screen, and it is what would let both timeouts be as long as mosh's
   own.
-- **The gate on a real phone**: switch the Wi-Fi off mid-session and keep typing.
-  Everything up to here is gated from the JVM against a real server, and that is the one
-  question the JVM cannot be asked.
+- ~~**The gate on a real phone**~~ — **met, 2026-10-23.** The Wi-Fi was switched off
+  mid-session on a phone with a SIM, against a VPS, and the session carried on; the
+  contact-lost line appeared and went by itself. It took one thing that was not in the plan:
+  the per-host **IPv4 / IPv6** preference, because a mosh session is bound to the family it
+  was born on and the first attempt had been born on IPv6 — which the carrier did not have.
+  Phase 6 is therefore complete.
 
 ### Phase 7 — prediction, separately or never
 
