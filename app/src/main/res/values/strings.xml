@@ -64,13 +64,13 @@
     <string name="host_mosh_family_auto">Automatic</string>
     <string name="host_mosh_family_ipv4">Prefer IPv4</string>
     <string name="host_mosh_family_ipv6">Prefer IPv6</string>
-    <string name="host_mosh_family_supporting">A Mosh session stays on the address family it was born on, so it can only follow you between networks that both have it — often IPv4, sometimes only IPv6 on mobile. If the one you choose has no address, the other is used.</string>
+    <string name="host_mosh_family_supporting">A Mosh session stays on the address family it started on.</string>
     <string name="host_mosh_ports_label">UDP ports</string>
     <string name="host_mosh_ports_placeholder">60001-60999</string>
-    <string name="host_mosh_ports_supporting">The range the server picks a port from. Narrow it if you have to open few ports on a firewall; one port is needed per session open at the same time on that server.</string>
+    <string name="host_mosh_ports_supporting">Default 60001-60999. One port per session open at once.</string>
     <string name="host_mosh_command_label">mosh-server command</string>
     <string name="host_mosh_command_placeholder">mosh-server</string>
-    <string name="host_mosh_command_supporting">Change it if the program is not on the PATH of a non-interactive shell, for example /usr/local/bin/mosh-server.</string>
+    <string name="host_mosh_command_supporting">Default mosh-server. A full path if it is not on the PATH.</string>
     <string name="mosh_failed_title">Mosh could not start</string>
     <string name="mosh_failed_not_installed">There is no mosh-server on this host. Install mosh there, or turn the Mosh switch off for this host.</string>
     <string name="mosh_failed_locale">mosh-server will not run because the host’s locale is not UTF-8. Set a UTF-8 locale on the server.</string>

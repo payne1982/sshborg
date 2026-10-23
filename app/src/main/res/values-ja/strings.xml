@@ -63,13 +63,13 @@
     <string name="host_mosh_family_auto">自動</string>
     <string name="host_mosh_family_ipv4">IPv4 を優先</string>
     <string name="host_mosh_family_ipv6">IPv6 を優先</string>
-    <string name="host_mosh_family_supporting">Mosh のセッションは、開始したときのアドレスファミリーのままになります。そのため、両方のネットワークにそのファミリーがある場合だけ移動についてこられます。多くは IPv4 で、モバイルでは IPv6 だけのこともあります。選んだほうにアドレスがなければ、もう一方が使われます。</string>
+    <string name="host_mosh_family_supporting">Mosh のセッションは、開始したときのアドレスファミリーのままになります。</string>
     <string name="host_mosh_ports_label">UDP ポート</string>
     <string name="host_mosh_ports_placeholder">60001-60999</string>
-    <string name="host_mosh_ports_supporting">サーバーがポートを選ぶ範囲です。ファイアウォールで開けるポートが少ないときは狭めてください。そのサーバーで同時に開くセッションごとに 1 ポート必要です。</string>
+    <string name="host_mosh_ports_supporting">既定は 60001-60999。同時に開くセッションごとに 1 ポート。</string>
     <string name="host_mosh_command_label">mosh-server コマンド</string>
     <string name="host_mosh_command_placeholder">mosh-server</string>
-    <string name="host_mosh_command_supporting">非対話シェルの PATH にプログラムがない場合に変更してください。例: /usr/local/bin/mosh-server</string>
+    <string name="host_mosh_command_supporting">既定は mosh-server。PATH にない場合はフルパスを指定します。</string>
     <string name="mosh_failed_title">Mosh を開始できませんでした</string>
     <string name="mosh_failed_not_installed">このホストに mosh-server がありません。サーバーに mosh をインストールするか、このホストの Mosh をオフにしてください。</string>
     <string name="mosh_failed_locale">サーバーのロケールが UTF-8 でないため mosh-server が起動しません。サーバーに UTF-8 のロケールを設定してください。</string>

@@ -64,13 +64,13 @@
     <string name="host_mosh_family_auto">Автоматически</string>
     <string name="host_mosh_family_ipv4">Предпочитать IPv4</string>
     <string name="host_mosh_family_ipv6">Предпочитать IPv6</string>
-    <string name="host_mosh_family_supporting">Сеанс Mosh остаётся в том семействе адресов, в котором возник, поэтому может перейти вместе с вами только между сетями, где есть оба — чаще это IPv4, иногда в мобильной сети только IPv6. Если выбранного семейства нет, используется другое.</string>
+    <string name="host_mosh_family_supporting">Сеанс Mosh остаётся в том семействе адресов, в котором начался.</string>
     <string name="host_mosh_ports_label">Порты UDP</string>
     <string name="host_mosh_ports_placeholder">60001-60999</string>
-    <string name="host_mosh_ports_supporting">Диапазон, из которого сервер выбирает порт. Сузьте его, если на межсетевом экране можно открыть лишь несколько; на каждый одновременно открытый сеанс на этом сервере нужен один порт.</string>
+    <string name="host_mosh_ports_supporting">По умолчанию 60001-60999. По одному порту на каждый одновременный сеанс.</string>
     <string name="host_mosh_command_label">Команда mosh-server</string>
     <string name="host_mosh_command_placeholder">mosh-server</string>
-    <string name="host_mosh_command_supporting">Измените, если программы нет в PATH неинтерактивной оболочки, например /usr/local/bin/mosh-server.</string>
+    <string name="host_mosh_command_supporting">По умолчанию mosh-server. Полный путь, если его нет в PATH.</string>
     <string name="mosh_failed_title">Mosh не запустился</string>
     <string name="mosh_failed_not_installed">На этом хосте нет mosh-server. Установите mosh там или выключите Mosh для этого хоста.</string>
     <string name="mosh_failed_locale">mosh-server не запускается, потому что локаль сервера не UTF-8. Задайте на сервере локаль UTF-8.</string>

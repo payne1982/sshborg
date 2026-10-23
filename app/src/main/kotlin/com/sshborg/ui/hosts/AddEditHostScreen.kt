@@ -393,22 +393,12 @@ fun AddEditHostScreen(
                 Text(stringResource(R.string.host_allow_legacy_ciphers))
             }
 
-            HorizontalDivider()
-            Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
-
+            // The three things about a mosh session that depend on somebody else's network and
+            // somebody else's server, so none of them can be decided here. Before the jump-host
+            // section rather than inside it: the two exclude each other, but this is a section of
+            // its own and reads as one.
             if (mosh) {
-                // Nothing is cleared when this appears: the switch above is what cannot be
-                // turned on while a chain exists, so by the time it is on there is no chain
-                // left to lose. The three mosh settings take this slot instead, since the two
-                // exclude each other anyway — and they are the three things about a mosh session
-                // that cannot be decided on somebody else's behalf.
-                Text(
-                    stringResource(R.string.host_jump_not_with_mosh),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-
-                Spacer(Modifier.height(4.dp))
+                HorizontalDivider()
                 Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
 
                 Text(stringResource(R.string.host_mosh_family_label), style = MaterialTheme.typography.bodyMedium)
@@ -456,6 +446,19 @@ fun AddEditHostScreen(
                     keyboardType = KeyboardType.Uri,
                     placeholder = stringResource(R.string.host_mosh_command_placeholder),
                     supporting = stringResource(R.string.host_mosh_command_supporting),
+                )
+            }
+
+            HorizontalDivider()
+            Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
+
+            if (mosh) {
+                // Nothing is cleared when this appears: the switch is what cannot be turned on
+                // while a chain exists, so by the time it is on there is no chain left to lose.
+                Text(
+                    stringResource(R.string.host_jump_not_with_mosh),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 // Mode selector
