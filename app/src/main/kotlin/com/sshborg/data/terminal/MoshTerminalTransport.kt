@@ -165,6 +165,7 @@ class MoshTerminalTransport(
         class Bytes(val bytes: ByteArray, val at: Long) : ToScreen
         class Keep(val state: Long) : ToScreen
         class Restore(val state: Long) : ToScreen
+        class IgnoreRepaint(val lines: Int) : ToScreen
         object Forget : ToScreen
     }
 
@@ -322,6 +323,7 @@ class MoshTerminalTransport(
                 }
                 is ToScreen.Keep -> past?.keep(message.state)
                 is ToScreen.Restore -> past?.restore(message.state)
+                is ToScreen.IgnoreRepaint -> past?.ignoreRepaint(message.lines)
                 is ToScreen.Forget -> past?.forget()
             }
         }
@@ -470,6 +472,10 @@ class MoshTerminalTransport(
                 is Event.Typed -> mosh.type(event.bytes)
                 is Event.Resized -> {
                     mosh.resize(event.columns, event.rows)
+                    // The far end has not heard this yet. Until it has, its frames are painted
+                    // for the shape it still believes in, and a repaint of a taller screen
+                    // scrolls the surplus off the bottom of ours — painting, not history.
+                    toScreen.trySend(ToScreen.IgnoreRepaint(event.rows))
                     // A screen of a different shape cannot be put back: nothing kept describes
                     // this terminal any more.
                     if (past != null) {

@@ -34,4 +34,16 @@ interface ScreenPast {
 
     /** Throws the lot away: the screen has changed shape and none of it can be put back. */
     fun forget()
+
+    /**
+     * Says that up to [lines] lines about to leave the screen are the far end repainting rather
+     * than history, and should not be kept.
+     *
+     * Called when the far end has just been told a new size and has not heard it yet: for about a
+     * round trip its frames are still drawn for the old shape, and a full repaint of a taller
+     * screen scrolls the surplus off the bottom of this one. Measured on a phone, where a session
+     * opened before the keyboard came up was painted at 43 rows onto the 27 that were left, and
+     * sixteen lines of somebody else's repaint became the first sixteen lines of the history.
+     */
+    fun ignoreRepaint(lines: Int)
 }

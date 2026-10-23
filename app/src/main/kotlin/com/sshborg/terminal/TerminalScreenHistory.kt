@@ -88,6 +88,10 @@ class TerminalScreenHistory(
         shots.clear()
     }
 
+    override fun ignoreRepaint(lines: Int) {
+        emulator.buffer.repaintLinesToIgnore = lines
+    }
+
     /**
      * Puts the screen back as it was at [state].
      *

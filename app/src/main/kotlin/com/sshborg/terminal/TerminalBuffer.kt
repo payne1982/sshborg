@@ -59,6 +59,22 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
      */
     var altScreen = false
 
+    /**
+     * How many more lines leaving the screen are the far end repainting rather than history.
+     *
+     * Only a synchronised screen sets this, and only when its size has just changed under it.
+     * The far end paints for the size it was last told, so for one round trip after a resize its
+     * frames are drawn for the old shape — and a full repaint draws every row, which on a screen
+     * that has since become shorter means the surplus rows scroll off the bottom. Measured on a
+     * phone: the session was opened before the keyboard came up, so the far end was told 43 rows
+     * and painted 43 onto the 27 that were left, and sixteen lines of somebody else's repaint
+     * became the first sixteen lines of the history.
+     *
+     * Counted rather than held by a flag so that it can only ever swallow as much as a repaint
+     * of one screen: if the expected repaint never comes, the history resumes by itself.
+     */
+    var repaintLinesToIgnore = 0
+
     // --- Read access ---
 
     /**
@@ -145,8 +161,13 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     /** Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom. */
     fun scrollUp(count: Int = 1) {
         repeat(count) {
-            // Push top line into scrollback (never from the alternate screen, which has no history)
-            if (!altScreen) {
+            // Push top line into scrollback (never from the alternate screen, which has no
+            // history, and never while a repaint drawn for another size is still landing)
+            if (altScreen) {
+                // nothing to keep
+            } else if (repaintLinesToIgnore > 0) {
+                repaintLinesToIgnore--
+            } else {
                 val evicted = screen[scrollTop].copyOf()
                 if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
                 scrollback.addLast(evicted)
