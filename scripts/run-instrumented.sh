@@ -2,7 +2,8 @@
 # Runs the instrumented tests on the emulator, which lives on another machine.
 #
 # Instrumented tests need a real Android device, and the emulator runs on a Linux box on the LAN
-# rather than here. Nothing of the build has to exist there: this builds both APKs locally, copies
+# rather than here. If that machine sleeps when nobody is using it, give test.properties an
+# emuWake command and this script wakes it and waits, instead of failing with no device. Nothing of the build has to exist there: this builds both APKs locally, copies
 # them over, and drives the test run through that machine's adb.
 #
 # Where that machine is comes from test.properties (not in the repo — see test.properties.example):
@@ -31,11 +32,28 @@ host=$(setting emuHost)
 user=$(setting emuUser)
 adb=$(setting emuAdb); adb=${adb:-adb}
 dir=$(setting emuDir); dir=${dir:-/tmp/sshborg-instrumented}
+wake=$(setting emuWake)
 [ -n "$host" ] && [ -n "$user" ] || { echo "emuHost and emuUser must be set in $config" >&2; exit 2; }
 
 remote="$user@$host"
 ssh_opts=(-o BatchMode=yes -o ConnectTimeout=10)
 run() { ssh "${ssh_opts[@]}" "$remote" "$@"; }
+
+# A machine that sleeps when nobody is using it answers neither ssh nor adb, and the failure then
+# looks like a broken emulator rather than a sleeping host. emuWake is whatever wakes it from here
+# — it is in test.properties and not in the repository because it tends to name the machine.
+wake_if_asleep() {
+    [ -n "$wake" ] || return 0
+    run true 2>/dev/null && return 0
+    echo "== $host is not answering; waking it"
+    $wake || { echo "emuWake failed: $wake" >&2; return 1; }
+    for _ in $(seq 60); do
+        run true 2>/dev/null && { echo "== awake"; return 0; }
+        sleep 5
+    done
+    echo "$host did not answer ssh within five minutes of emuWake" >&2
+    return 1
+}
 
 install_only=""
 if [ "${1:-}" = "--install-only" ]; then install_only=yes; shift; fi
@@ -55,7 +73,8 @@ echo "== waiting for a device on $host"
 # Through `timeout`, because wait-for-device does not fail when there is nothing to wait for —
 # it blocks for ever, and the message below could never be reached. A run then looks slow rather
 # than broken, which is how a stopped emulator cost an afternoon once.
-run "timeout 180 $adb wait-for-device" || { echo "no device: is the emulator running there? (~/Documents/sshborg-emulator/start.sh <avd>)" >&2; exit 1; }
+wake_if_asleep
+run "timeout 180 $adb wait-for-device" || { echo "no device: is an emulator running there? (~/Documents/sshborg-emulator/start.sh <avd>)" >&2; exit 1; }
 
 echo "== copying and installing"
 run "mkdir -p '$dir'"

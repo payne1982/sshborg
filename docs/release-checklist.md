@@ -13,9 +13,17 @@ was skipped is said out loud rather than left to be discovered on a store.
 - [ ] `./gradlew test` — green. It is also wired into `bundleRelease`, so a red test stops the
       release build by itself. Point it at the corpora to run everything:
       `./gradlew test -PkeyCorpus=… -PeditorCorpus=…` (see `test.properties.example`).
-- [ ] `scripts/run-instrumented.sh` — green on the emulator. Run it on the **TV** AVD too when the
-      release touches anything on screen: the D-pad walk only means something there, and Play has
-      rejected this app twice over television details.
+- [ ] `scripts/run-instrumented.sh` — green on the emulator, on the **phone** AVD and the **TV**
+      one both. The D-pad walk only means something on the TV, and Play has rejected this app twice
+      over television details; everything about a form, a keyboard or an inset only means something
+      on the phone. If the machine the emulator lives on sleeps, `emuWake` in
+      `test.properties` is the command that wakes it and the script runs it by itself; the AVD is
+      then started there with `~/Documents/sshborg-emulator/start.sh <avd>`, one at a time.
+- [ ] Uninstalling the app on the AVD first is worth it: it tests the first-run path, and it is the
+      only way out of a database newer than the build being installed. It also takes
+      `demo.properties` with it, so `TerminalKeyboardTest` skips until that is pushed back
+      (`scripts/make-screenshots.sh` does it, and asking first is the rule — it puts a real
+      server's address on the device).
 - [ ] Release notes written: `release_notes/release_notes_v<code>.txt` and the fastlane changelogs.
       `scripts/check-notes.sh <code>` checks every locale against Play's 500-character limit and
       that the two copies say the same thing. The limit is per locale and German and French are
