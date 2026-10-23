@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
  * reply to a query), and a resize.
  *
  * Implementations: [SshTerminalTransport], which is the shell channel the app has always used,
- * and the mosh one, which runs a UDP state machine instead. See `docs/mosh-plan.md` §8 phase 5.
+ * and the mosh one, which runs a UDP state machine instead.
  */
 interface TerminalTransport {
 

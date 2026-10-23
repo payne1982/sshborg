@@ -173,7 +173,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
      *
      * Under mosh it does not work and cannot be made to: the first frame homes the cursor and
      * clears the screen before painting at absolute positions, so the line feeds are erased —
-     * measured, and recorded in `docs/mosh-plan.md`. The screen is the server's there, and the
+     * measured on the wire rather than assumed. The screen is the server's there, and the
      * client is not allowed to edit it. So the bar starts out of the way instead, and a tap still
      * brings it back for as long as it is wanted.
      */

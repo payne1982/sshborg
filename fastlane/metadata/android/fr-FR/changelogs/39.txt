@@ -1,1 +1,2 @@
+• Prise en charge de mosh ajoutée : les connexions persistent lors d'un changement de réseau.
 • Modifier un hôte n'efface plus les statistiques qui servent à trier la liste.

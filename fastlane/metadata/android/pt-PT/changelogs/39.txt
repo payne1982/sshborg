@@ -1,1 +1,2 @@
+• Adicionado o suporte para mosh: as ligações persistem ao mudar de rede.
 • Editar um host já não apaga as estatísticas usadas para ordenar a lista.

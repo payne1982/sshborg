@@ -21,7 +21,7 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 /**
- * Phase 6's second gate: a terminal driven over mosh through the same interface SSH uses.
+ * The gate on the socket loop: a terminal driven over mosh through the same interface SSH uses.
  *
  * [com.sshborg.mosh.MoshTransport] was proved against a real server by `MoshSessionIntegrationTest`,
  * but with a loop written by the test. This is the loop the app itself will run — the sockets, the

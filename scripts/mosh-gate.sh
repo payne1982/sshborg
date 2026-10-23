@@ -1,5 +1,5 @@
 #!/bin/sh
-# Phase 5's repaint gate: does our terminal draw what mosh's optimiser meant?
+# The repaint gate: does our terminal draw what mosh's optimiser meant?
 #
 # It records the host byte stream of a scripted mosh session (MoshRepaintGateTest writes one file
 # per checkpoint), then replays the identical bytes through a second, independent terminal emulator
@@ -10,8 +10,6 @@
 # `capture-pane -e` and a parser for what it prints, and geometry is where the risk is. A colour
 # fault that moves nothing is invisible here and belongs to the manual pass, with the scenarios
 # that are not deterministic enough to diff — `htop` above all.
-#
-# See docs/mosh-plan.md §8 phase 5.
 set -e
 
 PORT="${MOSH_LAB_PORT:-60110}"

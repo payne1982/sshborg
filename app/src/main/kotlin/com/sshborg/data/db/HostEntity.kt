@@ -73,7 +73,7 @@ data class HostEntity(
      *
      * Off by default, per host and explicit — there is no detection and no silent fall back to
      * SSH, because somebody who asked for mosh and did not get it is owed the reason. It also
-     * excludes a jump chain: see `docs/mosh-plan.md` phase 6.
+     * excludes a jump chain: SSH would get through it, but the UDP session afterwards could not.
      */
     val mosh: Boolean = false,
     /**

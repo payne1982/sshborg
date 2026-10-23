@@ -230,7 +230,7 @@ class MoshTransportTest {
 
         // Data owes an acknowledgement within a hundred milliseconds rather than at the next
         // heartbeat, and the tick that notices it is what schedules it: an I/O loop therefore has
-        // to tick after every datagram and then wait until nextWakeup, which is what phase 6 does.
+        // to tick after every datagram and then wait until nextWakeup, which is what the socket loop does.
         assertTrue(transport.tick(1_150).isEmpty())
         assertEquals(1_250L, transport.nextWakeup())
         assertEquals(2L, ours(transport.tick(1_250).single()).ackNumber)

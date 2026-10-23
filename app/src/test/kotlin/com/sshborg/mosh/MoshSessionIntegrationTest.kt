@@ -7,7 +7,7 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 /**
- * Phase 4's gate: a session with a real `mosh-server`, driven by the code the app would use.
+ * The gate on the protocol: a session with a real `mosh-server`, driven by the code the app would use.
  *
  * It skips itself unless a server has been started for it — `scripts/mosh-lab.sh` does that, runs
  * this, and takes the server down again. A green unit suite proves the pieces; only this proves

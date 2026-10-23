@@ -11,7 +11,7 @@ import java.net.SocketTimeoutException
  * `mosh-server` — see `scripts/mosh-lab.sh` and `scripts/mosh-gate.sh`.
  *
  * Tick, send what comes back, wait for a datagram or for the next deadline, tick again. The real
- * one belongs to phase 6, with the foreground service and the Wi-Fi lock around it; this exists to
+ * one belongs to the app, with the foreground service and the Wi-Fi lock around it; this exists to
  * drive the protocol from a test, not to be that.
  *
  * Everything the host sends is also kept verbatim in [recorded], because the repaint gate works by

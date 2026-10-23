@@ -1,6 +1,6 @@
 #!/bin/sh
-# Phase 1's test rig as one command: start a throwaway mosh-server, run the mosh integration
-# test against it, take the server down again. See docs/mosh-plan.md and docs/mosh-wire-format.md.
+# The mosh test rig as one command: start a throwaway mosh-server, run the mosh integration
+# test against it, take the server down again. See docs/mosh-wire-format.md.
 #
 # The session key is minted by the server and lives only as long as it does, so it is passed to
 # Gradle on the command line. That makes it visible in the process list of this machine for the

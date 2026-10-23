@@ -1,7 +1,7 @@
 # The mosh wire format, as we need it to implement a client
 
 Written 2026-10-20 on `V1_DEV_MOSH`, from the mosh 1.4.0 source, to close the four
-verification points left open by [mosh-plan.md](mosh-plan.md). It is the document to
+verification points the planning had left open. It is the document to
 implement against, so that nobody has to reopen the C++ for every field.
 
 Reference source kept **outside this repository**, deliberately, at
@@ -144,7 +144,7 @@ handles all of the drawing part:
 - the client's `smcup` is emitted from the *client's own* terminfo and is local to
   mosh-client: we have no terminfo and we do not need one.
 
-**Correction to the plan's first draft: the mouse reporting mode is synchronised.**
+**Correction to our first reading: the mouse reporting mode is synchronised.**
 `mouse_reporting_mode` and `mouse_encoding_mode` are part of the synced draw state, so
 `Display` emits `?1000/?1002/?1003h`, `?1006/?1015/?1005h` and their `l` forms as part
 of the frame (`terminaldisplay.cc:302-334`), together with `?1004` focus events and
@@ -200,7 +200,7 @@ payload MTU of 500 and stays there (`network.cc:413`).
 | `SHUTDOWN_RETRIES` | 16 | closing packets before giving up |
 | `SERVER_ASSOCIATION_TIMEOUT` | 40000 ms | server-side only: forget the client's address |
 
-The 3 s ack interval is the figure behind the battery note in the plan: it is a radio
+The 3 s ack interval is the figure behind the battery cost of a mosh session: it is a radio
 wake-up every three seconds for as long as the session is up.
 
 ## 6. The launch environment
@@ -215,8 +215,8 @@ wake-up every three seconds for as long as the session is up.
   `SSH_AUTH_SOCK` through it.
 - `mosh-server` never calls `clearenv`: it sets `TERM`, `NCURSES_NO_UTF8_ACS` and
   `PWD`, and unsets `STY`. **Everything else inherited from the SSH command survives
-  into the login shell**, which is exactly what makes the agent-forwarding arrangement
-  in §6 of the plan work — `SSH_AUTH_SOCK=… mosh-server new …`, as a prefix.
+  into the login shell**, which is exactly what makes agent forwarding
+  survive the handover — `SSH_AUTH_SOCK=… mosh-server new …`, as a prefix.
 
 So the bootstrap command has the shape
 
@@ -260,13 +260,13 @@ more readily than a laptop does, which is why "wait for ever" is the wrong defau
 
 A `mosh-server` 1.4.0 launched by hand on the development host and a throwaway Java
 probe — `~/Documents/claude-generico/sshborg/mosh-lab/`, outside this repository,
-with the recipe in its `README.md` — closed the first gates of phase 1 in an afternoon,
+with the recipe in its `README.md` — closed the first gates in an afternoon,
 and everything in §§1–4 above is now measured rather than read:
 
 - **the cipher is interoperable in both directions.** Our datagram was authenticated by
   the server (`Server now attached to client at …`), and its answers decrypt. BouncyCastle
-  OCB against mosh's own OCB v3, no new dependency, nothing native. This was the plan's
-  biggest risk and it is gone;
+  OCB against mosh's own OCB v3, no new dependency, nothing native. This was the biggest risk of the whole
+  undertaking and it is gone;
 - **framing, zlib and the hand-written protobuf are right in both directions.** Fragment
   header, `Deflater`/`Inflater` with default (zlib) settings, and the five varint fields
   of the transport instruction;
@@ -289,7 +289,7 @@ Two behaviours of the server that only a running one teaches, both useful:
 
 - **a session nobody talks to cleans itself up.** With no client it exits after sixty
   seconds; after a client that stops answering it detaches at forty seconds
-  (`SERVER_ASSOCIATION_TIMEOUT`) and then exits. The orphan-process worry in the plan is
+  (`SERVER_ASSOCIATION_TIMEOUT`) and then exits. The orphan-process worry is
   smaller than it looked, and `MOSH_SERVER_NETWORK_TMOUT` covers the rest;
 - **a client that attaches late does not get the screen it missed.** The server diffs
   from the state it assumes the client shares, which is the terminal as it was when the
@@ -298,14 +298,14 @@ Two behaviours of the server that only a running one teaches, both useful:
   and attaches immediately, but in the rig it means: attach promptly, or type something
   to force a repaint.
 
-### What was left after phase 4, and when it was closed
+### What was left after the state machine, and when it was closed
 
-Phase 4 closed the timing half of this list the same day: the transport state machine
+The state machine closed the timing half of this list the same day: it
 holds a real session, idles through heartbeats and survives its local port being
 replaced mid-session, which the server announces in its own log. What is left:
 
 1. ~~the escape repertoire against real programs~~ — **closed 2026-10-21**. See the
-   repaint gate in §8 phase 5 of the plan: `vim`, `less`, `htop`, a scroll region, `ECH`,
+   repaint gate (`scripts/mosh-gate.sh`): `vim`, `less`, `htop`, a scroll region, `ECH`,
    256-colour and true-colour output and wide characters against the right margin, all
    fed into our emulator and into a `tmux` pane of the same size from the identical
    bytes, with no disagreement. The only thing the gate still cannot see is an attribute,
@@ -315,7 +315,7 @@ replaced mid-session, which the server announces in its own log. What is left:
    off appears in the host stream as `?1000`/`?1002`/`?1003`/`?1006` and the rest, which
    confirms §4's correction — the modes really are part of the synchronised state and
    reach us by themselves. Whether we then *send* the reports back is the terminal view's
-   wiring, not the protocol's, and belongs to phase 6.
+   wiring, not the protocol's.
 
 ### Multi-fragment reassembly from the server, closed 2026-10-20
 

@@ -9,7 +9,7 @@ import org.junit.Test
 import java.io.File
 
 /**
- * Phase 5's gate: does our emulator draw what mosh's optimiser meant?
+ * The repaint gate: does our emulator draw what mosh's optimiser meant?
  *
  * This is the one remaining question that can still cost real work, and it needs an oracle rather
  * than an opinion. Under SSH the bytes reaching the emulator are the remote program's own output,

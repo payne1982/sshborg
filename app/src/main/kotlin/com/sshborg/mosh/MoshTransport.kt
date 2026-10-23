@@ -4,13 +4,12 @@ import java.security.SecureRandom
 
 /**
  * The transport state machine: what to send, when to send it, and what to do with what arrives.
- * Phase 4 of `docs/mosh-plan.md`.
  *
  * It owns no socket and starts no thread. Every entry point takes the current time and [tick]
  * hands back the datagrams to put on the wire, so the whole of the protocol's timing can be driven
  * by a test with a clock it controls — which is the only honest way to check retransmission and
  * heartbeats, and the reason this class has no `Thread.sleep` and no `System.currentTimeMillis`
- * anywhere in it. The socket, the port hopping and the service lifecycle are phase 6's business.
+ * anywhere in it. The socket, the port hopping and the service lifecycle belong to the layer above.
  *
  * ### What the client has to keep
  *
@@ -449,8 +448,8 @@ class MoshTransport(
          * For IPv4 it guesses the minimum header (20 + 8) because fragmentation there is merely
          * wasteful; for IPv6 it is deliberately pessimistic (40 base + 16 for two extension
          * headers + 8) because fragmentation there is not allowed on the path. The default is the
-         * IPv6 figure, which is safe on both — phase 6 passes the IPv4 one once the socket has
-         * told it which family it got.
+         * IPv6 figure, which is safe on both — the layer that owns the socket passes the IPv4 one
+         * once the socket has told it which family it got.
          */
         const val IPV4_MTU = 1280 - (20 + 8)                 // 1252
         const val IPV6_MTU = 1280 - (40 + 16 + 8)            // 1216

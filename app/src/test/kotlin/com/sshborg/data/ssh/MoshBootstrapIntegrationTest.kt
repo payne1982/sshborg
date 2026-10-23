@@ -10,7 +10,7 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 /**
- * Phase 6's first gate: the handover from SSH to UDP, end to end, with no Android in it.
+ * The gate on the handover: from SSH to UDP, end to end, with no Android in it.
  *
  * This is the part of the mosh integration that can be checked properly without a device, and it
  * is the part most likely to be wrong in a way reading cannot show: whether `mosh-server` actually
