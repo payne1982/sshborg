@@ -39,7 +39,28 @@ internal object TestConfig {
         fun key(name: String): String = File(keys, name).readText()
     }
 
+    /**
+     * A `mosh-server` the transport tests may hold a session with. Its key is minted per session
+     * and lives only as long as the server does, so it arrives from `scripts/mosh-lab.sh` rather
+     * than from `test.properties`: there is nothing stable to put in a file.
+     */
+    fun moshServer(): Mosh? {
+        val port = value("MOSH_PORT")?.toIntOrNull() ?: return null
+        val key = value("MOSH_KEY") ?: return null
+        return Mosh(value("MOSH_HOST") ?: "127.0.0.1", port, key)
+    }
+
+    data class Mosh(val host: String, val port: Int, val key: String)
+
+    /**
+     * Where the repaint gate leaves what it recorded, so that `scripts/mosh-gate.sh` can replay it
+     * through a second terminal emulator and compare. Nothing durable goes here: it is all
+     * regenerable by running the gate again.
+     */
+    fun moshGateOut(): File? = value("MOSH_GATE_OUT")?.let(::File)?.also { it.mkdirs() }
+
     const val NO_SERVER = "no server configured in test.properties (sshHost, sshUser, sshKeyDir)"
     const val NO_KEY_CORPUS = "keyCorpus is not set in test.properties"
     const val NO_EDITOR_CORPUS = "editorCorpus is not set in test.properties"
+    const val NO_MOSH_SERVER = "no mosh-server to talk to; start one with scripts/mosh-lab.sh"
 }

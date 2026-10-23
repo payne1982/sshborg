@@ -41,8 +41,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var jumpHosts = MutableStateFlow("")
     /** Newline-separated port-forwarding rules in -L syntax. */
     var portForwardings = MutableStateFlow("")
-    /** Jump host mode: "simple" = text field, "host_list" = select from hosts. */
-    var jumpMode = MutableStateFlow("simple")
+    /**
+     * Jump host mode: "simple" = text field, "host_list" = select from hosts.
+     *
+     * A new host starts on the host list, which is the mode that can carry a hop's own key or
+     * password; [loadHost] replaces this for a host that already exists.
+     */
+    var jumpMode = MutableStateFlow("host_list")
     /** Ordered list of host IDs selected as jump hops (host-list mode). 0L = not yet selected. */
     var jumpHostIds = MutableStateFlow<List<Long>>(emptyList())
     /** SFTP starting directory mode: "last" | "fixed" | "home". */
@@ -52,10 +57,32 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /** Whether the SFTP browser shows dotfiles for this host. Default hides them. */
     var sftpShowHidden = MutableStateFlow(false)
     var allowLegacyCiphers = MutableStateFlow(false)
+    /** Whether this host's terminal rides mosh instead of the SSH shell channel. */
+    var mosh = MutableStateFlow(false)
+    /** Which address family a mosh session is made over: "auto" | "ipv4" | "ipv6". */
+    var moshFamily = MutableStateFlow("auto")
+    /** The UDP port range mosh-server may pick from; blank means its own default. */
+    var moshPorts = MutableStateFlow("")
+    /** What to run on the server; blank means `mosh-server`. */
+    var moshCommand = MutableStateFlow("")
     /** Null = ungrouped; otherwise the selected group's ID. */
     var groupId = MutableStateFlow<Long?>(null)
     /** Optional per-host ARGB color; overrides the group color. */
     var hostColor = MutableStateFlow<Int?>(null)
+
+    /**
+     * Whether a jump chain is configured, in whichever of the two modes is selected.
+     *
+     * Mosh and a jump chain exclude each other, so the form needs to know: it is what disables
+     * the mosh switch, and [save] applies the same rule where it cannot be got round. The
+     * exclusion is only in this direction — a host reached over mosh is still a perfectly good
+     * bastion for others, because that inward hop is SSH, runs on the server and is immune to
+     * whatever the phone's network does.
+     */
+    val jumpConfigured: StateFlow<Boolean> =
+        combine(jumpMode, jumpHosts, jumpHostIds) { mode, text, ids ->
+            if (mode == "simple") text.isNotBlank() else ids.any { it != 0L }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     /** When true, the saved host key and cached jump-host keys are cleared on save. */
     var resetHostKeys = MutableStateFlow(false)
@@ -116,6 +143,10 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir.value = h.sftpStartDir ?: ""
             sftpShowHidden.value = h.sftpShowHidden
             allowLegacyCiphers.value = h.allowLegacyCiphers
+            mosh.value = h.mosh
+            moshFamily.value = h.moshFamily
+            moshPorts.value = h.moshPorts ?: ""
+            moshCommand.value = h.moshCommand ?: ""
             groupId.value = h.groupId
             hostColor.value = h.color
             _hasStoredHostKeys.value = h.knownHostsEntry != null || h.jumpHostKeys != null
@@ -145,6 +176,10 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
         val newJumpHosts = if (currentMode == "simple") {
             jumpHosts.value.trim().takeIf { it.isNotEmpty() }
         } else null
+
+        // The exclusion, where nothing can get round it: whatever the form did, a row never
+        // leaves here with both mosh and a jump chain on it.
+        val newMosh = mosh.value && newJumpHosts == null && newJumpHostIdList == null
 
         val existing = editingId?.let { hostDao.getById(it) }
         val newHostname = hostname.value.trim()
@@ -186,6 +221,12 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir         = newSftpStartDir,
             sftpShowHidden       = sftpShowHidden.value,
             allowLegacyCiphers   = allowLegacyCiphers.value,
+            mosh                 = newMosh,
+            // Kept whatever the switch says, so that turning mosh off and on again does not lose
+            // a port range somebody had to get from their firewall.
+            moshFamily           = moshFamily.value,
+            moshPorts            = moshPorts.value.trim().takeIf { it.isNotEmpty() },
+            moshCommand          = moshCommand.value.trim().takeIf { it.isNotEmpty() },
             groupId              = groupId.value,
             color                = hostColor.value,
             // Not fields of this form, and `upsert` replaces the whole row — so leaving them out

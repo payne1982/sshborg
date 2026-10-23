@@ -603,7 +603,7 @@ class TerminalView @JvmOverloads constructor(
     private fun reportsWheel(emu: TerminalEmulator): Boolean {
         // While the user is selecting, gestures belong to the selection, not to the app.
         if (inSelectionMode) return false
-        synchronized(emu) { return emu.altScreenActive && emu.mouseReporting }
+        synchronized(emu) { return emu.wheelBelongsToApplication }
     }
 
     /** Turns whatever whole notches have accumulated in [wheelTravel] into a report. */

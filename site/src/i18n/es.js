@@ -109,6 +109,8 @@ module.exports = {
             <li><a href="#legacy-ciphers">Cifrados heredados</a></li>
             <li><a href="#connection-drops">Caídas de conexión</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh (experimental)</a></li>
+            <li class="sub"><a href="#mosh">Qué necesita el servidor</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Cadenas multi-salto</a></li>
             <li><a href="#sessions">Sesiones múltiples</a></li>
@@ -461,6 +463,36 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// CONSEJO</div>
                 Puedes añadir <code>tmux attach || tmux new -s main</code> a tu <code>~/.bashrc</code> o <code>~/.zshrc</code> en el servidor para que una sesión de multiplexor se inicie automáticamente cada vez que inicies sesión a través de SSHBorg.
+            </div>`,
+
+  doc_mosh: `
+            <h2>// MOSH (EXPERIMENTAL)</h2>
+            <p>Mosh es una segunda forma de transportar el terminal. En lugar de enviar la salida del servidor por la conexión SSH, mantiene el terminal <em>en el servidor</em> y envía al teléfono una imagen de cómo se ve la pantalla, por UDP. Como ya nada está atado a una conexión TCP, la sesión sobrevive a lo que normalmente la termina: un cambio de IP, el paso de Wi-Fi a datos móviles, un túnel, un teléfono que se quedó dormido en el bolsillo. Vuelves y la sesión simplemente está ahí.</p>
+            <p>Hay un límite que conviene conocer antes de confiar en esto: una sesión se queda en la familia de direcciones con la que nació. <code>mosh-server</code> escucha en la única dirección por la que llegó la conexión SSH, así que una sesión hecha por IPv6 no puede seguirte a una red sin IPv6, y lo mismo vale al contrario en una red móvil que solo tiene IPv6. El ajuste <strong>IPv4 / IPv6</strong> del editor de hosts está precisamente para esto: elige la familia que tus redes tienen en común y la sesión podrá pasar de una a otra.</p>
+            <p>SSHBorg no sustituye SSH por mosh. SSH sigue iniciando la sesión, arranca el servidor mosh y <strong>se queda abierto</strong>, que es lo que mantiene funcionando SFTP, el reenvío de puertos, el reenvío del agente y las sugerencias de comandos en el mismo host mientras el terminal viaja por UDP.</p>
+            <p>Esa mitad, eso sí, es SSH normal, así que no sobrevive a lo que sobrevive mosh: un cambio de red se lleva la conexión SSH, y el SFTP, un reenvío de puertos o las sugerencias de comandos en ese host dejan de funcionar hasta que lo vuelvas a abrir. El terminal sigue.</p>
+            <h3>Qué necesita el servidor</h3>
+            <ul>
+                <li><strong>mosh instalado</strong> — el programa <code>mosh-server</code> debe estar en el servidor. En casi todas las distribuciones el paquete se llama <code>mosh</code>.</li>
+                <li><strong>Una configuración regional UTF-8</strong> — mosh se niega a arrancar sin ella, porque tiene que interpretar él mismo el contenido del terminal.</li>
+                <li><strong>UDP entrante, puertos 60001–60999</strong> — el servidor debe ser alcanzable en ellos desde tu teléfono. Es el requisito que las redes de hoteles, campus y empresas suelen bloquear.</li>
+            </ul>
+            <h3>Cómo activarlo</h3>
+            <p>Abre el editor del host y marca <strong>Mosh</strong>, al lado del color. Es por host y está desactivado por defecto: para los hosts que no marques no cambia nada. Está marcado como experimental porque es nuevo, no porque esté sin terminar.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// BATERÍA</div>
+                Una sesión mosh envía un paquete pequeño cada tres segundos aproximadamente mientras está abierta, y es eso lo que le permite notar al instante un cambio de red. Es más radio de la que usa una sesión SSH normal, y en un teléfono cuesta batería. Para los hosts donde no lo necesites, déjalo desactivado.
+            </div>
+            <h3>Qué cambia en el terminal</h3>
+            <p><strong>El historial empieza vacío.</strong> Con SSH, todo lo que el servidor ha impreso pasa por tu teléfono, así que puede guardarse por completo. Con mosh solo viaja la pantalla, de modo que el historial se llena con las líneas que de verdad se van por arriba — y un programa que redibuja la pantalla sin desplazarla no deja nada detrás. El gesto de desplazamiento sigue funcionando; simplemente hay menos que encontrar por encima de una sesión recién abierta.</p>
+            <p><strong>No se escribe más rápido.</strong> Mosh es famoso por su eco local instantáneo, que SSHBorg todavía no hace: una tecla sigue yendo al servidor y volviendo. Medido en un teléfono en la misma red, escribir con mosh es más o menos igual de rápido que con SSH. Lo que se gana es que la sesión no muere.</p>
+            <h3>Mosh y los hosts de salto</h3>
+            <p>Los dos se excluyen en el mismo host, y el editor no te deja marcar Mosh mientras haya una cadena de salto configurada. Un host alcanzado por mosh sí puede usarse como host de salto <em>para otros</em>, que además es la disposición que conviene: el salto hacia dentro se ejecuta en el servidor, donde la red de tu teléfono no puede estorbarlo.</p>
+            <h3>Cuando no puede arrancar</h3>
+            <p>SSHBorg nunca recurre a SSH en silencio. Si el servidor mosh no puede arrancar, o si por UDP no vuelve nada, te dice cuál de las dos cosas ha pasado y ofrece dos opciones: continuar con SSH — el inicio de sesión ya está hecho, así que no cuesta nada — o salir. Tres de las cuatro causas posibles están en el servidor, y el mensaje nombra la que tienes.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// CONSEJO</div>
+                Mosh no sustituye a tmux. Mantiene viva una sesión a través de los cambios de red; tmux mantiene vivo tu <em>trabajo</em> a través de todo lo demás, incluido el cierre de la aplicación o el reinicio del teléfono. Juntos son la disposición más sólida: mosh para llegar al servidor, y dentro de tmux todo lo que sea largo.
             </div>`,
 
   doc_jump_hosts: `

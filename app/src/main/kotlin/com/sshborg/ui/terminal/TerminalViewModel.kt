@@ -4,15 +4,21 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
 import androidx.lifecycle.viewModelScope
+import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
 import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
 import com.sshborg.data.ssh.*
+import com.sshborg.data.terminal.MoshTerminalTransport
+import com.sshborg.data.terminal.SshTerminalTransport
+import com.sshborg.data.terminal.TerminalTransport
 import com.sshborg.service.SessionManager
 import com.sshborg.service.SshForegroundService
+import com.sshborg.data.terminal.ScreenPast
 import com.sshborg.terminal.TerminalEmulator
+import com.sshborg.terminal.TerminalScreenHistory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.ByteArrayOutputStream
@@ -31,6 +37,19 @@ sealed interface ConnectionState {
         val banner: String? = null,
     ) : ConnectionState
     data class Error(val message: String, val detail: String? = null) : ConnectionState
+    /**
+     * Mosh was asked for and could not be had. There is no silent fall back to SSH: the switch is
+     * per host and explicit, so somebody who asked for mosh and did not get it is owed the reason
+     * and the choice. The SSH session is already open and healthy underneath, which is why
+     * carrying on over it costs nothing.
+     *
+     * @param detail what the server said, with the handover line taken out of it; null when the
+     *   failure was silence, which has nothing to show.
+     */
+    data class MoshFailed(
+        val reason: MoshUnavailable.Reason,
+        val detail: String? = null,
+    ) : ConnectionState
     /**
      * @param summary short, human-readable line shown under the title (all non-clean cases).
      * @param detail  full technical cause (exception text + recent JSch log tail), shown
@@ -69,10 +88,19 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     var onNeedsRedraw: (() -> Unit)? = null
 
     private var shellSession: ShellSession? = null
+
+    /**
+     * Where the terminal's bytes come from. Separate from [shellSession] on purpose: the SSH
+     * session carries SFTP, port forwarding, the agent and the shell history, and it stays even
+     * when the terminal itself is riding something else.
+     */
+    private var transport: TerminalTransport? = null
     private var readerJob: Job? = null
     private var connectJob: Job? = null
 
     private val hostKeyResult  = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    /** True = carry on over SSH, false = leave. See [ConnectionState.MoshFailed]. */
+    private val moshFailureResult = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
     private val passwordResult = MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     // ── Command history suggestions ───────────────────────────────────────────
@@ -122,6 +150,35 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val _navBack = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val navBack: SharedFlow<Unit> = _navBack
 
+    private val _outOfContact = MutableStateFlow(0)
+
+    /**
+     * Seconds since the far end was last heard from, 0 while in contact or when the transport
+     * cannot tell — see [TerminalTransport.outOfContactSeconds]. The screen shows a line once it
+     * passes a threshold, and takes it away by itself when contact returns.
+     */
+    val outOfContact: StateFlow<Int> = _outOfContact.asStateFlow()
+
+    private var contactJob: Job? = null
+
+    private val _barWouldHideOutput = MutableStateFlow(false)
+
+    /**
+     * Whether a title bar lying over the top of this terminal would cover the host's own output
+     * rather than rows deliberately left blank for it.
+     *
+     * The retracting bar is an overlay, and what keeps it from hiding anything is [rowsUnderTitleBar]
+     * line feeds written into the emulator before the first byte arrives, so that the login begins
+     * below it. That works because under SSH the output is a stream appended at the cursor.
+     *
+     * Under mosh it does not work and cannot be made to: the first frame homes the cursor and
+     * clears the screen before painting at absolute positions, so the line feeds are erased —
+     * measured, and recorded in `docs/mosh-plan.md`. The screen is the server's there, and the
+     * client is not allowed to edit it. So the bar starts out of the way instead, and a tap still
+     * brings it back for as long as it is wanted.
+     */
+    val barWouldHideOutput: StateFlow<Boolean> = _barWouldHideOutput.asStateFlow()
+
     /**
      * Attaches this ViewModel to an existing session in [SessionManager].
      * Must be called before [connect]. If the session is already connected, starts reading.
@@ -140,6 +197,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         em.onTitleChanged = { t -> _title.value = t }
         _emulator.value = em
 
+        // Asked of the host rather than of the transport, because the bar's own countdown is
+        // shorter than a login: by the time there is a transport to ask, it would already have
+        // covered the first screenful. Corrected from the transport once there is one, so a
+        // session that fell back to SSH is not left with a stale answer.
+        viewModelScope.launch {
+            _barWouldHideOutput.value = hostDao.getById(session.hostId)?.mosh == true
+        }
+
         // Restore suggestion state cached on the session. When switching tabs the
         // ViewModel is recreated, and attach() (not connect()) runs, so without this
         // the loaded command history and detected prompt would be lost and the
@@ -153,9 +218,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         // If already connected, resume reading
         if (session.shellSession != null) {
             shellSession = session.shellSession
-            if (session.shellSession.isConnected) {
+            val resumed = session.transport ?: SshTerminalTransport(session.shellSession).also { made ->
+                sessionManager.update(id) { it.copy(transport = made) }
+            }
+            transport = resumed
+            if (resumed.isConnected) {
                 _state.value = ConnectionState.Connected
-                startReading(session.shellSession)
+                startReading(resumed)
             } else {
                 // Session dropped while backgrounded: no exception to catch here, so show JSch's
                 // own last disconnect reason as the summary (falls back to a generic line).
@@ -274,6 +343,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             jumpHosts          = jumpHosts,
                             portForwardings    = parsePortForwardings(host.portForwardings),
                             allowLegacyCiphers = host.allowLegacyCiphers,
+                            // Only mosh has a reason to care which family a session is born on,
+                            // and only its own hosts carry an answer.
+                            addressFamily      = if (host.mosh) host.moshFamily else "auto",
                         ),
                         columns = columns,
                         rows    = rows,
@@ -337,9 +409,41 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 if (session != null) {
                     shellSession = session
                     val em = _emulator.value
-                    synchronized(em) { session.resize(em.buffer.columns, em.buffer.rows) }
+                    // Mosh if the host asks for it and has no jump chain. The second half is not
+                    // belt and braces: the form cannot produce a host with both, but an imported
+                    // backup could have been edited by hand, and a jump chain is the one thing
+                    // mosh cannot carry.
+                    val made = if (host.mosh && jumpHosts.isEmpty()) {
+                        moshOrAnswerFor(session, host, em) ?: run {
+                            // Asked, told why, and the answer was to leave.
+                            runCatching { session.disconnect() }
+                            withContext(Dispatchers.Main.immediate) {
+                                _state.value = ConnectionState.Disconnected()
+                            }
+                            sessionManager.remove(id)
+                            if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
+                            return@launch
+                        }
+                    } else {
+                        SshTerminalTransport(session)
+                    }
+                    transport = made
+                    synchronized(em) {
+                        made.resize(em.buffer.columns, em.buffer.rows)
+                        // mosh keeps the terminal on its own side and sends us only what it looks
+                        // like, so it never forwards `?1049h` and there is no alternate screen
+                        // here to go by. Without this a scroll gesture inside tmux went to our
+                        // scrollback instead of to tmux — found on a real device. Asked of the
+                        // transport rather than remembered, so the two cannot drift apart: a
+                        // session that carried on over SSH after mosh failed gets it right too.
+                        em.hasAlternateScreen = !made.screenIsSynchronised
+                    }
+                    _barWouldHideOutput.value = made.screenIsSynchronised
+                    if (made is MoshTerminalTransport) watchMoshInDebug(made)
                     withContext(Dispatchers.Main.immediate) {
-                        sessionManager.update(id) { it.copy(shellSession = session, status = SessionManager.Status.Connected) }
+                        sessionManager.update(id) {
+                            it.copy(shellSession = session, transport = made, status = SessionManager.Status.Connected)
+                        }
                         _state.value = ConnectionState.Connected
                     }
                     val saved = hostDao.getById(hostId) ?: host
@@ -369,10 +473,18 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     // Here and not in [startReading], which also runs for a session being picked
                     // up again after the app was away: that one already has its output on screen
                     // and must not be nudged.
-                    val blankRows = rowsUnderTitleBar
-                        .coerceIn(0, (em.buffer.rows - 1).coerceAtLeast(0))
+                    // Not when the screen is the far side's: writing into our own emulator then
+                    // puts us out of step with the frames being computed against it, and the bar
+                    // is kept out of the way instead (see [barWouldHideOutput]). It was a race as
+                    // well as a mistake — whether these landed before the first frame's clear or
+                    // after it decided whether the session was merely odd or actually corrupt,
+                    // which is why it showed up as "sometimes three blank rows, sometimes not,
+                    // and then the line jumps to the top after a few words".
+                    val blankRows = if (made.screenIsSynchronised) 0 else {
+                        rowsUnderTitleBar.coerceIn(0, (em.buffer.rows - 1).coerceAtLeast(0))
+                    }
                     if (blankRows > 0) synchronized(em) { em.process("\n".repeat(blankRows)) }
-                    startReading(session)
+                    startReading(made)
                     if (prefs.historySuggestions.first()) loadCommandHistory(session)
                     return@launch
                 }
@@ -457,101 +569,203 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun startReading(session: ShellSession) {
+    /**
+     * Starts feeding the emulator from [transport], and decides what to do when it ends.
+     *
+     * The loop itself is three lines; everything that used to make it long — EOF against a late
+     * exit status, a session that goes away without an EOF, JSch closing the pipe instead of
+     * returning one — belongs to the transport, because every bit of it is specific to SSH. What
+     * is left here is what the *terminal* has to do: feed the emulator, ask for a redraw, keep the
+     * prompt detection and the suggestions fed, and close the session down when it is over.
+     */
+    private fun startReading(transport: TerminalTransport) {
         val em = _emulator.value
+        // Whatever this transport knows about being out of contact, passed on to the screen. SSH
+        // knows nothing, and then the number stays at zero and no line is ever shown.
+        contactJob?.cancel()
+        _outOfContact.value = 0
+        transport.outOfContactSeconds?.let { seconds ->
+            contactJob = viewModelScope.launch { seconds.collect { _outOfContact.value = it } }
+        }
         em.onSendResponse = { bytes ->
-            runCatching { session.write(bytes) }
+            runCatching { transport.write(bytes) }
         }
         readerJob?.cancel()
         readerJob = viewModelScope.launch(Dispatchers.IO) {
-            val buf = ByteArray(4096)
-            var cleanExit = false
-            // summary = short line under the title; detail = full technical cause (expandable).
-            var causeSummary: String? = null
-            var causeDetail: String? = null
-            // When the SSH session dies, JSch closes the channel and we only see EOF here — the
-            // real reason (e.g. "Software caused connection abort") is in JSch's log, not an
-            // exception. Use that reason as the short line and its detail (reason + stack) for the
-            // expandable section; fall back to a generic string.
-            val captureLoss = {
-                causeSummary = com.sshborg.data.ssh.SshDiagnostics.lastDisconnectReason()
-                    ?: getApplication<Application>().getString(R.string.terminal_connection_lost)
-                causeDetail = com.sshborg.data.ssh.SshDiagnostics.lastDisconnectDetail()
-            }
-            try {
-                while (isActive && session.isConnected) {
-                    val n = session.inputStream.read(buf)
-                    com.sshborg.data.ssh.SshDiagnostics.onRead(n)   // debug-only breadcrumb
-                    if (n < 0) {
-                        var waited = 0
-                        while (session.exitStatus == -1 && waited < 1000) {
-                            kotlinx.coroutines.delay(50)
-                            waited += 50
-                        }
-                        if (session.exitStatus != -1) {
-                            cleanExit = true
-                        } else {
-                            captureLoss()
-                        }
-                        break
-                    }
-                    synchronized(em) { em.process(buf, 0, n) }
-                    onNeedsRedraw?.invoke()
-                    detectPromptIfNeeded()
-                    scheduleUpdateSuggestions()
-                }
-                // Loop exited because session.isConnected flipped without EOF — unexpected disconnect.
-                if (isActive && !cleanExit && causeSummary == null) {
-                    if (session.exitStatus != -1) {
-                        cleanExit = true
-                    } else {
-                        captureLoss()
-                    }
-                }
-            } catch (e: Exception) {
-                // JSch may close the pipe via disconnect() before or instead of returning EOF,
-                // causing read() to throw IOException even on a clean exit. If exit-status is
-                // already set, treat it as a clean exit rather than an error.
-                if (session.exitStatus != -1) {
-                    cleanExit = true
-                } else {
-                    // Short summary from the exception; detail = just this exception's stack
-                    // trace (one relevant error, no cross-session log noise, no key info).
-                    causeSummary = e.message?.takeIf { it.isNotBlank() } ?: e.javaClass.simpleName
-                    causeDetail = e.stackTraceToString()
-                }
+            val end = transport.read { buffer, n ->
+                synchronized(em) { em.process(buffer, 0, n) }
+                noteEcho()
+                onNeedsRedraw?.invoke()
+                detectPromptIfNeeded()
+                scheduleUpdateSuggestions()
             }
 
-            // If the job was cancelled (background() called), don't touch the session
+            // Cancelled by background(): the session stays alive and is not ours to end.
             if (!isActive) return@launch
+            finishSession(transport, end)
+        }
+    }
 
-            // Session ended — remove it from SessionManager so the notification updates
-            val id = sessionId ?: return@launch
-            if (sessionManager.get(id)?.shellSession === session) {
-                sessionManager.remove(id)
-                if (sessionManager.sessions.value.isEmpty()) {
-                    SshForegroundService.stop(getApplication())
-                }
-                if (cleanExit) {
-                    _navBack.tryEmit(Unit)
-                } else {
-                    // Debug builds append session/network breadcrumbs so a remote tester can copy
-                    // the error overlay instead of running adb logcat. No-op in release.
-                    val diag = com.sshborg.data.ssh.SshDiagnostics.snapshot()
-                    val detailWithDiag = if (diag != null) (causeDetail.orEmpty() + diag) else causeDetail
-                    _state.value = ConnectionState.Disconnected(causeSummary, detailWithDiag)
-                }
+    /**
+     * Starts `mosh-server` over the SSH session and hands back the transport that rides it, or
+     * asks the person what to do when it cannot be started at all.
+     *
+     * The SSH session is left open whatever happens — it carries SFTP, port forwarding, the agent
+     * and the shell history — so "carry on over SSH" is simply the transport we would have made
+     * anyway, with nothing to redial.
+     *
+     * The size is sent before the handshake, so that the server's very first frame is already the
+     * right shape; the caller resizes again, which costs one more action in the same first
+     * datagram and keeps the two paths identical from there on.
+     *
+     * @return the transport to use, or null when the answer was to leave.
+     */
+    private suspend fun moshOrAnswerFor(
+        session: ShellSession,
+        host: HostEntity,
+        em: TerminalEmulator,
+    ): TerminalTransport? {
+        // Held so that it can be closed again if this never gets as far as handing it over. Its
+        // loop is already running by then, and nothing else knows about it: a screen left during
+        // the handshake would otherwise leave a pump answering a server for ever.
+        var unowned: MoshTerminalTransport? = null
+        val failure = try {
+            val handover = session.startMoshServer(
+                networkTimeoutSeconds = MOSH_SERVER_TIMEOUT_SECONDS,
+                command = host.moshCommand?.takeIf { it.isNotBlank() } ?: "mosh-server",
+                ports = host.moshPorts,
+            )
+            // The sink of last resort takes the emulator and nothing else — in particular not
+            // this ViewModel, which a tab switch throws away while the session carries on.
+            // The screen's recent pasts, so that a frame the far end computed against a state we
+            // have already passed can be used instead of costing a round trip. Every call into it
+            // happens on the one thread that applies host bytes, under the emulator's own lock.
+            val history = TerminalScreenHistory(em)
+            val made = MoshTerminalTransport(
+                handover,
+                past = object : ScreenPast {
+                    override val depth get() = history.depth
+                    override fun keep(state: Long) = synchronized(em) { history.keep(state) }
+                    override fun restore(state: Long) = synchronized(em) { history.restore(state) }
+                    override fun forget() = synchronized(em) { history.forget() }
+                    override fun ignoreRepaint(lines: Int) =
+                        synchronized(em) { history.ignoreRepaint(lines) }
+                },
+            ) { buffer, n ->
+                synchronized(em) { em.process(buffer, 0, n) }
+            }
+            unowned = made
+            synchronized(em) { made.resize(em.buffer.columns, em.buffer.rows) }
+            made.start()
+            if (made.awaitFirstContact()) {
+                unowned = null
+                return made
+            }
+            // Nothing came back. There is no error from the far end for a path that will not
+            // carry UDP — it looks exactly like a server that has not spoken yet — so silence is
+            // the whole diagnosis, and the server is told to go away again.
+            val where = made.peerDescription
+            made.close()
+            unowned = null
+            // Which port and, above all, which address family: a rule written for IPv4 does
+            // nothing for a session SSH made over IPv6, and that is the mistake this failure looks
+            // exactly like. Without it the dialog can only say "something is blocking UDP".
+            MoshUnavailable(MoshUnavailable.Reason.NoUdpAnswer, where)
+        } catch (e: CancellationException) {
+            // Before the general catch, which would otherwise turn a screen being left into a
+            // dialog nobody is there to answer.
+            throw e
+        } catch (e: MoshUnavailable) {
+            e
+        } catch (e: Exception) {
+            // The exec channel itself went wrong. Same question, with whatever is known.
+            MoshUnavailable(MoshUnavailable.Reason.NoConnectLine, e.message)
+        } finally {
+            unowned?.let { runCatching { it.close() } }
+        }
+        withContext(Dispatchers.Main.immediate) {
+            _state.value = ConnectionState.MoshFailed(failure.reason, failure.detail)
+        }
+        if (!moshFailureResult.first()) return null
+        withContext(Dispatchers.Main.immediate) { _state.value = ConnectionState.Connecting }
+        return SshTerminalTransport(session)
+    }
+
+    /**
+     * In a debug build, one line in the log every few seconds about how the mosh session is going.
+     *
+     * The lab can measure a keystroke against a real server from a desktop; it cannot tell us what
+     * the same session costs on somebody's tablet, and the first field report was "half a second a
+     * character" where the lab said seventeen milliseconds. This is how that gap gets a number
+     * instead of a theory: `adb logcat -s SshBorgMosh`. Nothing in release builds, and nothing in
+     * the line that is anybody's business but the session's own health.
+     */
+    private fun watchMoshInDebug(transport: MoshTerminalTransport) {
+        if (!BuildConfig.DEBUG) return
+        viewModelScope.launch {
+            while (true) {
+                delay(DIAGNOSTIC_INTERVAL_MS)
+                if (!transport.isConnected) return@launch
+                android.util.Log.i(TAG_MOSH, transport.diagnosticLine())
             }
         }
     }
 
+    /** Takes the session out of [SessionManager] and tells the screen why it ended. */
+    private fun finishSession(transport: TerminalTransport, end: TerminalTransport.End) {
+        val id = sessionId ?: return
+        if (sessionManager.get(id)?.transport !== transport) return
+        sessionManager.remove(id)
+        if (sessionManager.sessions.value.isEmpty()) {
+            SshForegroundService.stop(getApplication())
+        }
+        when (end) {
+            is TerminalTransport.End.CleanExit -> _navBack.tryEmit(Unit)
+            is TerminalTransport.End.Lost -> _state.value = ConnectionState.Disconnected(
+                summary = end.summary
+                    ?: getApplication<Application>().getString(R.string.terminal_connection_lost),
+                detail = end.detail,
+            )
+        }
+    }
+
+    /**
+     * When the oldest keystroke still waiting for an answer was typed, or 0.
+     *
+     * Debug builds only, and the reason it exists is that a field report of "half a second a
+     * character" and a lab measurement of seventeen milliseconds cannot both be acted on. It is
+     * measured for *either* transport on purpose: the useful comparison is the same device, the
+     * same network and the same finger, over SSH and over mosh.
+     */
+    @Volatile
+    private var typedAt = 0L
+
+    private fun noteKeystroke() {
+        if (BuildConfig.DEBUG && typedAt == 0L) typedAt = System.currentTimeMillis()
+    }
+
+    private fun noteEcho() {
+        if (!BuildConfig.DEBUG) return
+        val typed = typedAt
+        if (typed == 0L) return
+        typedAt = 0L
+        android.util.Log.i(
+            // Not the mosh tag: this one is measured for either transport, which is the whole
+            // point of it — the comparison is the same device, network and finger.
+            TAG_TERMINAL,
+            "echo=${System.currentTimeMillis() - typed}ms" +
+                if (transport?.screenIsSynchronised == true) " mosh" else " ssh",
+        )
+    }
+
     fun sendInput(data: ByteArray) {
+        noteKeystroke()
         // Enter (\r or \n) and Ctrl+C immediately clear suggestions — the line is gone.
         if (data.size == 1 && (data[0] == 0x0D.toByte() || data[0] == 0x0A.toByte() || data[0] == 0x03.toByte())) {
             _suggestions.value = emptyList()
         }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { shellSession?.write(data) }
+            runCatching { transport?.write(data) }
         }
     }
 
@@ -565,9 +779,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         val em = _emulator.value
         synchronized(em) { em.resize(cols, rows) }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { shellSession?.resize(cols, rows) }
+            runCatching { transport?.resize(cols, rows) }
         }
     }
+
+    fun carryOnOverSsh() { moshFailureResult.tryEmit(true) }
+    fun leaveAfterMoshFailed() { moshFailureResult.tryEmit(false) }
 
     fun acceptHostKey() { hostKeyResult.tryEmit(true) }
     fun rejectHostKey() { hostKeyResult.tryEmit(false) }
@@ -577,6 +794,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     fun background() {
         readerJob?.cancel()
         readerJob = null
+        contactJob?.cancel()
+        contactJob = null
         onNeedsRedraw = null
     }
 
@@ -586,6 +805,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         connectJob?.cancel()
         readerJob?.cancel()
         shellSession = null
+        transport = null
         sessionManager.remove(id)
         _state.value = ConnectionState.Disconnected()
         if (sessionManager.sessions.value.isEmpty()) {
@@ -718,10 +938,41 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         // If the connection never completed, clean up the dangling session
         val id = sessionId ?: return
         if (sessionManager.get(id)?.status == SessionManager.Status.Connecting) {
+            // A connection still being set up has nobody to hand over to. The SSH session only
+            // reaches the SessionManager once the transport has been chosen, so until then it is
+            // closed here or not at all — which matters for the window in which the mosh failure
+            // dialog is waiting for an answer and the login underneath is already live.
+            runCatching { shellSession?.disconnect() }
             sessionManager.remove(id)
             if (sessionManager.sessions.value.isEmpty()) {
                 SshForegroundService.stop(getApplication())
             }
         }
+    }
+
+    private companion object {
+        /**
+         * How long `mosh-server` is told to wait for us before exiting. Unset it would wait for
+         * ever, which mosh itself suggests for a laptop; a phone abandons sessions far more
+         * readily, and a server nobody will ever come back to is a shell left running.
+         *
+         * An hour, which is deliberately more than [MoshTerminalTransport.SILENCE_LIMIT]: the
+         * client is always the first of the two to give up, so this number never decides when a
+         * session ends — it only decides how long a server the client has already written off
+         * stays on the host. If the terminal ever gains mosh's own "contact lost, still trying"
+         * line, both numbers grow together.
+         */
+        const val MOSH_SERVER_TIMEOUT_SECONDS = 3600
+
+        /** How often a debug build says in the log how the mosh session is going. */
+        const val DIAGNOSTIC_INTERVAL_MS = 2_000L
+
+        /**
+         * Logcat tags, in the shape the app already uses for `SshDiagnostics`: one for how a mosh
+         * session is going, one for what a keystroke costs over whichever transport is carrying
+         * it. `adb logcat -s SshBorgMosh` or `-s SshBorgTerminal`, debug builds only.
+         */
+        const val TAG_MOSH = "SshBorgMosh"
+        const val TAG_TERMINAL = "SshBorgTerminal"
     }
 }

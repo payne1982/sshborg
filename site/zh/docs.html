@@ -541,6 +541,8 @@
             <li><a href="#legacy-ciphers">旧版加密算法</a></li>
             <li><a href="#connection-drops">连接断开</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh（实验性）</a></li>
+            <li class="sub"><a href="#mosh">服务器需要什么</a></li>
             <li><a href="#jump-hosts">跳板机</a></li>
             <li class="sub"><a href="#jump-hosts">多跳链</a></li>
             <li><a href="#sessions">多会话</a></li>
@@ -919,6 +921,38 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// 提示</div>
                 您可以在服务器的 <code>~/.bashrc</code> 或 <code>~/.zshrc</code> 中添加 <code>tmux attach || tmux new -s main</code>，这样每次通过 SSHBorg 登录时都会自动启动复用器会话。
+            </div>
+        </div>
+
+        <div class="doc-section" id="mosh">
+
+            <h2>// MOSH（实验性）</h2>
+            <p>Mosh 是承载终端的第二条路。它不把服务器的输出顺着 SSH 连接送下来，而是把终端留<em>在服务器上</em>，用 UDP 给手机送一份屏幕现在的样子。因为不再有任何东西绑在一条 TCP 连接上，平时会终结会话的那些情况它都能挺过去：IP 变了、从 Wi-Fi 切到移动数据、过隧道、手机在口袋里睡着了。你回来，会话就还在那里。</p>
+            <p>在依赖它之前，有一个限制值得知道：会话会一直停留在它开始时所用的地址族上。<code>mosh-server</code> 只在 SSH 连接进来的那一个地址上监听，所以用 IPv6 建立的会话没法跟你走到一个没有 IPv6 的网络上；反过来，在只有 IPv6 的移动网络上也是一样。主机编辑页里的 <strong>IPv4 / IPv6</strong> 设置正是为此而有的：选一个你的各个网络都有的地址族，会话就能在它们之间移动。</p>
+            <p>SSHBorg 并不用它取代 SSH。SSH 依旧负责登录、启动 mosh 服务端，并且<strong>保持打开</strong>——正是这一点让 SFTP、端口转发、代理转发和命令建议在同一台主机上继续可用，而终端走的是 UDP。</p>
+            <p>不过这一半是普通的 SSH，所以它撑不过 mosh 撑得过的事情：网络一换，SSH 连接就跟着断了，那台主机上的 SFTP、端口转发和命令建议都要等你重新打开才能用。终端那一半会继续。</p>
+            <h3>服务器需要什么</h3>
+            <ul>
+                <li><strong>装好 mosh</strong> — 服务器上必须有 <code>mosh-server</code> 程序。多数发行版里这个软件包就叫 <code>mosh</code>。</li>
+                <li><strong>UTF-8 的区域设置</strong> — 没有它 mosh 不会启动，因为终端里的内容要由它自己来解释。</li>
+                <li><strong>入站 UDP，端口 60001–60999</strong> — 手机必须能从这些端口连上服务器。这一条正是酒店、校园和公司网络最常屏蔽的。</li>
+            </ul>
+            <h3>怎么打开</h3>
+            <p>打开主机编辑页，在颜色旁边勾上 <strong>Mosh</strong>。它按主机单独设置，默认关闭：没勾的主机什么都不会变。标为实验性是因为它新，不是因为它没做完。</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// 耗电</div>
+                mosh 会话在打开期间大约每三秒发一个小包，正是靠这个它才能立刻察觉网络变化。这比普通 SSH 会话用到的射频更多，在手机上要耗电。用不到的主机，就别打开它。
+            </div>
+            <h3>终端里有什么不同</h3>
+            <p><strong>回滚历史从空的开始。</strong>走 SSH 时，服务器打印过的一切都经过你的手机，所以可以全部留下。走 mosh 只传屏幕，所以历史里攒下的是真正从上边滚出去的那些行——而一个重绘屏幕却不滚动的程序，什么也不会留下。滚动手势照常可用，只是刚开的会话上面能翻到的东西更少。</p>
+            <p><strong>打字不会更快。</strong>mosh 以本地即时回显闻名，这一点 SSHBorg 还没有做：按键依旧要去服务器一趟再回来。在同一个网络下用手机实测，用 mosh 打字和用 SSH 差不多快。真正赚到的是会话不会死。</p>
+            <h3>Mosh 与跳板机</h3>
+            <p>两者在同一台主机上互相排斥，只要配了跳板链，编辑页就不让你勾 Mosh。不过通过 mosh 连接的主机，仍然可以<em>给别的主机</em>当跳板机——这本来也是更合适的安排：往里那一跳跑在服务器上，手机的网络打扰不到它。</p>
+            <h3>启动不了的时候</h3>
+            <p>SSHBorg 绝不悄悄退回 SSH。如果 mosh 服务端起不来，或者 UDP 上什么都没回来，它会告诉你是哪一种，并给出两个选择：继续用 SSH——登录已经做完了，所以不花什么代价——或者退出。四种可能的原因里有三种在服务器上，而提示会说清你碰上的是哪一种。</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// 提示</div>
+                mosh 不是 tmux 的替代品。它让会话在网络变化之间活下来；tmux 让你的<em>工作</em>在其他一切之间活下来，包括应用被关掉或手机重启。两个一起用最稳妥：用 mosh 连到服务器，把耗时的活都放在 tmux 里面跑。
             </div>
         </div>
 

@@ -24,6 +24,32 @@ object SshManager {
     private const val OPENSSH_PEM_WIDTH = 70
 
     /**
+     * The address to dial for [hostname] when a family has been asked for, or the name itself.
+     *
+     * Returning the name is what this app has always done and what `auto` keeps doing: the
+     * resolver picks, and on Android that means IPv6 first. A host that has asked for a family
+     * gets the first address of it, and the *name* if that family has nothing — a preference is
+     * not worth failing a connection over.
+     *
+     * Only mosh has a reason to care, and the reason is in [SshConnectionParams.addressFamily]: a
+     * mosh session is bound to the family it was born on. Resolving here rather than twice also
+     * closes something that was merely unlikely before — the handover gives mosh no address, so it
+     * used to resolve the name again and could in principle have landed on a different one than
+     * SSH had used.
+     */
+    private fun preferredAddress(hostname: String, family: String): String {
+        if (family != "ipv4" && family != "ipv6") return hostname
+        val wanted = if (family == "ipv4") java.net.Inet4Address::class.java
+        else java.net.Inet6Address::class.java
+        return runCatching {
+            java.net.InetAddress.getAllByName(hostname)
+                .firstOrNull { wanted.isInstance(it) }
+                ?.hostAddress
+                ?: hostname
+        }.getOrDefault(hostname)
+    }
+
+    /**
      * The body of an OpenSSH private key, broken into lines the way ssh-keygen breaks them.
      *
      * The breaking is done here instead of by `Base64.getMimeEncoder(width, …)` because MIME wants
@@ -274,7 +300,7 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): ShellSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard -> runInterruptible {
 
-        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
+        val (session, dialled, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
@@ -298,7 +324,7 @@ object SshManager {
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
+        ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates, dialled)
     } }
 
     /**
@@ -310,7 +336,8 @@ object SshManager {
         onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
     ): SftpSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard ->
 
-        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) =
+        // SFTP has no use for the address it was dialled at; only mosh does.
+        val (session, _, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) =
             runInterruptible { createSession(params, guard) }
 
         val channel = runInterruptible {
@@ -333,6 +360,12 @@ object SshManager {
 
     private data class SessionResult(
         val session: Session,
+        /**
+         * The address the session was dialled at: the name, or a literal when a family was asked
+         * for. Carried out of here because mosh needs the address SSH actually used, not the name
+         * resolved a second time.
+         */
+        val dialled: String,
         val jumpSessions: List<Session>,
         /** New host-key lines for simple-mode jump hops (no prior stored key). */
         val newJumpKeyLines: List<String>,
@@ -478,8 +511,19 @@ object SshManager {
             jsch.setKnownHosts(ByteArrayInputStream(params.knownHostsEntry.toByteArray()))
         }
 
-        val session = jsch.getSession(params.username, params.hostname, params.port)
+        // The address we actually dial. Normally the name, left to the resolver as it always has
+        // been; an address of a chosen family when a host asked for one, which only mosh has a
+        // reason to. See [preferredAddress] for why the name still does the vouching.
+        val dialled = if (proxy != null) params.hostname
+        else preferredAddress(params.hostname, params.addressFamily)
+
+        val session = jsch.getSession(params.username, dialled, params.port)
         guard.track(session)
+        // Connect to the address, check the host key under the name. Without this a host whose
+        // family is chosen would be dialled as a literal, find nothing under that literal in its
+        // own pinned known-hosts entry, and ask to trust the server all over again — turning a
+        // preference about routing into a hole in the one check that says the server is the server.
+        if (dialled != params.hostname) session.setHostKeyAlias(params.hostname)
         if (proxy != null) session.setProxy(proxy)
 
         // Tag the session with the jump sessions so ShellSession/SftpSession can clean them up
@@ -588,7 +632,7 @@ object SshManager {
             session.setPortForwardingL(pf.bindAddress, pf.localPort, pf.remoteHost, pf.remotePort)
         }
 
-        return SessionResult(session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
+        return SessionResult(session, dialled, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
     }
 
     /** JSch [Proxy] implementation that tunnels through an already-connected SSH [Session]. */
@@ -868,6 +912,12 @@ class ShellSession(
      * Persist each keyLine to the corresponding HostEntity's knownHostsEntry.
      */
     val newJumpHostKeyUpdates: List<Pair<Long, String>> = emptyList(),
+    /**
+     * The address this session was actually dialled at — the name, or a literal when a family was
+     * chosen. It is what mosh is handed, so that the UDP half talks to exactly the address the SSH
+     * half used rather than resolving the name a second time and hoping to agree.
+     */
+    val dialledAddress: String = hostname,
 ) {
     val inputStream: java.io.InputStream get() = channelInput
     val isConnected get() = channel.isConnected && session.isConnected
@@ -899,6 +949,98 @@ class ShellSession(
     }
 
     /**
+     * Starts a `mosh-server` on this connection and reads its handover line.
+     *
+     * One exec channel, one command, one line of output. Three details are not obvious:
+     *
+     * - **no pty is asked for.** `mosh-server` takes its initial size from `TIOCGWINSZ` on its
+     *   stdin and falls back to 80x24, and the stock client does not request one either: the real
+     *   size arrives a moment later in the first datagram, which costs one extra frame and avoids
+     *   handing a detaching daemon a controlling terminal;
+     * - **`env` rather than `VAR=value cmd`.** sshd runs the command through the account's login
+     *   shell, and `fish` has no such syntax at all — we already know fish users exist, because
+     *   the history reader looks for its history file;
+     * - **the network timeout is raised far above the default.** A server hears nothing for forty
+     *   seconds and detaches, then exits. On a phone that is not an edge case: Doze batches our
+     *   heartbeat as soon as the screen goes off, so the default would end the session in exactly
+     *   the situation mosh exists for. Making the server patient is the cure, and it costs one
+     *   environment variable.
+     *
+     * @param networkTimeoutSeconds what the server waits, hearing nothing, before giving up.
+     * @param command the server binary, for the accounts where it is installed somewhere the
+     *   login shell's PATH does not reach.
+     * @throws MoshUnavailable with the reason, which the caller shows to the user. Never with the
+     *   key in it: anything echoed back into a diagnostic has the handover line taken out first.
+     */
+    fun startMoshServer(
+        networkTimeoutSeconds: Int,
+        command: String = "mosh-server",
+        ports: String? = null,
+        timeoutMs: Int = 20_000,
+    ): MoshBootstrap {
+        val channel = session.openChannel("exec") as com.jcraft.jsch.ChannelExec
+        // -p only when a host asked for one: left out, mosh picks from its own range of a
+        // thousand ports, which is the default precisely because nobody should have to care.
+        val range = MoshBootstrap.portRange(ports)?.let { " -p $it" } ?: ""
+        channel.setCommand(
+            "env MOSH_SERVER_NETWORK_TMOUT=$networkTimeoutSeconds $command new -s$range -c 256"
+        )
+        val errors = java.io.ByteArrayOutputStream()
+        channel.setErrStream(errors)
+        // The pipe has to exist before connect() or JSch silently drops what arrives first.
+        val output = channel.inputStream
+        try {
+            channel.connect(timeoutMs)
+            val said = readUntilClosed(channel, output, timeoutMs)
+            val full = said + errors.toString(Charsets.UTF_8.name())
+
+            MoshBootstrap.CONNECT_LINE.find(said)?.let { match ->
+                return MoshBootstrap(
+                    host = dialledAddress,
+                    port = match.groupValues[1].toInt(),
+                    key = match.groupValues[2],
+                )
+            }
+            throw MoshUnavailable(
+                reason = when {
+                    channel.exitStatus == 127 || "not found" in full -> MoshUnavailable.Reason.NotInstalled
+                    "UTF-8" in full || "utf-8" in full -> MoshUnavailable.Reason.LocaleNotUtf8
+                    else -> MoshUnavailable.Reason.NoConnectLine
+                },
+                detail = MoshBootstrap.redact(full),
+            )
+        } finally {
+            runCatching { channel.disconnect() }
+        }
+    }
+
+    /** Reads an exec channel's output until it closes or [timeoutMs] runs out. */
+    private fun readUntilClosed(
+        channel: com.jcraft.jsch.ChannelExec,
+        output: java.io.InputStream,
+        timeoutMs: Int,
+    ): String {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        val said = StringBuilder()
+        val buffer = ByteArray(1024)
+        while (System.currentTimeMillis() < deadline) {
+            if (output.available() > 0) {
+                val n = output.read(buffer)
+                if (n < 0) break
+                said.append(String(buffer, 0, n, Charsets.UTF_8))
+                // The handover is the first line; waiting for the channel to close as well would
+                // mean waiting for the daemon to let go of it.
+                if (MoshBootstrap.CONNECT_LINE.containsMatchIn(said)) break
+            } else if (channel.isClosed) {
+                break
+            } else {
+                Thread.sleep(POLL_MS)
+            }
+        }
+        return said.toString()
+    }
+
+    /**
      * Opens an SFTP channel on this connection, already authenticated and host-key checked —
      * for a quick side read (the shell history) without logging in a second time. The caller
      * owns the channel and must disconnect it; it runs alongside the shell, not in place of it.
@@ -911,6 +1053,11 @@ class ShellSession(
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
         jumpSessions.reversed().forEach { runCatching { it.disconnect() } }
+    }
+
+    private companion object {
+        /** How long to wait between looks at an exec channel that has said nothing yet. */
+        const val POLL_MS = 20L
     }
 }
 
