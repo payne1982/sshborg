@@ -458,9 +458,12 @@ fun AddEditHostScreen(
                 // which is what makes it read as "one or the other" rather than as a field whose
                 // value happens to be one of them.
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // The host list first, because it is the default and the one that can carry
+                    // a hop's own credentials; the text field is the fallback for a hop that is
+                    // not a host of yours.
                     listOf(
-                        "simple" to R.string.host_jump_mode_simple,
                         "host_list" to R.string.host_jump_mode_host_list,
+                        "simple" to R.string.host_jump_mode_simple,
                     ).forEach { (mode, labelRes) ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
