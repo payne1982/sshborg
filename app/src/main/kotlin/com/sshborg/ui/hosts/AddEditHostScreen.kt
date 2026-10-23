@@ -454,17 +454,26 @@ fun AddEditHostScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                    HostChoiceField(
-                    label = stringResource(R.string.host_jump_mode_label),
-                    selected = jumpMode,
-                    options = listOf(
+                // Two choices side by side, kept as radios on purpose: both are visible at once,
+                // which is what makes it read as "one or the other" rather than as a field whose
+                // value happens to be one of them.
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    listOf(
                         "simple" to R.string.host_jump_mode_simple,
                         "host_list" to R.string.host_jump_mode_host_list,
-                    ),
-                    onSelect = { vm.jumpMode.value = it },
-                    touchless = touchless,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                    ).forEach { (mode, labelRes) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            RadioButton(
+                                selected = jumpMode == mode,
+                                onClick  = { vm.jumpMode.value = mode },
+                            )
+                            Text(stringResource(labelRes))
+                        }
+                    }
+                }
 
                 if (jumpMode == "simple") {
                     HostField(

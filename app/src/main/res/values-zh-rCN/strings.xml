@@ -59,7 +59,7 @@
     <string name="host_mosh_no_jump">Mosh 不能与跳板机同时使用。要启用它，请先删除下面的跳板机。</string>
     <string name="host_jump_not_with_mosh">与 Mosh 不可同时使用。通过 Mosh 连接的主机仍然可以作为其他主机的跳板机。</string>
     <string name="host_section_mosh">Mosh</string>
-    <string name="host_mosh_family_label">地址</string>
+    <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自动</string>
     <string name="host_mosh_family_ipv4">优先 IPv4</string>
     <string name="host_mosh_family_ipv6">优先 IPv6</string>
@@ -121,9 +121,8 @@
     <string name="host_field_jump_hosts">跳板机（-J）</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">逗号分隔：[user@]host[:port] — 默认端口 22，用户名相同</string>
-    <string name="host_jump_mode_label">跳板机模式</string>
     <string name="host_start_mode_label">起始目录</string>
-    <string name="host_jump_mode_simple">简单模式</string>
+    <string name="host_jump_mode_simple">文本</string>
     <string name="host_jump_mode_host_list">主机列表</string>
     <string name="host_jump_select_placeholder">选择主机…</string>
     <string name="host_jump_add">添加跳板机</string>

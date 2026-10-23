@@ -59,7 +59,7 @@
     <string name="host_mosh_no_jump">Mosh は踏み台ホストと併用できません。有効にするには下の踏み台ホストを削除してください。</string>
     <string name="host_jump_not_with_mosh">Mosh では使用できません。Mosh で接続するホストは、他のホストの踏み台としては引き続き使えます。</string>
     <string name="host_section_mosh">Mosh</string>
-    <string name="host_mosh_family_label">アドレス</string>
+    <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自動</string>
     <string name="host_mosh_family_ipv4">IPv4 を優先</string>
     <string name="host_mosh_family_ipv6">IPv6 を優先</string>
@@ -121,9 +121,8 @@
     <string name="host_field_jump_hosts">踏み台ホスト（-J）</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">カンマ区切り：[user@]host[:port] — デフォルト: ポート 22、同じユーザー名</string>
-    <string name="host_jump_mode_label">踏み台ホストのモード</string>
     <string name="host_start_mode_label">開始ディレクトリ</string>
-    <string name="host_jump_mode_simple">シンプル</string>
+    <string name="host_jump_mode_simple">テキスト</string>
     <string name="host_jump_mode_host_list">ホストリスト</string>
     <string name="host_jump_select_placeholder">ホストを選択…</string>
     <string name="host_jump_add">踏み台ホストを追加</string>

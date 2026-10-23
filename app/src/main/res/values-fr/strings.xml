@@ -58,7 +58,7 @@
     <string name="host_mosh_no_jump">Mosh ne peut pas être utilisé avec un hôte de saut. Supprimez les hôtes de saut ci-dessous pour l’activer.</string>
     <string name="host_jump_not_with_mosh">Non disponible avec Mosh. Un hôte atteint via Mosh peut toujours servir d’hôte de saut pour d’autres hôtes.</string>
     <string name="host_section_mosh">Mosh</string>
-    <string name="host_mosh_family_label">Adresses</string>
+    <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatique</string>
     <string name="host_mosh_family_ipv4">Préférer IPv4</string>
     <string name="host_mosh_family_ipv6">Préférer IPv6</string>
@@ -118,9 +118,8 @@
     <string name="host_field_jump_hosts">Hôtes de saut (-J)</string>
     <string name="host_jump_hosts_placeholder">hôte1:22,utilisateur@hôte2:2222</string>
     <string name="host_jump_hosts_supporting">Séparés par des virgules : [utilisateur@]hôte[:port] — par défaut : port 22, même utilisateur</string>
-    <string name="host_jump_mode_label">Mode hôte de saut</string>
     <string name="host_start_mode_label">Répertoire de départ</string>
-    <string name="host_jump_mode_simple">Simple</string>
+    <string name="host_jump_mode_simple">Texte</string>
     <string name="host_jump_mode_host_list">Liste d’hôtes</string>
     <string name="host_jump_select_placeholder">Sélectionner un hôte…</string>
     <string name="host_jump_add">Ajouter un jump host</string>

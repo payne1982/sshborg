@@ -28,10 +28,16 @@ data class HostEntity(
      */
     val portForwardings: String? = null,
     /**
-     * Jump host mode: "simple" uses the [jumpHosts] text string,
-     * "host_list" uses [jumpHostIdList] (comma-separated host entity IDs).
+     * Jump host mode: "simple" uses the [jumpHosts] text string, "host_list" uses
+     * [jumpHostIdList] (comma-separated host entity IDs).
+     *
+     * `host_list` is the default for a host created from now on, because it is the one that can
+     * carry credentials: a hop picked from the host list brings its own key or password, where a
+     * hop typed into the text field has none of its own. Hosts that already exist keep whatever
+     * they were saved with — the column has been written on every save since it appeared — and a
+     * backup that predates the choice is still read as "simple", which is what it meant then.
      */
-    val jumpMode: String = "simple",
+    val jumpMode: String = "host_list",
     /**
      * Ordered comma-separated IDs of host entities to use as jump hosts.
      * Only used when [jumpMode] == "host_list".

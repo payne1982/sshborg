@@ -41,8 +41,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var jumpHosts = MutableStateFlow("")
     /** Newline-separated port-forwarding rules in -L syntax. */
     var portForwardings = MutableStateFlow("")
-    /** Jump host mode: "simple" = text field, "host_list" = select from hosts. */
-    var jumpMode = MutableStateFlow("simple")
+    /**
+     * Jump host mode: "simple" = text field, "host_list" = select from hosts.
+     *
+     * A new host starts on the host list, which is the mode that can carry a hop's own key or
+     * password; [loadHost] replaces this for a host that already exists.
+     */
+    var jumpMode = MutableStateFlow("host_list")
     /** Ordered list of host IDs selected as jump hops (host-list mode). 0L = not yet selected. */
     var jumpHostIds = MutableStateFlow<List<Long>>(emptyList())
     /** SFTP starting directory mode: "last" | "fixed" | "home". */

@@ -366,6 +366,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         jumpHosts = o.optString("jumpHosts").takeIf { it.isNotEmpty() },
                         jumpHostKeys = null,
                         portForwardings = o.optString("portForwardings").takeIf { it.isNotEmpty() },
+                        // "simple" and not the entity's new default: a backup old enough not to
+                        // carry this field was written when the text string was the only mode
+                        // there was, so that is what it meant.
                         jumpMode = o.optString("jumpMode", "simple"),
                         jumpHostIdList = o.optString("jumpHostIdList").takeIf { it.isNotEmpty() },
                         sftpStartMode = o.optString("sftpStartMode", "last"),

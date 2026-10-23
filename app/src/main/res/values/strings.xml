@@ -60,7 +60,7 @@
     <string name="host_mosh_no_jump">Mosh cannot be used with a jump host. Remove the jump hosts below to turn it on.</string>
     <string name="host_jump_not_with_mosh">Not available with Mosh. A host reached over Mosh can still be a jump host for other hosts.</string>
     <string name="host_section_mosh">Mosh</string>
-    <string name="host_mosh_family_label">Addresses</string>
+    <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatic</string>
     <string name="host_mosh_family_ipv4">Prefer IPv4</string>
     <string name="host_mosh_family_ipv6">Prefer IPv6</string>
@@ -122,9 +122,8 @@
     <string name="host_field_jump_hosts">Jump hosts (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">Comma-separated: [user@]host[:port] — defaults: port 22, same user</string>
-    <string name="host_jump_mode_label">Jump host mode</string>
     <string name="host_start_mode_label">Starting directory</string>
-    <string name="host_jump_mode_simple">Simple</string>
+    <string name="host_jump_mode_simple">Text</string>
     <string name="host_jump_mode_host_list">Host list</string>
     <string name="host_jump_select_placeholder">Select host…</string>
     <string name="host_jump_add">Add jump host</string>
