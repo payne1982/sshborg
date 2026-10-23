@@ -118,6 +118,8 @@
     <string name="host_field_jump_hosts">Jump host (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,utente@host2:2222</string>
     <string name="host_jump_hosts_supporting">Separati da virgola: [utente@]host[:porta] — predefiniti: porta 22, stesso utente</string>
+    <string name="host_jump_mode_label">Modalità jump host</string>
+    <string name="host_start_mode_label">Directory iniziale</string>
     <string name="host_jump_mode_simple">Semplice</string>
     <string name="host_jump_mode_host_list">Lista host</string>
     <string name="host_jump_select_placeholder">Seleziona host…</string>

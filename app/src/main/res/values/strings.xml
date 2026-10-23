@@ -122,6 +122,8 @@
     <string name="host_field_jump_hosts">Jump hosts (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">Comma-separated: [user@]host[:port] — defaults: port 22, same user</string>
+    <string name="host_jump_mode_label">Jump host mode</string>
+    <string name="host_start_mode_label">Starting directory</string>
     <string name="host_jump_mode_simple">Simple</string>
     <string name="host_jump_mode_host_list">Host list</string>
     <string name="host_jump_select_placeholder">Select host…</string>

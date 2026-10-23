@@ -122,6 +122,8 @@
     <string name="host_field_jump_hosts">Промежуточные хосты (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">Через запятую: [user@]host[:port] — по умолчанию: порт 22, тот же пользователь</string>
+    <string name="host_jump_mode_label">Режим промежуточного хоста</string>
+    <string name="host_start_mode_label">Начальный каталог</string>
     <string name="host_jump_mode_simple">Простой</string>
     <string name="host_jump_mode_host_list">Список хостов</string>
     <string name="host_jump_select_placeholder">Выберите хост…</string>

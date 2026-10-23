@@ -121,6 +121,8 @@
     <string name="host_field_jump_hosts">跳板机（-J）</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">逗号分隔：[user@]host[:port] — 默认端口 22，用户名相同</string>
+    <string name="host_jump_mode_label">跳板机模式</string>
+    <string name="host_start_mode_label">起始目录</string>
     <string name="host_jump_mode_simple">简单模式</string>
     <string name="host_jump_mode_host_list">主机列表</string>
     <string name="host_jump_select_placeholder">选择主机…</string>

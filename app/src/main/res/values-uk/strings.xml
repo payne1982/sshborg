@@ -118,6 +118,8 @@
     <string name="host_field_jump_hosts">Проміжні хости (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">Розділені комами: [user@]host[:порт] — за замовчуванням: порт 22, той самий користувач</string>
+    <string name="host_jump_mode_label">Режим проміжного хоста</string>
+    <string name="host_start_mode_label">Початковий каталог</string>
     <string name="host_jump_mode_simple">Простий</string>
     <string name="host_jump_mode_host_list">Список хостів</string>
     <string name="host_jump_select_placeholder">Оберіть хост…</string>

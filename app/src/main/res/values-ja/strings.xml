@@ -121,6 +121,8 @@
     <string name="host_field_jump_hosts">踏み台ホスト（-J）</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>
     <string name="host_jump_hosts_supporting">カンマ区切り：[user@]host[:port] — デフォルト: ポート 22、同じユーザー名</string>
+    <string name="host_jump_mode_label">踏み台ホストのモード</string>
+    <string name="host_start_mode_label">開始ディレクトリ</string>
     <string name="host_jump_mode_simple">シンプル</string>
     <string name="host_jump_mode_host_list">ホストリスト</string>
     <string name="host_jump_select_placeholder">ホストを選択…</string>

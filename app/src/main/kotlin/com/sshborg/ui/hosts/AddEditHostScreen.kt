@@ -401,25 +401,18 @@ fun AddEditHostScreen(
                 HorizontalDivider()
                 Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
 
-                Text(stringResource(R.string.host_mosh_family_label), style = MaterialTheme.typography.bodyMedium)
-                Column {
-                    listOf(
+                HostChoiceField(
+                    label = stringResource(R.string.host_mosh_family_label),
+                    selected = moshFamily,
+                    options = listOf(
                         "auto" to R.string.host_mosh_family_auto,
                         "ipv4" to R.string.host_mosh_family_ipv4,
                         "ipv6" to R.string.host_mosh_family_ipv6,
-                    ).forEach { (family, labelRes) ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            RadioButton(
-                                selected = moshFamily == family,
-                                onClick  = { vm.moshFamily.value = family },
-                            )
-                            Text(stringResource(labelRes))
-                        }
-                    }
-                }
+                    ),
+                    onSelect = { vm.moshFamily.value = it },
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                )
                 Text(
                     stringResource(R.string.host_mosh_family_supporting),
                     style = MaterialTheme.typography.bodySmall,
@@ -461,29 +454,17 @@ fun AddEditHostScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                // Mode selector
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        RadioButton(
-                            selected = jumpMode == "simple",
-                            onClick  = { vm.jumpMode.value = "simple" },
-                        )
-                        Text(stringResource(R.string.host_jump_mode_simple))
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        RadioButton(
-                            selected = jumpMode == "host_list",
-                            onClick  = { vm.jumpMode.value = "host_list" },
-                        )
-                        Text(stringResource(R.string.host_jump_mode_host_list))
-                    }
-                }
+                    HostChoiceField(
+                    label = stringResource(R.string.host_jump_mode_label),
+                    selected = jumpMode,
+                    options = listOf(
+                        "simple" to R.string.host_jump_mode_simple,
+                        "host_list" to R.string.host_jump_mode_host_list,
+                    ),
+                    onSelect = { vm.jumpMode.value = it },
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                )
 
                 if (jumpMode == "simple") {
                     HostField(
@@ -545,24 +526,18 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_start_directory), style = MaterialTheme.typography.titleSmall)
 
-            Column {
-                listOf(
+            HostChoiceField(
+                label = stringResource(R.string.host_start_mode_label),
+                selected = sftpStartMode,
+                options = listOf(
                     "last"  to R.string.host_start_mode_last,
                     "fixed" to R.string.host_start_mode_fixed,
                     "home"  to R.string.host_start_mode_home,
-                ).forEach { (mode, labelRes) ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        RadioButton(
-                            selected = sftpStartMode == mode,
-                            onClick  = { vm.sftpStartMode.value = mode },
-                        )
-                        Text(stringResource(labelRes))
-                    }
-                }
-            }
+                ),
+                onSelect = { vm.sftpStartMode.value = it },
+                touchless = touchless,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
             val startDirValue = when (sftpStartMode) {
                 "home" -> "~"
@@ -729,6 +704,58 @@ private fun JumpHostRow(
         IconButton(onClick = onRemove) {
             Icon(Icons.Default.Remove, contentDescription = null,
                 tint = MaterialTheme.colorScheme.error)
+        }
+    }
+}
+
+/**
+ * One of a few named choices, as a dropdown rather than a row of radio buttons.
+ *
+ * Radios were honest but they cost a line each and made the form long enough to hide what came
+ * after them; three of these used to take eleven lines between them. The dropdown shows the
+ * choice made, which is the only one anybody reads after the first time.
+ *
+ * Two flavours because the form already has two: a television has no touch, so there it is the
+ * tap-to-open field the rest of the screen uses ([TvSelectField]) rather than a menu anchored to
+ * a text box the remote cannot aim at.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HostChoiceField(
+    label: String,
+    selected: String,
+    options: List<Pair<String, Int>>,
+    onSelect: (String) -> Unit,
+    touchless: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val shown = stringResource(options.firstOrNull { it.first == selected }?.second ?: options.first().second)
+    val items: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
+        options.forEach { (value, labelRes) ->
+            DropdownMenuItem(
+                text = { Text(stringResource(labelRes)) },
+                onClick = { onSelect(value); dismiss() },
+            )
+        }
+    }
+    if (touchless) {
+        TvSelectField(label = label, valueText = shown, modifier = modifier, menuItems = items)
+    } else {
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+            OutlinedTextField(
+                value = shown,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(label) },
+                modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                singleLine = true,
+            )
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                items { expanded = false }
+            }
         }
     }
 }

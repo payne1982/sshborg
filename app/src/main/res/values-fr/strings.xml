@@ -118,6 +118,8 @@
     <string name="host_field_jump_hosts">Hôtes de saut (-J)</string>
     <string name="host_jump_hosts_placeholder">hôte1:22,utilisateur@hôte2:2222</string>
     <string name="host_jump_hosts_supporting">Séparés par des virgules : [utilisateur@]hôte[:port] — par défaut : port 22, même utilisateur</string>
+    <string name="host_jump_mode_label">Mode hôte de saut</string>
+    <string name="host_start_mode_label">Répertoire de départ</string>
     <string name="host_jump_mode_simple">Simple</string>
     <string name="host_jump_mode_host_list">Liste d’hôtes</string>
     <string name="host_jump_select_placeholder">Sélectionner un hôte…</string>
