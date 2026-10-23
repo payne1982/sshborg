@@ -928,7 +928,9 @@ screen -r work</code></pre>
 
             <h2>// MOSH (EXPERIMENTAL)</h2>
             <p>O mosh é uma segunda forma de transportar o terminal. Em vez de enviar a saída do servidor pela ligação SSH, mantém o terminal <em>no servidor</em> e envia ao telefone uma imagem do aspeto do ecrã, por UDP. Como já nada está preso a uma ligação TCP, a sessão sobrevive àquilo que normalmente lhe põe fim: uma mudança de IP, a passagem do Wi-Fi para os dados móveis, um túnel, um telefone que ficou a dormir no bolso. Volta e a sessão está simplesmente lá.</p>
+            <p>Há um limite que vale a pena conhecer antes de contar com isto: uma sessão fica na família de endereços em que nasceu. O <code>mosh-server</code> escuta no único endereço por onde chegou a ligação SSH, pelo que uma sessão feita por IPv6 não o pode seguir para uma rede sem IPv6, e o mesmo vale ao contrário numa rede móvel que só tenha IPv6. A opção <strong>IPv4 / IPv6</strong> na ficha do host existe exatamente para isto: escolha a família que as suas redes têm em comum e a sessão poderá passar de uma para a outra.</p>
             <p>O SSHBorg não substitui o SSH por mosh. O SSH continua a fazer a autenticação, arranca o servidor mosh e <strong>fica aberto</strong> — é isso que mantém a funcionar o SFTP, o encaminhamento de portas, o encaminhamento do agente e as sugestões de comandos no mesmo host enquanto o terminal viaja por UDP.</p>
+            <p>Essa metade é, no entanto, SSH normal, pelo que não sobrevive àquilo a que o mosh sobrevive: uma mudança de rede leva a ligação SSH consigo, e o SFTP, um encaminhamento de portas ou as sugestões de comandos nesse host deixam de funcionar até o abrir de novo. O terminal continua.</p>
             <h3>O que o servidor precisa</h3>
             <ul>
                 <li><strong>mosh instalado</strong> — o programa <code>mosh-server</code> tem de estar no servidor. Na maioria das distribuições o pacote chama-se <code>mosh</code>.</li>

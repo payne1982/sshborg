@@ -471,7 +471,9 @@ screen -r work</code></pre>
   doc_mosh: `
             <h2>// MOSH (EXPERIMENTAL)</h2>
             <p>Mosh is a second way of carrying the terminal. Instead of sending the server's output down the SSH connection, it keeps the terminal <em>on the server</em> and sends your phone a picture of what the screen looks like, over UDP. Because nothing is tied to a TCP connection any more, the session survives what normally ends one: a change of IP, a Wi-Fi to mobile handover, a tunnel, a phone that was asleep in your pocket. You come back and the session is simply there.</p>
+            <p>There is one limit worth knowing before relying on it: a session stays on the address family it was born on. <code>mosh-server</code> listens on the one address the SSH connection arrived on, so a session made over IPv6 cannot follow you onto a network that has no IPv6, and the reverse is just as true on a mobile network that has only IPv6. The <strong>IPv4 / IPv6</strong> setting in the host editor is there for exactly this: choose the family your networks have in common and the session can move between them.</p>
             <p>SSHBorg does not replace SSH with it. SSH still logs you in, starts the mosh server and <strong>stays open</strong>, which is what keeps SFTP, port forwarding, agent forwarding and the command suggestions working on the same host while the terminal rides UDP.</p>
+            <p>That half is ordinary SSH, though, so it does not survive what mosh survives: a change of network takes the SSH connection with it, and SFTP, a port forwarding or the command suggestions on that host stop working until you open it again. The terminal carries on.</p>
             <h3>What the server needs</h3>
             <ul>
                 <li><strong>mosh installed</strong> — the <code>mosh-server</code> program must be on the server. On most distributions the package is called <code>mosh</code>.</li>
