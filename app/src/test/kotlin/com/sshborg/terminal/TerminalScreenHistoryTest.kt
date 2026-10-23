@@ -1,6 +1,7 @@
 package com.sshborg.terminal
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
@@ -102,5 +103,56 @@ class TerminalScreenHistoryTest {
         history.restore(2)
         assertEquals(1, history.returns)
         assertEquals(1, history.refused)
+    }
+}
+
+/**
+ * Where a scrollback is allowed to begin.
+ *
+ * Found by scrolling to the top of a fresh mosh session on a phone and finding blank lines above
+ * everything. They were the top of the screen: over mosh the far end puts the first prompt on the
+ * second row, under SSH the first rows are deliberately left blank so the login clears the
+ * retracting title bar — and when the screen later shrank, or simply scrolled, those rows went
+ * into the history like any other. A history that opens with nothing opens with nothing.
+ */
+class ScrollbackStartTest {
+
+    @Test fun `a history does not begin with the blank top of a screen`() {
+        val em = TerminalEmulator(20, 4)
+        // What a mosh session looks like at the start: row 0 empty, the prompt on row 1.
+        em.process("\u001b[2;1H$ ")
+        // Then output enough to scroll twice.
+        em.process("\r\none\r\ntwo\r\nthree\r\nfour")
+
+        val lines = (0 until em.buffer.scrollbackSize).map {
+            em.buffer.getScrollbackLine(it)!!.joinToString("") { c -> c.char.toString() }.trimEnd()
+        }
+        assertTrue("something should have scrolled away", lines.isNotEmpty())
+        assertNotEquals("the history began with a blank line", "", lines.first())
+    }
+
+    @Test fun `a blank line between content is content`() {
+        val em = TerminalEmulator(20, 3)
+        em.process("first\r\n\r\nsecond\r\nthird\r\nfourth")
+        val lines = (0 until em.buffer.scrollbackSize).map {
+            em.buffer.getScrollbackLine(it)!!.joinToString("") { c -> c.char.toString() }.trimEnd()
+        }
+        assertEquals("first", lines.first())
+        assertTrue("the empty line the shell printed must still be there", lines.contains(""))
+    }
+
+    @Test fun `a shrink does not push the blank top in either`() {
+        val em = TerminalEmulator(20, 10)
+        em.process("\u001b[2;1H$ ")
+        em.process("\r\none\r\ntwo\r\nthree\r\nfour\r\nfive\r\nsix\r\nseven")
+        assertEquals("nothing should have scrolled yet", 0, em.buffer.scrollbackSize)
+
+        // The keyboard opening, which is a shrink with the cursor near the bottom.
+        em.resize(20, 5)
+        val lines = (0 until em.buffer.scrollbackSize).map {
+            em.buffer.getScrollbackLine(it)!!.joinToString("") { c -> c.char.toString() }.trimEnd()
+        }
+        assertTrue("the shrink should have pushed something", lines.isNotEmpty())
+        assertNotEquals("and not the blank row the session started on", "", lines.first())
     }
 }

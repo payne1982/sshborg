@@ -143,14 +143,29 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     }
 
     /** Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom. */
+    /**
+     * Pushes a line that has left the screen into the history — unless the history is still empty
+     * and the line is too.
+     *
+     * A blank line *between* content is content: a program printed it. A blank line at the very
+     * start of a history is not. It is the top of a screen that had never been written to, which
+     * is where every session begins: under SSH those first rows are even left blank on purpose,
+     * so that the login clears the retracting title bar, and over mosh the far end puts the first
+     * prompt on the second row. Keeping them means a scrollback that opens with nothing — which
+     * is what a scroll to the top of a fresh session used to show.
+     */
+    private fun pushScrolledOff(line: Array<Cell>, wrapped: Boolean) {
+        if (scrollback.isEmpty() && !wrapped && line.all { it.code == ' '.code || it.code == 0 }) return
+        if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
+        scrollback.addLast(line)
+        scrollbackWrapped.addLast(wrapped)
+    }
+
     fun scrollUp(count: Int = 1) {
         repeat(count) {
             // Push top line into scrollback (never from the alternate screen, which has no history)
             if (!altScreen) {
-                val evicted = screen[scrollTop].copyOf()
-                if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
-                scrollback.addLast(evicted)
-                scrollbackWrapped.addLast(screenWrapped[scrollTop])
+                pushScrolledOff(screen[scrollTop].copyOf(), screenWrapped[scrollTop])
             }
             // Shift lines up within scroll region
             for (r in scrollTop until scrollBottom) {
@@ -314,11 +329,12 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         val scrollNeeded = if (newRows < oldRows) (cursorRow - newRows + 1).coerceAtLeast(0) else 0
         if (scrollNeeded > 0) {
             if (!altScreen) {
+                // The same rule as scrolling: the blank top of a screen nobody has written to is
+                // not the start of a history. A shrink is how it used to get in — the keyboard
+                // opening is a shrink — and it was found by scrolling to the top of a fresh
+                // mosh session and finding blank lines above everything.
                 for (i in 0 until scrollNeeded) {
-                    val evicted = screen[i].copyOf()
-                    if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
-                    scrollback.addLast(evicted)
-                    scrollbackWrapped.addLast(screenWrapped[i])
+                    pushScrolledOff(screen[i].copyOf(), screenWrapped[i])
                 }
             }
             screen = Array(newRows) { r ->
