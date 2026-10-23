@@ -1,15 +1,90 @@
-# Mosh — what it would take, and what it would give
+# Mosh — what it took, and what it gives
 
-Status: **analysis only, nothing implemented.** Written 2026-10-20 on `V1_DEV_MOSH`,
-which exists to hold this file and, if the feature is ever scheduled, the work.
+Status: **built and measured on `V1_DEV_MOSH`**, behind a per-host switch that is off by
+default. Written 2026-10-20 as an analysis of whether to do it at all, and kept as the
+record of doing it: §0 is where it stands, §§1-7 are the reasoning from before any code
+existed, and §8 is the work itself with its gates, its measurements and its five expensive
+surprises.
 
-This file exists because a user asked why SSHBorg does not support mosh. The answer
-is longer than an issue reply, and most of it is reasoning that would be expensive to
-reconstruct from scratch: what the protocol forces on us, which of its famous
-limitations are real and which ones only apply to the stock client, and the order in
-which the work would be worth doing. Conclusions are marked where they rest on
-something still to be verified against the mosh source — nobody should start coding
-from this file without closing those first.
+This file exists because a user asked why SSHBorg did not support mosh. The answer was
+longer than an issue reply, and most of it was reasoning that would have been expensive
+to reconstruct: what the protocol forces on us, which of its famous limitations are real
+and which only apply to the stock client, and the order in which the work was worth
+doing. Where a conclusion from those first days turned out to be wrong, it is corrected
+in place and the correction says what the measurement was — there are several, and they
+are the most useful part of the file.
+
+## 0. Where this stands, 2026-10-23
+
+**Mosh is built, measured and complete behind a per-host switch**, on `V1_DEV_MOSH`. Phases 0
+to 6 are done and every gate is met, including the one that needed a real phone. What is left
+is release work — notes, a versionCode, a merge, and deploying the site chapter — and phase 7,
+prediction, which stays unscheduled on purpose.
+
+This section is the map. The rest of the file is the reasoning, in the order it happened, and
+is worth reading when a decision here looks arbitrary: most of them were not.
+
+### What exists, and where
+
+| | |
+|---|---|
+| `mosh/` | the protocol, pure JVM, no Android at all: crypto, framing, protobuf, diffs, timing, the user stream, and `MoshTransport`, the state machine that owns no socket and no thread |
+| `data/terminal/TerminalTransport` | the seam: three methods, because the bytes only ever crossed in three places. `SshTerminalTransport` and `MoshTerminalTransport` are the two implementations |
+| `data/terminal/MoshTerminalTransport` | the socket and the clock around the state machine: a `Selector`, port hopping, the goodbye, the queue to the screen. No Android either, so it is gated from the JVM |
+| `data/ssh/MoshBootstrap` + `ShellSession.startMoshServer` | one exec channel, one command, one line. The only part that touches JSch |
+| `terminal/TerminalScreenHistory` | the last eight screens, so a frame computed against one of them is applied rather than dropped |
+| `ui/hosts` | the switch beside the colour row, off by default, and three settings that cannot be guessed for somebody else |
+| `ui/terminal` | the failure dialog, the contact-lost line, and the glue that holds all of it together |
+
+**The terminal does not learn that mosh exists.** Nothing in `TerminalEmulator` branches on the
+transport; what it gained is capability (`hasAlternateScreen`, `wheelBelongsToApplication`,
+a screen that can be copied and put back, `repaintLinesToIgnore`) which SSH simply never asks
+for. One fact on the transport, `screenIsSynchronised`, is what the layers above read, and each
+takes from it only what it needs.
+
+### What is measured, not believed
+
+- **A keystroke on a phone**: median 97 ms, worst 282 over 125 samples, against plain SSH's 72 ms
+  on the same device and network. It began at 135 ms with a 770 ms tail; the three steps between
+  are in §8.
+- **Frames**: 40 printed slowly put 17 lines into the scrollback, exactly the 17 that scrolled off
+  a 24-row screen, with no repeats and no gaps. 200 printed at once put in none.
+- **The repaint gate**: 17 checkpoints of a scripted session rendered by our emulator and by a
+  detached tmux pane of the same size, diffed, no disagreements; 256 colour cells asserted
+  directly, because a text diff cannot see an attribute.
+- **The phone gate**: the Wi-Fi switched off mid-session, the session carried on.
+- **IPv6**: the whole gate runs green over `::1` (`./gradlew test -PsshHost=::1`).
+- 153 JVM tests, two of which want a `mosh-server` started by hand; 28 instrumented green on tv36.
+
+### Limits that are not going to be fixed
+
+- **Roaming is within one address family.** `mosh-server -s` listens on the one address the SSH
+  connection arrived on. Hence the per-host IPv4/IPv6 setting: pick the family your networks
+  share.
+- **The SSH half dies with the network.** It is ordinary SSH, kept open for SFTP, port forwarding,
+  the agent and the suggestions; a change of network takes it, and those stop until the host is
+  opened again while the terminal carries on.
+- **Fast bulk output leaves a hole in the scrollback**, because at that speed the far end coalesces
+  whole screens and a redraw scrolls nothing.
+- **A frame diffed against a state we never held is still dropped.** Mosh's own client cannot use
+  one either: parity, not a shortcut.
+- **Typing is not faster than SSH**, and will not be without prediction (phase 7).
+
+### Five things that cost a day each and are written up below
+
+1. **A gate must end on a number.** Two gates on this branch passed while testing nothing, and
+   the correctness gate would have passed at two seconds a keystroke because it waited fifteen.
+2. **Measure on the device.** Three explanations for a slow terminal, all guesses from the
+   development machine, one of them "reproduced" in the lab by a measurement that was measuring
+   its own lock contention.
+3. **The client may not edit a synchronised screen.** The line feeds that keep the login clear of
+   the title bar are erased by the first frame — and when they are not, they corrupt every frame
+   after it.
+4. **mosh carries `?1000h` but never `?1049h`.** Our wheel gate asked about the alternate screen,
+   which cannot exist there.
+5. **A repaint drawn for another size is not history.** The far end paints for the size it was
+   last told; the keyboard coming up is how sixteen lines of somebody else's repaint became the
+   first sixteen lines of a session's scrollback.
 
 ## 1. What mosh actually is
 

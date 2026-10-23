@@ -706,16 +706,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             while (true) {
                 delay(DIAGNOSTIC_INTERVAL_MS)
                 if (!transport.isConnected) return@launch
-                // The screen's own shape alongside the session's numbers, because the thing
-                // being chased now is scrollback that appears at the start of a session and
-                // belongs to nobody: knowing *when* it grows, against which geometry, is the
-                // difference between a measurement and a fifth guess.
-                val em = _emulator.value
-                val shape = synchronized(em) {
-                    "grid=${em.buffer.columns}x${em.buffer.rows} cursor=${em.buffer.cursorRow} " +
-                        "scrollback=${em.buffer.scrollbackSize}"
-                }
-                android.util.Log.i(TAG_MOSH, transport.diagnosticLine() + " " + shape)
+                android.util.Log.i(TAG_MOSH, transport.diagnosticLine())
             }
         }
     }
@@ -786,17 +777,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
 
     fun resize(cols: Int, rows: Int) {
         val em = _emulator.value
-        val before = if (BuildConfig.DEBUG) synchronized(em) { em.buffer.scrollbackSize } else 0
         synchronized(em) { em.resize(cols, rows) }
-        if (BuildConfig.DEBUG) {
-            val after = synchronized(em) { em.buffer.scrollbackSize }
-            // A resize is the one moment that can push lines into the history without anything
-            // having been printed, so it says so when it does.
-            if (after != before) android.util.Log.i(
-                TAG_TERMINAL,
-                "resize to ${cols}x$rows pushed ${after - before} lines into the scrollback",
-            )
-        }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { transport?.resize(cols, rows) }
         }
