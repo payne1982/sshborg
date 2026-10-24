@@ -19,6 +19,7 @@ import com.sshborg.data.AppLockManager
 import com.sshborg.data.AppPreferences
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -256,6 +257,10 @@ class LockGateTest {
             elapsed >= 100,
         )
         val possible = elapsed / BEAT_MS
+        // Printed and not only asserted: how long this takes is the measurement, and it differs
+        // by a factor of ten between an emulator and an old tablet.
+        Log.i("SshBorgLock", "hashed a secret in $elapsed ms; the main looper got " +
+            "${beats.get()} of about $possible turns meanwhile")
         assertTrue(
             "the main looper beat ${beats.get()} times while a secret was hashed for $elapsed ms, " +
                 "where about $possible were there to be had: it was blocked",
