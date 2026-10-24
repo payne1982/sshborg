@@ -219,12 +219,12 @@ class LockGateTest {
     /**
      * Hashing a secret must not block the thread that draws.
      *
-     * 210,000 iterations of HMAC-SHA256 cost anywhere between a tenth of a second and several
-     * seconds depending on the device, and all three callers reach that work from `Dispatchers
+     * 210,000 iterations of HMAC-SHA256 cost about a second on an ordinary device and thirty on
+     * one whose ART never compiled our code, and all three callers reach that work from `Dispatchers
      * .Main` — the settings, the dialog that confirms the current secret, and the unlock screen.
      * Marking them `suspend` moved nothing: a suspend function runs on its caller's dispatcher, so
-     * the whole derivation ran on the main thread. A slow tablet reported an ANR on the unlock
-     * screen, which is the one screen a user cannot leave.
+     * the whole derivation ran on the main thread. A tablet reported an ANR on the unlock screen,
+     * which is the one screen a user cannot leave.
      *
      * So this does not check the hash. It checks the main looper, with a heartbeat posted every
      * ten milliseconds — which is what a frame, or the progress indicator now shown during the

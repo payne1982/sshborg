@@ -107,9 +107,15 @@ class AppLockManager(private val prefs: AppPreferences) {
      * the callers `suspend` was not enough: a suspend function runs on whoever's dispatcher called
      * it, and all three callers arrive on `Main` (`viewModelScope.launch` from the settings, a
      * `rememberCoroutineScope` from the two dialogs and from the unlock screen). On a fast device
-     * that finished before Android noticed; on a slow tablet it was 16 seconds of main thread and
-     * an ANR on a screen the user cannot leave. `Dispatchers.Default` because this is CPU-bound,
-     * not IO, and because the number of cores is the right limit on how many of these can run.
+     * that finished before Android noticed; on a tablet whose ART had never compiled the app's
+     * code it was 33 seconds of main thread and an ANR on a screen the user cannot leave.
+     * `Dispatchers.Default` because this is CPU-bound, not IO, and because the number of cores is
+     * the right limit on how many of these can run.
+     *
+     * The 33 seconds were that device's, not this algorithm's — the same derivation took a second
+     * once its ART was fixed, and about one on any ordinary phone. The fix stays regardless: a
+     * second of blocked main thread is still a visible stall, and a client cannot assume every
+     * device it runs on is a healthy one.
      */
     private suspend fun pbkdf2(secret: CharArray, salt: ByteArray, iterations: Int): ByteArray =
         withContext(Dispatchers.Default) {
