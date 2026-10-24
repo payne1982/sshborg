@@ -1,6 +1,8 @@
 package com.sshborg.data
 
 import android.util.Base64
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
@@ -97,14 +99,27 @@ class AppLockManager(private val prefs: AppPreferences) {
         return MessageDigest.isEqual(actual, unb64(record.hashB64))
     }
 
-    private fun pbkdf2(secret: CharArray, salt: ByteArray, iterations: Int): ByteArray {
-        val spec = PBEKeySpec(secret, salt, iterations, KEY_BITS)
-        try {
-            return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
-        } finally {
-            spec.clearPassword()
+    /**
+     * The one piece of work in this class that costs anything, and the reason it is `suspend`.
+     *
+     * [ITERATIONS] iterations of HMAC-SHA256 is deliberately expensive — that is what makes a
+     * four-digit PIN worth anything at all — so it must not run on the thread that draws. Marking
+     * the callers `suspend` was not enough: a suspend function runs on whoever's dispatcher called
+     * it, and all three callers arrive on `Main` (`viewModelScope.launch` from the settings, a
+     * `rememberCoroutineScope` from the two dialogs and from the unlock screen). On a fast device
+     * that finished before Android noticed; on a slow tablet it was 16 seconds of main thread and
+     * an ANR on a screen the user cannot leave. `Dispatchers.Default` because this is CPU-bound,
+     * not IO, and because the number of cores is the right limit on how many of these can run.
+     */
+    private suspend fun pbkdf2(secret: CharArray, salt: ByteArray, iterations: Int): ByteArray =
+        withContext(Dispatchers.Default) {
+            val spec = PBEKeySpec(secret, salt, iterations, KEY_BITS)
+            try {
+                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+            } finally {
+                spec.clearPassword()
+            }
         }
-    }
 
     private fun b64(bytes: ByteArray) = Base64.encodeToString(bytes, Base64.NO_WRAP)
     private fun unb64(s: String) = Base64.decode(s, Base64.NO_WRAP)

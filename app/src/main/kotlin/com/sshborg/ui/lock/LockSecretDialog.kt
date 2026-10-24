@@ -48,6 +48,9 @@ fun LockSecretDialog(
     var secret by remember { mutableStateOf("") }
     var confirm by remember { mutableStateOf("") }
     var reveal by remember { mutableStateOf(false) }
+    // True while the current secret is being verified, which hashes it — seconds on a slow device.
+    // Saving the new one is slow too, but by then this dialog is gone and the settings screen says so.
+    var busy by remember { mutableStateOf(false) }
 
     // Switching kind clears the new fields so a PIN can't leak into passphrase rules.
     fun selectKind(k: AppLockManager.Kind) { if (k != kind) { kind = k; secret = ""; confirm = "" } }
@@ -85,8 +88,13 @@ fun LockSecretDialog(
     val onSave = {
         if (needsCurrent) {
             scope.launch {
-                if (verifyCurrent!!(current.toCharArray())) onConfirm(kind, secret.toCharArray())
-                else currentWrong = true
+                busy = true
+                try {
+                    if (verifyCurrent!!(current.toCharArray())) onConfirm(kind, secret.toCharArray())
+                    else currentWrong = true
+                } finally {
+                    busy = false
+                }
             }
             Unit
         } else onConfirm(kind, secret.toCharArray())
@@ -176,12 +184,13 @@ fun LockSecretDialog(
             }
         },
         confirmButton = {
-            TextButton(enabled = canSave, onClick = onSave) {
-                Text(stringResource(R.string.action_save))
+            TextButton(enabled = canSave && !busy, onClick = onSave) {
+                if (busy) CircularProgressIndicator(Modifier.size(18.dp))
+                else Text(stringResource(R.string.action_save))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }

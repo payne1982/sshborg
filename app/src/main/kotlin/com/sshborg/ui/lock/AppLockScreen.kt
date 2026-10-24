@@ -61,6 +61,9 @@ fun AppLockScreen(
         mutableStateOf(if (initialLockoutSeconds > 0) System.currentTimeMillis() + initialLockoutSeconds * 1000 else 0L)
     }
     var remaining by remember { mutableStateOf(initialLockoutSeconds) }
+    // Hashing an entered secret takes a moment, and seconds on a slow device. Nothing else may be
+    // typed while it runs, and the wait has to be visible or the screen looks frozen.
+    var working by remember { mutableStateOf(false) }
 
     // The remaining lockout is read from disk, so on a gate that went up in the same frame as
     // the app it arrives a moment later, when this composable is already running.
@@ -78,22 +81,27 @@ fun AppLockScreen(
         }
         remaining = 0
     }
-    val enabled = remaining <= 0
+    val enabled = remaining <= 0 && !working
 
     val submit: () -> Unit = submit@{
         if (!enabled || input.isEmpty()) return@submit
         val chars = input.toCharArray()
         input = ""
         scope.launch {
-            when (val r = verify(chars)) {
-                is AppLockManager.VerifyResult.Success -> onUnlocked()
-                is AppLockManager.VerifyResult.Wrong -> error = incorrectText
-                is AppLockManager.VerifyResult.LockedOut -> {
-                    error = null
-                    lockoutUntil = System.currentTimeMillis() + r.secondsRemaining * 1000
+            working = true
+            try {
+                when (val r = verify(chars)) {
+                    is AppLockManager.VerifyResult.Success -> onUnlocked()
+                    is AppLockManager.VerifyResult.Wrong -> error = incorrectText
+                    is AppLockManager.VerifyResult.LockedOut -> {
+                        error = null
+                        lockoutUntil = System.currentTimeMillis() + r.secondsRemaining * 1000
+                    }
                 }
+            } finally {
+                working = false
+                chars.fill('\u0000')
             }
-            chars.fill('\u0000')
         }
     }
 
@@ -123,13 +131,20 @@ fun AppLockScreen(
                         stringResource(R.string.lock_enter_pin) else stringResource(R.string.lock_enter_passphrase)
                     Text(prompt, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(16.dp))
-                    Text(
-                        message ?: " ",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.heightIn(min = 24.dp),
-                    )
+                    // One row, whatever is in it: the error, the countdown, or the wait. Giving
+                    // them the same reserved height keeps the keypad from moving under the thumb.
+                    Box(Modifier.heightIn(min = 24.dp), contentAlignment = Alignment.Center) {
+                        if (working) {
+                            CircularProgressIndicator(Modifier.size(20.dp))
+                        } else {
+                            Text(
+                                message ?: " ",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
                 }
             }
 

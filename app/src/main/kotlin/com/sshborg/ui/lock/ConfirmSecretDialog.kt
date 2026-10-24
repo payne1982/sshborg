@@ -1,6 +1,7 @@
 package com.sshborg.ui.lock
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -12,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import com.sshborg.R
 import kotlinx.coroutines.launch
 
@@ -30,6 +32,9 @@ fun ConfirmSecretDialog(
     var value by remember { mutableStateOf("") }
     var wrong by remember { mutableStateOf(false) }
     var reveal by remember { mutableStateOf(false) }
+    // Verifying hashes the entry, which takes seconds on a slow device: say so rather than
+    // letting the button look dead.
+    var busy by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -37,6 +42,7 @@ fun ConfirmSecretDialog(
         text = {
             OutlinedTextField(
                 value = value,
+                enabled = !busy,
                 onValueChange = { value = it; wrong = false },
                 label = { Text(stringResource(R.string.lock_current)) },
                 singleLine = true,
@@ -57,12 +63,24 @@ fun ConfirmSecretDialog(
         },
         confirmButton = {
             TextButton(
-                enabled = value.isNotEmpty(),
-                onClick = { scope.launch { if (verify(value.toCharArray())) onVerified() else wrong = true } },
-            ) { Text(stringResource(R.string.lock_confirm)) }
+                enabled = value.isNotEmpty() && !busy,
+                onClick = {
+                    scope.launch {
+                        busy = true
+                        try {
+                            if (verify(value.toCharArray())) onVerified() else wrong = true
+                        } finally {
+                            busy = false
+                        }
+                    }
+                },
+            ) {
+                if (busy) CircularProgressIndicator(Modifier.size(18.dp))
+                else Text(stringResource(R.string.lock_confirm))
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }

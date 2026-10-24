@@ -84,6 +84,7 @@ fun SettingsScreen(
     val extraBar              by vm.extraBar.collectAsState()
     val hostSortMode          by vm.hostSortMode.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
+    val savingLockSecret      by vm.savingLockSecret.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
     val scrollbackLines       by vm.scrollbackLines.collectAsState()
@@ -567,7 +568,10 @@ fun SettingsScreen(
                             )
                         }
                     }
-                    if (touchless) {
+                    if (savingLockSecret) {
+                        // Hashing the new secret, which the dialog handed over on its way out.
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    } else if (touchless) {
                         TvSelectField(
                             label = stringResource(R.string.settings_app_lock_title),
                             valueText = currentLockLabel,

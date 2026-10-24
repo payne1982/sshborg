@@ -110,6 +110,17 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val _isMigrating = MutableStateFlow(false)
     val isMigrating: StateFlow<Boolean> = _isMigrating
 
+    /**
+     * True while a new PIN/passphrase is being hashed.
+     *
+     * The dialog that collects it closes before this starts — deliberately, since the secret is
+     * already in hand — so there is no dialog left to say that anything is happening, and on a
+     * slow device the wait is seconds. The screen shows it where it shows the encryption
+     * migration, which is the same kind of promise.
+     */
+    private val _savingLockSecret = MutableStateFlow(false)
+    val savingLockSecret: StateFlow<Boolean> = _savingLockSecret
+
     private val _error = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val error: SharedFlow<String> = _error
 
@@ -143,9 +154,14 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     /** Stores a new PIN/passphrase and switches to the in-app lock mode. */
     fun setAppLockSecret(kind: com.sshborg.data.AppLockManager.Kind, secret: CharArray) {
         viewModelScope.launch {
-            appLock.setSecret(kind, secret)
-            secret.fill(' ')
-            prefs.setLockMode(com.sshborg.data.AppPreferences.LOCK_SECRET)
+            _savingLockSecret.value = true
+            try {
+                appLock.setSecret(kind, secret)
+                secret.fill(' ')
+                prefs.setLockMode(com.sshborg.data.AppPreferences.LOCK_SECRET)
+            } finally {
+                _savingLockSecret.value = false
+            }
         }
     }
 
