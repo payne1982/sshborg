@@ -1,2 +1,3 @@
 • Añadido el soporte para mosh: las conexiones persisten al cambiar de red.
 • Editar un host ya no borra las estadísticas que ordenan la lista.
+• Establecer o comprobar el PIN de bloqueo ya no congela la aplicación en dispositivos lentos.

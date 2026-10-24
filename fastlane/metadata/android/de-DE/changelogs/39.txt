@@ -1,2 +1,3 @@
 • Unterstützung für mosh hinzugefügt: Verbindungen bleiben bei einem Netzwechsel bestehen.
 • Das Bearbeiten eines Hosts löscht nicht mehr die Statistiken für die Sortierung der Liste.
+• Das Setzen oder Prüfen der App-Sperr-PIN friert die App auf langsameren Geräten nicht mehr ein.

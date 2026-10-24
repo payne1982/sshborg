@@ -1,49 +1,59 @@
 <en-US>
 • Added support for mosh: connections persist across network changes.
 • Editing a host no longer clears the statistics used to order the list.
+• Setting or checking the app lock PIN no longer freezes the app on slower devices.
 </en-US>
 
 <it-IT>
 • Aggiunto il supporto per mosh: connessioni persistenti al cambio di rete.
 • Editare un host non cancella più le statistiche per l'ordinamento nella lista.
+• Impostare o verificare il PIN di blocco non blocca più l'app sui dispositivi lenti.
 </it-IT>
 
 <de-DE>
 • Unterstützung für mosh hinzugefügt: Verbindungen bleiben bei einem Netzwechsel bestehen.
 • Das Bearbeiten eines Hosts löscht nicht mehr die Statistiken für die Sortierung der Liste.
+• Das Setzen oder Prüfen der App-Sperr-PIN friert die App auf langsameren Geräten nicht mehr ein.
 </de-DE>
 
 <es-ES>
 • Añadido el soporte para mosh: las conexiones persisten al cambiar de red.
 • Editar un host ya no borra las estadísticas que ordenan la lista.
+• Establecer o comprobar el PIN de bloqueo ya no congela la aplicación en dispositivos lentos.
 </es-ES>
 
 <fr-FR>
 • Prise en charge de mosh ajoutée : les connexions persistent lors d'un changement de réseau.
 • Modifier un hôte n'efface plus les statistiques qui servent à trier la liste.
+• Définir ou vérifier le code de verrouillage ne fige plus l'application sur les appareils lents.
 </fr-FR>
 
 <pt-PT>
 • Adicionado o suporte para mosh: as ligações persistem ao mudar de rede.
 • Editar um host já não apaga as estatísticas usadas para ordenar a lista.
+• Definir ou verificar o PIN de bloqueio já não congela a aplicação em dispositivos lentos.
 </pt-PT>
 
 <uk>
 • Додано підтримку mosh: з’єднання зберігаються під час зміни мережі.
 • Редагування хоста більше не стирає статистику, за якою впорядковується список.
+• Встановлення або перевірка PIN-коду блокування більше не підвішує застосунок на повільних пристроях.
 </uk>
 
 <ru-RU>
 • Добавлена поддержка mosh: соединения сохраняются при смене сети.
 • Изменение хоста больше не стирает статистику, по которой сортируется список.
+• Установка или проверка PIN-кода блокировки больше не подвешивает приложение на медленных устройствах.
 </ru-RU>
 
 <zh-CN>
 • 新增 mosh 支持：切换网络后连接依然保持。
 • 编辑主机不会再清除用于列表排序的统计数据。
+• 设置或校验应用锁 PIN 码时，在较慢的设备上不再卡死。
 </zh-CN>
 
 <ja-JP>
 • mosh に対応しました。ネットワークが変わっても接続が維持されます。
 • ホストを編集しても、一覧の並び替えに使う統計が消えなくなりました。
+• アプリロックの PIN を設定・確認しても、動作の遅い端末でアプリが固まらなくなりました。
 </ja-JP>
