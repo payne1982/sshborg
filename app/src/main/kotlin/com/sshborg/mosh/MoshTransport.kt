@@ -111,6 +111,13 @@ class MoshTransport(
      * protocol a late datagram and a lost one are the same thing.
      */
     var missedDatagrams = 0
+
+    /**
+     * Datagrams that did not authenticate: too short, or a failed tag. Anyone can send one to an
+     * open UDP port, so this is not a fault of the session's and is counted apart from
+     * [MoshProtocolException], which is reserved for what arrived *under our key*.
+     */
+    var strayDatagrams = 0
         private set
 
     private var highestSequence = -1L
@@ -235,12 +242,16 @@ class MoshTransport(
     // ─────────────────────────── what arrives ───────────────────────────
 
     /**
-     * @throws MoshProtocolException if the datagram is not ours — a failed integrity check, our own
-     *   traffic played back, or a malformed instruction. The caller drops it and carries on; it is
-     *   not a reason to end the session, because anyone can send us a packet.
+     * A datagram that did not authenticate is dropped here and tallied in [strayDatagrams]: anyone
+     * can send one, and it says nothing about the session.
+     *
+     * @throws MoshProtocolException if the datagram *did* authenticate and is still not usable —
+     *   our own traffic played back, or an instruction we cannot parse. That came from the real
+     *   peer, so the reason is worth having. Either way the caller carries on: it is not a reason
+     *   to end the session.
      */
     fun onDatagram(datagram: ByteArray, now: Long) {
-        val opened = crypto.open(datagram)
+        val opened = crypto.open(datagram) ?: run { strayDatagrams++; return }
         receivedDatagrams++
         val sequence = opened.nonce.sequence
         if (highestSequence >= 0 && sequence > highestSequence + 1) {

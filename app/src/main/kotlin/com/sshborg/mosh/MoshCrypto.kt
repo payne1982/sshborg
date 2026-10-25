@@ -53,12 +53,26 @@ class MoshCrypto(key: ByteArray) {
         return datagram
     }
 
-    /** @throws MoshProtocolException if the datagram is too short or fails its integrity check. */
-    fun open(datagram: ByteArray): Opened {
+    /**
+     * @return the nonce and plaintext, or **null** when this datagram is not ours: too short to
+     *   hold a nonce and a tag, or failing its integrity check.
+     *
+     * Null rather than an exception, and the line is drawn deliberately: *anyone* can send a
+     * datagram to an open UDP port, so a packet that does not authenticate is the weather and not
+     * an error. The caller drops it and counts it — there is nothing a reason would add, as our
+     * own `catch (_: MoshProtocolException)` used to admit by never looking at it. On the JVM the
+     * cost of throwing is filling in a stack trace, which an unauthenticated stranger could
+     * otherwise make us do at will by spraying short packets at the port, on the one path that has
+     * to stay cheap.
+     *
+     * Everything past this point still throws, because everything past this point required our
+     * shared key: an instruction we cannot parse came from the real peer, which is a version
+     * disagreement or a bug of ours, and there the reason is the whole value. That is the rule —
+     * **null for what anyone can send us, an exception for what needed our key.**
+     */
+    fun open(datagram: ByteArray): Opened? {
         // Eight bytes of nonce and sixteen of tag have to be there before there can be a message.
-        if (datagram.size < NONCE_WIRE_BYTES + TAG_BYTES) {
-            throw MoshProtocolException("datagram of ${datagram.size} bytes carries no nonce and tag")
-        }
+        if (datagram.size < NONCE_WIRE_BYTES + TAG_BYTES) return null
         val nonce = MoshNonce.fromWire(datagram, 0)
         val cipher = cipher(encrypting = false, nonce = nonce)
         val body = datagram.size - NONCE_WIRE_BYTES
@@ -67,10 +81,9 @@ class MoshCrypto(key: ByteArray) {
             var n = cipher.processBytes(datagram, NONCE_WIRE_BYTES, body, out, 0)
             n += cipher.doFinal(out, n)
             Opened(nonce, out.copyOf(n))
-        } catch (e: Exception) {
-            // A failed tag is the ordinary case for a stray or tampered packet, not a bug: the
-            // caller drops it and carries on.
-            throw MoshProtocolException("packet failed its integrity check", e)
+        } catch (_: Exception) {
+            // A failed tag is the ordinary case for a stray or tampered packet, not a bug.
+            null
         }
     }
 
@@ -142,6 +155,15 @@ class MoshNonce(val sequence: Long, val toClient: Boolean) {
  * make repetition impossible rather than merely unlikely: it only ever goes up, it is atomic, and
  * it refuses to wrap. It must outlive the socket — a new local port after a network change is
  * still the same key, so the count carries on from where it was.
+ *
+ * **And it must never be restarted under a key that has already been used.** Today that is free:
+ * a session lives in memory in [com.sshborg.service.SessionManager], the key goes from the
+ * bootstrap line into [MoshCrypto] and nowhere else, and if the process dies the session dies with
+ * it. But the foreground service exists precisely to keep sessions alive, so "restore the sessions
+ * after the process was killed" is a feature somebody will reasonably propose — and on that day a
+ * counter that starts again at 1 under the same key is a forgeable session, silently. If a session
+ * is ever restored, this number is restored with it or the key is not reused. The iOS client
+ * reached the same conclusion from the other end, where the system suspends the process for you.
  */
 class MoshSequence(start: Long = 1L) {
 

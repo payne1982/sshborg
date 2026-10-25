@@ -270,12 +270,15 @@ class MoshTerminalTransport(
         return "rtt~${mosh.timing.srtt.toInt()}ms screen-wait<=${worst}ms applied=$framesApplied " +
             "stale=${mosh.staleFrames} got=${mosh.receivedDatagrams} missed=${mosh.missedDatagrams} " +
             "back=${mosh.returnedToState} hops=$hops refused=$failedSends bad=$protocolErrors " +
+            "stray=${mosh.strayDatagrams} " +
             "[${mosh.lastStaleFrame}]"
     }
 
     /**
-     * Datagrams from the server's address that we could not open or parse. On a working session
-     * this stays at zero; anything else is worth knowing about, and is in the error report.
+     * Datagrams that authenticated under the session key and were still not usable. On a working
+     * session this stays at zero — it means the peer sent something we could not parse — and it is
+     * in the error report. Packets that never authenticated are not counted here but in
+     * [com.sshborg.mosh.MoshTransport.strayDatagrams], because anyone can send one of those.
      */
     val undecipherableDatagrams: Int get() = protocolErrors
 

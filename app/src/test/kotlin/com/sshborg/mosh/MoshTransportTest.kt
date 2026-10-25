@@ -62,7 +62,7 @@ class MoshTransportTest {
 
     /** What we would have put on the wire, read back as the server would read it. */
     private fun ours(datagram: ByteArray): MoshInstruction {
-        val opened = crypto.open(datagram)
+        val opened = checkNotNull(crypto.open(datagram)) { "we sealed it ourselves, so it must open" }
         assertTrue("the client's packets are addressed to the server", !opened.nonce.toClient)
         val packet = MoshPacket.decode(opened.plaintext)
         val payload = MoshFragmentAssembly().add(MoshFragment.decode(packet.payload))
@@ -73,7 +73,7 @@ class MoshTransportTest {
         val assembly = MoshFragmentAssembly()
         var payload: ByteArray? = null
         for (datagram in datagrams) {
-            val packet = MoshPacket.decode(crypto.open(datagram).plaintext)
+            val packet = MoshPacket.decode(checkNotNull(crypto.open(datagram)).plaintext)
             payload = assembly.add(MoshFragment.decode(packet.payload)) ?: payload
         }
         return MoshInstruction.decode(checkNotNull(payload))
@@ -337,16 +337,23 @@ class MoshTransportTest {
         }
     }
 
-    @Test fun `a packet that fails its integrity check is refused`() {
+    /**
+     * A packet that fails its tag is dropped where it lands, without a word and without a throw:
+     * anyone can send one to an open UDP port, so it is the weather rather than a fault of the
+     * session's. What this asserts is therefore stronger than the exception it used to expect —
+     * that nothing of it was believed, and that it was counted apart from what arrives under our
+     * own key.
+     */
+    @Test fun `a packet that fails its integrity check is dropped and tallied`() {
         transport.tick(1_000)
+        val before = transport.receivedDatagrams
         val bad = fromServer(now = 1_100).copyOf()
         bad[bad.size - 2] = (bad[bad.size - 2].toInt() xor 0xFF).toByte()
-        try {
-            transport.onDatagram(bad, 1_100)
-            fail("a tampered datagram must not be accepted")
-        } catch (e: MoshProtocolException) {
-            assertTrue(e.message!!.contains("integrity"))
-        }
+
+        transport.onDatagram(bad, 1_100)
+
+        assertEquals("a tampered datagram must not count as heard", before, transport.receivedDatagrams)
+        assertEquals("and it must be tallied as a stray", 1, transport.strayDatagrams)
     }
 
     // ───────────────────────────── timing and roaming ─────────────────────────────
