@@ -114,8 +114,21 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _editingId = MutableStateFlow<Long?>(null)
 
-    /** All hosts except the one being edited, annotated with whether they can be used as jump hosts. */
-    data class JumpHostOption(val host: HostEntity, val isSelectable: Boolean)
+    /**
+     * All hosts except the one being edited, annotated with what they could log in with.
+     *
+     * Two facts and not one verdict, because the verdict depends on the hop's place in the chain.
+     * A hop we dial ourselves is happy with a saved password; a hop *past* a mosh bastion is
+     * dialled by the bastion's own ssh, which has no way to be handed our password and no
+     * business being handed it — so there, only a key is of any use. See [moshBastion].
+     */
+    data class JumpHostOption(
+        val host: HostEntity,
+        /** Enough saved for us to log in: a key, or a password. */
+        val hasCredentials: Boolean,
+        /** A key of its own, which is the only credential that survives being used by somebody else. */
+        val hasKey: Boolean,
+    )
 
     val availableJumpHosts: StateFlow<List<JumpHostOption>> = combine(
         hostDao.getAll(),
@@ -124,11 +137,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
         hosts
             .filter { it.id != editingId }
             .map { host ->
+                val hasKey = host.keyId != null
                 JumpHostOption(
-                    host        = host,
-                    isSelectable = host.keyId != null ||
-                                   !host.encryptedPassword.isNullOrEmpty() ||
-                                   !host.password.isNullOrEmpty(),
+                    host           = host,
+                    hasKey         = hasKey,
+                    hasCredentials = hasKey ||
+                                     !host.encryptedPassword.isNullOrEmpty() ||
+                                     !host.password.isNullOrEmpty(),
                 )
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -198,18 +213,11 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             jumpHosts.value.trim().takeIf { it.isNotEmpty() }
         } else null
 
-        // The exclusion, where nothing can get round it — together with the one way round it
-        // that works. A chain cannot be tunnelled inside mosh, so mosh and a chain still cannot
-        // both stand on a row; but a chain whose first hop is a mosh host of yours is not
-        // tunnelled, it is walked from that hop, and then they can.
-        //
-        // Asked of the database rather than of [moshBastion], whose value is only maintained
-        // while something is collecting it: a save must decide the same way whether the form is
-        // on screen or not.
-        val firstHopId = newJumpHostIdList?.split(",")?.firstOrNull()?.trim()?.toLongOrNull()
-        val bastionCarriesMosh = firstHopId?.let { hostDao.getById(it)?.mosh } == true
-        val newMosh = mosh.value &&
-            ((newJumpHosts == null && newJumpHostIdList == null) || bastionCarriesMosh)
+        // The exclusion, where nothing can get round it: whatever the form did, a row never
+        // leaves here with both mosh and a jump chain on it. A chain that reaches its first hop
+        // over mosh needs nothing here — it is that hop's own switch that says so, and this row
+        // is not asked twice.
+        val newMosh = mosh.value && newJumpHosts == null && newJumpHostIdList == null
 
         val existing = editingId?.let { hostDao.getById(it) }
         val newHostname = hostname.value.trim()

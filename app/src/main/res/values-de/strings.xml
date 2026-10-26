@@ -55,10 +55,9 @@
     <string name="host_color_custom">Benutzerdefiniert</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimentell)</string>
-    <string name="host_mosh_no_jump">Um Mosh mit einem Jump-Host zu verwenden, muss der erste Hop ein Host mit aktiviertem Mosh sein.</string>
-    <string name="host_mosh_via_bastion">Mosh bis %1$s, dann von dort per ssh zu diesem Host. SFTP nutzt weiterhin die gesamte Kette.</string>
-    <string name="host_mosh_settings_on_bastion">Verwendet werden die Mosh-Einstellungen von %1$s.</string>
-    <string name="host_jump_mosh_chain">Mit Mosh wird die Kette nicht getunnelt, sondern abgelaufen: die Sitzung entsteht per Mosh auf dem ersten Hop, von dort geht es per ssh weiter. Der erste Hop muss ein Host mit aktiviertem Mosh sein.</string>
+    <string name="host_mosh_no_jump">Mosh lässt sich nicht durch einen Jump-Host tunneln. Ist der erste Hop ein Host mit aktiviertem Mosh, wird die Sitzung per Mosh zu ihm aufgebaut und von dort geht es per ssh weiter.</string>
+    <string name="host_mosh_via_bastion">%1$s hat Mosh aktiviert: das Terminal erreicht ihn per Mosh und geht von dort per ssh zu diesem Host weiter. SFTP nutzt weiterhin die gesamte Kette.</string>
+    <string name="host_jump_mosh_chain">Für diesen Host ist Mosh aktiv, deshalb wird keine Kette verwendet. Für den Weg über einen Bastion-Host die Markierung entfernen und als ersten Hop einen Host mit aktiviertem Mosh wählen.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatisch</string>
@@ -76,7 +75,6 @@
     <string name="mosh_failed_locale">mosh-server startet nicht, weil die Locale des Servers nicht UTF-8 ist. Richten Sie auf dem Server eine UTF-8-Locale ein.</string>
     <string name="mosh_failed_no_answer">mosh-server hat nicht so geantwortet, wie es sollte. Was es gesagt hat, steht unten.</string>
     <string name="mosh_failed_no_udp">Über UDP kam nichts zurück. Wahrscheinlich blockiert das Netz zwischen hier und dem Host die UDP-Ports 60001-60999.</string>
-    <string name="mosh_failed_bastion_no_mosh">Mosh über einen Jump-Host setzt voraus, dass der erste Hop Mosh aktiviert hat, und dieser hat es nicht mehr. Schalten Sie Mosh auf jenem Host ein oder auf diesem aus.</string>
     <string name="mosh_action_carry_on">Mit SSH fortfahren</string>
     <string name="mosh_action_leave">Verlassen</string>
     <string name="terminal_no_contact_seconds">Kein Kontakt seit %1$d s – wird weiter versucht</string>
@@ -127,6 +125,7 @@
     <string name="host_jump_select_placeholder">Host auswählen…</string>
     <string name="host_jump_add">Jump-Host hinzufügen</string>
     <string name="host_jump_no_password">Kein Passwort gespeichert</string>
+    <string name="host_jump_needs_key">Braucht einen Schlüssel: hinter dem Bastion-Host meldet er sich selbst an</string>
     <string name="host_section_port_forwarding">Port-Weiterleitung</string>
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

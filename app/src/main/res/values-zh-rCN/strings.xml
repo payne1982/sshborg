@@ -56,10 +56,9 @@
     <string name="host_color_custom">自定义</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">（实验性）</string>
-    <string name="host_mosh_no_jump">要在跳板机下使用 Mosh，第一跳必须是已启用 Mosh 的主机。</string>
-    <string name="host_mosh_via_bastion">先用 Mosh 连到 %1$s，再从那里用 ssh 进入此主机。SFTP 仍然走完整的跳板链。</string>
-    <string name="host_mosh_settings_on_bastion">使用的是 %1$s 的 Mosh 设置。</string>
-    <string name="host_jump_mosh_chain">使用 Mosh 时跳板链不是被封装，而是逐跳走过：会话通过 Mosh 连到第一跳，再从那里用 ssh 继续。第一跳必须是已启用 Mosh 的主机。</string>
+    <string name="host_mosh_no_jump">Mosh 无法在跳板机内部封装。如果第一跳是已启用 Mosh 的主机，会话会通过 Mosh 连到那里，再从那里用 ssh 继续。</string>
+    <string name="host_mosh_via_bastion">%1$s 已启用 Mosh：终端先通过 Mosh 连到它，再从那里用 ssh 进入此主机。SFTP 仍然使用完整的跳板链。</string>
+    <string name="host_jump_mosh_chain">此主机已启用 Mosh，因此不使用跳板链。若要经过跳板机，请取消勾选，并把第一跳选为已启用 Mosh 的主机。</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自动</string>
@@ -77,7 +76,6 @@
     <string name="mosh_failed_locale">服务器的区域设置不是 UTF-8，mosh-server 拒绝启动。请在服务器上设置 UTF-8 区域设置。</string>
     <string name="mosh_failed_no_answer">mosh-server 的回应不符合预期。它所说的内容见下方。</string>
     <string name="mosh_failed_no_udp">UDP 没有任何回应。这里到主机之间的网络很可能屏蔽了 UDP 端口 60001-60999。</string>
-    <string name="mosh_failed_bastion_no_mosh">经过跳板机使用 Mosh 需要第一跳启用了 Mosh，而它现在没有启用。请在那台主机上启用 Mosh，或在本主机上关闭 Mosh。</string>
     <string name="mosh_action_carry_on">继续使用 SSH</string>
     <string name="mosh_action_leave">退出</string>
     <string name="terminal_no_contact_seconds">已失联 %1$d 秒 — 仍在重试</string>
@@ -130,6 +128,7 @@
     <string name="host_jump_select_placeholder">选择主机…</string>
     <string name="host_jump_add">添加跳板机</string>
     <string name="host_jump_no_password">无已保存密码</string>
+    <string name="host_jump_needs_key">需要密钥：跳板机之后由它自己登录</string>
     <string name="host_section_port_forwarding">端口转发</string>
     <string name="host_field_port_forwarding">转发规则（-L）</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

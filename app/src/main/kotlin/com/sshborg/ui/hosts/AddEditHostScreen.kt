@@ -76,11 +76,9 @@ fun AddEditHostScreen(
     val moshPorts by vm.moshPorts.collectAsState()
     val moshCommand by vm.moshCommand.collectAsState()
     val jumpConfigured by vm.jumpConfigured.collectAsState()
+    // Not an option on this row — the hop's own switch decides — but the form has to be able to
+    // say what will happen, and which hop it is that says so.
     val moshBastion by vm.moshBastion.collectAsState()
-    // A chain used to be the end of the matter for mosh. It still is, unless its first hop is a
-    // host of yours with mosh on: that one is not tunnelled through but *reached* over mosh, and
-    // the rest of the way is walked by its own ssh.
-    val moshAllowed = !jumpConfigured || moshBastion != null
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
     val hostColor by vm.hostColor.collectAsState()
@@ -259,20 +257,20 @@ fun AddEditHostScreen(
                 // the line underneath says why it does.
                 Row(
                     modifier = Modifier
-                        .clickable(enabled = moshAllowed) { vm.mosh.value = !mosh }
+                        .clickable(enabled = !jumpConfigured) { vm.mosh.value = !mosh }
                         .padding(vertical = 8.dp, horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
-                        checked = mosh && moshAllowed,
+                        checked = mosh && !jumpConfigured,
                         onCheckedChange = { vm.mosh.value = it },
-                        enabled = moshAllowed,
+                        enabled = !jumpConfigured,
                     )
                     Column {
                         Text(
                             stringResource(R.string.host_mosh_label),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (!moshAllowed) MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (jumpConfigured) MaterialTheme.colorScheme.onSurfaceVariant
                             else MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
@@ -283,17 +281,14 @@ fun AddEditHostScreen(
                     }
                 }
             }
-            // Either why the box will not move, or — when it has moved — what it will actually
-            // do, which is not what the label alone would lead anyone to expect.
-            if (!moshAllowed) {
+            // Why the box will not move, and — when the first hop settles it anyway — what is
+            // going to happen instead. The second sentence is the one that matters: a chain that
+            // quietly became a mosh session would otherwise be visible nowhere at all.
+            if (jumpConfigured) {
+                val bastion = moshBastion
                 Text(
-                    stringResource(R.string.host_mosh_no_jump),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else if (mosh && moshBastion != null) {
-                Text(
-                    stringResource(R.string.host_mosh_via_bastion, moshBastion!!.label),
+                    if (bastion == null) stringResource(R.string.host_mosh_no_jump)
+                    else stringResource(R.string.host_mosh_via_bastion, bastion.label),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -407,18 +402,10 @@ fun AddEditHostScreen(
             }
 
             // The three things about a mosh session that depend on somebody else's network and
-            // somebody else's server, so none of them can be decided here.
-            //
-            // Not shown when a bastion carries the session: the mosh-server that runs is then the
-            // bastion's, started with the bastion's own three answers, and a second set of fields
-            // on this row would be read as governing something they have no say over.
-            if (mosh && moshBastion != null) {
-                Text(
-                    stringResource(R.string.host_mosh_settings_on_bastion, moshBastion!!.label),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else if (mosh) {
+            // somebody else's server, so none of them can be decided here. They belong to the
+            // machine that runs mosh-server, which is why a chain walked from a bastion reads
+            // the bastion's own three answers and never these.
+            if (mosh) {
                 HorizontalDivider()
                 Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
 
@@ -519,6 +506,11 @@ fun AddEditHostScreen(
                             touchless        = touchless,
                             selectedId       = selectedId,
                             options          = availableJumpHosts,
+                            // Everything past the first hop is dialled by the bastion's own ssh
+                            // when that hop carries mosh, and a password saved here never
+                            // reaches it. The first hop itself is ours to dial, so it is not
+                            // held to the same rule.
+                            requiresKey      = index > 0 && moshBastion != null,
                             onSelect         = { newId ->
                                 vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
                                     .also { it[index] = newId }
@@ -660,6 +652,8 @@ private fun JumpHostRow(
     touchless: Boolean,
     selectedId: Long,
     options: List<AddEditHostViewModel.JumpHostOption>,
+    /** True where a saved password is not enough, because this hop is dialled by the bastion. */
+    requiresKey: Boolean,
     onSelect: (Long) -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -667,17 +661,26 @@ private fun JumpHostRow(
     val selected = options.find { it.host.id == selectedId }
     val jumpItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
         options.forEach { option ->
+            val usable = option.hasCredentials && (!requiresKey || option.hasKey)
+            // Two different refusals, and saying which one it is matters: one is cured by saving
+            // a password, the other only by a key, and a host that has a password already would
+            // otherwise be greyed out with a line telling it to save one.
+            val whyNot = when {
+                !option.hasCredentials -> R.string.host_jump_no_password
+                !option.hasKey -> R.string.host_jump_needs_key
+                else -> null
+            }
             DropdownMenuItem(
                 text = {
                     Column {
                         Text(
                             option.host.label,
-                            color = if (option.isSelectable) LocalContentColor.current
+                            color = if (usable) LocalContentColor.current
                                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                         )
-                        if (!option.isSelectable) {
+                        if (!usable && whyNot != null) {
                             Text(
-                                stringResource(R.string.host_jump_no_password),
+                                stringResource(whyNot),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                             )
@@ -685,12 +688,12 @@ private fun JumpHostRow(
                     }
                 },
                 onClick = {
-                    if (option.isSelectable) {
+                    if (usable) {
                         onSelect(option.host.id)
                         dismiss()
                     }
                 },
-                enabled = option.isSelectable,
+                enabled = usable,
             )
         }
     }

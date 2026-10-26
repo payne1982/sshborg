@@ -55,10 +55,9 @@
     <string name="host_color_custom">Personalizada</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimental)</string>
-    <string name="host_mosh_no_jump">Para usar o Mosh com um host de salto, o primeiro salto tem de ser um host com o Mosh activado.</string>
-    <string name="host_mosh_via_bastion">Mosh até %1$s e, a partir daí, ssh para este host. O SFTP continua a passar por toda a cadeia.</string>
-    <string name="host_mosh_settings_on_bastion">São usadas as definições Mosh de %1$s.</string>
-    <string name="host_jump_mosh_chain">Com o Mosh a cadeia não é encapsulada, é percorrida: a sessão abre no primeiro salto por Mosh e dali continua com ssh. O primeiro salto tem de ter o Mosh activado.</string>
+    <string name="host_mosh_no_jump">O Mosh não pode ser encapsulado num host de salto. Se o primeiro salto for um host com o Mosh activado, a sessão chega até ele por Mosh e daí continua com ssh.</string>
+    <string name="host_mosh_via_bastion">%1$s tem o Mosh activado: o terminal chega até ele por Mosh e daí continua com ssh até este host. O SFTP continua a usar toda a cadeia.</string>
+    <string name="host_jump_mosh_chain">O Mosh está activado neste host, por isso não se usa cadeia. Para passar por um bastião, retire a marca e escolha como primeiro salto um host com o Mosh activado.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automático</string>
@@ -76,7 +75,6 @@
     <string name="mosh_failed_locale">O mosh-server não arranca porque a configuração regional do servidor não é UTF-8. Defina um locale UTF-8 no servidor.</string>
     <string name="mosh_failed_no_answer">O mosh-server não respondeu como devia. O que disse está abaixo.</string>
     <string name="mosh_failed_no_udp">Não voltou nada por UDP. A rede entre aqui e o host está provavelmente a bloquear as portas UDP 60001-60999.</string>
-    <string name="mosh_failed_bastion_no_mosh">O Mosh com um host de salto exige que o primeiro salto tenha o Mosh activado, e este já não tem. Active o Mosh nesse host, ou desactive-o neste.</string>
     <string name="mosh_action_carry_on">Continuar com SSH</string>
     <string name="mosh_action_leave">Sair</string>
     <string name="terminal_no_contact_seconds">Sem contacto há %1$d s — a continuar a tentar</string>
@@ -127,6 +125,7 @@
     <string name="host_jump_select_placeholder">Selecionar host…</string>
     <string name="host_jump_add">Adicionar jump host</string>
     <string name="host_jump_no_password">Sem senha guardada</string>
+    <string name="host_jump_needs_key">Precisa de uma chave: depois do bastião é ele que inicia sessão</string>
     <string name="host_section_port_forwarding">Encaminhamento de portas</string>
     <string name="host_field_port_forwarding">Regras de encaminhamento (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

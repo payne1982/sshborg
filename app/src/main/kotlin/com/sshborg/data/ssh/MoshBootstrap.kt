@@ -82,17 +82,5 @@ class MoshUnavailable(val reason: Reason, val detail: String? = null) : Exceptio
          * blocked by a firewall — there is no error from the far end for this, only silence.
          */
         NoUdpAnswer,
-
-        /**
-         * Nothing was started at all: the host asks for mosh behind a jump chain, which can only
-         * be had by making the session to the first hop over mosh and walking the rest from
-         * there — and that hop has no mosh of its own (any more). The chain can still be
-         * tunnelled, which is the offer, but what is tunnelled cannot be mosh.
-         *
-         * Its own case because it is the one mosh failure that is a question about two rows in
-         * the host list rather than about anything on a server, and the cure is on whichever of
-         * them the person meant.
-         */
-        BastionWithoutMosh,
     }
 }

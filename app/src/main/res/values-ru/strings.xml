@@ -57,10 +57,9 @@
     <string name="host_color_custom">Свой</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(экспериментально)</string>
-    <string name="host_mosh_no_jump">Чтобы использовать Mosh с промежуточным хостом, первым в цепочке должен быть хост с включённым Mosh.</string>
-    <string name="host_mosh_via_bastion">Mosh до %1$s, а оттуда ssh к этому хосту. SFTP по-прежнему идёт через всю цепочку.</string>
-    <string name="host_mosh_settings_on_bastion">Используются настройки Mosh хоста %1$s.</string>
-    <string name="host_jump_mosh_chain">С Mosh цепочка не туннелируется, а проходится: сессия открывается на первом хосте через Mosh, а дальше идёт ssh. Первый хост должен быть с включённым Mosh.</string>
+    <string name="host_mosh_no_jump">Mosh нельзя туннелировать через промежуточный хост. Если первым в цепочке стоит хост с включённым Mosh, сессия доходит до него по Mosh, а дальше идёт ssh.</string>
+    <string name="host_mosh_via_bastion">На %1$s включён Mosh: терминал доходит до него по Mosh, а дальше идёт к этому хосту по ssh. SFTP по-прежнему использует всю цепочку.</string>
+    <string name="host_jump_mosh_chain">На этом хосте включён Mosh, поэтому цепочка не используется. Чтобы идти через бастион, снимите отметку и выберите первым хостом тот, на котором включён Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Автоматически</string>
@@ -78,7 +77,6 @@
     <string name="mosh_failed_locale">mosh-server не запускается, потому что локаль сервера не UTF-8. Задайте на сервере локаль UTF-8.</string>
     <string name="mosh_failed_no_answer">mosh-server ответил не так, как должен. Что он сказал — ниже.</string>
     <string name="mosh_failed_no_udp">По UDP ничего не пришло. Скорее всего, сеть между вами и хостом блокирует UDP-порты 60001-60999.</string>
-    <string name="mosh_failed_bastion_no_mosh">Mosh через промежуточный хост требует, чтобы на первом хосте был включён Mosh, а его там больше нет. Включите Mosh на том хосте или выключите на этом.</string>
     <string name="mosh_action_carry_on">Продолжить по SSH</string>
     <string name="mosh_action_leave">Выйти</string>
     <string name="terminal_no_contact_seconds">Нет связи %1$d с — продолжаю попытки</string>
@@ -131,6 +129,7 @@
     <string name="host_jump_select_placeholder">Выберите хост…</string>
     <string name="host_jump_add">Добавить промежуточный хост</string>
     <string name="host_jump_no_password">Пароль не сохранён</string>
+    <string name="host_jump_needs_key">Нужен ключ: за бастионом вход выполняет он сам</string>
     <string name="host_section_port_forwarding">Проброс портов</string>
     <string name="host_field_port_forwarding">Правила проброса (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

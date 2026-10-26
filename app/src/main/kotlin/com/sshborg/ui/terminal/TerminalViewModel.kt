@@ -319,10 +319,15 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             // over mosh, and the rest of the way is typed into it as one ssh command. See
             // [BastionHop] for why one command and not a hop at a time.
             //
+            // The bastion's own switch is the whole decision, and there is deliberately nothing
+            // to tick on this row: a second consent would only be a second way to be puzzled,
+            // and a host's mosh switch already means "reach me over mosh" wherever it is read
+            // from. A chain whose first hop has mosh off is tunnelled exactly as it always was.
+            //
             // Only the terminal works this way. The SFTP tab opens a session of its own through
             // the whole chain exactly as it did before, because that one is SSH and can be
             // tunnelled.
-            val bastion = jumpHostEntities.firstOrNull()?.takeIf { host.mosh && it.mosh }
+            val bastion = jumpHostEntities.firstOrNull()?.takeIf { it.mosh }
             val hopCommand = bastion?.let {
                 BastionHop.compose(
                     target  = BastionHop.Endpoint(host.username, host.hostname, host.port),
@@ -463,24 +468,19 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 if (session != null) {
                     shellSession = session
                     val em = _emulator.value
-                    // Mosh if the host asks for it and there is no chain left for SSH to walk
-                    // — which covers both shapes: a host with no chain at all, and one whose
-                    // chain is being walked from its bastion, where [via] has already emptied
-                    // this list. The test is on the list rather than on the two flags because a
-                    // chain that could not be turned into an ssh line falls back to being
-                    // tunnelled, and then mosh is not to be had however the row is configured.
-                    val wanted: TerminalTransport? = when {
-                        host.mosh && jumpHosts.isEmpty() -> moshOrAnswerFor(session, target, em)
-                        // Mosh was asked for and the chain is being tunnelled after all, because
-                        // the hop that was to carry it has none. Nothing was started, so there is
-                        // nothing to report from a server — but the same question is owed, and
-                        // carrying on means the ordinary tunnelled chain.
-                        host.mosh -> answerMoshFailure(
-                            MoshUnavailable(MoshUnavailable.Reason.BastionWithoutMosh), session,
-                        )
-                        else -> SshTerminalTransport(session)
-                    }
-                    val made = wanted ?: run {
+                    // Mosh when the machine being dialled asks for it and there is no chain left
+                    // for SSH to walk. [target] is what makes that one test instead of two: it is
+                    // the host for a direct session and the bastion for a walked one, and either
+                    // way it is the row whose switch is being honoured.
+                    //
+                    // The second half is belt and braces as it always was — the form cannot save
+                    // mosh together with a chain of its own — except that it now also catches a
+                    // chain which could not be turned into an ssh line and is being tunnelled.
+                    val made = (if (target.mosh && jumpHosts.isEmpty()) {
+                        moshOrAnswerFor(session, target, em)
+                    } else {
+                        SshTerminalTransport(session)
+                    }) ?: run {
                         // Asked, told why, and the answer was to leave.
                         runCatching { session.disconnect() }
                         withContext(Dispatchers.Main.immediate) {
@@ -747,21 +747,6 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         } finally {
             unowned?.let { runCatching { it.close() } }
         }
-        return answerMoshFailure(failure, session)
-    }
-
-    /**
-     * Puts a mosh failure in front of the person and does what they answer: the SSH transport if
-     * they carry on, null if they would rather leave.
-     *
-     * Its own function because not every failure happens where mosh is started. A host whose
-     * chain was to be walked from a bastion that no longer has mosh fails before any of that is
-     * attempted, and it is owed the same sentence and the same two buttons as the rest.
-     */
-    private suspend fun answerMoshFailure(
-        failure: MoshUnavailable,
-        session: ShellSession,
-    ): TerminalTransport? {
         withContext(Dispatchers.Main.immediate) {
             _state.value = ConnectionState.MoshFailed(failure.reason, failure.detail)
         }

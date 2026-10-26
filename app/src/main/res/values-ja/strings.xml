@@ -56,10 +56,9 @@
     <string name="host_color_custom">カスタム</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">（実験的）</string>
-    <string name="host_mosh_no_jump">Mosh を踏み台ホストと併用するには、最初の踏み台が Mosh を有効にしたホストである必要があります。</string>
-    <string name="host_mosh_via_bastion">%1$s までは Mosh、そこから ssh でこのホストに入ります。SFTP は従来どおり経路全体を通ります。</string>
-    <string name="host_mosh_settings_on_bastion">使用されるのは %1$s の Mosh 設定です。</string>
-    <string name="host_jump_mosh_chain">Mosh では経路をトンネルせず、順にたどります。最初の踏み台まで Mosh で接続し、そこから ssh で先へ進みます。最初の踏み台は Mosh を有効にしたホストである必要があります。</string>
+    <string name="host_mosh_no_jump">Mosh は踏み台ホストの中をトンネルできません。最初の踏み台が Mosh を有効にしたホストであれば、そこまでは Mosh で接続し、そこから ssh で先へ進みます。</string>
+    <string name="host_mosh_via_bastion">%1$s は Mosh が有効です。端末はそこまで Mosh で接続し、そこから ssh でこのホストへ進みます。SFTP は従来どおり経路全体を使います。</string>
+    <string name="host_jump_mosh_chain">このホストでは Mosh が有効なので、経路は使いません。踏み台を経由するには、チェックを外して最初の踏み台に Mosh を有効にしたホストを選んでください。</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自動</string>
@@ -77,7 +76,6 @@
     <string name="mosh_failed_locale">サーバーのロケールが UTF-8 でないため mosh-server が起動しません。サーバーに UTF-8 のロケールを設定してください。</string>
     <string name="mosh_failed_no_answer">mosh-server の応答が想定どおりではありません。応答の内容は下に表示しています。</string>
     <string name="mosh_failed_no_udp">UDP で何も返ってきませんでした。ここからホストまでの経路で UDP ポート 60001-60999 が遮断されている可能性が高いです。</string>
-    <string name="mosh_failed_bastion_no_mosh">踏み台経由の Mosh は、最初の踏み台で Mosh が有効になっている必要がありますが、現在は無効です。そのホストで Mosh を有効にするか、このホストで無効にしてください。</string>
     <string name="mosh_action_carry_on">SSH で続ける</string>
     <string name="mosh_action_leave">終了</string>
     <string name="terminal_no_contact_seconds">%1$d 秒間応答なし — 再試行中</string>
@@ -130,6 +128,7 @@
     <string name="host_jump_select_placeholder">ホストを選択…</string>
     <string name="host_jump_add">踏み台ホストを追加</string>
     <string name="host_jump_no_password">保存されたパスワードなし</string>
+    <string name="host_jump_needs_key">鍵が必要です（踏み台より先はそのホスト自身がログインします）</string>
     <string name="host_section_port_forwarding">ポートフォワーディング</string>
     <string name="host_field_port_forwarding">転送ルール（-L）</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
