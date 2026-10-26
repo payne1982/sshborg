@@ -73,16 +73,37 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Whether a jump chain is configured, in whichever of the two modes is selected.
      *
-     * Mosh and a jump chain exclude each other, so the form needs to know: it is what disables
-     * the mosh switch, and [save] applies the same rule where it cannot be got round. The
-     * exclusion is only in this direction — a host reached over mosh is still a perfectly good
-     * bastion for others, because that inward hop is SSH, runs on the server and is immune to
-     * whatever the phone's network does.
+     * Mosh and a jump chain nearly exclude each other, so the form needs to know: together with
+     * [moshBastion] it is what decides whether the mosh switch can move at all, and [save]
+     * applies the same rule where it cannot be got round.
+     *
+     * The exclusion was never symmetric — a host reached over mosh is a perfectly good bastion
+     * for others, because that inward hop is SSH, runs on the server and is immune to whatever
+     * the phone's network does. [moshBastion] is what turns that fact into the way out.
      */
     val jumpConfigured: StateFlow<Boolean> =
         combine(jumpMode, jumpHosts, jumpHostIds) { mode, text, ids ->
             if (mode == "simple") text.isNotBlank() else ids.any { it != 0L }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /**
+     * The hop that can carry mosh, when the chain has one: the first selected hop, if it is a
+     * host of yours with mosh of its own.
+     *
+     * This is the one way mosh and a jump chain can both stand on the same row. The chain is not
+     * tunnelled then — mosh has no channels to tunnel anything through — it is walked from that
+     * hop: the session is made to it over mosh and the rest of the way is typed into it as one
+     * ssh command. Which is also why only the *first* hop is asked about, and only in host-list
+     * mode: a hop typed into the text field is not a host of ours and has no mosh answer to give.
+     */
+    val moshBastion: StateFlow<HostEntity?> = combine(
+        jumpMode, jumpHostIds, hostDao.getAll(),
+    ) { mode, ids, hosts ->
+        if (mode != "host_list") null
+        else ids.firstOrNull { it != 0L }
+            ?.let { first -> hosts.find { it.id == first } }
+            ?.takeIf { it.mosh }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     /** When true, the saved host key and cached jump-host keys are cleared on save. */
     var resetHostKeys = MutableStateFlow(false)
@@ -177,9 +198,18 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             jumpHosts.value.trim().takeIf { it.isNotEmpty() }
         } else null
 
-        // The exclusion, where nothing can get round it: whatever the form did, a row never
-        // leaves here with both mosh and a jump chain on it.
-        val newMosh = mosh.value && newJumpHosts == null && newJumpHostIdList == null
+        // The exclusion, where nothing can get round it — together with the one way round it
+        // that works. A chain cannot be tunnelled inside mosh, so mosh and a chain still cannot
+        // both stand on a row; but a chain whose first hop is a mosh host of yours is not
+        // tunnelled, it is walked from that hop, and then they can.
+        //
+        // Asked of the database rather than of [moshBastion], whose value is only maintained
+        // while something is collecting it: a save must decide the same way whether the form is
+        // on screen or not.
+        val firstHopId = newJumpHostIdList?.split(",")?.firstOrNull()?.trim()?.toLongOrNull()
+        val bastionCarriesMosh = firstHopId?.let { hostDao.getById(it)?.mosh } == true
+        val newMosh = mosh.value &&
+            ((newJumpHosts == null && newJumpHostIdList == null) || bastionCarriesMosh)
 
         val existing = editingId?.let { hostDao.getById(it) }
         val newHostname = hostname.value.trim()

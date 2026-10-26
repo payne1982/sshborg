@@ -57,8 +57,10 @@
     <string name="host_color_custom">Свой</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(экспериментально)</string>
-    <string name="host_mosh_no_jump">Mosh нельзя использовать с промежуточным хостом. Уберите промежуточные хосты ниже, чтобы включить его.</string>
-    <string name="host_jump_not_with_mosh">Недоступно с Mosh. Хост, доступный через Mosh, по-прежнему может быть промежуточным для других хостов.</string>
+    <string name="host_mosh_no_jump">Чтобы использовать Mosh с промежуточным хостом, первым в цепочке должен быть хост с включённым Mosh.</string>
+    <string name="host_mosh_via_bastion">Mosh до %1$s, а оттуда ssh к этому хосту. SFTP по-прежнему идёт через всю цепочку.</string>
+    <string name="host_mosh_settings_on_bastion">Используются настройки Mosh хоста %1$s.</string>
+    <string name="host_jump_mosh_chain">С Mosh цепочка не туннелируется, а проходится: сессия открывается на первом хосте через Mosh, а дальше идёт ssh. Первый хост должен быть с включённым Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Автоматически</string>
@@ -76,6 +78,7 @@
     <string name="mosh_failed_locale">mosh-server не запускается, потому что локаль сервера не UTF-8. Задайте на сервере локаль UTF-8.</string>
     <string name="mosh_failed_no_answer">mosh-server ответил не так, как должен. Что он сказал — ниже.</string>
     <string name="mosh_failed_no_udp">По UDP ничего не пришло. Скорее всего, сеть между вами и хостом блокирует UDP-порты 60001-60999.</string>
+    <string name="mosh_failed_bastion_no_mosh">Mosh через промежуточный хост требует, чтобы на первом хосте был включён Mosh, а его там больше нет. Включите Mosh на том хосте или выключите на этом.</string>
     <string name="mosh_action_carry_on">Продолжить по SSH</string>
     <string name="mosh_action_leave">Выйти</string>
     <string name="terminal_no_contact_seconds">Нет связи %1$d с — продолжаю попытки</string>

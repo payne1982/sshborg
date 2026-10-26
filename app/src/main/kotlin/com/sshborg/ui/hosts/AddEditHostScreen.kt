@@ -76,6 +76,11 @@ fun AddEditHostScreen(
     val moshPorts by vm.moshPorts.collectAsState()
     val moshCommand by vm.moshCommand.collectAsState()
     val jumpConfigured by vm.jumpConfigured.collectAsState()
+    val moshBastion by vm.moshBastion.collectAsState()
+    // A chain used to be the end of the matter for mosh. It still is, unless its first hop is a
+    // host of yours with mosh on: that one is not tunnelled through but *reached* over mosh, and
+    // the rest of the way is walked by its own ssh.
+    val moshAllowed = !jumpConfigured || moshBastion != null
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
     val hostColor by vm.hostColor.collectAsState()
@@ -254,20 +259,20 @@ fun AddEditHostScreen(
                 // the line underneath says why it does.
                 Row(
                     modifier = Modifier
-                        .clickable(enabled = !jumpConfigured) { vm.mosh.value = !mosh }
+                        .clickable(enabled = moshAllowed) { vm.mosh.value = !mosh }
                         .padding(vertical = 8.dp, horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
-                        checked = mosh && !jumpConfigured,
+                        checked = mosh && moshAllowed,
                         onCheckedChange = { vm.mosh.value = it },
-                        enabled = !jumpConfigured,
+                        enabled = moshAllowed,
                     )
                     Column {
                         Text(
                             stringResource(R.string.host_mosh_label),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = if (jumpConfigured) MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (!moshAllowed) MaterialTheme.colorScheme.onSurfaceVariant
                             else MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
@@ -278,9 +283,17 @@ fun AddEditHostScreen(
                     }
                 }
             }
-            if (jumpConfigured) {
+            // Either why the box will not move, or — when it has moved — what it will actually
+            // do, which is not what the label alone would lead anyone to expect.
+            if (!moshAllowed) {
                 Text(
                     stringResource(R.string.host_mosh_no_jump),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else if (mosh && moshBastion != null) {
+                Text(
+                    stringResource(R.string.host_mosh_via_bastion, moshBastion!!.label),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -394,10 +407,18 @@ fun AddEditHostScreen(
             }
 
             // The three things about a mosh session that depend on somebody else's network and
-            // somebody else's server, so none of them can be decided here. Before the jump-host
-            // section rather than inside it: the two exclude each other, but this is a section of
-            // its own and reads as one.
-            if (mosh) {
+            // somebody else's server, so none of them can be decided here.
+            //
+            // Not shown when a bastion carries the session: the mosh-server that runs is then the
+            // bastion's, started with the bastion's own three answers, and a second set of fields
+            // on this row would be read as governing something they have no say over.
+            if (mosh && moshBastion != null) {
+                Text(
+                    stringResource(R.string.host_mosh_settings_on_bastion, moshBastion!!.label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else if (mosh) {
                 HorizontalDivider()
                 Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
 
@@ -445,77 +466,77 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
+            // With mosh on the chain is not tunnelled: it is walked from its first hop, which
+            // therefore has to be a host of yours that has mosh of its own. Said here and not
+            // only next to the switch, because this is the section where that hop is chosen.
             if (mosh) {
-                // Nothing is cleared when this appears: the switch is what cannot be turned on
-                // while a chain exists, so by the time it is on there is no chain left to lose.
                 Text(
-                    stringResource(R.string.host_jump_not_with_mosh),
+                    stringResource(R.string.host_jump_mosh_chain),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            } else {
-                // Two choices side by side, kept as radios on purpose: both are visible at once,
-                // which is what makes it read as "one or the other" rather than as a field whose
-                // value happens to be one of them.
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // The host list first, because it is the default and the one that can carry
-                    // a hop's own credentials; the text field is the fallback for a hop that is
-                    // not a host of yours.
-                    listOf(
-                        "host_list" to R.string.host_jump_mode_host_list,
-                        "simple" to R.string.host_jump_mode_simple,
-                    ).forEach { (mode, labelRes) ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            RadioButton(
-                                selected = jumpMode == mode,
-                                onClick  = { vm.jumpMode.value = mode },
-                            )
-                            Text(stringResource(labelRes))
-                        }
+            }
+            // Two choices side by side, kept as radios on purpose: both are visible at once,
+            // which is what makes it read as "one or the other" rather than as a field whose
+            // value happens to be one of them.
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                // The host list first, because it is the default and the one that can carry
+                // a hop's own credentials; the text field is the fallback for a hop that is
+                // not a host of yours.
+                listOf(
+                    "host_list" to R.string.host_jump_mode_host_list,
+                    "simple" to R.string.host_jump_mode_simple,
+                ).forEach { (mode, labelRes) ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        RadioButton(
+                            selected = jumpMode == mode,
+                            onClick  = { vm.jumpMode.value = mode },
+                        )
+                        Text(stringResource(labelRes))
                     }
                 }
+            }
 
-                if (jumpMode == "simple") {
-                    HostField(
-                        value = jumpHosts,
-                        onValueChange = { vm.jumpHosts.value = it },
-                        label = stringResource(R.string.host_field_jump_hosts),
-                        touchless = touchless,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardType = KeyboardType.Uri,
-                        placeholder = stringResource(R.string.host_jump_hosts_placeholder),
-                        supporting = stringResource(R.string.host_jump_hosts_supporting),
-                    )
-                } else {
-                    // Host-list mode: one row per hop
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        jumpHostIds.forEachIndexed { index, selectedId ->
-                            JumpHostRow(
-                                touchless        = touchless,
-                                selectedId       = selectedId,
-                                options          = availableJumpHosts,
-                                onSelect         = { newId ->
-                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                        .also { it[index] = newId }
-                                },
-                                onRemove         = {
-                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                        .also { it.removeAt(index) }
-                                },
-                            )
-                        }
-                        OutlinedButton(
-                            onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
-                            modifier  = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = null,
-                                modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.host_jump_add))
-                        }
+            if (jumpMode == "simple") {
+                HostField(
+                    value = jumpHosts,
+                    onValueChange = { vm.jumpHosts.value = it },
+                    label = stringResource(R.string.host_field_jump_hosts),
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardType = KeyboardType.Uri,
+                    placeholder = stringResource(R.string.host_jump_hosts_placeholder),
+                    supporting = stringResource(R.string.host_jump_hosts_supporting),
+                )
+            } else {
+                // Host-list mode: one row per hop
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    jumpHostIds.forEachIndexed { index, selectedId ->
+                        JumpHostRow(
+                            touchless        = touchless,
+                            selectedId       = selectedId,
+                            options          = availableJumpHosts,
+                            onSelect         = { newId ->
+                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                    .also { it[index] = newId }
+                            },
+                            onRemove         = {
+                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                    .also { it.removeAt(index) }
+                            },
+                        )
+                    }
+                    OutlinedButton(
+                        onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
+                        modifier  = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null,
+                            modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.host_jump_add))
                     }
                 }
             }

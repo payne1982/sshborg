@@ -55,8 +55,10 @@
     <string name="host_color_custom">Власний</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(експериментально)</string>
-    <string name="host_mosh_no_jump">Mosh не можна використовувати з проміжним хостом. Приберіть проміжні хости нижче, щоб його увімкнути.</string>
-    <string name="host_jump_not_with_mosh">Недоступно з Mosh. Хост, доступний через Mosh, і далі може бути проміжним для інших хостів.</string>
+    <string name="host_mosh_no_jump">Щоб використовувати Mosh із проміжним хостом, першим у ланцюжку має бути хост з увімкненим Mosh.</string>
+    <string name="host_mosh_via_bastion">Mosh до %1$s, а звідти ssh до цього хоста. SFTP і далі йде через увесь ланцюжок.</string>
+    <string name="host_mosh_settings_on_bastion">Використовуються налаштування Mosh хоста %1$s.</string>
+    <string name="host_jump_mosh_chain">З Mosh ланцюжок не тунелюється, а проходиться: сесія відкривається на першому хості через Mosh, а далі йде ssh. Перший хост має мати увімкнений Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Автоматично</string>
@@ -74,6 +76,7 @@
     <string name="mosh_failed_locale">mosh-server не запускається, бо локаль сервера не UTF-8. Задайте на сервері локаль UTF-8.</string>
     <string name="mosh_failed_no_answer">mosh-server відповів не так, як мав би. Те, що він сказав, — нижче.</string>
     <string name="mosh_failed_no_udp">По UDP нічого не повернулося. Найімовірніше, мережа між вами та хостом блокує UDP-порти 60001-60999.</string>
+    <string name="mosh_failed_bastion_no_mosh">Mosh через проміжний хост вимагає, щоб на першому хості був увімкнений Mosh, а його там більше немає. Увімкніть Mosh на тому хості або вимкніть на цьому.</string>
     <string name="mosh_action_carry_on">Продовжити через SSH</string>
     <string name="mosh_action_leave">Вийти</string>
     <string name="terminal_no_contact_seconds">Немає зв’язку %1$d с — продовжую спроби</string>

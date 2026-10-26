@@ -57,8 +57,10 @@
     <string name="host_color_custom">Custom</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimental)</string>
-    <string name="host_mosh_no_jump">Mosh cannot be used with a jump host. Remove the jump hosts below to turn it on.</string>
-    <string name="host_jump_not_with_mosh">Not available with Mosh. A host reached over Mosh can still be a jump host for other hosts.</string>
+    <string name="host_mosh_no_jump">To use Mosh with a jump host, the first hop has to be a host with Mosh enabled.</string>
+    <string name="host_mosh_via_bastion">Mosh as far as %1$s, then ssh from there to this host. SFTP still goes through the whole chain.</string>
+    <string name="host_mosh_settings_on_bastion">The Mosh settings used are the ones on %1$s.</string>
+    <string name="host_jump_mosh_chain">With Mosh the chain is walked, not tunnelled: the session is made to the first hop over Mosh, and ssh goes on from there. The first hop has to be a host with Mosh enabled.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatic</string>
@@ -76,6 +78,7 @@
     <string name="mosh_failed_locale">mosh-server will not run because the host’s locale is not UTF-8. Set a UTF-8 locale on the server.</string>
     <string name="mosh_failed_no_answer">mosh-server did not answer the way it should. What it said is below.</string>
     <string name="mosh_failed_no_udp">Nothing came back over UDP. The network between here and the host is probably blocking UDP ports 60001-60999.</string>
+    <string name="mosh_failed_bastion_no_mosh">Mosh through a jump host needs the first hop to have Mosh enabled, and this one no longer does. Turn Mosh on for that host, or off for this one.</string>
     <string name="mosh_action_carry_on">Continue over SSH</string>
     <string name="mosh_action_leave">Leave</string>
     <string name="terminal_no_contact_seconds">No contact for %1$d s — still trying</string>

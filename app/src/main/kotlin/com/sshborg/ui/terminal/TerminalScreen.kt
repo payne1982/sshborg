@@ -1007,6 +1007,8 @@ private fun MoshFailedDialog(
                             MoshUnavailable.Reason.LocaleNotUtf8 -> R.string.mosh_failed_locale
                             MoshUnavailable.Reason.NoConnectLine -> R.string.mosh_failed_no_answer
                             MoshUnavailable.Reason.NoUdpAnswer -> R.string.mosh_failed_no_udp
+                            MoshUnavailable.Reason.BastionWithoutMosh ->
+                                R.string.mosh_failed_bastion_no_mosh
                         }
                     )
                 )

@@ -72,8 +72,14 @@ data class HostEntity(
      * the screen is synchronised over UDP and survives a change of network.
      *
      * Off by default, per host and explicit — there is no detection and no silent fall back to
-     * SSH, because somebody who asked for mosh and did not get it is owed the reason. It also
-     * excludes a jump chain: SSH would get through it, but the UDP session afterwards could not.
+     * SSH, because somebody who asked for mosh and did not get it is owed the reason.
+     *
+     * A jump chain is almost excluded. SSH would get through one, but the UDP session afterwards
+     * could not: a bastion forwards TCP and the datagrams have nowhere to go. The exception is a
+     * chain whose first hop is a mosh host of yours, which is not tunnelled through at all — the
+     * session is made *to* that hop over mosh and the rest of the way is typed into it as one
+     * `ssh` command. See `BastionHop`. Only the terminal takes that road; SFTP still opens its
+     * own session through the whole chain, because that one is SSH.
      */
     val mosh: Boolean = false,
     /**

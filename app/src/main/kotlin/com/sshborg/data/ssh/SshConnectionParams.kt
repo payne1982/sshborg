@@ -84,7 +84,9 @@ data class SshConnectionParams(
      * it. A preference and not a demand: if the chosen family has no address, the other is used.
      *
      * Ignored when the connection goes through a jump chain, where there is no socket of ours to
-     * aim at an address — and mosh and a jump chain exclude each other anyway.
+     * aim at an address. A mosh session reached from a bastion is not that case: the chain is
+     * walked by the bastion's own ssh and this connection dials the bastion directly, so the
+     * family asked for is the family it is born on, exactly as for a host with no chain.
      */
     val addressFamily: String = "auto",
 )

@@ -55,8 +55,10 @@
     <string name="host_color_custom">Personalizado</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimental)</string>
-    <string name="host_mosh_no_jump">Mosh no se puede usar con un host de salto. Quita los hosts de salto de abajo para activarlo.</string>
-    <string name="host_jump_not_with_mosh">No disponible con Mosh. Un host al que se llega por Mosh puede seguir siendo host de salto para otros.</string>
+    <string name="host_mosh_no_jump">Para usar Mosh con un host de salto, el primer salto debe ser un host con Mosh activado.</string>
+    <string name="host_mosh_via_bastion">Mosh hasta %1$s y desde allí ssh a este host. El SFTP sigue pasando por toda la cadena.</string>
+    <string name="host_mosh_settings_on_bastion">Se usan los ajustes de Mosh de %1$s.</string>
+    <string name="host_jump_mosh_chain">Con Mosh la cadena no se encapsula, se recorre: la sesión se abre en el primer salto por Mosh y desde allí continúa con ssh. El primer salto debe ser un host con Mosh activado.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automático</string>
@@ -74,6 +76,7 @@
     <string name="mosh_failed_locale">mosh-server no arranca porque la configuración regional del servidor no es UTF-8. Configura un locale UTF-8 en el servidor.</string>
     <string name="mosh_failed_no_answer">mosh-server no respondió como debería. Abajo está lo que dijo.</string>
     <string name="mosh_failed_no_udp">No llegó nada por UDP. Probablemente la red entre aquí y el host bloquea los puertos UDP 60001-60999.</string>
+    <string name="mosh_failed_bastion_no_mosh">Mosh con un host de salto necesita que el primer salto tenga Mosh activado, y este ya no lo tiene. Activa Mosh en ese host o desactívalo en este.</string>
     <string name="mosh_action_carry_on">Continuar con SSH</string>
     <string name="mosh_action_leave">Salir</string>
     <string name="terminal_no_contact_seconds">Sin contacto desde hace %1$d s: se sigue intentando</string>

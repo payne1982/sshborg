@@ -144,6 +144,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private var promptPrefix = ""
     private var promptDetected = false
     private var promptDetectJob: Job? = null
+    /**
+     * The ssh line that still has to be typed into a bastion's shell to finish walking a jump
+     * chain, and the clock that types it if no prompt is ever recognised.
+     *
+     * Volatile because it is armed on the connect's own thread and taken on the main one.
+     */
+    @Volatile private var pendingHopCommand: String? = null
+    private var hopCommandJob: Job? = null
     private var suggestionsUpdateJob: Job? = null
 
     /** Emitted when the remote shell exits cleanly — screen should navigate back automatically. */
@@ -225,6 +233,11 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             if (resumed.isConnected) {
                 _state.value = ConnectionState.Connected
                 startReading(resumed)
+                // Still owed its ssh line: the ViewModel that armed it was thrown away by a tab
+                // switch before the prompt it was waiting for came. Here and not up with the rest
+                // of the restored state, because the prompt it waits on has been restored by now
+                // — so a session whose prompt is already known is typed into at once.
+                session.pendingHopCommand?.let { awaitPromptThenType(it) }
             } else {
                 // Session dropped while backgrounded: no exception to catch here, so show JSch's
                 // own last disconnect reason as the summary (falls back to a generic line).
@@ -295,7 +308,39 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             val host = hostDao.getById(hostId) ?: run {
                 _state.value = ConnectionState.Error(getApplication<Application>().getString(R.string.error_host_not_found)); return@launch
             }
-            var auth: SshAuth = buildAuth(host)
+            // Pre-loaded for host-list mode so they can be looked up in onHostKeyVerify, and
+            // so the first of them can be recognised as a bastion just below.
+            val jumpHostEntities = if (host.jumpMode == "host_list") {
+                buildJumpHostEntities(host.jumpHostIdList)
+            } else emptyList()
+
+            // Mosh cannot be tunnelled through a jump chain, so a host whose first hop is itself
+            // a mosh host is reached from the other end: the session is made *to that bastion*
+            // over mosh, and the rest of the way is typed into it as one ssh command. See
+            // [BastionHop] for why one command and not a hop at a time.
+            //
+            // Only the terminal works this way. The SFTP tab opens a session of its own through
+            // the whole chain exactly as it did before, because that one is SSH and can be
+            // tunnelled.
+            val bastion = jumpHostEntities.firstOrNull()?.takeIf { host.mosh && it.mosh }
+            val hopCommand = bastion?.let {
+                BastionHop.compose(
+                    target  = BastionHop.Endpoint(host.username, host.hostname, host.port),
+                    through = jumpHostEntities.drop(1)
+                        .map { h -> BastionHop.Endpoint(h.username, h.hostname, h.port) },
+                )
+            }
+            // A name no shell can be trusted with is the one way out of the arrangement: the
+            // bastion is given up on and the ordinary chain is walked instead, which is what this
+            // host did before any of this existed.
+            val via = bastion?.takeIf { hopCommand != null }
+            // The machine this session dials and logs in to: the host itself, or its bastion.
+            // Everything about the login belongs to that machine — credentials, host key, legacy
+            // ciphers, which mosh-server is started — while everything about the destination
+            // still belongs to the host: the ssh line, the connection count, the SFTP tab.
+            val target = via ?: host
+
+            var auth: SshAuth = buildAuth(target)
             // The person closed the password prompt instead of answering it. The attempt then
             // ends as an authentication failure, which must not be read as one worth retrying.
             var passwordCancelled = false
@@ -306,16 +351,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             // password method at all would fail, be retried, and fail again for ever.
             var passwordAsked = false
 
-            // Pre-load jump host entities for host-list mode so we can look them up in onHostKeyVerify
-            val jumpHostEntities = if (host.jumpMode == "host_list") {
-                buildJumpHostEntities(host.jumpHostIdList)
-            } else emptyList()
-
             while (true) {
                 _state.value = ConnectionState.Connecting
                 passwordAsked = false
 
-                val jumpHosts = if (host.jumpMode == "host_list") {
+                // Empty when the bastion walks the chain: there is nothing left for SSH to
+                // tunnel, and what was the first hop is the machine being dialled.
+                val jumpHosts = if (via != null) emptyList()
+                else if (host.jumpMode == "host_list") {
                     jumpHostEntities.mapNotNull { jumpHost ->
                         val jumpAuth = buildJumpAuth(jumpHost) ?: return@mapNotNull null
                         JumpHost(
@@ -334,18 +377,25 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 val result = runCatching {
                     SshManager.openShell(
                         params = SshConnectionParams(
-                            hostname           = host.hostname,
-                            port               = host.port,
-                            username           = host.username,
+                            hostname           = target.hostname,
+                            port               = target.port,
+                            username           = target.username,
                             auth               = auth,
-                            agentForwarding    = host.agentForwarding,
-                            knownHostsEntry    = host.knownHostsEntry,
+                            // Either row asking for it is enough. The hop that needs the key is
+                            // the bastion, and the host that needs it is the one behind it, so
+                            // demanding the switch on both would only mean the ssh line failing
+                            // for a reason nobody would look for in the other host's form.
+                            agentForwarding    = host.agentForwarding || via?.agentForwarding == true,
+                            knownHostsEntry    = target.knownHostsEntry,
                             jumpHosts          = jumpHosts,
+                            // The destination's rules, on the bastion's session when there is one.
+                            // They still reach what they named: a forwarding is resolved by the
+                            // far end, and the bastion is on the same side of the door.
                             portForwardings    = parsePortForwardings(host.portForwardings),
-                            allowLegacyCiphers = host.allowLegacyCiphers,
+                            allowLegacyCiphers = target.allowLegacyCiphers,
                             // Only mosh has a reason to care which family a session is born on,
                             // and only its own hosts carry an answer.
-                            addressFamily      = if (host.mosh) host.moshFamily else "auto",
+                            addressFamily      = if (target.mosh) target.moshFamily else "auto",
                         ),
                         columns = columns,
                         rows    = rows,
@@ -379,9 +429,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                                     _state.value = ConnectionState.Connecting
                                     val current = hostDao.getById(hostId)
                                     if (current != null) {
-                                        if (hostname == host.hostname) {
-                                            if (current.knownHostsEntry == null)
-                                                hostDao.upsert(current.copy(knownHostsEntry = keyLine))
+                                        // Asked of the machine being dialled, which through a
+                                        // bastion is the bastion: its key is its own, and goes on
+                                        // its own row rather than on the row that named it.
+                                        if (hostname == target.hostname) {
+                                            val dialled = hostDao.getById(target.id)
+                                            if (dialled != null && dialled.knownHostsEntry == null)
+                                                hostDao.upsert(dialled.copy(knownHostsEntry = keyLine))
                                         } else if (host.jumpMode == "host_list") {
                                             // Host-list: persist key to the jump host's own entity
                                             val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
@@ -409,23 +463,32 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 if (session != null) {
                     shellSession = session
                     val em = _emulator.value
-                    // Mosh if the host asks for it and has no jump chain. The second half is not
-                    // belt and braces: the form cannot produce a host with both, but an imported
-                    // backup could have been edited by hand, and a jump chain is the one thing
-                    // mosh cannot carry.
-                    val made = if (host.mosh && jumpHosts.isEmpty()) {
-                        moshOrAnswerFor(session, host, em) ?: run {
-                            // Asked, told why, and the answer was to leave.
-                            runCatching { session.disconnect() }
-                            withContext(Dispatchers.Main.immediate) {
-                                _state.value = ConnectionState.Disconnected()
-                            }
-                            sessionManager.remove(id)
-                            if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
-                            return@launch
+                    // Mosh if the host asks for it and there is no chain left for SSH to walk
+                    // — which covers both shapes: a host with no chain at all, and one whose
+                    // chain is being walked from its bastion, where [via] has already emptied
+                    // this list. The test is on the list rather than on the two flags because a
+                    // chain that could not be turned into an ssh line falls back to being
+                    // tunnelled, and then mosh is not to be had however the row is configured.
+                    val wanted: TerminalTransport? = when {
+                        host.mosh && jumpHosts.isEmpty() -> moshOrAnswerFor(session, target, em)
+                        // Mosh was asked for and the chain is being tunnelled after all, because
+                        // the hop that was to carry it has none. Nothing was started, so there is
+                        // nothing to report from a server — but the same question is owed, and
+                        // carrying on means the ordinary tunnelled chain.
+                        host.mosh -> answerMoshFailure(
+                            MoshUnavailable(MoshUnavailable.Reason.BastionWithoutMosh), session,
+                        )
+                        else -> SshTerminalTransport(session)
+                    }
+                    val made = wanted ?: run {
+                        // Asked, told why, and the answer was to leave.
+                        runCatching { session.disconnect() }
+                        withContext(Dispatchers.Main.immediate) {
+                            _state.value = ConnectionState.Disconnected()
                         }
-                    } else {
-                        SshTerminalTransport(session)
+                        sessionManager.remove(id)
+                        if (sessionManager.sessions.value.isEmpty()) SshForegroundService.stop(getApplication())
+                        return@launch
                     }
                     transport = made
                     synchronized(em) {
@@ -446,12 +509,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         }
                         _state.value = ConnectionState.Connected
                     }
-                    val saved = hostDao.getById(hostId) ?: host
-                    if (saved.knownHostsEntry == null)
-                        hostDao.upsert(saved.copy(knownHostsEntry = session.hostKeyLine))
+                    val dialled = hostDao.getById(target.id) ?: target
+                    if (dialled.knownHostsEntry == null)
+                        hostDao.upsert(dialled.copy(knownHostsEntry = session.hostKeyLine))
                     // Simple mode: new jump keys → target's jumpHostKeys blob
                     if (session.newJumpHostKeyLines.isNotEmpty()) {
-                        val current = hostDao.getById(hostId) ?: saved
+                        val current = hostDao.getById(hostId) ?: host
                         val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
                         val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
                         if (toAdd.isNotEmpty())
@@ -485,6 +548,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     if (blankRows > 0) synchronized(em) { em.process("\n".repeat(blankRows)) }
                     startReading(made)
+                    hopCommand?.takeIf { via != null }?.let { awaitPromptThenType(it) }
                     if (prefs.historySuggestions.first()) loadCommandHistory(session)
                     return@launch
                 }
@@ -683,6 +747,21 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         } finally {
             unowned?.let { runCatching { it.close() } }
         }
+        return answerMoshFailure(failure, session)
+    }
+
+    /**
+     * Puts a mosh failure in front of the person and does what they answer: the SSH transport if
+     * they carry on, null if they would rather leave.
+     *
+     * Its own function because not every failure happens where mosh is started. A host whose
+     * chain was to be walked from a bastion that no longer has mosh fails before any of that is
+     * attempted, and it is owed the same sentence and the same two buttons as the rest.
+     */
+    private suspend fun answerMoshFailure(
+        failure: MoshUnavailable,
+        session: ShellSession,
+    ): TerminalTransport? {
         withContext(Dispatchers.Main.immediate) {
             _state.value = ConnectionState.MoshFailed(failure.reason, failure.detail)
         }
@@ -897,6 +976,52 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             promptDetected = true
             // Cache on the session so a tab switch (new ViewModel) keeps it.
             sessionId?.let { id -> sessionManager.update(id) { it.copy(promptPrefix = promptPrefix) } }
+            // What a bastion's shell was being waited on for.
+            typePendingHopCommand()
+        }
+    }
+
+    /**
+     * Types [command] into the session once its shell looks ready for it.
+     *
+     * Ready means the first prompt the detector recognises — the same signal the suggestion bar
+     * waits for — and [HOP_COMMAND_GRACE_MS] is the answer for a prompt it cannot read, since a
+     * shell whose PS1 ends in something that regex has never seen would otherwise never be typed
+     * into at all.
+     *
+     * Typing blind after the grace period costs little: authentication is long over by then, so
+     * the only thing listening is a shell, and a shell keeps a line that arrives while it is
+     * still printing its own greeting. The one thing that must not happen is typing it twice,
+     * which is why the line is taken rather than read.
+     */
+    private fun awaitPromptThenType(command: String) {
+        pendingHopCommand = command
+        sessionId?.let { id -> sessionManager.update(id) { it.copy(pendingHopCommand = command) } }
+        if (promptDetected) {
+            typePendingHopCommand()
+            return
+        }
+        hopCommandJob?.cancel()
+        hopCommandJob = viewModelScope.launch {
+            delay(HOP_COMMAND_GRACE_MS)
+            typePendingHopCommand()
+        }
+    }
+
+    /**
+     * Types the pending line, once. Later calls find nothing left to do.
+     *
+     * Written straight to the transport rather than through [sendInput]: this is not a keystroke,
+     * and counting it as one would put a line nobody typed into the echo measurement and clear a
+     * suggestion list the person may be looking at.
+     */
+    private fun typePendingHopCommand() {
+        val command = pendingHopCommand ?: return
+        pendingHopCommand = null
+        sessionId?.let { id -> sessionManager.update(id) { it.copy(pendingHopCommand = null) } }
+        hopCommandJob?.cancel()
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { transport?.write((command + "\n").toByteArray()) }
         }
     }
 
@@ -963,6 +1088,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
          * line, both numbers grow together.
          */
         const val MOSH_SERVER_TIMEOUT_SECONDS = 3600
+
+        /**
+         * How long a bastion's shell is given to show a prompt we can recognise before the ssh
+         * line is typed into it anyway. Generous on purpose: a login that prints a long greeting
+         * is still a login, and the cost of being early is nil while the cost of never typing it
+         * is a session sitting on the wrong machine.
+         */
+        const val HOP_COMMAND_GRACE_MS = 5_000L
 
         /** How often a debug build says in the log how the mosh session is going. */
         const val DIAGNOSTIC_INTERVAL_MS = 2_000L

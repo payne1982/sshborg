@@ -36,6 +36,13 @@ class SessionManager {
         // being recreated when switching between sibling tabs.
         val commandHistory: List<String> = emptyList(),
         val promptPrefix: String = "",
+        /**
+         * The ssh line that still has to be typed into a bastion's shell to finish walking a
+         * jump chain, or null once it has been. Here for the same reason as the rest: it is
+         * armed a moment after the session connects, and a tab switch inside that moment would
+         * otherwise leave the session sitting on the bastion for ever.
+         */
+        val pendingHopCommand: String? = null,
         // SFTP-specific
         val sftpSession: SftpSession? = null,
         val sftpCurrentPath: String = "/",
