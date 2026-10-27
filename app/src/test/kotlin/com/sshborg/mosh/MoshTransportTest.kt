@@ -313,6 +313,52 @@ class MoshTransportTest {
         assertEquals("and said so at once", 1L, ours(transport.tick(1_150).single()).ackNumber)
     }
 
+    @Test fun `a frame already applied cannot be applied a second time`() {
+        handshake()
+        // The screen can be put back to 1, which is the arrangement that makes a late frame
+        // usable — and the same arrangement is what made a *replayed* one usable.
+        canReturnTo.add(1)
+        val frame = fromServer(now = 1_100, oldNumber = 1, newNumber = 2, diff = hostBytes("one"))
+        assertEquals(MoshTransport.Arrival.Fresh, transport.onDatagram(frame, 1_100))
+        transport.onDatagram(fromServer(now = 1_200, oldNumber = 2, newNumber = 3, diff = hostBytes("two")), 1_200)
+        assertEquals("onetwo", hostOutput.toString())
+
+        // The same datagram again, byte for byte. Nothing was forged and no key was needed: it is
+        // a copy of one that already crossed the network, which anyone on the path can make. It
+        // used to put the screen back to state 1 and draw state 2 on top, so the terminal showed
+        // the past and acknowledged it — and plain reordering did the same thing by accident.
+        assertEquals(MoshTransport.Arrival.Duplicate, transport.onDatagram(frame, 1_300))
+        assertEquals("the screen did not go backwards", "onetwo", hostOutput.toString())
+        assertEquals("and was not asked to", emptyList<Long>(), returned)
+        assertEquals(listOf(1L, 2L, 3L), reached)
+        val answers = transport.tick(1_400) + transport.tick(1_500)
+        assertEquals(3L, ours(answers.first()).ackNumber)
+    }
+
+    @Test fun `two frames arriving the wrong way round leave the newer one in place`() {
+        handshake()
+        canReturnTo.add(1)
+        // Both diffed against state 1, which is what a far end does while it waits to hear which
+        // state we hold: the second is a newer picture of the same screen.
+        val second = fromServer(now = 1_100, oldNumber = 1, newNumber = 2, diff = hostBytes("half"))
+        val third = fromServer(now = 1_150, oldNumber = 1, newNumber = 3, diff = hostBytes("whole"))
+        // They overtake each other on the way. Nothing is wrong with the network: this is UDP.
+        transport.onDatagram(third, 1_200)
+        assertEquals("whole", hostOutput.toString())
+        assertEquals(MoshTransport.Arrival.Duplicate, transport.onDatagram(second, 1_210))
+        assertEquals("the older picture was not drawn over the newer one", "whole", hostOutput.toString())
+        assertEquals(listOf(1L, 3L), reached)
+        val said = transport.tick(1_300) + transport.tick(1_400)
+        assertEquals("and we still say we are at 3", 3L, ours(said.first()).ackNumber)
+    }
+
+    @Test fun `a datagram that does not authenticate is not even an arrival`() {
+        handshake()
+        val junk = ByteArray(40) { 7 }
+        assertEquals(MoshTransport.Arrival.Stray, transport.onDatagram(junk, 1_100))
+        assertEquals(1, transport.strayDatagrams)
+    }
+
     @Test fun `every state we accept is acknowledged without waiting for the heartbeat`() {
         handshake()
         // Even one that carried nothing to show. Mosh marks only a *data* acknowledgement owed and

@@ -58,6 +58,47 @@ class MoshOutOfContactTest {
         transport.close()
     }
 
+    @Test fun `a stranger answering from the server's address is not contact`() = runBlocking {
+        // A socket standing in for the server: it answers every datagram the client sends with
+        // bytes that were not made with the session key. The source address is right, which is
+        // all an attacker on the path has to manage, and it used to be all we checked — so the
+        // session committed to mosh on the strength of it instead of falling back to SSH, and a
+        // steady trickle of the same rubbish could then keep it from ever timing out.
+        val stranger = java.nio.channels.DatagramChannel.open()
+        stranger.bind(java.net.InetSocketAddress("127.0.0.1", 0))
+        val port = (stranger.localAddress as java.net.InetSocketAddress).port
+        val transport = MoshTerminalTransport(
+            MoshBootstrap("127.0.0.1", port, com.sshborg.mosh.MoshVectors.SESSION_KEY),
+            silenceLimitMs = SILENCE_LIMIT,
+        ) { _, _ -> }
+
+        val end = async(Dispatchers.IO) { transport.read { _, _ -> } }
+        val answering = async(Dispatchers.IO) {
+            val buffer = java.nio.ByteBuffer.allocate(2048)
+            runCatching {
+                while (true) {
+                    buffer.clear()
+                    val from = stranger.receive(buffer) ?: continue
+                    stranger.send(java.nio.ByteBuffer.wrap(ByteArray(64) { 9 }), from)
+                }
+            }
+        }
+        transport.start()
+
+        assertFalse(
+            "rubbish from the right address is not an answer",
+            transport.awaitFirstContact(timeoutMs = SILENCE_LIMIT / 2),
+        )
+        val reason = withTimeoutOrNull(SILENCE_LIMIT * 4) { end.await() }
+        assertTrue(
+            "a session nobody authentic is talking to must still time out",
+            reason is TerminalTransport.End.Lost,
+        )
+        stranger.close()
+        answering.cancel()
+        transport.close()
+    }
+
     @Test fun `nothing is counted before the loop is running`() = runBlocking {
         val nowhere = MoshBootstrap("127.0.0.1", 60998, com.sshborg.mosh.MoshVectors.SESSION_KEY)
         val transport = MoshTerminalTransport(nowhere, silenceLimitMs = SILENCE_LIMIT) { _, _ -> }

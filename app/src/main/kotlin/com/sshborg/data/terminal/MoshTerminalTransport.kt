@@ -543,16 +543,28 @@ class MoshTerminalTransport(
                 buffer.flip()
                 val datagram = ByteArray(buffer.remaining())
                 buffer.get(datagram)
-                lastHeard = now
-                if (_outOfContactSeconds.value != 0) _outOfContactSeconds.value = 0
-                firstContact.complete(true)
-                try {
+                // Nothing is believed yet. The address a datagram came from is a claim and not a
+                // proof: an open UDP port can be written to by anyone who can put the server's
+                // address on a packet, and what we do with this one decides whether mosh is used
+                // at all — [awaitFirstContact] is what the gate waits for — and whether a session
+                // that has actually gone silent is allowed to time out. So the decision waits for
+                // the key.
+                val arrival = try {
                     mosh.onDatagram(datagram, now)
                 } catch (_: MoshProtocolException) {
                     // Someone else's packet, a damaged one, or our own played back at us. Dropping
                     // it is the whole response — anyone can send us a datagram — but it is counted,
                     // because a session where this is not zero is worth knowing about.
                     protocolErrors++
+                    MoshTransport.Arrival.Stray
+                }
+                // Only a datagram that opened under our key and had never arrived before. A
+                // replayed one proves nothing it did not already prove when it was new, and a
+                // stray one proves nothing at all.
+                if (arrival == MoshTransport.Arrival.Fresh) {
+                    lastHeard = now
+                    if (_outOfContactSeconds.value != 0) _outOfContactSeconds.value = 0
+                    firstContact.complete(true)
                 }
                 if (send(mosh.tick(now))) broken = true
             }

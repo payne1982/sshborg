@@ -58,6 +58,21 @@ class MoshTransport(
         fun onReturnToState(number: Long): Boolean = false
     }
 
+    /**
+     * What an arriving datagram turned out to be, for the layer that owns the socket: it is the
+     * difference between hearing from the server and merely hearing *something*.
+     */
+    enum class Arrival {
+        /** Did not open under our key. Anyone can send one, and it says nothing about anything. */
+        Stray,
+
+        /** Opened, but its sequence number is not ahead of what we have seen: a copy of the past. */
+        Duplicate,
+
+        /** Opened under our key and never seen before. The only kind that proves the far end is there. */
+        Fresh,
+    }
+
     private class SentState(var timestamp: Long, val number: Long, val actionCount: Long)
 
     private val sequence = MoshSequence()
@@ -140,6 +155,14 @@ class MoshTransport(
 
     private var ackNumber = 0L
     private var heldState = 0L
+
+    /**
+     * The newest state ever applied to the screen, which is not always the one we hold: a frame
+     * diffed against an older state puts the screen back before drawing on top, and [heldState]
+     * goes with it. This one only ever goes up, and it is what decides whether an arriving frame
+     * has anything to tell us.
+     */
+    private var highestState = 0L
     private var pendingDataAck = false
 
     private var lastHeard = 0L
@@ -245,13 +268,16 @@ class MoshTransport(
      * A datagram that did not authenticate is dropped here and tallied in [strayDatagrams]: anyone
      * can send one, and it says nothing about the session.
      *
+     * @return what it was, so that the caller can tell the one kind that proves there is a far
+     *   end from the two kinds that anybody could have sent. Liveness, first contact and the
+     *   roaming all hang on that difference, and the address a datagram arrived from is not it.
      * @throws MoshProtocolException if the datagram *did* authenticate and is still not usable —
      *   our own traffic played back, or an instruction we cannot parse. That came from the real
      *   peer, so the reason is worth having. Either way the caller carries on: it is not a reason
      *   to end the session.
      */
-    fun onDatagram(datagram: ByteArray, now: Long) {
-        val opened = crypto.open(datagram) ?: run { strayDatagrams++; return }
+    fun onDatagram(datagram: ByteArray, now: Long): Arrival {
+        val opened = crypto.open(datagram) ?: run { strayDatagrams++; return Arrival.Stray }
         receivedDatagrams++
         val sequence = opened.nonce.sequence
         if (highestSequence >= 0 && sequence > highestSequence + 1) {
@@ -266,7 +292,7 @@ class MoshTransport(
             lastHeard = now
         }
 
-        val payload = assembly.add(MoshFragment.decode(packet.payload)) ?: return
+        val payload = assembly.add(MoshFragment.decode(packet.payload)) ?: return arrival(fresh)
         val instruction = MoshInstruction.decode(payload)
 
         processAcknowledgement(instruction.ackNumber, now)
@@ -277,10 +303,20 @@ class MoshTransport(
             counterpartyShutdown = true
             ackNumber = SHUTDOWN_NUMBER
             pendingDataAck = true
-            return
+            return arrival(fresh)
         }
-        // Already applied: the duplicate of a frame we have is not an error, it is a retransmission.
-        if (instruction.newNumber == heldState) return
+        // Nothing newer than what the screen has already been: a retransmission, a duplicate, or
+        // a datagram that overtook its neighbour on the way here. The replay filter hands all of
+        // those on deliberately, because being idempotent about them is *this* layer's job — and
+        // until this rule existed it was not. A frame diffed against a state the screen could
+        // still be put back to was applied on top of it, so two frames arriving the wrong way
+        // round took the screen **backwards**, and anybody able to copy one datagram back onto
+        // the wire could do the same on purpose, with no key and no forgery. Mosh's own client
+        // keeps the states in order and never makes an old one current, for this reason.
+        //
+        // Unsigned, because a state number is a uint64 on the wire. The shutdown number is the
+        // largest of them and is dealt with above, before this can refuse it.
+        if (java.lang.Long.compareUnsigned(instruction.newNumber, highestState) <= 0) return arrival(fresh)
         // We keep one state, the live terminal. A diff against anything else is unusable, and
         // applying it would corrupt the screen — but the server is sending it because it does not
         // yet know which state we hold, and it will go on sending it at frame rate until it does.
@@ -304,7 +340,7 @@ class MoshTransport(
                 // moving.
                 pendingDataAck = true
                 nextAckTime = now
-                return
+                return arrival(fresh)
             }
         }
 
@@ -318,6 +354,7 @@ class MoshTransport(
             }
         }
         heldState = instruction.newNumber
+        highestState = instruction.newNumber
         ackNumber = instruction.newNumber
         listener.onStateReached(instruction.newNumber)
         // Every state we accept is worth saying so about, and within [ACK_DELAY] rather than
@@ -327,7 +364,10 @@ class MoshTransport(
         // screen instead of thrown away. We keep one screen and throw the frame away, so being
         // slow to say where we are is the one thing we cannot afford.
         pendingDataAck = true
+        return arrival(fresh)
     }
+
+    private fun arrival(fresh: Boolean) = if (fresh) Arrival.Fresh else Arrival.Duplicate
 
     // ─────────────────────────── the sender ───────────────────────────
 
