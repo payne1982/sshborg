@@ -402,7 +402,12 @@ fun AddEditHostScreen(
             // somebody else's server, so none of them can be decided here. They belong to the
             // machine that runs mosh-server, which is why a chain walked from a bastion reads
             // the bastion's own three answers and never these.
-            if (mosh) {
+            //
+            // Hidden with the chain for the same reason the box shows empty: the switch is off as
+            // far as this row is concerned, and three settings for a session that will not happen
+            // read as a promise. The values themselves are kept, so clearing the chain brings
+            // them back as they were.
+            if (mosh && !jumpConfigured) {
                 HorizontalDivider()
                 Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
 
