@@ -60,7 +60,6 @@
     <string name="host_mosh_disabled_with_jump">Not available with a jump host</string>
     <string name="host_mosh_via_bastion">Terminal: Mosh to %1$s, then ssh to this host. SFTP uses the whole chain.</string>
     <string name="host_jump_mosh_chain">Mosh is on for this host, so no chain. For a bastion, turn Mosh off and pick a first hop that has Mosh.</string>
-    <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatic</string>
     <string name="host_mosh_family_ipv4">Prefer IPv4</string>

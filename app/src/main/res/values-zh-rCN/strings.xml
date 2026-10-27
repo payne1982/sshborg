@@ -59,7 +59,6 @@
     <string name="host_mosh_disabled_with_jump">有跳板机时不可用</string>
     <string name="host_mosh_via_bastion">终端：先用 Mosh 连到 %1$s，再用 ssh 进入此主机。SFTP 使用完整跳板链。</string>
     <string name="host_jump_mosh_chain">此主机已启用 Mosh，因此不使用跳板链。若要经过跳板机，请关闭 Mosh 并把第一跳选为启用 Mosh 的主机。</string>
-    <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自动</string>
     <string name="host_mosh_family_ipv4">优先 IPv4</string>

@@ -58,7 +58,6 @@
     <string name="host_mosh_disabled_with_jump">No disponible con un host de salto</string>
     <string name="host_mosh_via_bastion">Terminal: Mosh hasta %1$s y luego ssh hasta este host. El SFTP usa toda la cadena.</string>
     <string name="host_jump_mosh_chain">Mosh está activado en este host, así que no hay cadena. Para un bastión, desactiva Mosh y elige un primer salto con Mosh.</string>
-    <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automático</string>
     <string name="host_mosh_family_ipv4">Preferir IPv4</string>

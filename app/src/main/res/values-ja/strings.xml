@@ -59,7 +59,6 @@
     <string name="host_mosh_disabled_with_jump">踏み台ホストがあるときは使えません</string>
     <string name="host_mosh_via_bastion">端末: Mosh で %1$s まで、そこから ssh でこのホストへ。SFTP は経路全体を使います。</string>
     <string name="host_jump_mosh_chain">このホストは Mosh が有効なので経路は使いません。踏み台を使うには Mosh を外し、最初の踏み台に Mosh のホストを選んでください。</string>
-    <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自動</string>
     <string name="host_mosh_family_ipv4">IPv4 を優先</string>

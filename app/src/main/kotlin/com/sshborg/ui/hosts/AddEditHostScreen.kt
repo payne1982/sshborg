@@ -212,83 +212,38 @@ fun AddEditHostScreen(
                     }
                 }
             }
-            // The colour and the mosh switch share a line. They have nothing to do with each
-            // other; the colour row simply left the right half of its line empty, and that is
-            // where the switch was asked for.
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showHostColorDialog = true }
+                    .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { showHostColorDialog = true }
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    val groupColor = groups.find { it.id == groupId }?.color
-                    val shownColor = hostColor ?: groupColor
-                    Box(
-                        Modifier
-                            .size(28.dp)
-                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
-                            .padding(3.dp)
-                            .then(
-                                if (shownColor != null)
-                                    Modifier.background(Color(shownColor), CircleShape)
-                                else Modifier
-                            )
-                    )
-                    Column {
-                        Text(stringResource(R.string.host_color_label), style = MaterialTheme.typography.bodyLarge)
-                        Text(
-                            stringResource(
-                                if (hostColor != null) R.string.host_color_custom
-                                else R.string.host_color_auto
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                val groupColor = groups.find { it.id == groupId }?.color
+                val shownColor = hostColor ?: groupColor
+                Box(
+                    Modifier
+                        .size(28.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                        .padding(3.dp)
+                        .then(
+                            if (shownColor != null)
+                                Modifier.background(Color(shownColor), CircleShape)
+                            else Modifier
                         )
-                    }
-                }
-                // The whole row stops responding when a jump chain is configured, not only the
-                // box: a tap on the label must not be able to turn on what the box refuses, and
-                // the line underneath says why it does.
-                Row(
-                    modifier = Modifier
-                        .clickable(enabled = !jumpConfigured) { vm.mosh.value = !mosh }
-                        .padding(vertical = 8.dp, horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(
-                        checked = mosh && !jumpConfigured,
-                        onCheckedChange = { vm.mosh.value = it },
-                        enabled = !jumpConfigured,
-                    )
-                    Column {
-                        Text(
-                            stringResource(R.string.host_mosh_label),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (jumpConfigured) MaterialTheme.colorScheme.onSurfaceVariant
-                            else MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            stringResource(R.string.host_mosh_experimental),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-            // Why the box will not move, and nothing else. What happens *instead* depends on
-            // the first hop, so it is said where the first hop is chosen rather than twice.
-            if (jumpConfigured) {
-                Text(
-                    stringResource(R.string.host_mosh_disabled_with_jump),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Column {
+                    Text(stringResource(R.string.host_color_label), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(
+                            if (hostColor != null) R.string.host_color_custom
+                            else R.string.host_color_auto
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             HorizontalDivider()
@@ -398,19 +353,63 @@ fun AddEditHostScreen(
                 Text(stringResource(R.string.host_allow_legacy_ciphers))
             }
 
+            // Mosh, immediately above the three settings it reveals and immediately above the
+            // jump-host section whose first hop can change what it does. It used to share the
+            // colour's line, which had two faults: a supporting line for a control on the right
+            // starts at the left margin, under the colour, and reads as the colour's; and a
+            // switch four sections above the fields it opens is a switch whose effect happens
+            // out of sight. The colour's line was only ever lent to it because its right half
+            // was empty.
+            //
+            // The whole row stops responding when a jump chain is configured, not only the
+            // switch: a tap on the label must not be able to turn on what the switch refuses,
+            // and the line underneath says why it does.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = !jumpConfigured) { vm.mosh.value = !mosh },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Switch(
+                    checked = mosh && !jumpConfigured,
+                    onCheckedChange = { vm.mosh.value = it },
+                    enabled = !jumpConfigured,
+                )
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(
+                        stringResource(R.string.host_mosh_label),
+                        color = if (jumpConfigured) MaterialTheme.colorScheme.onSurfaceVariant
+                        else MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        stringResource(R.string.host_mosh_experimental),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    // Why the switch will not move, and nothing else. What happens *instead*
+                    // depends on the first hop, so it is said where the first hop is chosen.
+                    if (jumpConfigured) {
+                        Text(
+                            stringResource(R.string.host_mosh_disabled_with_jump),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
             // The three things about a mosh session that depend on somebody else's network and
             // somebody else's server, so none of them can be decided here. They belong to the
             // machine that runs mosh-server, which is why a chain walked from a bastion reads
             // the bastion's own three answers and never these.
             //
-            // Hidden with the chain for the same reason the box shows empty: the switch is off as
-            // far as this row is concerned, and three settings for a session that will not happen
-            // read as a promise. The values themselves are kept, so clearing the chain brings
-            // them back as they were.
+            // No heading: the switch above them is the heading, and a divider between the two
+            // would put the settings in a section of their own when they belong to it. Hidden
+            // with the chain for the same reason the switch shows off — three settings for a
+            // session that will not happen read as a promise — while the values themselves are
+            // kept, so clearing the chain brings them back as they were.
             if (mosh && !jumpConfigured) {
-                HorizontalDivider()
-                Text(stringResource(R.string.host_section_mosh), style = MaterialTheme.typography.titleSmall)
-
                 HostChoiceField(
                     label = stringResource(R.string.host_mosh_family_label),
                     selected = moshFamily,

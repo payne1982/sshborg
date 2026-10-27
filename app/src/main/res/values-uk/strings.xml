@@ -58,7 +58,6 @@
     <string name="host_mosh_disabled_with_jump">Недоступно з проміжним хостом</string>
     <string name="host_mosh_via_bastion">Термінал: через Mosh до %1$s, далі через ssh до цього хоста. SFTP використовує весь ланцюжок.</string>
     <string name="host_jump_mosh_chain">На цьому хості увімкнено Mosh, тому ланцюжка немає. Для бастіона вимкніть Mosh і виберіть першим хостом той, де увімкнено Mosh.</string>
-    <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Автоматично</string>
     <string name="host_mosh_family_ipv4">Надавати перевагу IPv4</string>
