@@ -92,6 +92,7 @@ class MoshFragmentAssembly {
     private var total = -1
     private var delivered = false
     private var fragments = arrayOfNulls<MoshFragment>(0)
+    private var bytesHeld = 0
 
     /** How many fragments the largest instruction we have assembled was split into. */
     var largestAssembly = 0
@@ -115,8 +116,32 @@ class MoshFragmentAssembly {
             total = -1
             delivered = false
             fragments = arrayOfNulls(INITIAL_SLOTS)
+            bytesHeld = 0
         }
-        if (fragment.final) total = fragment.number + 1
+        // The last fragment is what says how many there are, so it is also the only thing that
+        // can contradict itself. Two different answers for one id means the pieces on the floor
+        // belong to two instructions, and no amount of waiting will make them into one.
+        if (fragment.final) {
+            val announced = fragment.number + 1
+            if (total >= 0 && total != announced) {
+                throw MoshProtocolException("id ${fragment.id} has two different last fragments")
+            }
+            total = announced
+            // And a piece already held above it, which is the same contradiction arriving in the
+            // other order: it was taken in while the total was unknown.
+            for (i in announced until fragments.size) {
+                if (fragments[i] != null) {
+                    throw MoshProtocolException("id ${fragment.id} holds a fragment past its last one")
+                }
+            }
+        }
+        // A piece numbered past the last one. Harmless to drop, and not harmless to keep: it
+        // would be counted among the pieces that have arrived while the hole it does not fill
+        // stays open, which is how a count that adds up came to sit on top of a missing
+        // fragment 0 — and the assembly then dereferenced it.
+        if (total >= 0 && fragment.number >= total) {
+            throw MoshProtocolException("fragment ${fragment.number} of id ${fragment.id} is past its last one")
+        }
         if (fragment.number >= fragments.size) {
             fragments = fragments.copyOf(maxOf(fragment.number + 1, fragments.size * 2))
         }
@@ -124,10 +149,21 @@ class MoshFragmentAssembly {
         if (held == null) {
             fragments[fragment.number] = fragment
             arrived++
+            // What is being held for an instruction nobody has finished sending. The 4 MiB
+            // ceiling on an instruction applies to the decompressed bytes and therefore only
+            // after assembly; with fifteen bits of fragment numbers to fill, there is room for
+            // many times that much to sit here waiting for a last fragment that never comes.
+            bytesHeld += fragment.contents.size
+            if (bytesHeld > MAX_HELD_BYTES) {
+                throw MoshProtocolException("id ${fragment.id} is holding more than $MAX_HELD_BYTES bytes unassembled")
+            }
         } else if (!held.contents.contentEquals(fragment.contents)) {
             conflictingFragments++
         }
-        if (total < 0 || arrived != total || delivered) return null
+        if (total < 0 || arrived < total || delivered) return null
+        // A count of pieces is not the same as having the right ones. Every rule above exists to
+        // keep those two in step; this is the one that does not have to be believed.
+        if ((0 until total).any { fragments[it] == null }) return null
         delivered = true
         if (total > largestAssembly) largestAssembly = total
 
@@ -144,6 +180,13 @@ class MoshFragmentAssembly {
 
     private companion object {
         const val INITIAL_SLOTS = 8
+
+        /**
+         * How much unassembled payload one instruction may have waiting. An instruction is a
+         * screen's worth of differences, so this is already far above anything a real one needs,
+         * and the point is only that the number exists.
+         */
+        const val MAX_HELD_BYTES = 4 * 1024 * 1024
     }
 }
 

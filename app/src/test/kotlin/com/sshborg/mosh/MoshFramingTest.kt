@@ -5,6 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 
 /** Timestamps, fragment headers and reassembly, checked against a plaintext mosh really sent. */
@@ -73,6 +74,51 @@ class MoshFramingTest {
         // The sender moved on; what we were holding is of no use any more.
         val done = assembly.add(MoshFragment(id = 2, number = 0, final = true, contents = byteArrayOf(2)))
         assertArrayEquals(byteArrayOf(2), done)
+    }
+
+    @Test fun `a count of pieces is not the same as having them`() {
+        val assembly = MoshFragmentAssembly()
+        // Piece 2 of an instruction whose end has not arrived: the total is still unknown.
+        assertNull(assembly.add(MoshFragment(id = 9, number = 2, final = false, contents = byteArrayOf(2))))
+        // Then a piece that says it is the last and is numbered 1. Two pieces have arrived and the
+        // total is two, so the count agrees — on top of a hole where piece 0 should be, which the
+        // assembly then walked into. Under our key, so it needs a server that is hostile or
+        // broken; either way the answer is a protocol error and not a crash in the session loop.
+        try {
+            assembly.add(MoshFragment(id = 9, number = 1, final = true, contents = byteArrayOf(1)))
+            fail("a total that leaves a piece above it should be refused")
+        } catch (e: MoshProtocolException) {
+            assertTrue("the reason should name the piece: ${e.message}", e.message!!.contains("past its last one"))
+        }
+    }
+
+    @Test fun `two different answers about which piece is the last are refused`() {
+        val assembly = MoshFragmentAssembly()
+        assertNull(assembly.add(MoshFragment(id = 4, number = 0, final = false, contents = byteArrayOf(0))))
+        try {
+            assembly.add(MoshFragment(id = 4, number = 5, final = true, contents = byteArrayOf(5)))
+            assembly.add(MoshFragment(id = 4, number = 9, final = true, contents = byteArrayOf(9)))
+            fail("one id cannot have two last fragments")
+        } catch (e: MoshProtocolException) {
+            assertTrue(e.message!!.contains("two different last fragments"))
+        }
+    }
+
+    @Test fun `pieces arriving out of order still assemble`() {
+        // The rules above must not have cost this: reordering is ordinary on UDP, and the last
+        // piece arriving first is how the total becomes known early.
+        // Random bytes, because the fragmenter splits the *compressed* instruction and anything
+        // with a pattern in it deflates down to one piece.
+        val diff = ByteArray(2000).also { java.util.Random(7).nextBytes(it) }
+        val instruction = MoshInstruction(oldNumber = 1, newNumber = 2, diff = diff)
+        val fragments = MoshFragmenter().fragments(instruction, budget = 120)
+        assertTrue("the test needs several pieces", fragments.size >= 4)
+        val assembly = MoshFragmentAssembly()
+        var payload: ByteArray? = null
+        for (fragment in listOf(fragments.last()) + fragments.dropLast(1).reversed()) {
+            payload = assembly.add(fragment) ?: payload
+        }
+        assertArrayEquals(instruction.diff, MoshInstruction.decode(payload!!).diff)
     }
 
     @Test fun `the id advances for a new instruction and holds for a retransmission`() {
