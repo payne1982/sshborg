@@ -1166,8 +1166,13 @@ class SftpSession(
     fun listDir(path: String): List<SftpEntry> {
         val base = path.trimEnd('/')
         val raw = op { it.ls(path) } as Collection<com.jcraft.jsch.ChannelSftp.LsEntry>
+        // `.` and `..` are in every listing and are simply not shown; anything else that is not
+        // a plain name is a server answering with a path where a name belongs, which is counted
+        // out loud because it should never happen. See [SftpNames].
+        val odd = raw.count { !SftpNames.isPlain(it.filename) && it.filename != "." && it.filename != ".." }
+        if (odd > 0) android.util.Log.w("SftpSession", "$odd entries were not plain names and were left out")
         return raw
-            .filter { it.filename != "." && it.filename != ".." }
+            .filter { SftpNames.isPlain(it.filename) }
             .map { e ->
                 // lstat returns the symlink's own attrs, not the target's.
                 // For symlinks we call stat() so isDir correctly reflects the target type.
@@ -1227,6 +1232,11 @@ class SftpSession(
     /**
      * Reads [remotePath] whole into memory, for the editor. Checks the size first and refuses
      * anything over [limit]: a file too big to edit is also too big to be worth downloading.
+     *
+     * The declared size is checked, and then the arriving bytes are counted against the same
+     * limit — because the first number is the server's word and the second is our memory. A file
+     * that grew between the two, or a server that answers `stat` with whatever it likes, stops at
+     * the limit instead of filling the heap.
      */
     fun readFile(
         remotePath: String,
@@ -1236,8 +1246,36 @@ class SftpSession(
         val size = op { it.stat(remotePath) }.size
         if (size > limit) throw FileTooLargeException(size, limit)
         val out = java.io.ByteArrayOutputStream(size.coerceIn(0L, limit).toInt())
-        downloadFile(remotePath, out, onProgress)
+        try {
+            downloadFile(remotePath, CountedStream(out, limit), onProgress)
+        } catch (e: Exception) {
+            // JSch wraps what a stream throws at it, so the reason has to be fished back out of
+            // the chain to be reported as the limit it is rather than as a transfer failure.
+            var cause: Throwable? = e
+            while (cause != null) {
+                if (cause is TooMuchArriving) throw FileTooLargeException(cause.got, limit)
+                cause = cause.cause
+            }
+            throw e
+        }
         return out.toByteArray()
+    }
+
+    private class TooMuchArriving(val got: Long) : java.io.IOException("more bytes than the limit allows")
+
+    /** Passes bytes on until there have been more than [limit] of them. */
+    private class CountedStream(
+        private val sink: java.io.OutputStream,
+        private val limit: Long,
+    ) : java.io.OutputStream() {
+        private var written = 0L
+        override fun write(b: Int) { count(1); sink.write(b) }
+        override fun write(b: ByteArray, off: Int, len: Int) { count(len.toLong()); sink.write(b, off, len) }
+        override fun flush() = sink.flush()
+        private fun count(n: Long) {
+            written += n
+            if (written > limit) throw TooMuchArriving(written)
+        }
     }
 
     /**
@@ -1249,23 +1287,61 @@ class SftpSession(
      * server offers it (OpenSSH always does) — one atomic step, and the original survives if it
      * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there
      * we write in place instead rather than delete the original and hope.
+     *
+     * ### Why the name is random and the mode comes first
+     *
+     * The temporary used to be `.<name>.sshborg-tmp`, which is a name anyone can work out in
+     * advance. In a directory a second account can write to — a shared project, a group-writable
+     * folder — that account could leave a symlink waiting under that name, and SFTP's write
+     * follows it: saving a file here would have truncated a file somewhere else, chosen by
+     * somebody else, with our own access. An unguessable name is the part of that we can fix.
+     *
+     * It is a mitigation and not a guarantee, and the difference is worth writing down: the
+     * guarantee would be creating the file exclusively, which is `SSH_FXF_EXCL` in the protocol
+     * and is not reachable through the SFTP client we use — `put` offers overwrite, resume and
+     * append, and nothing else. So the name is made unpredictable, the name is checked to be free
+     * first, and that is as far as this goes.
+     *
+     * The permissions are put on the empty file before its contents go in, which costs one small
+     * round trip and closes a different window: the temporary was being created with the server's
+     * default mode, so the whole of a 0600 file passed through a world-readable name under an
+     * umask of 022. A mode we fail to set is a save that does not happen, rather than one that
+     * quietly widens the file it is saving.
      */
     fun writeFile(remotePath: String, bytes: ByteArray) {
         val slash = remotePath.lastIndexOf('/')
         val dir = if (slash <= 0) "" else remotePath.substring(0, slash)
         val name = remotePath.substring(slash + 1)
-        val temp = "$dir/.$name.sshborg-tmp"
         val mode = runCatching { op { it.stat(remotePath) }.permissions }.getOrNull()
+        val suffix = ByteArray(9).also { java.security.SecureRandom().nextBytes(it) }
+            .joinToString("") { "%02x".format(it) }
+        val temp = "$dir/.$name.$suffix.sshborg-tmp"
+        if (runCatching { op { it.stat(temp) } }.isSuccess) {
+            throw java.io.IOException("the temporary file $temp already exists")
+        }
 
+        // A file whose own mode we could not read is written owner-only: we have just read this
+        // file, so it barely happens, and that is the safe way for it to be wrong.
+        val wanted = mode ?: OWNER_ONLY
         try {
+            // Empty first, then the mode, then the contents.
+            uploadFile(java.io.ByteArrayInputStream(ByteArray(0)), temp)
+            if (!isWearing(temp, wanted)) {
+                runCatching { op { it.chmod(wanted, temp) } }
+                // Asked for, and then looked at. A server that cannot change a mode at all — a
+                // filesystem without them, where every file reads back as the same thing — is
+                // already wearing it and never gets here; one that failed for any other reason
+                // would otherwise write the contents under whatever the umask chose, which is
+                // how a 0600 file came to pass through a readable name in the first place.
+                if (!isWearing(temp, wanted)) {
+                    throw java.io.IOException("$temp could not be given the file's own permissions")
+                }
+            }
             uploadFile(java.io.ByteArrayInputStream(bytes), temp)
         } catch (e: Exception) {
             runCatching { op { it.rm(temp) } }
             throw e
         }
-        // The temporary file is created with the server's default mode; give it the original's
-        // before the swap, or saving would quietly clear an executable bit or widen a 0600 file.
-        if (mode != null) runCatching { op { it.chmod(mode, temp) } }
         try {
             op { it.rename(temp, remotePath) }
         } catch (e: com.jcraft.jsch.SftpException) {
@@ -1274,6 +1350,18 @@ class SftpSession(
             runCatching { op { it.rm(temp) } }
         }
     }
+
+    /** Whether [remotePath]'s permission bits are already the ones in [mode]. */
+    private fun isWearing(remotePath: String, mode: Int): Boolean =
+        runCatching { op { it.stat(remotePath) }.permissions }
+            .getOrNull()
+            ?.let { (it and PERMISSION_BITS) == (mode and PERMISSION_BITS) } ?: false
+
+    /** `0600`, for a temporary whose original mode could not be read. */
+    private val OWNER_ONLY = 0b110_000_000
+
+    /** The low twelve bits: the mode itself, without the bits that say what kind of file it is. */
+    private val PERMISSION_BITS = 0b111_111_111_111
 
     fun deleteFile(remotePath: String) = op { it.rm(remotePath) }
     fun deleteDir(remotePath: String)  = op { it.rmdir(remotePath) }
