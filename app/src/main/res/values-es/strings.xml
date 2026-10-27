@@ -125,7 +125,7 @@
     <string name="host_jump_select_placeholder">Seleccionar host…</string>
     <string name="host_jump_add">Añadir jump host</string>
     <string name="host_jump_no_password">Sin contraseña guardada</string>
-    <string name="host_jump_needs_key">Necesita una clave: más allá del bastión inicia sesión él</string>
+    <string name="host_jump_mosh_no_password">La autenticación por contraseña no se admite con Mosh</string>
     <string name="host_section_port_forwarding">Reenvío de puertos</string>
     <string name="host_field_port_forwarding">Reglas de reenvío (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

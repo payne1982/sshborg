@@ -125,7 +125,7 @@
     <string name="host_jump_select_placeholder">Sélectionner un hôte…</string>
     <string name="host_jump_add">Ajouter un jump host</string>
     <string name="host_jump_no_password">Aucun mot de passe enregistré</string>
-    <string name="host_jump_needs_key">Nécessite une clé : au-delà du bastion, c’est lui qui se connecte</string>
+    <string name="host_jump_mosh_no_password">L’authentification par mot de passe n’est pas prise en charge avec Mosh</string>
     <string name="host_section_port_forwarding">Transfert de port</string>
     <string name="host_field_port_forwarding">Règles de transfert (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

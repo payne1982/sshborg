@@ -288,6 +288,9 @@ fun AddEditHostScreen(
                 val bastion = moshBastion
                 Text(
                     if (bastion == null) stringResource(R.string.host_mosh_no_jump)
+                    // A chain that reaches a mosh bastion but cannot carry this host's password
+                    // on from there. Said instead of the sentence promising that it works.
+                    else if (!useKey) stringResource(R.string.host_jump_mosh_no_password)
                     else stringResource(R.string.host_mosh_via_bastion, bastion.label),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -453,6 +456,16 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
+            // The combination the picker refuses to build, said out loud for the one way it can
+            // still come about: the hop was chosen first and the auth switched to a password
+            // afterwards. In the colour of something to fix, because it is.
+            if (!useKey && moshBastion != null) {
+                Text(
+                    stringResource(R.string.host_jump_mosh_no_password),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             // With mosh on the chain is not tunnelled: it is walked from its first hop, which
             // therefore has to be a host of yours that has mosh of its own. Said here and not
             // only next to the switch, because this is the section where that hop is chosen.
@@ -508,9 +521,15 @@ fun AddEditHostScreen(
                             options          = availableJumpHosts,
                             // Everything past the first hop is dialled by the bastion's own ssh
                             // when that hop carries mosh, and a password saved here never
-                            // reaches it. The first hop itself is ours to dial, so it is not
-                            // held to the same rule.
+                            // reaches it — only a key of its own is any use there.
                             requiresKey      = index > 0 && moshBastion != null,
+                            // The first hop is ours to dial, so a password of its own is fine.
+                            // What it may not do is carry mosh while *this* host logs in with a
+                            // password, because then the password that would never arrive is
+                            // this one. Asked of the radio and not of the field: an empty
+                            // password is about to be typed into it, and a chain chosen in the
+                            // meantime would be the one that stops working.
+                            refuseMosh       = index == 0 && !useKey,
                             onSelect         = { newId ->
                                 vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
                                     .also { it[index] = newId }
@@ -654,6 +673,8 @@ private fun JumpHostRow(
     options: List<AddEditHostViewModel.JumpHostOption>,
     /** True where a saved password is not enough, because this hop is dialled by the bastion. */
     requiresKey: Boolean,
+    /** True where a hop carrying mosh is what cannot be chosen, whatever it can log in with. */
+    refuseMosh: Boolean,
     onSelect: (Long) -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -661,13 +682,17 @@ private fun JumpHostRow(
     val selected = options.find { it.host.id == selectedId }
     val jumpItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
         options.forEach { option ->
-            val usable = option.hasCredentials && (!requiresKey || option.hasKey)
-            // Two different refusals, and saying which one it is matters: one is cured by saving
-            // a password, the other only by a key, and a host that has a password already would
-            // otherwise be greyed out with a line telling it to save one.
+            // Mosh is what rules this hop out, in either direction: a password here that the
+            // bastion could never be handed, or mosh here while this host has a password of its
+            // own that would never be handed on.
+            val moshRefuses = (requiresKey && !option.hasKey) || (refuseMosh && option.host.mosh)
+            val usable = option.hasCredentials && !moshRefuses
+            // Which of the two refusals it is, and mosh comes first: a host with nothing saved
+            // at all would otherwise be told to save a password, when inside a mosh chain a
+            // password is not what it is missing.
             val whyNot = when {
+                moshRefuses -> R.string.host_jump_mosh_no_password
                 !option.hasCredentials -> R.string.host_jump_no_password
-                !option.hasKey -> R.string.host_jump_needs_key
                 else -> null
             }
             DropdownMenuItem(

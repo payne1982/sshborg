@@ -111,3 +111,17 @@ data class HostEntity(
      */
     val moshCommand: String? = null,
 )
+
+/**
+ * True when this host would log in with a password we kept for it, rather than with a key or by
+ * asking at the time.
+ *
+ * An extension and not a property of the entity, so that Room has nothing to wonder about.
+ *
+ * It is the one credential that cannot be lent: a key is lent by the agent and a question is
+ * asked wherever the session happens to be, but a password we hold can only be given to a server
+ * we are talking to ourselves. That is what decides whether a jump chain may be walked from a
+ * mosh bastion, where the login past the bastion is run by the bastion's own ssh.
+ */
+val HostEntity.hasSavedPassword: Boolean
+    get() = keyId == null && (!encryptedPassword.isNullOrEmpty() || !password.isNullOrEmpty())

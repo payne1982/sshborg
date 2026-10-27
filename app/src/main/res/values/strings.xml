@@ -129,7 +129,7 @@
     <string name="host_jump_select_placeholder">Select host…</string>
     <string name="host_jump_add">Add jump host</string>
     <string name="host_jump_no_password">No saved password</string>
-    <string name="host_jump_needs_key">Needs a key: past the bastion the login is its own</string>
+    <string name="host_jump_mosh_no_password">Password authentication is not supported with Mosh</string>
     <string name="host_section_port_forwarding">Port Forwarding</string>
     <string name="host_field_port_forwarding">Forwarding rules (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

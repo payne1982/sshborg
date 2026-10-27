@@ -129,7 +129,7 @@
     <string name="host_jump_select_placeholder">Выберите хост…</string>
     <string name="host_jump_add">Добавить промежуточный хост</string>
     <string name="host_jump_no_password">Пароль не сохранён</string>
-    <string name="host_jump_needs_key">Нужен ключ: за бастионом вход выполняет он сам</string>
+    <string name="host_jump_mosh_no_password">Аутентификация по паролю не поддерживается с Mosh</string>
     <string name="host_section_port_forwarding">Проброс портов</string>
     <string name="host_field_port_forwarding">Правила проброса (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

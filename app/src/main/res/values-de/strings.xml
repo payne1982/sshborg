@@ -125,7 +125,7 @@
     <string name="host_jump_select_placeholder">Host auswählen…</string>
     <string name="host_jump_add">Jump-Host hinzufügen</string>
     <string name="host_jump_no_password">Kein Passwort gespeichert</string>
-    <string name="host_jump_needs_key">Braucht einen Schlüssel: hinter dem Bastion-Host meldet er sich selbst an</string>
+    <string name="host_jump_mosh_no_password">Passwort-Anmeldung wird mit Mosh nicht unterstützt</string>
     <string name="host_section_port_forwarding">Port-Weiterleitung</string>
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
