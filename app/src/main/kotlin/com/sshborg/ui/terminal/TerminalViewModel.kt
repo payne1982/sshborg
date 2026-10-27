@@ -152,7 +152,10 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
      * Volatile because it is armed on the connect's own thread and taken on the main one.
      */
     @Volatile private var pendingHopCommand: String? = null
-    private var hopCommandJob: Job? = null
+    /** Re-armed by every chunk the login prints: it fires once the output has gone quiet. */
+    private var hopQuietJob: Job? = null
+    /** Armed once, and the reason a login that never stops talking is still typed into. */
+    private var hopDeadlineJob: Job? = null
     private var suggestionsUpdateJob: Job? = null
 
     /** Emitted when the remote shell exits cleanly — screen should navigate back automatically. */
@@ -238,7 +241,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 // switch before the prompt it was waiting for came. Here and not up with the rest
                 // of the restored state, because the prompt it waits on has been restored by now
                 // — so a session whose prompt is already known is typed into at once.
-                session.pendingHopCommand?.let { awaitPromptThenType(it) }
+                session.pendingHopCommand?.let { armHopCommand(it) }
             } else {
                 // Session dropped while backgrounded: no exception to catch here, so show JSch's
                 // own last disconnect reason as the summary (falls back to a generic line).
@@ -558,7 +561,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     if (blankRows > 0) synchronized(em) { em.process("\n".repeat(blankRows)) }
                     startReading(made)
-                    hopCommand?.takeIf { via != null }?.let { awaitPromptThenType(it) }
+                    hopCommand?.takeIf { via != null }?.let { armHopCommand(it) }
                     if (prefs.historySuggestions.first()) loadCommandHistory(session)
                     return@launch
                 }
@@ -672,6 +675,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                 onNeedsRedraw?.invoke()
                 detectPromptIfNeeded()
                 scheduleUpdateSuggestions()
+                noteHopOutput()
             }
 
             // Cancelled by background(): the session stays alive and is not ours to end.
@@ -977,28 +981,50 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Types [command] into the session once its shell looks ready for it.
+     * Types [command] into the session once its login has settled.
      *
-     * Ready means the first prompt the detector recognises — the same signal the suggestion bar
-     * waits for — and [HOP_COMMAND_GRACE_MS] is the answer for a prompt it cannot read, since a
-     * shell whose PS1 ends in something that regex has never seen would otherwise never be typed
-     * into at all.
+     * Settled means the output has stopped, not that a prompt has been recognised. Recognising
+     * one is a heuristic over somebody else's PS1 — and ours does not even fire at a bare prompt,
+     * because it wants whitespace after the `$` and the row arrives with its trailing spaces
+     * already gone, so it latches on the first thing typed instead. Waiting for silence needs to
+     * know nothing about the shell: a login that has had nothing to say for
+     * [HOP_COMMAND_QUIET_MS] is ready to be typed into, whatever its prompt looks like.
      *
-     * Typing blind after the grace period costs little: authentication is long over by then, so
-     * the only thing listening is a shell, and a shell keeps a line that arrives while it is
-     * still printing its own greeting. The one thing that must not happen is typing it twice,
-     * which is why the line is taken rather than read.
+     * Three things can trigger it, and the first one wins: the silence, a prompt if the detector
+     * does happen to latch one, and [HOP_COMMAND_GRACE_MS] for a login that never stops printing.
+     * Typing blind costs little anyway — authentication is long over, so the only thing listening
+     * is a shell, and a shell keeps a line that arrives while it is still greeting. The one thing
+     * that must not happen is typing it twice, which is why the line is taken rather than read.
      */
-    private fun awaitPromptThenType(command: String) {
+    private fun armHopCommand(command: String) {
         pendingHopCommand = command
         sessionId?.let { id -> sessionManager.update(id) { it.copy(pendingHopCommand = command) } }
         if (promptDetected) {
             typePendingHopCommand()
             return
         }
-        hopCommandJob?.cancel()
-        hopCommandJob = viewModelScope.launch {
+        hopDeadlineJob?.cancel()
+        hopDeadlineJob = viewModelScope.launch {
             delay(HOP_COMMAND_GRACE_MS)
+            typePendingHopCommand()
+        }
+        // Nothing may ever arrive — a session restored onto a shell that has already finished
+        // saying everything it had to say — so the silence is counted from here too and not only
+        // from the last chunk.
+        noteHopOutput()
+    }
+
+    /**
+     * The login has just printed something, so the silence starts again from now.
+     *
+     * Cheap on purpose: it runs on the path that applies host bytes, and does nothing at all
+     * once the line has been typed.
+     */
+    private fun noteHopOutput() {
+        if (pendingHopCommand == null) return
+        hopQuietJob?.cancel()
+        hopQuietJob = viewModelScope.launch {
+            delay(HOP_COMMAND_QUIET_MS)
             typePendingHopCommand()
         }
     }
@@ -1014,7 +1040,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         val command = pendingHopCommand ?: return
         pendingHopCommand = null
         sessionId?.let { id -> sessionManager.update(id) { it.copy(pendingHopCommand = null) } }
-        hopCommandJob?.cancel()
+        hopQuietJob?.cancel()
+        hopDeadlineJob?.cancel()
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { transport?.write((command + "\n").toByteArray()) }
         }
@@ -1085,10 +1112,19 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         const val MOSH_SERVER_TIMEOUT_SECONDS = 3600
 
         /**
-         * How long a bastion's shell is given to show a prompt we can recognise before the ssh
-         * line is typed into it anyway. Generous on purpose: a login that prints a long greeting
-         * is still a login, and the cost of being early is nil while the cost of never typing it
-         * is a session sitting on the wrong machine.
+         * How long a bastion's login has to say nothing before the ssh line is typed into it.
+         *
+         * Short, because this is the normal path and it is what the wait feels like: a login
+         * prints its greeting in one burst, and a fifth of a second of silence after it is
+         * already a shell waiting for input. Long enough not to fire between two chunks of a
+         * greeting that arrives in pieces.
+         */
+        const val HOP_COMMAND_QUIET_MS = 200L
+
+        /**
+         * The outer limit, for a login that never goes quiet — a greeting that animates, a motd
+         * that tails a log. Generous on purpose: the cost of being early is nil, while the cost
+         * of never typing it is a session sitting on the wrong machine.
          */
         const val HOP_COMMAND_GRACE_MS = 5_000L
 
