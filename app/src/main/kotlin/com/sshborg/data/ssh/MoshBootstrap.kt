@@ -32,6 +32,32 @@ class MoshBootstrap(val host: String, val port: Int, val key: String) {
             return if (from == to) "$from" else "$from:$to"
         }
 
+        /**
+         * What a host asked us to run, when it is a command and not a line of shell.
+         *
+         * The field exists for an account where `mosh-server` is somewhere the login shell's
+         * PATH does not reach, so what belongs in it is a path or a name — and it is interpolated
+         * into `env … $command new …`, which a remote shell then reads. A value carrying `;`, a
+         * substitution or a redirect would therefore run as whatever it says, on the server, with
+         * the account that just logged in.
+         *
+         * Typed by hand into the host's own form, that is nobody's problem but the typist's. It
+         * matters because a host row also arrives by *import*: a backup file is not something a
+         * person reads before applying it, and a field that is quietly a shell is not what anyone
+         * importing a list of servers is agreeing to. So the shape is checked where the value is
+         * used rather than where it was typed, and anything else falls back to the plain default
+         * — the same answer [portRange] gives to a port range it cannot make sense of.
+         *
+         * An absolute path, a bare name, `~/bin/mosh-server`: all fine. A space is not, which
+         * also means no arguments — if those are ever wanted they want a field of their own.
+         */
+        fun serverCommand(asked: String?): String? {
+            val text = asked?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+            return text.takeIf { PLAIN_COMMAND.matches(it) }
+        }
+
+        private val PLAIN_COMMAND = Regex("[A-Za-z0-9._\\-/~+]+")
+
         /** `MOSH CONNECT <port> <key>`, the whole of the handover. */
         val CONNECT_LINE = Regex("MOSH CONNECT (\\d{1,5}) (\\S+)")
 

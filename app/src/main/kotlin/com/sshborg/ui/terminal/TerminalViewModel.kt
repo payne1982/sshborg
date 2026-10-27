@@ -406,9 +406,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                             agentForwarding    = host.agentForwarding || via?.agentForwarding == true,
                             knownHostsEntry    = target.knownHostsEntry,
                             jumpHosts          = jumpHosts,
-                            // The destination's rules, on the bastion's session when there is one.
-                            // They still reach what they named: a forwarding is resolved by the
-                            // far end, and the bastion is on the same side of the door.
+                            // The destination's rules, on the bastion's session — the one session
+                            // SSH still has when the rest of the way is walked by the bastion's
+                            // own client. A rule naming a machine reaches it exactly as before,
+                            // the bastion being on the same side of the door. A rule saying
+                            // `localhost` does not: it is resolved by the far end of the session,
+                            // and that end is now the bastion rather than the host behind it.
                             portForwardings    = parsePortForwardings(host.portForwardings),
                             allowLegacyCiphers = target.allowLegacyCiphers,
                             // Only mosh has a reason to care which family a session is born on,
@@ -710,7 +713,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         val failure = try {
             val handover = session.startMoshServer(
                 networkTimeoutSeconds = MOSH_SERVER_TIMEOUT_SECONDS,
-                command = host.moshCommand?.takeIf { it.isNotBlank() } ?: "mosh-server",
+                command = MoshBootstrap.serverCommand(host.moshCommand) ?: "mosh-server",
                 ports = host.moshPorts,
             )
             // The sink of last resort takes the emulator and nothing else — in particular not

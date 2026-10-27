@@ -72,7 +72,13 @@ object BastionHop {
     private fun bracketed(host: String): String =
         if (host.contains(':') && !host.startsWith("[")) "[$host]" else host
 
+    /**
+     * A name that begins with `-` is read by ssh as an option and not as a name, which is a way
+     * onto the command line that the character whitelist does not close by itself: `-oSomething`
+     * is made only of characters a host name may contain. Nothing legitimate starts with one.
+     */
     private fun isSafe(e: Endpoint): Boolean =
         e.user.isNotBlank() && e.host.isNotBlank() &&
+            !e.user.startsWith("-") && !e.host.startsWith("-") &&
             SAFE.matches(e.user) && SAFE.matches(e.host) && e.port in 1..65535
 }

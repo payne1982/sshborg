@@ -2,6 +2,7 @@ package com.sshborg.data.ssh
 
 import com.sshborg.data.ssh.BastionHop.Endpoint
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
@@ -86,6 +87,22 @@ class BastionHopTest {
             assertNull("host name was accepted: <$name>", BastionHop.compose(Endpoint("alice", name, 22)))
             assertNull("user name was accepted: <$name>", BastionHop.compose(Endpoint(name, "host", 22)))
         }
+    }
+
+    @Test fun `a name ssh would read as an option composes nothing`() {
+        // The character whitelist does not close this one by itself: `-oSomething` is made
+        // entirely of characters a host name may legally contain, and a token beginning with a
+        // dash is an option to the client rather than a machine to reach.
+        for (name in listOf("-oProxyCommand", "-F", "-l", "--", "-")) {
+            assertNull("host name was accepted: <$name>", BastionHop.compose(Endpoint("alice", name, 22)))
+            assertNull("user name was accepted: <$name>", BastionHop.compose(Endpoint(name, "host", 22)))
+            assertNull(
+                "hop was accepted: <$name>",
+                BastionHop.compose(Endpoint("alice", "host", 22), listOf(Endpoint("bob", name, 22))),
+            )
+        }
+        // And a dash anywhere else is an ordinary character in an ordinary name.
+        assertNotNull(BastionHop.compose(Endpoint("alice", "web-01.example.com", 22)))
     }
 
     @Test fun `an unusable hop is as fatal as an unusable target`() {

