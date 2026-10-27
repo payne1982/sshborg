@@ -158,9 +158,15 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         currentStyle = savedStyle
     }
 
-    /** Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom. */
+    /**
+     * Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom.
+     *
+     * More than the region holds is the whole region blanked, and is done as exactly that: the
+     * count arrives from the far end and `CSI 2000000000 S` would otherwise be two billion rows
+     * allocated one at a time with the screen's lock held.
+     */
     fun scrollUp(count: Int = 1) {
-        repeat(count) {
+        repeat(count.coerceIn(0, scrollBottom - scrollTop + 1)) {
             // Push top line into scrollback (never from the alternate screen, which has no
             // history, and never while a repaint drawn for another size is still landing)
             if (altScreen) {
@@ -183,9 +189,9 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         }
     }
 
-    /** Scrolls lines scrollTop..scrollBottom down by count, adding blank lines at top. */
+    /** Scrolls lines scrollTop..scrollBottom down by count, adding blank lines at top. See [scrollUp]. */
     fun scrollDown(count: Int = 1) {
-        repeat(count) {
+        repeat(count.coerceIn(0, scrollBottom - scrollTop + 1)) {
             for (r in scrollBottom downTo scrollTop + 1) {
                 screen[r] = screen[r - 1]
                 screenWrapped[r] = screenWrapped[r - 1]
@@ -197,7 +203,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     /** Inserts [count] blank lines at [row], pushing lines down (bottom lines disappear). */
     fun insertLines(row: Int, count: Int) {
-        val n = count.coerceAtMost(scrollBottom - row + 1)
+        val n = count.coerceIn(0, scrollBottom - row + 1)
         for (r in scrollBottom downTo row + n) {
             screen[r] = screen[r - n]
             screenWrapped[r] = screenWrapped[r - n]
@@ -210,7 +216,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     /** Deletes [count] lines starting at [row], pulling lines up (blank lines added at bottom). */
     fun deleteLines(row: Int, count: Int) {
-        val n = count.coerceAtMost(scrollBottom - row + 1)
+        val n = count.coerceIn(0, scrollBottom - row + 1)
         for (r in row..scrollBottom - n) {
             screen[r] = screen[r + n]
             screenWrapped[r] = screenWrapped[r + n]
@@ -294,7 +300,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     }
 
     fun eraseChars(count: Int) {
-        for (c in cursorCol until (cursorCol + count).coerceAtMost(columns)) {
+        for (c in cursorCol until (cursorCol + count.coerceAtLeast(0)).coerceAtMost(columns)) {
             screen[cursorRow][c] = Cell()
         }
         if (cursorCol + count >= columns) screenWrapped[cursorRow] = false
@@ -303,7 +309,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     fun insertChars(count: Int) {
         val row = screen[cursorRow]
-        val n = count.coerceAtMost(columns - cursorCol)
+        val n = count.coerceIn(0, columns - cursorCol)
         for (c in columns - 1 downTo cursorCol + n) {
             row[c] = row[c - n]
         }
@@ -315,7 +321,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     fun deleteChars(count: Int) {
         val row = screen[cursorRow]
-        val n = count.coerceAtMost(columns - cursorCol)
+        val n = count.coerceIn(0, columns - cursorCol)
         for (c in cursorCol until columns - n) row[c] = row[c + n]
         for (c in columns - n until columns) row[c] = Cell()
         screenWrapped[cursorRow] = false
