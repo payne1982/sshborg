@@ -455,9 +455,9 @@ fun AddEditHostScreen(
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
             // What a chain through a mosh bastion does, said where the hop that decides it is
-            // chosen. Two cases, one line, and neither in the colour of an error: the first is a
-            // saved password that will go unused — which can still come about by choosing the hop
-            // and switching the auth afterwards — and the second is the arrangement working.
+            // chosen. Two cases, one line, and neither of them a warning: with a saved password
+            // on this row the chain is tunnelled exactly as it always was and mosh is simply not
+            // used, and with a key it is walked from the bastion.
             moshBastion?.let { bastion ->
                 Text(
                     if (!useKey) stringResource(R.string.host_jump_mosh_password)
@@ -522,14 +522,7 @@ fun AddEditHostScreen(
                             // Everything past the first hop is dialled by the bastion's own ssh
                             // when that hop carries mosh, and a password saved here never
                             // reaches it — only a key of its own is any use there.
-                            requiresKey      = index > 0 && moshBastion != null,
-                            // The first hop is ours to dial, so a password of its own is fine.
-                            // What it may not do is carry mosh while *this* host logs in with a
-                            // password, because then the password that would never arrive is
-                            // this one. Asked of the radio and not of the field: an empty
-                            // password is about to be typed into it, and a chain chosen in the
-                            // meantime would be the one that stops working.
-                            refuseMosh       = index == 0 && !useKey,
+                            dialledByBastion = index > 0 && moshBastion != null,
                             onSelect         = { newId ->
                                 vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
                                     .also { it[index] = newId }
@@ -671,10 +664,8 @@ private fun JumpHostRow(
     touchless: Boolean,
     selectedId: Long,
     options: List<AddEditHostViewModel.JumpHostOption>,
-    /** True where a saved password is not enough, because this hop is dialled by the bastion. */
-    requiresKey: Boolean,
-    /** True where a hop carrying mosh is what cannot be chosen, whatever it can log in with. */
-    refuseMosh: Boolean,
+    /** True where this hop is dialled by the bastion's own ssh rather than by us. */
+    dialledByBastion: Boolean,
     onSelect: (Long) -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -682,17 +673,18 @@ private fun JumpHostRow(
     val selected = options.find { it.host.id == selectedId }
     val jumpItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
         options.forEach { option ->
-            // Mosh is what rules this hop out, in either direction: a password here that the
-            // bastion could never be handed, or mosh here while this host has a password of its
-            // own that would never be handed on.
-            val moshRefuses = (requiresKey && !option.hasKey) || (refuseMosh && option.host.mosh)
-            val usable = option.hasCredentials && !moshRefuses
-            // Which of the two refusals it is, and mosh comes first: a host with nothing saved
-            // at all would otherwise be told to save a password, when inside a mosh chain a
-            // password is not what it is missing.
-            val whyNot = when {
-                moshRefuses -> R.string.host_jump_mosh_no_password
-                !option.hasCredentials -> R.string.host_jump_no_password
+            // Nothing is refused here for mosh's sake, because nothing about mosh makes a hop
+            // unreachable. A hop past the bastion is dialled by the bastion's own ssh, which
+            // never gets handed the password we have saved for it — it asks in the terminal
+            // instead, where the person can answer. So the row says what will become of the
+            // saved password rather than standing in the way of choosing the hop.
+            //
+            // The one rule left is the one that was always here and has nothing to do with
+            // mosh: a hop we dial ourselves, with nothing saved to dial it with.
+            val usable = option.hasCredentials
+            val note = when {
+                !usable -> R.string.host_jump_no_password
+                dialledByBastion && !option.hasKey -> R.string.host_jump_mosh_password_unused
                 else -> null
             }
             DropdownMenuItem(
@@ -703,11 +695,14 @@ private fun JumpHostRow(
                             color = if (usable) LocalContentColor.current
                                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                         )
-                        if (!usable && whyNot != null) {
+                        if (note != null) {
                             Text(
-                                stringResource(whyNot),
+                                stringResource(note),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                                // In the ordinary supporting colour when the hop can be chosen:
+                                // it is a consequence, not a reason the row is out of reach.
+                                color = if (usable) MaterialTheme.colorScheme.onSurfaceVariant
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                             )
                         }
                     }

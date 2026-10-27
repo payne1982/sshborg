@@ -337,8 +337,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             // would end at a prompt in the terminal with a password sitting unused in the
             // database. The chain is tunnelled instead, which is a session that works and is
             // what the row would have had anyway: nothing was promised, because a row with a
-            // chain cannot have mosh of its own to promise it. The form refuses the combination
-            // outright; this is what happens if one arrives from an edited backup.
+            // chain cannot have mosh of its own to promise it. The form allows the combination
+            // and says here is where that leads, rather than refusing it: the only thing lost
+            // is mosh, and losing it is better than being unable to save the row.
             val bastion = jumpHostEntities.firstOrNull()
                 ?.takeIf { it.mosh && !host.hasSavedPassword }
             val hopCommand = bastion?.let {

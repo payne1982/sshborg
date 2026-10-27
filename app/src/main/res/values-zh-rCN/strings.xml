@@ -127,8 +127,8 @@
     <string name="host_jump_select_placeholder">选择主机…</string>
     <string name="host_jump_add">添加跳板机</string>
     <string name="host_jump_no_password">无已保存密码</string>
-    <string name="host_jump_mosh_no_password">Mosh 不支持密码认证</string>
-    <string name="host_jump_mosh_password">保存的密码无法通过启用 Mosh 的跳板机使用</string>
+    <string name="host_jump_mosh_password_unused">保存的密码将被忽略</string>
+    <string name="host_jump_mosh_password">使用保存的密码时，跳板链走隧道方式，不使用 Mosh</string>
     <string name="host_section_port_forwarding">端口转发</string>
     <string name="host_field_port_forwarding">转发规则（-L）</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
