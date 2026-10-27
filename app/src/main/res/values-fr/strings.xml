@@ -55,9 +55,9 @@
     <string name="host_color_custom">Personnalisée</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(expérimental)</string>
-    <string name="host_mosh_no_jump">Mosh ne peut pas être encapsulé dans un hôte de saut. Si le premier saut est un hôte avec Mosh activé, la session est établie jusqu’à lui via Mosh et ssh continue depuis là.</string>
-    <string name="host_mosh_via_bastion">%1$s a Mosh activé : le terminal l’atteint via Mosh puis continue vers cet hôte avec ssh. Le SFTP utilise toujours toute la chaîne.</string>
-    <string name="host_jump_mosh_chain">Mosh est activé pour cet hôte, donc aucune chaîne n’est utilisée. Pour passer par un bastion, décochez-le et choisissez comme premier saut un hôte avec Mosh activé.</string>
+    <string name="host_mosh_disabled_with_jump">Indisponible avec un hôte de saut</string>
+    <string name="host_mosh_via_bastion">Terminal : Mosh jusqu’à %1$s, puis ssh vers cet hôte. Le SFTP utilise toute la chaîne.</string>
+    <string name="host_jump_mosh_chain">Mosh est activé pour cet hôte, donc pas de chaîne. Pour un bastion, désactivez Mosh et choisissez un premier saut avec Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatique</string>
@@ -126,6 +126,7 @@
     <string name="host_jump_add">Ajouter un jump host</string>
     <string name="host_jump_no_password">Aucun mot de passe enregistré</string>
     <string name="host_jump_mosh_no_password">L’authentification par mot de passe n’est pas prise en charge avec Mosh</string>
+    <string name="host_jump_mosh_password">Un mot de passe enregistré ne fonctionne pas à travers un hôte de saut avec Mosh</string>
     <string name="host_section_port_forwarding">Transfert de port</string>
     <string name="host_field_port_forwarding">Règles de transfert (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

@@ -56,9 +56,9 @@
     <string name="host_color_custom">カスタム</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">（実験的）</string>
-    <string name="host_mosh_no_jump">Mosh は踏み台ホストの中をトンネルできません。最初の踏み台が Mosh を有効にしたホストであれば、そこまでは Mosh で接続し、そこから ssh で先へ進みます。</string>
-    <string name="host_mosh_via_bastion">%1$s は Mosh が有効です。端末はそこまで Mosh で接続し、そこから ssh でこのホストへ進みます。SFTP は従来どおり経路全体を使います。</string>
-    <string name="host_jump_mosh_chain">このホストでは Mosh が有効なので、経路は使いません。踏み台を経由するには、チェックを外して最初の踏み台に Mosh を有効にしたホストを選んでください。</string>
+    <string name="host_mosh_disabled_with_jump">踏み台ホストがあるときは使えません</string>
+    <string name="host_mosh_via_bastion">端末: Mosh で %1$s まで、そこから ssh でこのホストへ。SFTP は経路全体を使います。</string>
+    <string name="host_jump_mosh_chain">このホストは Mosh が有効なので経路は使いません。踏み台を使うには Mosh を外し、最初の踏み台に Mosh のホストを選んでください。</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自動</string>
@@ -129,6 +129,7 @@
     <string name="host_jump_add">踏み台ホストを追加</string>
     <string name="host_jump_no_password">保存されたパスワードなし</string>
     <string name="host_jump_mosh_no_password">パスワード認証は Mosh では利用できません</string>
+    <string name="host_jump_mosh_password">保存したパスワードは Mosh の踏み台ホスト経由では使えません</string>
     <string name="host_section_port_forwarding">ポートフォワーディング</string>
     <string name="host_field_port_forwarding">転送ルール（-L）</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

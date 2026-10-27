@@ -55,9 +55,9 @@
     <string name="host_color_custom">Personalizzato</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(sperimentale)</string>
-    <string name="host_mosh_no_jump">Mosh non si può incapsulare in un jump host. Se il primo hop è un host con Mosh attivo, la sessione arriva fino a lì via Mosh e da quel punto continua con ssh.</string>
-    <string name="host_mosh_via_bastion">%1$s ha Mosh attivo: il terminale arriva fino a lì via Mosh e poi continua con ssh verso questo host. SFTP passa ancora da tutta la catena.</string>
-    <string name="host_jump_mosh_chain">Mosh è attivo su questo host, quindi la catena non si usa. Per passare da un bastione, togli la spunta e scegli come primo hop un host con Mosh attivo.</string>
+    <string name="host_mosh_disabled_with_jump">Non disponibile con un jump host</string>
+    <string name="host_mosh_via_bastion">Terminale: Mosh fino a %1$s, poi ssh verso questo host. SFTP usa tutta la catena.</string>
+    <string name="host_jump_mosh_chain">Mosh è attivo su questo host, quindi nessuna catena. Per un bastione, togli Mosh e scegli un primo hop con Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatico</string>
@@ -126,6 +126,7 @@
     <string name="host_jump_add">Aggiungi jump host</string>
     <string name="host_jump_no_password">Nessuna password salvata</string>
     <string name="host_jump_mosh_no_password">Autenticazione con password non supportata con Mosh</string>
+    <string name="host_jump_mosh_password">Una password salvata non funziona attraverso un jump host con Mosh</string>
     <string name="host_section_port_forwarding">Port Forwarding</string>
     <string name="host_field_port_forwarding">Regole di forwarding (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

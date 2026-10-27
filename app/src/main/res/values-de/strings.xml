@@ -55,9 +55,9 @@
     <string name="host_color_custom">Benutzerdefiniert</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimentell)</string>
-    <string name="host_mosh_no_jump">Mosh lässt sich nicht durch einen Jump-Host tunneln. Ist der erste Hop ein Host mit aktiviertem Mosh, wird die Sitzung per Mosh zu ihm aufgebaut und von dort geht es per ssh weiter.</string>
-    <string name="host_mosh_via_bastion">%1$s hat Mosh aktiviert: das Terminal erreicht ihn per Mosh und geht von dort per ssh zu diesem Host weiter. SFTP nutzt weiterhin die gesamte Kette.</string>
-    <string name="host_jump_mosh_chain">Für diesen Host ist Mosh aktiv, deshalb wird keine Kette verwendet. Für den Weg über einen Bastion-Host die Markierung entfernen und als ersten Hop einen Host mit aktiviertem Mosh wählen.</string>
+    <string name="host_mosh_disabled_with_jump">Mit einem Jump-Host nicht verfügbar</string>
+    <string name="host_mosh_via_bastion">Terminal: per Mosh zu %1$s, dann per ssh zu diesem Host. SFTP nutzt die gesamte Kette.</string>
+    <string name="host_jump_mosh_chain">Für diesen Host ist Mosh aktiv, also keine Kette. Für einen Bastion-Host Mosh ausschalten und als ersten Hop einen Host mit Mosh wählen.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatisch</string>
@@ -126,6 +126,7 @@
     <string name="host_jump_add">Jump-Host hinzufügen</string>
     <string name="host_jump_no_password">Kein Passwort gespeichert</string>
     <string name="host_jump_mosh_no_password">Passwort-Anmeldung wird mit Mosh nicht unterstützt</string>
+    <string name="host_jump_mosh_password">Ein gespeichertes Passwort funktioniert über einen Jump-Host mit Mosh nicht</string>
     <string name="host_section_port_forwarding">Port-Weiterleitung</string>
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

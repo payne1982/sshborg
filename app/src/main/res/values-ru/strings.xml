@@ -57,9 +57,9 @@
     <string name="host_color_custom">Свой</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(экспериментально)</string>
-    <string name="host_mosh_no_jump">Mosh нельзя туннелировать через промежуточный хост. Если первым в цепочке стоит хост с включённым Mosh, сессия доходит до него по Mosh, а дальше идёт ssh.</string>
-    <string name="host_mosh_via_bastion">На %1$s включён Mosh: терминал доходит до него по Mosh, а дальше идёт к этому хосту по ssh. SFTP по-прежнему использует всю цепочку.</string>
-    <string name="host_jump_mosh_chain">На этом хосте включён Mosh, поэтому цепочка не используется. Чтобы идти через бастион, снимите отметку и выберите первым хостом тот, на котором включён Mosh.</string>
+    <string name="host_mosh_disabled_with_jump">Недоступно с промежуточным хостом</string>
+    <string name="host_mosh_via_bastion">Терминал: по Mosh до %1$s, затем по ssh к этому хосту. SFTP использует всю цепочку.</string>
+    <string name="host_jump_mosh_chain">На этом хосте включён Mosh, поэтому цепочки нет. Для бастиона выключите Mosh и выберите первым хостом тот, где включён Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Автоматически</string>
@@ -130,6 +130,7 @@
     <string name="host_jump_add">Добавить промежуточный хост</string>
     <string name="host_jump_no_password">Пароль не сохранён</string>
     <string name="host_jump_mosh_no_password">Аутентификация по паролю не поддерживается с Mosh</string>
+    <string name="host_jump_mosh_password">Сохранённый пароль не работает через промежуточный хост с Mosh</string>
     <string name="host_section_port_forwarding">Проброс портов</string>
     <string name="host_field_port_forwarding">Правила проброса (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

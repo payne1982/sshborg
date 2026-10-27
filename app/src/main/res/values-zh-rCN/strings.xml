@@ -56,9 +56,9 @@
     <string name="host_color_custom">自定义</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">（实验性）</string>
-    <string name="host_mosh_no_jump">Mosh 无法在跳板机内部封装。如果第一跳是已启用 Mosh 的主机，会话会通过 Mosh 连到那里，再从那里用 ssh 继续。</string>
-    <string name="host_mosh_via_bastion">%1$s 已启用 Mosh：终端先通过 Mosh 连到它，再从那里用 ssh 进入此主机。SFTP 仍然使用完整的跳板链。</string>
-    <string name="host_jump_mosh_chain">此主机已启用 Mosh，因此不使用跳板链。若要经过跳板机，请取消勾选，并把第一跳选为已启用 Mosh 的主机。</string>
+    <string name="host_mosh_disabled_with_jump">有跳板机时不可用</string>
+    <string name="host_mosh_via_bastion">终端：先用 Mosh 连到 %1$s，再用 ssh 进入此主机。SFTP 使用完整跳板链。</string>
+    <string name="host_jump_mosh_chain">此主机已启用 Mosh，因此不使用跳板链。若要经过跳板机，请关闭 Mosh 并把第一跳选为启用 Mosh 的主机。</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">自动</string>
@@ -129,6 +129,7 @@
     <string name="host_jump_add">添加跳板机</string>
     <string name="host_jump_no_password">无已保存密码</string>
     <string name="host_jump_mosh_no_password">Mosh 不支持密码认证</string>
+    <string name="host_jump_mosh_password">保存的密码无法通过启用 Mosh 的跳板机使用</string>
     <string name="host_section_port_forwarding">端口转发</string>
     <string name="host_field_port_forwarding">转发规则（-L）</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

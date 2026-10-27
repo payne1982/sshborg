@@ -55,9 +55,9 @@
     <string name="host_color_custom">Personalizada</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimental)</string>
-    <string name="host_mosh_no_jump">O Mosh não pode ser encapsulado num host de salto. Se o primeiro salto for um host com o Mosh activado, a sessão chega até ele por Mosh e daí continua com ssh.</string>
-    <string name="host_mosh_via_bastion">%1$s tem o Mosh activado: o terminal chega até ele por Mosh e daí continua com ssh até este host. O SFTP continua a usar toda a cadeia.</string>
-    <string name="host_jump_mosh_chain">O Mosh está activado neste host, por isso não se usa cadeia. Para passar por um bastião, retire a marca e escolha como primeiro salto um host com o Mosh activado.</string>
+    <string name="host_mosh_disabled_with_jump">Não disponível com um host de salto</string>
+    <string name="host_mosh_via_bastion">Terminal: Mosh até %1$s e depois ssh até este host. O SFTP usa toda a cadeia.</string>
+    <string name="host_jump_mosh_chain">O Mosh está activado neste host, por isso não há cadeia. Para um bastião, desactive o Mosh e escolha um primeiro salto com Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automático</string>
@@ -126,6 +126,7 @@
     <string name="host_jump_add">Adicionar jump host</string>
     <string name="host_jump_no_password">Sem senha guardada</string>
     <string name="host_jump_mosh_no_password">A autenticação por palavra-passe não é suportada com o Mosh</string>
+    <string name="host_jump_mosh_password">Uma palavra-passe guardada não funciona através de um host de salto com Mosh</string>
     <string name="host_section_port_forwarding">Encaminhamento de portas</string>
     <string name="host_field_port_forwarding">Regras de encaminhamento (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

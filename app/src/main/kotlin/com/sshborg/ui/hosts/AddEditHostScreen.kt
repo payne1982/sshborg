@@ -281,17 +281,11 @@ fun AddEditHostScreen(
                     }
                 }
             }
-            // Why the box will not move, and — when the first hop settles it anyway — what is
-            // going to happen instead. The second sentence is the one that matters: a chain that
-            // quietly became a mosh session would otherwise be visible nowhere at all.
+            // Why the box will not move, and nothing else. What happens *instead* depends on
+            // the first hop, so it is said where the first hop is chosen rather than twice.
             if (jumpConfigured) {
-                val bastion = moshBastion
                 Text(
-                    if (bastion == null) stringResource(R.string.host_mosh_no_jump)
-                    // A chain that reaches a mosh bastion but cannot carry this host's password
-                    // on from there. Said instead of the sentence promising that it works.
-                    else if (!useKey) stringResource(R.string.host_jump_mosh_no_password)
-                    else stringResource(R.string.host_mosh_via_bastion, bastion.label),
+                    stringResource(R.string.host_mosh_disabled_with_jump),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -456,14 +450,16 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
-            // The combination the picker refuses to build, said out loud for the one way it can
-            // still come about: the hop was chosen first and the auth switched to a password
-            // afterwards. In the colour of something to fix, because it is.
-            if (!useKey && moshBastion != null) {
+            // What a chain through a mosh bastion does, said where the hop that decides it is
+            // chosen. Two cases, one line, and neither in the colour of an error: the first is a
+            // saved password that will go unused — which can still come about by choosing the hop
+            // and switching the auth afterwards — and the second is the arrangement working.
+            moshBastion?.let { bastion ->
                 Text(
-                    stringResource(R.string.host_jump_mosh_no_password),
+                    if (!useKey) stringResource(R.string.host_jump_mosh_password)
+                    else stringResource(R.string.host_mosh_via_bastion, bastion.label),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             // With mosh on the chain is not tunnelled: it is walked from its first hop, which

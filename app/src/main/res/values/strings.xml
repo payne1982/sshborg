@@ -57,9 +57,9 @@
     <string name="host_color_custom">Custom</string>
     <string name="host_mosh_label">Mosh</string>
     <string name="host_mosh_experimental">(experimental)</string>
-    <string name="host_mosh_no_jump">Mosh cannot be tunnelled through a jump host. If the first hop is a host that has Mosh enabled, the session is made to it over Mosh and ssh goes on from there.</string>
-    <string name="host_mosh_via_bastion">%1$s has Mosh enabled, so the terminal reaches it over Mosh and then goes on to this host with ssh. SFTP still uses the whole chain.</string>
-    <string name="host_jump_mosh_chain">Mosh is on for this host, so there is no chain. To go through a bastion instead, clear it and pick a first hop that has Mosh enabled.</string>
+    <string name="host_mosh_disabled_with_jump">Not available with a jump host</string>
+    <string name="host_mosh_via_bastion">Terminal: Mosh to %1$s, then ssh to this host. SFTP uses the whole chain.</string>
+    <string name="host_jump_mosh_chain">Mosh is on for this host, so no chain. For a bastion, turn Mosh off and pick a first hop that has Mosh.</string>
     <string name="host_section_mosh">Mosh</string>
     <string name="host_mosh_family_label">IPv4 / IPv6</string>
     <string name="host_mosh_family_auto">Automatic</string>
@@ -130,6 +130,7 @@
     <string name="host_jump_add">Add jump host</string>
     <string name="host_jump_no_password">No saved password</string>
     <string name="host_jump_mosh_no_password">Password authentication is not supported with Mosh</string>
+    <string name="host_jump_mosh_password">A saved password will not work through a Mosh jump host</string>
     <string name="host_section_port_forwarding">Port Forwarding</string>
     <string name="host_field_port_forwarding">Forwarding rules (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
