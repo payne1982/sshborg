@@ -892,7 +892,12 @@ data class ImportedKey(
     val keyType: String,
 )
 
-/** A live interactive SSH shell. */
+/**
+ * A live interactive SSH shell.
+ *
+ * It is a [com.sshborg.data.terminal.ShellChannel] so that the read loop which consumes it can be
+ * tested without one of these: the five members below are everything a transport touches.
+ */
 class ShellSession(
     private val session: Session,
     private val channel: ChannelShell,
@@ -918,10 +923,10 @@ class ShellSession(
      * half used rather than resolving the name a second time and hoping to agree.
      */
     val dialledAddress: String = hostname,
-) {
-    val inputStream: java.io.InputStream get() = channelInput
-    val isConnected get() = channel.isConnected && session.isConnected
-    val exitStatus get() = channel.exitStatus
+) : com.sshborg.data.terminal.ShellChannel {
+    override val inputStream: java.io.InputStream get() = channelInput
+    override val isConnected get() = channel.isConnected && session.isConnected
+    override val exitStatus get() = channel.exitStatus
 
     // JSch's channel OutputStream (channel.outputStream) is NOT thread-safe: its write/flush
     // are unsynchronized and accumulate into a shared packet buffer. We write to it from
@@ -931,7 +936,7 @@ class ShellSession(
     private val writeLock = Any()
 
     /** Writes [data] to the remote shell's stdin and flushes, serialized against other writers. */
-    fun write(data: ByteArray) {
+    override fun write(data: ByteArray) {
         synchronized(writeLock) {
             try {
                 stdinOutput.write(data)
@@ -944,7 +949,7 @@ class ShellSession(
         }
     }
 
-    fun resize(columns: Int, rows: Int) {
+    override fun resize(columns: Int, rows: Int) {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
     }
 
