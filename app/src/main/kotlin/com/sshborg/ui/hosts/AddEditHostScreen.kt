@@ -474,81 +474,89 @@ fun AddEditHostScreen(
                     )
                 }
             }
-            // With mosh on the chain is not tunnelled: it is walked from its first hop, which
-            // therefore has to be a host of yours that has mosh of its own. Said here and not
-            // only next to the switch, because this is the section where that hop is chosen.
-            if (mosh) {
+            // Mosh and a jump chain exclude each other on one row, and an exclusion enforced from
+            // one side only is not one: the switch cannot be turned on while a chain exists, and
+            // while it is on there is nothing here to build a chain with. What stays is the line
+            // that says how to reach a host *through* a mosh bastion, which is what somebody who
+            // has arrived in this corner is usually after.
+            //
+            // `jumpConfigured` belongs in the condition because a row can arrive with both set,
+            // from an older database or an edited backup. The switch already shows off in that
+            // case, so the section stays usable: a chain that exists can be seen and removed
+            // rather than hidden behind a switch the form says is off.
+            if (mosh && !jumpConfigured) {
                 Text(
                     stringResource(R.string.host_jump_mosh_chain),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            }
-            // Two choices side by side, kept as radios on purpose: both are visible at once,
-            // which is what makes it read as "one or the other" rather than as a field whose
-            // value happens to be one of them.
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                // The host list first, because it is the default and the one that can carry
-                // a hop's own credentials; the text field is the fallback for a hop that is
-                // not a host of yours.
-                listOf(
-                    "host_list" to R.string.host_jump_mode_host_list,
-                    "simple" to R.string.host_jump_mode_simple,
-                ).forEach { (mode, labelRes) ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        RadioButton(
-                            selected = jumpMode == mode,
-                            onClick  = { vm.jumpMode.value = mode },
-                        )
-                        Text(stringResource(labelRes))
+            } else {
+                // Two choices side by side, kept as radios on purpose: both are visible at once,
+                // which is what makes it read as "one or the other" rather than as a field whose
+                // value happens to be one of them.
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // The host list first, because it is the default and the one that can carry
+                    // a hop's own credentials; the text field is the fallback for a hop that is
+                    // not a host of yours.
+                    listOf(
+                        "host_list" to R.string.host_jump_mode_host_list,
+                        "simple" to R.string.host_jump_mode_simple,
+                    ).forEach { (mode, labelRes) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            RadioButton(
+                                selected = jumpMode == mode,
+                                onClick  = { vm.jumpMode.value = mode },
+                            )
+                            Text(stringResource(labelRes))
+                        }
                     }
                 }
-            }
 
-            if (jumpMode == "simple") {
-                HostField(
-                    value = jumpHosts,
-                    onValueChange = { vm.jumpHosts.value = it },
-                    label = stringResource(R.string.host_field_jump_hosts),
-                    touchless = touchless,
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardType = KeyboardType.Uri,
-                    placeholder = stringResource(R.string.host_jump_hosts_placeholder),
-                    supporting = stringResource(R.string.host_jump_hosts_supporting),
-                )
-            } else {
-                // Host-list mode: one row per hop
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    jumpHostIds.forEachIndexed { index, selectedId ->
-                        JumpHostRow(
-                            touchless        = touchless,
-                            selectedId       = selectedId,
-                            options          = availableJumpHosts,
-                            // Everything past the first hop is dialled by the bastion's own ssh
-                            // when that hop carries mosh, and a password saved here never
-                            // reaches it — only a key of its own is any use there.
-                            dialledByBastion = index > 0 && moshBastion != null,
-                            onSelect         = { newId ->
-                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                    .also { it[index] = newId }
-                            },
-                            onRemove         = {
-                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                    .also { it.removeAt(index) }
-                            },
-                        )
-                    }
-                    OutlinedButton(
-                        onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
-                        modifier  = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = null,
-                            modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.host_jump_add))
+                if (jumpMode == "simple") {
+                    HostField(
+                        value = jumpHosts,
+                        onValueChange = { vm.jumpHosts.value = it },
+                        label = stringResource(R.string.host_field_jump_hosts),
+                        touchless = touchless,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = KeyboardType.Uri,
+                        placeholder = stringResource(R.string.host_jump_hosts_placeholder),
+                        supporting = stringResource(R.string.host_jump_hosts_supporting),
+                    )
+                } else {
+                    // Host-list mode: one row per hop
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        jumpHostIds.forEachIndexed { index, selectedId ->
+                            JumpHostRow(
+                                touchless        = touchless,
+                                selectedId       = selectedId,
+                                options          = availableJumpHosts,
+                                // Everything past the first hop is dialled by the bastion's own ssh
+                                // when that hop carries mosh, and a password saved here never
+                                // reaches it — only a key of its own is any use there.
+                                dialledByBastion = index > 0 && moshBastion != null,
+                                onSelect         = { newId ->
+                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                        .also { it[index] = newId }
+                                },
+                                onRemove         = {
+                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                        .also { it.removeAt(index) }
+                                },
+                            )
+                        }
+                        OutlinedButton(
+                            onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
+                            modifier  = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null,
+                                modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.host_jump_add))
+                        }
                     }
                 }
             }
