@@ -1,3 +1,4 @@
 • Adicionado o suporte para mosh: as ligações persistem ao mudar de rede.
 • Editar um host já não apaga as estatísticas usadas para ordenar a lista.
 • Definir ou verificar o PIN de bloqueio já não congela a aplicação em dispositivos lentos.
+• Reforço do terminal e do manuseamento de ficheiros.
