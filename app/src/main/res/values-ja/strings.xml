@@ -128,7 +128,6 @@
     <string name="host_jump_add">踏み台ホストを追加</string>
     <string name="host_jump_no_password">保存されたパスワードなし</string>
     <string name="host_jump_mosh_password_unused">保存したパスワードは使われません</string>
-    <string name="host_jump_mosh_password">保存したパスワードがあると経路はトンネルされ、Mosh は使われません</string>
     <string name="host_section_port_forwarding">ポートフォワーディング</string>
     <string name="host_field_port_forwarding">転送ルール（-L）</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

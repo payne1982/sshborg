@@ -125,7 +125,6 @@
     <string name="host_jump_add">Додати проміжний хост</string>
     <string name="host_jump_no_password">Пароль не збережено</string>
     <string name="host_jump_mosh_password_unused">Збережений пароль ігнорується</string>
-    <string name="host_jump_mosh_password">Зі збереженим паролем ланцюжок тунелюється, без Mosh</string>
     <string name="host_section_port_forwarding">Переадресація портів</string>
     <string name="host_field_port_forwarding">Правила переадресації (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

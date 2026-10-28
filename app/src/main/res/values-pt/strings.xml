@@ -125,7 +125,6 @@
     <string name="host_jump_add">Adicionar jump host</string>
     <string name="host_jump_no_password">Sem senha guardada</string>
     <string name="host_jump_mosh_password_unused">Palavra-passe guardada ignorada</string>
-    <string name="host_jump_mosh_password">Com uma palavra-passe guardada a cadeia é encapsulada, sem Mosh</string>
     <string name="host_section_port_forwarding">Encaminhamento de portas</string>
     <string name="host_field_port_forwarding">Regras de encaminhamento (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

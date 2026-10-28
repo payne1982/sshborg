@@ -129,7 +129,6 @@
     <string name="host_jump_add">Добавить промежуточный хост</string>
     <string name="host_jump_no_password">Пароль не сохранён</string>
     <string name="host_jump_mosh_password_unused">Сохранённый пароль игнорируется</string>
-    <string name="host_jump_mosh_password">С сохранённым паролем цепочка туннелируется, без Mosh</string>
     <string name="host_section_port_forwarding">Проброс портов</string>
     <string name="host_field_port_forwarding">Правила проброса (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>

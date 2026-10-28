@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
 import com.sshborg.data.db.HostEntity
-import com.sshborg.data.db.hasSavedPassword
 import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
@@ -332,16 +331,13 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             // the whole chain exactly as it did before, because that one is SSH and can be
             // tunnelled.
             //
-            // Not taken when this host logs in with a saved password. Past the bastion the login
-            // is run by the bastion's own ssh, which cannot be handed that password, so the road
-            // would end at a prompt in the terminal with a password sitting unused in the
-            // database. The chain is tunnelled instead, which is a session that works and is
-            // what the row would have had anyway: nothing was promised, because a row with a
-            // chain cannot have mosh of its own to promise it. The form allows the combination
-            // and says here is where that leads, rather than refusing it: the only thing lost
-            // is mosh, and losing it is better than being unable to save the row.
-            val bastion = jumpHostEntities.firstOrNull()
-                ?.takeIf { it.mosh && !host.hasSavedPassword }
+            // A saved password on this row does not change it. Past the bastion every login is
+            // run by the bastion's own ssh, which cannot be handed a password we hold — so it
+            // asks, in the terminal, and the person answers it there. That is true of the hops
+            // in the middle and it is just as true of the destination: a prompt is not a
+            // failure. What a saved password costs here is being typed instead of being used,
+            // which the form says plainly; what it used to cost was mosh.
+            val bastion = jumpHostEntities.firstOrNull()?.takeIf { it.mosh }
             val hopCommand = bastion?.let {
                 BastionHop.compose(
                     target  = BastionHop.Endpoint(host.username, host.hostname, host.port),

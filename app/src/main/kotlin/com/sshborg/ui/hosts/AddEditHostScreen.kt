@@ -455,16 +455,24 @@ fun AddEditHostScreen(
             Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
 
             // What a chain through a mosh bastion does, said where the hop that decides it is
-            // chosen. Two cases, one line, and neither of them a warning: with a saved password
-            // on this row the chain is tunnelled exactly as it always was and mosh is simply not
-            // used, and with a key it is walked from the bastion.
+            // chosen — and then, when this row logs in with a password, what becomes of it.
+            // Nothing here is a warning: the session happens either way. Past the bastion the
+            // logins are run by its own ssh, which asks for what it needs in the terminal, so a
+            // password we have saved is simply not the thing that answers it. The same sentence
+            // the hop rows use, because it is the same fact about the same arrangement.
             moshBastion?.let { bastion ->
                 Text(
-                    if (!useKey) stringResource(R.string.host_jump_mosh_password)
-                    else stringResource(R.string.host_mosh_via_bastion, bastion.label),
+                    stringResource(R.string.host_mosh_via_bastion, bastion.label),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                if (!useKey) {
+                    Text(
+                        stringResource(R.string.host_jump_mosh_password_unused),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
             // With mosh on the chain is not tunnelled: it is walked from its first hop, which
             // therefore has to be a host of yours that has mosh of its own. Said here and not
