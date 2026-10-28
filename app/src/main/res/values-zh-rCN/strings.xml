@@ -126,6 +126,8 @@
     <string name="host_jump_mode_host_list">主机列表</string>
     <string name="host_jump_select_placeholder">选择主机…</string>
     <string name="host_jump_add">添加跳板机</string>
+    <string name="host_jump_auth_key">密钥认证</string>
+    <string name="host_jump_auth_password">密码认证</string>
     <string name="host_jump_no_password">无已保存密码</string>
     <string name="host_jump_mosh_password_unused">保存的密码将被忽略</string>
     <string name="host_section_port_forwarding">端口转发</string>

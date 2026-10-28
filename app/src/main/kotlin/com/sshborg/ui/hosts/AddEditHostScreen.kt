@@ -538,6 +538,7 @@ fun AddEditHostScreen(
                                 // when that hop carries mosh, and a password saved here never
                                 // reaches it — only a key of its own is any use there.
                                 dialledByBastion = index > 0 && moshBastion != null,
+                            first            = index == 0,
                                 onSelect         = { newId ->
                                     vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
                                         .also { it[index] = newId }
@@ -682,6 +683,8 @@ private fun JumpHostRow(
     options: List<AddEditHostViewModel.JumpHostOption>,
     /** True where this hop is dialled by the bastion's own ssh rather than by us. */
     dialledByBastion: Boolean,
+    /** True for the first hop of the chain, which is the one a mosh host would be dialled as. */
+    first: Boolean,
     onSelect: (Long) -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -689,20 +692,29 @@ private fun JumpHostRow(
     val selected = options.find { it.host.id == selectedId }
     val jumpItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
         options.forEach { option ->
-            // Nothing is refused here for mosh's sake, because nothing about mosh makes a hop
-            // unreachable. A hop past the bastion is dialled by the bastion's own ssh, which
-            // never gets handed the password we have saved for it — it asks in the terminal
-            // instead, where the person can answer. So the row says what will become of the
-            // saved password rather than standing in the way of choosing the hop.
-            //
-            // The one rule left is the one that was always here and has nothing to do with
-            // mosh: a hop we dial ourselves, with nothing saved to dial it with.
-            val usable = option.hasCredentials
+            // What the row says about a host is a fact about that host and not a prediction
+            // about this position in the chain: a consequence changes depending on where the hop
+            // is put, and the same sentence then lies in one place and tells the truth in
+            // another. What it logs in with is true wherever it goes, and it is also what
+            // somebody composing a chain wants to see at a glance.
             val note = when {
-                !usable -> R.string.host_jump_no_password
-                dialledByBastion && !option.hasKey -> R.string.host_jump_mosh_password_unused
-                else -> null
+                option.hasKey -> R.string.host_jump_auth_key
+                option.hasCredentials -> R.string.host_jump_auth_password
+                else -> R.string.host_jump_no_password
             }
+            // Nothing saved is only a problem where *we* have to do the logging in, and the
+            // reason is older than mosh: a hop's credentials have to be resolved before the
+            // connect begins, because the password prompt is the host's own, raised inside the
+            // connect with the server's banner on it, and there is exactly one of it. A hop with
+            // nothing saved would be dropped from the chain, so the row is refused instead.
+            //
+            // Both ways out of that are mosh's. Past the bastion no session of ours dials this
+            // hop at all — the bastion's ssh asks in the terminal. And a mosh host chosen as the
+            // *first* hop stops being a hop: it becomes the host this session dials, where the
+            // one prompt we have is exactly the right prompt.
+            val usable = option.hasCredentials ||
+                dialledByBastion ||
+                (first && option.host.mosh)
             DropdownMenuItem(
                 text = {
                     Column {
@@ -711,16 +723,12 @@ private fun JumpHostRow(
                             color = if (usable) LocalContentColor.current
                                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                         )
-                        if (note != null) {
-                            Text(
-                                stringResource(note),
-                                style = MaterialTheme.typography.bodySmall,
-                                // In the ordinary supporting colour when the hop can be chosen:
-                                // it is a consequence, not a reason the row is out of reach.
-                                color = if (usable) MaterialTheme.colorScheme.onSurfaceVariant
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                            )
-                        }
+                        Text(
+                            stringResource(note),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (usable) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                        )
                     }
                 },
                 onClick = {

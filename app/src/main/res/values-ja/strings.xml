@@ -126,6 +126,8 @@
     <string name="host_jump_mode_host_list">ホストリスト</string>
     <string name="host_jump_select_placeholder">ホストを選択…</string>
     <string name="host_jump_add">踏み台ホストを追加</string>
+    <string name="host_jump_auth_key">鍵で認証</string>
+    <string name="host_jump_auth_password">パスワードで認証</string>
     <string name="host_jump_no_password">保存されたパスワードなし</string>
     <string name="host_jump_mosh_password_unused">保存したパスワードは使われません</string>
     <string name="host_section_port_forwarding">ポートフォワーディング</string>

@@ -127,6 +127,8 @@
     <string name="host_jump_mode_host_list">Host list</string>
     <string name="host_jump_select_placeholder">Select host…</string>
     <string name="host_jump_add">Add jump host</string>
+    <string name="host_jump_auth_key">Key authentication</string>
+    <string name="host_jump_auth_password">Password authentication</string>
     <string name="host_jump_no_password">No saved password</string>
     <string name="host_jump_mosh_password_unused">Saved password ignored</string>
     <string name="host_section_port_forwarding">Port Forwarding</string>

@@ -123,6 +123,8 @@
     <string name="host_jump_mode_host_list">Lista de hosts</string>
     <string name="host_jump_select_placeholder">Seleccionar host…</string>
     <string name="host_jump_add">Añadir jump host</string>
+    <string name="host_jump_auth_key">Autenticación con clave</string>
+    <string name="host_jump_auth_password">Autenticación con contraseña</string>
     <string name="host_jump_no_password">Sin contraseña guardada</string>
     <string name="host_jump_mosh_password_unused">Contraseña guardada ignorada</string>
     <string name="host_section_port_forwarding">Reenvío de puertos</string>
