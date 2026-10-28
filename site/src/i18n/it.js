@@ -112,6 +112,7 @@ module.exports = {
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#mosh">Mosh (sperimentale)</a></li>
             <li class="sub"><a href="#mosh">Cosa serve sul server</a></li>
+            <li class="sub"><a href="#mosh">Attraverso un bastione</a></li>
             <li><a href="#jump-hosts">Jump Host</a></li>
             <li class="sub"><a href="#jump-hosts">Catene multi-hop</a></li>
             <li><a href="#sessions">Sessioni multiple</a></li>
@@ -479,7 +480,7 @@ screen -r work</code></pre>
                 <li><strong>UDP in entrata, porte 60001–60999</strong> — il server deve essere raggiungibile su quelle porte dal telefono. È il requisito che le reti di alberghi, università e aziende tendono a bloccare.</li>
             </ul>
             <h3>Come si accende</h3>
-            <p>Apri la scheda dell'host e spunta <strong>Mosh</strong>, accanto al colore. È per singolo host e di default è spenta: per gli host che non spunti non cambia niente. È segnata come sperimentale perché è nuova, non perché sia incompleta.</p>
+            <p>Apri la scheda dell'host e accendi <strong>Mosh</strong>: sta con gli interruttori di connessione, subito sopra le sue tre impostazioni. È per singolo host e di default è spenta: per gli host che lasci stare non cambia niente. È segnata come sperimentale perché è nuova, non perché sia incompleta.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// BATTERIA</div>
                 Una sessione mosh manda un pacchetto piccolo circa ogni tre secondi per tutto il tempo che resta aperta, ed è questo che le permette di accorgersi subito di un cambio di rete. È più radio di quanta ne usi una sessione SSH normale, e su un telefono costa batteria. Per gli host dove non serve, lasciala spenta.
@@ -487,8 +488,28 @@ screen -r work</code></pre>
             <h3>Cosa cambia nel terminale</h3>
             <p><strong>Lo scrollback parte vuoto.</strong> Con SSH tutto quello che il server ha stampato passa dal telefono, quindi si può conservare tutto. Con mosh viaggia solo lo schermo, quindi la cronologia si riempie con le righe che scorrono davvero fuori dal bordo alto — e un programma che ridisegna lo schermo senza far scorrere niente non lascia nulla dietro di sé. Il gesto di scorrimento funziona come sempre: sopra una sessione appena aperta c'è semplicemente meno da trovare.</p>
             <p><strong>Non si digita più veloce.</strong> Mosh è famoso per l'eco locale istantaneo, che SSHBorg ancora non fa: un tasto va comunque al server e torna. Misurato su un telefono sulla stessa rete, digitare con mosh è più o meno rapido come con SSH. Quello che si guadagna è che la sessione non muore.</p>
-            <h3>Mosh e i jump host</h3>
-            <p>I due si escludono sullo stesso host, e la scheda non ti lascia spuntare Mosh finché c'è una catena di jump configurata. Un host raggiunto via mosh può comunque fare da jump host <em>per altri</em>, che è poi la disposizione che conviene: il salto verso l'interno gira sul server, dove la rete del telefono non lo può disturbare.</p>
+            <h3>Mosh attraverso un bastione</h3>
+            <p>Mosh non si può incapsulare. Un hop di salto è un canale dentro una connessione SSH, e mosh non ha canali: porta lo schermo di un terminale su UDP e nient'altro. Un host raggiungibile solo attraverso un bastione, quindi, non si può raggiungere via mosh — e non solo qui: non ci riesce nemmeno il client mosh originale, perché l'UDP deve viaggiare direttamente fra il telefono e la destinazione, mentre un bastione inoltra TCP.</p>
+            <p>Allora SSHBorg gira la cosa al contrario, che è anche ciò che consiglia la documentazione di mosh: <strong>mosh fino al bastione</strong>, e da lì un solo comando <code>ssh</code> verso l'interno. Il terminale vive così su una macchina la cui rete non cambia mai, e la tua camminata dal Wi-Fi ai dati tocca solo il tratto che mosh protegge.</p>
+            <p>Servono due schede host e nessuna impostazione nuova:</p>
+            <ol class="steps">
+                <li>Sulla <strong>scheda del bastione</strong>, accendi Mosh.</li>
+                <li>Sulla <strong>scheda della destinazione</strong>, scegli quel bastione come primo hop della catena, esattamente come per qualsiasi catena.</li>
+            </ol>
+            <p>L'interruttore del bastione è tutta la decisione. Il Mosh della destinazione resta spento e non disponibile — un host con una catena non può avere mosh suo — e la sezione dei jump host dice cosa succederà invece. Alla connessione il terminale arriva al bastione via mosh e SSHBorg gli scrive dentro la riga <code>ssh</code>: il comando lo vedi sullo schermo, come se l'avessi scritto tu.</p>
+            <p>Tutto il resto viene dal fatto che il salto verso l'interno lo esegue il bastione e non il telefono:</p>
+            <ul>
+                <li><strong>Le impostazioni mosh che contano sono quelle del bastione</strong> — la sua famiglia di indirizzi, le sue porte UDP, il suo comando <code>mosh-server</code>. Quelle della destinazione non vengono lette, perché là non parte nessun server mosh.</li>
+                <li><strong>Le password vengono chieste nel terminale.</strong> All'ssh del bastione non si può passare una password che tiene SSHBorg, quindi la chiede lui e tu rispondi a video. Le righe la cui password salvata non verrà usata lo dicono. La password del bastione, se ce l'ha, si usa normalmente: quell'hop lo chiama il telefono.</li>
+                <li><strong>La chiave host della destinazione la verifica il bastione</strong>, contro il suo <code>known_hosts</code> e non contro quella che SSHBorg aveva fissato. La prima volta la sua domanda compare nel terminale e rispondi lì.</li>
+                <li><strong>SFTP non cambia.</strong> La scheda dei file apre una sessione SSH sua attraverso tutta la catena, esattamente come prima, perché quella si può incapsulare.</li>
+                <li><strong>Il port forwarding parte dal bastione.</strong> Una regola che nomina una macchina la raggiunge come sempre; una regola che dice <code>localhost</code> ora significa il bastione, non l'host dietro di lui.</li>
+            </ul>
+            <p>Se mosh non parte sul bastione compare la scelta di sempre — continuare in SSH oppure uscire — e continuando la catena viene percorsa allo stesso modo, solo senza la protezione di mosh.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// SUGGERIMENTO</div>
+                Vuoi lo stesso bastione in entrambi i modi? Duplica la sua scheda e sulla copia lascia Mosh spento: una catena che parte dalla copia è incapsulata come sempre, una che parte dall'originale viene percorsa da lui via mosh.
+            </div>
             <h3>Quando non riesce a partire</h3>
             <p>SSHBorg non ricade mai su SSH in silenzio. Se il server mosh non si avvia, o se da UDP non torna niente, ti dice quale delle due cose è successa e offre due scelte: continuare con SSH — il login è già fatto, quindi non costa nulla — oppure uscire. Tre delle quattro cause possibili stanno sul server, e il messaggio dice quale hai davanti.</p>
             <div class="callout callout-info">

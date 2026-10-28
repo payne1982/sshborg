@@ -111,6 +111,7 @@ module.exports = {
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#mosh">Mosh (experimental)</a></li>
             <li class="sub"><a href="#mosh">O que o servidor precisa</a></li>
+            <li class="sub"><a href="#mosh">Através de um bastião</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Cadeias multi-salto</a></li>
             <li><a href="#sessions">Sessões múltiplas</a></li>
@@ -478,7 +479,7 @@ screen -r work</code></pre>
                 <li><strong>UDP de entrada, portas 60001–60999</strong> — o servidor tem de estar alcançável nelas a partir do telefone. É o requisito que as redes de hotéis, campus e empresas costumam bloquear.</li>
             </ul>
             <h3>Como ligar</h3>
-            <p>Abra a ficha do host e marque <strong>Mosh</strong>, ao lado da cor. É por host e está desligado por predefinição: nos hosts que não marcar, nada muda. Está marcado como experimental porque é recente, não porque esteja incompleto.</p>
+            <p>Abra a ficha do host e ligue o <strong>Mosh</strong>: está com os interruptores de ligação, logo acima das suas três opções. É por host e está desligado por predefinição: nos hosts que deixar como estão nada muda. Está marcado como experimental porque é recente, não porque esteja incompleto.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// BATERIA</div>
                 Uma sessão mosh envia um pacote pequeno mais ou menos a cada três segundos enquanto estiver aberta, e é isso que lhe permite dar-se conta de imediato de uma mudança de rede. É mais rádio do que uma sessão SSH normal usa e, num telefone, custa bateria. Nos hosts onde não precisar, deixe-a desligada.
@@ -486,8 +487,28 @@ screen -r work</code></pre>
             <h3>O que muda no terminal</h3>
             <p><strong>O histórico começa vazio.</strong> Com o SSH, tudo o que o servidor imprimiu passa pelo telefone, pelo que pode ser todo guardado. Com o mosh viaja apenas o ecrã, de modo que o histórico se enche com as linhas que realmente saem por cima — e um programa que redesenha o ecrã sem o fazer deslizar não deixa nada para trás. O gesto de deslizar continua a funcionar; há apenas menos para encontrar acima de uma sessão recém-aberta.</p>
             <p><strong>Não se escreve mais depressa.</strong> O mosh é conhecido pelo eco local instantâneo, que o SSHBorg ainda não faz: uma tecla continua a ir ao servidor e a voltar. Medido num telefone na mesma rede, escrever com mosh é mais ou menos tão rápido como com SSH. O que se ganha é a sessão não morrer.</p>
-            <h3>O mosh e os hosts de salto</h3>
-            <p>Os dois excluem-se no mesmo host, e a ficha não deixa marcar Mosh enquanto houver uma cadeia de salto configurada. Um host alcançado por mosh pode ainda servir de host de salto <em>para outros</em>, que é aliás o arranjo que convém: o salto para dentro corre no servidor, onde a rede do telefone não o pode incomodar.</p>
+            <h3>Mosh através de um bastião</h3>
+            <p>O mosh não pode ser encapsulado. Um salto é um canal dentro de uma ligação SSH, e o mosh não tem canais: leva o ecrã de um terminal por UDP e mais nada. Um host a que só se chega através de um bastião não pode, portanto, ser alcançado por mosh — e não é só aqui: o cliente mosh original também não consegue, porque o UDP tem de viajar directamente entre o telefone e o destino, enquanto um bastião reencaminha TCP.</p>
+            <p>Por isso o SSHBorg inverte o arranjo, que é o que a própria documentação do mosh recomenda: <strong>mosh até ao bastião</strong> e, daí para dentro, um único comando <code>ssh</code>. O terminal passa a viver numa máquina cuja rede nunca muda, e a sua passagem do Wi-Fi para os dados só toca o trecho que o mosh protege.</p>
+            <p>São precisas duas fichas de host e nenhuma opção nova:</p>
+            <ol class="steps">
+                <li>Na <strong>ficha do bastião</strong>, ligue o Mosh.</li>
+                <li>Na <strong>ficha do destino</strong>, escolha esse bastião como primeiro salto da cadeia, exactamente como em qualquer cadeia.</li>
+            </ol>
+            <p>O interruptor do bastião é toda a decisão. O Mosh do destino fica desligado e indisponível — um host com cadeia não pode ter mosh próprio — e a secção dos hosts de salto diz o que vai acontecer em vez disso. Ao ligar, o terminal chega ao bastião por mosh e o SSHBorg escreve-lhe a linha <code>ssh</code> lá dentro: vê o comando no ecrã, como se o tivesse escrito.</p>
+            <p>Tudo o resto decorre de o salto para dentro ser executado pelo bastião e não pelo telefone:</p>
+            <ul>
+                <li><strong>As opções de mosh que contam são as do bastião</strong> — a sua família de endereços, as suas portas UDP, o seu comando <code>mosh-server</code>. As do destino nunca são lidas, porque lá não arranca servidor mosh nenhum.</li>
+                <li><strong>As palavras-passe são pedidas no terminal.</strong> Ao ssh do bastião não se pode entregar uma palavra-passe que o SSHBorg guarda, por isso pede-a ele e você responde no ecrã. As linhas cuja palavra-passe guardada vai ficar sem uso dizem-no. A palavra-passe do próprio bastião continua a ser usada normalmente: esse salto é o telefone que o faz.</li>
+                <li><strong>A chave de host do destino é verificada pelo bastião</strong>, contra o seu <code>known_hosts</code> e não contra a que o SSHBorg tinha fixado. Da primeira vez a pergunta dele aparece no terminal e você responde ali.</li>
+                <li><strong>O SFTP não muda.</strong> O separador dos ficheiros abre uma sessão SSH própria por toda a cadeia, exactamente como antes, porque essa pode ser encapsulada.</li>
+                <li><strong>O encaminhamento de portas parte do bastião.</strong> Uma regra que nomeia uma máquina alcança-a como sempre; uma regra que diz <code>localhost</code> passa a significar o bastião, e não o host que está por trás.</li>
+            </ul>
+            <p>Se o mosh não conseguir arrancar no bastião aparece a escolha de sempre — continuar com SSH ou sair — e continuando, a cadeia é percorrida da mesma maneira, apenas sem a protecção do mosh.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                Quer o mesmo bastião das duas maneiras? Duplique a ficha dele e deixe o Mosh desligado na cópia: uma cadeia que começa na cópia é encapsulada como sempre, e uma que começa no original é percorrida a partir dele por mosh.
+            </div>
             <h3>Quando não consegue arrancar</h3>
             <p>O SSHBorg nunca recorre ao SSH em silêncio. Se o servidor mosh não arrancar, ou se por UDP não voltar nada, diz-lhe qual das duas coisas aconteceu e oferece duas escolhas: continuar com SSH — a autenticação já está feita, portanto não custa nada — ou sair. Três das quatro causas possíveis estão no servidor, e a mensagem nomeia aquela que tem.</p>
             <div class="callout callout-info">

@@ -111,6 +111,7 @@ module.exports = {
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
             <li><a href="#mosh">Mosh (experimentell)</a></li>
             <li class="sub"><a href="#mosh">Was der Server braucht</a></li>
+            <li class="sub"><a href="#mosh">Über einen Bastion-Host</a></li>
             <li><a href="#jump-hosts">Jump-Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-Hop-Ketten</a></li>
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
@@ -478,7 +479,7 @@ screen -r work</code></pre>
                 <li><strong>Eingehendes UDP, Ports 60001–60999</strong> — der Server muss darauf von Ihrem Telefon aus erreichbar sein. Das ist die Voraussetzung, die Hotel-, Campus- und Firmennetze gern blockieren.</li>
             </ul>
             <h3>Einschalten</h3>
-            <p>Öffnen Sie den Host-Editor und setzen Sie den Haken bei <strong>Mosh</strong>, neben der Farbe. Es gilt pro Host und ist standardmäßig aus: für jeden Host ohne Haken ändert sich nichts. Als experimentell ist es markiert, weil es neu ist, nicht weil es unfertig wäre.</p>
+            <p>Öffnen Sie den Host-Editor und schalten Sie <strong>Mosh</strong> ein; es steht bei den Verbindungsschaltern, direkt über seinen eigenen drei Einstellungen. Es gilt pro Host und ist standardmäßig aus: für Hosts, die Sie so lassen, ändert sich nichts. Als experimentell ist es markiert, weil es neu ist, nicht weil es unfertig wäre.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// AKKU</div>
                 Eine Mosh-Sitzung sendet etwa alle drei Sekunden ein kleines Paket, solange sie offen ist — genau dadurch bemerkt sie einen Netzwechsel sofort. Das ist mehr Funk als eine gewöhnliche SSH-Sitzung braucht, und auf einem Telefon kostet es Akku. Für Hosts, wo Sie es nicht brauchen, lassen Sie es aus.
@@ -486,8 +487,28 @@ screen -r work</code></pre>
             <h3>Was im Terminal anders ist</h3>
             <p><strong>Der Verlauf beginnt leer.</strong> Über SSH geht alles, was der Server je ausgegeben hat, durch Ihr Telefon und kann deshalb vollständig aufbewahrt werden. Über mosh wird nur der Bildschirm übertragen, also füllt sich der Verlauf mit den Zeilen, die wirklich oben hinausscrollen — und ein Programm, das den Bildschirm neu zeichnet, ohne zu scrollen, lässt nichts zurück. Die Wischgeste funktioniert weiterhin; über einer frischen Sitzung gibt es nur weniger zu finden.</p>
             <p><strong>Tippen wird nicht schneller.</strong> Mosh ist für sein sofortiges lokales Echo bekannt, das SSHBorg noch nicht hat: ein Tastendruck geht nach wie vor zum Server und zurück. Auf einem Telefon im selben Netz gemessen ist Tippen über mosh etwa so schnell wie über SSH. Der Gewinn ist, dass die Sitzung nicht stirbt.</p>
-            <h3>Mosh und Jump-Hosts</h3>
-            <p>Beides schließt sich auf demselben Host aus, und der Host-Editor lässt den Haken bei Mosh nicht setzen, solange eine Jump-Kette eingetragen ist. Ein über mosh erreichter Host kann weiterhin <em>für andere</em> als Jump-Host dienen — die Anordnung, die man ohnehin haben will: der Sprung nach innen läuft auf dem Server, wo das Netz Ihres Telefons ihn nicht stören kann.</p>
+            <h3>Mosh über einen Bastion-Host</h3>
+            <p>Mosh lässt sich nicht tunneln. Ein Jump-Hop ist ein Kanal innerhalb einer SSH-Verbindung, und mosh hat keine Kanäle: es überträgt den Bildschirm eines Terminals über UDP und sonst nichts. Ein Host, der nur über einen Bastion-Host erreichbar ist, ist deshalb nicht über mosh erreichbar — und das nicht nur hier. Auch der Original-Client von mosh kann es nicht, weil das UDP direkt zwischen Telefon und Ziel laufen muss, während ein Bastion-Host TCP weiterleitet.</p>
+            <p>SSHBorg dreht die Sache deshalb um, was auch die Dokumentation von mosh empfiehlt: <strong>mosh bis zum Bastion-Host</strong>, und von dort ein einzelnes <code>ssh</code>-Kommando nach innen. Das Terminal liegt dann auf einer Maschine, deren Netz sich nie ändert, und der Weg von WLAN zu Mobilfunk berührt nur den Abschnitt, den mosh schützt.</p>
+            <p>Dazu braucht es zwei Host-Einträge und keine neue Einstellung:</p>
+            <ol class="steps">
+                <li>Im <strong>Eintrag des Bastion-Hosts</strong> Mosh einschalten.</li>
+                <li>Im <strong>Eintrag des Ziels</strong> diesen Bastion-Host als ersten Hop der Jump-Kette wählen, genau wie bei jeder Kette.</li>
+            </ol>
+            <p>Der Schalter des Bastion-Hosts ist die ganze Entscheidung. Der Mosh-Schalter des Ziels bleibt aus und nicht verfügbar — ein Host mit einer Kette kann kein eigenes mosh haben — und der Jump-Host-Abschnitt sagt, was stattdessen geschieht. Beim Verbinden erreicht das Terminal den Bastion-Host über mosh, und SSHBorg schreibt die <code>ssh</code>-Zeile hinein: Sie sehen das Kommando auf dem Bildschirm, als hätten Sie es selbst getippt.</p>
+            <p>Alles Weitere folgt daraus, dass der Hop nach innen vom Bastion-Host ausgeführt wird und nicht vom Telefon:</p>
+            <ul>
+                <li><strong>Es gelten die Mosh-Einstellungen des Bastion-Hosts</strong> — seine Adressfamilie, seine UDP-Ports, sein <code>mosh-server</code>-Kommando. Die des Ziels werden nie gelesen, weil dort kein Mosh-Server gestartet wird.</li>
+                <li><strong>Passwörter werden im Terminal erfragt.</strong> Dem ssh des Bastion-Hosts kann kein Passwort übergeben werden, das SSHBorg hält, also fragt es selbst und Sie antworten auf dem Bildschirm. Einträge, deren gespeichertes Passwort ungenutzt bleibt, sagen es. Das Passwort des Bastion-Hosts selbst wird weiterhin normal verwendet: diesen Hop wählt das Telefon.</li>
+                <li><strong>Den Hostschlüssel des Ziels prüft der Bastion-Host</strong>, gegen sein <code>known_hosts</code> und nicht gegen den von SSHBorg hinterlegten. Beim ersten Mal erscheint seine Frage im Terminal, und Sie antworten dort.</li>
+                <li><strong>SFTP bleibt unberührt.</strong> Der Dateien-Tab öffnet eine eigene SSH-Sitzung durch die ganze Kette, genau wie vorher, denn die lässt sich tunneln.</li>
+                <li><strong>Port-Weiterleitungen laufen vom Bastion-Host aus.</strong> Eine Regel, die eine Maschine benennt, erreicht sie wie immer; eine Regel mit <code>localhost</code> meint jetzt den Bastion-Host und nicht den Host dahinter.</li>
+            </ul>
+            <p>Kann mosh auf dem Bastion-Host nicht starten, erscheint die gewohnte Wahl — über SSH weitermachen oder abbrechen — und beim Weitermachen wird die Kette genauso gegangen, nur ohne den Schutz von mosh.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// TIPP</div>
+                Denselben Bastion-Host in beiden Varianten? Duplizieren Sie seinen Eintrag und lassen Sie Mosh in der Kopie aus: eine Kette, die bei der Kopie beginnt, wird getunnelt wie immer, eine, die beim Original beginnt, wird von ihm aus über mosh gegangen.
+            </div>
             <h3>Wenn es nicht starten kann</h3>
             <p>SSHBorg fällt niemals stillschweigend zurück. Lässt sich der Mosh-Server nicht starten, oder kommt über UDP keine Antwort, sagt SSHBorg, welcher der beiden Fälle vorliegt, und bietet zwei Wege an: mit SSH weitermachen — die Anmeldung ist schon erfolgt, es kostet also nichts — oder abbrechen. Drei der vier möglichen Ursachen liegen auf dem Server, und die Meldung nennt die, die Sie haben.</p>
             <div class="callout callout-info">
