@@ -91,8 +91,16 @@ class MoshFragmentAssembly {
     private var arrived = 0
     private var total = -1
     private var delivered = false
+    private var refused = false
     private var fragments = arrayOfNulls<MoshFragment>(0)
-    private var bytesHeld = 0
+
+    /**
+     * How much payload is being held for an instruction nobody has finished sending. Public
+     * because it is the thing a limit on memory has to be stated about: an assertion that the
+     * ceiling was *reported* passes while it goes on being exceeded.
+     */
+    var bytesHeld = 0
+        private set
 
     /** How many fragments the largest instruction we have assembled was split into. */
     var largestAssembly = 0
@@ -115,23 +123,32 @@ class MoshFragmentAssembly {
             arrived = 0
             total = -1
             delivered = false
+            refused = false
             fragments = arrayOfNulls(INITIAL_SLOTS)
             bytesHeld = 0
         }
+        // Every refusal below is about the instruction, not about the piece that happened to
+        // arrive when it was noticed: all three are impossible from a sender that is working, so
+        // once one is raised there is nothing left to assemble under this id and no reason to keep
+        // holding what arrived before it. An exception does not undo what the object already did
+        // to itself — the caller counts it, drops the datagram and goes on reading, which is the
+        // right response to one unusable datagram and no help at all against a peer that keeps
+        // sending them. So the undoing is done here.
+        if (refused) throw MoshProtocolException("id ${fragment.id} was refused and is not being assembled")
         // The last fragment is what says how many there are, so it is also the only thing that
         // can contradict itself. Two different answers for one id means the pieces on the floor
         // belong to two instructions, and no amount of waiting will make them into one.
         if (fragment.final) {
             val announced = fragment.number + 1
             if (total >= 0 && total != announced) {
-                throw MoshProtocolException("id ${fragment.id} has two different last fragments")
+                refuse("id ${fragment.id} has two different last fragments")
             }
             total = announced
             // And a piece already held above it, which is the same contradiction arriving in the
             // other order: it was taken in while the total was unknown.
             for (i in announced until fragments.size) {
                 if (fragments[i] != null) {
-                    throw MoshProtocolException("id ${fragment.id} holds a fragment past its last one")
+                    refuse("id ${fragment.id} holds a fragment past its last one")
                 }
             }
         }
@@ -140,23 +157,26 @@ class MoshFragmentAssembly {
         // stays open, which is how a count that adds up came to sit on top of a missing
         // fragment 0 — and the assembly then dereferenced it.
         if (total >= 0 && fragment.number >= total) {
-            throw MoshProtocolException("fragment ${fragment.number} of id ${fragment.id} is past its last one")
+            refuse("fragment ${fragment.number} of id ${fragment.id} is past its last one")
         }
-        if (fragment.number >= fragments.size) {
-            fragments = fragments.copyOf(maxOf(fragment.number + 1, fragments.size * 2))
-        }
-        val held = fragments[fragment.number]
+        val held = fragments.getOrNull(fragment.number)
         if (held == null) {
+            // The ceiling on what may be held for an instruction nobody has finished sending. The
+            // 4 MiB ceiling on an instruction itself applies to the decompressed bytes and
+            // therefore only after assembly; with fifteen bits of fragment numbers to fill, there
+            // is room for many times that much to sit here waiting for a last fragment that never
+            // comes. Asked *before* the piece is taken in, so the number is a ceiling and not a
+            // line the object reports crossing on its way past it — and before the array is grown
+            // too, so a refusal costs nothing at all.
+            if (bytesHeld + fragment.contents.size > MAX_HELD_BYTES) {
+                refuse("id ${fragment.id} would hold more than $MAX_HELD_BYTES bytes unassembled")
+            }
+            if (fragment.number >= fragments.size) {
+                fragments = fragments.copyOf(maxOf(fragment.number + 1, fragments.size * 2))
+            }
             fragments[fragment.number] = fragment
             arrived++
-            // What is being held for an instruction nobody has finished sending. The 4 MiB
-            // ceiling on an instruction applies to the decompressed bytes and therefore only
-            // after assembly; with fifteen bits of fragment numbers to fill, there is room for
-            // many times that much to sit here waiting for a last fragment that never comes.
             bytesHeld += fragment.contents.size
-            if (bytesHeld > MAX_HELD_BYTES) {
-                throw MoshProtocolException("id ${fragment.id} is holding more than $MAX_HELD_BYTES bytes unassembled")
-            }
         } else if (!held.contents.contentEquals(fragment.contents)) {
             conflictingFragments++
         }
@@ -178,8 +198,22 @@ class MoshFragmentAssembly {
         return out
     }
 
-    private companion object {
-        const val INITIAL_SLOTS = 8
+    /**
+     * Give up on this id: let go of the pieces, and refuse the rest of them until the sender moves
+     * on to another instruction. The refusal is per instruction and not per session, because one
+     * instruction we cannot assemble is no reason to lose a terminal.
+     */
+    private fun refuse(why: String): Nothing {
+        refused = true
+        fragments = arrayOfNulls(0)
+        bytesHeld = 0
+        arrived = 0
+        total = -1
+        throw MoshProtocolException(why)
+    }
+
+    companion object {
+        private const val INITIAL_SLOTS = 8
 
         /**
          * How much unassembled payload one instruction may have waiting. An instruction is a

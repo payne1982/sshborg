@@ -131,4 +131,55 @@ class MoshFramingTest {
         val next = MoshInstruction(oldNumber = 2, newNumber = 3)
         assertNotEquals(idOfFirst, fragmenter.fragments(next, budget = 500).first().id)
     }
+
+    @Test(timeout = 20_000) fun `an instruction refused for its size stops being held`() {
+        // A ceiling that is noticed is not a ceiling that is kept. The piece is stored, the total
+        // is raised, and only then does the complaint go out — and throwing does not undo any of
+        // it. The id is still current, nothing is marked refused, so the next piece is stored too
+        // and complained about again: the sender is told it is over budget as many times as it
+        // likes while the budget goes on being spent. The caller cannot help, because counting
+        // the error and going on reading is the whole right response to one unusable datagram.
+        val assembly = MoshFragmentAssembly()
+        val piece = ByteArray(1100)
+        var refusals = 0
+        for (number in 0 until 5000) {
+            try {
+                assembly.add(MoshFragment(id = 77, number = number, final = false, contents = piece))
+            } catch (_: MoshProtocolException) {
+                refusals++
+            }
+            assertTrue(
+                "nothing may be held above the ceiling, on any arrival: ${assembly.bytesHeld}",
+                assembly.bytesHeld <= MoshFragmentAssembly.MAX_HELD_BYTES,
+            )
+        }
+        assertTrue("a flood of this size has to have been refused", refusals > 0)
+        assertEquals("a refused instruction holds nothing at all", 0, assembly.bytesHeld)
+        // And its own last fragment does not bring it back: the pieces are gone, so there is no
+        // instruction here that could honestly be handed over.
+        try {
+            assembly.add(MoshFragment(id = 77, number = 5000, final = true, contents = piece))
+            fail("a refused instruction cannot be completed")
+        } catch (_: MoshProtocolException) {
+        }
+        assertEquals(0, assembly.bytesHeld)
+    }
+
+    @Test(timeout = 20_000) fun `the sender moving on clears a refusal`() {
+        // The refusal belongs to the instruction, not to the session: one over-sized instruction
+        // must not cost every instruction after it.
+        val assembly = MoshFragmentAssembly()
+        val piece = ByteArray(1100)
+        var number = 0
+        while (number < 0x7FFF) {
+            try {
+                assembly.add(MoshFragment(id = 1, number = number++, final = false, contents = piece))
+            } catch (_: MoshProtocolException) {
+                break
+            }
+        }
+        assertTrue("the flood should have been refused long before the numbers ran out", number < 0x7FFF)
+        val whole = assembly.add(MoshFragment(id = 2, number = 0, final = true, contents = byteArrayOf(1, 2, 3)))
+        assertArrayEquals(byteArrayOf(1, 2, 3), whole)
+    }
 }
