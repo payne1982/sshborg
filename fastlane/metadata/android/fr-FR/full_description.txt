@@ -3,6 +3,7 @@ SSHBorg est un puissant client SSH et SFTP pour Android. Gérez vos serveurs en 
 FONCTIONNALITÉS
 
 • Terminal SSH Complet — Terminal interactif avec émulation VT100/xterm, support UTF-8 complet et sessions simultanées multiples.
+• Prise en Charge de Mosh — Le terminal survit à un changement de réseau et à un téléphone endormi : aucune reconnexion, rien de perdu. Nécessite mosh-server sur le serveur.
 • Gestionnaire de Fichiers SFTP — Parcourez, envoyez, téléchargez, renommez et supprimez des fichiers sur vos serveurs avec un gestionnaire de fichiers intuitif.
 • Auth par Clé SSH — Générez des clés Ed25519, ECDSA et RSA directement sur votre appareil. Sans mot de passe.
 • Support Jump Host — Connectez-vous via un ou plusieurs hôtes bastions avec tunneling transparent. Transfert complet de l'agent SSH.
