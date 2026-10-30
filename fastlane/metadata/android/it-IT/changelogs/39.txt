@@ -1,4 +1,5 @@
 • Aggiunto il supporto per mosh: connessioni persistenti al cambio di rete.
 • Editare un host non cancella più le statistiche per l'ordinamento nella lista.
 • Impostare o verificare il PIN di blocco non blocca più l'app sui dispositivi lenti.
+• Un server la cui chiave host è cambiata ora lo dice chiaramente, e accettando la nuova chiave si sostituisce quella salvata.
 • Irrobustimento del terminale e della gestione dei file.
