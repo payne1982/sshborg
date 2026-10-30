@@ -59,4 +59,26 @@ class TerminalBacklogTest {
         assertFalse(backlog.reserve(40))
         assertEquals("backlog=4/10B events=1/2", backlog.describe())
     }
+
+    @Test fun `being behind starts above the high mark and ends below the low one`() {
+        // 1024 bytes / 64 events: the marks are an eighth and a quarter of those, and the point
+        // of the second mark is that a loop sitting exactly at the edge does not flap between
+        // taking datagrams in and letting them go on every single one.
+        val backlog = TerminalBacklog(maximumBytes = 1024, maximumEvents = 64)
+        assertFalse("an empty queue is not behind", backlog.isBehind())
+        repeat(16) { backlog.reserve(8) }          // 128 bytes, the high mark exactly
+        assertFalse("at the mark is not past it", backlog.isBehind())
+        backlog.reserve(8)
+        assertTrue("past the mark it lets go", backlog.isBehind())
+        repeat(8) { backlog.release(8) }           // down to 72, above the low mark
+        assertTrue("and goes on letting go until it is well clear", backlog.isBehind())
+        repeat(9) { backlog.release(8) }           // down to 0
+        assertFalse("clear", backlog.isBehind())
+    }
+
+    @Test fun `too many events is being behind too, however small they are`() {
+        val backlog = TerminalBacklog(maximumBytes = 1_000_000, maximumEvents = 64)
+        repeat(17) { backlog.reserve(0) }
+        assertTrue(backlog.isBehind())
+    }
 }

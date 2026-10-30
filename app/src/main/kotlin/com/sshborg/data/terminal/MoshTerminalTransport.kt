@@ -282,6 +282,15 @@ class MoshTerminalTransport(
     private var framesApplied = 0
 
     /**
+     * Datagrams let go of on purpose because the screen had not caught up.
+     *
+     * Worth a counter of its own: on a session that is going well it is zero, and a session where
+     * it is not tells you the phone cannot draw as fast as the server is talking — which looks
+     * like nothing else, and nothing else looks like it.
+     */
+    private var droppedWhileBehind = 0
+
+    /**
      * One line of how the session is actually going — for a debug build's log, which is the only
      * way to ask a real device the questions the lab cannot answer for it, and for the report the
      * user can copy when a session is lost. One format for both, so a number somebody pastes into
@@ -299,7 +308,7 @@ class MoshTerminalTransport(
         return "rtt~${mosh.timing.srtt.toInt()}ms screen-wait<=${worst}ms applied=$framesApplied " +
             "stale=${mosh.staleFrames} got=${mosh.receivedDatagrams} missed=${mosh.missedDatagrams} " +
             "back=${mosh.returnedToState} hops=$hops refused=$failedSends bad=$protocolErrors " +
-            "stray=${mosh.strayDatagrams} " +
+            "stray=${mosh.strayDatagrams} behind=$droppedWhileBehind " +
             "[${mosh.lastStaleFrame}]"
     }
 
@@ -577,6 +586,18 @@ class MoshTerminalTransport(
                 // Not from the server: dropped without a word. The crypto would refuse it anyway,
                 // but counting it as a protocol error would blame the server for somebody else.
                 if (from != peer) continue
+                // The screen is too far behind to take any more. Dropping the datagram here,
+                // before it is opened, is not a loss: to the protocol it is a packet that never
+                // arrived, which is the one failure mosh is built around. Our acknowledgement
+                // stays where it was, so the server goes on sending from the state we last
+                // confirmed — and because a mosh frame is a diff from *that* state to the newest
+                // one, what eventually arrives is a single collapsed frame instead of every one
+                // we skipped. Less work than applying them, and the screen ends up in the same
+                // place. (The idea is the iOS side's; the mechanism is the same on both.)
+                if (screenBudget.isBehind()) {
+                    droppedWhileBehind++
+                    continue
+                }
                 buffer.flip()
                 val datagram = ByteArray(buffer.remaining())
                 buffer.get(datagram)
