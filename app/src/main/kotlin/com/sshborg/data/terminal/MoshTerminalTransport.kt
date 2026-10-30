@@ -589,11 +589,13 @@ class MoshTerminalTransport(
                 // The screen is too far behind to take any more. Dropping the datagram here,
                 // before it is opened, is not a loss: to the protocol it is a packet that never
                 // arrived, which is the one failure mosh is built around. Our acknowledgement
-                // stays where it was, so the server goes on sending from the state we last
-                // confirmed — and because a mosh frame is a diff from *that* state to the newest
-                // one, what eventually arrives is a single collapsed frame instead of every one
-                // we skipped. Less work than applying them, and the screen ends up in the same
-                // place. (The idea is the iOS side's; the mechanism is the same on both.)
+                // stays where it was, so the server cannot move past it — it keeps the output on
+                // its own side, and the frame that does get through is one diff from the state we
+                // confirmed with everything since folded into it. That is back pressure, which
+                // nothing else here provides: the alternative was ending the session, and a `cat`
+                // of a big file on a fast link is enough to fill the queue with output that is
+                // perfectly legitimate. Nobody should lose a tab for that.
+                // (The idea is the iOS side's; the mechanism is the same on both.)
                 if (screenBudget.isBehind()) {
                     droppedWhileBehind++
                     continue
