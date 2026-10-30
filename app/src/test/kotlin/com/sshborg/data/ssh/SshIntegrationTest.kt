@@ -39,7 +39,7 @@ class SshIntegrationTest {
                 JumpHost(host = s.host, port = s.port, username = s.user, knownHostsEntry = null, auth = auth),
             ),
         )
-        return runBlocking { SshManager.openShell(params) { _, _, _ -> true } }
+        return runBlocking { SshManager.openShell(params) { _, _, _, _ -> true } }
     }
 
     /**
@@ -143,7 +143,7 @@ class SshIntegrationTest {
         val params = SshConnectionParams(
             hostname = s.host, port = s.port, username = s.user, auth = auth, knownHostsEntry = line,
         )
-        val second = runBlocking { SshManager.openShell(params) { _, _, _ -> asked = true; true } }
+        val second = runBlocking { SshManager.openShell(params) { _, _, _, _ -> asked = true; true } }
         try {
             second.assertAlive()
         } finally {

@@ -112,6 +112,9 @@ module.exports = {
             <li><a href="#legacy-ciphers">Legacy Ciphers</a></li>
             <li><a href="#connection-drops">Connection Drops</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh (experimental)</a></li>
+            <li class="sub"><a href="#mosh">What the server needs</a></li>
+            <li class="sub"><a href="#mosh">Through a bastion</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-hop chains</a></li>
             <li><a href="#sessions">Multiple Sessions</a></li>
@@ -134,6 +137,7 @@ module.exports = {
             <h3>Host fingerprint verification</h3>
             <p>On the first connection SSHBorg shows you the server's fingerprint and asks you to accept it. This is a security check: it ensures you are connecting to the right machine and not to an impostor. You should verify the fingerprint matches the one shown by your server admin or obtained via a trusted channel before accepting.</p>
             <p>Once accepted, the fingerprint is stored locally. If it changes on a future connection, SSHBorg will warn you — this could indicate a server rebuild, a key rotation, or a man-in-the-middle attack.</p>
+            <p>That warning is unmistakable: a red line saying this is not the key saved for this host, the fingerprint of the key the server has just offered, and a button that says <strong>Replace key</strong> rather than <em>Trust</em>. Accepting really does replace the saved key, so the next connection is quiet again; a jump host is asked about in exactly the same way. If you were not expecting the change, do not accept it — ask whoever runs the server first.</p>
             <div class="callout callout-info">
                 <h3>The server's pre-login message</h3>
             <p>Many servers send a message before letting anyone in: a legal notice, a maintenance window, a reference number to quote. SSHBorg shows it above the password request, so you can read it before you type, and it stays in view if the password is refused and asked for again.</p>
@@ -307,6 +311,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel. On iOS a long press selects the word under your finger and opens the system menu with <em>Copy</em>, <em>Paste</em> and <em>Select All</em>; drag from either end of the selection to extend it.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
             </ul>
+            <p><strong>The title bar.</strong> Three seconds after the session comes up, the bar at the top slides away and the text takes the whole height of the screen. A tap anywhere brings it back for another three seconds, and it does not leave while a finger is resting on it, so there is time to reach its buttons. If you would rather keep it in sight, turn <em>Auto-hide the title bar</em> off in <strong>Settings &rarr; Terminal</strong>. On a television the bar never hides: there would be nothing to tap to bring it back.</p>
+
             <p><strong>Full-screen apps.</strong> Programs that take over the whole screen — tmux, vim, nano, less — have no scrollback of their own, so while one is running the view stays on the live screen instead of drifting into the shell output underneath it.</p>
             <p>To scroll inside them, the application has to handle the scrolling itself. In tmux, add <code>set -g mouse on</code> to <code>~/.tmux.conf</code>: a swipe then scrolls the history of the pane under your finger. The same goes for any program that accepts mouse input, such as vim with <code>set mouse=a</code>. With <code>screen</code>, check that <code>altscreen on</code> is set in <code>~/.screenrc</code> — on many systems it is off by default, and screen then draws over the ordinary scrollback.</p>`,
 
@@ -316,6 +322,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>Terminal colors</strong> — the classic <em>dark</em> scheme (white on black), a <em>light</em> scheme (black on white) that is easier to read in bright daylight, or <em>match app theme</em>, which switches automatically together with the app theme. The change applies immediately, including to sessions that are already open.</li>
                 <li><strong>Keep screen on</strong> — prevents the display from turning off while a terminal is open. Handy when watching logs or long-running commands. Off by default.</li>
+                <li><strong>Auto-hide the title bar</strong> &mdash; the retracting bar described above. On by default; off keeps the bar always visible.</li>
+                <li><strong>Hide the status bar</strong> &mdash; in the terminal, hide the system's clock and notification strip as well, for a couple of lines more. Swipe down from the top edge to see it again for a moment. Off by default; Android only.</li>
                 <li><strong>Default font size</strong> — the text size new terminal sessions start with; you can still pinch-zoom each session individually.</li>
                 <li><strong>Scrollback</strong>, <strong>inverted scrolling</strong> and <strong>command suggestions</strong> — control how much output history is kept, the scroll direction, and the suggestion bar described above.</li>
                 <li><strong>Double-tap action</strong> — optionally make a double-tap on the terminal send <em>Tab</em> (auto-complete), or two Tabs (list all candidates). Off by default; on iOS, while it is off, a double-tap selects a word.</li>
@@ -460,6 +468,56 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// TIP</div>
                 You can add <code>tmux attach || tmux new -s main</code> to your <code>~/.bashrc</code> or <code>~/.zshrc</code> on the server so that a multiplexer session starts automatically every time you log in via SSHBorg.
+            </div>`,
+
+  doc_mosh: `
+            <h2>// MOSH (EXPERIMENTAL)</h2>
+            <p>Mosh is a second way of carrying the terminal. Instead of sending the server's output down the SSH connection, it keeps the terminal <em>on the server</em> and sends your phone a picture of what the screen looks like, over UDP. Because nothing is tied to a TCP connection any more, the session survives what normally ends one: a change of IP, a Wi-Fi to mobile handover, a tunnel, a phone that was asleep in your pocket. You come back and the session is simply there.</p>
+            <p>There is one limit worth knowing before relying on it: a session stays on the address family it was born on. <code>mosh-server</code> listens on the one address the SSH connection arrived on, so a session made over IPv6 cannot follow you onto a network that has no IPv6, and the reverse is just as true on a mobile network that has only IPv6. The <strong>IPv4 / IPv6</strong> setting in the host editor is there for exactly this: choose the family your networks have in common and the session can move between them.</p>
+            <p>SSHBorg does not replace SSH with it. SSH still logs you in, starts the mosh server and <strong>stays open</strong>, which is what keeps SFTP, port forwarding, agent forwarding and the command suggestions working on the same host while the terminal rides UDP.</p>
+            <p>That half is ordinary SSH, though, so it does not survive what mosh survives: a change of network takes the SSH connection with it, and SFTP, a port forwarding or the command suggestions on that host stop working until you open it again. The terminal carries on.</p>
+            <h3>What the server needs</h3>
+            <ul>
+                <li><strong>mosh installed</strong> — the <code>mosh-server</code> program must be on the server. On most distributions the package is called <code>mosh</code>.</li>
+                <li><strong>A UTF-8 locale</strong> — mosh refuses to start without one, because it has to interpret the terminal's contents itself.</li>
+                <li><strong>Inbound UDP, ports 60001–60999</strong> — the server must be reachable on them from your phone. This is the one that hotel, campus and corporate networks tend to block.</li>
+            </ul>
+            <h3>Turning it on</h3>
+            <p>Open the host editor and turn on <strong>Mosh</strong>, with the connection switches just above its own three settings. It is per host and off by default: nothing changes for the hosts you leave alone. It is marked experimental because it is new, not because it is unfinished.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// BATTERY</div>
+                A mosh session sends a small packet about every three seconds for as long as it is open, which is what lets it notice a change of network straight away. That is more radio than a plain SSH session uses, and on a phone it costs battery. Leave it off for hosts where you do not need it.
+            </div>
+            <h3>What is different in the terminal</h3>
+            <p><strong>The scrollback starts empty.</strong> Over SSH, everything the server has ever printed passes through your phone, so it can all be kept. Over mosh only the screen is sent, so the history fills up with the lines that genuinely scroll off the top — and a program that redraws the screen without scrolling leaves nothing behind. The scroll gesture still works; there is simply less to find above a fresh session.</p>
+            <p><strong>Typing is not faster.</strong> Mosh is famous for instant local echo, which SSHBorg does not do yet: a keystroke still goes to the server and back. Measured on a phone over the same network, typing over mosh is about as quick as over SSH. What you gain is the session not dying.</p>
+            <h3>Mosh through a bastion</h3>
+            <p>Mosh cannot be tunnelled. A jump hop is a channel inside an SSH connection, and mosh has no channels: it carries one terminal's screen over UDP and nothing else. A host reachable only through a bastion therefore cannot be reached over mosh — and not only here. The stock mosh client cannot do it either, because the UDP has to travel between your phone and the target directly, while a bastion forwards TCP.</p>
+            <p>So SSHBorg turns the arrangement around, which is what mosh's own documentation recommends: <strong>mosh to the bastion</strong>, and one <code>ssh</code> command from there inwards. The terminal then lives on a machine whose network never changes, and your walk from Wi-Fi to mobile touches only the hop mosh protects.</p>
+            <p>It takes two host rows and no new setting:</p>
+            <ol class="steps">
+                <li>On the <strong>bastion's own row</strong>, turn Mosh on.</li>
+                <li>On the <strong>target's row</strong>, choose that bastion as the first hop of the jump chain, exactly as for any chain.</li>
+            </ol>
+            <p>The bastion's switch is the whole decision. The target's own Mosh switch stays off and unavailable — a host with a chain cannot have mosh of its own — and the jump-host section tells you what will happen instead. On connecting, the terminal reaches the bastion over mosh and SSHBorg types the <code>ssh</code> line into it: you see the command on screen, as though you had typed it yourself.</p>
+            <p>Everything else follows from the inward hop being run by the bastion and not by your phone:</p>
+            <ul>
+                <li><strong>The mosh settings that count are the bastion's</strong> — its address family, its UDP ports, its <code>mosh-server</code> command. The target's are never read, because no mosh server is started there.</li>
+                <li><strong>Passwords are asked in the terminal.</strong> The bastion's ssh cannot be handed a password SSHBorg is holding, so it asks for one itself and you answer on screen. It also means a hop beyond the bastion needs nothing saved at all: the picker shows what each host logs in with, and a hop with nothing saved can still be chosen there. The bastion's own password is still used normally: that hop is dialled by your phone.</li>
+                <li><strong>The target's host key is checked by the bastion</strong>, against its <code>known_hosts</code> rather than the key SSHBorg pinned. The first time, its question appears in the terminal and you answer it there.</li>
+                <li><strong>SFTP is unaffected.</strong> The files tab opens an SSH session of its own through the whole chain, exactly as before, because that one can be tunnelled.</li>
+                <li><strong>Port forwarding runs from the bastion.</strong> A rule naming a machine reaches it as it always did; a rule saying <code>localhost</code> now means the bastion, not the host behind it.</li>
+            </ul>
+            <p>If mosh cannot start on the bastion the usual choice appears — carry on over SSH, or leave — and carrying on still walks the chain the same way, only without mosh's protection.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// TIP</div>
+                Want the same bastion both ways? Duplicate its host row and leave Mosh off on the copy: a chain that starts at the copy is tunnelled as it always was, and one that starts at the original is walked from it over mosh.
+            </div>
+            <h3>When it cannot start</h3>
+            <p>SSHBorg never falls back quietly. If the mosh server cannot be started, or no answer comes back over UDP, it tells you which of those happened and offers two choices: carry on over SSH — the login is already done, so it costs nothing — or leave. Three of the four possible causes are on the server, and the message names the one you have.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// TIP</div>
+                Mosh is not a substitute for tmux. It keeps a session alive across changes of network; tmux keeps your <em>work</em> alive across everything else, including the app being closed or the phone being restarted. The two together are the strongest arrangement: start mosh to reach the server, and run anything long inside tmux.
             </div>`,
 
   doc_jump_hosts: `

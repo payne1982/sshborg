@@ -4,7 +4,7 @@ package com.sshborg.terminal
  * VT100/VT220/xterm terminal emulator.
  * Feed incoming bytes via [process]; the state is reflected in [buffer].
  */
-class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
+class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = TerminalBuffer.DEFAULT_SCROLLBACK) {
 
     val buffer = TerminalBuffer(columns, rows, maxScrollback)
 
@@ -12,6 +12,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
     private var state = State.NORMAL
     private val params = mutableListOf<Int>()
     private val oscBuf = java.io.ByteArrayOutputStream()
+    private var oscOverflowed = false
     private var csiIntermediate = ""
     private var privMode = false   // '?' was seen after CSI
 
@@ -33,6 +34,34 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     /** True while the remote app has asked to be sent mouse events. */
     val mouseReporting: Boolean get() = mouseMode != 0
+
+    /**
+     * Whether the stream feeding this terminal ever uses the alternate screen.
+     *
+     * True for everything that sends a program's own output, which is all of SSH. False for a
+     * *synchronised* screen — mosh's — where the far end keeps the terminal and sends us only what
+     * it looks like: it handles `?1049h` itself and never passes it on, so a full-screen program
+     * is indistinguishable from the shell. Measured, not assumed: see `MoshTerminalTransportTest`,
+     * which holds mosh to forwarding `?1000h` and `?1006h` and to never forwarding `?1049h`.
+     *
+     * Not a branch in the parsing — nothing here reads it — but a statement about what the stream
+     * can contain, and the one thing [wheelBelongsToApplication] cannot work out for itself.
+     */
+    var hasAlternateScreen = true
+
+    /**
+     * Whether a wheel notch is the far side's business rather than our own scrollback's.
+     *
+     * A program drawing a whole screen scrolls itself — in tmux, its own copy-mode history — so
+     * the wheel has to reach it. At a shell prompt the wheel belongs to our scrollback, even if
+     * some program left mouse reporting switched on behind it, which is why the alternate screen
+     * is part of the question at all. Where there is no alternate screen to go by, mouse reporting
+     * alone decides, and that is honest there: the synchronised stream turns the modes off
+     * explicitly when the program that wanted them has gone, which is visible in the recording in
+     * that same test.
+     */
+    val wheelBelongsToApplication: Boolean
+        get() = mouseReporting && (onAltScreen || !hasAlternateScreen)
 
     // Pending title / callback
     var onTitleChanged: ((String) -> Unit)? = null
@@ -137,7 +166,7 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
         state = State.NORMAL
         when (b) {
             '['.code -> { state = State.CSI; params.clear(); csiIntermediate = ""; privMode = false }
-            ']'.code -> { state = State.OSC; oscBuf.reset() }
+            ']'.code -> { state = State.OSC; oscBuf.reset(); oscOverflowed = false }
             'O'.code -> { state = State.SS3 }
             '7'.code -> buffer.saveCursor()
             '8'.code -> buffer.restoreCursor()
@@ -158,10 +187,16 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             b in 0x30..0x39 -> { // digit
                 if (params.isEmpty()) params.add(0)
                 val last = params.last()
-                params[params.size - 1] = last * 10 + (b - 0x30)
+                // Saturating, not wrapping: `last * 10 + digit` on a long enough run of digits
+                // overflows into a negative number, and a negative count reaches operations that
+                // only bound theirs from above — one of them reads outside its own row.
+                params[params.size - 1] = minOf(last * 10 + (b - 0x30), MAX_PARAM)
             }
-            b == ';'.code || b == ':'.code -> params.add(0) // parameter / sub-parameter separator
-            b in 0x20..0x2F -> csiIntermediate += b.toChar() // intermediate bytes
+            // Parameter / sub-parameter separator. Nothing real sends more than a handful; a
+            // stream of semicolons is an unbounded list, so past the limit they stop being kept.
+            b == ';'.code || b == ':'.code -> if (params.size < MAX_PARAMS) params.add(0)
+            b in 0x20..0x2F ->                                      // intermediate bytes
+                if (csiIntermediate.length < MAX_INTERMEDIATE) csiIntermediate += b.toChar()
             b in 0x40..0x7E -> { // final byte
                 executeCsi(b.toChar())
                 state = State.NORMAL
@@ -176,11 +211,21 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             // BEL (0x07) terminates OSC. 0x9C (8-bit ST) is intentionally NOT treated as a
             // terminator because in UTF-8 mode 0x9C is a valid continuation byte (e.g. U+2726
             // ✦ encodes as E2 9C A6), so treating it as ST would corrupt multi-byte titles.
-            0x07 -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
+            0x07 -> endOsc()
             0x1B -> { /* ESC \ terminator – wait for next byte */ }
-            '\\'.code -> { handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8)); oscBuf.reset(); state = State.NORMAL }
-            else -> oscBuf.write(b)
+            '\\'.code -> endOsc()
+            // A string that never ends would otherwise grow for as long as the far end keeps
+            // typing. Past the limit the bytes are read and dropped: the parser still has to
+            // reach the terminator, but nothing is kept and the string is not acted on.
+            else -> if (oscBuf.size() < MAX_OSC) oscBuf.write(b) else oscOverflowed = true
         }
+    }
+
+    private fun endOsc() {
+        if (!oscOverflowed) handleOsc(oscBuf.toByteArray().toString(Charsets.UTF_8))
+        oscBuf.reset()
+        oscOverflowed = false
+        state = State.NORMAL
     }
 
     private fun processSs3(b: Int) {
@@ -190,9 +235,18 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
 
     // --- CSI dispatch ---
 
+    /**
+     * A parameter as a number, or [default] where the far end sent nothing (an absent parameter
+     * and a zero are the same thing to the standard, which is why `CSI H` and `CSI 1;1H` mean the
+     * same).
+     *
+     * Clamped to 0..[MAX_PARAM]. The accumulator already saturates there, so this is the second
+     * line rather than the first: every count that drives a loop or indexes a row comes through
+     * here, and nothing downstream should have to wonder whether the number is sane.
+     */
     private fun param(index: Int, default: Int = 0): Int {
         val v = params.getOrElse(index) { default }
-        return if (v == 0) default else v
+        return (if (v == 0) default else v).coerceIn(0, MAX_PARAM)
     }
 
     private fun executeCsi(final: Char) {
@@ -247,7 +301,10 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
             // Repeat
             'b' -> {
                 val cp = lastPrintedCodePoint
-                if (cp >= 0) repeat(param(0, 1)) { printChar(cp) }
+                // No more than a screenful: the whole point of REP is filling a line, and a
+                // count of a billion is a loop that never comes back with the screen's lock in
+                // its hand.
+                if (cp >= 0) repeat(param(0, 1).coerceAtMost(buffer.columns * buffer.rows)) { printChar(cp) }
             }
             else -> {} // unhandled
         }
@@ -449,5 +506,22 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
                 buffer.cursorRow = 0; buffer.cursorCol = 0
             }
         }
+    }
+
+    companion object {
+        /**
+         * The largest a CSI parameter can be. Every real one is a row, a column, a colour or a
+         * count of either, so this is already far past anything a terminal can mean by it.
+         */
+        const val MAX_PARAM = 65535
+
+        /** How many parameters one sequence can carry. The longest real ones are SGR, under ten. */
+        const val MAX_PARAMS = 64
+
+        /** How many intermediate bytes. The standard allows two; four is room to spare. */
+        const val MAX_INTERMEDIATE = 4
+
+        /** How long an OSC string can be. Only titles are acted on, and no title is this long. */
+        const val MAX_OSC = 8192
     }
 }

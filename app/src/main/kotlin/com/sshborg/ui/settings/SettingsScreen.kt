@@ -1,5 +1,6 @@
 package com.sshborg.ui.settings
 
+import com.sshborg.terminal.saneScrollback
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
@@ -84,6 +85,7 @@ fun SettingsScreen(
     val extraBar              by vm.extraBar.collectAsState()
     val hostSortMode          by vm.hostSortMode.collectAsState()
     val isMigrating           by vm.isMigrating.collectAsState()
+    val savingLockSecret      by vm.savingLockSecret.collectAsState()
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
     val scrollbackLines       by vm.scrollbackLines.collectAsState()
@@ -385,7 +387,8 @@ fun SettingsScreen(
             )
 
             val saveScrollback = {
-                val n = scrollbackText.toIntOrNull()?.coerceIn(100, 50000) ?: 2000
+                val n = scrollbackText.toIntOrNull()?.let { saneScrollback(it) }
+                    ?: com.sshborg.terminal.TerminalBuffer.DEFAULT_SCROLLBACK
                 scrollbackText = n.toString()
                 vm.setScrollbackLines(n)
             }
@@ -567,7 +570,10 @@ fun SettingsScreen(
                             )
                         }
                     }
-                    if (touchless) {
+                    if (savingLockSecret) {
+                        // Hashing the new secret, which the dialog handed over on its way out.
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    } else if (touchless) {
                         TvSelectField(
                             label = stringResource(R.string.settings_app_lock_title),
                             valueText = currentLockLabel,

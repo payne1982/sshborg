@@ -14,8 +14,8 @@ android {
         applicationId = "com.sshborg"
         minSdk = 28
         targetSdk = 36
-        versionCode = 38
-        versionName = "1.20.0"
+        versionCode = 39
+        versionName = "1.21.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -170,7 +170,8 @@ tasks.withType<Test>().configureEach {
         (project.findProperty(name) as String?)?.let { settings[name] = it }
     }
     listOf("keyCorpus", "keyCorpusPassphrase", "keyCorpusUtf8Passphrase", "editorCorpus",
-           "sshHost", "sshPort", "sshUser", "sshKeyDir", "sshKeyPassphrase").forEach { name ->
+           "sshHost", "sshPort", "sshUser", "sshKeyDir", "sshKeyPassphrase",
+           "moshHost", "moshPort", "moshKey", "moshGateOut").forEach { name ->
         if (name !in settings) (project.findProperty(name) as String?)?.let { settings[name] = it }
     }
     settings.forEach { (name, value) -> environment(variableFor(name), value) }

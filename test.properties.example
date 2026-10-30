@@ -39,6 +39,10 @@ emuUser=the-login-that-runs-the-emulator
 #emuAdb=/path/to/platform-tools/adb
 # Where to leave the APKs on that machine (default: /tmp/sshborg-instrumented):
 #emuDir=/path/to/a/folder
+# If that machine sleeps when nobody is using it: a command, run HERE, that wakes it. The script
+# runs it when ssh gets no answer and then waits for it to come up. Wake-on-LAN, a smart plug, an
+# IPMI call — whatever yours needs.
+#emuWake=the-command-that-wakes-it
 # For the terminal screenshot: an address of the SSH server above that the EMULATOR can reach.
 # It is on another machine, so 127.0.0.1 is not it. Unset means that one picture is skipped.
 #emuSshHost=192.0.2.1

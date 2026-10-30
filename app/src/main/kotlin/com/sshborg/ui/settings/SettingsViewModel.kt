@@ -110,6 +110,17 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val _isMigrating = MutableStateFlow(false)
     val isMigrating: StateFlow<Boolean> = _isMigrating
 
+    /**
+     * True while a new PIN/passphrase is being hashed.
+     *
+     * The dialog that collects it closes before this starts — deliberately, since the secret is
+     * already in hand — so there is no dialog left to say that anything is happening, and on a
+     * slow device the wait is seconds. The screen shows it where it shows the encryption
+     * migration, which is the same kind of promise.
+     */
+    private val _savingLockSecret = MutableStateFlow(false)
+    val savingLockSecret: StateFlow<Boolean> = _savingLockSecret
+
     private val _error = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val error: SharedFlow<String> = _error
 
@@ -143,9 +154,14 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     /** Stores a new PIN/passphrase and switches to the in-app lock mode. */
     fun setAppLockSecret(kind: com.sshborg.data.AppLockManager.Kind, secret: CharArray) {
         viewModelScope.launch {
-            appLock.setSecret(kind, secret)
-            secret.fill(' ')
-            prefs.setLockMode(com.sshborg.data.AppPreferences.LOCK_SECRET)
+            _savingLockSecret.value = true
+            try {
+                appLock.setSecret(kind, secret)
+                secret.fill(' ')
+                prefs.setLockMode(com.sshborg.data.AppPreferences.LOCK_SECRET)
+            } finally {
+                _savingLockSecret.value = false
+            }
         }
     }
 
@@ -265,6 +281,16 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         put("sftpStartMode", h.sftpStartMode)
                         put("sftpShowHidden", h.sftpShowHidden)
                         put("allowLegacyCiphers", h.allowLegacyCiphers)
+                        // Backup version 8. Written for every host rather than only when on, so
+                        // that restoring over a host which has it on turns it off again: the
+                        // backup is what the hosts were, not a set of things to add.
+                        put("mosh", h.mosh)
+                        // Backup version 9. Only when they say something: a host left on the
+                        // defaults carries nothing, and a backup from 8 or earlier reads as the
+                        // defaults, which is what those hosts had.
+                        if (h.moshFamily != "auto") put("moshFamily", h.moshFamily)
+                        h.moshPorts?.let { put("moshPorts", it) }
+                        h.moshCommand?.let { put("moshCommand", it) }
                         h.jumpHosts?.let { put("jumpHosts", it) }
                         h.jumpHostIdList?.let { put("jumpHostIdList", it) }
                         h.portForwardings?.let { put("portForwardings", it) }
@@ -280,7 +306,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 7)
+                    put("version", 9)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
@@ -356,12 +382,20 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         jumpHosts = o.optString("jumpHosts").takeIf { it.isNotEmpty() },
                         jumpHostKeys = null,
                         portForwardings = o.optString("portForwardings").takeIf { it.isNotEmpty() },
+                        // "simple" and not the entity's new default: a backup old enough not to
+                        // carry this field was written when the text string was the only mode
+                        // there was, so that is what it meant.
                         jumpMode = o.optString("jumpMode", "simple"),
                         jumpHostIdList = o.optString("jumpHostIdList").takeIf { it.isNotEmpty() },
                         sftpStartMode = o.optString("sftpStartMode", "last"),
                         sftpStartDir = o.optString("sftpStartDir").takeIf { it.isNotEmpty() },
                         sftpShowHidden = o.optBoolean("sftpShowHidden", false),
                         allowLegacyCiphers = o.optBoolean("allowLegacyCiphers", false),
+                        // Absent in backups up to version 7, where no host could have it on.
+                        mosh = o.optBoolean("mosh", false),
+                        moshFamily = o.optString("moshFamily").takeIf { it.isNotEmpty() } ?: "auto",
+                        moshPorts = o.optString("moshPorts").takeIf { it.isNotEmpty() },
+                        moshCommand = o.optString("moshCommand").takeIf { it.isNotEmpty() },
                         groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
                         color = if (o.has("color")) o.getInt("color") else null,
                         position = if (o.has("position")) o.getInt("position") else null,

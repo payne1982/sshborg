@@ -12,7 +12,14 @@ import android.util.Base64
 
 /**
  * Encrypts and decrypts private key material using an AES-256-GCM key stored in
- * the Android Keystore. The key never leaves secure hardware.
+ * the Android Keystore.
+ *
+ * The key is not readable by this process: it is used by handle, and the encryption happens
+ * behind the keystore. Whether it is held in secure hardware is the device's answer and not
+ * ours — on anything modern it is, but nothing here asks for StrongBox or checks what was
+ * given, so this says what the arrangement is rather than promising where the key lives.
+ * It is also not bound to the user being authenticated: that is deliberate, because a session
+ * has to be able to reconnect while the phone is in a pocket.
  *
  * Blob format: Base64(IV_12_bytes || ciphertext)
  */

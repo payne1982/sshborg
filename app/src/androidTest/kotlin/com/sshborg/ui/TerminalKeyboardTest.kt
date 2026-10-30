@@ -85,6 +85,11 @@ class TerminalKeyboardTest {
         TestApp.asReturningUser()
         runBlocking {
             val dao = TestApp.app.db
+            // A run killed between the test and its @After leaves its host behind, and then the
+            // next run has two of the same name and cannot say which one to click. Clearing the
+            // namesakes first makes this self-healing instead of needing the app's data wiped.
+            dao.hostDao().getAllOnce().filter { it.label == HOST_LABEL }.forEach { dao.hostDao().delete(it) }
+            dao.sshKeyDao().getAllOnce().filter { it.label == KEY_LABEL }.forEach { dao.sshKeyDao().delete(it) }
             val imported = SshManager.importPrivateKey(keyFile.readText())
             val keyId = dao.sshKeyDao().upsert(
                 SshKeyEntity(

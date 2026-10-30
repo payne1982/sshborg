@@ -1,0 +1,79 @@
+<en-US>
+• Added support for mosh: connections persist across network changes.
+• Editing a host no longer clears the statistics used to order the list.
+• Setting or checking the app lock PIN no longer freezes the app on slower devices.
+• A server whose host key has changed now says so plainly, and accepting the new key replaces the old one.
+• Hardening of the terminal and file handling.
+</en-US>
+
+<it-IT>
+• Aggiunto il supporto per mosh: connessioni persistenti al cambio di rete.
+• Editare un host non cancella più le statistiche per l'ordinamento nella lista.
+• Impostare o verificare il PIN di blocco non blocca più l'app sui dispositivi lenti.
+• Un server la cui chiave host è cambiata ora lo dice chiaramente, e accettando la nuova chiave si sostituisce quella salvata.
+• Irrobustimento del terminale e della gestione dei file.
+</it-IT>
+
+<de-DE>
+• Unterstützung für mosh hinzugefügt: Verbindungen bleiben bei einem Netzwechsel bestehen.
+• Das Bearbeiten eines Hosts löscht nicht mehr die Statistiken für die Sortierung der Liste.
+• Das Setzen oder Prüfen der App-Sperr-PIN friert die App auf langsameren Geräten nicht mehr ein.
+• Ein Server mit geändertem Hostschlüssel sagt das jetzt deutlich, und wer den neuen Schlüssel annimmt, ersetzt den gespeicherten.
+• Härtung des Terminals und der Dateiverwaltung.
+</de-DE>
+
+<es-ES>
+• Añadido el soporte para mosh: las conexiones persisten al cambiar de red.
+• Editar un host ya no borra las estadísticas que ordenan la lista.
+• Establecer o comprobar el PIN de bloqueo ya no congela la aplicación en dispositivos lentos.
+• Un servidor cuya clave de host ha cambiado ahora lo dice claramente, y al aceptar la nueva se sustituye la guardada.
+• Refuerzo del terminal y del manejo de archivos.
+</es-ES>
+
+<fr-FR>
+• Prise en charge de mosh ajoutée : les connexions persistent lors d'un changement de réseau.
+• Modifier un hôte n'efface plus les statistiques qui servent à trier la liste.
+• Définir ou vérifier le code de verrouillage ne fige plus l'application sur les appareils lents.
+• Un serveur dont la clé d'hôte a changé le dit maintenant clairement, et accepter la nouvelle remplace celle qui était enregistrée.
+• Renforcement du terminal et de la gestion des fichiers.
+</fr-FR>
+
+<pt-PT>
+• Adicionado o suporte para mosh: as ligações persistem ao mudar de rede.
+• Editar um host já não apaga as estatísticas usadas para ordenar a lista.
+• Definir ou verificar o PIN de bloqueio já não congela a aplicação em dispositivos lentos.
+• Um servidor cuja chave de host mudou passa a dizê-lo claramente, e aceitar a nova substitui a que estava guardada.
+• Reforço do terminal e do manuseamento de ficheiros.
+</pt-PT>
+
+<uk>
+• Додано підтримку mosh: з’єднання зберігаються під час зміни мережі.
+• Редагування хоста більше не стирає статистику, за якою впорядковується список.
+• Встановлення або перевірка PIN-коду блокування більше не підвішує застосунок на повільних пристроях.
+• Сервер зі зміненим ключем хоста тепер прямо про це повідомляє, а прийняття нового ключа замінює збережений.
+• Підвищено надійність термінала й роботи з файлами.
+</uk>
+
+<ru-RU>
+• Добавлена поддержка mosh: соединения сохраняются при смене сети.
+• Изменение хоста больше не стирает статистику, по которой сортируется список.
+• Установка или проверка PIN-кода блокировки больше не подвешивает приложение на медленных устройствах.
+• Сервер с изменившимся ключом хоста теперь прямо об этом сообщает, а принятие нового ключа заменяет сохранённый.
+• Повышена надёжность терминала и работы с файлами.
+</ru-RU>
+
+<zh-CN>
+• 新增 mosh 支持：切换网络后连接依然保持。
+• 编辑主机不会再清除用于列表排序的统计数据。
+• 设置或校验应用锁 PIN 码时，在较慢的设备上不再卡死。
+• 主机密钥已更改的服务器现在会明确说明，接受新密钥即替换已保存的密钥。
+• 终端与文件处理的加固。
+</zh-CN>
+
+<ja-JP>
+• mosh に対応しました。ネットワークが変わっても接続が維持されます。
+• ホストを編集しても、一覧の並び替えに使う統計が消えなくなりました。
+• アプリロックの PIN を設定・確認しても、動作の遅い端末でアプリが固まらなくなりました。
+• ホスト鍵が変わったサーバーはそれをはっきり知らせ、新しい鍵を受け入れると保存されていた鍵が置き換わります。
+• 端末とファイル処理の堅牢化。
+</ja-JP>

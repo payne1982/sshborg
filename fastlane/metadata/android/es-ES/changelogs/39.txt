@@ -1,0 +1,5 @@
+• Añadido el soporte para mosh: las conexiones persisten al cambiar de red.
+• Editar un host ya no borra las estadísticas que ordenan la lista.
+• Establecer o comprobar el PIN de bloqueo ya no congela la aplicación en dispositivos lentos.
+• Un servidor cuya clave de host ha cambiado ahora lo dice claramente, y al aceptar la nueva se sustituye la guardada.
+• Refuerzo del terminal y del manejo de archivos.

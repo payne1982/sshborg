@@ -71,6 +71,14 @@ fun AddEditHostScreen(
     val sftpStartDir by vm.sftpStartDir.collectAsState()
     val sftpShowHidden by vm.sftpShowHidden.collectAsState()
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
+    val mosh by vm.mosh.collectAsState()
+    val moshFamily by vm.moshFamily.collectAsState()
+    val moshPorts by vm.moshPorts.collectAsState()
+    val moshCommand by vm.moshCommand.collectAsState()
+    val jumpConfigured by vm.jumpConfigured.collectAsState()
+    // Not an option on this row — the hop's own switch decides — but the form has to be able to
+    // say what will happen, and which hop it is that says so.
+    val moshBastion by vm.moshBastion.collectAsState()
     val groups by vm.groups.collectAsState()
     val groupId by vm.groupId.collectAsState()
     val hostColor by vm.hostColor.collectAsState()
@@ -345,70 +353,211 @@ fun AddEditHostScreen(
                 Text(stringResource(R.string.host_allow_legacy_ciphers))
             }
 
-            HorizontalDivider()
-            Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
-
-            // Mode selector
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    RadioButton(
-                        selected = jumpMode == "simple",
-                        onClick  = { vm.jumpMode.value = "simple" },
+            // Mosh, immediately above the three settings it reveals and immediately above the
+            // jump-host section whose first hop can change what it does. It used to share the
+            // colour's line, which had two faults: a supporting line for a control on the right
+            // starts at the left margin, under the colour, and reads as the colour's; and a
+            // switch four sections above the fields it opens is a switch whose effect happens
+            // out of sight. The colour's line was only ever lent to it because its right half
+            // was empty.
+            //
+            // The whole row stops responding when a jump chain is configured, not only the
+            // switch: a tap on the label must not be able to turn on what the switch refuses,
+            // and the line underneath says why it does.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = !jumpConfigured) { vm.mosh.value = !mosh },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Switch(
+                    checked = mosh && !jumpConfigured,
+                    onCheckedChange = { vm.mosh.value = it },
+                    enabled = !jumpConfigured,
+                )
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(
+                        stringResource(R.string.host_mosh_label),
+                        color = if (jumpConfigured) MaterialTheme.colorScheme.onSurfaceVariant
+                        else MaterialTheme.colorScheme.onSurface,
                     )
-                    Text(stringResource(R.string.host_jump_mode_simple))
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    RadioButton(
-                        selected = jumpMode == "host_list",
-                        onClick  = { vm.jumpMode.value = "host_list" },
+                    Text(
+                        stringResource(R.string.host_mosh_experimental),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(stringResource(R.string.host_jump_mode_host_list))
+                    // Why the switch will not move, and nothing else. What happens *instead*
+                    // depends on the first hop, so it is said where the first hop is chosen.
+                    if (jumpConfigured) {
+                        Text(
+                            stringResource(R.string.host_mosh_disabled_with_jump),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
 
-            if (jumpMode == "simple") {
+            // The three things about a mosh session that depend on somebody else's network and
+            // somebody else's server, so none of them can be decided here. They belong to the
+            // machine that runs mosh-server, which is why a chain walked from a bastion reads
+            // the bastion's own three answers and never these.
+            //
+            // No heading: the switch above them is the heading, and a divider between the two
+            // would put the settings in a section of their own when they belong to it. Hidden
+            // with the chain for the same reason the switch shows off — three settings for a
+            // session that will not happen read as a promise — while the values themselves are
+            // kept, so clearing the chain brings them back as they were.
+            if (mosh && !jumpConfigured) {
+                HostChoiceField(
+                    label = stringResource(R.string.host_mosh_family_label),
+                    selected = moshFamily,
+                    options = listOf(
+                        "auto" to R.string.host_mosh_family_auto,
+                        "ipv4" to R.string.host_mosh_family_ipv4,
+                        "ipv6" to R.string.host_mosh_family_ipv6,
+                    ),
+                    onSelect = { vm.moshFamily.value = it },
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    stringResource(R.string.host_mosh_family_supporting),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
                 HostField(
-                    value = jumpHosts,
-                    onValueChange = { vm.jumpHosts.value = it },
-                    label = stringResource(R.string.host_field_jump_hosts),
+                    value = moshPorts,
+                    onValueChange = { vm.moshPorts.value = it },
+                    label = stringResource(R.string.host_mosh_ports_label),
                     touchless = touchless,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardType = KeyboardType.Uri,
-                    placeholder = stringResource(R.string.host_jump_hosts_placeholder),
-                    supporting = stringResource(R.string.host_jump_hosts_supporting),
+                    placeholder = stringResource(R.string.host_mosh_ports_placeholder),
+                    supporting = stringResource(R.string.host_mosh_ports_supporting),
+                )
+
+                HostField(
+                    value = moshCommand,
+                    onValueChange = { vm.moshCommand.value = it },
+                    label = stringResource(R.string.host_mosh_command_label),
+                    touchless = touchless,
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardType = KeyboardType.Uri,
+                    placeholder = stringResource(R.string.host_mosh_command_placeholder),
+                    supporting = stringResource(R.string.host_mosh_command_supporting),
+                )
+            }
+
+            HorizontalDivider()
+            Text(stringResource(R.string.host_section_jump_hosts), style = MaterialTheme.typography.titleSmall)
+
+            // What a chain through a mosh bastion does, said where the hop that decides it is
+            // chosen — and then, when this row logs in with a password, what becomes of it.
+            // Nothing here is a warning: the session happens either way. Past the bastion the
+            // logins are run by its own ssh, which asks for what it needs in the terminal, so a
+            // password we have saved is simply not the thing that answers it. The same sentence
+            // the hop rows use, because it is the same fact about the same arrangement.
+            moshBastion?.let { bastion ->
+                Text(
+                    stringResource(R.string.host_mosh_via_bastion, bastion.label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (!useKey) {
+                    Text(
+                        stringResource(R.string.host_jump_mosh_password_unused),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            // Mosh and a jump chain exclude each other on one row, and an exclusion enforced from
+            // one side only is not one: the switch cannot be turned on while a chain exists, and
+            // while it is on there is nothing here to build a chain with. What stays is the line
+            // that says how to reach a host *through* a mosh bastion, which is what somebody who
+            // has arrived in this corner is usually after.
+            //
+            // `jumpConfigured` belongs in the condition because a row can arrive with both set,
+            // from an older database or an edited backup. The switch already shows off in that
+            // case, so the section stays usable: a chain that exists can be seen and removed
+            // rather than hidden behind a switch the form says is off.
+            if (mosh && !jumpConfigured) {
+                Text(
+                    stringResource(R.string.host_jump_mosh_chain),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                // Host-list mode: one row per hop
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    jumpHostIds.forEachIndexed { index, selectedId ->
-                        JumpHostRow(
-                            touchless        = touchless,
-                            selectedId       = selectedId,
-                            options          = availableJumpHosts,
-                            onSelect         = { newId ->
-                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                    .also { it[index] = newId }
-                            },
-                            onRemove         = {
-                                vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
-                                    .also { it.removeAt(index) }
-                            },
-                        )
+                // Two choices side by side, kept as radios on purpose: both are visible at once,
+                // which is what makes it read as "one or the other" rather than as a field whose
+                // value happens to be one of them.
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // The host list first, because it is the default and the one that can carry
+                    // a hop's own credentials; the text field is the fallback for a hop that is
+                    // not a host of yours.
+                    listOf(
+                        "host_list" to R.string.host_jump_mode_host_list,
+                        "simple" to R.string.host_jump_mode_simple,
+                    ).forEach { (mode, labelRes) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            RadioButton(
+                                selected = jumpMode == mode,
+                                onClick  = { vm.jumpMode.value = mode },
+                            )
+                            Text(stringResource(labelRes))
+                        }
                     }
-                    OutlinedButton(
-                        onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
-                        modifier  = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = null,
-                            modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.host_jump_add))
+                }
+
+                if (jumpMode == "simple") {
+                    HostField(
+                        value = jumpHosts,
+                        onValueChange = { vm.jumpHosts.value = it },
+                        label = stringResource(R.string.host_field_jump_hosts),
+                        touchless = touchless,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardType = KeyboardType.Uri,
+                        placeholder = stringResource(R.string.host_jump_hosts_placeholder),
+                        supporting = stringResource(R.string.host_jump_hosts_supporting),
+                    )
+                } else {
+                    // Host-list mode: one row per hop
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        jumpHostIds.forEachIndexed { index, selectedId ->
+                            JumpHostRow(
+                                touchless        = touchless,
+                                selectedId       = selectedId,
+                                options          = availableJumpHosts,
+                                // Everything past the first hop is dialled by the bastion's own ssh
+                                // when that hop carries mosh, and a password saved here never
+                                // reaches it — only a key of its own is any use there.
+                                dialledByBastion = index > 0 && moshBastion != null,
+                            first            = index == 0,
+                                onSelect         = { newId ->
+                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                        .also { it[index] = newId }
+                                },
+                                onRemove         = {
+                                    vm.jumpHostIds.value = vm.jumpHostIds.value.toMutableList()
+                                        .also { it.removeAt(index) }
+                                },
+                            )
+                        }
+                        OutlinedButton(
+                            onClick   = { vm.jumpHostIds.value = vm.jumpHostIds.value + 0L },
+                            modifier  = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null,
+                                modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.host_jump_add))
+                        }
                     }
                 }
             }
@@ -431,24 +580,18 @@ fun AddEditHostScreen(
             HorizontalDivider()
             Text(stringResource(R.string.host_section_start_directory), style = MaterialTheme.typography.titleSmall)
 
-            Column {
-                listOf(
+            HostChoiceField(
+                label = stringResource(R.string.host_start_mode_label),
+                selected = sftpStartMode,
+                options = listOf(
                     "last"  to R.string.host_start_mode_last,
                     "fixed" to R.string.host_start_mode_fixed,
                     "home"  to R.string.host_start_mode_home,
-                ).forEach { (mode, labelRes) ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        RadioButton(
-                            selected = sftpStartMode == mode,
-                            onClick  = { vm.sftpStartMode.value = mode },
-                        )
-                        Text(stringResource(labelRes))
-                    }
-                }
-            }
+                ),
+                onSelect = { vm.sftpStartMode.value = it },
+                touchless = touchless,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
             val startDirValue = when (sftpStartMode) {
                 "home" -> "~"
@@ -538,6 +681,10 @@ private fun JumpHostRow(
     touchless: Boolean,
     selectedId: Long,
     options: List<AddEditHostViewModel.JumpHostOption>,
+    /** True where this hop is dialled by the bastion's own ssh rather than by us. */
+    dialledByBastion: Boolean,
+    /** True for the first hop of the chain, which is the one a mosh host would be dialled as. */
+    first: Boolean,
     onSelect: (Long) -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -545,30 +692,52 @@ private fun JumpHostRow(
     val selected = options.find { it.host.id == selectedId }
     val jumpItems: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
         options.forEach { option ->
+            // What the row says about a host is a fact about that host and not a prediction
+            // about this position in the chain: a consequence changes depending on where the hop
+            // is put, and the same sentence then lies in one place and tells the truth in
+            // another. What it logs in with is true wherever it goes, and it is also what
+            // somebody composing a chain wants to see at a glance.
+            val note = when {
+                option.hasKey -> R.string.host_jump_auth_key
+                option.hasCredentials -> R.string.host_jump_auth_password
+                else -> R.string.host_jump_no_password
+            }
+            // Nothing saved is only a problem where *we* have to do the logging in, and the
+            // reason is older than mosh: a hop's credentials have to be resolved before the
+            // connect begins, because the password prompt is the host's own, raised inside the
+            // connect with the server's banner on it, and there is exactly one of it. A hop with
+            // nothing saved would be dropped from the chain, so the row is refused instead.
+            //
+            // Both ways out of that are mosh's. Past the bastion no session of ours dials this
+            // hop at all — the bastion's ssh asks in the terminal. And a mosh host chosen as the
+            // *first* hop stops being a hop: it becomes the host this session dials, where the
+            // one prompt we have is exactly the right prompt.
+            val usable = option.hasCredentials ||
+                dialledByBastion ||
+                (first && option.host.mosh)
             DropdownMenuItem(
                 text = {
                     Column {
                         Text(
                             option.host.label,
-                            color = if (option.isSelectable) LocalContentColor.current
+                            color = if (usable) LocalContentColor.current
                                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                         )
-                        if (!option.isSelectable) {
-                            Text(
-                                stringResource(R.string.host_jump_no_password),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                            )
-                        }
+                        Text(
+                            stringResource(note),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (usable) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                        )
                     }
                 },
                 onClick = {
-                    if (option.isSelectable) {
+                    if (usable) {
                         onSelect(option.host.id)
                         dismiss()
                     }
                 },
-                enabled = option.isSelectable,
+                enabled = usable,
             )
         }
     }
@@ -615,6 +784,58 @@ private fun JumpHostRow(
         IconButton(onClick = onRemove) {
             Icon(Icons.Default.Remove, contentDescription = null,
                 tint = MaterialTheme.colorScheme.error)
+        }
+    }
+}
+
+/**
+ * One of a few named choices, as a dropdown rather than a row of radio buttons.
+ *
+ * Radios were honest but they cost a line each and made the form long enough to hide what came
+ * after them; three of these used to take eleven lines between them. The dropdown shows the
+ * choice made, which is the only one anybody reads after the first time.
+ *
+ * Two flavours because the form already has two: a television has no touch, so there it is the
+ * tap-to-open field the rest of the screen uses ([TvSelectField]) rather than a menu anchored to
+ * a text box the remote cannot aim at.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HostChoiceField(
+    label: String,
+    selected: String,
+    options: List<Pair<String, Int>>,
+    onSelect: (String) -> Unit,
+    touchless: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val shown = stringResource(options.firstOrNull { it.first == selected }?.second ?: options.first().second)
+    val items: @Composable (dismiss: () -> Unit) -> Unit = { dismiss ->
+        options.forEach { (value, labelRes) ->
+            DropdownMenuItem(
+                text = { Text(stringResource(labelRes)) },
+                onClick = { onSelect(value); dismiss() },
+            )
+        }
+    }
+    if (touchless) {
+        TvSelectField(label = label, valueText = shown, modifier = modifier, menuItems = items)
+    } else {
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+            OutlinedTextField(
+                value = shown,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(label) },
+                modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                singleLine = true,
+            )
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                items { expanded = false }
+            }
         }
     }
 }

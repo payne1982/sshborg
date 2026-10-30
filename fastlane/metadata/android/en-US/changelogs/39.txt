@@ -1,0 +1,5 @@
+• Added support for mosh: connections persist across network changes.
+• Editing a host no longer clears the statistics used to order the list.
+• Setting or checking the app lock PIN no longer freezes the app on slower devices.
+• A server whose host key has changed now says so plainly, and accepting the new key replaces the old one.
+• Hardening of the terminal and file handling.

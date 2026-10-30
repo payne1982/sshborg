@@ -1,6 +1,8 @@
 package com.sshborg.data
 
 import android.util.Base64
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
@@ -77,7 +79,7 @@ class AppLockManager(private val prefs: AppPreferences) {
         val newFailed = failed + 1
         return if (newFailed % ATTEMPTS_PER_LOCKOUT == 0) {
             val lockoutNumber = newFailed / ATTEMPTS_PER_LOCKOUT      // 1, 2, 3, …
-            val secs = (BASE_LOCKOUT_SECONDS shl (lockoutNumber - 1)).coerceAtMost(MAX_LOCKOUT_SECONDS)
+            val secs = lockoutSeconds(lockoutNumber)
             prefs.writeLockAttempts(newFailed, now + secs * 1000)
             VerifyResult.LockedOut(secs)
         } else {
@@ -97,14 +99,33 @@ class AppLockManager(private val prefs: AppPreferences) {
         return MessageDigest.isEqual(actual, unb64(record.hashB64))
     }
 
-    private fun pbkdf2(secret: CharArray, salt: ByteArray, iterations: Int): ByteArray {
-        val spec = PBEKeySpec(secret, salt, iterations, KEY_BITS)
-        try {
-            return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
-        } finally {
-            spec.clearPassword()
+    /**
+     * The one piece of work in this class that costs anything, and the reason it is `suspend`.
+     *
+     * [ITERATIONS] iterations of HMAC-SHA256 is deliberately expensive — that is what makes a
+     * four-digit PIN worth anything at all — so it must not run on the thread that draws. Marking
+     * the callers `suspend` was not enough: a suspend function runs on whoever's dispatcher called
+     * it, and all three callers arrive on `Main` (`viewModelScope.launch` from the settings, a
+     * `rememberCoroutineScope` from the two dialogs and from the unlock screen). On a fast device
+     * that finished before Android noticed; on a tablet whose ART had never compiled the app's
+     * code it was 33 seconds of main thread and an ANR on a screen the user cannot leave.
+     * `Dispatchers.Default` because this is CPU-bound, not IO, and because the number of cores is
+     * the right limit on how many of these can run.
+     *
+     * The 33 seconds were that device's, not this algorithm's — the same derivation took a second
+     * once its ART was fixed, and about one on any ordinary phone. The fix stays regardless: a
+     * second of blocked main thread is still a visible stall, and a client cannot assume every
+     * device it runs on is a healthy one.
+     */
+    private suspend fun pbkdf2(secret: CharArray, salt: ByteArray, iterations: Int): ByteArray =
+        withContext(Dispatchers.Default) {
+            val spec = PBEKeySpec(secret, salt, iterations, KEY_BITS)
+            try {
+                SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+            } finally {
+                spec.clearPassword()
+            }
         }
-    }
 
     private fun b64(bytes: ByteArray) = Base64.encodeToString(bytes, Base64.NO_WRAP)
     private fun unb64(s: String) = Base64.decode(s, Base64.NO_WRAP)
@@ -118,5 +139,30 @@ class AppLockManager(private val prefs: AppPreferences) {
         const val ATTEMPTS_PER_LOCKOUT = 5
         private const val BASE_LOCKOUT_SECONDS = 30L
         private const val MAX_LOCKOUT_SECONDS = 15L * 60L
+
+        /**
+         * How long the [lockoutNumber]th lockout lasts: 30 s, then doubling to a quarter of an
+         * hour, which it then stays at.
+         *
+         * The doubling was a shift, and `shl` on a `Long` uses **only the low six bits** of the
+         * count. Worked out over the whole range: lockouts 60 to 63 overflowed into a negative
+         * number, the 64th came out as 0, the 65th shifted by nothing and asked for 30 seconds
+         * again, and from there it went round the cycle for ever — twelve of the first two hundred
+         * were negative. `coerceAtMost` returned all of them happily, and a lockout of minus two
+         * billion seconds is one that expired long ago: from the 300th wrong attempt on, the
+         * unlock screen could be tried as fast as a PIN can be typed. Getting there costs some
+         * three hundred attempts and most of a day of waiting, which is a patient afternoon with
+         * somebody's phone and not a theory.
+         *
+         * So the shift is clamped where the maximum already bites — 30 << 5 is past it — and the
+         * schedule is the same one it always was.
+         */
+        internal fun lockoutSeconds(lockoutNumber: Int): Long {
+            val shift = (lockoutNumber - 1).coerceIn(0, MAX_LOCKOUT_SHIFT)
+            return (BASE_LOCKOUT_SECONDS shl shift).coerceAtMost(MAX_LOCKOUT_SECONDS)
+        }
+
+        /** The first shift whose result is already past [MAX_LOCKOUT_SECONDS]. */
+        private const val MAX_LOCKOUT_SHIFT = 5
     }
 }

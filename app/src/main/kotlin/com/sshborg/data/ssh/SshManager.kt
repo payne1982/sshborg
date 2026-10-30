@@ -24,6 +24,32 @@ object SshManager {
     private const val OPENSSH_PEM_WIDTH = 70
 
     /**
+     * The address to dial for [hostname] when a family has been asked for, or the name itself.
+     *
+     * Returning the name is what this app has always done and what `auto` keeps doing: the
+     * resolver picks, and on Android that means IPv6 first. A host that has asked for a family
+     * gets the first address of it, and the *name* if that family has nothing — a preference is
+     * not worth failing a connection over.
+     *
+     * Only mosh has a reason to care, and the reason is in [SshConnectionParams.addressFamily]: a
+     * mosh session is bound to the family it was born on. Resolving here rather than twice also
+     * closes something that was merely unlikely before — the handover gives mosh no address, so it
+     * used to resolve the name again and could in principle have landed on a different one than
+     * SSH had used.
+     */
+    private fun preferredAddress(hostname: String, family: String): String {
+        if (family != "ipv4" && family != "ipv6") return hostname
+        val wanted = if (family == "ipv4") java.net.Inet4Address::class.java
+        else java.net.Inet6Address::class.java
+        return runCatching {
+            java.net.InetAddress.getAllByName(hostname)
+                .firstOrNull { wanted.isInstance(it) }
+                ?.hostAddress
+                ?: hostname
+        }.getOrDefault(hostname)
+    }
+
+    /**
      * The body of an OpenSSH private key, broken into lines the way ssh-keygen breaks them.
      *
      * The breaking is done here instead of by `Base64.getMimeEncoder(width, …)` because MIME wants
@@ -59,7 +85,7 @@ object SshManager {
      * waits on a pipe with no deadline of any kind.
      */
     private class ConnectGuard(
-        private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
         private val onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
     ) {
         private val sessions = mutableListOf<Session>()
@@ -128,9 +154,9 @@ object SshManager {
             }
 
         /** The host-key callback, wrapped so it stops the clock for as long as it blocks. */
-        val verify: (String, String, String) -> Boolean = { hostname, fingerprint, keyLine ->
+        val verify: (String, String, String, Boolean) -> Boolean = { hostname, fingerprint, keyLine, changed ->
             waitingForUser = true
-            try { onHostKeyVerify(hostname, fingerprint, keyLine) } finally { waitingForUser = false }
+            try { onHostKeyVerify(hostname, fingerprint, keyLine, changed) } finally { waitingForUser = false }
         }
 
         /**
@@ -223,7 +249,7 @@ object SshManager {
      */
     private suspend fun <T> guardedConnect(
         params: SshConnectionParams,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
         onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
         block: suspend (ConnectGuard) -> T,
     ): T {
@@ -271,10 +297,10 @@ object SshManager {
         columns: Int = 80,
         rows: Int = 24,
         onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
     ): ShellSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard -> runInterruptible {
 
-        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
+        val (session, dialled, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPtyType(termType)
@@ -298,7 +324,7 @@ object SshManager {
         channel.connect(10_000)
 
         val hostKeyLine = buildKnownHostsLine(session.hostKey)
-        ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
+        ShellSession(session, channel, channelInput, channelOutput, params.hostname, hostKeyLine, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates, dialled)
     } }
 
     /**
@@ -307,10 +333,11 @@ object SshManager {
     suspend fun openSftp(
         params: SshConnectionParams,
         onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
     ): SftpSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard ->
 
-        val (session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) =
+        // SFTP has no use for the address it was dialled at; only mosh does.
+        val (session, _, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) =
             runInterruptible { createSession(params, guard) }
 
         val channel = runInterruptible {
@@ -333,6 +360,12 @@ object SshManager {
 
     private data class SessionResult(
         val session: Session,
+        /**
+         * The address the session was dialled at: the name, or a literal when a family was asked
+         * for. Carried out of here because mosh needs the address SSH actually used, not the name
+         * resolved a second time.
+         */
+        val dialled: String,
         val jumpSessions: List<Session>,
         /** New host-key lines for simple-mode jump hops (no prior stored key). */
         val newJumpKeyLines: List<String>,
@@ -402,10 +435,9 @@ object SshManager {
                 }
                 override fun promptPassphrase(message: String?) = false
                 override fun promptYesNo(message: String?): Boolean {
-                    val fp = message?.lines()
-                        ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
-                        ?: message ?: "unknown"
-                    return guard.verify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
+                    val fp = fingerprintOf(jumpJsch, jumpSession.hostKey, message)
+                    val line = buildKnownHostsLine(jumpSession.hostKey)
+                    return guard.verify(jump.host, fp, line, KnownHosts.identityChanged(jump.knownHostsEntry, line))
                 }
                 override fun showMessage(message: String?) = typed.noteBanner(message)
                 override fun promptKeyboardInteractive(
@@ -425,7 +457,14 @@ object SshManager {
             })
 
             val jumpConfig = Properties().apply {
-                setProperty("StrictHostKeyChecking", if (jump.knownHostsEntry.isNullOrBlank()) "ask" else "yes")
+                // `ask`, as for the machine at the end of the chain. A hop used to be `yes` once
+                // it had a key pinned, which meant a hop whose key had changed was refused by JSch
+                // with its own English sentence and no dialog at all — while the destination, the
+                // machine that matters most, asked. Strictness that cannot be answered is not
+                // protection: the way out of it was "reset accepted host keys", which throws every
+                // pin away. Asked, it is a dialog that names the hop, says in red that this is not
+                // the key that was saved, and replaces that key only if the person says so.
+                setProperty("StrictHostKeyChecking", "ask")
                 setProperty("PreferredAuthentications", when (jumpAuth) {
                     is SshAuth.PublicKey -> "publickey"
                     is SshAuth.Password, SshAuth.Interactive -> "password,keyboard-interactive"
@@ -444,9 +483,11 @@ object SshManager {
                      else "connecting to jump host ${hop + 1} through the previous hop")
             jumpSession.connect(20_000)
 
-            // Collect the host key so we can persist it if it was unknown
-            if (jump.knownHostsEntry.isNullOrBlank()) {
-                val keyLine = buildKnownHostsLine(jumpSession.hostKey)
+            // Collect the hop's key unless it is already the pinned one: nothing pinned, a
+            // second algorithm, or a key the person has just accepted in place of the old one.
+            val hopKey = buildKnownHostsLine(jumpSession.hostKey)
+            if (!KnownHosts.isPinned(jump.knownHostsEntry, hopKey)) {
+                val keyLine = hopKey
                 if (jump.hostId != null) {
                     // Host-list mode: associate key update with the jump host entity
                     newJumpHostKeyUpdates.add(jump.hostId to keyLine)
@@ -478,8 +519,19 @@ object SshManager {
             jsch.setKnownHosts(ByteArrayInputStream(params.knownHostsEntry.toByteArray()))
         }
 
-        val session = jsch.getSession(params.username, params.hostname, params.port)
+        // The address we actually dial. Normally the name, left to the resolver as it always has
+        // been; an address of a chosen family when a host asked for one, which only mosh has a
+        // reason to. See [preferredAddress] for why the name still does the vouching.
+        val dialled = if (proxy != null) params.hostname
+        else preferredAddress(params.hostname, params.addressFamily)
+
+        val session = jsch.getSession(params.username, dialled, params.port)
         guard.track(session)
+        // Connect to the address, check the host key under the name. Without this a host whose
+        // family is chosen would be dialled as a literal, find nothing under that literal in its
+        // own pinned known-hosts entry, and ask to trust the server all over again — turning a
+        // preference about routing into a hole in the one check that says the server is the server.
+        if (dialled != params.hostname) session.setHostKeyAlias(params.hostname)
         if (proxy != null) session.setProxy(proxy)
 
         // Tag the session with the jump sessions so ShellSession/SftpSession can clean them up
@@ -508,10 +560,12 @@ object SshManager {
             }
             override fun promptPassphrase(message: String?) = false
             override fun promptYesNo(message: String?): Boolean {
-                val fp = message?.lines()
-                    ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
-                    ?: message ?: "unknown"
-                return guard.verify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
+                val fp = fingerprintOf(jsch, session.hostKey, message)
+                val line = buildKnownHostsLine(session.hostKey)
+                // Whether this is a host being introduced or the host we pinned offering a
+                // different key. The dialog has to say which, and saying yes has to mean
+                // something different in each case — see [KnownHosts].
+                return guard.verify(params.hostname, fp, line, KnownHosts.identityChanged(params.knownHostsEntry, line))
             }
             // Where the banner arrives: during authentication, which is why the prompt for a
             // password that is not saved anywhere is raised from in here (see [SshAuth.Interactive]).
@@ -588,7 +642,7 @@ object SshManager {
             session.setPortForwardingL(pf.bindAddress, pf.localPort, pf.remoteHost, pf.remotePort)
         }
 
-        return SessionResult(session, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
+        return SessionResult(session, dialled, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates)
     }
 
     /** JSch [Proxy] implementation that tunnels through an already-connected SSH [Session]. */
@@ -823,6 +877,24 @@ object SshManager {
         try { kp.isEncrypted } finally { kp.dispose() }
     }.getOrDefault(false)
 
+    /**
+     * The fingerprint of the key the server has just offered, taken from the key itself.
+     *
+     * It used to be read out of JSch's own warning, by taking the first line with the word
+     * "fingerprint" in it. That works for a host we have never met, where the word and the value
+     * share a line — and fails in the case that matters: the changed-key warning puts the value on
+     * the line *after* "The fingerprint for the … key sent by the remote host … is", so the dialog
+     * showed that sentence where the fingerprint should have been. The key is in our hands here,
+     * and it is the thing being asked about, so it is asked.
+     *
+     * The message is still the fallback, because a fingerprint the library declines to compute is
+     * no reason to show an empty dialog.
+     */
+    private fun fingerprintOf(jsch: JSch, hostKey: HostKey, message: String?): String =
+        runCatching { hostKey.getFingerPrint(jsch) }.getOrNull()?.takeIf { it.isNotBlank() }
+            ?: message?.lines()?.firstOrNull { it.contains("SHA256") || it.contains("MD5") }
+            ?: message ?: "unknown"
+
     /** Builds a known_hosts line from a JSch HostKey. */
     fun buildKnownHostsLine(hostKey: HostKey): String =
         "${hostKey.host} ${hostKey.type} ${hostKey.getKey()}"
@@ -848,7 +920,12 @@ data class ImportedKey(
     val keyType: String,
 )
 
-/** A live interactive SSH shell. */
+/**
+ * A live interactive SSH shell.
+ *
+ * It is a [com.sshborg.data.terminal.ShellChannel] so that the read loop which consumes it can be
+ * tested without one of these: the five members below are everything a transport touches.
+ */
 class ShellSession(
     private val session: Session,
     private val channel: ChannelShell,
@@ -868,10 +945,16 @@ class ShellSession(
      * Persist each keyLine to the corresponding HostEntity's knownHostsEntry.
      */
     val newJumpHostKeyUpdates: List<Pair<Long, String>> = emptyList(),
-) {
-    val inputStream: java.io.InputStream get() = channelInput
-    val isConnected get() = channel.isConnected && session.isConnected
-    val exitStatus get() = channel.exitStatus
+    /**
+     * The address this session was actually dialled at — the name, or a literal when a family was
+     * chosen. It is what mosh is handed, so that the UDP half talks to exactly the address the SSH
+     * half used rather than resolving the name a second time and hoping to agree.
+     */
+    val dialledAddress: String = hostname,
+) : com.sshborg.data.terminal.ShellChannel {
+    override val inputStream: java.io.InputStream get() = channelInput
+    override val isConnected get() = channel.isConnected && session.isConnected
+    override val exitStatus get() = channel.exitStatus
 
     // JSch's channel OutputStream (channel.outputStream) is NOT thread-safe: its write/flush
     // are unsynchronized and accumulate into a shared packet buffer. We write to it from
@@ -881,7 +964,7 @@ class ShellSession(
     private val writeLock = Any()
 
     /** Writes [data] to the remote shell's stdin and flushes, serialized against other writers. */
-    fun write(data: ByteArray) {
+    override fun write(data: ByteArray) {
         synchronized(writeLock) {
             try {
                 stdinOutput.write(data)
@@ -894,8 +977,100 @@ class ShellSession(
         }
     }
 
-    fun resize(columns: Int, rows: Int) {
+    override fun resize(columns: Int, rows: Int) {
         channel.setPtySize(columns, rows, columns * 8, rows * 16)
+    }
+
+    /**
+     * Starts a `mosh-server` on this connection and reads its handover line.
+     *
+     * One exec channel, one command, one line of output. Three details are not obvious:
+     *
+     * - **no pty is asked for.** `mosh-server` takes its initial size from `TIOCGWINSZ` on its
+     *   stdin and falls back to 80x24, and the stock client does not request one either: the real
+     *   size arrives a moment later in the first datagram, which costs one extra frame and avoids
+     *   handing a detaching daemon a controlling terminal;
+     * - **`env` rather than `VAR=value cmd`.** sshd runs the command through the account's login
+     *   shell, and `fish` has no such syntax at all — we already know fish users exist, because
+     *   the history reader looks for its history file;
+     * - **the network timeout is raised far above the default.** A server hears nothing for forty
+     *   seconds and detaches, then exits. On a phone that is not an edge case: Doze batches our
+     *   heartbeat as soon as the screen goes off, so the default would end the session in exactly
+     *   the situation mosh exists for. Making the server patient is the cure, and it costs one
+     *   environment variable.
+     *
+     * @param networkTimeoutSeconds what the server waits, hearing nothing, before giving up.
+     * @param command the server binary, for the accounts where it is installed somewhere the
+     *   login shell's PATH does not reach.
+     * @throws MoshUnavailable with the reason, which the caller shows to the user. Never with the
+     *   key in it: anything echoed back into a diagnostic has the handover line taken out first.
+     */
+    fun startMoshServer(
+        networkTimeoutSeconds: Int,
+        command: String = "mosh-server",
+        ports: String? = null,
+        timeoutMs: Int = 20_000,
+    ): MoshBootstrap {
+        val channel = session.openChannel("exec") as com.jcraft.jsch.ChannelExec
+        // -p only when a host asked for one: left out, mosh picks from its own range of a
+        // thousand ports, which is the default precisely because nobody should have to care.
+        val range = MoshBootstrap.portRange(ports)?.let { " -p $it" } ?: ""
+        channel.setCommand(
+            "env MOSH_SERVER_NETWORK_TMOUT=$networkTimeoutSeconds $command new -s$range -c 256"
+        )
+        val errors = java.io.ByteArrayOutputStream()
+        channel.setErrStream(errors)
+        // The pipe has to exist before connect() or JSch silently drops what arrives first.
+        val output = channel.inputStream
+        try {
+            channel.connect(timeoutMs)
+            val said = readUntilClosed(channel, output, timeoutMs)
+            val full = said + errors.toString(Charsets.UTF_8.name())
+
+            MoshBootstrap.CONNECT_LINE.find(said)?.let { match ->
+                return MoshBootstrap(
+                    host = dialledAddress,
+                    port = match.groupValues[1].toInt(),
+                    key = match.groupValues[2],
+                )
+            }
+            throw MoshUnavailable(
+                reason = when {
+                    channel.exitStatus == 127 || "not found" in full -> MoshUnavailable.Reason.NotInstalled
+                    "UTF-8" in full || "utf-8" in full -> MoshUnavailable.Reason.LocaleNotUtf8
+                    else -> MoshUnavailable.Reason.NoConnectLine
+                },
+                detail = MoshBootstrap.redact(full),
+            )
+        } finally {
+            runCatching { channel.disconnect() }
+        }
+    }
+
+    /** Reads an exec channel's output until it closes or [timeoutMs] runs out. */
+    private fun readUntilClosed(
+        channel: com.jcraft.jsch.ChannelExec,
+        output: java.io.InputStream,
+        timeoutMs: Int,
+    ): String {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        val said = StringBuilder()
+        val buffer = ByteArray(1024)
+        while (System.currentTimeMillis() < deadline) {
+            if (output.available() > 0) {
+                val n = output.read(buffer)
+                if (n < 0) break
+                said.append(String(buffer, 0, n, Charsets.UTF_8))
+                // The handover is the first line; waiting for the channel to close as well would
+                // mean waiting for the daemon to let go of it.
+                if (MoshBootstrap.CONNECT_LINE.containsMatchIn(said)) break
+            } else if (channel.isClosed) {
+                break
+            } else {
+                Thread.sleep(POLL_MS)
+            }
+        }
+        return said.toString()
     }
 
     /**
@@ -911,6 +1086,11 @@ class ShellSession(
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
         jumpSessions.reversed().forEach { runCatching { it.disconnect() } }
+    }
+
+    private companion object {
+        /** How long to wait between looks at an exec channel that has said nothing yet. */
+        const val POLL_MS = 20L
     }
 }
 
@@ -1014,8 +1194,13 @@ class SftpSession(
     fun listDir(path: String): List<SftpEntry> {
         val base = path.trimEnd('/')
         val raw = op { it.ls(path) } as Collection<com.jcraft.jsch.ChannelSftp.LsEntry>
+        // `.` and `..` are in every listing and are simply not shown; anything else that is not
+        // a plain name is a server answering with a path where a name belongs, which is counted
+        // out loud because it should never happen. See [SftpNames].
+        val odd = raw.count { !SftpNames.isPlain(it.filename) && it.filename != "." && it.filename != ".." }
+        if (odd > 0) android.util.Log.w("SftpSession", "$odd entries were not plain names and were left out")
         return raw
-            .filter { it.filename != "." && it.filename != ".." }
+            .filter { SftpNames.isPlain(it.filename) }
             .map { e ->
                 // lstat returns the symlink's own attrs, not the target's.
                 // For symlinks we call stat() so isDir correctly reflects the target type.
@@ -1075,6 +1260,11 @@ class SftpSession(
     /**
      * Reads [remotePath] whole into memory, for the editor. Checks the size first and refuses
      * anything over [limit]: a file too big to edit is also too big to be worth downloading.
+     *
+     * The declared size is checked, and then the arriving bytes are counted against the same
+     * limit — because the first number is the server's word and the second is our memory. A file
+     * that grew between the two, or a server that answers `stat` with whatever it likes, stops at
+     * the limit instead of filling the heap.
      */
     fun readFile(
         remotePath: String,
@@ -1084,8 +1274,36 @@ class SftpSession(
         val size = op { it.stat(remotePath) }.size
         if (size > limit) throw FileTooLargeException(size, limit)
         val out = java.io.ByteArrayOutputStream(size.coerceIn(0L, limit).toInt())
-        downloadFile(remotePath, out, onProgress)
+        try {
+            downloadFile(remotePath, CountedStream(out, limit), onProgress)
+        } catch (e: Exception) {
+            // JSch wraps what a stream throws at it, so the reason has to be fished back out of
+            // the chain to be reported as the limit it is rather than as a transfer failure.
+            var cause: Throwable? = e
+            while (cause != null) {
+                if (cause is TooMuchArriving) throw FileTooLargeException(cause.got, limit)
+                cause = cause.cause
+            }
+            throw e
+        }
         return out.toByteArray()
+    }
+
+    private class TooMuchArriving(val got: Long) : java.io.IOException("more bytes than the limit allows")
+
+    /** Passes bytes on until there have been more than [limit] of them. */
+    private class CountedStream(
+        private val sink: java.io.OutputStream,
+        private val limit: Long,
+    ) : java.io.OutputStream() {
+        private var written = 0L
+        override fun write(b: Int) { count(1); sink.write(b) }
+        override fun write(b: ByteArray, off: Int, len: Int) { count(len.toLong()); sink.write(b, off, len) }
+        override fun flush() = sink.flush()
+        private fun count(n: Long) {
+            written += n
+            if (written > limit) throw TooMuchArriving(written)
+        }
     }
 
     /**
@@ -1095,33 +1313,114 @@ class SftpSession(
      *
      * The swap is a plain rename, which JSch turns into posix-rename@openssh.com wherever the
      * server offers it (OpenSSH always does) — one atomic step, and the original survives if it
-     * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there
-     * we write in place instead rather than delete the original and hope.
+     * fails. Servers with only the SFTP v3 rename refuse to replace a name that already exists,
+     * and v3 has one generic FAILURE for every reason a rename can be refused — so there is no
+     * way to tell "the name is taken" from "no room", "no permission" or "no". The old answer was
+     * to upload over the original instead, and that is exactly the wrong one: an upload opens the
+     * file for writing, which **truncates it before the first byte arrives**, so a save that then
+     * failed took the original with it.
+     *
+     * So the fallback never writes over anything. The original is moved aside, the temporary
+     * takes its name, and only then is the original removed; if the second move fails, the first
+     * is undone. At no point is the file opened for writing, which is the only way it could be
+     * lost — and a crash in the middle leaves the contents under one name or the other, never
+     * under neither.
+     *
+     * ### Why the name is random and the mode comes first
+     *
+     * The temporary used to be `.<name>.sshborg-tmp`, which is a name anyone can work out in
+     * advance. In a directory a second account can write to — a shared project, a group-writable
+     * folder — that account could leave a symlink waiting under that name, and SFTP's write
+     * follows it: saving a file here would have truncated a file somewhere else, chosen by
+     * somebody else, with our own access. An unguessable name is the part of that we can fix.
+     *
+     * It is a mitigation and not a guarantee, and the difference is worth writing down: the
+     * guarantee would be creating the file exclusively, which is `SSH_FXF_EXCL` in the protocol
+     * and is not reachable through the SFTP client we use — `put` offers overwrite, resume and
+     * append, and nothing else. So the name is made unpredictable, the name is checked to be free
+     * first, and that is as far as this goes.
+     *
+     * The permissions are put on the empty file before its contents go in, which costs one small
+     * round trip and closes a different window: the temporary was being created with the server's
+     * default mode, so the whole of a 0600 file passed through a world-readable name under an
+     * umask of 022. A mode we fail to set is a save that does not happen, rather than one that
+     * quietly widens the file it is saving.
      */
     fun writeFile(remotePath: String, bytes: ByteArray) {
         val slash = remotePath.lastIndexOf('/')
         val dir = if (slash <= 0) "" else remotePath.substring(0, slash)
         val name = remotePath.substring(slash + 1)
-        val temp = "$dir/.$name.sshborg-tmp"
         val mode = runCatching { op { it.stat(remotePath) }.permissions }.getOrNull()
+        val suffix = ByteArray(9).also { java.security.SecureRandom().nextBytes(it) }
+            .joinToString("") { "%02x".format(it) }
+        val temp = "$dir/.$name.$suffix.sshborg-tmp"
+        if (runCatching { op { it.stat(temp) } }.isSuccess) {
+            throw java.io.IOException("the temporary file $temp already exists")
+        }
 
+        // A file whose own mode we could not read is written owner-only: we have just read this
+        // file, so it barely happens, and that is the safe way for it to be wrong.
+        val wanted = mode ?: OWNER_ONLY
         try {
+            // Empty first, then the mode, then the contents.
+            uploadFile(java.io.ByteArrayInputStream(ByteArray(0)), temp)
+            if (!isWearing(temp, wanted)) {
+                runCatching { op { it.chmod(wanted, temp) } }
+                // Asked for, and then looked at. A server that cannot change a mode at all — a
+                // filesystem without them, where every file reads back as the same thing — is
+                // already wearing it and never gets here; one that failed for any other reason
+                // would otherwise write the contents under whatever the umask chose, which is
+                // how a 0600 file came to pass through a readable name in the first place.
+                if (!isWearing(temp, wanted)) {
+                    throw java.io.IOException("$temp could not be given the file's own permissions")
+                }
+            }
             uploadFile(java.io.ByteArrayInputStream(bytes), temp)
         } catch (e: Exception) {
             runCatching { op { it.rm(temp) } }
             throw e
         }
-        // The temporary file is created with the server's default mode; give it the original's
-        // before the swap, or saving would quietly clear an executable bit or widen a 0600 file.
-        if (mode != null) runCatching { op { it.chmod(mode, temp) } }
         try {
             op { it.rename(temp, remotePath) }
-        } catch (e: com.jcraft.jsch.SftpException) {
-            android.util.Log.w("SftpSession", "rename onto an existing name refused, writing in place", e)
-            uploadFile(java.io.ByteArrayInputStream(bytes), remotePath)
-            runCatching { op { it.rm(temp) } }
+        } catch (refused: Exception) {
+            // Why the reason is not examined: SFTP v3 answers every refusal with the same generic
+            // FAILURE, so "the name is taken" is not a thing that can be recognised. The way out
+            // has to be one that is safe whatever the reason was — and moving a file is that,
+            // while writing over it is not.
+            val aside = "$dir/.$name.$suffix.sshborg-old"
+            try {
+                op { it.rename(remotePath, aside) }
+            } catch (_: Exception) {
+                // Not even that was allowed: nothing has been touched, so the original refusal is
+                // the honest answer and the temporary goes away with it.
+                runCatching { op { it.rm(temp) } }
+                throw refused
+            }
+            android.util.Log.w("SftpSession", "rename onto an existing name refused, moving the original aside", refused)
+            try {
+                op { it.rename(temp, remotePath) }
+            } catch (e: Exception) {
+                // Put it back. The file is where it was, and the save is reported as the failure
+                // it is rather than leaving a hole where the original used to be.
+                runCatching { op { it.rename(aside, remotePath) } }
+                runCatching { op { it.rm(temp) } }
+                throw e
+            }
+            runCatching { op { it.rm(aside) } }
         }
     }
+
+    /** Whether [remotePath]'s permission bits are already the ones in [mode]. */
+    private fun isWearing(remotePath: String, mode: Int): Boolean =
+        runCatching { op { it.stat(remotePath) }.permissions }
+            .getOrNull()
+            ?.let { (it and PERMISSION_BITS) == (mode and PERMISSION_BITS) } ?: false
+
+    /** `0600`, for a temporary whose original mode could not be read. */
+    private val OWNER_ONLY = 0b110_000_000
+
+    /** The low twelve bits: the mode itself, without the bits that say what kind of file it is. */
+    private val PERMISSION_BITS = 0b111_111_111_111
 
     fun deleteFile(remotePath: String) = op { it.rm(remotePath) }
     fun deleteDir(remotePath: String)  = op { it.rmdir(remotePath) }

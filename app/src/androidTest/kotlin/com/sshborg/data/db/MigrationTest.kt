@@ -17,7 +17,9 @@ import org.junit.runner.RunWith
  * A database somebody already has must survive an update, and there is no second chance: a
  * migration that gets it wrong meets the user as "the app won't open any more", with their hosts
  * and keys inside. This is also the one part of the app that has already gone wrong here — a
- * 13→14 migration was added and then removed, which left a database newer than the schema.
+ * 13→14 migration was added and then removed, which left a development database newer than the
+ * schema. Version 14 is now the per-host mosh switch and 15 its three settings, and nothing ever
+ * shipped the other one.
  *
  * Room checks the result itself: [MigrationTestHelper.runMigrationsAndValidate] compares what the
  * migration produced against the schema exported from the entities, and fails on any difference —
@@ -88,9 +90,12 @@ class MigrationTest {
 
         // Runs every migration the app ships and then holds the result against the schema the
         // entities describe. Anything the migration forgot fails here.
-        val migrated = helper.runMigrationsAndValidate(NAME, 13, true, *AppDatabase.MIGRATIONS)
+        val migrated = helper.runMigrationsAndValidate(NAME, 15, true, *AppDatabase.MIGRATIONS)
 
-        migrated.query("SELECT label, hostname, port, position, connectCount FROM hosts").use {
+        migrated.query(
+            "SELECT label, hostname, port, position, connectCount, mosh, moshFamily, moshPorts, " +
+                "moshCommand FROM hosts"
+        ).use {
             assertTrue("the host did not survive the upgrade", it.moveToFirst())
             assertEquals("fatberry", it.getString(0))
             assertEquals("10.0.0.9", it.getString(1))
@@ -99,6 +104,14 @@ class MigrationTest {
             // position yet, and a host nobody has connected to.
             assertTrue("position should start unset", it.isNull(3))
             assertEquals(0, it.getInt(4))
+            // 13→14: a host that existed before mosh did must come out with it off. Anything
+            // else would turn it on behind the user's back, for a server that may not have it.
+            assertEquals("mosh should be off for a host that predates it", 0, it.getInt(5))
+            // 14→15: the three mosh settings, defaulting to "as before" — the resolver's own
+            // choice of address, mosh's own range of ports, and mosh-server on the PATH.
+            assertEquals("auto", it.getString(6))
+            assertTrue("no port range was asked for", it.isNull(7))
+            assertTrue("no command was overridden", it.isNull(8))
             assertEquals("one host in, one host out", 1, it.count)
         }
         migrated.query("SELECT name, color, position FROM host_groups").use {

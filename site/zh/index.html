@@ -536,6 +536,40 @@
         }
         .tip-section p.support-source { margin: 26px 0 0; }
 
+        /* ── Landing on a section from the nav or the footer ──── */
+        /* The nav is sticky, so without a scroll margin the heading of the section
+           jumped to ends up behind it: that is how the support section came to look
+           as if it were not there at all. The docs pages already do this. */
+        /* --nav-h is measured by the script below, because the bar's height is not a
+           constant: the links wrap on a narrow screen, and the phone menu opens
+           inside the bar itself, where it can take half the screen. */
+        section[id], .tip-section[id] { scroll-margin-top: calc(var(--nav-h, 84px) + 12px); }
+
+        /* Arriving there it says so: two flashes in the section's own colour, and
+           then nothing — the border is there only for the flash to colour, so the
+           box does not shift while it plays, and it leaves no outline behind. */
+        .support-section { --flash: var(--neon-blue); }
+        #tip { --flash: var(--copper); }
+        .tip-section[id] { border: 1px solid transparent; }
+        .tip-section.arrived { animation: section-arrival 2.2s ease-out 1; }
+        @keyframes section-arrival {
+            0%   { border-color: transparent;  box-shadow: none;                      background: transparent; }
+            12%  { border-color: var(--flash); box-shadow: 0 0 26px -6px var(--flash); background: rgba(255,255,255,0.03); }
+            40%  { border-color: transparent;  box-shadow: none;                      background: transparent; }
+            60%  { border-color: var(--flash); box-shadow: 0 0 26px -6px var(--flash); background: rgba(255,255,255,0.03); }
+            100% { border-color: transparent;  box-shadow: none;                      background: transparent; }
+        }
+        /* Reduced motion gets one slow fade instead of two flashes, and still
+           nothing that stays. */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .tip-section.arrived { animation: section-arrival-gentle 1.8s ease-in-out 1; }
+            @keyframes section-arrival-gentle {
+                0%, 100% { border-color: transparent;  background: transparent; }
+                45%      { border-color: var(--flash); background: rgba(255,255,255,0.03); }
+            }
+        }
+
         /* ── Footer ──────────────────────────────────────────── */
         footer {
             border-top: 1px solid var(--border);
@@ -901,6 +935,56 @@ document.addEventListener('keydown', function(e) {
             dd.querySelector('.dl-toggle').focus();
         }
     }
+});
+
+// The flash is driven from here rather than from :target, which would play once
+// and never again for a second click on the link of the section we are already
+// in. Started by hand on a click, and on arrival from another page.
+function flashSection(el) {
+    if (!el || !el.classList.contains('tip-section')) return;
+    el.classList.remove('arrived');
+    void el.offsetWidth;
+    el.classList.add('arrived');
+}
+// The phone menu opens inside the sticky bar, so a link tapped in it has to close
+// it first: left open, the bar is half the screen and the section lands underneath.
+function closeMenu() {
+    var links = document.querySelector('.nav-links');
+    var burger = document.querySelector('.nav-hamburger');
+    if (links && links.classList.contains('open')) {
+        links.classList.remove('open');
+        if (burger) burger.setAttribute('aria-expanded', 'false');
+    }
+}
+// The bar's own height, handed to the CSS so the jump clears it whatever it is.
+function syncNavHeight() {
+    var nav = document.querySelector('nav');
+    if (nav) document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+}
+document.addEventListener('click', function(e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    closeMenu();
+    syncNavHeight();          // reads the height back, so the bar is already shut
+    var id = a.getAttribute('href').slice(1);
+    if (!id) return;
+    var el = document.getElementById(id);
+    // Tapping the link of the section we are already in leaves the hash unchanged,
+    // so the browser scrolls nowhere — and closing the menu has just moved the page
+    // up by its height. Put the section back where it belongs ourselves.
+    if (el && location.hash.slice(1) === id) el.scrollIntoView();
+    flashSection(el);
+});
+syncNavHeight();
+window.addEventListener('resize', syncNavHeight);
+window.addEventListener('orientationchange', syncNavHeight);
+if (window.ResizeObserver) {
+    var navEl = document.querySelector('nav');
+    if (navEl) new ResizeObserver(syncNavHeight).observe(navEl);
+}
+window.addEventListener('load', function() {
+    syncNavHeight();
+    if (location.hash.length > 1) flashSection(document.getElementById(location.hash.slice(1)));
 });
 </script>
 </body>

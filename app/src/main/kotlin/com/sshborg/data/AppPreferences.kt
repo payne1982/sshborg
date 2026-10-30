@@ -1,5 +1,6 @@
 package com.sshborg.data
 
+import com.sshborg.terminal.saneScrollback
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -439,7 +440,7 @@ class AppPreferences(private val context: Context) {
             if (obj.has("invert_terminal_scroll")) p[Keys.INVERT_TERMINAL_SCROLL] = obj.getBoolean("invert_terminal_scroll")
             if (obj.has("night_mode"))             p[Keys.NIGHT_MODE] = obj.getInt("night_mode")
             if (obj.has("allow_screenshots"))      p[Keys.ALLOW_SCREENSHOTS] = obj.getBoolean("allow_screenshots")
-            if (obj.has("scrollback_lines"))       p[Keys.SCROLLBACK_LINES] = obj.getInt("scrollback_lines").coerceAtLeast(1)
+            if (obj.has("scrollback_lines"))       p[Keys.SCROLLBACK_LINES] = saneScrollback(obj.getInt("scrollback_lines"))
             if (obj.has("terminal_font_size"))     p[Keys.TERMINAL_FONT_SIZE] = obj.getInt("terminal_font_size").coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)
             if (obj.has("keep_screen_on"))         p[Keys.KEEP_SCREEN_ON] = obj.getBoolean("keep_screen_on")
             if (obj.has("terminal_color_scheme"))  p[Keys.TERMINAL_COLOR_SCHEME] = obj.getInt("terminal_color_scheme").coerceIn(TERMINAL_SCHEME_DARK, TERMINAL_SCHEME_FOLLOW_APP)

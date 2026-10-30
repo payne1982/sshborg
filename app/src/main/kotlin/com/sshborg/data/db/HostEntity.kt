@@ -28,10 +28,16 @@ data class HostEntity(
      */
     val portForwardings: String? = null,
     /**
-     * Jump host mode: "simple" uses the [jumpHosts] text string,
-     * "host_list" uses [jumpHostIdList] (comma-separated host entity IDs).
+     * Jump host mode: "simple" uses the [jumpHosts] text string, "host_list" uses
+     * [jumpHostIdList] (comma-separated host entity IDs).
+     *
+     * `host_list` is the default for a host created from now on, because it is the one that can
+     * carry credentials: a hop picked from the host list brings its own key or password, where a
+     * hop typed into the text field has none of its own. Hosts that already exist keep whatever
+     * they were saved with — the column has been written on every save since it appeared — and a
+     * backup that predates the choice is still read as "simple", which is what it meant then.
      */
-    val jumpMode: String = "simple",
+    val jumpMode: String = "host_list",
     /**
      * Ordered comma-separated IDs of host entities to use as jump hosts.
      * Only used when [jumpMode] == "host_list".
@@ -60,4 +66,48 @@ data class HostEntity(
     val position: Int? = null,
     /** How many terminal sessions were opened to this host; drives the "most used" order. */
     val connectCount: Int = 0,
+    /**
+     * If true, the terminal for this host rides mosh instead of the SSH shell channel: SSH still
+     * logs in, starts `mosh-server` and stays open for SFTP, port forwarding and the agent, but
+     * the screen is synchronised over UDP and survives a change of network.
+     *
+     * Off by default, per host and explicit — there is no detection and no silent fall back to
+     * SSH, because somebody who asked for mosh and did not get it is owed the reason.
+     *
+     * A jump chain is almost excluded. SSH would get through one, but the UDP session afterwards
+     * could not: a bastion forwards TCP and the datagrams have nowhere to go. The exception is a
+     * chain whose first hop is a mosh host of yours, which is not tunnelled through at all — the
+     * session is made *to* that hop over mosh and the rest of the way is typed into it as one
+     * `ssh` command. See `BastionHop`. Only the terminal takes that road; SFTP still opens its
+     * own session through the whole chain, because that one is SSH.
+     */
+    val mosh: Boolean = false,
+    /**
+     * Which address family a mosh session should be made over: `auto`, `ipv4` or `ipv6`.
+     *
+     * It matters more than it looks. A mosh session is bound to the family it was born on —
+     * `mosh-server -s` listens on the address the SSH connection arrived on, one address of one
+     * family — so roaming works *within* a family and not across one. A session made over IPv6 on
+     * Wi-Fi cannot follow the phone onto a carrier that has no IPv6, and the reverse is just as
+     * true on an IPv6-only carrier. Neither can be guessed for somebody else's networks, which is
+     * why this is a choice and its default is to let the resolver decide as it always has.
+     *
+     * A preference, not a demand: if the chosen family has no address, the other is used.
+     */
+    val moshFamily: String = "auto",
+    /**
+     * The UDP port range `mosh-server` may choose from, as `60001-60999` or a single port. Null
+     * means mosh's own default, which is that whole range — a thousand ports for a firewall rule
+     * to open, which is why it can be narrowed. One port per session open at once on that server.
+     */
+    val moshPorts: String? = null,
+    /**
+     * What to run on the server, when `mosh-server` is not what a non-interactive shell finds on
+     * its PATH. Null means `mosh-server`.
+     *
+     * Without this, a server that has mosh installed somewhere unusual reports itself as not
+     * having it at all, and there is nothing the person can do about a diagnosis that is simply
+     * wrong. The stock client has `--server=` for the same reason.
+     */
+    val moshCommand: String? = null,
 )

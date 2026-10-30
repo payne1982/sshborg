@@ -541,6 +541,9 @@
             <li><a href="#legacy-ciphers">Legacy-Verschlüsselung</a></li>
             <li><a href="#connection-drops">Verbindungsabbrüche</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh (experimentell)</a></li>
+            <li class="sub"><a href="#mosh">Was der Server braucht</a></li>
+            <li class="sub"><a href="#mosh">Über einen Bastion-Host</a></li>
             <li><a href="#jump-hosts">Jump-Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Multi-Hop-Ketten</a></li>
             <li><a href="#sessions">Mehrere Sitzungen</a></li>
@@ -569,6 +572,7 @@
             <h3>Host-Fingerabdruck-Verifizierung</h3>
             <p>Bei der ersten Verbindung zeigt SSHBorg den Fingerabdruck des Servers und bittet dich, ihn zu akzeptieren. Dies ist eine Sicherheitsprüfung: Sie stellt sicher, dass du dich mit dem richtigen Gerät verbindest und nicht mit einem Angreifer. Überprüfe, ob der Fingerabdruck mit dem übereinstimmt, den dir dein Server-Administrator mitgeteilt hat oder den du über einen vertrauenswürdigen Kanal erhalten hast.</p>
             <p>Nach der Akzeptanz wird der Fingerabdruck lokal gespeichert. Wenn er sich bei einer zukünftigen Verbindung ändert, warnt dich SSHBorg — dies könnte auf einen Server-Neuaufbau, eine Schlüsselrotation oder einen Man-in-the-Middle-Angriff hinweisen.</p>
+            <p>Diese Warnung ist unmissverständlich: eine rote Zeile, die sagt, dass dies nicht der für diesen Host gespeicherte Schlüssel ist, der Fingerabdruck des gerade angebotenen Schlüssels und eine Schaltfläche <strong>Schlüssel ersetzen</strong> statt <em>Vertrauen</em>. Beim Akzeptieren wird der gespeicherte Schlüssel wirklich ersetzt, sodass die nächste Verbindung wieder still ist; bei einem Jump-Host wird genauso gefragt. Wenn du die Änderung nicht erwartet hast, akzeptiere sie nicht — frage zuerst die Serververwaltung.</p>
             <div class="callout callout-info">
                 <h3>Die Meldung des Servers vor der Anmeldung</h3>
             <p>Viele Server senden eine Meldung, bevor sie jemanden hereinlassen: einen rechtlichen Hinweis, ein Wartungsfenster, eine Vorgangsnummer. SSHBorg zeigt sie über der Passwortabfrage, damit du sie lesen kannst, bevor du tippst, und sie bleibt stehen, wenn das Passwort abgelehnt und erneut verlangt wird.</p>
@@ -752,6 +756,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen. Unter iOS wählt ein langer Druck das Wort unter dem Finger aus und öffnet das Systemmenü mit <em>Kopieren</em>, <em>Einsetzen</em> und <em>Alles auswählen</em>; ziehe an einem Ende der Auswahl, um sie zu erweitern.</li>
                 <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
             </ul>
+            <p><strong>Die Titelleiste.</strong> Drei Sekunden nachdem die Sitzung steht, fährt die Leiste oben ein und der Text nutzt die volle Höhe des Bildschirms. Ein Tippen an beliebiger Stelle holt sie für weitere drei Sekunden zurück, und sie verschwindet nicht, solange ein Finger auf ihr liegt &mdash; so bleibt Zeit, ihre Schaltflächen zu erreichen. Wenn du sie lieber immer im Blick hast, schalte <em>Titelleiste automatisch ausblenden</em> unter <strong>Einstellungen &rarr; Terminal</strong> aus. Auf einem Fernseher blendet sie sich nie aus: es gäbe nichts anzutippen, um sie zurückzuholen.</p>
+
             <p><strong>Vollbild-Anwendungen.</strong> Programme, die den ganzen Bildschirm übernehmen — tmux, vim, nano, less — haben keinen eigenen Verlauf, daher bleibt die Ansicht währenddessen auf dem laufenden Bildschirm und rutscht nicht in die darunterliegende Shell-Ausgabe.</p>
             <p>Das Scrollen darin muss die Anwendung selbst übernehmen. In tmux <code>set -g mouse on</code> in <code>~/.tmux.conf</code> eintragen: Eine Wischgeste scrollt dann den Verlauf des Bereichs unter dem Finger. Das gilt für jedes Programm, das Mauseingaben annimmt, etwa vim mit <code>set mouse=a</code>. Bei <code>screen</code> prüfen, ob in <code>~/.screenrc</code> <code>altscreen on</code> steht — auf vielen Systemen ist es standardmäßig aus, und screen zeichnet dann über den normalen Verlauf.</p>
         </div>
@@ -763,6 +769,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>Terminalfarben</strong> — das klassische <em>dunkle</em> Schema (Weiß auf Schwarz), ein <em>helles</em> Schema (Schwarz auf Weiß), das bei Tageslicht besser lesbar ist, oder <em>dem App-Design folgen</em>, das automatisch zusammen mit dem App-Design wechselt. Die Änderung gilt sofort, auch für bereits geöffnete Sitzungen.</li>
                 <li><strong>Bildschirm eingeschaltet lassen</strong> — verhindert, dass sich der Bildschirm ausschaltet, solange ein Terminal geöffnet ist. Praktisch beim Beobachten von Logs oder lang laufenden Befehlen. Standardmäßig aus.</li>
+                <li><strong>Titelleiste automatisch ausblenden</strong> &mdash; die oben beschriebene einfahrende Leiste. Standardmäßig an; aus bleibt die Leiste immer sichtbar.</li>
+                <li><strong>Statusleiste ausblenden</strong> &mdash; blendet im Terminal auch die Uhr- und Benachrichtigungsleiste des Systems aus, für ein paar Zeilen mehr. Zum kurzen Anzeigen vom oberen Rand nach unten wischen. Standardmäßig aus; nur unter Android.</li>
                 <li><strong>Standard-Schriftgröße</strong> — die Textgröße, mit der neue Terminalsitzungen starten; in jeder Sitzung kannst du weiterhin per Pinch-Geste zoomen.</li>
                 <li><strong>Scrollback</strong>, <strong>umgekehrtes Scrollen</strong> und <strong>Befehlsvorschläge</strong> — steuern, wie viel Ausgabeverlauf behalten wird, die Scrollrichtung und die oben beschriebene Vorschlagsleiste.</li>
                 <li><strong>Doppeltipp-Aktion</strong> — optional sendet ein Doppeltippen im Terminal <em>Tab</em> (Autovervollständigung) oder zweimal <em>Tab</em> (listet alle Kandidaten auf). Standardmäßig aus. Unter iOS wählt ein Doppeltippen, solange die Option aus ist, ein Wort aus.</li>
@@ -915,6 +923,58 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// TIPP</div>
                 Du kannst <code>tmux attach || tmux new -s main</code> zu deiner <code>~/.bashrc</code> oder <code>~/.zshrc</code> auf dem Server hinzufügen, damit bei jeder Anmeldung über SSHBorg automatisch eine Multiplexer-Sitzung gestartet wird.
+            </div>
+        </div>
+
+        <div class="doc-section" id="mosh">
+
+            <h2>// MOSH (EXPERIMENTELL)</h2>
+            <p>Mosh ist ein zweiter Weg, das Terminal zu übertragen. Statt die Ausgabe des Servers durch die SSH-Verbindung zu schicken, behält es das Terminal <em>auf dem Server</em> und sendet dem Telefon über UDP ein Bild davon, wie der Bildschirm aussieht. Da nichts mehr an eine TCP-Verbindung gebunden ist, übersteht die Sitzung genau das, was sie sonst beendet: eine neue IP-Adresse, den Wechsel von WLAN zu Mobilfunk, einen Tunnel, ein Telefon, das in der Tasche geschlafen hat. Sie kommen zurück, und die Sitzung ist einfach da.</p>
+            <p>Eine Einschränkung sollte man kennen, bevor man sich darauf verlässt: eine Sitzung bleibt bei der Adressfamilie, mit der sie entstanden ist. <code>mosh-server</code> lauscht auf der einen Adresse, über die die SSH-Verbindung kam — eine über IPv6 entstandene Sitzung kann Ihnen also nicht in ein Netz ohne IPv6 folgen, und umgekehrt gilt dasselbe in einem Mobilnetz, das nur IPv6 hat. Genau dafür gibt es im Host-Editor die Einstellung <strong>IPv4 / IPv6</strong>: wählen Sie die Familie, die Ihre Netze gemeinsam haben, dann kann die Sitzung zwischen ihnen wechseln.</p>
+            <p>SSHBorg ersetzt SSH damit nicht. SSH meldet Sie weiterhin an, startet den Mosh-Server und <strong>bleibt offen</strong> — das ist es, was SFTP, Portweiterleitung, Agent-Weiterleitung und die Befehlsvorschläge auf demselben Host weiter funktionieren lässt, während das Terminal über UDP läuft.</p>
+            <p>Diese Hälfte ist allerdings gewöhnliches SSH und übersteht daher nicht, was mosh übersteht: ein Netzwechsel nimmt die SSH-Verbindung mit, und SFTP, eine Portweiterleitung oder die Befehlsvorschläge auf diesem Host funktionieren erst wieder, wenn Sie ihn neu öffnen. Das Terminal läuft weiter.</p>
+            <h3>Was der Server braucht</h3>
+            <ul>
+                <li><strong>mosh installiert</strong> — das Programm <code>mosh-server</code> muss auf dem Server liegen. In den meisten Distributionen heißt das Paket <code>mosh</code>.</li>
+                <li><strong>Eine UTF-8-Locale</strong> — ohne sie startet mosh nicht, denn es muss den Inhalt des Terminals selbst deuten.</li>
+                <li><strong>Eingehendes UDP, Ports 60001–60999</strong> — der Server muss darauf von Ihrem Telefon aus erreichbar sein. Das ist die Voraussetzung, die Hotel-, Campus- und Firmennetze gern blockieren.</li>
+            </ul>
+            <h3>Einschalten</h3>
+            <p>Öffnen Sie den Host-Editor und schalten Sie <strong>Mosh</strong> ein; es steht bei den Verbindungsschaltern, direkt über seinen eigenen drei Einstellungen. Es gilt pro Host und ist standardmäßig aus: für Hosts, die Sie so lassen, ändert sich nichts. Als experimentell ist es markiert, weil es neu ist, nicht weil es unfertig wäre.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// AKKU</div>
+                Eine Mosh-Sitzung sendet etwa alle drei Sekunden ein kleines Paket, solange sie offen ist — genau dadurch bemerkt sie einen Netzwechsel sofort. Das ist mehr Funk als eine gewöhnliche SSH-Sitzung braucht, und auf einem Telefon kostet es Akku. Für Hosts, wo Sie es nicht brauchen, lassen Sie es aus.
+            </div>
+            <h3>Was im Terminal anders ist</h3>
+            <p><strong>Der Verlauf beginnt leer.</strong> Über SSH geht alles, was der Server je ausgegeben hat, durch Ihr Telefon und kann deshalb vollständig aufbewahrt werden. Über mosh wird nur der Bildschirm übertragen, also füllt sich der Verlauf mit den Zeilen, die wirklich oben hinausscrollen — und ein Programm, das den Bildschirm neu zeichnet, ohne zu scrollen, lässt nichts zurück. Die Wischgeste funktioniert weiterhin; über einer frischen Sitzung gibt es nur weniger zu finden.</p>
+            <p><strong>Tippen wird nicht schneller.</strong> Mosh ist für sein sofortiges lokales Echo bekannt, das SSHBorg noch nicht hat: ein Tastendruck geht nach wie vor zum Server und zurück. Auf einem Telefon im selben Netz gemessen ist Tippen über mosh etwa so schnell wie über SSH. Der Gewinn ist, dass die Sitzung nicht stirbt.</p>
+            <h3>Mosh über einen Bastion-Host</h3>
+            <p>Mosh lässt sich nicht tunneln. Ein Jump-Hop ist ein Kanal innerhalb einer SSH-Verbindung, und mosh hat keine Kanäle: es überträgt den Bildschirm eines Terminals über UDP und sonst nichts. Ein Host, der nur über einen Bastion-Host erreichbar ist, ist deshalb nicht über mosh erreichbar — und das nicht nur hier. Auch der Original-Client von mosh kann es nicht, weil das UDP direkt zwischen Telefon und Ziel laufen muss, während ein Bastion-Host TCP weiterleitet.</p>
+            <p>SSHBorg dreht die Sache deshalb um, was auch die Dokumentation von mosh empfiehlt: <strong>mosh bis zum Bastion-Host</strong>, und von dort ein einzelnes <code>ssh</code>-Kommando nach innen. Das Terminal liegt dann auf einer Maschine, deren Netz sich nie ändert, und der Weg von WLAN zu Mobilfunk berührt nur den Abschnitt, den mosh schützt.</p>
+            <p>Dazu braucht es zwei Host-Einträge und keine neue Einstellung:</p>
+            <ol class="steps">
+                <li>Im <strong>Eintrag des Bastion-Hosts</strong> Mosh einschalten.</li>
+                <li>Im <strong>Eintrag des Ziels</strong> diesen Bastion-Host als ersten Hop der Jump-Kette wählen, genau wie bei jeder Kette.</li>
+            </ol>
+            <p>Der Schalter des Bastion-Hosts ist die ganze Entscheidung. Der Mosh-Schalter des Ziels bleibt aus und nicht verfügbar — ein Host mit einer Kette kann kein eigenes mosh haben — und der Jump-Host-Abschnitt sagt, was stattdessen geschieht. Beim Verbinden erreicht das Terminal den Bastion-Host über mosh, und SSHBorg schreibt die <code>ssh</code>-Zeile hinein: Sie sehen das Kommando auf dem Bildschirm, als hätten Sie es selbst getippt.</p>
+            <p>Alles Weitere folgt daraus, dass der Hop nach innen vom Bastion-Host ausgeführt wird und nicht vom Telefon:</p>
+            <ul>
+                <li><strong>Es gelten die Mosh-Einstellungen des Bastion-Hosts</strong> — seine Adressfamilie, seine UDP-Ports, sein <code>mosh-server</code>-Kommando. Die des Ziels werden nie gelesen, weil dort kein Mosh-Server gestartet wird.</li>
+                <li><strong>Passwörter werden im Terminal erfragt.</strong> Dem ssh des Bastion-Hosts kann kein Passwort übergeben werden, das SSHBorg hält, also fragt es selbst und Sie antworten auf dem Bildschirm. Das heißt auch, dass ein Hop hinter dem Bastion-Host überhaupt nichts Gespeichertes braucht: die Auswahl zeigt, womit sich jeder Host anmeldet, und ein Hop ohne alles kann dort trotzdem gewählt werden. Das Passwort des Bastion-Hosts selbst wird weiterhin normal verwendet: diesen Hop wählt das Telefon.</li>
+                <li><strong>Den Hostschlüssel des Ziels prüft der Bastion-Host</strong>, gegen sein <code>known_hosts</code> und nicht gegen den von SSHBorg hinterlegten. Beim ersten Mal erscheint seine Frage im Terminal, und Sie antworten dort.</li>
+                <li><strong>SFTP bleibt unberührt.</strong> Der Dateien-Tab öffnet eine eigene SSH-Sitzung durch die ganze Kette, genau wie vorher, denn die lässt sich tunneln.</li>
+                <li><strong>Port-Weiterleitungen laufen vom Bastion-Host aus.</strong> Eine Regel, die eine Maschine benennt, erreicht sie wie immer; eine Regel mit <code>localhost</code> meint jetzt den Bastion-Host und nicht den Host dahinter.</li>
+            </ul>
+            <p>Kann mosh auf dem Bastion-Host nicht starten, erscheint die gewohnte Wahl — über SSH weitermachen oder abbrechen — und beim Weitermachen wird die Kette genauso gegangen, nur ohne den Schutz von mosh.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// TIPP</div>
+                Denselben Bastion-Host in beiden Varianten? Duplizieren Sie seinen Eintrag und lassen Sie Mosh in der Kopie aus: eine Kette, die bei der Kopie beginnt, wird getunnelt wie immer, eine, die beim Original beginnt, wird von ihm aus über mosh gegangen.
+            </div>
+            <h3>Wenn es nicht starten kann</h3>
+            <p>SSHBorg fällt niemals stillschweigend zurück. Lässt sich der Mosh-Server nicht starten, oder kommt über UDP keine Antwort, sagt SSHBorg, welcher der beiden Fälle vorliegt, und bietet zwei Wege an: mit SSH weitermachen — die Anmeldung ist schon erfolgt, es kostet also nichts — oder abbrechen. Drei der vier möglichen Ursachen liegen auf dem Server, und die Meldung nennt die, die Sie haben.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// TIPP</div>
+                Mosh ist kein Ersatz für tmux. Es hält eine Sitzung über Netzwechsel hinweg am Leben; tmux hält Ihre <em>Arbeit</em> über alles andere hinweg am Leben, auch über das Schließen der App oder einen Neustart des Telefons. Zusammen sind sie die stabilste Anordnung: mosh, um den Server zu erreichen, und alles Langlaufende innerhalb von tmux.
             </div>
         </div>
 

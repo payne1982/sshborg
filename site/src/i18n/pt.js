@@ -109,6 +109,9 @@ module.exports = {
             <li><a href="#legacy-ciphers">Cifras legadas</a></li>
             <li><a href="#connection-drops">Quedas de ligação</a></li>
             <li class="sub"><a href="#connection-drops">tmux / screen</a></li>
+            <li><a href="#mosh">Mosh (experimental)</a></li>
+            <li class="sub"><a href="#mosh">O que o servidor precisa</a></li>
+            <li class="sub"><a href="#mosh">Através de um bastião</a></li>
             <li><a href="#jump-hosts">Jump Hosts</a></li>
             <li class="sub"><a href="#jump-hosts">Cadeias multi-salto</a></li>
             <li><a href="#sessions">Sessões múltiplas</a></li>
@@ -131,6 +134,7 @@ module.exports = {
             <h3>Verificação da impressão digital do host</h3>
             <p>Na primeira ligação, o SSHBorg mostra a impressão digital do servidor e pede que a aceite. É uma verificação de segurança: garante que está a ligar à máquina correta e não a um impostor. Verifique se a impressão digital corresponde à fornecida pelo administrador do servidor antes de aceitar.</p>
             <p>Uma vez aceite, a impressão digital é guardada localmente. Se mudar numa ligação futura, o SSHBorg avisá-lo-á — pode indicar uma reconstrução do servidor, uma rotação de chaves ou um ataque man-in-the-middle.</p>
+            <p>O aviso é inequívoco: uma linha em vermelho a dizer que esta não é a chave guardada para este host, a impressão digital da chave que o servidor acabou de apresentar e um botão que diz <strong>Substituir chave</strong> em vez de <em>Confiar</em>. Ao aceitar, a chave guardada é realmente substituída, pelo que a ligação seguinte volta a ser silenciosa; a um host de salto a pergunta é exatamente a mesma. Se não estava à espera da mudança, não aceite: pergunte primeiro a quem administra o servidor.</p>
             <div class="callout callout-info">
                 <h3>A mensagem do servidor antes do início de sessão</h3>
             <p>Muitos servidores enviam uma mensagem antes de deixar entrar quem seja: um aviso legal, uma janela de manutenção, um número de referência a citar. O SSHBorg mostra-a acima do pedido de palavra-passe, para a poder ler antes de escrever, e fica à vista se a palavra-passe for recusada e pedida de novo.</p>
@@ -304,6 +308,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar. No iOS, um toque longo seleciona a palavra sob o dedo e abre o menu do sistema com <em>Copiar</em>, <em>Colar</em> e <em>Selecionar tudo</em>; arraste a partir de uma das extremidades da seleção para a alargar.</li>
                 <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
             </ul>
+            <p><strong>A barra de título.</strong> Três segundos depois de a sessão ficar aberta, a barra do topo recolhe e o texto passa a ocupar toda a altura do ecrã. Um toque em qualquer ponto traz a barra de volta por outros três segundos, e ela não desaparece enquanto mantiver o dedo sobre ela, pelo que há tempo para chegar aos seus botões. Se preferir tê-la sempre à vista, desligue <em>Ocultar a barra de título automaticamente</em> em <strong>Definições &rarr; Terminal</strong>. Num televisor nunca se oculta: não haveria nada para tocar para a fazer voltar.</p>
+
             <p><strong>Aplicações de ecrã inteiro.</strong> Os programas que ocupam todo o ecrã — tmux, vim, nano, less — não têm histórico próprio, por isso enquanto estão em execução a vista permanece no ecrã ativo em vez de deslizar para a saída da shell que está por baixo.</p>
             <p>Para rolar dentro deles, é a aplicação que tem de tratar disso. No tmux, adicione <code>set -g mouse on</code> ao <code>~/.tmux.conf</code>: deslizar percorre então o histórico do painel sob o seu dedo. O mesmo se aplica a qualquer programa que aceite entrada do rato, como o vim com <code>set mouse=a</code>. Com o <code>screen</code>, verifique se <code>altscreen on</code> está em <code>~/.screenrc</code> — em muitos sistemas está desativado por omissão, e o screen desenha por cima do histórico normal.</p>`,
 
@@ -313,6 +319,8 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
             <ul>
                 <li><strong>Cores do terminal</strong> — o clássico esquema <em>escuro</em> (branco sobre preto), um esquema <em>claro</em> (preto sobre branco) mais legível à luz do dia, ou <em>seguir o tema da app</em>, que muda automaticamente com o tema da app. A alteração aplica-se de imediato, incluindo às sessões já abertas.</li>
                 <li><strong>Manter o ecrã ligado</strong> — impede que o ecrã se desligue enquanto um terminal está aberto. Útil ao acompanhar logs ou comandos demorados. Desativado por predefinição.</li>
+                <li><strong>Ocultar a barra de título automaticamente</strong> &mdash; a barra que recolhe, descrita acima. Ligado por predefinição; desligado, a barra fica sempre visível.</li>
+                <li><strong>Ocultar a barra de estado</strong> &mdash; no terminal, oculta também o relógio e as notificações do sistema, para mais algumas linhas. Arraste a partir da margem superior para a ver por um momento. Desativado por predefinição; apenas no Android.</li>
                 <li><strong>Tamanho de letra predefinido</strong> — o tamanho do texto com que as novas sessões começam; continua a poder fazer zoom com dois dedos em cada sessão.</li>
                 <li><strong>Scrollback</strong>, <strong>deslocamento invertido</strong> e <strong>sugestões de comandos</strong> — controlam quanto histórico de saída é mantido, a direção do deslocamento e a barra de sugestões descrita acima.</li>
                 <li><strong>Ação de toque duplo</strong> — se quiser, um toque duplo no terminal envia <em>Tab</em> (conclusão automática) ou <em>Tab</em> duas vezes (lista todos os candidatos). Desativado por predefinição. No iOS, enquanto está desativado, um toque duplo seleciona uma palavra.</li>
@@ -457,6 +465,56 @@ screen -r work</code></pre>
             <div class="callout callout-info">
                 <div class="callout-label">// DICA</div>
                 Pode adicionar <code>tmux attach || tmux new -s main</code> ao seu <code>~/.bashrc</code> ou <code>~/.zshrc</code> no servidor para que uma sessão de multiplexador inicie automaticamente sempre que iniciar sessão via SSHBorg.
+            </div>`,
+
+  doc_mosh: `
+            <h2>// MOSH (EXPERIMENTAL)</h2>
+            <p>O mosh é uma segunda forma de transportar o terminal. Em vez de enviar a saída do servidor pela ligação SSH, mantém o terminal <em>no servidor</em> e envia ao telefone uma imagem do aspeto do ecrã, por UDP. Como já nada está preso a uma ligação TCP, a sessão sobrevive àquilo que normalmente lhe põe fim: uma mudança de IP, a passagem do Wi-Fi para os dados móveis, um túnel, um telefone que ficou a dormir no bolso. Volta e a sessão está simplesmente lá.</p>
+            <p>Há um limite que vale a pena conhecer antes de contar com isto: uma sessão fica na família de endereços em que nasceu. O <code>mosh-server</code> escuta no único endereço por onde chegou a ligação SSH, pelo que uma sessão feita por IPv6 não o pode seguir para uma rede sem IPv6, e o mesmo vale ao contrário numa rede móvel que só tenha IPv6. A opção <strong>IPv4 / IPv6</strong> na ficha do host existe exatamente para isto: escolha a família que as suas redes têm em comum e a sessão poderá passar de uma para a outra.</p>
+            <p>O SSHBorg não substitui o SSH por mosh. O SSH continua a fazer a autenticação, arranca o servidor mosh e <strong>fica aberto</strong> — é isso que mantém a funcionar o SFTP, o encaminhamento de portas, o encaminhamento do agente e as sugestões de comandos no mesmo host enquanto o terminal viaja por UDP.</p>
+            <p>Essa metade é, no entanto, SSH normal, pelo que não sobrevive àquilo a que o mosh sobrevive: uma mudança de rede leva a ligação SSH consigo, e o SFTP, um encaminhamento de portas ou as sugestões de comandos nesse host deixam de funcionar até o abrir de novo. O terminal continua.</p>
+            <h3>O que o servidor precisa</h3>
+            <ul>
+                <li><strong>mosh instalado</strong> — o programa <code>mosh-server</code> tem de estar no servidor. Na maioria das distribuições o pacote chama-se <code>mosh</code>.</li>
+                <li><strong>Uma configuração regional UTF-8</strong> — o mosh recusa-se a arrancar sem ela, porque tem de interpretar ele próprio o conteúdo do terminal.</li>
+                <li><strong>UDP de entrada, portas 60001–60999</strong> — o servidor tem de estar alcançável nelas a partir do telefone. É o requisito que as redes de hotéis, campus e empresas costumam bloquear.</li>
+            </ul>
+            <h3>Como ligar</h3>
+            <p>Abra a ficha do host e ligue o <strong>Mosh</strong>: está com os interruptores de ligação, logo acima das suas três opções. É por host e está desligado por predefinição: nos hosts que deixar como estão nada muda. Está marcado como experimental porque é recente, não porque esteja incompleto.</p>
+            <div class="callout callout-warn">
+                <div class="callout-label">// BATERIA</div>
+                Uma sessão mosh envia um pacote pequeno mais ou menos a cada três segundos enquanto estiver aberta, e é isso que lhe permite dar-se conta de imediato de uma mudança de rede. É mais rádio do que uma sessão SSH normal usa e, num telefone, custa bateria. Nos hosts onde não precisar, deixe-a desligada.
+            </div>
+            <h3>O que muda no terminal</h3>
+            <p><strong>O histórico começa vazio.</strong> Com o SSH, tudo o que o servidor imprimiu passa pelo telefone, pelo que pode ser todo guardado. Com o mosh viaja apenas o ecrã, de modo que o histórico se enche com as linhas que realmente saem por cima — e um programa que redesenha o ecrã sem o fazer deslizar não deixa nada para trás. O gesto de deslizar continua a funcionar; há apenas menos para encontrar acima de uma sessão recém-aberta.</p>
+            <p><strong>Não se escreve mais depressa.</strong> O mosh é conhecido pelo eco local instantâneo, que o SSHBorg ainda não faz: uma tecla continua a ir ao servidor e a voltar. Medido num telefone na mesma rede, escrever com mosh é mais ou menos tão rápido como com SSH. O que se ganha é a sessão não morrer.</p>
+            <h3>Mosh através de um bastião</h3>
+            <p>O mosh não pode ser encapsulado. Um salto é um canal dentro de uma ligação SSH, e o mosh não tem canais: leva o ecrã de um terminal por UDP e mais nada. Um host a que só se chega através de um bastião não pode, portanto, ser alcançado por mosh — e não é só aqui: o cliente mosh original também não consegue, porque o UDP tem de viajar directamente entre o telefone e o destino, enquanto um bastião reencaminha TCP.</p>
+            <p>Por isso o SSHBorg inverte o arranjo, que é o que a própria documentação do mosh recomenda: <strong>mosh até ao bastião</strong> e, daí para dentro, um único comando <code>ssh</code>. O terminal passa a viver numa máquina cuja rede nunca muda, e a sua passagem do Wi-Fi para os dados só toca o trecho que o mosh protege.</p>
+            <p>São precisas duas fichas de host e nenhuma opção nova:</p>
+            <ol class="steps">
+                <li>Na <strong>ficha do bastião</strong>, ligue o Mosh.</li>
+                <li>Na <strong>ficha do destino</strong>, escolha esse bastião como primeiro salto da cadeia, exactamente como em qualquer cadeia.</li>
+            </ol>
+            <p>O interruptor do bastião é toda a decisão. O Mosh do destino fica desligado e indisponível — um host com cadeia não pode ter mosh próprio — e a secção dos hosts de salto diz o que vai acontecer em vez disso. Ao ligar, o terminal chega ao bastião por mosh e o SSHBorg escreve-lhe a linha <code>ssh</code> lá dentro: vê o comando no ecrã, como se o tivesse escrito.</p>
+            <p>Tudo o resto decorre de o salto para dentro ser executado pelo bastião e não pelo telefone:</p>
+            <ul>
+                <li><strong>As opções de mosh que contam são as do bastião</strong> — a sua família de endereços, as suas portas UDP, o seu comando <code>mosh-server</code>. As do destino nunca são lidas, porque lá não arranca servidor mosh nenhum.</li>
+                <li><strong>As palavras-passe são pedidas no terminal.</strong> Ao ssh do bastião não se pode entregar uma palavra-passe que o SSHBorg guarda, por isso pede-a ele e você responde no ecrã. Significa também que um salto depois do bastião não precisa de nada guardado: o selector mostra com o que cada host entra, e um salto sem nada guardado pode ser escolhido de qualquer forma. A palavra-passe do próprio bastião continua a ser usada normalmente: esse salto é o telefone que o faz.</li>
+                <li><strong>A chave de host do destino é verificada pelo bastião</strong>, contra o seu <code>known_hosts</code> e não contra a que o SSHBorg tinha fixado. Da primeira vez a pergunta dele aparece no terminal e você responde ali.</li>
+                <li><strong>O SFTP não muda.</strong> O separador dos ficheiros abre uma sessão SSH própria por toda a cadeia, exactamente como antes, porque essa pode ser encapsulada.</li>
+                <li><strong>O encaminhamento de portas parte do bastião.</strong> Uma regra que nomeia uma máquina alcança-a como sempre; uma regra que diz <code>localhost</code> passa a significar o bastião, e não o host que está por trás.</li>
+            </ul>
+            <p>Se o mosh não conseguir arrancar no bastião aparece a escolha de sempre — continuar com SSH ou sair — e continuando, a cadeia é percorrida da mesma maneira, apenas sem a protecção do mosh.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                Quer o mesmo bastião das duas maneiras? Duplique a ficha dele e deixe o Mosh desligado na cópia: uma cadeia que começa na cópia é encapsulada como sempre, e uma que começa no original é percorrida a partir dele por mosh.
+            </div>
+            <h3>Quando não consegue arrancar</h3>
+            <p>O SSHBorg nunca recorre ao SSH em silêncio. Se o servidor mosh não arrancar, ou se por UDP não voltar nada, diz-lhe qual das duas coisas aconteceu e oferece duas escolhas: continuar com SSH — a autenticação já está feita, portanto não custa nada — ou sair. Três das quatro causas possíveis estão no servidor, e a mensagem nomeia aquela que tem.</p>
+            <div class="callout callout-info">
+                <div class="callout-label">// DICA</div>
+                O mosh não substitui o tmux. Mantém uma sessão viva através das mudanças de rede; o tmux mantém o seu <em>trabalho</em> vivo através de tudo o resto, incluindo a aplicação ser fechada ou o telefone reiniciado. Os dois juntos são o arranjo mais sólido: mosh para chegar ao servidor, e dentro do tmux tudo o que for longo.
             </div>`,
 
   doc_jump_hosts: `

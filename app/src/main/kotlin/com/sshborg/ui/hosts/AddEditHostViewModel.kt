@@ -41,8 +41,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var jumpHosts = MutableStateFlow("")
     /** Newline-separated port-forwarding rules in -L syntax. */
     var portForwardings = MutableStateFlow("")
-    /** Jump host mode: "simple" = text field, "host_list" = select from hosts. */
-    var jumpMode = MutableStateFlow("simple")
+    /**
+     * Jump host mode: "simple" = text field, "host_list" = select from hosts.
+     *
+     * A new host starts on the host list, which is the mode that can carry a hop's own key or
+     * password; [loadHost] replaces this for a host that already exists.
+     */
+    var jumpMode = MutableStateFlow("host_list")
     /** Ordered list of host IDs selected as jump hops (host-list mode). 0L = not yet selected. */
     var jumpHostIds = MutableStateFlow<List<Long>>(emptyList())
     /** SFTP starting directory mode: "last" | "fixed" | "home". */
@@ -52,10 +57,53 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /** Whether the SFTP browser shows dotfiles for this host. Default hides them. */
     var sftpShowHidden = MutableStateFlow(false)
     var allowLegacyCiphers = MutableStateFlow(false)
+    /** Whether this host's terminal rides mosh instead of the SSH shell channel. */
+    var mosh = MutableStateFlow(false)
+    /** Which address family a mosh session is made over: "auto" | "ipv4" | "ipv6". */
+    var moshFamily = MutableStateFlow("auto")
+    /** The UDP port range mosh-server may pick from; blank means its own default. */
+    var moshPorts = MutableStateFlow("")
+    /** What to run on the server; blank means `mosh-server`. */
+    var moshCommand = MutableStateFlow("")
     /** Null = ungrouped; otherwise the selected group's ID. */
     var groupId = MutableStateFlow<Long?>(null)
     /** Optional per-host ARGB color; overrides the group color. */
     var hostColor = MutableStateFlow<Int?>(null)
+
+    /**
+     * Whether a jump chain is configured, in whichever of the two modes is selected.
+     *
+     * Mosh and a jump chain nearly exclude each other, so the form needs to know: together with
+     * [moshBastion] it is what decides whether the mosh switch can move at all, and [save]
+     * applies the same rule where it cannot be got round.
+     *
+     * The exclusion was never symmetric — a host reached over mosh is a perfectly good bastion
+     * for others, because that inward hop is SSH, runs on the server and is immune to whatever
+     * the phone's network does. [moshBastion] is what turns that fact into the way out.
+     */
+    val jumpConfigured: StateFlow<Boolean> =
+        combine(jumpMode, jumpHosts, jumpHostIds) { mode, text, ids ->
+            if (mode == "simple") text.isNotBlank() else ids.any { it != 0L }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /**
+     * The hop that can carry mosh, when the chain has one: the first selected hop, if it is a
+     * host of yours with mosh of its own.
+     *
+     * This is the one way mosh and a jump chain can both stand on the same row. The chain is not
+     * tunnelled then — mosh has no channels to tunnel anything through — it is walked from that
+     * hop: the session is made to it over mosh and the rest of the way is typed into it as one
+     * ssh command. Which is also why only the *first* hop is asked about, and only in host-list
+     * mode: a hop typed into the text field is not a host of ours and has no mosh answer to give.
+     */
+    val moshBastion: StateFlow<HostEntity?> = combine(
+        jumpMode, jumpHostIds, hostDao.getAll(),
+    ) { mode, ids, hosts ->
+        if (mode != "host_list") null
+        else ids.firstOrNull { it != 0L }
+            ?.let { first -> hosts.find { it.id == first } }
+            ?.takeIf { it.mosh }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     /** When true, the saved host key and cached jump-host keys are cleared on save. */
     var resetHostKeys = MutableStateFlow(false)
@@ -66,8 +114,21 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _editingId = MutableStateFlow<Long?>(null)
 
-    /** All hosts except the one being edited, annotated with whether they can be used as jump hosts. */
-    data class JumpHostOption(val host: HostEntity, val isSelectable: Boolean)
+    /**
+     * All hosts except the one being edited, annotated with what they could log in with.
+     *
+     * Two facts and not one verdict, because the verdict depends on the hop's place in the chain.
+     * A hop we dial ourselves is happy with a saved password; a hop *past* a mosh bastion is
+     * dialled by the bastion's own ssh, which has no way to be handed our password and no
+     * business being handed it — so there, only a key is of any use. See [moshBastion].
+     */
+    data class JumpHostOption(
+        val host: HostEntity,
+        /** Enough saved for us to log in: a key, or a password. */
+        val hasCredentials: Boolean,
+        /** A key of its own, which is the only credential that survives being used by somebody else. */
+        val hasKey: Boolean,
+    )
 
     val availableJumpHosts: StateFlow<List<JumpHostOption>> = combine(
         hostDao.getAll(),
@@ -76,11 +137,13 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
         hosts
             .filter { it.id != editingId }
             .map { host ->
+                val hasKey = host.keyId != null
                 JumpHostOption(
-                    host        = host,
-                    isSelectable = host.keyId != null ||
-                                   !host.encryptedPassword.isNullOrEmpty() ||
-                                   !host.password.isNullOrEmpty(),
+                    host           = host,
+                    hasKey         = hasKey,
+                    hasCredentials = hasKey ||
+                                     !host.encryptedPassword.isNullOrEmpty() ||
+                                     !host.password.isNullOrEmpty(),
                 )
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -116,6 +179,10 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir.value = h.sftpStartDir ?: ""
             sftpShowHidden.value = h.sftpShowHidden
             allowLegacyCiphers.value = h.allowLegacyCiphers
+            mosh.value = h.mosh
+            moshFamily.value = h.moshFamily
+            moshPorts.value = h.moshPorts ?: ""
+            moshCommand.value = h.moshCommand ?: ""
             groupId.value = h.groupId
             hostColor.value = h.color
             _hasStoredHostKeys.value = h.knownHostsEntry != null || h.jumpHostKeys != null
@@ -145,6 +212,12 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
         val newJumpHosts = if (currentMode == "simple") {
             jumpHosts.value.trim().takeIf { it.isNotEmpty() }
         } else null
+
+        // The exclusion, where nothing can get round it: whatever the form did, a row never
+        // leaves here with both mosh and a jump chain on it. A chain that reaches its first hop
+        // over mosh needs nothing here — it is that hop's own switch that says so, and this row
+        // is not asked twice.
+        val newMosh = mosh.value && newJumpHosts == null && newJumpHostIdList == null
 
         val existing = editingId?.let { hostDao.getById(it) }
         val newHostname = hostname.value.trim()
@@ -186,8 +259,22 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir         = newSftpStartDir,
             sftpShowHidden       = sftpShowHidden.value,
             allowLegacyCiphers   = allowLegacyCiphers.value,
+            mosh                 = newMosh,
+            // Kept whatever the switch says, so that turning mosh off and on again does not lose
+            // a port range somebody had to get from their firewall.
+            moshFamily           = moshFamily.value,
+            moshPorts            = moshPorts.value.trim().takeIf { it.isNotEmpty() },
+            moshCommand          = moshCommand.value.trim().takeIf { it.isNotEmpty() },
             groupId              = groupId.value,
             color                = hostColor.value,
+            // Not fields of this form, and `upsert` replaces the whole row — so leaving them out
+            // did not mean "don't touch", it meant "set them back to the defaults". Saving an
+            // edit therefore reset the most-used counter, forgot when the host was last connected
+            // to and lost the place it had been dragged to in the manual order. Nothing in this
+            // screen ever means to touch any of the three.
+            lastConnected        = existing?.lastConnected,
+            connectCount         = existing?.connectCount ?: 0,
+            position             = existing?.position,
         )
         hostDao.upsert(entity)
         onDone()

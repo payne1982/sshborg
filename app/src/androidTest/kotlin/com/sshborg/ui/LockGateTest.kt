@@ -17,9 +17,18 @@ import com.sshborg.R
 import com.sshborg.TestApp
 import com.sshborg.data.AppLockManager
 import com.sshborg.data.AppPreferences
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.measureTimeMillis
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
@@ -203,5 +212,59 @@ class LockGateTest {
         const val TIMEOUT = 5_000L
         /** A configuration change is not instant, and nothing fires an event when it is done. */
         const val SETTLE = 1_500L
+        /** How often the heartbeat asks the main looper for a turn, in milliseconds. */
+        const val BEAT_MS = 10L
+    }
+
+    /**
+     * Hashing a secret must not block the thread that draws.
+     *
+     * 210,000 iterations of HMAC-SHA256 cost about a second on an ordinary device and thirty on
+     * one whose ART never compiled our code, and all three callers reach that work from `Dispatchers
+     * .Main` — the settings, the dialog that confirms the current secret, and the unlock screen.
+     * Marking them `suspend` moved nothing: a suspend function runs on its caller's dispatcher, so
+     * the whole derivation ran on the main thread. A tablet reported an ANR on the unlock screen,
+     * which is the one screen a user cannot leave.
+     *
+     * So this does not check the hash. It checks the main looper, with a heartbeat posted every
+     * ten milliseconds — which is what a frame, or the progress indicator now shown during the
+     * wait, would be. The assertion is a count, because "did it finish" passed before the fix too.
+     */
+    @Test fun hashingASecretLeavesTheMainThreadFree() = runBlocking {
+        val lock = TestApp.app.appLockManager
+        val beats = AtomicInteger()
+        val finished = AtomicBoolean(false)
+        val main = Handler(Looper.getMainLooper())
+        val heartbeat = object : Runnable {
+            override fun run() {
+                beats.incrementAndGet()
+                if (!finished.get()) main.postDelayed(this, BEAT_MS)
+            }
+        }
+        main.post(heartbeat)
+
+        val elapsed = measureTimeMillis {
+            withContext(Dispatchers.Main) {
+                lock.setSecret(AppLockManager.Kind.PIN, "123456".toCharArray())
+            }
+        }
+        finished.set(true)
+
+        // If a device ever hashes this fast there is nothing left to measure, and a test that
+        // cannot fail should say so rather than pass quietly.
+        assertTrue(
+            "hashing took $elapsed ms, too little for this test to mean anything",
+            elapsed >= 100,
+        )
+        val possible = elapsed / BEAT_MS
+        // Printed and not only asserted: how long this takes is the measurement, and it differs
+        // by a factor of ten between an emulator and an old tablet.
+        Log.i("SshBorgLock", "hashed a secret in $elapsed ms; the main looper got " +
+            "${beats.get()} of about $possible turns meanwhile")
+        assertTrue(
+            "the main looper beat ${beats.get()} times while a secret was hashed for $elapsed ms, " +
+                "where about $possible were there to be had: it was blocked",
+            beats.get() >= possible / 4,
+        )
     }
 }

@@ -4,7 +4,20 @@ package com.sshborg.terminal
  * A 2D grid of cells representing the terminal screen, plus a scrollback history.
  * Thread-safety: this class is NOT thread-safe; synchronize externally.
  */
-class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2000) {
+class TerminalBuffer(var columns: Int, var rows: Int, wantedScrollback: Int = DEFAULT_SCROLLBACK) {
+
+    /**
+     * Clamped here and not only where it is typed, because this is where it is *spent*: the
+     * deques below reserve this many slots before a single line has been printed. A value from
+     * outside the range can only have come from a file, and a file is not a reason to fail to
+     * open a terminal — see [saneScrollback].
+     *
+     * The parameter has a different name on purpose. A constructor parameter is in scope for
+     * every property initializer in the class, so a property that merely shadows it leaves the
+     * initializers below reading the raw number — which is how the first attempt at this fix
+     * still ran out of memory.
+     */
+    val maxScrollback: Int = saneScrollback(wantedScrollback)
 
     /**
      * A single screen cell. [code] is a full Unicode codepoint (Int), so supplementary
@@ -22,6 +35,17 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     ) {
         /** BMP convenience view; supplementary codepoints (emoji) read back as a space. */
         val char: Char get() = if (Character.isBmpCodePoint(code)) code.toChar() else ' '
+    }
+
+    companion object {
+        /**
+         * The range of scrollback a terminal may be asked for, and the range the settings field
+         * offers. It is a range and not a maximum because the number decides an allocation: the
+         * deques below reserve that many slots the moment a terminal opens.
+         */
+        const val MIN_SCROLLBACK = 100
+        const val MAX_SCROLLBACK = 50_000
+        const val DEFAULT_SCROLLBACK = 2000
     }
 
     // Scrollback: index 0 = oldest line
@@ -58,6 +82,22 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
      * shell history sitting underneath it.
      */
     var altScreen = false
+
+    /**
+     * How many more lines leaving the screen are the far end repainting rather than history.
+     *
+     * Only a synchronised screen sets this, and only when its size has just changed under it.
+     * The far end paints for the size it was last told, so for one round trip after a resize its
+     * frames are drawn for the old shape — and a full repaint draws every row, which on a screen
+     * that has since become shorter means the surplus rows scroll off the bottom. Measured on a
+     * phone: the session was opened before the keyboard came up, so the far end was told 43 rows
+     * and painted 43 onto the 27 that were left, and sixteen lines of somebody else's repaint
+     * became the first sixteen lines of the history.
+     *
+     * Counted rather than held by a flag so that it can only ever swallow as much as a repaint
+     * of one screen: if the expected repaint never comes, the history resumes by itself.
+     */
+    var repaintLinesToIgnore = 0
 
     // --- Read access ---
 
@@ -142,11 +182,22 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         currentStyle = savedStyle
     }
 
-    /** Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom. */
+    /**
+     * Scrolls lines scrollTop..scrollBottom up by count, adding blank lines at bottom.
+     *
+     * More than the region holds is the whole region blanked, and is done as exactly that: the
+     * count arrives from the far end and `CSI 2000000000 S` would otherwise be two billion rows
+     * allocated one at a time with the screen's lock held.
+     */
     fun scrollUp(count: Int = 1) {
-        repeat(count) {
-            // Push top line into scrollback (never from the alternate screen, which has no history)
-            if (!altScreen) {
+        repeat(count.coerceIn(0, scrollBottom - scrollTop + 1)) {
+            // Push top line into scrollback (never from the alternate screen, which has no
+            // history, and never while a repaint drawn for another size is still landing)
+            if (altScreen) {
+                // nothing to keep
+            } else if (repaintLinesToIgnore > 0) {
+                repaintLinesToIgnore--
+            } else {
                 val evicted = screen[scrollTop].copyOf()
                 if (scrollback.size >= maxScrollback) { scrollback.removeAt(0); scrollbackWrapped.removeAt(0) }
                 scrollback.addLast(evicted)
@@ -162,9 +213,9 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         }
     }
 
-    /** Scrolls lines scrollTop..scrollBottom down by count, adding blank lines at top. */
+    /** Scrolls lines scrollTop..scrollBottom down by count, adding blank lines at top. See [scrollUp]. */
     fun scrollDown(count: Int = 1) {
-        repeat(count) {
+        repeat(count.coerceIn(0, scrollBottom - scrollTop + 1)) {
             for (r in scrollBottom downTo scrollTop + 1) {
                 screen[r] = screen[r - 1]
                 screenWrapped[r] = screenWrapped[r - 1]
@@ -176,7 +227,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     /** Inserts [count] blank lines at [row], pushing lines down (bottom lines disappear). */
     fun insertLines(row: Int, count: Int) {
-        val n = count.coerceAtMost(scrollBottom - row + 1)
+        val n = count.coerceIn(0, scrollBottom - row + 1)
         for (r in scrollBottom downTo row + n) {
             screen[r] = screen[r - n]
             screenWrapped[r] = screenWrapped[r - n]
@@ -189,7 +240,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     /** Deletes [count] lines starting at [row], pulling lines up (blank lines added at bottom). */
     fun deleteLines(row: Int, count: Int) {
-        val n = count.coerceAtMost(scrollBottom - row + 1)
+        val n = count.coerceIn(0, scrollBottom - row + 1)
         for (r in row..scrollBottom - n) {
             screen[r] = screen[r + n]
             screenWrapped[r] = screenWrapped[r + n]
@@ -207,6 +258,21 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     fun restoreScreen(snapshot: Array<Array<Cell>>) {
         if (snapshot.size != rows || snapshot.any { it.size != columns }) return
         for (r in 0 until rows) screen[r] = snapshot[r].copyOf()
+    }
+
+    /**
+     * Drops the newest [count] lines of scrollback.
+     *
+     * For putting the screen back as it was at an earlier moment: the lines that scrolled away
+     * since then are about to be scrolled away again by whatever is replayed over the top, and
+     * left here they would appear in the history twice. Nothing real is lost — it is the same
+     * content, arriving again.
+     */
+    fun dropNewestScrollback(count: Int) {
+        repeat(count.coerceIn(0, scrollback.size)) {
+            scrollback.removeLast()
+            if (scrollbackWrapped.isNotEmpty()) scrollbackWrapped.removeLast()
+        }
     }
 
     /** Returns a snapshot of the screen wrap flags (for alt-screen save/restore). */
@@ -258,7 +324,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     }
 
     fun eraseChars(count: Int) {
-        for (c in cursorCol until (cursorCol + count).coerceAtMost(columns)) {
+        for (c in cursorCol until (cursorCol + count.coerceAtLeast(0)).coerceAtMost(columns)) {
             screen[cursorRow][c] = Cell()
         }
         if (cursorCol + count >= columns) screenWrapped[cursorRow] = false
@@ -267,7 +333,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     fun insertChars(count: Int) {
         val row = screen[cursorRow]
-        val n = count.coerceAtMost(columns - cursorCol)
+        val n = count.coerceIn(0, columns - cursorCol)
         for (c in columns - 1 downTo cursorCol + n) {
             row[c] = row[c - n]
         }
@@ -279,7 +345,7 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
 
     fun deleteChars(count: Int) {
         val row = screen[cursorRow]
-        val n = count.coerceAtMost(columns - cursorCol)
+        val n = count.coerceIn(0, columns - cursorCol)
         for (c in cursorCol until columns - n) row[c] = row[c + n]
         for (c in columns - n until columns) row[c] = Cell()
         screenWrapped[cursorRow] = false
@@ -335,3 +401,16 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (r in 0 until rows) sanitizeWide(r)
     }
 }
+
+/**
+ * A number of scrollback lines that can actually be allocated.
+ *
+ * The settings field clamps what is typed into it, but the same number also arrives in a **backup
+ * file**, and a backup is not something anybody reads before applying it. From there it goes
+ * straight into [TerminalBuffer], where it reserves that many slots the moment a terminal opens —
+ * so two billion lines was not a slow terminal, it was an OutOfMemoryError on the way to the first
+ * prompt. Asked here by everything that can supply the number, so no single one of them has to be
+ * the one that remembers.
+ */
+fun saneScrollback(lines: Int): Int =
+    lines.coerceIn(TerminalBuffer.MIN_SCROLLBACK, TerminalBuffer.MAX_SCROLLBACK)
