@@ -600,14 +600,15 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                                         val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
                                         if (jumpEntity != null) {
                                             val jCurrent = hostDao.getById(jumpEntity.id)
-                                            if (jCurrent != null && jCurrent.knownHostsEntry == null)
-                                                hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                                            if (jCurrent != null)
+                                                hostDao.upsert(jCurrent.copy(
+                                                    knownHostsEntry = KnownHosts.replacing(jCurrent.knownHostsEntry, keyLine),
+                                                ))
                                         }
                                     } else {
-                                        val existing = current.jumpHostKeys
-                                            ?.lines()?.filter { it.isNotBlank() } ?: emptyList()
-                                        if (keyLine !in existing)
-                                            hostDao.upsert(current.copy(jumpHostKeys = (existing + keyLine).joinToString("\n")))
+                                        val merged = KnownHosts.replacing(current.jumpHostKeys, keyLine)
+                                        if (merged != current.jumpHostKeys)
+                                            hostDao.upsert(current.copy(jumpHostKeys = merged))
                                     }
                                 }
                             }
@@ -621,19 +622,21 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                     sftpSession = session
                     sessionManager.update(id) { it.copy(sftpSession = session, status = SessionManager.Status.Connected) }
                     val saved = hostDao.getById(hostId) ?: host
-                    if (saved.knownHostsEntry == null)
-                        hostDao.upsert(saved.copy(knownHostsEntry = session.hostKeyLine))
+                    val pinned = KnownHosts.replacing(saved.knownHostsEntry, session.hostKeyLine)
+                    if (pinned != saved.knownHostsEntry)
+                        hostDao.upsert(saved.copy(knownHostsEntry = pinned))
                     if (session.newJumpHostKeyLines.isNotEmpty()) {
                         val current = hostDao.getById(hostId) ?: saved
-                        val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
-                        val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
-                        if (toAdd.isNotEmpty())
-                            hostDao.upsert(current.copy(jumpHostKeys = (existing + toAdd).joinToString("\n")))
+                        val merged = session.newJumpHostKeyLines
+                            .fold(current.jumpHostKeys) { blob, line -> KnownHosts.replacing(blob, line) }
+                        if (merged != current.jumpHostKeys)
+                            hostDao.upsert(current.copy(jumpHostKeys = merged))
                     }
                     for ((jumpHostId, keyLine) in session.newJumpHostKeyUpdates) {
                         val jCurrent = hostDao.getById(jumpHostId) ?: continue
-                        if (jCurrent.knownHostsEntry == null)
-                            hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                        hostDao.upsert(jCurrent.copy(
+                            knownHostsEntry = KnownHosts.replacing(jCurrent.knownHostsEntry, keyLine),
+                        ))
                     }
                     val startPaths = when (host.sftpStartMode) {
                         "last", "fixed" -> listOfNotNull(

@@ -466,15 +466,19 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                                             val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
                                             if (jumpEntity != null) {
                                                 val jCurrent = hostDao.getById(jumpEntity.id)
-                                                if (jCurrent != null && jCurrent.knownHostsEntry == null)
-                                                    hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                                                if (jCurrent != null)
+                                                    hostDao.upsert(jCurrent.copy(
+                                                        knownHostsEntry = KnownHosts.replacing(jCurrent.knownHostsEntry, keyLine),
+                                                    ))
                                             }
                                         } else {
-                                            // Simple mode: persist to target's jumpHostKeys blob
-                                            val existing = current.jumpHostKeys
-                                                ?.lines()?.filter { it.isNotBlank() } ?: emptyList()
-                                            if (keyLine !in existing)
-                                                hostDao.upsert(current.copy(jumpHostKeys = (existing + keyLine).joinToString("\n")))
+                                            // Simple mode: persist to target's jumpHostKeys blob,
+                                            // where the accepted line takes the place of the one
+                                            // pinned for that hop and algorithm. Appending beside
+                                            // it would leave the old key trusted for good.
+                                            val merged = KnownHosts.replacing(current.jumpHostKeys, keyLine)
+                                            if (merged != current.jumpHostKeys)
+                                                hostDao.upsert(current.copy(jumpHostKeys = merged))
                                         }
                                     }
                                 }
@@ -530,21 +534,23 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         _state.value = ConnectionState.Connected
                     }
                     val dialled = hostDao.getById(target.id) ?: target
-                    if (dialled.knownHostsEntry == null)
-                        hostDao.upsert(dialled.copy(knownHostsEntry = session.hostKeyLine))
+                    val pinned = KnownHosts.replacing(dialled.knownHostsEntry, session.hostKeyLine)
+                    if (pinned != dialled.knownHostsEntry)
+                        hostDao.upsert(dialled.copy(knownHostsEntry = pinned))
                     // Simple mode: new jump keys → target's jumpHostKeys blob
                     if (session.newJumpHostKeyLines.isNotEmpty()) {
                         val current = hostDao.getById(hostId) ?: host
-                        val existing = current.jumpHostKeys?.lines()?.filter { it.isNotBlank() } ?: emptyList()
-                        val toAdd = session.newJumpHostKeyLines.filter { it !in existing }
-                        if (toAdd.isNotEmpty())
-                            hostDao.upsert(current.copy(jumpHostKeys = (existing + toAdd).joinToString("\n")))
+                        val merged = session.newJumpHostKeyLines
+                            .fold(current.jumpHostKeys) { blob, line -> KnownHosts.replacing(blob, line) }
+                        if (merged != current.jumpHostKeys)
+                            hostDao.upsert(current.copy(jumpHostKeys = merged))
                     }
                     // Host-list mode: new jump keys → each jump host's own knownHostsEntry
                     for ((jumpHostId, keyLine) in session.newJumpHostKeyUpdates) {
                         val jCurrent = hostDao.getById(jumpHostId) ?: continue
-                        if (jCurrent.knownHostsEntry == null)
-                            hostDao.upsert(jCurrent.copy(knownHostsEntry = keyLine))
+                        hostDao.upsert(jCurrent.copy(
+                            knownHostsEntry = KnownHosts.replacing(jCurrent.knownHostsEntry, keyLine),
+                        ))
                     }
                     hostDao.recordConnection(hostId, System.currentTimeMillis())
                     // A login that prints two lines leaves both of them under the title bar, and

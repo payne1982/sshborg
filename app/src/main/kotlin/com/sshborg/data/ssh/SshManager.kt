@@ -436,11 +436,8 @@ object SshManager {
                 override fun promptPassphrase(message: String?) = false
                 override fun promptYesNo(message: String?): Boolean {
                     val fp = fingerprintOf(jumpJsch, jumpSession.hostKey, message)
-                    // Never a changed key: a hop with something pinned is checked with
-                    // `StrictHostKeyChecking=yes` just below, so a key that differs from it is
-                    // refused by JSch and this question is never asked. Reaching here means the
-                    // hop had nothing pinned at all.
-                    return guard.verify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey), false)
+                    val line = buildKnownHostsLine(jumpSession.hostKey)
+                    return guard.verify(jump.host, fp, line, KnownHosts.identityChanged(jump.knownHostsEntry, line))
                 }
                 override fun showMessage(message: String?) = typed.noteBanner(message)
                 override fun promptKeyboardInteractive(
@@ -460,7 +457,14 @@ object SshManager {
             })
 
             val jumpConfig = Properties().apply {
-                setProperty("StrictHostKeyChecking", if (jump.knownHostsEntry.isNullOrBlank()) "ask" else "yes")
+                // `ask`, as for the machine at the end of the chain. A hop used to be `yes` once
+                // it had a key pinned, which meant a hop whose key had changed was refused by JSch
+                // with its own English sentence and no dialog at all — while the destination, the
+                // machine that matters most, asked. Strictness that cannot be answered is not
+                // protection: the way out of it was "reset accepted host keys", which throws every
+                // pin away. Asked, it is a dialog that names the hop, says in red that this is not
+                // the key that was saved, and replaces that key only if the person says so.
+                setProperty("StrictHostKeyChecking", "ask")
                 setProperty("PreferredAuthentications", when (jumpAuth) {
                     is SshAuth.PublicKey -> "publickey"
                     is SshAuth.Password, SshAuth.Interactive -> "password,keyboard-interactive"
@@ -479,9 +483,11 @@ object SshManager {
                      else "connecting to jump host ${hop + 1} through the previous hop")
             jumpSession.connect(20_000)
 
-            // Collect the host key so we can persist it if it was unknown
-            if (jump.knownHostsEntry.isNullOrBlank()) {
-                val keyLine = buildKnownHostsLine(jumpSession.hostKey)
+            // Collect the hop's key unless it is already the pinned one: nothing pinned, a
+            // second algorithm, or a key the person has just accepted in place of the old one.
+            val hopKey = buildKnownHostsLine(jumpSession.hostKey)
+            if (!KnownHosts.isPinned(jump.knownHostsEntry, hopKey)) {
+                val keyLine = hopKey
                 if (jump.hostId != null) {
                     // Host-list mode: associate key update with the jump host entity
                     newJumpHostKeyUpdates.add(jump.hostId to keyLine)

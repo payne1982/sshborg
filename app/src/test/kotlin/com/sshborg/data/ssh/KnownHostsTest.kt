@@ -65,4 +65,25 @@ class KnownHostsTest {
             KnownHosts.replacing(entry, "fatberry ssh-ed25519 AAAAnew"),
         )
     }
+
+    @Test fun `a key already pinned is not collected again`() {
+        // What a hop asks after it has connected. Everything else — nothing pinned, a second
+        // algorithm, a key just accepted in place of the old one — is worth storing.
+        assertTrue(KnownHosts.isPinned(pinned, "fatberry ssh-ed25519 AAAAoriginal"))
+        assertFalse(KnownHosts.isPinned(pinned, "fatberry ssh-ed25519 AAAAnew"))
+        assertFalse(KnownHosts.isPinned(pinned, "fatberry ssh-rsa AAAArsa"))
+        assertFalse(KnownHosts.isPinned(null, "fatberry ssh-ed25519 AAAAoriginal"))
+    }
+
+    @Test fun `a hop's line in the chain's blob gives way without disturbing the other hops`() {
+        // The hand-written chain keeps every hop's key in one blob on the target's row. Appending
+        // the accepted line beside the old one would leave the old key trusted for good.
+        val blob = "hop1 ssh-ed25519 AAAAone\nhop2 ssh-ed25519 AAAAtwo\nhop3 ssh-ed25519 AAAAthree"
+        assertEquals(
+            "hop1 ssh-ed25519 AAAAone\nhop3 ssh-ed25519 AAAAthree\nhop2 ssh-ed25519 AAAAnew",
+            KnownHosts.replacing(blob, "hop2 ssh-ed25519 AAAAnew"),
+        )
+        assertTrue(KnownHosts.identityChanged(blob, "hop2 ssh-ed25519 AAAAnew"))
+        assertFalse(KnownHosts.identityChanged(blob, "hop4 ssh-ed25519 AAAAfour"))
+    }
 }

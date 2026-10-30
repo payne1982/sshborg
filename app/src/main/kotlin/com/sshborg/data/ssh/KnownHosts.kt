@@ -52,6 +52,15 @@ object KnownHosts {
         return (kept + arriving).joinToString("\n")
     }
 
+    /**
+     * Whether [arriving] is already pinned, exactly as it stands.
+     *
+     * The question a hop asks after it has connected: anything else — nothing pinned, a second
+     * algorithm, or a key just accepted in place of the pinned one — is a key worth storing.
+     */
+    fun isPinned(pinned: String?, arriving: String): Boolean =
+        lines(pinned).any { it.trim() == arriving.trim() }
+
     /** A line is about this host and algorithm. The host field may be a comma-separated list. */
     private fun matches(line: String, host: String, type: String): Boolean =
         fieldOf(line, 1) == type &&
