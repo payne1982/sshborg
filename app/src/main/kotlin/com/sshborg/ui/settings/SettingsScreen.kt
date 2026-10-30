@@ -1,5 +1,6 @@
 package com.sshborg.ui.settings
 
+import com.sshborg.terminal.saneScrollback
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
@@ -386,7 +387,8 @@ fun SettingsScreen(
             )
 
             val saveScrollback = {
-                val n = scrollbackText.toIntOrNull()?.coerceIn(100, 50000) ?: 2000
+                val n = scrollbackText.toIntOrNull()?.let { saneScrollback(it) }
+                    ?: com.sshborg.terminal.TerminalBuffer.DEFAULT_SCROLLBACK
                 scrollbackText = n.toString()
                 vm.setScrollbackLines(n)
             }

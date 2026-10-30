@@ -4,7 +4,7 @@ package com.sshborg.terminal
  * VT100/VT220/xterm terminal emulator.
  * Feed incoming bytes via [process]; the state is reflected in [buffer].
  */
-class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = 2000) {
+class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = TerminalBuffer.DEFAULT_SCROLLBACK) {
 
     val buffer = TerminalBuffer(columns, rows, maxScrollback)
 

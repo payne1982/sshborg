@@ -1313,8 +1313,11 @@ class SftpSession(
      *
      * The swap is a plain rename, which JSch turns into posix-rename@openssh.com wherever the
      * server offers it (OpenSSH always does) — one atomic step, and the original survives if it
-     * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there
-     * we write in place instead rather than delete the original and hope.
+     * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there,
+     * and only there, we write in place instead rather than delete the original and hope. Any
+     * other refusal — no permission, the connection gone — is a save that did not happen and is
+     * reported as one: overwriting the original because the rename failed for a reason we have
+     * not understood would take the original with it.
      *
      * ### Why the name is random and the mode comes first
      *
@@ -1373,6 +1376,24 @@ class SftpSession(
         try {
             op { it.rename(temp, remotePath) }
         } catch (e: com.jcraft.jsch.SftpException) {
+            // Writing in place is the thing this whole function exists to avoid, so it is done
+            // for exactly one reason: a server whose rename will not take a name that is already
+            // taken. That is `SSH_FX_FAILURE` from an SFTP v3 server, or `SSH_FX_OP_UNSUPPORTED`
+            // from one with no rename at all — and in both cases the original has to still be
+            // standing there, which is what made the name unavailable.
+            //
+            // Every other refusal used to land here too: no permission, the connection gone, a
+            // malformed answer. Overwriting the file directly because the connection dropped is
+            // how a save that failed takes the original with it, so those now fail as what they
+            // are, and the temporary is cleared away.
+            val nameIsTaken =
+                (e.id == com.jcraft.jsch.ChannelSftp.SSH_FX_FAILURE ||
+                    e.id == com.jcraft.jsch.ChannelSftp.SSH_FX_OP_UNSUPPORTED) &&
+                    lstatOrNull(remotePath) != null
+            if (!nameIsTaken) {
+                runCatching { op { it.rm(temp) } }
+                throw e
+            }
             android.util.Log.w("SftpSession", "rename onto an existing name refused, writing in place", e)
             uploadFile(java.io.ByteArrayInputStream(bytes), remotePath)
             runCatching { op { it.rm(temp) } }

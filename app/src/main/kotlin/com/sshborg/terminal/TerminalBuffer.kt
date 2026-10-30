@@ -4,7 +4,20 @@ package com.sshborg.terminal
  * A 2D grid of cells representing the terminal screen, plus a scrollback history.
  * Thread-safety: this class is NOT thread-safe; synchronize externally.
  */
-class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2000) {
+class TerminalBuffer(var columns: Int, var rows: Int, wantedScrollback: Int = DEFAULT_SCROLLBACK) {
+
+    /**
+     * Clamped here and not only where it is typed, because this is where it is *spent*: the
+     * deques below reserve this many slots before a single line has been printed. A value from
+     * outside the range can only have come from a file, and a file is not a reason to fail to
+     * open a terminal — see [saneScrollback].
+     *
+     * The parameter has a different name on purpose. A constructor parameter is in scope for
+     * every property initializer in the class, so a property that merely shadows it leaves the
+     * initializers below reading the raw number — which is how the first attempt at this fix
+     * still ran out of memory.
+     */
+    val maxScrollback: Int = saneScrollback(wantedScrollback)
 
     /**
      * A single screen cell. [code] is a full Unicode codepoint (Int), so supplementary
@@ -22,6 +35,17 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
     ) {
         /** BMP convenience view; supplementary codepoints (emoji) read back as a space. */
         val char: Char get() = if (Character.isBmpCodePoint(code)) code.toChar() else ' '
+    }
+
+    companion object {
+        /**
+         * The range of scrollback a terminal may be asked for, and the range the settings field
+         * offers. It is a range and not a maximum because the number decides an allocation: the
+         * deques below reserve that many slots the moment a terminal opens.
+         */
+        const val MIN_SCROLLBACK = 100
+        const val MAX_SCROLLBACK = 50_000
+        const val DEFAULT_SCROLLBACK = 2000
     }
 
     // Scrollback: index 0 = oldest line
@@ -377,3 +401,16 @@ class TerminalBuffer(var columns: Int, var rows: Int, val maxScrollback: Int = 2
         for (r in 0 until rows) sanitizeWide(r)
     }
 }
+
+/**
+ * A number of scrollback lines that can actually be allocated.
+ *
+ * The settings field clamps what is typed into it, but the same number also arrives in a **backup
+ * file**, and a backup is not something anybody reads before applying it. From there it goes
+ * straight into [TerminalBuffer], where it reserves that many slots the moment a terminal opens —
+ * so two billion lines was not a slow terminal, it was an OutOfMemoryError on the way to the first
+ * prompt. Asked here by everything that can supply the number, so no single one of them has to be
+ * the one that remembers.
+ */
+fun saneScrollback(lines: Int): Int =
+    lines.coerceIn(TerminalBuffer.MIN_SCROLLBACK, TerminalBuffer.MAX_SCROLLBACK)
