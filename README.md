@@ -1,6 +1,6 @@
 # SSHBorg
 
-An SSH client for Android. Full terminal emulation, SFTP file manager, SSH key management, jump hosts, agent forwarding, and biometric lock — with no ads, no tracking, and no cloud.
+An SSH client for Android. Full terminal emulation, mosh, SFTP file manager, a remote file editor, SSH key management, jump hosts, agent forwarding, and an app lock — with no ads, no tracking, and no cloud.
 
 [![Get it on Google Play](https://img.shields.io/badge/Google-Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.sshborg) &nbsp; [![Explore it on AppGallery](https://img.shields.io/badge/Huawei-AppGallery-CF0A2C?style=for-the-badge&logo=huawei&logoColor=white)](https://appgallery.huawei.com/app/C117647135) &nbsp; [![Get it on F-Droid](https://img.shields.io/badge/F--Droid-get%20it%20on-1976D2?style=for-the-badge&logo=f-droid&logoColor=white)](https://f-droid.org/en/packages/com.sshborg/)
 
@@ -9,15 +9,17 @@ An SSH client for Android. Full terminal emulation, SFTP file manager, SSH key m
 ## Features
 
 - **SSH terminal** — VT100/xterm emulation, full UTF-8, multiple concurrent sessions
+- **mosh** — a session that survives a change of network and a sleeping phone, with nothing to reconnect; needs `mosh-server` on the server
 - **SFTP file manager** — browse, upload, download, rename, and delete files
+- **Remote file editor** — edit a file in place over SFTP, with syntax highlighting and a byte-exact hex mode
 - **SSH key auth** — generate Ed25519, ECDSA, and RSA keys directly on device
 - **Jump host support** — connect through one or more bastion hosts with transparent tunnelling
 - **SSH agent forwarding** — forward your keys through jump chains
-- **Biometric lock** — protect access with fingerprint or face unlock
+- **App lock** — fingerprint or face unlock, the device's own lock, or an in-app PIN or passphrase
 - **Backup / restore** — export and import host configurations as JSON (credentials excluded)
 - **No ads, no tracking, no third-party SDKs**
 
-Requires Android 10 (API 29) or later.
+Requires Android 9 (API 28) or later.
 
 ## Building
 
