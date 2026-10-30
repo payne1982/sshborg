@@ -108,12 +108,12 @@ class MoshTerminalTransport(
         object : MoshTransport.Listener {
             override fun onHostBytes(bytes: ByteArray) {
                 // Handed over, not applied: see [toScreen].
-                toScreen.trySend(ToScreen.Bytes(bytes, clock()))
+                enqueueScreen(ToScreen.Bytes(bytes, clock()))
             }
 
             override fun onStateReached(number: Long) {
                 if (past == null) return
-                toScreen.trySend(ToScreen.Keep(number))
+                enqueueScreen(ToScreen.Keep(number))
                 // The loop's own tally of what the screen can be put back to. It cannot ask the
                 // screen directly: the answer is needed here, on this thread, before the frame is
                 // either used or thrown away, and the copies themselves are made over there.
@@ -123,7 +123,7 @@ class MoshTerminalTransport(
 
             override fun onReturnToState(number: Long): Boolean {
                 if (past == null || number !in kept) return false
-                toScreen.trySend(ToScreen.Restore(number))
+                enqueueScreen(ToScreen.Restore(number))
                 // Everything after it never happened.
                 while (kept.isNotEmpty() && kept.last() != number) kept.removeLast()
                 return true
@@ -149,8 +149,37 @@ class MoshTerminalTransport(
      * exists to respect.
      *
      * One consumer, so the order the server sent them in is the order the screen gets them in.
+     *
+     * Bounded, and the bound is [screenBudget]. Unbounded was the right shape for a server that
+     * behaves and the wrong one for a peer that does not: nothing here applies back pressure, so
+     * a far end sending faster than a screen can be drawn was growing our heap with no ceiling at
+     * all. The channel's own capacity is the second of the two, structural rather than counted.
      */
-    private val toScreen = Channel<ToScreen>(Channel.UNLIMITED)
+    private val toScreen = Channel<ToScreen>(TerminalBacklog.MAX_EVENTS)
+
+    /** What is held for the screen: see [TerminalBacklog] for why going over ends the session. */
+    private val screenBudget = TerminalBacklog()
+
+    private fun ToScreen.byteCount(): Int = if (this is ToScreen.Bytes) bytes.size else 0
+
+    /**
+     * Puts one event in the queue, or ends the session.
+     *
+     * Thrown rather than returned because every caller is a protocol callback with nothing
+     * sensible to do about it, and because [pump]'s own wrapper already turns anything thrown out
+     * of the loop into a lost session — which is what this is. The message carries the numbers:
+     * it reaches the error dialog, and somebody reading it needs to know this was a ceiling and
+     * not a network.
+     */
+    private fun enqueueScreen(message: ToScreen) {
+        val count = message.byteCount()
+        if (!screenBudget.reserve(count) || toScreen.trySend(message).isFailure) {
+            screenBudget.release(count)
+            throw IllegalStateException(
+                "mosh: output waiting for the screen is over budget, ${screenBudget.describe()}",
+            )
+        }
+    }
 
     /**
      * What the loop sends the screen's way, in the order the far end sent it.
@@ -310,24 +339,32 @@ class MoshTerminalTransport(
         // The state we begin at, which is a blank screen, and is worth being able to return to:
         // the far end's very first frame is computed against exactly that.
         if (past != null) {
-            toScreen.trySend(ToScreen.Keep(0))
+            enqueueScreen(ToScreen.Keep(0))
             kept.addLast(0)
         }
         openSocket()
         scope.launch {
             // Drains to the end: a channel that is closed hands out what is already in it first,
             // so the last frames of a session still reach the screen.
-            for (message in toScreen) when (message) {
-                is ToScreen.Bytes -> {
-                    (attached ?: unattendedSink)(message.bytes, message.bytes.size)
-                    val waited = clock() - message.at
-                    if (waited > worstScreenWait) worstScreenWait = waited
-                    framesApplied++
+            for (message in toScreen) {
+                // Released when it is done with, not when it is taken: an event being drawn is
+                // still being held, and the ceiling is on what is held.
+                try {
+                    when (message) {
+                        is ToScreen.Bytes -> {
+                            (attached ?: unattendedSink)(message.bytes, message.bytes.size)
+                            val waited = clock() - message.at
+                            if (waited > worstScreenWait) worstScreenWait = waited
+                            framesApplied++
+                        }
+                        is ToScreen.Keep -> past?.keep(message.state)
+                        is ToScreen.Restore -> past?.restore(message.state)
+                        is ToScreen.IgnoreRepaint -> past?.ignoreRepaint(message.lines)
+                        is ToScreen.Forget -> past?.forget()
+                    }
+                } finally {
+                    screenBudget.release(message.byteCount())
                 }
-                is ToScreen.Keep -> past?.keep(message.state)
-                is ToScreen.Restore -> past?.restore(message.state)
-                is ToScreen.IgnoreRepaint -> past?.ignoreRepaint(message.lines)
-                is ToScreen.Forget -> past?.forget()
             }
         }
         scope.launch {
@@ -478,12 +515,12 @@ class MoshTerminalTransport(
                     // The far end has not heard this yet. Until it has, its frames are painted
                     // for the shape it still believes in, and a repaint of a taller screen
                     // scrolls the surplus off the bottom of ours — painting, not history.
-                    toScreen.trySend(ToScreen.IgnoreRepaint(event.rows))
+                    enqueueScreen(ToScreen.IgnoreRepaint(event.rows))
                     // A screen of a different shape cannot be put back: nothing kept describes
                     // this terminal any more.
                     if (past != null) {
                         kept.clear()
-                        toScreen.trySend(ToScreen.Forget)
+                        enqueueScreen(ToScreen.Forget)
                     }
                 }
             }

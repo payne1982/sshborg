@@ -79,7 +79,7 @@ class AppLockManager(private val prefs: AppPreferences) {
         val newFailed = failed + 1
         return if (newFailed % ATTEMPTS_PER_LOCKOUT == 0) {
             val lockoutNumber = newFailed / ATTEMPTS_PER_LOCKOUT      // 1, 2, 3, …
-            val secs = (BASE_LOCKOUT_SECONDS shl (lockoutNumber - 1)).coerceAtMost(MAX_LOCKOUT_SECONDS)
+            val secs = lockoutSeconds(lockoutNumber)
             prefs.writeLockAttempts(newFailed, now + secs * 1000)
             VerifyResult.LockedOut(secs)
         } else {
@@ -139,5 +139,30 @@ class AppLockManager(private val prefs: AppPreferences) {
         const val ATTEMPTS_PER_LOCKOUT = 5
         private const val BASE_LOCKOUT_SECONDS = 30L
         private const val MAX_LOCKOUT_SECONDS = 15L * 60L
+
+        /**
+         * How long the [lockoutNumber]th lockout lasts: 30 s, then doubling to a quarter of an
+         * hour, which it then stays at.
+         *
+         * The doubling was a shift, and `shl` on a `Long` uses **only the low six bits** of the
+         * count. Worked out over the whole range: lockouts 60 to 63 overflowed into a negative
+         * number, the 64th came out as 0, the 65th shifted by nothing and asked for 30 seconds
+         * again, and from there it went round the cycle for ever — twelve of the first two hundred
+         * were negative. `coerceAtMost` returned all of them happily, and a lockout of minus two
+         * billion seconds is one that expired long ago: from the 300th wrong attempt on, the
+         * unlock screen could be tried as fast as a PIN can be typed. Getting there costs some
+         * three hundred attempts and most of a day of waiting, which is a patient afternoon with
+         * somebody's phone and not a theory.
+         *
+         * So the shift is clamped where the maximum already bites — 30 << 5 is past it — and the
+         * schedule is the same one it always was.
+         */
+        internal fun lockoutSeconds(lockoutNumber: Int): Long {
+            val shift = (lockoutNumber - 1).coerceIn(0, MAX_LOCKOUT_SHIFT)
+            return (BASE_LOCKOUT_SECONDS shl shift).coerceAtMost(MAX_LOCKOUT_SECONDS)
+        }
+
+        /** The first shift whose result is already past [MAX_LOCKOUT_SECONDS]. */
+        private const val MAX_LOCKOUT_SHIFT = 5
     }
 }

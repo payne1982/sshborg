@@ -1313,11 +1313,18 @@ class SftpSession(
      *
      * The swap is a plain rename, which JSch turns into posix-rename@openssh.com wherever the
      * server offers it (OpenSSH always does) — one atomic step, and the original survives if it
-     * fails. Servers with only the SFTP v3 rename refuse to overwrite an existing name; there,
-     * and only there, we write in place instead rather than delete the original and hope. Any
-     * other refusal — no permission, the connection gone — is a save that did not happen and is
-     * reported as one: overwriting the original because the rename failed for a reason we have
-     * not understood would take the original with it.
+     * fails. Servers with only the SFTP v3 rename refuse to replace a name that already exists,
+     * and v3 has one generic FAILURE for every reason a rename can be refused — so there is no
+     * way to tell "the name is taken" from "no room", "no permission" or "no". The old answer was
+     * to upload over the original instead, and that is exactly the wrong one: an upload opens the
+     * file for writing, which **truncates it before the first byte arrives**, so a save that then
+     * failed took the original with it.
+     *
+     * So the fallback never writes over anything. The original is moved aside, the temporary
+     * takes its name, and only then is the original removed; if the second move fails, the first
+     * is undone. At no point is the file opened for writing, which is the only way it could be
+     * lost — and a crash in the middle leaves the contents under one name or the other, never
+     * under neither.
      *
      * ### Why the name is random and the mode comes first
      *
@@ -1375,28 +1382,31 @@ class SftpSession(
         }
         try {
             op { it.rename(temp, remotePath) }
-        } catch (e: com.jcraft.jsch.SftpException) {
-            // Writing in place is the thing this whole function exists to avoid, so it is done
-            // for exactly one reason: a server whose rename will not take a name that is already
-            // taken. That is `SSH_FX_FAILURE` from an SFTP v3 server, or `SSH_FX_OP_UNSUPPORTED`
-            // from one with no rename at all — and in both cases the original has to still be
-            // standing there, which is what made the name unavailable.
-            //
-            // Every other refusal used to land here too: no permission, the connection gone, a
-            // malformed answer. Overwriting the file directly because the connection dropped is
-            // how a save that failed takes the original with it, so those now fail as what they
-            // are, and the temporary is cleared away.
-            val nameIsTaken =
-                (e.id == com.jcraft.jsch.ChannelSftp.SSH_FX_FAILURE ||
-                    e.id == com.jcraft.jsch.ChannelSftp.SSH_FX_OP_UNSUPPORTED) &&
-                    lstatOrNull(remotePath) != null
-            if (!nameIsTaken) {
+        } catch (refused: Exception) {
+            // Why the reason is not examined: SFTP v3 answers every refusal with the same generic
+            // FAILURE, so "the name is taken" is not a thing that can be recognised. The way out
+            // has to be one that is safe whatever the reason was — and moving a file is that,
+            // while writing over it is not.
+            val aside = "$dir/.$name.$suffix.sshborg-old"
+            try {
+                op { it.rename(remotePath, aside) }
+            } catch (_: Exception) {
+                // Not even that was allowed: nothing has been touched, so the original refusal is
+                // the honest answer and the temporary goes away with it.
+                runCatching { op { it.rm(temp) } }
+                throw refused
+            }
+            android.util.Log.w("SftpSession", "rename onto an existing name refused, moving the original aside", refused)
+            try {
+                op { it.rename(temp, remotePath) }
+            } catch (e: Exception) {
+                // Put it back. The file is where it was, and the save is reported as the failure
+                // it is rather than leaving a hole where the original used to be.
+                runCatching { op { it.rename(aside, remotePath) } }
                 runCatching { op { it.rm(temp) } }
                 throw e
             }
-            android.util.Log.w("SftpSession", "rename onto an existing name refused, writing in place", e)
-            uploadFile(java.io.ByteArrayInputStream(bytes), remotePath)
-            runCatching { op { it.rm(temp) } }
+            runCatching { op { it.rm(aside) } }
         }
     }
 
