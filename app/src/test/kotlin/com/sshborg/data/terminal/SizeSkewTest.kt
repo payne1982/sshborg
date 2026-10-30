@@ -38,7 +38,7 @@ class SizeSkewTest {
                 hostname = s!!.host, port = s.port, username = s.user,
                 auth = SshAuth.PublicKey(s.key("i_plain")),
             )
-        ) { _, _, _ -> true }
+        ) { _, _, _, _ -> true }
         val handover = ssh.startMoshServer(networkTimeoutSeconds = 120)
         // The same arrangement the app makes, which is what carries the rule being tested.
         val history = com.sshborg.terminal.TerminalScreenHistory(emulator)

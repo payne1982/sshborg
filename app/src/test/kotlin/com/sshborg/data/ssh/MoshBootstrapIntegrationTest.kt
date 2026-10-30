@@ -35,7 +35,7 @@ class MoshBootstrapIntegrationTest {
             username = s.user,
             auth = SshAuth.PublicKey(s.key("i_plain")),
         )
-        return runBlocking { SshManager.openShell(params) { _, _, _ -> true } }
+        return runBlocking { SshManager.openShell(params) { _, _, _, _ -> true } }
     }
 
     @Test fun `a chosen address family is dialled, and the host key still vouches by name`() {
@@ -59,7 +59,7 @@ class MoshBootstrapIntegrationTest {
                     auth = SshAuth.PublicKey(s.key("i_plain")),
                     addressFamily = "ipv4",
                 ),
-            ) { _, _, _ -> true }
+            ) { _, _, _, _ -> true }
         }
         try {
             assertTrue("the session should be up", ssh.isConnected)

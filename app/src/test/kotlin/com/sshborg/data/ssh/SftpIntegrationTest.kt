@@ -37,7 +37,7 @@ class SftpIntegrationTest {
             hostname = s.host, port = s.port, username = s.user,
             auth = SshAuth.PublicKey(s.key("i_plain")),
         )
-        val opened = runBlocking { SshManager.openSftp(params) { _, _, _ -> true } }
+        val opened = runBlocking { SshManager.openSftp(params) { _, _, _, _ -> true } }
         session = opened
         scratch = "${opened.homePath.trimEnd('/')}/.sshborg-test-${System.nanoTime()}"
         opened.mkdir(scratch)

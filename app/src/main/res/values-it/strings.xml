@@ -357,6 +357,10 @@
     <string name="hostkey_terminal_host">Host: %1$s</string>
     <string name="hostkey_terminal_fingerprint">Impronta digitale:</string>
     <string name="hostkey_terminal_trust_question">Ti fidi di questo host?</string>
+    <string name="hostkey_changed_title">Chiave host cambiata</string>
+    <string name="hostkey_changed_warning">Questa non è la chiave salvata per questo host.</string>
+    <string name="hostkey_changed_explain">Il server può essere stato reinstallato, oppure qualcosa sta rispondendo al suo posto. Accettando, la chiave salvata viene sostituita.</string>
+    <string name="hostkey_changed_accept">Sostituisci chiave</string>
 
     <string name="password_dialog_title">Password per %1$s</string>
     <string name="password_field_label">Password</string>

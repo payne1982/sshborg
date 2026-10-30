@@ -374,6 +374,10 @@
     <string name="hostkey_terminal_host">Хост: %1$s</string>
     <string name="hostkey_terminal_fingerprint">Отпечаток:</string>
     <string name="hostkey_terminal_trust_question">Доверяете этому хосту?</string>
+    <string name="hostkey_changed_title">Ключ хоста изменился</string>
+    <string name="hostkey_changed_warning">Это не тот ключ, который сохранён для этого хоста.</string>
+    <string name="hostkey_changed_explain">Возможно, сервер переустановили, или вместо него отвечает что-то другое. Если принять, сохранённый ключ будет заменён.</string>
+    <string name="hostkey_changed_accept">Заменить ключ</string>
 
     <string name="password_dialog_title">Пароль для %1$s</string>
     <string name="password_field_label">Пароль</string>

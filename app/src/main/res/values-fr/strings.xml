@@ -356,6 +356,10 @@
     <string name="hostkey_terminal_host">Hôte : %1$s</string>
     <string name="hostkey_terminal_fingerprint">Empreinte :</string>
     <string name="hostkey_terminal_trust_question">Faites-vous confiance à cet hôte ?</string>
+    <string name="hostkey_changed_title">La clé de l\'hôte a changé</string>
+    <string name="hostkey_changed_warning">Ce n\'est pas la clé enregistrée pour cet hôte.</string>
+    <string name="hostkey_changed_explain">Le serveur a peut-être été réinstallé, ou quelque chose répond à sa place. Accepter remplace la clé enregistrée.</string>
+    <string name="hostkey_changed_accept">Remplacer la clé</string>
 
     <string name="password_dialog_title">Mot de passe pour %1$s</string>
     <string name="password_field_label">Mot de passe</string>

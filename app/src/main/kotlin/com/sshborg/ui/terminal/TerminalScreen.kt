@@ -650,6 +650,7 @@ fun TerminalScreen(
                 is ConnectionState.HostKeyPrompt   -> HostKeyDialog(
                     hostname    = s.hostname,
                     fingerprint = s.fingerprint,
+                    changed     = s.changed,
                     onAccept    = { vm.acceptHostKey() },
                     onReject    = { vm.rejectHostKey() },
                 )
@@ -1044,12 +1045,30 @@ private fun MoshFailedDialog(
 }
 
 @Composable
-private fun HostKeyDialog(hostname: String, fingerprint: String, onAccept: () -> Unit, onReject: () -> Unit) {
+private fun HostKeyDialog(
+    hostname: String,
+    fingerprint: String,
+    changed: Boolean,
+    onAccept: () -> Unit,
+    onReject: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onReject,
-        title = { Text(stringResource(R.string.hostkey_title)) },
+        // A host being introduced and the host we pinned offering a different key are not the
+        // same question, and until now they were the same dialog. The second one is the only
+        // place in the app where red is the right colour: it is the one check that says the
+        // server is the server, and it has just failed.
+        title = { Text(stringResource(if (changed) R.string.hostkey_changed_title else R.string.hostkey_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (changed) {
+                    Text(
+                        stringResource(R.string.hostkey_changed_warning),
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(stringResource(R.string.hostkey_changed_explain), style = MaterialTheme.typography.bodySmall)
+                }
                 Text(stringResource(R.string.hostkey_terminal_host, hostname))
                 Text(stringResource(R.string.hostkey_terminal_fingerprint))
                 Text(fingerprint, style = MaterialTheme.typography.bodySmall)
@@ -1057,7 +1076,11 @@ private fun HostKeyDialog(hostname: String, fingerprint: String, onAccept: () ->
             }
         },
         confirmButton = {
-            OutlinedButton(onClick = onAccept) { Text(stringResource(R.string.action_trust)) }
+            // What the button does, rather than how to feel about it: accepting a changed key
+            // replaces the one that was pinned, and that is the part worth knowing before tapping.
+            OutlinedButton(onClick = onAccept) {
+                Text(stringResource(if (changed) R.string.hostkey_changed_accept else R.string.action_trust))
+            }
         },
         dismissButton = {
             OutlinedButton(

@@ -220,7 +220,7 @@ class MoshLatencyTest {
                     hostname = s.host, port = s.port, username = s.user,
                     auth = SshAuth.PublicKey(s.key("i_plain")),
                 )
-            ) { _, _, _ -> true }
+            ) { _, _, _, _ -> true }
         }
     }
 

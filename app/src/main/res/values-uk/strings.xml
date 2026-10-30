@@ -358,6 +358,10 @@
     <string name="hostkey_terminal_host">Хост: %1$s</string>
     <string name="hostkey_terminal_fingerprint">Відбиток:</string>
     <string name="hostkey_terminal_trust_question">Ви довіряєте цьому хосту?</string>
+    <string name="hostkey_changed_title">Ключ хоста змінився</string>
+    <string name="hostkey_changed_warning">Це не той ключ, який збережено для цього хоста.</string>
+    <string name="hostkey_changed_explain">Можливо, сервер перевстановили, або замість нього відповідає щось інше. Якщо прийняти, збережений ключ буде замінено.</string>
+    <string name="hostkey_changed_accept">Замінити ключ</string>
 
     <string name="password_dialog_title">Пароль для %1$s</string>
     <string name="password_field_label">Пароль</string>

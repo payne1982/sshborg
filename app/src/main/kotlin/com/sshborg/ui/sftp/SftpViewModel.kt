@@ -34,7 +34,8 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
     sealed interface State {
         object Connecting : State
         object Preparing : State
-        data class HostKeyPrompt(val hostname: String, val fingerprint: String) : State
+        /** @param changed the host had a key pinned and this is not it. */
+        data class HostKeyPrompt(val hostname: String, val fingerprint: String, val changed: Boolean) : State
         /** @param banner what the server said before letting anyone in, if it said anything. */
         data class PasswordPrompt(
             val hostname: String,
@@ -581,17 +582,20 @@ class SftpViewModel(app: Application) : AndroidViewModel(app) {
                                 }
                             }
                         },
-                    ) { hostname, fingerprint, keyLine ->
+                    ) { hostname, fingerprint, keyLine, changed ->
                         runBlocking {
-                            _state.value = State.HostKeyPrompt(hostname, fingerprint)
+                            _state.value = State.HostKeyPrompt(hostname, fingerprint, changed)
                             val accepted = hostKeyResult.first()
                             if (accepted) {
                                 _state.value = State.Connecting
                                 val current = hostDao.getById(hostId)
                                 if (current != null) {
                                     if (hostname == host.hostname) {
-                                        if (current.knownHostsEntry == null)
-                                            hostDao.upsert(current.copy(knownHostsEntry = keyLine))
+                                        // See the same spot in TerminalViewModel: accepting a key
+                                        // has to replace the one it was offered against.
+                                        hostDao.upsert(current.copy(
+                                            knownHostsEntry = KnownHosts.replacing(current.knownHostsEntry, keyLine),
+                                        ))
                                     } else if (host.jumpMode == "host_list") {
                                         val jumpEntity = jumpHostEntities.find { it.hostname == hostname }
                                         if (jumpEntity != null) {

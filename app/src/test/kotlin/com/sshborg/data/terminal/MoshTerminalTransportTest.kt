@@ -244,7 +244,7 @@ class MoshTerminalTransportTest {
             username = s.user,
             auth = SshAuth.PublicKey(s.key("i_plain")),
         )
-        return runBlocking { SshManager.openShell(params) { _, _, _ -> true } }
+        return runBlocking { SshManager.openShell(params) { _, _, _, _ -> true } }
     }
 
     private companion object {

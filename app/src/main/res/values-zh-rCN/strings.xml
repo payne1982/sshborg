@@ -370,6 +370,10 @@
     <string name="hostkey_terminal_host">主机：%1$s</string>
     <string name="hostkey_terminal_fingerprint">指纹：</string>
     <string name="hostkey_terminal_trust_question">您是否信任此主机？</string>
+    <string name="hostkey_changed_title">主机密钥已更改</string>
+    <string name="hostkey_changed_warning">这不是为此主机保存的密钥。</string>
+    <string name="hostkey_changed_explain">服务器可能已重装，也可能有别的东西在代替它应答。接受后将替换已保存的密钥。</string>
+    <string name="hostkey_changed_accept">替换密钥</string>
 
     <string name="password_dialog_title">%1$s 的密码</string>
     <string name="password_field_label">密码</string>

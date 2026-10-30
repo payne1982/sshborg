@@ -372,6 +372,10 @@
     <string name="hostkey_terminal_host">Host: %1$s</string>
     <string name="hostkey_terminal_fingerprint">Fingerprint:</string>
     <string name="hostkey_terminal_trust_question">Do you trust this host?</string>
+    <string name="hostkey_changed_title">Host key changed</string>
+    <string name="hostkey_changed_warning">This is not the key saved for this host.</string>
+    <string name="hostkey_changed_explain">The server may have been reinstalled, or something may be answering in its place. Accepting replaces the saved key.</string>
+    <string name="hostkey_changed_accept">Replace key</string>
 
     <string name="password_dialog_title">Password for %1$s</string>
     <string name="password_field_label">Password</string>

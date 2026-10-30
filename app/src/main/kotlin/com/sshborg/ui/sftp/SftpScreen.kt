@@ -327,6 +327,7 @@ fun SftpScreen(
                     HostKeyDialog(
                         hostname    = s.hostname,
                         fingerprint = s.fingerprint,
+                        changed     = s.changed,
                         onAccept    = vm::acceptHostKey,
                         onReject    = { vm.rejectHostKey(); onBack() },
                     )
@@ -1499,15 +1500,30 @@ private fun BatchConflictDialog(
 
 @Composable
 private fun HostKeyDialog(
-    hostname: String, fingerprint: String,
+    hostname: String, fingerprint: String, changed: Boolean,
     onAccept: () -> Unit, onReject: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onReject,
-        title = { Text(stringResource(R.string.hostkey_title)) },
-        text  = { Text(stringResource(R.string.hostkey_sftp_body, hostname, fingerprint)) },
+        // The same two questions as in the terminal, told apart the same way.
+        title = { Text(stringResource(if (changed) R.string.hostkey_changed_title else R.string.hostkey_title)) },
+        text  = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (changed) {
+                    Text(
+                        stringResource(R.string.hostkey_changed_warning),
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    )
+                    Text(stringResource(R.string.hostkey_changed_explain), style = MaterialTheme.typography.bodySmall)
+                }
+                Text(stringResource(R.string.hostkey_sftp_body, hostname, fingerprint))
+            }
+        },
         confirmButton = {
-            OutlinedButton(onClick = onAccept) { Text(stringResource(R.string.action_trust)) }
+            OutlinedButton(onClick = onAccept) {
+                Text(stringResource(if (changed) R.string.hostkey_changed_accept else R.string.action_trust))
+            }
         },
         dismissButton = {
             OutlinedButton(

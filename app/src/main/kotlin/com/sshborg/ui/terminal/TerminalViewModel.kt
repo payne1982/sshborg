@@ -26,7 +26,8 @@ import java.io.ByteArrayOutputStream
 sealed interface ConnectionState {
     object Connecting : ConnectionState
     object Connected : ConnectionState
-    data class HostKeyPrompt(val hostname: String, val fingerprint: String) : ConnectionState
+    /** @param changed the host had a key pinned and this is not it. */
+    data class HostKeyPrompt(val hostname: String, val fingerprint: String, val changed: Boolean) : ConnectionState
     /**
      * @param banner what the server said before letting anyone in, if it said anything. It is
      *               read before typing or not at all, which is why it comes with the prompt.
@@ -439,9 +440,9 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                                 }
                             }
                         },
-                        onHostKeyVerify = { hostname, fingerprint, keyLine ->
+                        onHostKeyVerify = { hostname, fingerprint, keyLine, changed ->
                             runBlocking {
-                                _state.value = ConnectionState.HostKeyPrompt(hostname, fingerprint)
+                                _state.value = ConnectionState.HostKeyPrompt(hostname, fingerprint, changed)
                                 val accepted = hostKeyResult.first()
                                 if (accepted) {
                                     _state.value = ConnectionState.Connecting
@@ -452,8 +453,14 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                                         // its own row rather than on the row that named it.
                                         if (hostname == target.hostname) {
                                             val dialled = hostDao.getById(target.id)
-                                            if (dialled != null && dialled.knownHostsEntry == null)
-                                                hostDao.upsert(dialled.copy(knownHostsEntry = keyLine))
+                                            // Whatever was pinned for this algorithm gives way to
+                                            // what was just accepted. Pinning it only when nothing
+                                            // was pinned yet is what made the dialog ask again on
+                                            // every connection after a key really did change.
+                                            if (dialled != null)
+                                                hostDao.upsert(dialled.copy(
+                                                    knownHostsEntry = KnownHosts.replacing(dialled.knownHostsEntry, keyLine),
+                                                ))
                                         } else if (host.jumpMode == "host_list") {
                                             // Host-list: persist key to the jump host's own entity
                                             val jumpEntity = jumpHostEntities.find { it.hostname == hostname }

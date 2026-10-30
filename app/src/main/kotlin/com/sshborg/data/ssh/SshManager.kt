@@ -85,7 +85,7 @@ object SshManager {
      * waits on a pipe with no deadline of any kind.
      */
     private class ConnectGuard(
-        private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        private val onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
         private val onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
     ) {
         private val sessions = mutableListOf<Session>()
@@ -154,9 +154,9 @@ object SshManager {
             }
 
         /** The host-key callback, wrapped so it stops the clock for as long as it blocks. */
-        val verify: (String, String, String) -> Boolean = { hostname, fingerprint, keyLine ->
+        val verify: (String, String, String, Boolean) -> Boolean = { hostname, fingerprint, keyLine, changed ->
             waitingForUser = true
-            try { onHostKeyVerify(hostname, fingerprint, keyLine) } finally { waitingForUser = false }
+            try { onHostKeyVerify(hostname, fingerprint, keyLine, changed) } finally { waitingForUser = false }
         }
 
         /**
@@ -249,7 +249,7 @@ object SshManager {
      */
     private suspend fun <T> guardedConnect(
         params: SshConnectionParams,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
         onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
         block: suspend (ConnectGuard) -> T,
     ): T {
@@ -297,7 +297,7 @@ object SshManager {
         columns: Int = 80,
         rows: Int = 24,
         onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
     ): ShellSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard -> runInterruptible {
 
         val (session, dialled, jumpSessions, newJumpKeyLines, newJumpHostKeyUpdates) = createSession(params, guard)
@@ -333,7 +333,7 @@ object SshManager {
     suspend fun openSftp(
         params: SshConnectionParams,
         onPasswordNeeded: ((hostname: String, banner: String?, retry: Boolean) -> String?)? = null,
-        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String) -> Boolean,
+        onHostKeyVerify: (hostname: String, fingerprint: String, keyLine: String, changed: Boolean) -> Boolean,
     ): SftpSession = guardedConnect(params, onHostKeyVerify, onPasswordNeeded) { guard ->
 
         // SFTP has no use for the address it was dialled at; only mosh does.
@@ -435,10 +435,12 @@ object SshManager {
                 }
                 override fun promptPassphrase(message: String?) = false
                 override fun promptYesNo(message: String?): Boolean {
-                    val fp = message?.lines()
-                        ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
-                        ?: message ?: "unknown"
-                    return guard.verify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey))
+                    val fp = fingerprintOf(jumpJsch, jumpSession.hostKey, message)
+                    // Never a changed key: a hop with something pinned is checked with
+                    // `StrictHostKeyChecking=yes` just below, so a key that differs from it is
+                    // refused by JSch and this question is never asked. Reaching here means the
+                    // hop had nothing pinned at all.
+                    return guard.verify(jump.host, fp, buildKnownHostsLine(jumpSession.hostKey), false)
                 }
                 override fun showMessage(message: String?) = typed.noteBanner(message)
                 override fun promptKeyboardInteractive(
@@ -552,10 +554,12 @@ object SshManager {
             }
             override fun promptPassphrase(message: String?) = false
             override fun promptYesNo(message: String?): Boolean {
-                val fp = message?.lines()
-                    ?.firstOrNull { it.contains("fingerprint") || it.contains("SHA256") || it.contains("MD5") }
-                    ?: message ?: "unknown"
-                return guard.verify(params.hostname, fp, buildKnownHostsLine(session.hostKey))
+                val fp = fingerprintOf(jsch, session.hostKey, message)
+                val line = buildKnownHostsLine(session.hostKey)
+                // Whether this is a host being introduced or the host we pinned offering a
+                // different key. The dialog has to say which, and saying yes has to mean
+                // something different in each case — see [KnownHosts].
+                return guard.verify(params.hostname, fp, line, KnownHosts.identityChanged(params.knownHostsEntry, line))
             }
             // Where the banner arrives: during authentication, which is why the prompt for a
             // password that is not saved anywhere is raised from in here (see [SshAuth.Interactive]).
@@ -866,6 +870,24 @@ object SshManager {
         val kp = KeyPair.load(JSch(), pem.replace("\r\n", "\n").trim().toByteArray(Charsets.UTF_8), null)
         try { kp.isEncrypted } finally { kp.dispose() }
     }.getOrDefault(false)
+
+    /**
+     * The fingerprint of the key the server has just offered, taken from the key itself.
+     *
+     * It used to be read out of JSch's own warning, by taking the first line with the word
+     * "fingerprint" in it. That works for a host we have never met, where the word and the value
+     * share a line — and fails in the case that matters: the changed-key warning puts the value on
+     * the line *after* "The fingerprint for the … key sent by the remote host … is", so the dialog
+     * showed that sentence where the fingerprint should have been. The key is in our hands here,
+     * and it is the thing being asked about, so it is asked.
+     *
+     * The message is still the fallback, because a fingerprint the library declines to compute is
+     * no reason to show an empty dialog.
+     */
+    private fun fingerprintOf(jsch: JSch, hostKey: HostKey, message: String?): String =
+        runCatching { hostKey.getFingerPrint(jsch) }.getOrNull()?.takeIf { it.isNotBlank() }
+            ?: message?.lines()?.firstOrNull { it.contains("SHA256") || it.contains("MD5") }
+            ?: message ?: "unknown"
 
     /** Builds a known_hosts line from a JSch HostKey. */
     fun buildKnownHostsLine(hostKey: HostKey): String =

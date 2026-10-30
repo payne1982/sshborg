@@ -370,6 +370,10 @@
     <string name="hostkey_terminal_host">ホスト：%1$s</string>
     <string name="hostkey_terminal_fingerprint">フィンガープリント：</string>
     <string name="hostkey_terminal_trust_question">このホストを信頼しますか？</string>
+    <string name="hostkey_changed_title">ホスト鍵が変わりました</string>
+    <string name="hostkey_changed_warning">これはこのホストに保存されている鍵ではありません。</string>
+    <string name="hostkey_changed_explain">サーバーが再インストールされたか、別のものが代わりに応答している可能性があります。受け入れると、保存されている鍵が置き換えられます。</string>
+    <string name="hostkey_changed_accept">鍵を置き換える</string>
 
     <string name="password_dialog_title">%1$s のパスワード</string>
     <string name="password_field_label">パスワード</string>
