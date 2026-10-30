@@ -137,6 +137,7 @@ module.exports = {
             <h3>Host fingerprint verification</h3>
             <p>On the first connection SSHBorg shows you the server's fingerprint and asks you to accept it. This is a security check: it ensures you are connecting to the right machine and not to an impostor. You should verify the fingerprint matches the one shown by your server admin or obtained via a trusted channel before accepting.</p>
             <p>Once accepted, the fingerprint is stored locally. If it changes on a future connection, SSHBorg will warn you — this could indicate a server rebuild, a key rotation, or a man-in-the-middle attack.</p>
+            <p>That warning is unmistakable: a red line saying this is not the key saved for this host, the fingerprint of the key the server has just offered, and a button that says <strong>Replace key</strong> rather than <em>Trust</em>. Accepting really does replace the saved key, so the next connection is quiet again; a jump host is asked about in exactly the same way. If you were not expecting the change, do not accept it — ask whoever runs the server first.</p>
             <div class="callout callout-info">
                 <h3>The server's pre-login message</h3>
             <p>Many servers send a message before letting anyone in: a legal notice, a maintenance window, a reference number to quote. SSHBorg shows it above the password request, so you can read it before you type, and it stays in view if the password is refused and asked for again.</p>
