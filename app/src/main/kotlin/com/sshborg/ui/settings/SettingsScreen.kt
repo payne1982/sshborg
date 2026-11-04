@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
@@ -28,6 +29,7 @@ import com.sshborg.BiometricHelper
 import com.sshborg.BuildConfig
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
+import com.sshborg.data.MoshPatience
 import com.sshborg.isTelevision
 import com.sshborg.isTouchless
 import com.sshborg.ui.common.FocusOutlinedButton
@@ -89,6 +91,7 @@ fun SettingsScreen(
     val nightMode             by vm.nightMode.collectAsState()
     val allowScreenshots      by vm.allowScreenshots.collectAsState()
     val scrollbackLines       by vm.scrollbackLines.collectAsState()
+    val moshSessionMinutes    by vm.moshSessionMinutes.collectAsState()
     val terminalFontSize      by vm.terminalFontSize.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -424,6 +427,30 @@ fun SettingsScreen(
                             }
                         }
                     }
+                },
+            )
+
+            // How long a mosh session outlives its network. The figure is the server's, because
+            // that is the one with a cost — a shell kept alive on somebody's host — and what the
+            // app waits is derived from it five minutes shorter, never the other way round.
+            val moshPatienceOptions = MoshPatience.CHOICES.map { minutes ->
+                minutes to pluralStringResource(
+                    R.plurals.settings_mosh_patience_hours, minutes / 60, minutes / 60)
+            }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_mosh_patience_title)) },
+                supportingContent = {
+                    Text(stringResource(
+                        R.string.settings_mosh_patience_subtitle, MoshPatience.CLIENT_MARGIN_MINUTES))
+                },
+                trailingContent = {
+                    SettingSelect(
+                        label = stringResource(R.string.settings_mosh_patience_title),
+                        selected = moshSessionMinutes,
+                        options = moshPatienceOptions,
+                        onSelect = { vm.setMoshSessionMinutes(it) },
+                        touchless = touchless,
+                    )
                 },
             )
 

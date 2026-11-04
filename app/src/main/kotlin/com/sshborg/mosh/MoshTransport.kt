@@ -166,6 +166,13 @@ class MoshTransport(
     private var pendingDataAck = false
 
     private var lastHeard = 0L
+    /**
+     * When the person last did something, which counts as a reason to probe again even though
+     * nothing has answered. Taken from [MoshUserStream.count] changing rather than from a call of
+     * its own: the loop ticks after every event, so the first tick after a keystroke sees it.
+     */
+    private var lastUserAction = 0L
+    private var knownUserCount = -1L
     private var lastRoundtrip = 0L
     private var nextAckTime = 0L
     private var nextSendTime = NEVER
@@ -375,6 +382,11 @@ class MoshTransport(
         updateAssumedReceiver(now)
         user.dropThrough(sent.first().actionCount)
 
+        if (user.count != knownUserCount) {
+            knownUserCount = user.count
+            lastUserAction = now
+        }
+
         if (pendingDataAck && nextAckTime > now + ACK_DELAY) nextAckTime = now + ACK_DELAY
 
         val last = sent.last()
@@ -399,6 +411,34 @@ class MoshTransport(
         }
     }
 
+    /**
+     * How long until the next heartbeat, given how long it is since anything happened.
+     *
+     * [ACK_INTERVAL] is mosh's own figure and the right one for a session that is being used: it is
+     * what tells the server we are here, and it is what holds the NAT mapping open on the way.
+     *
+     * While **nothing is coming back**, though, three seconds buys nothing. The server cannot be
+     * told anything — it is not listening, or the path is gone — and the only thing the probe can
+     * still do is notice the network returning. So it slows to an eighth of however long the
+     * silence has lasted, up to [MAX_ACK_INTERVAL]: a minute into an outage it probes every eight
+     * seconds, eight minutes in every minute. That is what makes a session allowed to last hours
+     * affordable, because a phone waking the radio every three seconds all night is a battery
+     * regression and nothing else.
+     *
+     * **Anything the person does resets it**, which is what keeps the cost invisible: coming back
+     * to the app and typing starts the probe at three seconds again, so the wait for a network
+     * that has just returned is never the minute the back-off had reached. What is not wired yet
+     * is the app merely coming to the front, with nothing typed — that still waits for the current
+     * interval to come round.
+     */
+    private fun ackInterval(now: Long): Long {
+        // Nothing has ever answered: this is first contact, not an outage, and the session is
+        // given up on in seconds rather than backed off from.
+        if (lastHeard == 0L) return ACK_INTERVAL
+        val quiet = now - maxOf(lastHeard, lastUserAction)
+        return (quiet / BACKOFF_SHARE).coerceIn(ACK_INTERVAL, MAX_ACK_INTERVAL)
+    }
+
     /** Gives recently sent states the benefit of the doubt, as mosh does, instead of assuming loss. */
     private fun updateAssumedReceiver(now: Long) {
         assumedReceiver = 0
@@ -419,7 +459,7 @@ class MoshTransport(
 
         val datagrams = sendInFragments(diff, number, now)
         assumedReceiver = sent.lastIndex
-        nextAckTime = now + ACK_INTERVAL
+        nextAckTime = now + ackInterval(now)
         nextSendTime = NEVER
         mindelayClock = NEVER
         return datagrams
@@ -429,7 +469,7 @@ class MoshTransport(
         val number = if (shutdownInProgress) SHUTDOWN_NUMBER else sent.last().number + 1
         addSentState(SentState(now, number, user.count))
         val datagrams = sendInFragments(EMPTY, number, now)
-        nextAckTime = now + ACK_INTERVAL
+        nextAckTime = now + ackInterval(now)
         nextSendTime = NEVER
         return datagrams
     }
@@ -512,6 +552,12 @@ class MoshTransport(
         const val SEND_MINDELAY = 8L
         const val ACK_DELAY = 100L
         const val ACK_INTERVAL = 3_000L
+
+        /** The slowest the heartbeat gets while nothing answers. See [ackInterval]. */
+        const val MAX_ACK_INTERVAL = 60_000L
+
+        /** The fraction of the silence the heartbeat is allowed to cost. See [ackInterval]. */
+        const val BACKOFF_SHARE = 8
         const val ACTIVE_RETRY_TIMEOUT = 10_000L
         const val PORT_HOP_INTERVAL = 10_000L
         const val SHUTDOWN_RETRIES = 16

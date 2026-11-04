@@ -32,6 +32,7 @@ class AppPreferences(private val context: Context) {
         val NIGHT_MODE                = intPreferencesKey("night_mode")
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
+        val MOSH_SESSION_MINUTES      = intPreferencesKey("mosh_session_minutes")
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val TERMINAL_BAR_AUTO_HIDE    = booleanPreferencesKey("terminal_bar_auto_hide")
@@ -158,6 +159,21 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setScrollbackLines(lines: Int) {
         context.dataStore.edit { it[Keys.SCROLLBACK_LINES] = lines }
+    }
+
+    /**
+     * How long a mosh session survives with no contact, in minutes. Default and floor one hour.
+     *
+     * It is the figure the *server* is told; what the client waits is derived from it, five minutes
+     * shorter. [MoshPatience] holds both and says why.
+     */
+    val moshSessionMinutes: Flow<Int> =
+        context.dataStore.data.map {
+            MoshPatience.serverMinutes(it[Keys.MOSH_SESSION_MINUTES] ?: MoshPatience.DEFAULT_MINUTES)
+        }
+
+    suspend fun setMoshSessionMinutes(minutes: Int) {
+        context.dataStore.edit { it[Keys.MOSH_SESSION_MINUTES] = MoshPatience.serverMinutes(minutes) }
     }
 
     /** Default terminal font size in sp. 13sp ≈ the 36px the app used before this setting. */
@@ -417,6 +433,7 @@ class AppPreferences(private val context: Context) {
             put("night_mode",             p[Keys.NIGHT_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             put("allow_screenshots",      p[Keys.ALLOW_SCREENSHOTS] ?: false)
             put("scrollback_lines",       p[Keys.SCROLLBACK_LINES] ?: 2000)
+            put("mosh_session_minutes",   p[Keys.MOSH_SESSION_MINUTES] ?: MoshPatience.DEFAULT_MINUTES)
             put("terminal_font_size",     p[Keys.TERMINAL_FONT_SIZE] ?: DEFAULT_TERMINAL_FONT_SIZE)
             put("keep_screen_on",         p[Keys.KEEP_SCREEN_ON] ?: false)
             put("terminal_color_scheme",  p[Keys.TERMINAL_COLOR_SCHEME] ?: TERMINAL_SCHEME_DARK)
@@ -441,6 +458,7 @@ class AppPreferences(private val context: Context) {
             if (obj.has("night_mode"))             p[Keys.NIGHT_MODE] = obj.getInt("night_mode")
             if (obj.has("allow_screenshots"))      p[Keys.ALLOW_SCREENSHOTS] = obj.getBoolean("allow_screenshots")
             if (obj.has("scrollback_lines"))       p[Keys.SCROLLBACK_LINES] = saneScrollback(obj.getInt("scrollback_lines"))
+            if (obj.has("mosh_session_minutes"))   p[Keys.MOSH_SESSION_MINUTES] = MoshPatience.serverMinutes(obj.getInt("mosh_session_minutes"))
             if (obj.has("terminal_font_size"))     p[Keys.TERMINAL_FONT_SIZE] = obj.getInt("terminal_font_size").coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)
             if (obj.has("keep_screen_on"))         p[Keys.KEEP_SCREEN_ON] = obj.getBoolean("keep_screen_on")
             if (obj.has("terminal_color_scheme"))  p[Keys.TERMINAL_COLOR_SCHEME] = obj.getInt("terminal_color_scheme").coerceIn(TERMINAL_SCHEME_DARK, TERMINAL_SCHEME_FOLLOW_APP)

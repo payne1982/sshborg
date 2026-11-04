@@ -244,6 +244,15 @@
     <string name="settings_font_size_subtitle">Размер текста терминала по умолчанию (sp); в сессии можно менять жестом</string>
     <string name="settings_scrollback_title">Строки истории прокрутки</string>
     <string name="settings_scrollback_subtitle">Сколько строк истории терминала хранится в памяти</string>
+
+    <string name="settings_mosh_patience_title">Сессия mosh без связи</string>
+    <string name="settings_mosh_patience_subtitle">Сколько сервер держит сессию после того, как перестал слышать этот телефон. Приложение сдаётся на %1$d минут раньше, поэтому никогда не ждёт сессию, которая уже завершилась. Более долгий срок означает, что забытая сессия продолжает работать на сервере.</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">%d час</item>
+        <item quantity="few">%d часа</item>
+        <item quantity="many">%d часов</item>
+        <item quantity="other">%d часов</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Подсказки из истории команд</string>
     <string name="settings_history_suggestions_subtitle">Показывать подсказки из истории команд сервера при вводе в терминале</string>
     <string name="settings_suggestions_bar_sticky_title">Всегда видимая панель подсказок</string>

@@ -228,6 +228,13 @@
     <string name="settings_font_size_subtitle">Dimensione predefinita del testo del terminale (sp); il pinch la cambia nella sessione</string>
     <string name="settings_scrollback_title">Righe di scrollback</string>
     <string name="settings_scrollback_subtitle">Righe di cronologia del terminale mantenute in memoria</string>
+
+    <string name="settings_mosh_patience_title">Sessione mosh senza contatto</string>
+    <string name="settings_mosh_patience_subtitle">Quanto il server tiene la sessione dopo aver smesso di sentire questo telefono. L\'app si arrende %1$d minuti prima, così non aspetta mai una sessione che è già finita. Un tempo più lungo significa che una sessione che dimentichi resta in esecuzione sul server.</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 ora</item>
+        <item quantity="other">%d ore</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Suggerimenti dalla cronologia comandi</string>
     <string name="settings_history_suggestions_subtitle">Mostra suggerimenti dalla cronologia shell del server mentre si digita nel terminale</string>
     <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>

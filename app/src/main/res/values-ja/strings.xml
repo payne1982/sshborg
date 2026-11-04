@@ -234,6 +234,12 @@
     <string name="settings_font_size_subtitle">ターミナルの既定の文字サイズ（sp）。セッション中はピンチで拡大縮小できます</string>
     <string name="settings_scrollback_title">スクロールバック行数</string>
     <string name="settings_scrollback_subtitle">メモリに保持するターミナル履歴の行数</string>
+
+    <string name="settings_mosh_patience_title">接続が途切れた mosh セッション</string>
+    <string name="settings_mosh_patience_subtitle">この端末からの応答が途絶えたあと、サーバーがセッションを保持する時間です。アプリは %1$d 分早くあきらめるので、すでに終了したセッションを待つことはありません。長くすると、忘れたセッションがサーバー上で動き続けます。</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="other">%d 時間</item>
+    </plurals>
     <string name="settings_history_suggestions_title">コマンド履歴の候補</string>
     <string name="settings_history_suggestions_subtitle">ターミナル入力中にサーバーのシェル履歴から候補を表示</string>
     <string name="settings_suggestions_bar_sticky_title">候補バーを常に表示</string>

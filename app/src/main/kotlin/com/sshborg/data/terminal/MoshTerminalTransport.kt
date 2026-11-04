@@ -65,14 +65,16 @@ class MoshTerminalTransport(
     /**
      * How long to keep trying while nothing at all comes back, before calling the session lost.
      *
-     * Not the server's own patience, which is a different number set when it is started and is
-     * deliberately much larger — a week, as mosh itself suggests, so that a server forgotten by a
-     * killed app does not hold a shell for ever. This is ours, and it is a compromise with
-     * something the app does not have yet: mosh's own client shows a "contact lost" line and goes
-     * on trying indefinitely, and until there is somewhere to say that, a terminal that cannot be
-     * reached is a photograph with nothing to explain it. So we stay patient for long enough to
-     * cover what mosh is actually for — a tunnel, a lift, a change of network, a phone asleep —
-     * and after that we say so rather than go on showing a screen that is no longer anybody's.
+     * The caller derives it from the one figure a person actually sets — how long the *server*
+     * keeps the session — and always comes out five minutes short of it; `MoshPatience` holds the
+     * arithmetic and the reason. Short of it because the server is the one holding the shell:
+     * outliving it would mean saying "still trying" about something that has already exited.
+     *
+     * Why there is a limit at all, rather than mosh's own client behaviour of trying for ever: a
+     * terminal that cannot be reached and never says so is a photograph with nothing to explain
+     * it. We now have somewhere to say it — the terminal shows how long contact has been lost —
+     * so the limit is no longer a workaround, only the point past which a screen stops being
+     * anybody's.
      */
     private val silenceLimitMs: Long = SILENCE_LIMIT,
     private val clock: () -> Long = { System.nanoTime() / 1_000_000 },
@@ -704,8 +706,12 @@ class MoshTerminalTransport(
         /** How long a session with no answer at all is given before it is called a failure. */
         const val FIRST_CONTACT_TIMEOUT = 10_000L
 
-        /** How long a session hears nothing before it is called lost. See [silenceLimitMs]. */
-        const val SILENCE_LIMIT = 30 * 60 * 1000L
+        /**
+         * The default for [silenceLimitMs], for the callers that do not care — the tests and
+         * anything built before the setting existed. Five minutes under the hour the server is
+         * given by default, which is what `MoshPatience` would derive.
+         */
+        const val SILENCE_LIMIT = 55 * 60 * 1000L
 
         /** How long [close] waits for the server to acknowledge the goodbye. */
         const val CLOSE_GRACE = 1_000L

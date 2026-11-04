@@ -228,6 +228,13 @@
     <string name="settings_font_size_subtitle">Taille par défaut du texte du terminal (sp) ; pincez pour zoomer dans la session</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
     <string name="settings_scrollback_subtitle">Lignes d\'historique du terminal conservées en mémoire</string>
+
+    <string name="settings_mosh_patience_title">Session mosh sans contact</string>
+    <string name="settings_mosh_patience_subtitle">Combien de temps le serveur garde la session après avoir cessé d\'entendre ce téléphone. L\'application abandonne %1$d minutes plus tôt, elle n\'attend donc jamais une session déjà terminée. Une durée plus longue signifie qu\'une session oubliée continue de tourner sur le serveur.</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 heure</item>
+        <item quantity="other">%d heures</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Suggestions de l\'historique des commandes</string>
     <string name="settings_history_suggestions_subtitle">Afficher des suggestions tirées de l\'historique shell du serveur lors de la saisie dans le terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>
