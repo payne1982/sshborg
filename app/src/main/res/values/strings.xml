@@ -91,6 +91,23 @@
     <string name="host_menu_resume_files">Resume files (%1$d)</string>
     <string name="host_menu_new_files_session">New files session</string>
 
+    <!-- The "last connected" line under a host row -->
+    <string name="host_last_connected">Last connected: %1$s</string>
+    <string name="host_last_just_now">just now</string>
+    <string name="host_last_yesterday">yesterday</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">1 minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">1 hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">1 day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+
     <!-- Session picker bottom sheet -->
     <string name="session_picker_title">%1$s — %2$s sessions</string>
     <string name="session_picker_session_label">Session %1$d</string>

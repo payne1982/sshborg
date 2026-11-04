@@ -91,6 +91,28 @@
     <string name="host_menu_resume_files">Продолжить сессию файлов (%1$d)</string>
     <string name="host_menu_new_files_session">Новая сессия файлов</string>
 
+    <string name="host_last_connected">Последнее подключение: %1$s</string>
+    <string name="host_last_just_now">только что</string>
+    <string name="host_last_yesterday">вчера</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">%d минуту назад</item>
+        <item quantity="few">%d минуты назад</item>
+        <item quantity="many">%d минут назад</item>
+        <item quantity="other">%d минут назад</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">%d час назад</item>
+        <item quantity="few">%d часа назад</item>
+        <item quantity="many">%d часов назад</item>
+        <item quantity="other">%d часов назад</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">%d день назад</item>
+        <item quantity="few">%d дня назад</item>
+        <item quantity="many">%d дней назад</item>
+        <item quantity="other">%d дней назад</item>
+    </plurals>
+
     <!-- Session picker bottom sheet -->
     <string name="session_picker_title">%1$s — сессии «%2$s»</string>
     <string name="session_picker_session_label">Сессия %1$d</string>

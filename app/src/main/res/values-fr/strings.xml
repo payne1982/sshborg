@@ -88,6 +88,22 @@
     <string name="host_menu_resume_files">Reprendre les fichiers (%1$d)</string>
     <string name="host_menu_new_files_session">Nouvelle session fichiers</string>
 
+    <string name="host_last_connected">Dernière connexion : %1$s</string>
+    <string name="host_last_just_now">à l\'instant</string>
+    <string name="host_last_yesterday">hier</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">il y a 1 minute</item>
+        <item quantity="other">il y a %d minutes</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">il y a 1 heure</item>
+        <item quantity="other">il y a %d heures</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">il y a 1 jour</item>
+        <item quantity="other">il y a %d jours</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — sessions %2$s</string>
     <string name="session_picker_session_label">Session %1$d</string>
     <string name="session_picker_new_session">Nouvelle session %1$s</string>

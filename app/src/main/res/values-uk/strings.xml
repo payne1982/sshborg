@@ -88,6 +88,28 @@
     <string name="host_menu_resume_files">Відновити файли (%1$d)</string>
     <string name="host_menu_new_files_session">Нова файлова сесія</string>
 
+    <string name="host_last_connected">Останнє підключення: %1$s</string>
+    <string name="host_last_just_now">щойно</string>
+    <string name="host_last_yesterday">вчора</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">%d хвилину тому</item>
+        <item quantity="few">%d хвилини тому</item>
+        <item quantity="many">%d хвилин тому</item>
+        <item quantity="other">%d хвилин тому</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">%d годину тому</item>
+        <item quantity="few">%d години тому</item>
+        <item quantity="many">%d годин тому</item>
+        <item quantity="other">%d годин тому</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">%d день тому</item>
+        <item quantity="few">%d дні тому</item>
+        <item quantity="many">%d днів тому</item>
+        <item quantity="other">%d днів тому</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — сесії %2$s</string>
     <string name="session_picker_session_label">Сесія %1$d</string>
     <string name="session_picker_new_session">Нова сесія %1$s</string>

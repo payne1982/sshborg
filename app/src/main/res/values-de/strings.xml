@@ -88,6 +88,22 @@
     <string name="host_menu_resume_files">Dateien fortsetzen (%1$d)</string>
     <string name="host_menu_new_files_session">Neue Dateisitzung</string>
 
+    <string name="host_last_connected">Letzte Verbindung: %1$s</string>
+    <string name="host_last_just_now">gerade eben</string>
+    <string name="host_last_yesterday">gestern</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">vor 1 Minute</item>
+        <item quantity="other">vor %d Minuten</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">vor 1 Stunde</item>
+        <item quantity="other">vor %d Stunden</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">vor 1 Tag</item>
+        <item quantity="other">vor %d Tagen</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — %2$s-Sitzungen</string>
     <string name="session_picker_session_label">Sitzung %1$d</string>
     <string name="session_picker_new_session">Neue %1$s-Sitzung</string>

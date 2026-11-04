@@ -90,6 +90,19 @@
     <string name="host_menu_resume_files">ファイルセッションを再開（%1$d）</string>
     <string name="host_menu_new_files_session">新しいファイルセッション</string>
 
+    <string name="host_last_connected">最終接続：%1$s</string>
+    <string name="host_last_just_now">たった今</string>
+    <string name="host_last_yesterday">昨日</string>
+    <plurals name="host_last_minutes">
+        <item quantity="other">%d分前</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="other">%d時間前</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="other">%d日前</item>
+    </plurals>
+
     <!-- Session picker bottom sheet -->
     <string name="session_picker_title">%1$s — %2$s セッション</string>
     <string name="session_picker_session_label">セッション %1$d</string>

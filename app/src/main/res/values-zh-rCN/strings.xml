@@ -90,6 +90,19 @@
     <string name="host_menu_resume_files">恢复文件会话（%1$d）</string>
     <string name="host_menu_new_files_session">新建文件会话</string>
 
+    <string name="host_last_connected">上次连接：%1$s</string>
+    <string name="host_last_just_now">刚刚</string>
+    <string name="host_last_yesterday">昨天</string>
+    <plurals name="host_last_minutes">
+        <item quantity="other">%d 分钟前</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="other">%d 小时前</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="other">%d 天前</item>
+    </plurals>
+
     <!-- Session picker bottom sheet -->
     <string name="session_picker_title">%1$s — %2$s 个会话</string>
     <string name="session_picker_session_label">会话 %1$d</string>

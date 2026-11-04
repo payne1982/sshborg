@@ -27,7 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -37,11 +39,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.data.AppPreferences
+import com.sshborg.data.LastSeen
+import com.sshborg.data.lastSeen
 import com.sshborg.data.db.GroupEntity
 import com.sshborg.data.db.HostEntity
 import com.sshborg.isTouchless
 import com.sshborg.ui.common.onMenuKey
 import com.sshborg.service.SessionManager
+import java.text.DateFormat
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -439,11 +445,23 @@ private fun HostItem(
             ),
         headlineContent = { Text(host.label) },
         supportingContent = {
-            Text(
-                "${host.username}@${host.hostname}:${host.port}",
-                fontFamily = FontFamily.Monospace,
-                style = MaterialTheme.typography.bodySmall,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    "${host.username}@${host.hostname}:${host.port}",
+                    fontFamily = FontFamily.Monospace,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                // Only a host that has been connected has anything to say here, and a row that has
+                // never been used says nothing rather than saying "never": the address above it is
+                // already the whole story.
+                host.lastConnected?.let {
+                    Text(
+                        lastConnectedLine(it),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = LocalContentColor.current.copy(alpha = 0.7f),
+                    )
+                }
+            }
         },
         leadingContent = {
             Row(
@@ -557,6 +575,31 @@ private fun HostItem(
         },
     )
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+/**
+ * The "last connected" line, said in whichever unit [lastSeen] picked: a count up to six days, and
+ * the date itself beyond that, because "47 days ago" is a number nobody converts back.
+ *
+ * It is read off the clock at composition and does not tick. That is on purpose: the list is redrawn
+ * whenever a connection updates the row in the database and whenever the screen is entered, which
+ * covers everything a minute of staring at the list could change.
+ */
+@Composable
+private fun lastConnectedLine(millis: Long): String {
+    val phrase = when (val seen = lastSeen(millis)) {
+        LastSeen.JustNow    -> stringResource(R.string.host_last_just_now)
+        LastSeen.Yesterday  -> stringResource(R.string.host_last_yesterday)
+        is LastSeen.Minutes -> pluralStringResource(R.plurals.host_last_minutes, seen.count, seen.count)
+        is LastSeen.Hours   -> pluralStringResource(R.plurals.host_last_hours, seen.count, seen.count)
+        is LastSeen.Days    -> pluralStringResource(R.plurals.host_last_days, seen.count, seen.count)
+        // The app's own language, not the system's: the configuration carries the per-app locale,
+        // which is the same place the SFTP listing takes its date format from.
+        LastSeen.Earlier    -> DateFormat
+            .getDateInstance(DateFormat.MEDIUM, LocalConfiguration.current.locales[0])
+            .format(Date(millis))
+    }
+    return stringResource(R.string.host_last_connected, phrase)
 }
 
 /**
