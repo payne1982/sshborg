@@ -31,8 +31,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -445,20 +448,33 @@ private fun HostItem(
             ),
         headlineContent = { Text(host.label) },
         supportingContent = {
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            // Both facts share the one line. A second line costs height on every row in the list
+            // and, because the item then becomes a three-line one, Material moves the leading icon
+            // to the top of it — so the price of saying "3 days ago" was a taller list with its
+            // icons out of line. The address yields first when there is not enough width, since
+            // the row's own name is already in the headline above it.
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "${host.username}@${host.hostname}:${host.port}",
                     fontFamily = FontFamily.Monospace,
                     style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
                 )
-                // Only a host that has been connected has anything to say here, and a row that has
-                // never been used says nothing rather than saying "never": the address above it is
-                // already the whole story.
-                host.lastConnected?.let {
+                // Only a host that has been connected has anything to say, and one that never has
+                // says nothing rather than saying "never".
+                host.lastConnected?.let { at ->
+                    val phrase = lastSeenPhrase(at)
+                    val spoken = stringResource(R.string.host_last_connected, phrase)
                     Text(
-                        lastConnectedLine(it),
+                        "  ·  $phrase",
                         style = MaterialTheme.typography.bodySmall,
                         color = LocalContentColor.current.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        // What is read out is the whole sentence: on the screen the address beside
+                        // it supplies the context that a bare "3 days ago" is missing.
+                        modifier = Modifier.semantics { contentDescription = spoken },
                     )
                 }
             }
@@ -578,16 +594,16 @@ private fun HostItem(
 }
 
 /**
- * The "last connected" line, said in whichever unit [lastSeen] picked: a count up to six days, and
- * the date itself beyond that, because "47 days ago" is a number nobody converts back.
+ * How long ago, said in whichever unit [lastSeen] picked: a count up to six days, and the date
+ * itself beyond that, because "47 days ago" is a number nobody converts back.
  *
  * It is read off the clock at composition and does not tick. That is on purpose: the list is redrawn
  * whenever a connection updates the row in the database and whenever the screen is entered, which
  * covers everything a minute of staring at the list could change.
  */
 @Composable
-private fun lastConnectedLine(millis: Long): String {
-    val phrase = when (val seen = lastSeen(millis)) {
+private fun lastSeenPhrase(millis: Long): String =
+    when (val seen = lastSeen(millis)) {
         LastSeen.JustNow    -> stringResource(R.string.host_last_just_now)
         LastSeen.Yesterday  -> stringResource(R.string.host_last_yesterday)
         is LastSeen.Minutes -> pluralStringResource(R.plurals.host_last_minutes, seen.count, seen.count)
@@ -599,8 +615,6 @@ private fun lastConnectedLine(millis: Long): String {
             .getDateInstance(DateFormat.MEDIUM, LocalConfiguration.current.locales[0])
             .format(Date(millis))
     }
-    return stringResource(R.string.host_last_connected, phrase)
-}
 
 /**
  * "Move up" / "Move down" for the manual list order (#16). Greyed out at the ends of the
