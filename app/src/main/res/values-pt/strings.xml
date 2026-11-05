@@ -229,8 +229,8 @@
     <string name="settings_scrollback_title">Linhas de scrollback</string>
     <string name="settings_scrollback_subtitle">Linhas do histórico do terminal mantidas em memória</string>
 
-    <string name="settings_mosh_patience_title">Sessão mosh sem contacto</string>
-    <string name="settings_mosh_patience_subtitle">Quanto tempo o servidor mantém a sessão depois de deixar de ouvir este telefone. A aplicação desiste %1$d minutos antes, por isso nunca espera por uma sessão que já terminou. Um tempo mais longo significa que uma sessão esquecida continua a correr no servidor.</string>
+    <string name="settings_mosh_patience_title">Tempo limite da sessão mosh</string>
+    <string name="settings_mosh_patience_subtitle">Lado servidor e cliente</string>
     <plurals name="settings_mosh_patience_hours">
         <item quantity="one">1 hora</item>
         <item quantity="other">%d horas</item>

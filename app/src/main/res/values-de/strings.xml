@@ -229,8 +229,8 @@
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>
     <string name="settings_scrollback_subtitle">Im Speicher gehaltene Zeilen der Terminal-Historie</string>
 
-    <string name="settings_mosh_patience_title">Mosh-Sitzung ohne Kontakt</string>
-    <string name="settings_mosh_patience_subtitle">Wie lange der Server die Sitzung hält, nachdem er dieses Telefon nicht mehr hört. Die App gibt %1$d Minuten früher auf und wartet so nie auf eine Sitzung, die bereits beendet ist. Eine längere Zeit bedeutet, dass eine vergessene Sitzung auf dem Server weiterläuft.</string>
+    <string name="settings_mosh_patience_title">Timeout der Mosh-Sitzung</string>
+    <string name="settings_mosh_patience_subtitle">Server- und clientseitig</string>
     <plurals name="settings_mosh_patience_hours">
         <item quantity="one">1 Stunde</item>
         <item quantity="other">%d Stunden</item>

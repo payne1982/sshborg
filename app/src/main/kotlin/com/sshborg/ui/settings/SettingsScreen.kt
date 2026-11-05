@@ -439,10 +439,7 @@ fun SettingsScreen(
             }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_mosh_patience_title)) },
-                supportingContent = {
-                    Text(stringResource(
-                        R.string.settings_mosh_patience_subtitle, MoshPatience.CLIENT_MARGIN_MINUTES))
-                },
+                supportingContent = { Text(stringResource(R.string.settings_mosh_patience_subtitle)) },
                 trailingContent = {
                     SettingSelect(
                         label = stringResource(R.string.settings_mosh_patience_title),

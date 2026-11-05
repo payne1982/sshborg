@@ -235,8 +235,8 @@
     <string name="settings_scrollback_title">滚动回看行数</string>
     <string name="settings_scrollback_subtitle">终端历史记录在内存中保留的行数</string>
 
-    <string name="settings_mosh_patience_title">失去联系的 mosh 会话</string>
-    <string name="settings_mosh_patience_subtitle">服务器在听不到本机后保留会话的时长。应用会提前 %1$d 分钟放弃，因此绝不会等待一个已经结束的会话。时间越长，被遗忘的会话就会在服务器上运行越久。</string>
+    <string name="settings_mosh_patience_title">mosh 会话超时</string>
+    <string name="settings_mosh_patience_subtitle">服务器端与客户端</string>
     <plurals name="settings_mosh_patience_hours">
         <item quantity="other">%d 小时</item>
     </plurals>
