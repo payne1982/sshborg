@@ -1,0 +1,3 @@
+• La liste des hôtes indique désormais quand vous vous êtes connecté pour la dernière fois à chacun.
+• Une session mosh survit à la perte du réseau aussi longtemps que vous le choisissez, jusqu'à un jour, et consomme moins de batterie tant que le contact manque.
+• La sauvegarde de la configuration contient désormais trois réglages de terminal et SFTP qui lui manquaient.

@@ -1,0 +1,59 @@
+<en-US>
+• The host list now shows when you last connected to each host.
+• A mosh session can outlive a lost network for as long as you choose, up to a day, and costs less battery while out of contact.
+• The configuration backup now carries three terminal and SFTP settings it had been missing.
+</en-US>
+
+<it-IT>
+• La lista degli host mostra quando ti sei collegato l'ultima volta a ciascuno.
+• Una sessione mosh può sopravvivere alla perdita di rete per il tempo che scegli, fino a un giorno, e consuma meno batteria mentre il contatto manca.
+• Il backup della configurazione include tre impostazioni di terminale e SFTP che gli mancavano.
+</it-IT>
+
+<de-DE>
+• Die Hostliste zeigt jetzt, wann Sie sich zuletzt mit jedem Host verbunden haben.
+• Eine mosh-Sitzung übersteht den Verlust des Netzes so lange, wie Sie wählen, bis zu einem Tag, und verbraucht weniger Akku, solange kein Kontakt besteht.
+• Das Konfigurations-Backup enthält jetzt drei Terminal- und SFTP-Einstellungen, die ihm fehlten.
+</de-DE>
+
+<es-ES>
+• La lista de hosts muestra ahora cuándo te conectaste por última vez a cada uno.
+• Una sesión mosh sobrevive a la pérdida de red el tiempo que elijas, hasta un día, y consume menos batería mientras no hay contacto.
+• La copia de seguridad de la configuración incluye ahora tres ajustes de terminal y SFTP que le faltaban.
+</es-ES>
+
+<fr-FR>
+• La liste des hôtes indique désormais quand vous vous êtes connecté pour la dernière fois à chacun.
+• Une session mosh survit à la perte du réseau aussi longtemps que vous le choisissez, jusqu'à un jour, et consomme moins de batterie tant que le contact manque.
+• La sauvegarde de la configuration contient désormais trois réglages de terminal et SFTP qui lui manquaient.
+</fr-FR>
+
+<pt-PT>
+• A lista de hosts mostra agora quando se ligou pela última vez a cada um.
+• Uma sessão mosh sobrevive à perda de rede o tempo que escolher, até um dia, e consome menos bateria enquanto não há contacto.
+• A cópia de segurança da configuração inclui agora três definições de terminal e SFTP que lhe faltavam.
+</pt-PT>
+
+<uk>
+• Список хостів тепер показує, коли ви останнього разу підключалися до кажного.
+• Сеанс mosh переживає втрату мережі стільки, скільки ви виберете, до доби, і витрачає менше заряду, поки зв'язку немає.
+• Резервна копія налаштувань тепер містить три параметри термінала та SFTP, яких у ній не було.
+</uk>
+
+<ru-RU>
+• Список хостов теперь показывает, когда вы подключались к каждому в последний раз.
+• Сеанс mosh переживает потерю сети столько, сколько вы выберете, до суток, и расходует меньше заряда, пока связи нет.
+• Резервная копия настроек теперь включает три параметра терминала и SFTP, которых в ней не было.
+</ru-RU>
+
+<zh-CN>
+• 主机列表现在会显示上次连接每台主机的时间。
+• mosh 会话可以按你设定的时长在断网后继续存活，最长一天；失去联系期间也更省电。
+• 配置备份现在包含了此前缺少的三项终端与 SFTP 设置。
+</zh-CN>
+
+<ja-JP>
+• ホスト一覧に、各ホストへ最後に接続した時期が表示されます。
+• mosh のセッションは、選んだ時間だけネットワークを失っても生き続けます（最長 1 日）。接続が途切れている間の電池消耗も減りました。
+• 設定のバックアップに、これまで含まれていなかった端末と SFTP の設定 3 件が加わりました。
+</ja-JP>
