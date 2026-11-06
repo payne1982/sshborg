@@ -1089,7 +1089,7 @@ Host target
             <p>SSHBorg può esportare e importare le configurazioni degli host e le impostazioni dell'app come file JSON. Questo permette di trasferire la lista dei server su un altro dispositivo o di conservare un backup portabile della propria configurazione.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                Il backup include le configurazioni degli host e le impostazioni dell'app (terminale, aspetto, comportamento). <strong>Password e chiavi SSH non vengono mai esportate</strong> — il materiale della chiave va riconfigurato su un nuovo dispositivo. Il backup registra però il <em>nome</em> della chiave usata da ogni host: se ricrei una chiave con lo stesso nome prima di importare, i suoi host vengono ricollegati automaticamente.
+                Il backup include le configurazioni degli host e le impostazioni dell'app (terminale, aspetto, comportamento). <strong>Password e chiavi SSH non vengono mai esportate</strong> — il materiale della chiave va riconfigurato su un nuovo dispositivo. Il backup registra però il <em>nome</em> della chiave usata da ogni host: se ricrei una chiave con lo stesso nome prima di importare, i suoi host vengono ricollegati automaticamente. Non viaggia nemmeno il blocco dell'app: il PIN o la passphrase e l'impostazione biometrica si riconfigurano sul nuovo dispositivo.
             </div>
             <h3>Esportare</h3>
             <p>Vai in <strong>Impostazioni → Backup → Esporta backup</strong>. Scegli dove salvare il file tramite il selettore file di sistema. Il file si chiama <code>sshborg_backup.json</code> (<code>sshborg-backup-</code><em>data</em><code>.json</code> su iOS) per impostazione predefinita.</p>
@@ -1106,7 +1106,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>Il file esportato è un normale oggetto JSON. È possibile crearlo manualmente per importare in blocco una lista di server da un'altra fonte.</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produzione", "color": -1754827, "position": 0 }
@@ -1126,6 +1126,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1156,6 +1160,10 @@ Host target
                 <li><code>sftpStartDir</code> — percorso da usare quando <code>sftpStartMode</code> è <code>"fixed"</code>.</li>
                 <li><code>sftpShowHidden</code> — <code>true</code> per mostrare i file nascosti (dotfile, nomi che iniziano con ".") nel browser SFTP di questo host. Predefinito <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> per abilitare gli algoritmi legacy descritti sopra. Predefinito: <code>false</code>.</li>
+                <li><code>mosh</code> — <code>true</code> per portare il terminale di questo host su mosh. Richiede <code>mosh-server</code> sul server. Predefinito: <code>false</code>.</li>
+                <li><code>moshFamily</code> — su quale famiglia di indirizzi fare la sessione: <code>"auto"</code>, <code>"ipv4"</code> o <code>"ipv6"</code>. Una sessione resta sulla famiglia in cui è nata, quindi è questo campo che le permette di seguirti fra le reti. Predefinito: <code>"auto"</code>.</li>
+                <li><code>moshPorts</code> — le porte UDP fra cui <code>mosh-server</code> può scegliere, come <code>60001-60999</code> o una porta singola. Omesso, mosh usa il suo intervallo di mille porte.</li>
+                <li><code>moshCommand</code> — cosa eseguire sul server quando <code>mosh-server</code> non è ciò che una shell non interattiva trova nel PATH.</li>
                 <li><code>keyLabel</code> — nome della chiave SSH usata da questo host. All'importazione, se esiste una chiave con questo nome viene collegata all'host; altrimenti il campo viene ignorato. La chiave stessa non è mai inclusa nel backup.</li>
                 <li><code>group</code> — nome del gruppo a cui appartiene l'host. I gruppi sono elencati nell'array <code>groups</code> in cima al file, con <code>name</code> e <code>color</code> (ARGB come intero a 32 bit con segno). Se un host fa riferimento a un gruppo assente dall'array, il gruppo viene creato automaticamente con un colore predefinito: scrivendo il file a mano puoi quindi omettere l'array.</li>
                 <li><code>color</code> — colore opzionale del singolo host (ARGB come intero a 32 bit con segno). Prevale sul colore del gruppo.</li>

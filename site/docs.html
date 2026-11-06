@@ -1089,7 +1089,7 @@ Host target
             <p>SSHBorg can export and import host configurations and app settings as a JSON file. This lets you transfer your server list to another device or keep a portable backup of your setup.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANT</div>
-                The backup includes your host configurations and app settings (terminal, appearance, behaviour). <strong>Passwords and SSH keys are never exported</strong> — the key material must be set up again on a new device. The backup does record the <em>name</em> of the key each host uses, so if you re-create a key with the same name before importing, its hosts are re-linked to it automatically.
+                The backup includes your host configurations and app settings (terminal, appearance, behaviour). <strong>Passwords and SSH keys are never exported</strong> — the key material must be set up again on a new device. The backup does record the <em>name</em> of the key each host uses, so if you re-create a key with the same name before importing, its hosts are re-linked to it automatically. The app lock does not travel either: the PIN or passphrase and the biometric setting are set up again on the new device.
             </div>
             <h3>Exporting</h3>
             <p>Go to <strong>Settings → Backup → Export backup</strong>. Choose where to save the file using the system file picker. The file is named <code>sshborg_backup.json</code> by default (<code>sshborg-backup-</code><em>date</em><code>.json</code> on iOS).</p>
@@ -1106,7 +1106,7 @@ Host target
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827, "position": 0 }
@@ -1126,6 +1126,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1156,6 +1160,10 @@ Host target
                 <li><code>sftpStartDir</code> — path to use when <code>sftpStartMode</code> is <code>"fixed"</code>.</li>
                 <li><code>sftpShowHidden</code> — <code>true</code> to show hidden files (dotfiles, names starting with ".") in the SFTP browser for this host. Defaults to <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> to enable the legacy cipher algorithms described above. Defaults to <code>false</code>.</li>
+                <li><code>mosh</code> — <code>true</code> to carry this host's terminal over mosh. Needs <code>mosh-server</code> on the server. Default: <code>false</code>.</li>
+                <li><code>moshFamily</code> — which address family the session is made over: <code>"auto"</code>, <code>"ipv4"</code> or <code>"ipv6"</code>. A session stays on the family it was born on, so this is what lets it follow you between networks. Default: <code>"auto"</code>.</li>
+                <li><code>moshPorts</code> — the UDP ports <code>mosh-server</code> may choose from, as <code>60001-60999</code> or a single port. Omitted, mosh uses its own range of a thousand.</li>
+                <li><code>moshCommand</code> — what to run on the server when <code>mosh-server</code> is not what a non-interactive shell finds on its PATH.</li>
                 <li><code>keyLabel</code> — name of the SSH key this host uses. On import, if a key with this name exists it is linked to the host; otherwise the field is ignored. The key itself is never included in the backup.</li>
                 <li><code>group</code> — name of the group the host belongs to. Groups are listed in the top-level <code>groups</code> array with their <code>name</code> and <code>color</code> (ARGB as a signed 32-bit integer). If a host references a group that is not in the array, it is created automatically with a default color — so you can omit the array entirely when writing the file by hand.</li>
                 <li><code>color</code> — optional per-host color (ARGB as a signed 32-bit integer). It overrides the group color.</li>

@@ -651,7 +651,7 @@ Host target
             <p>SSHBorg 可以将主机配置和应用设置导出并导入为 JSON 文件。这样您可以将服务器列表转移到另一台设备，或保留一份可移植的配置备份。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 密钥材料需要在新设备上重新设置。不过备份会记录每个主机所用密钥的<em>名称</em>：如果在导入前重新创建同名密钥，其主机会自动重新关联。
+                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 密钥材料需要在新设备上重新设置。不过备份会记录每个主机所用密钥的<em>名称</em>：如果在导入前重新创建同名密钥，其主机会自动重新关联。 应用锁也不会随备份迁移：PIN 或口令以及生物识别设置需要在新设备上重新配置。
             </div>
             <h3>导出</h3>
             <p>前往 <strong>设置 → 备份 → 导出备份</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_backup.json</code>（iOS 上为 <code>sshborg-backup-</code><em>日期</em><code>.json</code>）。</p>
@@ -668,7 +668,7 @@ Host target
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "生产", "color": -1754827, "position": 0 }
@@ -688,6 +688,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -718,6 +722,10 @@ Host target
                 <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
                 <li><code>sftpShowHidden</code> — <code>true</code> 时在该主机的 SFTP 浏览器中显示隐藏文件（点文件，以 "." 开头的名称）。默认 <code>false</code>。</li>
                 <li><code>allowLegacyCiphers</code> — 设为 <code>true</code> 可启用上文介绍的旧式加密算法。默认为 <code>false</code>。</li>
+                <li><code>mosh</code> — 设为 <code>true</code> 则这台主机的终端走 mosh。服务器上需要有 <code>mosh-server</code>。默认 <code>false</code>。</li>
+                <li><code>moshFamily</code> — 会话建立在哪个地址族上：<code>"auto"</code>、<code>"ipv4"</code> 或 <code>"ipv6"</code>。会话只能留在它出生的地址族里，所以能不能跟着你换网络，就由这一项决定。默认 <code>"auto"</code>。</li>
+                <li><code>moshPorts</code> — <code>mosh-server</code> 可选的 UDP 端口，写成 <code>60001-60999</code> 或单个端口。省略时 mosh 使用它自己那一千个端口的范围。</li>
+                <li><code>moshCommand</code> — 当非交互 shell 在 PATH 中找到的 <code>mosh-server</code> 不是你要的那个时，在服务器上实际执行的命令。</li>
                 <li><code>keyLabel</code> — 此主机所用 SSH 密钥的名称。导入时，如果存在同名密钥，则关联到该主机；否则忽略该字段。密钥本身从不包含在备份中。</li>
                 <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
                 <li><code>color</code> — 主机的可选颜色（ARGB，带符号 32 位整数），会覆盖分组颜色。</li>

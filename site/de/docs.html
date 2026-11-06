@@ -1089,7 +1089,7 @@ Host target
             <p>SSHBorg kann Host-Konfigurationen und App-Einstellungen als JSON-Datei exportieren und importieren. Das ermöglicht es, die Serverliste auf ein anderes Gerät zu übertragen oder ein portables Backup der eigenen Einrichtung aufzubewahren.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// WICHTIG</div>
-                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — das Schlüsselmaterial muss auf einem neuen Gerät neu eingerichtet werden. Das Backup speichert jedoch den <em>Namen</em> des von jedem Host verwendeten Schlüssels: Wenn du vor dem Import einen Schlüssel mit demselben Namen neu erstellst, werden seine Hosts automatisch wieder damit verknüpft.
+                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — das Schlüsselmaterial muss auf einem neuen Gerät neu eingerichtet werden. Das Backup speichert jedoch den <em>Namen</em> des von jedem Host verwendeten Schlüssels: Wenn du vor dem Import einen Schlüssel mit demselben Namen neu erstellst, werden seine Hosts automatisch wieder damit verknüpft. Auch die App-Sperre reist nicht mit: PIN oder Passphrase und die biometrische Einstellung werden auf dem neuen Gerät neu eingerichtet.
             </div>
             <h3>Exportieren</h3>
             <p>Gehe zu <strong>Einstellungen → Backup → Backup exportieren</strong>. Wähle über den Systemdatei-Auswähler aus, wo die Datei gespeichert werden soll. Die Datei heißt standardmäßig <code>sshborg_backup.json</code> (unter iOS <code>sshborg-backup-</code><em>Datum</em><code>.json</code>).</p>
@@ -1106,7 +1106,7 @@ Host target
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produktion", "color": -1754827, "position": 0 }
@@ -1126,6 +1126,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1156,6 +1160,10 @@ Host target
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
                 <li><code>sftpShowHidden</code> — <code>true</code>, um versteckte Dateien (Dotfiles, Namen mit "." am Anfang) im SFTP-Browser dieses Hosts anzuzeigen. Standard <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
+                <li><code>mosh</code> — <code>true</code>, um das Terminal dieses Hosts über mosh zu führen. Benötigt <code>mosh-server</code> auf dem Server. Standard: <code>false</code>.</li>
+                <li><code>moshFamily</code> — über welche Adressfamilie die Sitzung aufgebaut wird: <code>"auto"</code>, <code>"ipv4"</code> oder <code>"ipv6"</code>. Eine Sitzung bleibt bei der Familie, in der sie entstanden ist; dieses Feld ist es also, das sie Ihnen zwischen Netzen folgen lässt. Standard: <code>"auto"</code>.</li>
+                <li><code>moshPorts</code> — die UDP-Ports, aus denen <code>mosh-server</code> wählen darf, als <code>60001-60999</code> oder als einzelner Port. Ohne Angabe nimmt mosh seinen eigenen Bereich von tausend.</li>
+                <li><code>moshCommand</code> — was auf dem Server auszuführen ist, wenn <code>mosh-server</code> nicht das ist, was eine nicht-interaktive Shell im PATH findet.</li>
                 <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
                 <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>
