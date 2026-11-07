@@ -1,4 +1,5 @@
 • La lista degli host mostra quando ti sei collegato l'ultima volta a ciascuno.
 • Una sessione mosh può sopravvivere alla perdita di rete per il tempo che scegli, fino a un giorno, e consuma meno batteria mentre il contatto manca.
-• Il backup della configurazione include tre impostazioni di terminale e SFTP che gli mancavano.
-• Aggiornate le librerie di terze parti, con irrobustimento del livello SSH e di trasferimento file.
+• Il backup include tre impostazioni di terminale e SFTP che gli mancavano.
+• La tastiera non resta più alzata sulla schermata di blocco con il PIN.
+• Aggiornate le librerie di terze parti, con irrobustimento di SSH e dei trasferimenti.

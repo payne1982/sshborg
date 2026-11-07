@@ -1,4 +1,5 @@
-• La liste des hôtes indique quand vous vous êtes connecté à chaque hôte pour la dernière fois.
-• Une session mosh survit à la perte du réseau aussi longtemps que vous le voulez, jusqu'à un jour, et consomme moins de batterie hors contact.
-• La sauvegarde de la configuration contient trois réglages de terminal et SFTP qui lui manquaient.
-• Bibliothèques tierces mises à jour, dont un renforcement de la couche SSH et des transferts de fichiers.
+• La liste des hôtes indique quand vous vous êtes connecté à chaque hôte.
+• Une session mosh survit à la perte du réseau le temps que vous voulez, jusqu'à un jour, et consomme moins de batterie hors contact.
+• La sauvegarde contient trois réglages de terminal et SFTP qui lui manquaient.
+• Le clavier ne reste plus affiché sur l'écran de verrouillage par code PIN.
+• Bibliothèques tierces mises à jour, dont un renforcement de la couche SSH.
