@@ -63,6 +63,7 @@ import com.sshborg.data.AppPreferences
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import com.sshborg.data.ssh.MoshUnavailable
+import com.sshborg.ui.common.hideKeyboard
 import com.sshborg.ui.common.ProblemContent
 import com.sshborg.ui.common.ServerBanner
 import kotlinx.coroutines.delay
@@ -267,12 +268,18 @@ fun TerminalScreen(
     // only starts once the IME has settled, or the frames before it opens would be read as "put
     // away" and the memory would be wrong from the first moment.
     var keyboardSettled by remember { mutableStateOf(false) }
-    LaunchedEffect(sessionId, sessionUp, terminalView) {
+    LaunchedEffect(sessionId, sessionUp, terminalView, app.lockGateUp) {
         if (!sessionUp || terminalView == null) return@LaunchedEffect
         // Nothing is recorded while this runs: a reconnect restarts the effect, and the keyboard
         // moving because we moved it is not the user's doing. The seal from the last time this
         // session was left comes off here, now that it is the one on screen.
         keyboardSettled = false
+        // The gate going up stops this screen having any say in the keyboard: the gate puts it
+        // away itself, over every screen and not only this one. Standing down here is what keeps
+        // the session's memory intact — `keyboardSettled` stays false for as long as the gate is
+        // up, so that hide is not read back as the user putting the keyboard away, and when the
+        // gate comes down this effect runs again and gives the session what it had.
+        if (app.lockGateUp) return@LaunchedEffect
         val wanted = app.sessionManager.keyboardWasUp(sessionId)
         app.sessionManager.thawKeyboard(sessionId)
         if (wanted) {
@@ -697,17 +704,6 @@ fun TerminalScreen(
             }
         }
     }
-}
-
-/**
- * Puts the soft keyboard away. [view] only has to be in the right window; the terminal takes its
- * input connection back by hand (TerminalView.reattachIme), so Compose's own keyboard controller
- * does not know about it and cannot dismiss it.
- */
-private fun hideKeyboard(view: android.view.View) {
-    val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
-            as android.view.inputmethod.InputMethodManager
-    imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
 @Composable
