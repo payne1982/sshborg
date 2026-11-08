@@ -31,7 +31,7 @@ module.exports = {
   feat_terminal_title: 'VOLLES SSH-TERMINAL',
   feat_terminal_desc:  'Interaktives Terminal mit VT100/xterm-Emulation, vollständiger UTF-8-Unterstützung und mehreren gleichzeitigen Sitzungen.',
   feat_mosh_title:     'MOSH-SITZUNGEN',
-  feat_mosh_desc:      'Das Terminal eines Hosts über mosh führen: die Sitzung übersteht einen IP-Wechsel, den Übergang von WLAN zu Mobilfunk und ein Telefon, das in der Tasche geschlafen hat. Getestet mit mosh-server 1.4.0. Experimentell, nur Android.',
+  feat_mosh_desc:      'Das Terminal eines Hosts über mosh führen: die Sitzung übersteht einen IP-Wechsel, den Übergang von WLAN zu Mobilfunk und ein Telefon, das in der Tasche geschlafen hat. Getestet mit mosh-server 1.4.0. Experimentell, pro Host einschaltbar.',
   feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'SFTP-DATEIMANAGER',
   feat_sftp_desc:      'Dateien auf deinen Servern durchsuchen, hochladen, herunterladen, umbenennen und löschen – mit einem intuitiven Dateimanager.',
@@ -489,7 +489,7 @@ screen -r work</code></pre>
                 Eine Mosh-Sitzung sendet etwa alle drei Sekunden ein kleines Paket, solange der Server antwortet — genau dadurch bemerkt sie einen Netzwechsel sofort. Das ist mehr Funk als eine gewöhnliche SSH-Sitzung braucht, und auf einem Telefon kostet es Akku. Solange kein Kontakt besteht, werden diese Pakete von selbst seltener, ein Ausfall kostet also nicht so viel wie ein Gespräch. Für Hosts, wo Sie es nicht brauchen, lassen Sie es aus.
             </div>
             <h3>Wie lange eine Sitzung ohne Kontakt überlebt</h3>
-            <p>Eine Mosh-Sitzung stirbt nicht, wenn das Telefon das Netz verliert: sie bleibt, wo sie ist — auf dem Server — und macht weiter, sobald das Telefon zurück ist. Wie lange sie wartet, entscheiden Sie unter <strong>Einstellungen → Timeout der Mosh-Sitzung</strong>: von einer Stunde, dem Standard, bis zu einem Tag.</p>
+            <p>Eine Mosh-Sitzung stirbt nicht, wenn das Telefon das Netz verliert: sie bleibt, wo sie ist — auf dem Server — und macht weiter, sobald das Telefon zurück ist. Wie lange sie wartet, entscheiden Sie unter <strong>Einstellungen → Timeout der Mosh-Sitzung</strong>: von einer Stunde, dem Standard, bis zu einem Tag. Die Einstellung gehört Android; auf iOS liegt der Wert fest bei einer Stunde.</p>
             <p>Der Wert gehört dem <strong>Server</strong>: so lange hält <code>mosh-server</code> die Sitzung und die Shell darin am Leben, nachdem er dieses Telefon nicht mehr hört. Die App gibt fünf Minuten früher auf, denn länger als der Server zu warten heißt, auf eine Sitzung zu hoffen, die es nicht mehr gibt.</p>
             <p>Der Preis eines langen Werts ist nicht der Akku, sondern der Server: eine vergessene Sitzung hält einen <code>mosh-server</code> und seine Shell — mitsamt dem, was darin lief — die ganze Zeit offen. Eine Stunde ist die vorsichtige Wahl; erhöhen Sie sie, wenn Sie abends das Telefon zuklappen und die Sitzung morgens wiederfinden wollen, im Wissen, worauf Sie sich damit einlassen.</p>
             <p>Solange der Kontakt fehlt, werden die Lebenszeichen von selbst seltener — von drei Sekunden bis auf eines pro Minute, je länger die Stille dauert — damit eine Sitzung, die Stunden dauern darf, nicht Stunden Funk kostet. Tippen Sie etwas, beginnen sie sofort wieder: die Rückkehr wartet nicht auf die Verlangsamung.</p>

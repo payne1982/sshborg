@@ -31,7 +31,7 @@ module.exports = {
   feat_terminal_title: 'TERMINAL SSH COMPLETO',
   feat_terminal_desc:  'Terminal interactivo con emulación VT100/xterm, soporte UTF-8 completo y múltiples sesiones simultáneas.',
   feat_mosh_title:     'SESIONES MOSH',
-  feat_mosh_desc:      'Lleva el terminal de un host por mosh: la sesión sobrevive a un cambio de IP, al salto del Wi-Fi a la red móvil y a un teléfono que estaba dormido en el bolsillo. Probado con mosh-server 1.4.0. Experimental, solo Android.',
+  feat_mosh_desc:      'Lleva el terminal de un host por mosh: la sesión sobrevive a un cambio de IP, al salto del Wi-Fi a la red móvil y a un teléfono que estaba dormido en el bolsillo. Probado con mosh-server 1.4.0. Experimental, se activa host por host.',
   feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'GESTOR DE ARCHIVOS SFTP',
   feat_sftp_desc:      'Navega, sube, descarga, renombra y elimina archivos en tus servidores con un gestor de archivos intuitivo.',
@@ -489,7 +489,7 @@ screen -r work</code></pre>
                 Una sesión mosh envía un paquete pequeño cada tres segundos aproximadamente mientras el servidor responde, y es eso lo que le permite notar al instante un cambio de red. Es más radio de la que usa una sesión SSH normal, y en un teléfono cuesta batería. Mientras no hay contacto esos paquetes se espacian por sí solos, así que un corte no cuesta lo que cuesta una conversación. Para los hosts donde no lo necesites, déjalo desactivado.
             </div>
             <h3>Cuánto sobrevive una sesión sin contacto</h3>
-            <p>Una sesión mosh no muere cuando el teléfono pierde la red: se queda donde está, en el servidor, y continúa cuando el teléfono vuelve. Cuánto espera lo decides tú, en <strong>Ajustes → Tiempo de espera de la sesión mosh</strong>: desde una hora, el valor por omisión, hasta un día.</p>
+            <p>Una sesión mosh no muere cuando el teléfono pierde la red: se queda donde está, en el servidor, y continúa cuando el teléfono vuelve. Cuánto espera lo decides tú, en <strong>Ajustes → Tiempo de espera de la sesión mosh</strong>: desde una hora, el valor por omisión, hasta un día. El ajuste es de Android; en iOS la duración es fija de una hora.</p>
             <p>La cifra es la del <strong>servidor</strong>: cuánto mantiene <code>mosh-server</code> la sesión, y el shell que hay dentro, después de dejar de oír este teléfono. La aplicación se rinde cinco minutos antes, porque esperar más que el servidor sería esperar una sesión que ya ha terminado.</p>
             <p>El precio de una duración larga no es la batería sino el servidor: una sesión que olvidas mantiene en pie un <code>mosh-server</code> y su shell, con lo que estuviera ejecutándose dentro, todo ese tiempo. Una hora es la elección prudente; súbela si quieres cerrar el teléfono por la noche y encontrar la sesión por la mañana, sabiendo que eso es lo que aceptas.</p>
             <p>Mientras falta el contacto, los paquetes de presencia se espacian por sí solos — de tres segundos a uno por minuto, cuanto más dura el silencio — así que una sesión que puede durar horas no cuesta horas de radio. En cuanto escribes algo vuelven a empezar: la vuelta no espera a la ralentización.</p>

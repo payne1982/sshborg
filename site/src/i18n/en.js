@@ -32,7 +32,7 @@ module.exports = {
   feat_terminal_title: 'FULL SSH TERMINAL',
   feat_terminal_desc:  'Interactive terminal with VT100/xterm emulation, full UTF-8 support, and multiple concurrent sessions.',
   feat_mosh_title:     'MOSH SESSIONS',
-  feat_mosh_desc:      'Carry a host\'s terminal over mosh and the session survives a change of IP, a Wi-Fi to mobile handover, a phone asleep in your pocket. Tested against mosh-server 1.4.0. Experimental, Android only.',
+  feat_mosh_desc:      'Carry a host\'s terminal over mosh and the session survives a change of IP, a Wi-Fi to mobile handover, a phone asleep in your pocket. Tested against mosh-server 1.4.0. Experimental, and switched on per host.',
   feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'SFTP FILE MANAGER',
   feat_sftp_desc:      'Browse, upload, download, rename, and delete files on your servers with an intuitive file manager.',
@@ -492,7 +492,7 @@ screen -r work</code></pre>
                 A mosh session sends a small packet about every three seconds while the server is answering, which is what lets it notice a change of network straight away. That is more radio than a plain SSH session uses, and on a phone it costs battery. While there is no contact those packets slow down by themselves, so an outage does not cost what a conversation does. Leave it off for hosts where you do not need it.
             </div>
             <h3>How long a session survives without contact</h3>
-            <p>A mosh session does not die when the phone loses the network: it stays where it is, on the server, and picks up when the phone comes back. How long it waits is yours to set, in <strong>Settings → Mosh session timeout</strong>: from one hour, the default, up to a day.</p>
+            <p>A mosh session does not die when the phone loses the network: it stays where it is, on the server, and picks up when the phone comes back. How long it waits is yours to set, in <strong>Settings → Mosh session timeout</strong>: from one hour, the default, up to a day. The setting is Android's; on iOS the figure is fixed at one hour.</p>
             <p>The figure is the <strong>server's</strong> — how long <code>mosh-server</code> keeps the session, and the shell inside it, alive after it stops hearing this phone. The app gives up five minutes earlier, because waiting longer than the server means hoping for a session that has already ended.</p>
             <p>The cost of a long one is not battery but the server: a session you forget about holds a <code>mosh-server</code> and its shell, with whatever was running in it, for that whole time. An hour is the careful choice; raise it if you want to close the phone in the evening and find the session in the morning, knowing that this is what you are agreeing to.</p>
             <p>While contact is missing the presence packets slow down on their own — from three seconds out to one a minute, the longer the silence lasts — so a session allowed to last hours does not cost hours of radio. Type something and they start again at once: coming back does not wait for the slowdown.</p>
