@@ -30,6 +30,9 @@ module.exports = {
 
   feat_terminal_title: 'VOLLES SSH-TERMINAL',
   feat_terminal_desc:  'Interaktives Terminal mit VT100/xterm-Emulation, vollständiger UTF-8-Unterstützung und mehreren gleichzeitigen Sitzungen.',
+  feat_mosh_title:     'MOSH-SITZUNGEN',
+  feat_mosh_desc:      'Das Terminal eines Hosts über mosh führen: die Sitzung übersteht einen IP-Wechsel, den Übergang von WLAN zu Mobilfunk und ein Telefon, das in der Tasche geschlafen hat. Getestet mit mosh-server 1.4.0. Experimentell, nur Android.',
+  feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'SFTP-DATEIMANAGER',
   feat_sftp_desc:      'Dateien auf deinen Servern durchsuchen, hochladen, herunterladen, umbenennen und löschen – mit einem intuitiven Dateimanager.',
   feat_keys_title:     'SSH-SCHLÜSSEL-AUTH',

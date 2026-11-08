@@ -455,6 +455,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -801,6 +808,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>TERMINAL SSH COMPLET</h3>
             <p>Terminal interactif avec émulation VT100/xterm, support UTF-8 complet et sessions simultanées multiples.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>SESSIONS MOSH</h3>
+            <p>Faites passer le terminal d'un hôte par mosh : la session survit à un changement d'IP, au passage du Wi-Fi au réseau mobile, à un téléphone resté en veille dans votre poche. Testé avec mosh-server 1.4.0. Expérimental, Android uniquement.</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

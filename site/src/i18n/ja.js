@@ -31,6 +31,9 @@ module.exports = {
 
   feat_terminal_title: '完全SSH端末',
   feat_terminal_desc:  'VT100/xtermエミュレーション、完全UTF-8サポート、複数の同時セッションに対応したインタラクティブ端末。',
+  feat_mosh_title:     'MOSH セッション',
+  feat_mosh_desc:      'ホストのターミナルを mosh で運びます。IP の変化、Wi-Fi からモバイル回線への切り替え、ポケットで眠っていた端末——どれでもセッションは残ります。mosh-server 1.4.0 で検証済み。実験的機能、Android のみ。',
+  feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'SFTPファイルマネージャー',
   feat_sftp_desc:      '直感的なファイルマネージャーでサーバー上のファイルを参照、アップロード、ダウンロード、リネーム、削除。',
   feat_keys_title:     'SSH鍵認証',

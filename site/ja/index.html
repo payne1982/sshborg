@@ -455,6 +455,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -801,6 +808,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>完全SSH端末</h3>
             <p>VT100/xtermエミュレーション、完全UTF-8サポート、複数の同時セッションに対応したインタラクティブ端末。</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>MOSH セッション</h3>
+            <p>ホストのターミナルを mosh で運びます。IP の変化、Wi-Fi からモバイル回線への切り替え、ポケットで眠っていた端末——どれでもセッションは残ります。mosh-server 1.4.0 で検証済み。実験的機能、Android のみ。</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

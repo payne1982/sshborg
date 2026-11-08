@@ -31,6 +31,9 @@ module.exports = {
 
   feat_terminal_title: '完整 SSH 终端',
   feat_terminal_desc:  '支持 VT100/xterm 仿真、完整 UTF-8 和多个并发会话的交互式终端。',
+  feat_mosh_title:     'MOSH 会话',
+  feat_mosh_desc:      '让主机的终端走 mosh：IP 变化、从 Wi-Fi 切到移动网络、手机在口袋里睡了一觉，会话都不会断。已对 mosh-server 1.4.0 验证。实验性，仅 Android。',
+  feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'SFTP 文件管理器',
   feat_sftp_desc:      '通过直观的文件管理器浏览、上传、下载、重命名和删除服务器文件。',
   feat_keys_title:     'SSH 密钥认证',

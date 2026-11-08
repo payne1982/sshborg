@@ -455,6 +455,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -801,6 +808,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>ПОВНИЙ SSH ТЕРМІНАЛ</h3>
             <p>Інтерактивний термінал з емуляцією VT100/xterm, повною підтримкою UTF-8 та кількома одночасними сесіями.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>СЕСІЇ MOSH</h3>
+            <p>Термінал хоста їде через mosh: сесія витримує зміну IP, перехід із Wi-Fi на мобільну мережу та телефон, що спав у кишені. Перевірено з mosh-server 1.4.0. Експериментально, лише Android.</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

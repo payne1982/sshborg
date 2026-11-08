@@ -455,6 +455,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -801,6 +808,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>完整 SSH 终端</h3>
             <p>支持 VT100/xterm 仿真、完整 UTF-8 和多个并发会话的交互式终端。</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>MOSH 会话</h3>
+            <p>让主机的终端走 mosh：IP 变化、从 Wi-Fi 切到移动网络、手机在口袋里睡了一觉，会话都不会断。已对 mosh-server 1.4.0 验证。实验性，仅 Android。</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">
