@@ -564,6 +564,24 @@
     </div>
 
         <article class="release">
+            <h2>1.3.1<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh: corrigido um defeito que mantinha o processador ocupado enquanto uma sessão estava aberta, o que podia aquecer o dispositivo e gastar a bateria.</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.3.0<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh (experimental): um terminal que sobrevive a uma mudança de rede e ao telefone guardado. O ecrã vive no servidor, por isso ao voltar encontra a mesma shell com os mesmos programas ainda a correr. Liga-se host a host — no servidor é preciso ter o mosh-server instalado e as suas portas UDP acessíveis.</li>
+                <li>Mosh através de um bastião: um host cujo primeiro salto tem o Mosh ligado é alcançado ao contrário — Mosh até essa máquina e, de lá, uma linha ssh — para que o terminal fique onde a rede não muda.</li>
+                <li>O editor de ficheiros já não corta um ficheiro se uma gravação for interrompida: a nova versão é escrita à parte primeiro, e o original fica no servidor até ter sido substituído. E mantém exatamente as permissões do ficheiro.</li>
+                <li>SFTP: os nomes de ficheiros enviados por um servidor são verificados antes de serem usados, para que um servidor não possa levar a app fora da pasta que está a ver.</li>
+                <li>Jump hosts: a escolha começa pela sua própria lista de hosts, com a forma escrita à mão a um toque de distância.</li>
+                <li>Bloqueio da app com o seu próprio PIN ou frase-passe: um bloqueio que não precisa de Face ID nem do código do dispositivo. Cinco tentativas erradas bloqueiam-no durante um tempo, cada vez mais longo — e um esquecido não se recupera, por isso a app avisa antes de o definir.</li>
+                <li>Segurança: quando aprova a chave de um servidor, a partir daí só essa chave exata é aceite — para cada máquina de uma cadeia de jump hosts, e também para o reencaminhamento de portas. Um comando mosh-server restaurado de uma cópia de segurança já não pode executar nada além do programa que indica.</li>
+            </ul>
+        </article>
+        <article class="release">
             <h2>1.2.0<span class="release-date">2026-10-20</span></h2>
             <ul>
                 <li>Mais espaço no terminal: a barra de título esconde-se sozinha e volta quando toca no ecrã, pelo que o texto ocupa toda a altura (pode mantê-la fixa nas definições).</li>

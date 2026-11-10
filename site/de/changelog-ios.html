@@ -564,6 +564,24 @@
     </div>
 
         <article class="release">
+            <h2>1.3.1<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh: Ein Fehler wurde behoben, der den Prozessor beschäftigt hielt, solange eine Sitzung offen war. Dadurch konnte sich das Gerät erwärmen und der Akku schneller leeren.</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.3.0<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh (experimentell): ein Terminal, das einen Netzwechsel und das Weglegen des Telefons übersteht. Der Bildschirm liegt auf dem Server, also finden Sie bei der Rückkehr dieselbe Shell mit denselben noch laufenden Programmen. Pro Host einschaltbar — auf dem Server muss mosh-server installiert und seine UDP-Ports erreichbar sein.</li>
+                <li>Mosh über einen Bastion-Host: ein Host, dessen erster Sprung Mosh aktiviert hat, wird umgekehrt erreicht — Mosh bis zu dieser Maschine, von dort eine ssh-Zeile — damit das Terminal dort sitzt, wo das Netz sich nicht ändert.</li>
+                <li>Der Dateieditor schneidet keine Datei mehr ab, wenn ein Speichern unterbrochen wird: die neue Fassung wird zuerst daneben geschrieben, und das Original bleibt auf dem Server, bis es ersetzt ist. Die Dateirechte bleiben dabei genau erhalten.</li>
+                <li>SFTP: Dateinamen, die ein Server sendet, werden vor der Verwendung geprüft, damit ein Server die App nicht aus dem Ordner herausführen kann, den Sie gerade ansehen.</li>
+                <li>Jump-Hosts: die Auswahl beginnt jetzt bei Ihrer eigenen Hostliste, die getippte Form ist einen Fingertipp entfernt.</li>
+                <li>App-Sperre mit eigener PIN oder Passphrase: eine Sperre, die weder Face ID noch den Gerätecode braucht. Fünf falsche Versuche sperren sie eine Weile, jedes Mal länger — und eine vergessene lässt sich nicht wiederherstellen, deshalb sagt die App das, bevor Sie sie festlegen.</li>
+                <li>Sicherheit: wenn Sie den Schlüssel eines Servers bestätigen, wird von da an nur genau dieser Schlüssel angenommen — für jede Maschine einer Jump-Host-Kette und auch für die Portweiterleitung. Ein aus einem Backup wiederhergestellter mosh-server-Befehl kann nichts anderes mehr ausführen als das Programm, das er nennt.</li>
+            </ul>
+        </article>
+        <article class="release">
             <h2>1.2.0<span class="release-date">2026-10-20</span></h2>
             <ul>
                 <li>Mehr Platz im Terminal: die Titelleiste blendet sich selbst aus und kommt beim Antippen des Bildschirms zurück, sodass der Text die volle Höhe nutzt (sie lässt sich in den Einstellungen fest einblenden).</li>

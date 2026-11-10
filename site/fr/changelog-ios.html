@@ -564,6 +564,24 @@
     </div>
 
         <article class="release">
+            <h2>1.3.1<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh : correction d'un défaut qui occupait le processeur tant qu'une session restait ouverte, ce qui pouvait faire chauffer l'appareil et vider la batterie.</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.3.0<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh (expérimental) : un terminal qui survit à un changement de réseau et au téléphone rangé dans la poche. L'écran vit sur le serveur : au retour, vous retrouvez le même shell avec les mêmes programmes toujours en cours. À activer hôte par hôte — le serveur doit avoir mosh-server installé et ses ports UDP joignables.</li>
+                <li>Mosh à travers un rebond : un hôte dont le premier saut a Mosh activé est atteint dans l'autre sens — Mosh jusqu'à cette machine, puis une ligne ssh depuis là — pour que le terminal soit là où le réseau ne change pas.</li>
+                <li>L'éditeur de fichiers ne tronque plus un fichier quand un enregistrement est interrompu : la nouvelle version est d'abord écrite à côté, et l'original reste sur le serveur jusqu'à son remplacement. Les permissions du fichier sont conservées à l'identique.</li>
+                <li>SFTP : les noms de fichiers envoyés par un serveur sont vérifiés avant d'être utilisés, pour qu'un serveur ne puisse pas emmener l'app hors du dossier que vous regardez.</li>
+                <li>Hôtes de rebond : le choix part désormais de votre propre liste d'hôtes, la forme saisie à la main restant à portée de doigt.</li>
+                <li>Verrouillage de l'app par votre propre code PIN ou phrase secrète : un verrou qui ne demande ni Face ID ni le code de l'appareil. Cinq essais erronés le bloquent un moment, chaque fois plus longtemps — et un code oublié ne se récupère pas, l'app le dit donc avant que vous le définissiez.</li>
+                <li>Sécurité : quand vous approuvez la clé d'un serveur, seule cette clé exacte est acceptée ensuite — pour chaque machine d'une chaîne de rebonds, et pour la redirection de ports aussi. Une commande mosh-server restaurée depuis une sauvegarde ne peut plus exécuter autre chose que le programme qu'elle nomme.</li>
+            </ul>
+        </article>
+        <article class="release">
             <h2>1.2.0<span class="release-date">2026-10-20</span></h2>
             <ul>
                 <li>Plus de place dans le terminal : la barre de titre se masque d'elle-même et revient quand vous touchez l'écran, si bien que le texte occupe toute la hauteur (elle peut rester fixe dans les réglages).</li>
