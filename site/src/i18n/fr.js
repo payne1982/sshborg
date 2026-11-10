@@ -17,7 +17,7 @@ module.exports = {
   badge_no_tracking: 'Sans traçage',
   badge_no_cloud:    'Sans cloud',
   badge_free:        'Gratuit',
-  badge_android:     'Android 10+',
+  badge_android:     'Android 9+',
   badge_ios: 'iOS 16+',
 
   cta_download:   'TÉLÉCHARGER',
