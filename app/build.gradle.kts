@@ -14,8 +14,8 @@ android {
         applicationId = "com.sshborg"
         minSdk = 28
         targetSdk = 36
-        versionCode = 39
-        versionName = "1.21.0"
+        versionCode = 40
+        versionName = "1.22.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
