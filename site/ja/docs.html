@@ -27,13 +27,15 @@
     <meta property="og:url"         content="https://sshborg.com/ja/docs.html">
     <meta property="og:title"       content="SSHBorg – ユーザーガイド">
     <meta property="og:description" content="SSHBorg Android・iOS ユーザーガイド：SSH鍵、踏み台ホスト、エージェント転送、コマンド候補、tmuxなど。">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="ja_JP">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – ユーザーガイド">
     <meta name="twitter:description" content="SSHBorg Android・iOS ユーザーガイド：SSH鍵、踏み台ホスト、エージェント転送、コマンド候補、tmuxなど。">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -943,8 +945,13 @@ screen -r work</code></pre>
             <p>ホストの編集画面を開き、<strong>Mosh</strong> をオンにします。接続のスイッチ類と並んでいて、Mosh 自身の三つの設定のすぐ上にあります。ホストごとの設定で、既定はオフです。触らなかったホストは何も変わりません。実験的と付いているのは新しいからで、未完成だからではありません。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// バッテリー</div>
-                mosh のセッションは開いている間、約 3 秒ごとに小さなパケットを送ります。ネットワークの変化にすぐ気づけるのはそのためです。通常の SSH セッションより電波を使うので、端末ではバッテリーを消費します。必要のないホストではオフのままにしてください。
+                mosh のセッションは、サーバーが応答している間、約 3 秒ごとに小さなパケットを送ります。ネットワークの変化にすぐ気づけるのはそのためです。通常の SSH セッションより電波を使うので、端末ではバッテリーを消費します。接続が途切れている間はこの間隔が自動的に広がるため、通信が切れている時間は会話している時間ほどには消費しません。必要のないホストではオフのままにしてください。
             </div>
+            <h3>接続が途切れたセッションはどれだけ持つか</h3>
+            <p>mosh のセッションは、端末がネットワークを失っても終わりません。サーバー側にそのまま残り、端末が戻れば続きから再開します。どれだけ待つかは <strong>設定 → mosh セッションのタイムアウト</strong> で決められます。既定の 1 時間から、最長 1 日までです。</p>
+            <p>この値は <strong>サーバー</strong>のものです。つまり <code>mosh-server</code> が、この端末からの応答が途絶えたあと、セッションとその中のシェルを生かしておく時間です。アプリはその 5 分前にあきらめます。サーバーより長く待つのは、すでに終わったセッションを待つことになるからです。</p>
+            <p>長くしたときの代償はバッテリーではなくサーバーです。忘れられたセッションは、その時間ずっと <code>mosh-server</code> とそのシェルを、中で動いていたものもろとも抱え続けます。1 時間は慎重な選択です。夜に端末を閉じて朝にセッションを見つけたいなら、この点を承知のうえで延ばしてください。</p>
+            <p>接続が途切れている間、生存確認のパケットは自動的に間隔を広げます。沈黙が長引くほど、3 秒から 1 分に 1 回までです。そのため、何時間も持つセッションが何時間も電波を使うことはありません。何か入力すればすぐ元の間隔に戻るので、復帰がこの減速を待つことはありません。</p>
             <h3>ターミナルで変わること</h3>
             <p><strong>スクロールバックは空から始まります。</strong>SSH ではサーバーが出力したものすべてが端末を通るので、全部とっておけます。mosh では画面だけが送られてくるため、履歴に溜まるのは実際に上へ流れていった行だけです。スクロールせずに画面を描き直すプログラムは、何も残しません。スクロールの操作はこれまでどおり使えます。開いたばかりのセッションでは、上にさかのぼれるものが少ないだけです。</p>
             <p><strong>入力が速くなるわけではありません。</strong>mosh はローカルでの即時エコーで知られていますが、SSHBorg はまだそれをしていません。キーは今もサーバーまで行って戻ってきます。同じネットワークで実機計測したところ、mosh での入力は SSH とほぼ同じ速さでした。得られるのは、セッションが死なないことです。</p>
@@ -1084,7 +1091,7 @@ Host target
             <p>SSHBorgはホストの設定とアプリの設定をJSONファイルとしてエクスポート・インポートできます。これにより、サーバーリストを別のデバイスに移したり、設定のポータブルなバックアップを保管したりできます。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                バックアップにはホスト設定とアプリ設定（ターミナル、外観、動作）が含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 鍵そのものは新しいデバイスで再設定が必要です。ただしバックアップには各ホストが使用する鍵の<em>名前</em>が記録されるため、インポート前に同じ名前の鍵を作成しておくと、そのホストは自動的に再リンクされます。
+                バックアップにはホスト設定とアプリ設定（ターミナル、外観、動作）が含まれます。<strong>パスワードとSSH鍵はエクスポートされません</strong> — 鍵そのものは新しいデバイスで再設定が必要です。ただしバックアップには各ホストが使用する鍵の<em>名前</em>が記録されるため、インポート前に同じ名前の鍵を作成しておくと、そのホストは自動的に再リンクされます。 アプリのロックも移動しません。PIN またはパスフレーズと生体認証の設定は、新しい端末であらためて設定してください。
             </div>
             <h3>エクスポート</h3>
             <p><strong>設定 → バックアップ → バックアップをエクスポート</strong> に移動します。システムのファイル選択ツールを使って保存先を選択します。ファイル名はデフォルトで <code>sshborg_backup.json</code>（iOSでは <code>sshborg-backup-</code><em>日付</em><code>.json</code>） です。</p>
@@ -1101,7 +1108,7 @@ Host target
             <h3>JSON形式</h3>
             <p>エクスポートファイルは通常のJSONオブジェクトです。手動で作成して、別のソースからサーバーリストを一括インポートすることもできます。</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "本番", "color": -1754827, "position": 0 }
@@ -1121,6 +1128,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1151,6 +1162,10 @@ Host target
                 <li><code>sftpStartDir</code> — <code>sftpStartMode</code> が <code>"fixed"</code> のときに使用するパス。</li>
                 <li><code>sftpShowHidden</code> — <code>true</code> でこのホストの SFTP ブラウザに隠しファイル（ドットファイル、"." で始まる名前）を表示します。既定は <code>false</code>。</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> にすると、前述のレガシー暗号アルゴリズムが有効になります。既定は <code>false</code> です。</li>
+                <li><code>mosh</code> — このホストの端末を mosh で運ぶなら <code>true</code>。サーバーに <code>mosh-server</code> が必要です。既定値は <code>false</code>。</li>
+                <li><code>moshFamily</code> — セッションをどのアドレスファミリーで作るか。<code>"auto"</code>、<code>"ipv4"</code>、<code>"ipv6"</code> のいずれか。セッションは生まれたファミリーから動けないので、ネットワークをまたいで付いてこられるかはこの項目で決まります。既定値は <code>"auto"</code>。</li>
+                <li><code>moshPorts</code> — <code>mosh-server</code> が選べる UDP ポート。<code>60001-60999</code> のような範囲か、単一のポート。省略すると mosh 自身の 1000 ポートの範囲を使います。</li>
+                <li><code>moshCommand</code> — 非対話シェルの PATH にある <code>mosh-server</code> が目的のものでない場合に、サーバーで実行するコマンド。</li>
                 <li><code>keyLabel</code> — このホストが使用するSSH鍵の名前。インポート時に同じ名前の鍵があればホストにリンクされ、なければ無視されます。鍵そのものはバックアップに含まれません。</li>
                 <li><code>group</code> — ホストが属するグループ名。グループはトップレベルの <code>groups</code> 配列に <code>name</code> と <code>color</code>（符号付き 32 ビット整数の ARGB）で記載します。配列にないグループをホストが参照している場合は既定の色で自動作成されるため、手書きの場合は配列を丸ごと省略してもかまいません。</li>
                 <li><code>color</code> — ホストごとの任意の色（符号付き 32 ビット整数の ARGB）。グループの色より優先されます。</li>

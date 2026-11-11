@@ -28,13 +28,15 @@
     <meta property="og:url"         content="https://sshborg.com/ja/">
     <meta property="og:title"       content="SSHBorg – Android・iOS 向け SSH & SFTP クライアント">
     <meta property="og:description" content="SSHBorgはAndroid、iPhone、iPad向けの強力なSSH/SFTPクライアントです。鍵認証、暗号化ストレージ、生体認証ロックでサーバーをスマートフォンから安全に管理できます。">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="ja_JP">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – Android・iOS 向け SSH & SFTP クライアント">
     <meta name="twitter:description" content="SSHBorgはAndroid、iPhone、iPad向けの強力なSSH/SFTPクライアントです。鍵認証、暗号化ストレージ、生体認証ロックでサーバーをスマートフォンから安全に管理できます。">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -455,6 +457,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -731,7 +740,7 @@
         <span class="badge badge-green">&#10003; トラッキングなし</span>
         <span class="badge badge-green">&#10003; クラウドなし</span>
         <span class="badge badge-blue">無料</span>
-        <span class="badge badge-blue">Android 10+</span>
+        <span class="badge badge-blue">Android 9+</span>
         <span class="badge badge-blue">iOS 16+</span>
     </div>
     <div class="cta-wrap">
@@ -801,6 +810,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>完全SSH端末</h3>
             <p>VT100/xtermエミュレーション、完全UTF-8サポート、複数の同時セッションに対応したインタラクティブ端末。</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>MOSH セッション</h3>
+            <p>ホストのターミナルを mosh で運びます。IP の変化、Wi-Fi からモバイル回線への切り替え、ポケットで眠っていた端末——どれでもセッションは残ります。mosh-server 1.4.0 で検証済み。実験的機能。ホストごとに有効にできます。</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

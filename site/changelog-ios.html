@@ -27,13 +27,15 @@
     <meta property="og:url"         content="https://sshborg.com/changelog-ios.html">
     <meta property="og:title"       content="SSHBorg – Changelog (iOS)">
     <meta property="og:description" content="Release history of SSHBorg for iOS: what changed in every version.">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="en_US">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – Changelog (iOS)">
     <meta name="twitter:description" content="Release history of SSHBorg for iOS: what changed in every version.">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -563,6 +565,24 @@
         <span class="tab tab-active" aria-current="page">iOS</span>
     </div>
 
+        <article class="release">
+            <h2>1.3.1<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh: fixes a fault that kept the processor busy for as long as a session was open, which could warm the device and drain the battery.</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.3.0<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh (experimental): a terminal that survives a change of network and the phone being put away. The screen lives on the server, so the same shell with the same programs still running in it is there when you come back. Turn it on per host — the server needs mosh-server installed and its UDP ports reachable.</li>
+                <li>Mosh through a bastion: a host whose first hop has Mosh on is reached the other way round — Mosh to that machine, then one ssh line from there — so the terminal sits where the network does not change.</li>
+                <li>The file editor no longer cuts a file short when a save is interrupted: the new version is written aside first, and the original stays on the server until it has been replaced. It also keeps the file's permissions exactly.</li>
+                <li>SFTP: file names sent by a server are checked before they are used, so a server cannot point the app outside the folder you are looking at.</li>
+                <li>Jump hosts: choosing them now starts from your own host list, with the typed form a tap away.</li>
+                <li>App lock with your own PIN or passphrase: a lock that needs neither Face ID nor the device passcode. Five wrong tries lock it for a while, longer each time — and a forgotten one cannot be recovered, so the app says so before you set it.</li>
+                <li>Security: when you approve a server's key, only that exact key is accepted from then on — for every machine in a jump-host chain, and for port forwarding too. A mosh-server command restored from a backup can no longer run anything but the program it names.</li>
+            </ul>
+        </article>
         <article class="release">
             <h2>1.2.0<span class="release-date">2026-10-20</span></h2>
             <ul>

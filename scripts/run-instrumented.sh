@@ -65,6 +65,18 @@ package=$(sed -n 's/.*applicationId = "\(.*\)".*/\1/p' app/build.gradle.kts)
 suffix=$(sed -n 's/.*applicationIdSuffix = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
 target="${package}${suffix}"
 
+# Which device, said rather than guessed. That machine sometimes has a real phone plugged into it
+# as well — once in recovery, and not ours to unplug — and adb then refuses every call with "more
+# than one device/emulator", which reads like a broken emulator. SSHBORG_SERIAL names one; without
+# it the first emulator wins, since that is what this script is for. The state is not checked here
+# so that an emulator still booting is handed to wait-for-device below instead of being called
+# missing.
+wake_if_asleep
+serial=${SSHBORG_SERIAL:-$(run "$adb devices" | awk '/^emulator-[0-9]+/ {print $1; exit}')}
+[ -n "$serial" ] || { echo "no emulator on $host (~/Documents/sshborg-emulator/start.sh <avd>)" >&2; exit 1; }
+adb="$adb -s $serial"
+echo "== device $serial"
+
 if [ -z "${SSHBORG_SKIP_INSTALL:-}" ]; then
 echo "== building"
 JAVA_HOME=${JAVA_HOME:-/home/payne/jdk21} ./gradlew -q assembleDebug assembleDebugAndroidTest
@@ -73,7 +85,6 @@ echo "== waiting for a device on $host"
 # Through `timeout`, because wait-for-device does not fail when there is nothing to wait for —
 # it blocks for ever, and the message below could never be reached. A run then looks slow rather
 # than broken, which is how a stopped emulator cost an afternoon once.
-wake_if_asleep
 run "timeout 180 $adb wait-for-device" || { echo "no device: is an emulator running there? (~/Documents/sshborg-emulator/start.sh <avd>)" >&2; exit 1; }
 
 echo "== copying and installing"

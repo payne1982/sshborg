@@ -32,6 +32,7 @@ class AppPreferences(private val context: Context) {
         val NIGHT_MODE                = intPreferencesKey("night_mode")
         val ALLOW_SCREENSHOTS         = booleanPreferencesKey("allow_screenshots")
         val SCROLLBACK_LINES          = intPreferencesKey("scrollback_lines")
+        val MOSH_SESSION_MINUTES      = intPreferencesKey("mosh_session_minutes")
         val TERMINAL_FONT_SIZE        = intPreferencesKey("terminal_font_size")
         val KEEP_SCREEN_ON            = booleanPreferencesKey("keep_screen_on")
         val TERMINAL_BAR_AUTO_HIDE    = booleanPreferencesKey("terminal_bar_auto_hide")
@@ -158,6 +159,21 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setScrollbackLines(lines: Int) {
         context.dataStore.edit { it[Keys.SCROLLBACK_LINES] = lines }
+    }
+
+    /**
+     * How long a mosh session survives with no contact, in minutes. Default and floor one hour.
+     *
+     * It is the figure the *server* is told; what the client waits is derived from it, five minutes
+     * shorter. [MoshPatience] holds both and says why.
+     */
+    val moshSessionMinutes: Flow<Int> =
+        context.dataStore.data.map {
+            MoshPatience.serverMinutes(it[Keys.MOSH_SESSION_MINUTES] ?: MoshPatience.DEFAULT_MINUTES)
+        }
+
+    suspend fun setMoshSessionMinutes(minutes: Int) {
+        context.dataStore.edit { it[Keys.MOSH_SESSION_MINUTES] = MoshPatience.serverMinutes(minutes) }
     }
 
     /** Default terminal font size in sp. 13sp ≈ the 36px the app used before this setting. */
@@ -407,6 +423,23 @@ class AppPreferences(private val context: Context) {
      * the backup. Otherwise restoring would be non-deterministic — it could only
      * ever reset the settings the user had already changed. Keep these defaults in
      * sync with the corresponding Flow getters above.
+     *
+     * **A new preference belongs here unless it is one of these three kinds**, and three of them
+     * were quietly missed for releases at a time before an audit found them. Saying what is left
+     * out, and why, is what makes the next audit a matter of reading rather than of guessing:
+     *
+     * - **the app lock** — [Keys.BIOMETRIC_LOCK], [Keys.LOCK_MODE], the `LOCK_SECRET_*` triple,
+     *   [Keys.LOCK_FAILED_ATTEMPTS], [Keys.LOCK_LOCKOUT_UNTIL]. The backup is a plain file the
+     *   person moves about: a PIN's hash and salt have no business in it, and restoring a lock —
+     *   or a lockout — onto a device whose owner cannot answer it would lock them out of their own
+     *   hosts. The lock is set up again where it is wanted. [Keys.LOCK_TIMEOUT_SECONDS] does
+     *   travel, since on its own it unlocks nothing;
+     * - **what is bound to this device** — [Keys.KEYSTORE_ENCRYPTION], because the Keystore key it
+     *   names cannot leave the phone it was made on, so the flag would arrive pointing at nothing;
+     * - **answers the person has given once** — [Keys.ROOT_WARNING_ACKNOWLEDGED],
+     *   [Keys.SECURITY_REMINDER_DISMISSED], [Keys.PRIVACY_POLICY_ACCEPTED]. A warning dismissed on
+     *   one phone was not read on the next one, and a privacy policy accepted is an act, not a
+     *   setting.
      */
     suspend fun exportSettingsJson(): JSONObject {
         val p = context.dataStore.data.first()
@@ -417,8 +450,12 @@ class AppPreferences(private val context: Context) {
             put("night_mode",             p[Keys.NIGHT_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             put("allow_screenshots",      p[Keys.ALLOW_SCREENSHOTS] ?: false)
             put("scrollback_lines",       p[Keys.SCROLLBACK_LINES] ?: 2000)
+            put("mosh_session_minutes",   p[Keys.MOSH_SESSION_MINUTES] ?: MoshPatience.DEFAULT_MINUTES)
             put("terminal_font_size",     p[Keys.TERMINAL_FONT_SIZE] ?: DEFAULT_TERMINAL_FONT_SIZE)
             put("keep_screen_on",         p[Keys.KEEP_SCREEN_ON] ?: false)
+            put("terminal_bar_auto_hide", p[Keys.TERMINAL_BAR_AUTO_HIDE] ?: true)
+            put("terminal_hide_status_bar", p[Keys.TERMINAL_HIDE_STATUS_BAR] ?: false)
+            put("sftp_sort_dirs_first",   p[Keys.SFTP_SORT_DIRS_FIRST] ?: true)
             put("terminal_color_scheme",  p[Keys.TERMINAL_COLOR_SCHEME] ?: TERMINAL_SCHEME_DARK)
             put("history_suggestions",    p[Keys.HISTORY_SUGGESTIONS] ?: true)
             put("suggestions_bar_sticky", p[Keys.SUGGESTIONS_BAR_STICKY] ?: false)
@@ -441,8 +478,12 @@ class AppPreferences(private val context: Context) {
             if (obj.has("night_mode"))             p[Keys.NIGHT_MODE] = obj.getInt("night_mode")
             if (obj.has("allow_screenshots"))      p[Keys.ALLOW_SCREENSHOTS] = obj.getBoolean("allow_screenshots")
             if (obj.has("scrollback_lines"))       p[Keys.SCROLLBACK_LINES] = saneScrollback(obj.getInt("scrollback_lines"))
+            if (obj.has("mosh_session_minutes"))   p[Keys.MOSH_SESSION_MINUTES] = MoshPatience.serverMinutes(obj.getInt("mosh_session_minutes"))
             if (obj.has("terminal_font_size"))     p[Keys.TERMINAL_FONT_SIZE] = obj.getInt("terminal_font_size").coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)
             if (obj.has("keep_screen_on"))         p[Keys.KEEP_SCREEN_ON] = obj.getBoolean("keep_screen_on")
+            if (obj.has("terminal_bar_auto_hide")) p[Keys.TERMINAL_BAR_AUTO_HIDE] = obj.getBoolean("terminal_bar_auto_hide")
+            if (obj.has("terminal_hide_status_bar")) p[Keys.TERMINAL_HIDE_STATUS_BAR] = obj.getBoolean("terminal_hide_status_bar")
+            if (obj.has("sftp_sort_dirs_first"))   p[Keys.SFTP_SORT_DIRS_FIRST] = obj.getBoolean("sftp_sort_dirs_first")
             if (obj.has("terminal_color_scheme"))  p[Keys.TERMINAL_COLOR_SCHEME] = obj.getInt("terminal_color_scheme").coerceIn(TERMINAL_SCHEME_DARK, TERMINAL_SCHEME_FOLLOW_APP)
             if (obj.has("history_suggestions"))    p[Keys.HISTORY_SUGGESTIONS] = obj.getBoolean("history_suggestions")
             if (obj.has("suggestions_bar_sticky")) p[Keys.SUGGESTIONS_BAR_STICKY] = obj.getBoolean("suggestions_bar_sticky")

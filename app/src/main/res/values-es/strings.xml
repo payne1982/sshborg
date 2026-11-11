@@ -88,6 +88,22 @@
     <string name="host_menu_resume_files">Reanudar archivos (%1$d)</string>
     <string name="host_menu_new_files_session">Nueva sesión de archivos</string>
 
+    <string name="host_last_connected">Última conexión: %1$s</string>
+    <string name="host_last_just_now">ahora mismo</string>
+    <string name="host_last_yesterday">ayer</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">hace 1 minuto</item>
+        <item quantity="other">hace %d minutos</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">hace 1 hora</item>
+        <item quantity="other">hace %d horas</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">hace 1 día</item>
+        <item quantity="other">hace %d días</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — sesiones de %2$s</string>
     <string name="session_picker_session_label">Sesión %1$d</string>
     <string name="session_picker_new_session">Nueva sesión de %1$s</string>
@@ -212,6 +228,13 @@
     <string name="settings_font_size_subtitle">Tamaño de texto predeterminado del terminal (sp); pellizca para hacer zoom en la sesión</string>
     <string name="settings_scrollback_title">Líneas de scrollback</string>
     <string name="settings_scrollback_subtitle">Líneas del historial del terminal mantenidas en memoria</string>
+
+    <string name="settings_mosh_patience_title">Tiempo de espera de la sesión mosh</string>
+    <string name="settings_mosh_patience_subtitle">Lado servidor y cliente</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Sugerencias del historial de comandos</string>
     <string name="settings_history_suggestions_subtitle">Mostrar sugerencias del historial de shell del servidor mientras se escribe en el terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barra de sugerencias siempre visible</string>

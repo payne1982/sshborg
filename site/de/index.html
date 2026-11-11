@@ -28,13 +28,15 @@
     <meta property="og:url"         content="https://sshborg.com/de/">
     <meta property="og:title"       content="SSHBorg – SSH- &amp; SFTP-Client für Android und iOS">
     <meta property="og:description" content="SSHBorg ist ein leistungsstarker SSH- und SFTP-Client für Android, iPhone und iPad. Verwalte deine Server sicher vom Smartphone aus – mit Schlüssel-Authentifizierung, verschlüsseltem Speicher und biometrischer Sperre.">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="de_DE">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – SSH- &amp; SFTP-Client für Android und iOS">
     <meta name="twitter:description" content="SSHBorg ist ein leistungsstarker SSH- und SFTP-Client für Android, iPhone und iPad. Verwalte deine Server sicher vom Smartphone aus – mit Schlüssel-Authentifizierung, verschlüsseltem Speicher und biometrischer Sperre.">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -455,6 +457,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -731,7 +740,7 @@
         <span class="badge badge-green">&#10003; Kein Tracking</span>
         <span class="badge badge-green">&#10003; Keine Cloud</span>
         <span class="badge badge-blue">Kostenlos</span>
-        <span class="badge badge-blue">Android 10+</span>
+        <span class="badge badge-blue">Android 9+</span>
         <span class="badge badge-blue">iOS 16+</span>
     </div>
     <div class="cta-wrap">
@@ -801,6 +810,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>VOLLES SSH-TERMINAL</h3>
             <p>Interaktives Terminal mit VT100/xterm-Emulation, vollständiger UTF-8-Unterstützung und mehreren gleichzeitigen Sitzungen.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>MOSH-SITZUNGEN</h3>
+            <p>Das Terminal eines Hosts über mosh führen: die Sitzung übersteht einen IP-Wechsel, den Übergang von WLAN zu Mobilfunk und ein Telefon, das in der Tasche geschlafen hat. Getestet mit mosh-server 1.4.0. Experimentell, pro Host einschaltbar.</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

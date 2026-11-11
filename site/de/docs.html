@@ -27,13 +27,15 @@
     <meta property="og:url"         content="https://sshborg.com/de/docs.html">
     <meta property="og:title"       content="SSHBorg – Benutzerhandbuch">
     <meta property="og:description" content="SSHBorg-Benutzerhandbuch für Android und iOS: SSH-Schlüssel, Jump-Hosts, Agent-Forwarding, Befehlsvorschläge, tmux und mehr.">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="de_DE">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – Benutzerhandbuch">
     <meta name="twitter:description" content="SSHBorg-Benutzerhandbuch für Android und iOS: SSH-Schlüssel, Jump-Hosts, Agent-Forwarding, Befehlsvorschläge, tmux und mehr.">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -943,8 +945,13 @@ screen -r work</code></pre>
             <p>Öffnen Sie den Host-Editor und schalten Sie <strong>Mosh</strong> ein; es steht bei den Verbindungsschaltern, direkt über seinen eigenen drei Einstellungen. Es gilt pro Host und ist standardmäßig aus: für Hosts, die Sie so lassen, ändert sich nichts. Als experimentell ist es markiert, weil es neu ist, nicht weil es unfertig wäre.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// AKKU</div>
-                Eine Mosh-Sitzung sendet etwa alle drei Sekunden ein kleines Paket, solange sie offen ist — genau dadurch bemerkt sie einen Netzwechsel sofort. Das ist mehr Funk als eine gewöhnliche SSH-Sitzung braucht, und auf einem Telefon kostet es Akku. Für Hosts, wo Sie es nicht brauchen, lassen Sie es aus.
+                Eine Mosh-Sitzung sendet etwa alle drei Sekunden ein kleines Paket, solange der Server antwortet — genau dadurch bemerkt sie einen Netzwechsel sofort. Das ist mehr Funk als eine gewöhnliche SSH-Sitzung braucht, und auf einem Telefon kostet es Akku. Solange kein Kontakt besteht, werden diese Pakete von selbst seltener, ein Ausfall kostet also nicht so viel wie ein Gespräch. Für Hosts, wo Sie es nicht brauchen, lassen Sie es aus.
             </div>
+            <h3>Wie lange eine Sitzung ohne Kontakt überlebt</h3>
+            <p>Eine Mosh-Sitzung stirbt nicht, wenn das Telefon das Netz verliert: sie bleibt, wo sie ist — auf dem Server — und macht weiter, sobald das Telefon zurück ist. Wie lange sie wartet, entscheiden Sie unter <strong>Einstellungen → Timeout der Mosh-Sitzung</strong>: von einer Stunde, dem Standard, bis zu einem Tag.</p>
+            <p>Der Wert gehört dem <strong>Server</strong>: so lange hält <code>mosh-server</code> die Sitzung und die Shell darin am Leben, nachdem er dieses Telefon nicht mehr hört. Die App gibt fünf Minuten früher auf, denn länger als der Server zu warten heißt, auf eine Sitzung zu hoffen, die es nicht mehr gibt.</p>
+            <p>Der Preis eines langen Werts ist nicht der Akku, sondern der Server: eine vergessene Sitzung hält einen <code>mosh-server</code> und seine Shell — mitsamt dem, was darin lief — die ganze Zeit offen. Eine Stunde ist die vorsichtige Wahl; erhöhen Sie sie, wenn Sie abends das Telefon zuklappen und die Sitzung morgens wiederfinden wollen, im Wissen, worauf Sie sich damit einlassen.</p>
+            <p>Solange der Kontakt fehlt, werden die Lebenszeichen von selbst seltener — von drei Sekunden bis auf eines pro Minute, je länger die Stille dauert — damit eine Sitzung, die Stunden dauern darf, nicht Stunden Funk kostet. Tippen Sie etwas, beginnen sie sofort wieder: die Rückkehr wartet nicht auf die Verlangsamung.</p>
             <h3>Was im Terminal anders ist</h3>
             <p><strong>Der Verlauf beginnt leer.</strong> Über SSH geht alles, was der Server je ausgegeben hat, durch Ihr Telefon und kann deshalb vollständig aufbewahrt werden. Über mosh wird nur der Bildschirm übertragen, also füllt sich der Verlauf mit den Zeilen, die wirklich oben hinausscrollen — und ein Programm, das den Bildschirm neu zeichnet, ohne zu scrollen, lässt nichts zurück. Die Wischgeste funktioniert weiterhin; über einer frischen Sitzung gibt es nur weniger zu finden.</p>
             <p><strong>Tippen wird nicht schneller.</strong> Mosh ist für sein sofortiges lokales Echo bekannt, das SSHBorg noch nicht hat: ein Tastendruck geht nach wie vor zum Server und zurück. Auf einem Telefon im selben Netz gemessen ist Tippen über mosh etwa so schnell wie über SSH. Der Gewinn ist, dass die Sitzung nicht stirbt.</p>
@@ -1084,7 +1091,7 @@ Host target
             <p>SSHBorg kann Host-Konfigurationen und App-Einstellungen als JSON-Datei exportieren und importieren. Das ermöglicht es, die Serverliste auf ein anderes Gerät zu übertragen oder ein portables Backup der eigenen Einrichtung aufzubewahren.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// WICHTIG</div>
-                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — das Schlüsselmaterial muss auf einem neuen Gerät neu eingerichtet werden. Das Backup speichert jedoch den <em>Namen</em> des von jedem Host verwendeten Schlüssels: Wenn du vor dem Import einen Schlüssel mit demselben Namen neu erstellst, werden seine Hosts automatisch wieder damit verknüpft.
+                Das Backup enthält Host-Konfigurationen und App-Einstellungen (Terminal, Darstellung, Verhalten). <strong>Passwörter und SSH-Schlüssel werden niemals exportiert</strong> — das Schlüsselmaterial muss auf einem neuen Gerät neu eingerichtet werden. Das Backup speichert jedoch den <em>Namen</em> des von jedem Host verwendeten Schlüssels: Wenn du vor dem Import einen Schlüssel mit demselben Namen neu erstellst, werden seine Hosts automatisch wieder damit verknüpft. Auch die App-Sperre reist nicht mit: PIN oder Passphrase und die biometrische Einstellung werden auf dem neuen Gerät neu eingerichtet.
             </div>
             <h3>Exportieren</h3>
             <p>Gehe zu <strong>Einstellungen → Backup → Backup exportieren</strong>. Wähle über den Systemdatei-Auswähler aus, wo die Datei gespeichert werden soll. Die Datei heißt standardmäßig <code>sshborg_backup.json</code> (unter iOS <code>sshborg-backup-</code><em>Datum</em><code>.json</code>).</p>
@@ -1101,7 +1108,7 @@ Host target
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produktion", "color": -1754827, "position": 0 }
@@ -1121,6 +1128,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1151,6 +1162,10 @@ Host target
                 <li><code>sftpStartDir</code> — Pfad, der verwendet wird, wenn <code>sftpStartMode</code> <code>"fixed"</code> ist.</li>
                 <li><code>sftpShowHidden</code> — <code>true</code>, um versteckte Dateien (Dotfiles, Namen mit "." am Anfang) im SFTP-Browser dieses Hosts anzuzeigen. Standard <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code>, um die oben beschriebenen Legacy-Algorithmen zu aktivieren. Standard: <code>false</code>.</li>
+                <li><code>mosh</code> — <code>true</code>, um das Terminal dieses Hosts über mosh zu führen. Benötigt <code>mosh-server</code> auf dem Server. Standard: <code>false</code>.</li>
+                <li><code>moshFamily</code> — über welche Adressfamilie die Sitzung aufgebaut wird: <code>"auto"</code>, <code>"ipv4"</code> oder <code>"ipv6"</code>. Eine Sitzung bleibt bei der Familie, in der sie entstanden ist; dieses Feld ist es also, das sie Ihnen zwischen Netzen folgen lässt. Standard: <code>"auto"</code>.</li>
+                <li><code>moshPorts</code> — die UDP-Ports, aus denen <code>mosh-server</code> wählen darf, als <code>60001-60999</code> oder als einzelner Port. Ohne Angabe nimmt mosh seinen eigenen Bereich von tausend.</li>
+                <li><code>moshCommand</code> — was auf dem Server auszuführen ist, wenn <code>mosh-server</code> nicht das ist, was eine nicht-interaktive Shell im PATH findet.</li>
                 <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
                 <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>

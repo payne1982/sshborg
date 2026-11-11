@@ -90,6 +90,19 @@
     <string name="host_menu_resume_files">恢复文件会话（%1$d）</string>
     <string name="host_menu_new_files_session">新建文件会话</string>
 
+    <string name="host_last_connected">上次连接：%1$s</string>
+    <string name="host_last_just_now">刚刚</string>
+    <string name="host_last_yesterday">昨天</string>
+    <plurals name="host_last_minutes">
+        <item quantity="other">%d 分钟前</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="other">%d 小时前</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="other">%d 天前</item>
+    </plurals>
+
     <!-- Session picker bottom sheet -->
     <string name="session_picker_title">%1$s — %2$s 个会话</string>
     <string name="session_picker_session_label">会话 %1$d</string>
@@ -221,6 +234,12 @@
     <string name="settings_font_size_subtitle">终端默认文字大小（sp）；会话中可双指缩放</string>
     <string name="settings_scrollback_title">滚动回看行数</string>
     <string name="settings_scrollback_subtitle">终端历史记录在内存中保留的行数</string>
+
+    <string name="settings_mosh_patience_title">mosh 会话超时</string>
+    <string name="settings_mosh_patience_subtitle">服务器端与客户端</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="other">%d 小时</item>
+    </plurals>
     <string name="settings_history_suggestions_title">命令历史建议</string>
     <string name="settings_history_suggestions_subtitle">在终端输入时显示服务器 shell 历史记录中的建议</string>
     <string name="settings_suggestions_bar_sticky_title">始终显示建议栏</string>

@@ -1,0 +1,5 @@
+• Die Hostliste zeigt jetzt, wann Sie sich zuletzt mit jedem Host verbunden haben.
+• Eine mosh-Sitzung übersteht den Verlust des Netzes so lange, wie Sie wählen, bis zu einem Tag, und verbraucht ohne Kontakt weniger Akku.
+• Das Backup enthält jetzt drei Terminal- und SFTP-Einstellungen, die ihm fehlten.
+• Die Tastatur bleibt nicht mehr über dem PIN-Sperrbildschirm stehen.
+• Bibliotheken von Drittanbietern aktualisiert, mit Härtung der SSH- und Dateiübertragung.

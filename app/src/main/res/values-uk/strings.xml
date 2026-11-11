@@ -88,6 +88,28 @@
     <string name="host_menu_resume_files">Відновити файли (%1$d)</string>
     <string name="host_menu_new_files_session">Нова файлова сесія</string>
 
+    <string name="host_last_connected">Останнє підключення: %1$s</string>
+    <string name="host_last_just_now">щойно</string>
+    <string name="host_last_yesterday">вчора</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">%d хвилину тому</item>
+        <item quantity="few">%d хвилини тому</item>
+        <item quantity="many">%d хвилин тому</item>
+        <item quantity="other">%d хвилин тому</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">%d годину тому</item>
+        <item quantity="few">%d години тому</item>
+        <item quantity="many">%d годин тому</item>
+        <item quantity="other">%d годин тому</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">%d день тому</item>
+        <item quantity="few">%d дні тому</item>
+        <item quantity="many">%d днів тому</item>
+        <item quantity="other">%d днів тому</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — сесії %2$s</string>
     <string name="session_picker_session_label">Сесія %1$d</string>
     <string name="session_picker_new_session">Нова сесія %1$s</string>
@@ -212,6 +234,15 @@
     <string name="settings_font_size_subtitle">Типовий розмір тексту термінала (sp); жест масштабування діє в сеансі</string>
     <string name="settings_scrollback_title">Рядки прокрутки</string>
     <string name="settings_scrollback_subtitle">Рядки історії терміналу, що зберігаються в пам\'яті</string>
+
+    <string name="settings_mosh_patience_title">Час очікування сесії mosh</string>
+    <string name="settings_mosh_patience_subtitle">На боці сервера й клієнта</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">%d година</item>
+        <item quantity="few">%d години</item>
+        <item quantity="many">%d годин</item>
+        <item quantity="other">%d годин</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Підказки з історії команд</string>
     <string name="settings_history_suggestions_subtitle">Показувати підказки з історії shell сервера під час введення в терміналі</string>
     <string name="settings_suggestions_bar_sticky_title">Панель підказок завжди видима</string>

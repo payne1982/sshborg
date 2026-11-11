@@ -17,13 +17,15 @@
     <meta property="og:url"         content="{{CANONICAL_URL}}">
     <meta property="og:title"       content="{{page_title}}">
     <meta property="og:description" content="{{meta_description}}">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="{{OG_LOCALE}}">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="{{page_title}}">
     <meta name="twitter:description" content="{{meta_description}}">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -444,6 +446,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -777,6 +786,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>{{feat_terminal_title}}</h3>
             <p>{{feat_terminal_desc}}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>{{feat_mosh_title}}</h3>
+            <p>{{feat_mosh_desc}}</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">{{feat_mosh_badge}}</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

@@ -91,6 +91,23 @@
     <string name="host_menu_resume_files">Resume files (%1$d)</string>
     <string name="host_menu_new_files_session">New files session</string>
 
+    <!-- The "last connected" line under a host row -->
+    <string name="host_last_connected">Last connected: %1$s</string>
+    <string name="host_last_just_now">just now</string>
+    <string name="host_last_yesterday">yesterday</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">1 minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">1 hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">1 day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+
     <!-- Session picker bottom sheet -->
     <string name="session_picker_title">%1$s — %2$s sessions</string>
     <string name="session_picker_session_label">Session %1$d</string>
@@ -222,6 +239,14 @@
     <string name="settings_font_size_subtitle">Default terminal text size (sp); pinch to zoom in a session</string>
     <string name="settings_scrollback_title">Scrollback lines</string>
     <string name="settings_scrollback_subtitle">Lines of terminal history kept in memory</string>
+
+    <!-- How long a mosh session outlives its network -->
+    <string name="settings_mosh_patience_title">Mosh session timeout</string>
+    <string name="settings_mosh_patience_subtitle">Server and client side</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Command history suggestions</string>
     <string name="settings_history_suggestions_subtitle">Show suggestions from the server shell history while typing in the terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Always-visible suggestion bar</string>

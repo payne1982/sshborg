@@ -1,5 +1,8 @@
 package com.sshborg
 
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.LocalView
+import com.sshborg.ui.common.hideKeyboard
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -97,6 +100,28 @@ class MainActivity : AppCompatActivity() {
                 Box(Modifier.fillMaxSize()) {
                     AppNavigation()
                     // Opaque lock gate on top of (and preserving) the live app content.
+                    // A gate is drawn over the app, not instead of it, so a keyboard that was up
+                    // when the user left is still up when they come back — over the PIN pad, with
+                    // its suggestion strip, and with the screen underneath still holding the
+                    // input connection. It is put away here, for every screen at once, rather
+                    // than by each screen guessing that it has been covered.
+                    //
+                    // Twice, and that is the point: once as the gate arrives, and again whenever
+                    // the window takes focus back, because the system restores the IME together
+                    // with window focus. A single hide at composition time loses that race and
+                    // the keyboard reappears a moment later, which is what this looked like.
+                    //
+                    // The passphrase gate is the exception: its field asks for the keyboard
+                    // itself, and it is the only lock screen where typing is the way in.
+                    val gateNow = gate.value
+                    val gateWantsTyping =
+                        gateNow is Gate.Secret && gateNow.kind == AppLockManager.Kind.PASSPHRASE
+                    val windowFocused = LocalWindowInfo.current.isWindowFocused
+                    val rootView = LocalView.current
+                    LaunchedEffect(gateNow, gateWantsTyping, windowFocused) {
+                        if (gateNow != null && !gateWantsTyping) hideKeyboard(rootView)
+                    }
+
                     when (val g = gate.value) {
                         is Gate.Secret -> {
                             val app = application as SshBorgApp

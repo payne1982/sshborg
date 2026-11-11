@@ -138,6 +138,61 @@ class MoshTransportTest {
         assertEquals(1, transport.tick(7_000).size)
     }
 
+    @Test fun `the heartbeat backs off while nothing answers`() {
+        handshake()                                  // last heard at 1_050
+        // Drive the loop the way the socket loop does — sleep until nextWakeup, tick there — and
+        // write down when a datagram actually leaves. Nothing answers for the whole run.
+        val gaps = ArrayList<Long>()
+        var last = 1_000L                            // the handshake's own tick was the last send
+        while (last - 1_000L <= 60 * 60_000L && gaps.size < 500) {
+            val now = transport.nextWakeup()
+            if (transport.tick(now).isNotEmpty()) {
+                gaps.add(now - last)
+                last = now
+            }
+        }
+
+        assertEquals("the first probes are still mosh's three seconds",
+            listOf(MoshTransport.ACK_INTERVAL, MoshTransport.ACK_INTERVAL, MoshTransport.ACK_INTERVAL),
+            gaps.take(3))
+        assertEquals("it never speeds up again on its own", gaps.sorted(), gaps)
+        assertEquals("and it stops growing at the ceiling",
+            MoshTransport.MAX_ACK_INTERVAL, gaps.last())
+        // The number that matters, and the reason a session may now be told to last a whole day:
+        // an hour of silence costs 86 packets where a flat three seconds costs 1200.
+        assertEquals("an hour of silence, in packets", 86, gaps.size)
+    }
+
+    @Test fun `typing after an outage puts the probe back to three seconds`() {
+        handshake()
+        var last = 1_050L
+        repeat(60) {
+            val now = transport.nextWakeup()
+            if (transport.tick(now).isNotEmpty()) last = now
+        }
+        // Backed off to the ceiling by now, with the network still gone.
+        assertEquals(last + MoshTransport.MAX_ACK_INTERVAL, transport.nextWakeup())
+
+        // Somebody picks the phone up and types. The tick that follows a keystroke is part of the
+        // contract — the loop ticks after every event — and from there the keystroke leaves at the
+        // frame rate rather than waiting out the backed-off heartbeat.
+        val typedAt = last + 1_000
+        transport.type("x".toByteArray())
+        assertTrue("the tick after a keystroke carries nothing yet", transport.tick(typedAt).isEmpty())
+        assertTrue("but it schedules the send at once, not a minute out",
+            transport.nextWakeup() <= typedAt + MoshTransport.ACK_INTERVAL)
+        var sentAt = -1L
+        repeat(10) {
+            if (sentAt < 0) {
+                val now = maxOf(transport.nextWakeup(), typedAt)
+                if (transport.tick(now).isNotEmpty()) sentAt = now
+            }
+        }
+        assertTrue("the typed state left the phone", sentAt > 0)
+        assertEquals("and the next probe is back at three seconds",
+            sentAt + MoshTransport.ACK_INTERVAL, transport.nextWakeup())
+    }
+
     @Test fun `the wakeup time is when something is actually due`() {
         transport.tick(1_000)
         assertEquals(4_000L, transport.nextWakeup())

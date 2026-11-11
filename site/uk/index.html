@@ -28,13 +28,15 @@
     <meta property="og:url"         content="https://sshborg.com/uk/">
     <meta property="og:title"       content="SSHBorg – SSH та SFTP клієнт для Android та iOS">
     <meta property="og:description" content="SSHBorg — потужний SSH та SFTP клієнт для Android, iPhone та iPad. Керуйте своїми серверами безпечно з телефону за допомогою автентифікації за ключем, зашифрованого сховища та біометричного блокування.">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="uk_UA">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – SSH та SFTP клієнт для Android та iOS">
     <meta name="twitter:description" content="SSHBorg — потужний SSH та SFTP клієнт для Android, iPhone та iPad. Керуйте своїми серверами безпечно з телефону за допомогою автентифікації за ключем, зашифрованого сховища та біометричного блокування.">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -455,6 +457,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -731,7 +740,7 @@
         <span class="badge badge-green">&#10003; Без стеження</span>
         <span class="badge badge-green">&#10003; Без хмари</span>
         <span class="badge badge-blue">Безкоштовно</span>
-        <span class="badge badge-blue">Android 10+</span>
+        <span class="badge badge-blue">Android 9+</span>
         <span class="badge badge-blue">iOS 16+</span>
     </div>
     <div class="cta-wrap">
@@ -801,6 +810,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>ПОВНИЙ SSH ТЕРМІНАЛ</h3>
             <p>Інтерактивний термінал з емуляцією VT100/xterm, повною підтримкою UTF-8 та кількома одночасними сесіями.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>СЕСІЇ MOSH</h3>
+            <p>Термінал хоста їде через mosh: сесія витримує зміну IP, перехід із Wi-Fi на мобільну мережу та телефон, що спав у кишені. Перевірено з mosh-server 1.4.0. Експериментально, увімкнете для окремого хоста.</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

@@ -14,8 +14,8 @@ android {
         applicationId = "com.sshborg"
         minSdk = 28
         targetSdk = 36
-        versionCode = 39
-        versionName = "1.21.0"
+        versionCode = 40
+        versionName = "1.22.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -97,7 +97,15 @@ dependencies {
         // everything resolves to 1.9.0). The pin that trapped us was the `strictly` in
         // kotlinx-serialization's own BOM. Delete this whole block once navigation asks for
         // 1.8.1 or later by itself.
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+        //
+        // It says **core**, and it used to say `-json`, which is the trap this is a note about: a
+        // constraint only does something while the module it names is in the graph at all. After a
+        // dependency update in 2026-11 nothing asked for `-json` any more — only `-core`, through
+        // the 1.7.3 BOM — so the floor silently stopped applying, consistent resolution copied
+        // 1.7.3 into the instrumented tests, and `MigrationTest` died with exactly the
+        // AbstractMethodError described above. `-core` is the module Room's generated serializers
+        // actually need, and the one every other serialization artefact depends on.
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core") {
             version { require("1.8.1") }
         }
     }

@@ -88,6 +88,22 @@
     <string name="host_menu_resume_files">Reprendre les fichiers (%1$d)</string>
     <string name="host_menu_new_files_session">Nouvelle session fichiers</string>
 
+    <string name="host_last_connected">Dernière connexion : %1$s</string>
+    <string name="host_last_just_now">à l\'instant</string>
+    <string name="host_last_yesterday">hier</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">il y a 1 minute</item>
+        <item quantity="other">il y a %d minutes</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">il y a 1 heure</item>
+        <item quantity="other">il y a %d heures</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">il y a 1 jour</item>
+        <item quantity="other">il y a %d jours</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — sessions %2$s</string>
     <string name="session_picker_session_label">Session %1$d</string>
     <string name="session_picker_new_session">Nouvelle session %1$s</string>
@@ -212,6 +228,13 @@
     <string name="settings_font_size_subtitle">Taille par défaut du texte du terminal (sp) ; pincez pour zoomer dans la session</string>
     <string name="settings_scrollback_title">Lignes de défilement</string>
     <string name="settings_scrollback_subtitle">Lignes d\'historique du terminal conservées en mémoire</string>
+
+    <string name="settings_mosh_patience_title">Délai d\'expiration de la session mosh</string>
+    <string name="settings_mosh_patience_subtitle">Côté serveur et client</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 heure</item>
+        <item quantity="other">%d heures</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Suggestions de l\'historique des commandes</string>
     <string name="settings_history_suggestions_subtitle">Afficher des suggestions tirées de l\'historique shell du serveur lors de la saisie dans le terminal</string>
     <string name="settings_suggestions_bar_sticky_title">Barre de suggestions toujours visible</string>

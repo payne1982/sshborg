@@ -28,13 +28,15 @@
     <meta property="og:url"         content="https://sshborg.com/zh/">
     <meta property="og:title"       content="SSHBorg – Android 与 iOS 的 SSH & SFTP 客户端">
     <meta property="og:description" content="SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="zh_CN">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – Android 与 iOS 的 SSH & SFTP 客户端">
     <meta name="twitter:description" content="SSHBorg 是一款功能强大的 SSH 和 SFTP 客户端，支持 Android、iPhone 和 iPad。使用密钥认证、加密存储和生物识别锁，安全地从手机管理您的服务器。">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -455,6 +457,13 @@
             color: var(--muted);
             line-height: 1.55;
         }
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feature-badges a:hover { text-shadow: 0 0 8px var(--neon-blue); }
 
         /* ── Security block ──────────────────────────────────── */
         .security-block {
@@ -731,7 +740,7 @@
         <span class="badge badge-green">&#10003; 无跟踪</span>
         <span class="badge badge-green">&#10003; 无云端</span>
         <span class="badge badge-blue">免费</span>
-        <span class="badge badge-blue">Android 10+</span>
+        <span class="badge badge-blue">Android 9+</span>
         <span class="badge badge-blue">iOS 16+</span>
     </div>
     <div class="cta-wrap">
@@ -801,6 +810,15 @@
             <div class="feature-icon">&#128187;</div>
             <h3>完整 SSH 终端</h3>
             <p>支持 VT100/xterm 仿真、完整 UTF-8 和多个并发会话的交互式终端。</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">&#128225;</div>
+            <h3>MOSH 会话</h3>
+            <p>让主机的终端走 mosh：IP 变化、从 Wi-Fi 切到移动网络、手机在口袋里睡了一觉，会话都不会断。已对 mosh-server 1.4.0 验证。实验性，按主机单独开启。</p>
+            <div class="feature-badges">
+                <a href="docs.html#mosh"><span class="badge badge-blue">Mosh 1.4.0</span></a>
+            </div>
         </div>
 
         <div class="feature-card">

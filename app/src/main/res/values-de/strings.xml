@@ -88,6 +88,22 @@
     <string name="host_menu_resume_files">Dateien fortsetzen (%1$d)</string>
     <string name="host_menu_new_files_session">Neue Dateisitzung</string>
 
+    <string name="host_last_connected">Letzte Verbindung: %1$s</string>
+    <string name="host_last_just_now">gerade eben</string>
+    <string name="host_last_yesterday">gestern</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">vor 1 Minute</item>
+        <item quantity="other">vor %d Minuten</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">vor 1 Stunde</item>
+        <item quantity="other">vor %d Stunden</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">vor 1 Tag</item>
+        <item quantity="other">vor %d Tagen</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — %2$s-Sitzungen</string>
     <string name="session_picker_session_label">Sitzung %1$d</string>
     <string name="session_picker_new_session">Neue %1$s-Sitzung</string>
@@ -212,6 +228,13 @@
     <string name="settings_font_size_subtitle">Standard-Textgröße des Terminals (sp); Zoomen per Fingergeste in der Sitzung</string>
     <string name="settings_scrollback_title">Scrollback-Zeilen</string>
     <string name="settings_scrollback_subtitle">Im Speicher gehaltene Zeilen der Terminal-Historie</string>
+
+    <string name="settings_mosh_patience_title">Timeout der Mosh-Sitzung</string>
+    <string name="settings_mosh_patience_subtitle">Server- und clientseitig</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 Stunde</item>
+        <item quantity="other">%d Stunden</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Befehlshistorie-Vorschläge</string>
     <string name="settings_history_suggestions_subtitle">Vorschläge aus der Shell-Historie des Servers beim Tippen im Terminal anzeigen</string>
     <string name="settings_suggestions_bar_sticky_title">Vorschlagsleiste immer sichtbar</string>

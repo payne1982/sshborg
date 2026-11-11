@@ -1,0 +1,5 @@
+• The host list now shows when you last connected to each host.
+• A mosh session can outlive a lost network for as long as you choose, up to a day, and costs less battery while out of contact.
+• The backup now carries three terminal and SFTP settings it had been missing.
+• The keyboard no longer stays up over the PIN lock screen.
+• Updated third-party libraries, including hardening of the SSH and file-transfer layer.

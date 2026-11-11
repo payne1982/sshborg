@@ -1,0 +1,5 @@
+• La lista de hosts muestra ahora cuándo te conectaste por última vez a cada uno.
+• Una sesión mosh sobrevive a la pérdida de red el tiempo que elijas, hasta un día, y consume menos batería mientras no hay contacto.
+• La copia de seguridad incluye ahora tres ajustes de terminal y SFTP que le faltaban.
+• El teclado ya no se queda abierto sobre la pantalla de bloqueo con PIN.
+• Actualizadas las bibliotecas de terceros, con refuerzo de SSH y de las transferencias.

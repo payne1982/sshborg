@@ -9,6 +9,7 @@ import com.sshborg.R
 import androidx.lifecycle.viewModelScope
 import com.sshborg.SshBorgApp
 import com.sshborg.data.AppPreferences
+import com.sshborg.data.MoshPatience
 import com.sshborg.data.ExtraBar
 import com.sshborg.data.ExtraBarPresets
 import com.sshborg.data.KeystoreManager
@@ -54,6 +55,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     val scrollbackLines: StateFlow<Int> =
         prefs.scrollbackLines.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 2000)
+
+    val moshSessionMinutes: StateFlow<Int> =
+        prefs.moshSessionMinutes.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000), MoshPatience.DEFAULT_MINUTES)
 
     val terminalFontSize: StateFlow<Int> =
         prefs.terminalFontSize.stateIn(
@@ -193,6 +198,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setScrollbackLines(lines) }
     }
 
+    fun setMoshSessionMinutes(minutes: Int) {
+        viewModelScope.launch { prefs.setMoshSessionMinutes(minutes) }
+    }
+
     fun setTerminalFontSize(sp: Int) {
         viewModelScope.launch { prefs.setTerminalFontSize(sp) }
     }
@@ -306,7 +315,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 9)
+                    put("version", 10)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)

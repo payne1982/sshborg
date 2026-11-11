@@ -27,13 +27,15 @@
     <meta property="og:url"         content="https://sshborg.com/ru/changelog-ios.html">
     <meta property="og:title"       content="SSHBorg – история версий (iOS)">
     <meta property="og:description" content="История версий SSHBorg для iOS: что изменилось в каждой версии.">
-    <meta property="og:image"       content="https://sshborg.com/logo.png">
+    <meta property="og:image"       content="https://sshborg.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
     <meta property="og:locale"      content="ru_RU">
     <!-- Twitter Card -->
-    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:title"       content="SSHBorg – история версий (iOS)">
     <meta name="twitter:description" content="История версий SSHBorg для iOS: что изменилось в каждой версии.">
-    <meta name="twitter:image"       content="https://sshborg.com/logo.png">
+    <meta name="twitter:image"       content="https://sshborg.com/og-image.jpg">
     <!-- JSON-LD -->
     <script type="application/ld+json">
     {
@@ -563,6 +565,24 @@
         <span class="tab tab-active" aria-current="page">iOS</span>
     </div>
 
+        <article class="release">
+            <h2>1.3.1<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh: исправлена ошибка, из-за которой процессор оставался занят, пока сессия была открыта; из-за этого устройство могло нагреваться, а батарея быстрее разряжаться.</li>
+            </ul>
+        </article>
+        <article class="release">
+            <h2>1.3.0<span class="release-date">2026-11-08</span></h2>
+            <ul>
+                <li>Mosh (экспериментально): терминал, который переживает смену сети и убранный в карман телефон. Экран живёт на сервере, поэтому по возвращении вы находите ту же оболочку с теми же работающими программами. Включается для каждого хоста отдельно — на сервере нужен установленный mosh-server и доступные его UDP-порты.</li>
+                <li>Mosh через бастион: хост, у которого на первом переходе включён Mosh, достигается наоборот — Mosh до этой машины, а оттуда одна строка ssh — чтобы терминал оказался там, где сеть не меняется.</li>
+                <li>Редактор файлов больше не обрезает файл, если сохранение прервалось: новая версия сначала записывается отдельно, а оригинал остаётся на сервере, пока не заменён. Права доступа файла сохраняются в точности.</li>
+                <li>SFTP: имена файлов, которые присылает сервер, проверяются перед использованием, чтобы сервер не мог вывести приложение за пределы папки, которую вы смотрите.</li>
+                <li>Промежуточные хосты: выбор теперь начинается с вашего собственного списка хостов, а ввод вручную — в одно касание.</li>
+                <li>Блокировка приложения собственным PIN-кодом или парольной фразой: блокировка, которой не нужны ни Face ID, ни код устройства. Пять неверных попыток блокируют её на время, каждый раз дольше — а забытый код не восстановить, поэтому приложение предупреждает об этом до того, как вы его зададите.</li>
+                <li>Безопасность: когда вы подтверждаете ключ сервера, с этого момента принимается только именно этот ключ — для каждой машины в цепочке промежуточных хостов и для переадресации портов тоже. Команда mosh-server, восстановленная из резервной копии, больше не может выполнить ничего, кроме программы, которую она называет.</li>
+            </ul>
+        </article>
         <article class="release">
             <h2>1.2.0<span class="release-date">2026-10-20</span></h2>
             <ul>

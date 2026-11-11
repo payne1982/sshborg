@@ -18,7 +18,7 @@ module.exports = {
   badge_no_tracking: '无跟踪',
   badge_no_cloud:    '无云端',
   badge_free:        '免费',
-  badge_android:     'Android 10+',
+  badge_android:     'Android 9+',
   badge_ios: 'iOS 16+',
 
   cta_download:   '下载',
@@ -31,6 +31,9 @@ module.exports = {
 
   feat_terminal_title: '完整 SSH 终端',
   feat_terminal_desc:  '支持 VT100/xterm 仿真、完整 UTF-8 和多个并发会话的交互式终端。',
+  feat_mosh_title:     'MOSH 会话',
+  feat_mosh_desc:      '让主机的终端走 mosh：IP 变化、从 Wi-Fi 切到移动网络、手机在口袋里睡了一觉，会话都不会断。已对 mosh-server 1.4.0 验证。实验性，按主机单独开启。',
+  feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'SFTP 文件管理器',
   feat_sftp_desc:      '通过直观的文件管理器浏览、上传、下载、重命名和删除服务器文件。',
   feat_keys_title:     'SSH 密钥认证',
@@ -485,8 +488,13 @@ screen -r work</code></pre>
             <p>打开主机编辑页，打开 <strong>Mosh</strong>。它和连接类开关放在一起，就在自己那三项设置的上面。它按主机单独设置，默认关闭：没动过的主机什么都不会变。标为实验性是因为它新，不是因为它没做完。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 耗电</div>
-                mosh 会话在打开期间大约每三秒发一个小包，正是靠这个它才能立刻察觉网络变化。这比普通 SSH 会话用到的射频更多，在手机上要耗电。用不到的主机，就别打开它。
+                mosh 会话在服务器有应答时大约每三秒发一个小包，正是靠这个它才能立刻察觉网络变化。这比普通 SSH 会话用到的射频更多，在手机上要耗电。失去联系期间这些包会自动变稀，所以断网的时间并不像通话的时间那样费电。用不到的主机，就别打开它。
             </div>
+            <h3>失去联系后会话能存活多久</h3>
+            <p>手机断网时 mosh 会话不会死：它留在服务器上原处，手机回来就接着用。等多久由你决定，在<strong>设置 → mosh 会话超时</strong>里：从默认的一小时，最长到一天。</p>
+            <p>这个时长属于<strong>服务器</strong>：它是 <code>mosh-server</code> 在听不到本机之后，继续让会话以及其中的 shell 存活的时间。应用会提前五分钟放弃，因为等得比服务器久，就是在等一个已经结束的会话。</p>
+            <p>设得长的代价不是电量而是服务器：一个被你忘掉的会话，会在整段时间里一直占着一个 <code>mosh-server</code> 和它的 shell，连里面正在跑的东西一起。一小时是稳妥的选择；如果你想晚上合上手机、早上还能找到会话，那就把它调大，并清楚这意味着什么。</p>
+            <p>失去联系期间，保活包会自己变稀：沉默越久，从三秒一个放缓到每分钟一个。所以一个允许存活数小时的会话，并不会耗上数小时的射频。你一输入它们就立刻恢复，回来时不必等这个放缓过去。</p>
             <h3>终端里有什么不同</h3>
             <p><strong>回滚历史从空的开始。</strong>走 SSH 时，服务器打印过的一切都经过你的手机，所以可以全部留下。走 mosh 只传屏幕，所以历史里攒下的是真正从上边滚出去的那些行——而一个重绘屏幕却不滚动的程序，什么也不会留下。滚动手势照常可用，只是刚开的会话上面能翻到的东西更少。</p>
             <p><strong>打字不会更快。</strong>mosh 以本地即时回显闻名，这一点 SSHBorg 还没有做：按键依旧要去服务器一趟再回来。在同一个网络下用手机实测，用 mosh 打字和用 SSH 差不多快。真正赚到的是会话不会死。</p>
@@ -646,7 +654,7 @@ Host target
             <p>SSHBorg 可以将主机配置和应用设置导出并导入为 JSON 文件。这样您可以将服务器列表转移到另一台设备，或保留一份可移植的配置备份。</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// 重要</div>
-                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 密钥材料需要在新设备上重新设置。不过备份会记录每个主机所用密钥的<em>名称</em>：如果在导入前重新创建同名密钥，其主机会自动重新关联。
+                备份包含主机配置和应用设置（终端、外观、行为）。<strong>密码和 SSH 密钥从不导出</strong> — 密钥材料需要在新设备上重新设置。不过备份会记录每个主机所用密钥的<em>名称</em>：如果在导入前重新创建同名密钥，其主机会自动重新关联。 应用锁也不会随备份迁移：PIN 或口令以及生物识别设置需要在新设备上重新配置。
             </div>
             <h3>导出</h3>
             <p>前往 <strong>设置 → 备份 → 导出备份</strong>。通过系统文件选择器选择文件保存位置。文件默认命名为 <code>sshborg_backup.json</code>（iOS 上为 <code>sshborg-backup-</code><em>日期</em><code>.json</code>）。</p>
@@ -663,7 +671,7 @@ Host target
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "生产", "color": -1754827, "position": 0 }
@@ -683,6 +691,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -713,6 +725,10 @@ Host target
                 <li><code>sftpStartDir</code> — 当 <code>sftpStartMode</code> 为 <code>"fixed"</code> 时使用的路径。</li>
                 <li><code>sftpShowHidden</code> — <code>true</code> 时在该主机的 SFTP 浏览器中显示隐藏文件（点文件，以 "." 开头的名称）。默认 <code>false</code>。</li>
                 <li><code>allowLegacyCiphers</code> — 设为 <code>true</code> 可启用上文介绍的旧式加密算法。默认为 <code>false</code>。</li>
+                <li><code>mosh</code> — 设为 <code>true</code> 则这台主机的终端走 mosh。服务器上需要有 <code>mosh-server</code>。默认 <code>false</code>。</li>
+                <li><code>moshFamily</code> — 会话建立在哪个地址族上：<code>"auto"</code>、<code>"ipv4"</code> 或 <code>"ipv6"</code>。会话只能留在它出生的地址族里，所以能不能跟着你换网络，就由这一项决定。默认 <code>"auto"</code>。</li>
+                <li><code>moshPorts</code> — <code>mosh-server</code> 可选的 UDP 端口，写成 <code>60001-60999</code> 或单个端口。省略时 mosh 使用它自己那一千个端口的范围。</li>
+                <li><code>moshCommand</code> — 当非交互 shell 在 PATH 中找到的 <code>mosh-server</code> 不是你要的那个时，在服务器上实际执行的命令。</li>
                 <li><code>keyLabel</code> — 此主机所用 SSH 密钥的名称。导入时，如果存在同名密钥，则关联到该主机；否则忽略该字段。密钥本身从不包含在备份中。</li>
                 <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
                 <li><code>color</code> — 主机的可选颜色（ARGB，带符号 32 位整数），会覆盖分组颜色。</li>

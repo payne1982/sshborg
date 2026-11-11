@@ -3,6 +3,7 @@ package com.sshborg.ui.terminal
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.sshborg.R
+import com.sshborg.data.MoshPatience
 import androidx.lifecycle.viewModelScope
 import com.sshborg.BuildConfig
 import com.sshborg.SshBorgApp
@@ -720,9 +721,12 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         // loop is already running by then, and nothing else knows about it: a screen left during
         // the handshake would otherwise leave a pump answering a server for ever.
         var unowned: MoshTerminalTransport? = null
+        // One setting, read here, used twice: the server is told the figure and the client is
+        // given five minutes less of it. See MoshPatience for why that order and not the reverse.
+        val patience = prefs.moshSessionMinutes.first()
         val failure = try {
             val handover = session.startMoshServer(
-                networkTimeoutSeconds = MOSH_SERVER_TIMEOUT_SECONDS,
+                networkTimeoutSeconds = MoshPatience.serverSeconds(patience),
                 command = MoshBootstrap.serverCommand(host.moshCommand) ?: "mosh-server",
                 ports = host.moshPorts,
             )
@@ -734,6 +738,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             val history = TerminalScreenHistory(em)
             val made = MoshTerminalTransport(
                 handover,
+                silenceLimitMs = MoshPatience.clientMillis(patience),
                 past = object : ScreenPast {
                     override val depth get() = history.depth
                     override fun keep(state: Long) = synchronized(em) { history.keep(state) }
@@ -1111,19 +1116,6 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private companion object {
-        /**
-         * How long `mosh-server` is told to wait for us before exiting. Unset it would wait for
-         * ever, which mosh itself suggests for a laptop; a phone abandons sessions far more
-         * readily, and a server nobody will ever come back to is a shell left running.
-         *
-         * An hour, which is deliberately more than [MoshTerminalTransport.SILENCE_LIMIT]: the
-         * client is always the first of the two to give up, so this number never decides when a
-         * session ends — it only decides how long a server the client has already written off
-         * stays on the host. If the terminal ever gains mosh's own "contact lost, still trying"
-         * line, both numbers grow together.
-         */
-        const val MOSH_SERVER_TIMEOUT_SECONDS = 3600
-
         /**
          * How long a bastion's login has to say nothing before the ssh line is typed into it.
          *

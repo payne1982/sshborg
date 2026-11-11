@@ -1,5 +1,8 @@
 package com.sshborg
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.Network
@@ -44,9 +47,13 @@ class SshBorgApp : Application() {
      * dismantling it, so the terminal underneath is still there, still focused and still able to
      * open a keyboard — which is how the soft keyboard ended up on top of the lock screen. Read
      * before raising it.
+     *
+     * Compose state rather than a plain field, because it is now *observed* as well as read: the
+     * gate puts the keyboard away when it arrives, and the terminal has to know to stop having
+     * opinions about it until the gate is gone. Written and read on the main thread, which is why
+     * it no longer needs `@Volatile`.
      */
-    @Volatile
-    var lockGateUp: Boolean = false
+    var lockGateUp: Boolean by mutableStateOf(false)
 
     @Volatile private var pickerTrip = false
 

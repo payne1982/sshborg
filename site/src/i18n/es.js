@@ -17,7 +17,7 @@ module.exports = {
   badge_no_tracking: 'Sin seguimiento',
   badge_no_cloud:    'Sin nube',
   badge_free:        'Gratis',
-  badge_android:     'Android 10+',
+  badge_android:     'Android 9+',
   badge_ios: 'iOS 16+',
 
   cta_download:   'DESCARGAR',
@@ -30,6 +30,9 @@ module.exports = {
 
   feat_terminal_title: 'TERMINAL SSH COMPLETO',
   feat_terminal_desc:  'Terminal interactivo con emulación VT100/xterm, soporte UTF-8 completo y múltiples sesiones simultáneas.',
+  feat_mosh_title:     'SESIONES MOSH',
+  feat_mosh_desc:      'Lleva el terminal de un host por mosh: la sesión sobrevive a un cambio de IP, al salto del Wi-Fi a la red móvil y a un teléfono que estaba dormido en el bolsillo. Probado con mosh-server 1.4.0. Experimental, se activa host por host.',
+  feat_mosh_badge:     'Mosh 1.4.0',
   feat_sftp_title:     'GESTOR DE ARCHIVOS SFTP',
   feat_sftp_desc:      'Navega, sube, descarga, renombra y elimina archivos en tus servidores con un gestor de archivos intuitivo.',
   feat_keys_title:     'AUTENTICACIÓN POR CLAVE SSH',
@@ -483,8 +486,13 @@ screen -r work</code></pre>
             <p>Abre el editor del host y activa <strong>Mosh</strong>: está con los interruptores de conexión, justo encima de sus tres ajustes. Es por host y está desactivado por defecto: en los hosts que dejes como están no cambia nada. Está marcado como experimental porque es nuevo, no porque esté sin terminar.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// BATERÍA</div>
-                Una sesión mosh envía un paquete pequeño cada tres segundos aproximadamente mientras está abierta, y es eso lo que le permite notar al instante un cambio de red. Es más radio de la que usa una sesión SSH normal, y en un teléfono cuesta batería. Para los hosts donde no lo necesites, déjalo desactivado.
+                Una sesión mosh envía un paquete pequeño cada tres segundos aproximadamente mientras el servidor responde, y es eso lo que le permite notar al instante un cambio de red. Es más radio de la que usa una sesión SSH normal, y en un teléfono cuesta batería. Mientras no hay contacto esos paquetes se espacian por sí solos, así que un corte no cuesta lo que cuesta una conversación. Para los hosts donde no lo necesites, déjalo desactivado.
             </div>
+            <h3>Cuánto sobrevive una sesión sin contacto</h3>
+            <p>Una sesión mosh no muere cuando el teléfono pierde la red: se queda donde está, en el servidor, y continúa cuando el teléfono vuelve. Cuánto espera lo decides tú, en <strong>Ajustes → Tiempo de espera de la sesión mosh</strong>: desde una hora, el valor por omisión, hasta un día.</p>
+            <p>La cifra es la del <strong>servidor</strong>: cuánto mantiene <code>mosh-server</code> la sesión, y el shell que hay dentro, después de dejar de oír este teléfono. La aplicación se rinde cinco minutos antes, porque esperar más que el servidor sería esperar una sesión que ya ha terminado.</p>
+            <p>El precio de una duración larga no es la batería sino el servidor: una sesión que olvidas mantiene en pie un <code>mosh-server</code> y su shell, con lo que estuviera ejecutándose dentro, todo ese tiempo. Una hora es la elección prudente; súbela si quieres cerrar el teléfono por la noche y encontrar la sesión por la mañana, sabiendo que eso es lo que aceptas.</p>
+            <p>Mientras falta el contacto, los paquetes de presencia se espacian por sí solos — de tres segundos a uno por minuto, cuanto más dura el silencio — así que una sesión que puede durar horas no cuesta horas de radio. En cuanto escribes algo vuelven a empezar: la vuelta no espera a la ralentización.</p>
             <h3>Qué cambia en el terminal</h3>
             <p><strong>El historial empieza vacío.</strong> Con SSH, todo lo que el servidor ha impreso pasa por tu teléfono, así que puede guardarse por completo. Con mosh solo viaja la pantalla, de modo que el historial se llena con las líneas que de verdad se van por arriba — y un programa que redibuja la pantalla sin desplazarla no deja nada detrás. El gesto de desplazamiento sigue funcionando; simplemente hay menos que encontrar por encima de una sesión recién abierta.</p>
             <p><strong>No se escribe más rápido.</strong> Mosh es famoso por su eco local instantáneo, que SSHBorg todavía no hace: una tecla sigue yendo al servidor y volviendo. Medido en un teléfono en la misma red, escribir con mosh es más o menos igual de rápido que con SSH. Lo que se gana es que la sesión no muere.</p>
@@ -644,7 +652,7 @@ Host target
             <p>SSHBorg puede exportar e importar configuraciones de hosts y ajustes de la app como archivo JSON. Esto permite transferir la lista de servidores a otro dispositivo o conservar una copia de seguridad portátil de tu configuración.</p>
             <div class="callout callout-warn">
                 <div class="callout-label">// IMPORTANTE</div>
-                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — el material de la clave debe configurarse de nuevo en un dispositivo nuevo. No obstante, la copia registra el <em>nombre</em> de la clave que usa cada host: si vuelves a crear una clave con el mismo nombre antes de importar, sus hosts se vuelven a vincular automáticamente.
+                La copia de seguridad incluye las configuraciones de los hosts y los ajustes de la app (terminal, apariencia, comportamiento). <strong>Las contraseñas y las claves SSH nunca se exportan</strong> — el material de la clave debe configurarse de nuevo en un dispositivo nuevo. No obstante, la copia registra el <em>nombre</em> de la clave que usa cada host: si vuelves a crear una clave con el mismo nombre antes de importar, sus hosts se vuelven a vincular automáticamente. El bloqueo de la aplicación tampoco viaja: el PIN o la frase de contraseña y el ajuste biométrico se configuran de nuevo en el dispositivo nuevo.
             </div>
             <h3>Exportar</h3>
             <p>Ve a <strong>Ajustes → Copia de seguridad → Exportar copia</strong>. Elige dónde guardar el archivo usando el selector de archivos del sistema. El archivo se llama <code>sshborg_backup.json</code> (<code>sshborg-backup-</code><em>fecha</em><code>.json</code> en iOS) por defecto.</p>
@@ -661,7 +669,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>El archivo exportado es un objeto JSON estándar. También puedes crearlo manualmente para importar en bloque una lista de servidores desde otra fuente.</p>
             <pre><code>{
-  "version": 7,
+  "version": 10,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Producción", "color": -1754827, "position": 0 }
@@ -681,6 +689,10 @@ Host target
       "sftpStartDir":    null,
       "sftpShowHidden":  false,
       "allowLegacyCiphers": false,
+      "mosh":            false,
+      "moshFamily":      "auto",
+      "moshPorts":       null,
+      "moshCommand":     null,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -711,6 +723,10 @@ Host target
                 <li><code>sftpStartDir</code> — ruta a usar cuando <code>sftpStartMode</code> es <code>"fixed"</code>.</li>
                 <li><code>sftpShowHidden</code> — <code>true</code> para mostrar los archivos ocultos (dotfiles, nombres que empiezan por ".") en el explorador SFTP de este host. Predeterminado <code>false</code>.</li>
                 <li><code>allowLegacyCiphers</code> — <code>true</code> para habilitar los algoritmos heredados descritos más arriba. Por defecto <code>false</code>.</li>
+                <li><code>mosh</code> — <code>true</code> para llevar el terminal de este host por mosh. Necesita <code>mosh-server</code> en el servidor. Predeterminado: <code>false</code>.</li>
+                <li><code>moshFamily</code> — sobre qué familia de direcciones se hace la sesión: <code>"auto"</code>, <code>"ipv4"</code> o <code>"ipv6"</code>. Una sesión se queda en la familia en la que nació, así que es este campo el que le permite seguirte entre redes. Predeterminado: <code>"auto"</code>.</li>
+                <li><code>moshPorts</code> — los puertos UDP entre los que <code>mosh-server</code> puede elegir, como <code>60001-60999</code> o un puerto único. Si se omite, mosh usa su propio rango de mil.</li>
+                <li><code>moshCommand</code> — qué ejecutar en el servidor cuando <code>mosh-server</code> no es lo que una shell no interactiva encuentra en su PATH.</li>
                 <li><code>keyLabel</code> — nombre de la clave SSH que usa este host. Al importar, si existe una clave con este nombre se vincula al host; de lo contrario, el campo se ignora. La clave en sí nunca se incluye en la copia.</li>
                 <li><code>group</code> — nombre del grupo al que pertenece el host. Los grupos se listan en el array <code>groups</code> del nivel superior, con <code>name</code> y <code>color</code> (ARGB como entero de 32 bits con signo). Si un host hace referencia a un grupo que no está en el array, se crea automáticamente con un color por defecto — al escribir el archivo a mano puedes omitir el array.</li>
                 <li><code>color</code> — color opcional del host (ARGB como entero de 32 bits con signo). Prevalece sobre el color del grupo.</li>

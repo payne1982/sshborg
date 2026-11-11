@@ -88,6 +88,22 @@
     <string name="host_menu_resume_files">Riprendi file (%1$d)</string>
     <string name="host_menu_new_files_session">Nuova sessione file</string>
 
+    <string name="host_last_connected">Ultima connessione: %1$s</string>
+    <string name="host_last_just_now">proprio ora</string>
+    <string name="host_last_yesterday">ieri</string>
+    <plurals name="host_last_minutes">
+        <item quantity="one">1 minuto fa</item>
+        <item quantity="other">%d minuti fa</item>
+    </plurals>
+    <plurals name="host_last_hours">
+        <item quantity="one">1 ora fa</item>
+        <item quantity="other">%d ore fa</item>
+    </plurals>
+    <plurals name="host_last_days">
+        <item quantity="one">1 giorno fa</item>
+        <item quantity="other">%d giorni fa</item>
+    </plurals>
+
     <string name="session_picker_title">%1$s — sessioni %2$s</string>
     <string name="session_picker_session_label">Sessione %1$d</string>
     <string name="session_picker_new_session">Nuova sessione %1$s</string>
@@ -212,6 +228,13 @@
     <string name="settings_font_size_subtitle">Dimensione predefinita del testo del terminale (sp); il pinch la cambia nella sessione</string>
     <string name="settings_scrollback_title">Righe di scrollback</string>
     <string name="settings_scrollback_subtitle">Righe di cronologia del terminale mantenute in memoria</string>
+
+    <string name="settings_mosh_patience_title">Timeout della sessione mosh</string>
+    <string name="settings_mosh_patience_subtitle">Lato server e lato client</string>
+    <plurals name="settings_mosh_patience_hours">
+        <item quantity="one">1 ora</item>
+        <item quantity="other">%d ore</item>
+    </plurals>
     <string name="settings_history_suggestions_title">Suggerimenti dalla cronologia comandi</string>
     <string name="settings_history_suggestions_subtitle">Mostra suggerimenti dalla cronologia shell del server mentre si digita nel terminale</string>
     <string name="settings_suggestions_bar_sticky_title">Barra suggerimenti sempre visibile</string>
