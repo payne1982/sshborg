@@ -130,6 +130,10 @@
     <string name="host_key_no_keys">Sem chaves – adicione uma primeiro</string>
     <string name="host_agent_forwarding">Encaminhamento de agente</string>
     <string name="host_allow_legacy_ciphers">Cifras legadas</string>
+    <string name="host_clipboard_write">Escrever na área de transferência</string>
+    <string name="host_clipboard_write_supporting">Permite que um programa neste host coloque texto na área de transferência do dispositivo. Apenas para máquinas em que confia: pode usá-lo qualquer coisa capaz de escrever no terminal.</string>
+    <string name="terminal_clipboard_from_host">O host escreveu na área de transferência</string>
+    <string name="terminal_clipboard_disable">Desativar</string>
     <string name="host_section_jump_hosts">Hosts de Salto</string>
     <string name="host_field_jump_hosts">Hosts de salto (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,utilizador@host2:2222</string>

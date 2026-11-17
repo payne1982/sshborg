@@ -54,6 +54,21 @@ data class HostEntity(
     val sftpShowHidden: Boolean = false,
     /** If true, legacy/weak cipher algorithms are appended to the negotiation list (for old servers). */
     val allowLegacyCiphers: Boolean = false,
+    /**
+     * Whether this host may put text on the device clipboard, by sending `OSC 52` (issue #22).
+     *
+     * Per host and not one setting for the app, because what it grants is not a convenience but
+     * **trust in a machine**: anything able to write to the terminal can use it — a line of a log
+     * being tailed, a file that gets `cat`-ed, a login message on a server somebody else
+     * administers — and what it would overwrite is the clipboard of a phone, which quite often
+     * holds what a password manager put there a moment ago. One switch for the app would mean
+     * granting that to every server in the list in order to have it on one.
+     *
+     * Only the copy direction is ever honoured. `OSC 52` also has a *read* form, which asks the
+     * terminal to send the clipboard back into the session, and that is not implemented at all:
+     * see `TerminalEmulator.handleOsc`.
+     */
+    val clipboardWrite: Boolean = false,
     /** Null = ungrouped; otherwise ID of the [GroupEntity] this host belongs to. */
     val groupId: Long? = null,
     /** Optional per-host ARGB color; overrides the group color. Null = group color or default. */

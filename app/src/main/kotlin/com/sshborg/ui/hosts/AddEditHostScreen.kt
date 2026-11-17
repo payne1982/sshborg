@@ -71,6 +71,7 @@ fun AddEditHostScreen(
     val sftpStartDir by vm.sftpStartDir.collectAsState()
     val sftpShowHidden by vm.sftpShowHidden.collectAsState()
     val allowLegacyCiphers by vm.allowLegacyCiphers.collectAsState()
+    val clipboardWrite by vm.clipboardWrite.collectAsState()
     val mosh by vm.mosh.collectAsState()
     val moshFamily by vm.moshFamily.collectAsState()
     val moshPorts by vm.moshPorts.collectAsState()
@@ -351,6 +352,28 @@ fun AddEditHostScreen(
                 Switch(checked = allowLegacyCiphers, onCheckedChange = { vm.allowLegacyCiphers.value = it })
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.host_allow_legacy_ciphers))
+            }
+
+            // Among the switches that grant this machine something, rather than down with mosh's
+            // settings: what it decides is trust, not a convenience. The supporting line says
+            // what it is for before it says what it costs, because somebody who has never heard
+            // of OSC 52 is reading a switch about their clipboard.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { vm.clipboardWrite.value = !clipboardWrite },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Switch(checked = clipboardWrite, onCheckedChange = { vm.clipboardWrite.value = it })
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(stringResource(R.string.host_clipboard_write))
+                    Text(
+                        stringResource(R.string.host_clipboard_write_supporting),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             // Mosh, immediately above the three settings it reveals and immediately above the

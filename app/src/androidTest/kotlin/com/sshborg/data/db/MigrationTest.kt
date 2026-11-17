@@ -18,8 +18,8 @@ import org.junit.runner.RunWith
  * migration that gets it wrong meets the user as "the app won't open any more", with their hosts
  * and keys inside. This is also the one part of the app that has already gone wrong here — a
  * 13→14 migration was added and then removed, which left a development database newer than the
- * schema. Version 14 is now the per-host mosh switch and 15 its three settings, and nothing ever
- * shipped the other one.
+ * schema. Version 14 is now the per-host mosh switch, 15 its three settings and 16 the
+ * per-host clipboard permission, and nothing ever shipped the other one.
  *
  * Room checks the result itself: [MigrationTestHelper.runMigrationsAndValidate] compares what the
  * migration produced against the schema exported from the entities, and fails on any difference —
@@ -90,11 +90,11 @@ class MigrationTest {
 
         // Runs every migration the app ships and then holds the result against the schema the
         // entities describe. Anything the migration forgot fails here.
-        val migrated = helper.runMigrationsAndValidate(NAME, 15, true, *AppDatabase.MIGRATIONS)
+        val migrated = helper.runMigrationsAndValidate(NAME, 16, true, *AppDatabase.MIGRATIONS)
 
         migrated.query(
             "SELECT label, hostname, port, position, connectCount, mosh, moshFamily, moshPorts, " +
-                "moshCommand FROM hosts"
+                "moshCommand, clipboardWrite FROM hosts"
         ).use {
             assertTrue("the host did not survive the upgrade", it.moveToFirst())
             assertEquals("fatberry", it.getString(0))
@@ -112,6 +112,10 @@ class MigrationTest {
             assertEquals("auto", it.getString(6))
             assertTrue("no port range was asked for", it.isNull(7))
             assertTrue("no command was overridden", it.isNull(8))
+            // 15→16: and a host that existed before the clipboard permission did must come out
+            // without it. An update that granted a machine the clipboard would be the one thing
+            // this setting exists to prevent.
+            assertEquals("the clipboard must not be granted by an upgrade", 0, it.getInt(9))
             assertEquals("one host in, one host out", 1, it.count)
         }
         migrated.query("SELECT name, color, position FROM host_groups").use {

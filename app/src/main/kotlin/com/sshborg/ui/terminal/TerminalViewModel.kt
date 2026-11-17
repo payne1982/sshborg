@@ -193,6 +193,28 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     val barWouldHideOutput: StateFlow<Boolean> = _barWouldHideOutput.asStateFlow()
 
     /**
+     * Whether the host of this session may put text on the clipboard with `OSC 52`, kept current.
+     *
+     * Observed and not read once: the switch lives in the host editor, and the message the screen
+     * shows when it happens carries a *Disable* of its own, so the answer can change while the
+     * session is open.
+     */
+    private val clipboardAllowed = MutableStateFlow(false)
+
+    private val _clipboardFromHost = MutableSharedFlow<String>(replay = 0, extraBufferCapacity = 0)
+
+    /**
+     * Text the far end has asked to put on the clipboard, for the screen to act on — or to drop.
+     *
+     * No replay and no buffer, deliberately. Only the session on screen is collected, and only
+     * while the app is in front, so an event nobody is there for is **dropped rather than
+     * queued**: a clipboard that changes minutes later with no visible cause is exactly the
+     * surprise this feature has to avoid. The emulator keeps parsing in the background — the
+     * sessions outlive the screen — so this is where that is decided.
+     */
+    val clipboardFromHost: SharedFlow<String> = _clipboardFromHost.asSharedFlow()
+
+    /**
      * Attaches this ViewModel to an existing session in [SessionManager].
      * Must be called before [connect]. If the session is already connected, starts reading.
      */
@@ -208,7 +230,18 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
             sessionManager.update(id) { it.copy(emulator = newEm) }
         }
         em.onTitleChanged = { t -> _title.value = t }
+        em.onClipboard = { text -> if (clipboardAllowed.value) _clipboardFromHost.tryEmit(text) }
         _emulator.value = em
+
+        // The host's own answer about the clipboard, followed rather than fetched: the list is
+        // already observable, and this way the switch moving in the editor — or the Disable on
+        // the message itself — is in force at once, without a session having to be reopened.
+        viewModelScope.launch {
+            hostDao.getAll()
+                .map { hosts -> hosts.firstOrNull { it.id == session.hostId }?.clipboardWrite == true }
+                .distinctUntilChanged()
+                .collect { clipboardAllowed.value = it }
+        }
 
         // Asked of the host rather than of the transport, because the bar's own countdown is
         // shorter than a login: by the time there is a transport to ask, it would already have
@@ -878,6 +911,21 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
         synchronized(em) { em.resize(cols, rows) }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching { transport?.resize(cols, rows) }
+        }
+    }
+
+    /**
+     * Takes the clipboard away from this session's host, which is what the message's action does.
+     *
+     * Written to the host row rather than held for this session, because that is where the
+     * decision belongs: it shows in the host editor afterwards, and it holds for the next session
+     * too. Somebody who is surprised by their clipboard changing wants it to stop, not to stop
+     * until they come back.
+     */
+    fun refuseClipboardFromHost() {
+        val id = sessionId?.let { sessionManager.get(it) }?.hostId ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            hostDao.getById(id)?.let { hostDao.upsert(it.copy(clipboardWrite = false)) }
         }
     }
 

@@ -311,6 +311,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copier du texte</strong> — appuyez longuement n'importe où sur le terminal pour entrer en mode sélection. Faites glisser les poignées pour ajuster la zone sélectionnée, puis appuyez sur <em>Copier la sélection</em> pour le texte surligné, ou <em>Tout copier</em> pour toute la sortie. Appuyez en dehors pour annuler. Sur iOS, un appui long sélectionne le mot sous le doigt et ouvre le menu système avec <em>Copier</em>, <em>Coller</em> et <em>Tout sélectionner</em> ; faites glisser une extrémité de la sélection pour l'étendre.</li>
                 <li><strong>Coller</strong> — utilisez le bouton <em>Coller</em> dans la barre de touches supplémentaires (visible lorsque le clavier est ouvert).</li>
             </ul>
+            <p><strong>L'hôte peut copier pour vous, si vous l'y autorisez.</strong> Un programme sur le serveur — tmux, vim, un script — peut placer du texte directement dans le presse-papiers de l'appareil en envoyant <code>OSC 52</code>. C'est désactivé pour chaque hôte et s'active un hôte à la fois : <strong>éditeur d'hôte → Écrire dans le presse-papiers</strong>. Par hôte, parce que ce que cela accorde est une confiance en une machine et non un confort : tout ce qui peut écrire dans le terminal peut s'en servir, y compris une ligne d'un journal que vous suivez. Quand cela arrive, l'application le dit, et le message porte un <em>Désactiver</em> pour cet hôte. Le sens inverse — un serveur qui <em>demande</em> qu'on lui donne le presse-papiers, ce que <code>OSC 52</code> permet aussi — n'est pas implémenté et ne le sera pas.</p>
             <p><strong>La barre de titre.</strong> Trois secondes après l'ouverture de la session, la barre du haut se retire et le texte occupe toute la hauteur de l'écran. Un appui n'importe où la ramène pour trois secondes, et elle ne s'en va pas tant qu'un doigt reste posé dessus : vous avez le temps d'atteindre ses boutons. Si vous préférez l'avoir toujours sous les yeux, désactivez <em>Masquer automatiquement la barre de titre</em> dans <strong>Réglages &rarr; Terminal</strong>. Sur un téléviseur, elle ne se masque jamais : il n'y aurait rien à toucher pour la faire revenir.</p>
 
             <p><strong>Applications plein écran.</strong> Les programmes qui occupent tout l'écran — tmux, vim, nano, less — n'ont pas d'historique propre : pendant leur exécution, la vue reste sur l'écran actif au lieu de glisser dans la sortie du shell située en dessous.</p>
@@ -670,7 +671,7 @@ Host target
             <h3>Format JSON</h3>
             <p>Le fichier exporté est un objet JSON standard. Vous pouvez également le créer manuellement pour importer en masse une liste de serveurs depuis une autre source.</p>
             <pre><code>{
-  "version": 10,
+  "version": 11,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827, "position": 0 }
@@ -694,6 +695,7 @@ Host target
       "moshFamily":      "auto",
       "moshPorts":       null,
       "moshCommand":     null,
+      "clipboardWrite":  false,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -728,6 +730,7 @@ Host target
                 <li><code>moshFamily</code> — sur quelle famille d'adresses la session est établie : <code>"auto"</code>, <code>"ipv4"</code> ou <code>"ipv6"</code>. Une session reste sur la famille où elle est née ; c'est donc ce champ qui lui permet de vous suivre d'un réseau à l'autre. Par défaut : <code>"auto"</code>.</li>
                 <li><code>moshPorts</code> — les ports UDP parmi lesquels <code>mosh-server</code> peut choisir, sous la forme <code>60001-60999</code> ou un port unique. Omis, mosh utilise sa propre plage de mille.</li>
                 <li><code>moshCommand</code> — ce qu'il faut lancer sur le serveur quand <code>mosh-server</code> n'est pas ce qu'un shell non interactif trouve dans son PATH.</li>
+                <li><code>clipboardWrite</code> — <code>true</code> pour autoriser les programmes de cet hôte à placer du texte dans le presse-papiers de l'appareil, via <code>OSC 52</code>. Désactivé pour tout hôte qui ne le dit pas, y compris ceux d'une sauvegarde écrite avant l'existence de ce champ : cela accorde quelque chose à une machine, donc un silence ne peut vouloir dire que non.</li>
                 <li><code>keyLabel</code> — nom de la clé SSH utilisée par cet hôte. À l'import, si une clé de ce nom existe, l'hôte y est relié ; sinon le champ est ignoré. La clé elle-même n'est jamais incluse dans la sauvegarde.</li>
                 <li><code>group</code> — nom du groupe auquel appartient l'hôte. Les groupes figurent dans le tableau <code>groups</code> au niveau racine, avec <code>name</code> et <code>color</code> (ARGB en entier 32 bits signé). Si un hôte référence un groupe absent du tableau, celui-ci est créé automatiquement avec une couleur par défaut — vous pouvez donc omettre le tableau en écrivant le fichier à la main.</li>
                 <li><code>color</code> — couleur facultative de l'hôte (ARGB en entier 32 bits signé). Elle prime sur la couleur du groupe.</li>

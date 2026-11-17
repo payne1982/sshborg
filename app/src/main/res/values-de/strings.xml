@@ -130,6 +130,10 @@
     <string name="host_key_no_keys">Keine Schlüssel – zuerst einen hinzufügen</string>
     <string name="host_agent_forwarding">Agent-Weiterleitung</string>
     <string name="host_allow_legacy_ciphers">Legacy-Verschlüsselung</string>
+    <string name="host_clipboard_write">In die Zwischenablage schreiben</string>
+    <string name="host_clipboard_write_supporting">Erlaubt einem Programm auf diesem Host, Text in die Zwischenablage des Geräts zu legen. Nur für Maschinen, denen Sie vertrauen: alles, was ins Terminal schreiben kann, kann es nutzen.</string>
+    <string name="terminal_clipboard_from_host">Der Host hat in die Zwischenablage geschrieben</string>
+    <string name="terminal_clipboard_disable">Abschalten</string>
     <string name="host_section_jump_hosts">Jump-Hosts</string>
     <string name="host_field_jump_hosts">Jump-Hosts (-J)</string>
     <string name="host_jump_hosts_placeholder">host1:22,benutzer@host2:2222</string>

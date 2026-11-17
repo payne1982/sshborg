@@ -130,6 +130,10 @@
     <string name="host_key_no_keys">Aucune clé – ajoutez-en une d\'abord</string>
     <string name="host_agent_forwarding">Transfert d\'agent</string>
     <string name="host_allow_legacy_ciphers">Chiffrements legacy</string>
+    <string name="host_clipboard_write">Écrire dans le presse-papiers</string>
+    <string name="host_clipboard_write_supporting">Permet à un programme sur cet hôte de placer du texte dans le presse-papiers de l\'appareil. Seulement pour les machines de confiance : tout ce qui peut écrire dans le terminal peut s\'en servir.</string>
+    <string name="terminal_clipboard_from_host">L\'hôte a écrit dans le presse-papiers</string>
+    <string name="terminal_clipboard_disable">Désactiver</string>
     <string name="host_section_jump_hosts">Hôtes de Saut</string>
     <string name="host_field_jump_hosts">Hôtes de saut (-J)</string>
     <string name="host_jump_hosts_placeholder">hôte1:22,utilisateur@hôte2:2222</string>

@@ -758,6 +758,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copy text</strong> — long-press anywhere on the terminal to enter selection mode. Drag the handles to adjust the selected area, then tap <em>Copy selection</em> to copy only the highlighted text, or <em>Copy all</em> to copy the entire output. Tap anywhere else to cancel. On iOS a long press selects the word under your finger and opens the system menu with <em>Copy</em>, <em>Paste</em> and <em>Select All</em>; drag from either end of the selection to extend it.</li>
                 <li><strong>Paste</strong> — use the <em>Paste</em> button in the extra-key bar (visible when the keyboard is open).</li>
             </ul>
+            <p><strong>The host can be allowed to copy for you.</strong> A program on the server — tmux, vim, a script — can put text straight on the device clipboard by sending <code>OSC 52</code>. It is off for every host, and turned on one host at a time: <strong>host editor → Write to the clipboard</strong>. Per host because what it grants is trust in a machine rather than a convenience: anything able to write to the terminal can use it, a line of a log being tailed included. When it happens the app says so, and the message carries a <em>Disable</em> for that host. The reverse direction — a server <em>asking</em> to be given the clipboard, which <code>OSC 52</code> also allows — is not implemented and will not be.</p>
             <p><strong>The title bar.</strong> Three seconds after the session comes up, the bar at the top slides away and the text takes the whole height of the screen. A tap anywhere brings it back for another three seconds, and it does not leave while a finger is resting on it, so there is time to reach its buttons. If you would rather keep it in sight, turn <em>Auto-hide the title bar</em> off in <strong>Settings &rarr; Terminal</strong>. On a television the bar never hides: there would be nothing to tap to bring it back.</p>
 
             <p><strong>Full-screen apps.</strong> Programs that take over the whole screen — tmux, vim, nano, less — have no scrollback of their own, so while one is running the view stays on the live screen instead of drifting into the shell output underneath it.</p>
@@ -1109,7 +1110,7 @@ Host target
             <h3>JSON format</h3>
             <p>The export file is a plain JSON object. You can also create it by hand to bulk-import a server list from another source.</p>
             <pre><code>{
-  "version": 10,
+  "version": 11,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Production", "color": -1754827, "position": 0 }
@@ -1133,6 +1134,7 @@ Host target
       "moshFamily":      "auto",
       "moshPorts":       null,
       "moshCommand":     null,
+      "clipboardWrite":  false,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1167,6 +1169,7 @@ Host target
                 <li><code>moshFamily</code> — which address family the session is made over: <code>"auto"</code>, <code>"ipv4"</code> or <code>"ipv6"</code>. A session stays on the family it was born on, so this is what lets it follow you between networks. Default: <code>"auto"</code>.</li>
                 <li><code>moshPorts</code> — the UDP ports <code>mosh-server</code> may choose from, as <code>60001-60999</code> or a single port. Omitted, mosh uses its own range of a thousand.</li>
                 <li><code>moshCommand</code> — what to run on the server when <code>mosh-server</code> is not what a non-interactive shell finds on its PATH.</li>
+                <li><code>clipboardWrite</code> — <code>true</code> to let programs on this host put text on the device clipboard, with <code>OSC 52</code>. Off for every host that does not say so, including every host in a backup written before this field existed: it grants a machine something, so a silence can only mean no.</li>
                 <li><code>keyLabel</code> — name of the SSH key this host uses. On import, if a key with this name exists it is linked to the host; otherwise the field is ignored. The key itself is never included in the backup.</li>
                 <li><code>group</code> — name of the group the host belongs to. Groups are listed in the top-level <code>groups</code> array with their <code>name</code> and <code>color</code> (ARGB as a signed 32-bit integer). If a host references a group that is not in the array, it is created automatically with a default color — so you can omit the array entirely when writing the file by hand.</li>
                 <li><code>color</code> — optional per-host color (ARGB as a signed 32-bit integer). It overrides the group color.</li>

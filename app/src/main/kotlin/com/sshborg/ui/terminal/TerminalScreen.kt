@@ -54,6 +54,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sshborg.R
 import com.sshborg.SshBorgApp
@@ -355,8 +359,54 @@ fun TerminalScreen(
         )
     }
 
+    // OSC 52: the host asking to put text on the clipboard. Three gates stand between the request
+    // and the clipboard, and none of them is in the parser:
+    //
+    //  - the **host's** own switch, which the ViewModel applies before anything reaches here;
+    //  - **RESUMED**, so a session running in the background cannot do it. The sessions outlive
+    //    this screen and keep parsing, which is exactly why this is tied to the lifecycle and not
+    //    to the composition, and why nothing is buffered: an event nobody is there for is dropped;
+    //  - the **lock gate**, because the screen being covered is not somebody looking at it.
+    //
+    // And it is never silent: the message names what happened and carries the way to stop it.
+    val snackbarHostState = remember { SnackbarHostState() }
+    // From the view tree rather than by casting the context: the cast is the usual way and it
+    // works until something wraps the context, and then the whole feature is simply silent.
+    val lifecycleOwner = rootView.findViewTreeLifecycleOwner() ?: ctx as? LifecycleOwner
+    val clipboardWritten = stringResource(R.string.terminal_clipboard_from_host)
+    val clipboardDisable = stringResource(R.string.terminal_clipboard_disable)
+    LaunchedEffect(lifecycleOwner, sessionId) {
+        val lifecycle = lifecycleOwner?.lifecycle ?: return@LaunchedEffect
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            vm.clipboardFromHost.collect { text ->
+                if (app.lockGateUp) return@collect
+                val cb = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                        as android.content.ClipboardManager
+                cb.setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
+                val answer = snackbarHostState.showSnackbar(
+                    message = clipboardWritten,
+                    actionLabel = clipboardDisable,
+                    duration = SnackbarDuration.Long,
+                )
+                if (answer == SnackbarResult.ActionPerformed) vm.refuseClipboardFromHost()
+            }
+        }
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0),
+        // The Scaffold's own insets are zero because the terminal takes them itself, row by
+        // measured row — so the snackbar has to be given the ones it needs, or it sits under the
+        // navigation bar and behind the keyboard. Same bottom inset the terminal uses.
+        snackbarHost = {
+            SnackbarHost(
+                snackbarHostState,
+                modifier = Modifier.windowInsetsPadding(
+                    WindowInsets.ime.union(WindowInsets.navigationBars)
+                        .only(WindowInsetsSides.Bottom)
+                ),
+            )
+        },
         // Fixed: the bar is the Scaffold's, and the terminal starts below it, exactly as before.
         // Auto-hiding: the Scaffold has no top bar at all and the terminal owns the whole height,
         // with the bar drawn over it further down.

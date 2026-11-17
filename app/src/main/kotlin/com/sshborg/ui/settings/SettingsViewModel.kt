@@ -300,6 +300,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         if (h.moshFamily != "auto") put("moshFamily", h.moshFamily)
                         h.moshPorts?.let { put("moshPorts", it) }
                         h.moshCommand?.let { put("moshCommand", it) }
+                        // Backup version 11. Only when it is on: a host that cannot write to the
+                        // clipboard carries nothing, and a backup from 10 or earlier reads as off
+                        // — which is what every host in it had, the setting not existing yet.
+                        if (h.clipboardWrite) put("clipboardWrite", true)
                         h.jumpHosts?.let { put("jumpHosts", it) }
                         h.jumpHostIdList?.let { put("jumpHostIdList", it) }
                         h.portForwardings?.let { put("portForwardings", it) }
@@ -315,7 +319,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 10)
+                    put("version", 11)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
@@ -405,6 +409,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         moshFamily = o.optString("moshFamily").takeIf { it.isNotEmpty() } ?: "auto",
                         moshPorts = o.optString("moshPorts").takeIf { it.isNotEmpty() },
                         moshCommand = o.optString("moshCommand").takeIf { it.isNotEmpty() },
+                        // Absent in backups up to version 10, and off is the only safe reading of
+                        // a silence: a restore must not grant a machine the clipboard.
+                        clipboardWrite = o.optBoolean("clipboardWrite", false),
                         groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
                         color = if (o.has("color")) o.getInt("color") else null,
                         position = if (o.has("position")) o.getInt("position") else null,

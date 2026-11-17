@@ -312,6 +312,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiare il testo</strong> — tieni premuto in un punto del terminale per entrare in modalità selezione. Trascina i marcatori per regolare l'area selezionata, poi tocca <em>Copia selezione</em> per copiare solo il testo evidenziato, oppure <em>Copia tutto</em> per copiare l'intero output. Tocca altrove per annullare. Su iOS una pressione prolungata seleziona la parola sotto il dito e apre il menu di sistema con <em>Copia</em>, <em>Incolla</em> e <em>Seleziona tutto</em>; trascina da un estremo della selezione per estenderla.</li>
                 <li><strong>Incollare</strong> — usa il tasto <em>Incolla</em> nella barra dei tasti extra (visibile quando la tastiera è aperta).</li>
             </ul>
+            <p><strong>L'host può copiare per te, se glielo permetti.</strong> Un programma sul server — tmux, vim, uno script — può mettere testo direttamente negli appunti del dispositivo inviando <code>OSC 52</code>. È spento per ogni host e si accende un host alla volta: <strong>editor dell'host → Scrittura negli appunti</strong>. Per host perché quello che concede è fiducia in una macchina, non una comodità: può usarla qualunque cosa sia in grado di scrivere nel terminale, compresa una riga di un log che stai seguendo. Quando succede l'app lo dice, e il messaggio porta con sé un <em>Disattiva</em> per quell'host. La direzione opposta — un server che <em>chiede</em> di farsi dare gli appunti, cosa che <code>OSC 52</code> permette anch'essa — non è implementata e non lo sarà.</p>
             <p><strong>La barra del titolo.</strong> Tre secondi dopo che la sessione è aperta la barra in alto si ritira e il testo prende tutta l'altezza dello schermo. Un tocco in qualsiasi punto la fa tornare per altri tre secondi, e non se ne va mentre ci tieni il dito sopra, così c'è tempo per arrivare ai suoi pulsanti. Se preferisci averla sempre davanti, disattiva <em>Barra del titolo a scomparsa</em> in <strong>Impostazioni &rarr; Terminale</strong>. Su un televisore la barra non si nasconde mai: non ci sarebbe niente da toccare per farla tornare.</p>
 
             <p><strong>App a tutto schermo.</strong> I programmi che occupano l'intero schermo — tmux, vim, nano, less — non hanno una cronologia propria, quindi mentre sono in esecuzione la vista resta sulla schermata attiva invece di scivolare nell'output della shell che sta sotto.</p>
@@ -671,7 +672,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>Il file esportato è un normale oggetto JSON. È possibile crearlo manualmente per importare in blocco una lista di server da un'altra fonte.</p>
             <pre><code>{
-  "version": 10,
+  "version": 11,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produzione", "color": -1754827, "position": 0 }
@@ -695,6 +696,7 @@ Host target
       "moshFamily":      "auto",
       "moshPorts":       null,
       "moshCommand":     null,
+      "clipboardWrite":  false,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -729,6 +731,7 @@ Host target
                 <li><code>moshFamily</code> — su quale famiglia di indirizzi fare la sessione: <code>"auto"</code>, <code>"ipv4"</code> o <code>"ipv6"</code>. Una sessione resta sulla famiglia in cui è nata, quindi è questo campo che le permette di seguirti fra le reti. Predefinito: <code>"auto"</code>.</li>
                 <li><code>moshPorts</code> — le porte UDP fra cui <code>mosh-server</code> può scegliere, come <code>60001-60999</code> o una porta singola. Omesso, mosh usa il suo intervallo di mille porte.</li>
                 <li><code>moshCommand</code> — cosa eseguire sul server quando <code>mosh-server</code> non è ciò che una shell non interattiva trova nel PATH.</li>
+                <li><code>clipboardWrite</code> — <code>true</code> per permettere ai programmi su questo host di mettere testo negli appunti del dispositivo, con <code>OSC 52</code>. Spento per ogni host che non lo dice, compresi tutti quelli di un backup scritto prima che questo campo esistesse: concede qualcosa a una macchina, quindi un silenzio può solo voler dire no.</li>
                 <li><code>keyLabel</code> — nome della chiave SSH usata da questo host. All'importazione, se esiste una chiave con questo nome viene collegata all'host; altrimenti il campo viene ignorato. La chiave stessa non è mai inclusa nel backup.</li>
                 <li><code>group</code> — nome del gruppo a cui appartiene l'host. I gruppi sono elencati nell'array <code>groups</code> in cima al file, con <code>name</code> e <code>color</code> (ARGB come intero a 32 bit con segno). Se un host fa riferimento a un gruppo assente dall'array, il gruppo viene creato automaticamente con un colore predefinito: scrivendo il file a mano puoi quindi omettere l'array.</li>
                 <li><code>color</code> — colore opzionale del singolo host (ARGB come intero a 32 bit con segno). Prevale sul colore del gruppo.</li>

@@ -313,6 +313,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>复制文本</strong> — 长按终端任意位置进入选择模式。拖动控制柄调整选择区域，然后点击 <em>复制选中内容</em> 只复制高亮文本，或点击 <em>全部复制</em> 复制所有输出。点击其他位置取消。 在 iOS 上，长按会选中手指下的单词并打开系统菜单，其中有<em>拷贝</em>、<em>粘贴</em>和<em>全选</em>；拖动选区任一端可扩大选区。</li>
                 <li><strong>粘贴</strong> — 使用键盘打开时可见的扩展键栏中的 <em>粘贴</em> 按钮。</li>
             </ul>
+            <p><strong>也可以让主机替你复制。</strong>服务器上的程序——tmux、vim、脚本——可以发送 <code>OSC 52</code>，把文本直接放进设备剪贴板。所有主机默认都关着，要一台一台地开：<strong>主机编辑 → 写入剪贴板</strong>。按主机来，是因为它给出的不是便利，而是<strong>对一台机器的信任</strong>：任何能往终端里写东西的东西都能用它，包括你正在 tail 的一行日志。真的发生时应用会告诉你，提示里带着针对那台主机的<em>关闭</em>。反方向——服务器<em>索要</em>剪贴板，这也是 <code>OSC 52</code> 允许的——没有实现，也不会实现。</p>
             <p><strong>标题栏。</strong>会话建立三秒后，顶部的标题栏会收起，文字占满整个屏幕高度。轻触任意位置可让它再出现三秒；手指按在标题栏上时它不会收起，因此有时间按到上面的按钮。如果希望它一直可见，请在<strong>设置 &rarr; 终端</strong>中关闭<em>自动隐藏标题栏</em>。在电视上标题栏从不隐藏：那里没有可以轻触的地方让它回来。</p>
 
             <p><strong>全屏程序。</strong> 占据整个屏幕的程序 — tmux、vim、nano、less — 没有自己的回滚缓冲区，因此在它们运行期间，视图会停留在当前画面，而不会滑入下面的 shell 输出。</p>
@@ -672,7 +673,7 @@ Host target
             <h3>JSON 格式</h3>
             <p>导出文件是一个标准 JSON 对象。您也可以手动创建它，从其他来源批量导入服务器列表。</p>
             <pre><code>{
-  "version": 10,
+  "version": 11,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "生产", "color": -1754827, "position": 0 }
@@ -696,6 +697,7 @@ Host target
       "moshFamily":      "auto",
       "moshPorts":       null,
       "moshCommand":     null,
+      "clipboardWrite":  false,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -730,6 +732,7 @@ Host target
                 <li><code>moshFamily</code> — 会话建立在哪个地址族上：<code>"auto"</code>、<code>"ipv4"</code> 或 <code>"ipv6"</code>。会话只能留在它出生的地址族里，所以能不能跟着你换网络，就由这一项决定。默认 <code>"auto"</code>。</li>
                 <li><code>moshPorts</code> — <code>mosh-server</code> 可选的 UDP 端口，写成 <code>60001-60999</code> 或单个端口。省略时 mosh 使用它自己那一千个端口的范围。</li>
                 <li><code>moshCommand</code> — 当非交互 shell 在 PATH 中找到的 <code>mosh-server</code> 不是你要的那个时，在服务器上实际执行的命令。</li>
+                <li><code>clipboardWrite</code> — 设为 <code>true</code>，这台主机上的程序就可以用 <code>OSC 52</code> 把文本放进设备剪贴板。没有写明的主机一律为关，包括在这个字段出现之前写下的备份里的所有主机：它授予一台机器某种权限，所以沉默只能解作否。</li>
                 <li><code>keyLabel</code> — 此主机所用 SSH 密钥的名称。导入时，如果存在同名密钥，则关联到该主机；否则忽略该字段。密钥本身从不包含在备份中。</li>
                 <li><code>group</code> — 主机所属分组的名称。分组列在顶层的 <code>groups</code> 数组中，包含 <code>name</code> 和 <code>color</code>（ARGB，带符号 32 位整数）。如果主机引用的分组不在数组中，会用默认颜色自动创建 — 因此手写文件时可以完全省略该数组。</li>
                 <li><code>color</code> — 主机的可选颜色（ARGB，带符号 32 位整数），会覆盖分组颜色。</li>

@@ -69,6 +69,14 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = TerminalBuf
     // Called when the terminal must send a response back to the remote (e.g. CPR, DA replies)
     var onSendResponse: ((ByteArray) -> Unit)? = null
 
+    /**
+     * Text the far end has asked to put on the device clipboard with `OSC 52`, already decoded.
+     *
+     * Only that it asked. Whether it is allowed to, and whether anybody is looking at the screen,
+     * is decided above — see [handleClipboard].
+     */
+    var onClipboard: ((String) -> Unit)? = null
+
     private enum class State { NORMAL, ESC, CSI, OSC, SS3, CHARSET }
 
     // UTF-8 multi-byte decoder state
@@ -405,8 +413,48 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = TerminalBuf
         val arg = s.substring(semi + 1)
         when (cmd) {
             0, 2 -> onTitleChanged?.invoke(arg) // set window title
+            52 -> handleClipboard(arg)
             else -> {}
         }
+    }
+
+    /**
+     * `OSC 52` — the far end putting text on the clipboard, or asking to be given it.
+     *
+     * The argument is `<selection>;<base64>`, and **any** selection is taken to mean the
+     * clipboard, the empty one included: that is what tmux sends, and insisting on `c` would fail
+     * the commonest case there is. (Mosh insists on exactly `c`, which is why a copy made in tmux
+     * never leaves a mosh server. Not something this end can mend.)
+     *
+     * The **read** form — `?` in place of the payload — is deliberately not implemented, and must
+     * not be. It asks the terminal to type the clipboard back into the session, so anything able
+     * to write to this terminal could walk off with it: a line of a log being tailed, a file that
+     * gets `cat`-ed, the login message of a server somebody else administers. What it would be
+     * taking is the clipboard of a phone, which quite often holds what a password manager put
+     * there a moment ago. The machinery to answer is right there — [onSendResponse], which the
+     * device-status replies use — and that is exactly why the refusal is written down here.
+     *
+     * Nothing else is decided here. Whether this host may write to the clipboard at all is the
+     * host's own setting, and whether anybody is looking at the screen is the screen's business.
+     */
+    private fun handleClipboard(arg: String) {
+        val semi = arg.indexOf(';')
+        if (semi < 0) return
+        val payload = arg.substring(semi + 1)
+        if (payload == "?" || payload.isEmpty()) return
+        // This cannot be allowed to throw. It runs on the thread that applies host bytes, inside
+        // `process`, and the transports call that with no try/catch of their own: an exception
+        // from a malformed payload would travel up and end the session. A payload that is not
+        // base64 is simply ignored.
+        //
+        // The MIME decoder is the lenient one — it drops characters outside the alphabet, which
+        // is what a sender that wrapped its lines leaves behind. And `java.util.Base64` on
+        // purpose: `android.util.Base64` returns the default value under the unit tests'
+        // `isReturnDefaultValues`, so a test written against it would prove nothing at all.
+        val text = runCatching {
+            String(java.util.Base64.getMimeDecoder().decode(payload), Charsets.UTF_8)
+        }.getOrNull() ?: return
+        if (text.isNotEmpty()) onClipboard?.invoke(text)
     }
 
     // --- Helpers ---
@@ -521,7 +569,15 @@ class TerminalEmulator(columns: Int, rows: Int, maxScrollback: Int = TerminalBuf
         /** How many intermediate bytes. The standard allows two; four is room to spare. */
         const val MAX_INTERMEDIATE = 4
 
-        /** How long an OSC string can be. Only titles are acted on, and no title is this long. */
-        const val MAX_OSC = 8192
+        /**
+         * How long an OSC string may be, in bytes.
+         *
+         * Sixteen kilobytes because of `OSC 52`: a clipboard payload is base64, so this carries
+         * some twelve kilobytes of text, and it is the same ceiling mosh puts on an OSC string
+         * (`MAXIMUM_CLIPBOARD_SIZE`, in its `terminaldispatcher.cc`) — so anything a mosh server
+         * will hand us fits. Past the limit the bytes are read and dropped: the parser still has
+         * to reach the terminator, but nothing is kept and the string is not acted on.
+         */
+        const val MAX_OSC = 16 * 1024
     }
 }

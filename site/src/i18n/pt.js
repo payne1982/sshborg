@@ -311,6 +311,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Copiar texto</strong> — pressione longamente em qualquer lugar do terminal para entrar no modo de seleção. Arraste as alças para ajustar a área selecionada, depois toque em <em>Copiar seleção</em> para o texto destacado, ou <em>Copiar tudo</em> para toda a saída. Toque fora para cancelar. No iOS, um toque longo seleciona a palavra sob o dedo e abre o menu do sistema com <em>Copiar</em>, <em>Colar</em> e <em>Selecionar tudo</em>; arraste a partir de uma das extremidades da seleção para a alargar.</li>
                 <li><strong>Colar</strong> — use o botão <em>Colar</em> na barra de teclas adicionais (visível quando o teclado está aberto).</li>
             </ul>
+            <p><strong>O host pode copiar por você, se lhe permitir.</strong> Um programa no servidor — tmux, vim, um script — pode colocar texto diretamente na área de transferência do dispositivo enviando <code>OSC 52</code>. Está desligado em todos os hosts e liga-se um host de cada vez: <strong>editor do host → Escrever na área de transferência</strong>. Por host, porque o que concede é confiança numa máquina e não uma comodidade: pode usá-lo qualquer coisa capaz de escrever no terminal, incluindo uma linha de um registo que esteja a seguir. Quando acontece, a aplicação di-lo, e a mensagem traz um <em>Desativar</em> para esse host. O sentido inverso — um servidor que <em>pede</em> que lhe seja dada a área de transferência, o que o <code>OSC 52</code> também permite — não está implementado nem o será.</p>
             <p><strong>A barra de título.</strong> Três segundos depois de a sessão ficar aberta, a barra do topo recolhe e o texto passa a ocupar toda a altura do ecrã. Um toque em qualquer ponto traz a barra de volta por outros três segundos, e ela não desaparece enquanto mantiver o dedo sobre ela, pelo que há tempo para chegar aos seus botões. Se preferir tê-la sempre à vista, desligue <em>Ocultar a barra de título automaticamente</em> em <strong>Definições &rarr; Terminal</strong>. Num televisor nunca se oculta: não haveria nada para tocar para a fazer voltar.</p>
 
             <p><strong>Aplicações de ecrã inteiro.</strong> Os programas que ocupam todo o ecrã — tmux, vim, nano, less — não têm histórico próprio, por isso enquanto estão em execução a vista permanece no ecrã ativo em vez de deslizar para a saída da shell que está por baixo.</p>
@@ -670,7 +671,7 @@ Host target
             <h3>Formato JSON</h3>
             <p>O ficheiro exportado é um objeto JSON simples. Também pode criá-lo manualmente para importar em bloco uma lista de servidores de outra fonte.</p>
             <pre><code>{
-  "version": 10,
+  "version": 11,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produção", "color": -1754827, "position": 0 }
@@ -694,6 +695,7 @@ Host target
       "moshFamily":      "auto",
       "moshPorts":       null,
       "moshCommand":     null,
+      "clipboardWrite":  false,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -728,6 +730,7 @@ Host target
                 <li><code>moshFamily</code> — sobre que família de endereços a sessão é feita: <code>"auto"</code>, <code>"ipv4"</code> ou <code>"ipv6"</code>. Uma sessão fica na família onde nasceu, por isso é este campo que lhe permite segui-lo entre redes. Por omissão: <code>"auto"</code>.</li>
                 <li><code>moshPorts</code> — as portas UDP entre as quais o <code>mosh-server</code> pode escolher, como <code>60001-60999</code> ou uma porta única. Omitido, o mosh usa o seu próprio intervalo de mil.</li>
                 <li><code>moshCommand</code> — o que executar no servidor quando <code>mosh-server</code> não é o que uma shell não interativa encontra no PATH.</li>
+                <li><code>clipboardWrite</code> — <code>true</code> para permitir que programas neste host coloquem texto na área de transferência do dispositivo, com <code>OSC 52</code>. Desligado em todos os hosts que não o digam, incluindo os de uma cópia escrita antes de este campo existir: concede algo a uma máquina, pelo que um silêncio só pode significar não.</li>
                 <li><code>keyLabel</code> — nome da chave SSH que este host usa. Ao importar, se existir uma chave com este nome, é associada ao host; caso contrário, o campo é ignorado. A própria chave nunca é incluída na cópia.</li>
                 <li><code>group</code> — nome do grupo a que o host pertence. Os grupos estão no array <code>groups</code> de nível superior, com <code>name</code> e <code>color</code> (ARGB como inteiro de 32 bits com sinal). Se um host referir um grupo ausente do array, este é criado automaticamente com uma cor predefinida — ao escrever o ficheiro à mão pode omitir o array.</li>
                 <li><code>color</code> — cor opcional do host (ARGB como inteiro de 32 bits com sinal). Prevalece sobre a cor do grupo.</li>

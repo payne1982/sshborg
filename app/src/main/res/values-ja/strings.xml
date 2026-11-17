@@ -130,6 +130,10 @@
     <string name="host_key_no_keys">鍵がありません — 先に追加してください</string>
     <string name="host_agent_forwarding">エージェント転送</string>
     <string name="host_allow_legacy_ciphers">レガシー暗号を許可</string>
+    <string name="host_clipboard_write">クリップボードへの書き込み</string>
+    <string name="host_clipboard_write_supporting">このホスト上のプログラムが端末のクリップボードにテキストを置けるようになります。信頼できるマシンだけに許可してください。ターミナルに書き込めるものは何でもこれを使えます。</string>
+    <string name="terminal_clipboard_from_host">ホストがクリップボードに書き込みました</string>
+    <string name="terminal_clipboard_disable">無効にする</string>
     <string name="host_section_jump_hosts">踏み台ホスト</string>
     <string name="host_field_jump_hosts">踏み台ホスト（-J）</string>
     <string name="host_jump_hosts_placeholder">host1:22,user@host2:2222</string>

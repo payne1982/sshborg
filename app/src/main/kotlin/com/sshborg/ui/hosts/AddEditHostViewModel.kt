@@ -57,6 +57,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     /** Whether the SFTP browser shows dotfiles for this host. Default hides them. */
     var sftpShowHidden = MutableStateFlow(false)
     var allowLegacyCiphers = MutableStateFlow(false)
+    /** Whether this host may put text on the clipboard with `OSC 52`. Off unless asked for. */
+    var clipboardWrite = MutableStateFlow(false)
     /** Whether this host's terminal rides mosh instead of the SSH shell channel. */
     var mosh = MutableStateFlow(false)
     /** Which address family a mosh session is made over: "auto" | "ipv4" | "ipv6". */
@@ -179,6 +181,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir.value = h.sftpStartDir ?: ""
             sftpShowHidden.value = h.sftpShowHidden
             allowLegacyCiphers.value = h.allowLegacyCiphers
+            clipboardWrite.value = h.clipboardWrite
             mosh.value = h.mosh
             moshFamily.value = h.moshFamily
             moshPorts.value = h.moshPorts ?: ""
@@ -259,6 +262,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             sftpStartDir         = newSftpStartDir,
             sftpShowHidden       = sftpShowHidden.value,
             allowLegacyCiphers   = allowLegacyCiphers.value,
+            clipboardWrite       = clipboardWrite.value,
             mosh                 = newMosh,
             // Kept whatever the switch says, so that turning mosh off and on again does not lose
             // a port range somebody had to get from their firewall.

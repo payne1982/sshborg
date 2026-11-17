@@ -758,6 +758,7 @@ setopt APPEND_HISTORY SHARE_HISTORY</code></pre>
                 <li><strong>Text kopieren</strong> — lange auf das Terminal drücken, um den Auswahlmodus zu aktivieren. Griffe ziehen, um den ausgewählten Bereich anzupassen, dann auf <em>Auswahl kopieren</em> tippen für den markierten Text, oder <em>Alles kopieren</em> für die gesamte Ausgabe. Außerhalb tippen zum Abbrechen. Unter iOS wählt ein langer Druck das Wort unter dem Finger aus und öffnet das Systemmenü mit <em>Kopieren</em>, <em>Einsetzen</em> und <em>Alles auswählen</em>; ziehe an einem Ende der Auswahl, um sie zu erweitern.</li>
                 <li><strong>Einfügen</strong> — die Schaltfläche <em>Einfügen</em> in der Zusatztastenleiste verwenden (sichtbar, wenn die Tastatur geöffnet ist).</li>
             </ul>
+            <p><strong>Der Host darf für Sie kopieren, wenn Sie es erlauben.</strong> Ein Programm auf dem Server — tmux, vim, ein Skript — kann Text direkt in die Zwischenablage des Geräts legen, indem es <code>OSC 52</code> sendet. Für jeden Host ist das aus und wird einzeln eingeschaltet: <strong>Host-Editor → In die Zwischenablage schreiben</strong>. Pro Host, weil es Vertrauen in eine Maschine gewährt und keine Bequemlichkeit: alles, was ins Terminal schreiben kann, kann es nutzen, auch eine Zeile eines Logs, dem Sie folgen. Wenn es passiert, sagt die App es, und die Meldung trägt ein <em>Abschalten</em> für diesen Host. Die Gegenrichtung — ein Server, der die Zwischenablage <em>anfordert</em>, was <code>OSC 52</code> ebenfalls erlaubt — ist nicht umgesetzt und wird es nicht werden.</p>
             <p><strong>Die Titelleiste.</strong> Drei Sekunden nachdem die Sitzung steht, fährt die Leiste oben ein und der Text nutzt die volle Höhe des Bildschirms. Ein Tippen an beliebiger Stelle holt sie für weitere drei Sekunden zurück, und sie verschwindet nicht, solange ein Finger auf ihr liegt &mdash; so bleibt Zeit, ihre Schaltflächen zu erreichen. Wenn du sie lieber immer im Blick hast, schalte <em>Titelleiste automatisch ausblenden</em> unter <strong>Einstellungen &rarr; Terminal</strong> aus. Auf einem Fernseher blendet sie sich nie aus: es gäbe nichts anzutippen, um sie zurückzuholen.</p>
 
             <p><strong>Vollbild-Anwendungen.</strong> Programme, die den ganzen Bildschirm übernehmen — tmux, vim, nano, less — haben keinen eigenen Verlauf, daher bleibt die Ansicht währenddessen auf dem laufenden Bildschirm und rutscht nicht in die darunterliegende Shell-Ausgabe.</p>
@@ -1109,7 +1110,7 @@ Host target
             <h3>JSON-Format</h3>
             <p>Die Exportdatei ist ein einfaches JSON-Objekt. Du kannst sie auch manuell erstellen, um eine Serverliste aus einer anderen Quelle massenweise zu importieren.</p>
             <pre><code>{
-  "version": 10,
+  "version": 11,
   "exported_at": "2026-05-14T10:00:00Z",
   "groups": [
     { "name": "Produktion", "color": -1754827, "position": 0 }
@@ -1133,6 +1134,7 @@ Host target
       "moshFamily":      "auto",
       "moshPorts":       null,
       "moshCommand":     null,
+      "clipboardWrite":  false,
       "position":        0,
       "lastConnected":   1757404800000,
       "connectCount":    12,
@@ -1167,6 +1169,7 @@ Host target
                 <li><code>moshFamily</code> — über welche Adressfamilie die Sitzung aufgebaut wird: <code>"auto"</code>, <code>"ipv4"</code> oder <code>"ipv6"</code>. Eine Sitzung bleibt bei der Familie, in der sie entstanden ist; dieses Feld ist es also, das sie Ihnen zwischen Netzen folgen lässt. Standard: <code>"auto"</code>.</li>
                 <li><code>moshPorts</code> — die UDP-Ports, aus denen <code>mosh-server</code> wählen darf, als <code>60001-60999</code> oder als einzelner Port. Ohne Angabe nimmt mosh seinen eigenen Bereich von tausend.</li>
                 <li><code>moshCommand</code> — was auf dem Server auszuführen ist, wenn <code>mosh-server</code> nicht das ist, was eine nicht-interaktive Shell im PATH findet.</li>
+                <li><code>clipboardWrite</code> — <code>true</code>, damit Programme auf diesem Host Text in die Zwischenablage des Geräts legen dürfen, per <code>OSC 52</code>. Für jeden Host aus, der es nicht sagt, auch für jeden Host in einem Backup, das vor diesem Feld geschrieben wurde: es gewährt einer Maschine etwas, also kann ein Schweigen nur Nein bedeuten.</li>
                 <li><code>keyLabel</code> — Name des von diesem Host verwendeten SSH-Schlüssels. Beim Import wird der Host mit einem vorhandenen Schlüssel dieses Namens verknüpft; andernfalls wird das Feld ignoriert. Der Schlüssel selbst ist nie im Backup enthalten.</li>
                 <li><code>group</code> — Name der Gruppe, zu der der Host gehört. Gruppen stehen im Array <code>groups</code> auf oberster Ebene, mit <code>name</code> und <code>color</code> (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Verweist ein Host auf eine Gruppe, die im Array fehlt, wird sie automatisch mit einer Standardfarbe angelegt — beim manuellen Erstellen der Datei kannst du das Array also weglassen.</li>
                 <li><code>color</code> — optionale Farbe des einzelnen Hosts (ARGB als vorzeichenbehaftete 32-Bit-Ganzzahl). Sie überschreibt die Gruppenfarbe.</li>
