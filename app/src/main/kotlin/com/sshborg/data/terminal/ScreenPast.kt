@@ -46,4 +46,16 @@ interface ScreenPast {
      * sixteen lines of somebody else's repaint became the first sixteen lines of the history.
      */
     fun ignoreRepaint(lines: Int)
+
+    /**
+     * Says that the far end is now painting for a screen of [rows] rows, which ends the skew
+     * [ignoreRepaint] guards against — but only if that is the number of rows we actually hold.
+     *
+     * The two can disagree, and the difference is the whole point. The far end confirms a size by
+     * reporting its own, which says that its frames now fit the shape it was told; whether they
+     * fit *this* screen is a question only the screen can answer. Confirming a shape we have
+     * since left behind must not disarm anything, or the guard is lifted exactly when the frames
+     * are still too tall for us.
+     */
+    fun paintingFor(rows: Int)
 }

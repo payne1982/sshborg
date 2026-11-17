@@ -746,6 +746,8 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                     override fun forget() = synchronized(em) { history.forget() }
                     override fun ignoreRepaint(lines: Int) =
                         synchronized(em) { history.ignoreRepaint(lines) }
+                    override fun paintingFor(rows: Int) =
+                        synchronized(em) { history.paintingFor(rows) }
                 },
             ) { buffer, n ->
                 synchronized(em) { em.process(buffer, 0, n) }

@@ -188,6 +188,7 @@ class MoshLatencyTest {
         override fun restore(state: Long) = synchronized(emulator) { history.restore(state) }
         override fun forget() = synchronized(emulator) { history.forget() }
         override fun ignoreRepaint(lines: Int) = synchronized(emulator) { history.ignoreRepaint(lines) }
+        override fun paintingFor(rows: Int) = synchronized(emulator) { history.paintingFor(rows) }
     }
 
     private fun toScreen(buffer: ByteArray, n: Int) {

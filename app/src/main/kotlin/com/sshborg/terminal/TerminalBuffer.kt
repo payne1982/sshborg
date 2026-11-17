@@ -359,6 +359,12 @@ class TerminalBuffer(var columns: Int, var rows: Int, wantedScrollback: Int = DE
      * so the cursor stays at the last row and no visible content is lost.
      */
     fun resize(newCols: Int, newRows: Int) {
+        // Nothing to do, and not nothing to lose. The work below rebuilds the screen arrays and
+        // resets the scrolling region, so a measurement that reports the shape the terminal
+        // already has would quietly undo a region a full-screen program had set. The view
+        // measures again whenever its *pixels* change — an inset, a bar, a tab switch — and most
+        // of those leave the cell count exactly where it was.
+        if (newCols == columns && newRows == rows) return
         val oldRows = rows
         val oldCols = columns
         // How many top lines to push into scrollback to keep cursor in view

@@ -92,6 +92,12 @@ class TerminalScreenHistory(
         emulator.buffer.repaintLinesToIgnore = lines
     }
 
+    override fun paintingFor(rows: Int) {
+        // Only the screen can say whether the far end's shape is its own, which is why this is
+        // asked here and not decided by the transport.
+        if (emulator.buffer.rows == rows) emulator.buffer.repaintLinesToIgnore = 0
+    }
+
     /**
      * Puts the screen back as it was at [state].
      *

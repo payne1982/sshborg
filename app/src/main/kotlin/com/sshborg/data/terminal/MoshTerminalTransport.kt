@@ -130,9 +130,21 @@ class MoshTerminalTransport(
                 while (kept.isNotEmpty() && kept.last() != number) kept.removeLast()
                 return true
             }
-            // The server telling us how big it thinks the terminal is. We are the ones who decide
-            // that, and we have already told it, so there is nothing here to obey.
-            override fun onHostResize(width: Int, height: Int) {}
+            /**
+             * The far end saying how big it thinks the terminal is. Nothing here to obey — we
+             * decide that and have already said so — but it is the **acknowledgement**, and that
+             * is worth something: from this point every frame is painted for the shape we hold,
+             * so a line leaving the screen is history again rather than somebody else's repaint.
+             *
+             * It arrives in the right place of its own accord. Mosh puts its new size in the
+             * instruction *before* the one carrying the frame's bytes, so this lands in the
+             * screen's queue ahead of the first frame painted for us.
+             */
+            override fun onHostResize(width: Int, height: Int) {
+                if (width != toldColumns || height != toldRows) return
+                unconfirmedTallest = 0
+                enqueueScreen(ToScreen.PaintingFor(height))
+            }
         },
         mtu = if (peer.address is Inet4Address) MoshTransport.IPV4_MTU else MoshTransport.IPV6_MTU,
     )
@@ -197,6 +209,7 @@ class MoshTerminalTransport(
         class Keep(val state: Long) : ToScreen
         class Restore(val state: Long) : ToScreen
         class IgnoreRepaint(val lines: Int) : ToScreen
+        class PaintingFor(val rows: Int) : ToScreen
         object Forget : ToScreen
     }
 
@@ -242,6 +255,20 @@ class MoshTerminalTransport(
 
     /** State numbers the screen can be put back to, newest last. Touched by the loop only. */
     private val kept = ArrayDeque<Long>()
+
+    /**
+     * The size the far end has been told, and therefore the shape its frames are painted for.
+     * Zero until it has been told anything. Touched by the loop only, like [kept].
+     */
+    private var toldColumns = 0
+    private var toldRows = 0
+
+    /**
+     * The tallest shape the far end may still be painting for, while it has not confirmed ours.
+     * Zero once it has: it is then painting for [toldRows] and nothing is skewed. See
+     * [applyResize].
+     */
+    private var unconfirmedTallest = 0
 
     @Volatile
     private var hopRequested = false
@@ -371,6 +398,7 @@ class MoshTerminalTransport(
                         is ToScreen.Keep -> past?.keep(message.state)
                         is ToScreen.Restore -> past?.restore(message.state)
                         is ToScreen.IgnoreRepaint -> past?.ignoreRepaint(message.lines)
+                        is ToScreen.PaintingFor -> past?.paintingFor(message.rows)
                         is ToScreen.Forget -> past?.forget()
                     }
                 } finally {
@@ -521,20 +549,53 @@ class MoshTerminalTransport(
         while (true) {
             when (val event = pending.poll() ?: return) {
                 is Event.Typed -> mosh.type(event.bytes)
-                is Event.Resized -> {
-                    mosh.resize(event.columns, event.rows)
-                    // The far end has not heard this yet. Until it has, its frames are painted
-                    // for the shape it still believes in, and a repaint of a taller screen
-                    // scrolls the surplus off the bottom of ours — painting, not history.
-                    enqueueScreen(ToScreen.IgnoreRepaint(event.rows))
-                    // A screen of a different shape cannot be put back: nothing kept describes
-                    // this terminal any more.
-                    if (past != null) {
-                        kept.clear()
-                        enqueueScreen(ToScreen.Forget)
-                    }
-                }
+                is Event.Resized -> applyResize(event)
             }
+        }
+    }
+
+    /**
+     * Tells the far end a new size, and arms the repaint guard for no more than it can cost.
+     *
+     * The guard is there for one thing: until the far end has heard a new size its frames are
+     * still painted for the old one, and a frame painted for a **taller** screen paints more rows
+     * than we have, so the surplus scrolls off the bottom of ours. That is painting, not history,
+     * and it was ending up in the scrollback — sixteen lines of somebody else's repaint at the
+     * top of a session nobody had typed into (`SizeSkewTest`).
+     *
+     * Two things were wrong with arming it on every resize, and both only ever lost real history:
+     *
+     * - **A screen that grew cannot push anything off.** The surplus belongs to a screen that got
+     *   *shorter*, and it is exactly the rows it lost. Arming on the way up swallowed the next
+     *   screenful of genuine output, which is the whole of what a scrollback is for.
+     * - **A resize that says nothing still armed it.** The view measures again whenever its
+     *   pixels change and a tab switch measures from scratch, so the same shape arrives over and
+     *   over. Mosh's own `Framebuffer::resize` returns immediately on an unchanged size and sends
+     *   no frame at all — so there was nothing to guard against, while on this side it threw away
+     *   every screen kept for a late frame as well.
+     *
+     * Before the far end has confirmed anything there is no way to know what shape it is painting
+     * for, so a whole screen is the only safe bound — and it costs nothing there, because at the
+     * first resize the screen holds nothing worth keeping.
+     *
+     * The disarm is the far end's own resize and not a timer; see `onHostResize` above.
+     */
+    private fun applyResize(event: Event.Resized) {
+        if (event.columns == toldColumns && event.rows == toldRows) return
+        mosh.resize(event.columns, event.rows)
+        // The tallest shape it may still be painting for: what it was last told, or any taller
+        // size it was told and we have since left without hearing back.
+        val believed = maxOf(unconfirmedTallest, toldRows)
+        val surplus = if (believed == 0) event.rows else believed - event.rows
+        unconfirmedTallest = maxOf(believed, event.rows)
+        toldColumns = event.columns
+        toldRows = event.rows
+        if (surplus > 0) enqueueScreen(ToScreen.IgnoreRepaint(surplus))
+        // A screen of a different shape cannot be put back: nothing kept describes
+        // this terminal any more.
+        if (past != null) {
+            kept.clear()
+            enqueueScreen(ToScreen.Forget)
         }
     }
 
