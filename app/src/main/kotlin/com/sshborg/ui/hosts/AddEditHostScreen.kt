@@ -340,6 +340,21 @@ fun AddEditHostScreen(
                 }
             }
 
+            // Both of these belong to the login rather than to anything after it: the agent is
+            // what authenticates, and the weak ciphers are offered during the handshake. They sat
+            // in a block of their own for as long as there was no section that wanted them.
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.host_agent_forwarding))
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = allowLegacyCiphers, onCheckedChange = { vm.allowLegacyCiphers.value = it })
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.host_allow_legacy_ciphers))
+            }
+
             HorizontalDivider()
             Text(stringResource(R.string.host_section_terminal), style = MaterialTheme.typography.titleSmall)
 
@@ -459,22 +474,6 @@ fun AddEditHostScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-            }
-
-            // Neither of these is a terminal setting — they belong to the SSH connection — so the
-            // Terminal section ends here. Unnamed, as they have always been.
-            HorizontalDivider()
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.host_agent_forwarding))
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = allowLegacyCiphers, onCheckedChange = { vm.allowLegacyCiphers.value = it })
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.host_allow_legacy_ciphers))
             }
 
             HorizontalDivider()
