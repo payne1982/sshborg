@@ -21,6 +21,7 @@ import com.sshborg.data.terminal.ScreenPast
 import com.sshborg.terminal.TerminalEmulator
 import com.sshborg.terminal.TerminalScreenHistory
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import java.io.ByteArrayOutputStream
 
@@ -201,16 +202,28 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
      */
     private val clipboardAllowed = MutableStateFlow(false)
 
-    private val _clipboardFromHost = MutableSharedFlow<String>(replay = 0, extraBufferCapacity = 0)
+    private val _clipboardFromHost = MutableSharedFlow<String>(
+        replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
 
     /**
      * Text the far end has asked to put on the clipboard, for the screen to act on — or to drop.
      *
-     * No replay and no buffer, deliberately. Only the session on screen is collected, and only
-     * while the app is in front, so an event nobody is there for is **dropped rather than
-     * queued**: a clipboard that changes minutes later with no visible cause is exactly the
-     * surprise this feature has to avoid. The emulator keeps parsing in the background — the
-     * sessions outlive the screen — so this is where that is decided.
+     * An event nobody is there for is **dropped rather than queued**: only the session on screen
+     * is collected, and only while the app is in front, and a clipboard that changes minutes
+     * later with no visible cause is the surprise this feature exists to avoid. The emulator
+     * keeps parsing in the background — the sessions outlive the screen — so this is where that
+     * is decided.
+     *
+     * **One slot and `DROP_OLDEST`, not a rendezvous.** The first attempt said "no buffer at
+     * all", which reads like the strictest possible version of that rule and does the opposite:
+     * on a rendezvous shared flow `tryEmit` fails whenever anybody *is* subscribed, because
+     * delivery there needs the emitter to suspend, and succeeds when nobody is, dropping the
+     * value. So the clipboard was written in exactly the case where nothing should happen and
+     * never in the case it was built for — measured, after a phone reported the title changing
+     * and the clipboard never doing. `ClipboardHandoffTest` holds the two apart. And `tryEmit`
+     * rather than `emit` is not a detail: this is called on the thread that applies host bytes,
+     * which must never be suspended by a screen that is slow or absent.
      */
     val clipboardFromHost: SharedFlow<String> = _clipboardFromHost.asSharedFlow()
 
