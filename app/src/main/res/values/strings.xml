@@ -127,6 +127,7 @@
     <string name="host_field_username">Username</string>
     <string name="host_field_port">Port</string>
     <string name="host_section_authentication">Authentication</string>
+    <string name="host_section_terminal">Terminal</string>
     <string name="host_auth_ssh_key">SSH Key</string>
     <string name="host_auth_password">Password</string>
     <string name="host_field_password">Password</string>
@@ -136,7 +137,7 @@
     <string name="host_agent_forwarding">Agent Forwarding</string>
     <string name="host_allow_legacy_ciphers">Allow Legacy Ciphers</string>
     <string name="host_clipboard_write">Write to the clipboard</string>
-    <string name="host_clipboard_write_supporting">Lets a program on this host put text on the device clipboard. Only for machines you trust: anything able to write to the terminal can use it.</string>
+    <string name="host_clipboard_write_supporting">Enables OSC 52 clipboard writes</string>
     <string name="terminal_clipboard_from_host">The host wrote to the clipboard</string>
     <string name="terminal_clipboard_disable">Disable</string>
     <string name="host_section_jump_hosts">Jump Hosts</string>

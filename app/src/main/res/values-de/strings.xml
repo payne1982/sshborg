@@ -122,6 +122,7 @@
     <string name="host_field_username">Benutzername</string>
     <string name="host_field_port">Port</string>
     <string name="host_section_authentication">Authentifizierung</string>
+    <string name="host_section_terminal">Terminal</string>
     <string name="host_auth_ssh_key">SSH-Schlüssel</string>
     <string name="host_auth_password">Passwort</string>
     <string name="host_field_password">Passwort</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">Agent-Weiterleitung</string>
     <string name="host_allow_legacy_ciphers">Legacy-Verschlüsselung</string>
     <string name="host_clipboard_write">In die Zwischenablage schreiben</string>
-    <string name="host_clipboard_write_supporting">Erlaubt einem Programm auf diesem Host, Text in die Zwischenablage des Geräts zu legen. Nur für Maschinen, denen Sie vertrauen: alles, was ins Terminal schreiben kann, kann es nutzen.</string>
+    <string name="host_clipboard_write_supporting">Aktiviert Schreibzugriff auf die Zwischenablage per OSC 52</string>
     <string name="terminal_clipboard_from_host">Der Host hat in die Zwischenablage geschrieben</string>
     <string name="terminal_clipboard_disable">Abschalten</string>
     <string name="host_section_jump_hosts">Jump-Hosts</string>

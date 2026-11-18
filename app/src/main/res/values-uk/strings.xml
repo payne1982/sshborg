@@ -128,6 +128,7 @@
     <string name="host_field_username">Ім\'я користувача</string>
     <string name="host_field_port">Порт</string>
     <string name="host_section_authentication">Автентифікація</string>
+    <string name="host_section_terminal">Термінал</string>
     <string name="host_auth_ssh_key">Ключ SSH</string>
     <string name="host_auth_password">Пароль</string>
     <string name="host_field_password">Пароль</string>
@@ -137,7 +138,7 @@
     <string name="host_agent_forwarding">Пересилання агента</string>
     <string name="host_allow_legacy_ciphers">Дозволити застарілі шифри</string>
     <string name="host_clipboard_write">Запис у буфер обміну</string>
-    <string name="host_clipboard_write_supporting">Дозволяє програмі на цьому вузлі покласти текст у буфер обміну пристрою. Лише для машин, яким ви довіряєте: цим може скористатися будь-що, здатне писати в термінал.</string>
+    <string name="host_clipboard_write_supporting">Вмикає запис у буфер обміну через OSC 52</string>
     <string name="terminal_clipboard_from_host">Вузол записав у буфер обміну</string>
     <string name="terminal_clipboard_disable">Вимкнути</string>
     <string name="host_section_jump_hosts">Проміжні хости</string>

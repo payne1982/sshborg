@@ -341,40 +341,7 @@ fun AddEditHostScreen(
             }
 
             HorizontalDivider()
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.host_agent_forwarding))
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = allowLegacyCiphers, onCheckedChange = { vm.allowLegacyCiphers.value = it })
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.host_allow_legacy_ciphers))
-            }
-
-            // Among the switches that grant this machine something, rather than down with mosh's
-            // settings: what it decides is trust, not a convenience. The supporting line says
-            // what it is for before it says what it costs, because somebody who has never heard
-            // of OSC 52 is reading a switch about their clipboard.
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { vm.clipboardWrite.value = !clipboardWrite },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Switch(checked = clipboardWrite, onCheckedChange = { vm.clipboardWrite.value = it })
-                Spacer(Modifier.width(8.dp))
-                Column {
-                    Text(stringResource(R.string.host_clipboard_write))
-                    Text(
-                        stringResource(R.string.host_clipboard_write_supporting),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            Text(stringResource(R.string.host_section_terminal), style = MaterialTheme.typography.titleSmall)
 
             // Mosh, immediately above the three settings it reveals and immediately above the
             // jump-host section whose first hop can change what it does. It used to share the
@@ -472,6 +439,42 @@ fun AddEditHostScreen(
                     placeholder = stringResource(R.string.host_mosh_command_placeholder),
                     supporting = stringResource(R.string.host_mosh_command_supporting),
                 )
+            }
+
+            // Under mosh rather than above it: mosh is what most people came to this section
+            // for, and this is the one that needs the line of explanation underneath.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { vm.clipboardWrite.value = !clipboardWrite },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Switch(checked = clipboardWrite, onCheckedChange = { vm.clipboardWrite.value = it })
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(stringResource(R.string.host_clipboard_write))
+                    Text(
+                        stringResource(R.string.host_clipboard_write_supporting),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            // Neither of these is a terminal setting — they belong to the SSH connection — so the
+            // Terminal section ends here. Unnamed, as they have always been.
+            HorizontalDivider()
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = agentForwarding, onCheckedChange = { vm.agentForwarding.value = it })
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.host_agent_forwarding))
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = allowLegacyCiphers, onCheckedChange = { vm.allowLegacyCiphers.value = it })
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.host_allow_legacy_ciphers))
             }
 
             HorizontalDivider()

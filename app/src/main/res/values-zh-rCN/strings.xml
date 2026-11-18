@@ -122,6 +122,7 @@
     <string name="host_field_username">用户名</string>
     <string name="host_field_port">端口</string>
     <string name="host_section_authentication">身份验证</string>
+    <string name="host_section_terminal">终端</string>
     <string name="host_auth_ssh_key">SSH 密钥</string>
     <string name="host_auth_password">密码</string>
     <string name="host_field_password">密码</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">代理转发</string>
     <string name="host_allow_legacy_ciphers">允许旧版加密</string>
     <string name="host_clipboard_write">写入剪贴板</string>
-    <string name="host_clipboard_write_supporting">允许这台主机上的程序把文本放进设备剪贴板。只对你信任的机器开启：任何能往终端里写东西的东西都能用它。</string>
+    <string name="host_clipboard_write_supporting">启用通过 OSC 52 写入剪贴板</string>
     <string name="terminal_clipboard_from_host">主机写入了剪贴板</string>
     <string name="terminal_clipboard_disable">关闭</string>
     <string name="host_section_jump_hosts">跳板机</string>

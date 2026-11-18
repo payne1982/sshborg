@@ -122,6 +122,7 @@
     <string name="host_field_username">Nom d\'utilisateur</string>
     <string name="host_field_port">Port</string>
     <string name="host_section_authentication">Authentification</string>
+    <string name="host_section_terminal">Terminal</string>
     <string name="host_auth_ssh_key">Clé SSH</string>
     <string name="host_auth_password">Mot de passe</string>
     <string name="host_field_password">Mot de passe</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">Transfert d\'agent</string>
     <string name="host_allow_legacy_ciphers">Chiffrements legacy</string>
     <string name="host_clipboard_write">Écrire dans le presse-papiers</string>
-    <string name="host_clipboard_write_supporting">Permet à un programme sur cet hôte de placer du texte dans le presse-papiers de l\'appareil. Seulement pour les machines de confiance : tout ce qui peut écrire dans le terminal peut s\'en servir.</string>
+    <string name="host_clipboard_write_supporting">Active l\'écriture du presse-papiers via OSC 52</string>
     <string name="terminal_clipboard_from_host">L\'hôte a écrit dans le presse-papiers</string>
     <string name="terminal_clipboard_disable">Désactiver</string>
     <string name="host_section_jump_hosts">Hôtes de Saut</string>

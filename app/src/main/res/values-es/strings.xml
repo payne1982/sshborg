@@ -122,6 +122,7 @@
     <string name="host_field_username">Usuario</string>
     <string name="host_field_port">Puerto</string>
     <string name="host_section_authentication">Autenticación</string>
+    <string name="host_section_terminal">Terminal</string>
     <string name="host_auth_ssh_key">Clave SSH</string>
     <string name="host_auth_password">Contraseña</string>
     <string name="host_field_password">Contraseña</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">Reenvío de agente</string>
     <string name="host_allow_legacy_ciphers">Cifrados heredados</string>
     <string name="host_clipboard_write">Escribir en el portapapeles</string>
-    <string name="host_clipboard_write_supporting">Permite que un programa de este host ponga texto en el portapapeles del dispositivo. Solo para máquinas de confianza: puede usarlo cualquier cosa capaz de escribir en el terminal.</string>
+    <string name="host_clipboard_write_supporting">Habilita la escritura del portapapeles con OSC 52</string>
     <string name="terminal_clipboard_from_host">El host ha escrito en el portapapeles</string>
     <string name="terminal_clipboard_disable">Desactivar</string>
     <string name="host_section_jump_hosts">Hosts de Salto</string>

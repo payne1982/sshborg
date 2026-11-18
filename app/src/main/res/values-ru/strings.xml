@@ -132,6 +132,7 @@
     <string name="host_field_username">Имя пользователя</string>
     <string name="host_field_port">Порт</string>
     <string name="host_section_authentication">Аутентификация</string>
+    <string name="host_section_terminal">Терминал</string>
     <string name="host_auth_ssh_key">SSH-ключ</string>
     <string name="host_auth_password">Пароль</string>
     <string name="host_field_password">Пароль</string>
@@ -141,7 +142,7 @@
     <string name="host_agent_forwarding">Проброс агента</string>
     <string name="host_allow_legacy_ciphers">Разрешить устаревшие шифры</string>
     <string name="host_clipboard_write">Запись в буфер обмена</string>
-    <string name="host_clipboard_write_supporting">Позволяет программе на этом узле помещать текст в буфер обмена устройства. Только для машин, которым вы доверяете: этим может воспользоваться всё, что способно писать в терминал.</string>
+    <string name="host_clipboard_write_supporting">Включает запись в буфер обмена через OSC 52</string>
     <string name="terminal_clipboard_from_host">Узел записал в буфер обмена</string>
     <string name="terminal_clipboard_disable">Отключить</string>
     <string name="host_section_jump_hosts">Промежуточные хосты</string>

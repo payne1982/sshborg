@@ -122,6 +122,7 @@
     <string name="host_field_username">Nome utente</string>
     <string name="host_field_port">Porta</string>
     <string name="host_section_authentication">Autenticazione</string>
+    <string name="host_section_terminal">Terminale</string>
     <string name="host_auth_ssh_key">Chiave SSH</string>
     <string name="host_auth_password">Password</string>
     <string name="host_field_password">Password</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">Agent Forwarding</string>
     <string name="host_allow_legacy_ciphers">Cifrature Legacy</string>
     <string name="host_clipboard_write">Scrittura negli appunti</string>
-    <string name="host_clipboard_write_supporting">Permette a un programma su questo host di mettere testo negli appunti del dispositivo. Solo per macchine di cui ti fidi: può usarla qualunque cosa sia in grado di scrivere nel terminale.</string>
+    <string name="host_clipboard_write_supporting">Abilita la scrittura negli appunti con OSC 52</string>
     <string name="terminal_clipboard_from_host">L\'host ha scritto negli appunti</string>
     <string name="terminal_clipboard_disable">Disattiva</string>
     <string name="host_section_jump_hosts">Jump Host</string>

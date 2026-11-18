@@ -122,6 +122,7 @@
     <string name="host_field_username">ユーザー名</string>
     <string name="host_field_port">ポート</string>
     <string name="host_section_authentication">認証</string>
+    <string name="host_section_terminal">ターミナル</string>
     <string name="host_auth_ssh_key">SSH 鍵</string>
     <string name="host_auth_password">パスワード</string>
     <string name="host_field_password">パスワード</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">エージェント転送</string>
     <string name="host_allow_legacy_ciphers">レガシー暗号を許可</string>
     <string name="host_clipboard_write">クリップボードへの書き込み</string>
-    <string name="host_clipboard_write_supporting">このホスト上のプログラムが端末のクリップボードにテキストを置けるようになります。信頼できるマシンだけに許可してください。ターミナルに書き込めるものは何でもこれを使えます。</string>
+    <string name="host_clipboard_write_supporting">OSC 52 によるクリップボードへの書き込みを有効にします</string>
     <string name="terminal_clipboard_from_host">ホストがクリップボードに書き込みました</string>
     <string name="terminal_clipboard_disable">無効にする</string>
     <string name="host_section_jump_hosts">踏み台ホスト</string>

@@ -122,6 +122,7 @@
     <string name="host_field_username">Utilizador</string>
     <string name="host_field_port">Porta</string>
     <string name="host_section_authentication">Autenticação</string>
+    <string name="host_section_terminal">Terminal</string>
     <string name="host_auth_ssh_key">Chave SSH</string>
     <string name="host_auth_password">Palavra-passe</string>
     <string name="host_field_password">Palavra-passe</string>
@@ -131,7 +132,7 @@
     <string name="host_agent_forwarding">Encaminhamento de agente</string>
     <string name="host_allow_legacy_ciphers">Cifras legadas</string>
     <string name="host_clipboard_write">Escrever na área de transferência</string>
-    <string name="host_clipboard_write_supporting">Permite que um programa neste host coloque texto na área de transferência do dispositivo. Apenas para máquinas em que confia: pode usá-lo qualquer coisa capaz de escrever no terminal.</string>
+    <string name="host_clipboard_write_supporting">Ativa a escrita na área de transferência com OSC 52</string>
     <string name="terminal_clipboard_from_host">O host escreveu na área de transferência</string>
     <string name="terminal_clipboard_disable">Desativar</string>
     <string name="host_section_jump_hosts">Hosts de Salto</string>
